@@ -25,7 +25,7 @@ class WindowsExecutionTests(unittest.TestCase):
                 return (
                     tool(
                         "bash",
-                        command="python.exe -c \"from pathlib import Path; assert Path('result.txt').read_text(encoding='utf-8-sig').strip()=='1250'; Path('review.txt').write_text('verified')\"",
+                        command="python.exe -c \"from pathlib import Path; print('WINDOWS_CHILD_CWD='+str(Path.cwd())); assert Path('result.txt').read_text(encoding='utf-8-sig').strip()=='1250'; Path('review.txt').write_text('verified')\"",
                         description="Verify output independently",
                     )
                     if step == 0
@@ -40,7 +40,7 @@ class WindowsExecutionTests(unittest.TestCase):
                 )
                 return tool(
                     "bash",
-                    command="'print(1250)' | Set-Content -Encoding UTF8 calc.py; python.exe calc.py | Set-Content -Encoding UTF8 result.txt; npm.cmd --version | Set-Content -Encoding UTF8 npm-version.txt",
+                    command="[Console]::WriteLine('WINDOWS_PROVIDER_CWD='+$PWD.ProviderPath); 'print(1250)' | Set-Content -Encoding UTF8 calc.py; python.exe calc.py | Set-Content -Encoding UTF8 result.txt; npm.cmd --version | Set-Content -Encoding UTF8 npm-version.txt",
                     description="Write and run Python on Windows",
                     timeoutMs=30000,
                 )
@@ -106,6 +106,23 @@ class WindowsExecutionTests(unittest.TestCase):
                     12,
                 )
                 finish()
+                self.assertTrue(
+                    (session.directory / "review.txt").is_file(),
+                    json.dumps(
+                        {
+                            "workspace": str(session.directory),
+                            "workspace_files": [
+                                p.name for p in session.directory.iterdir()
+                            ],
+                            "state_files": [
+                                str(p.relative_to(session.state_directory))
+                                for p in session.state_directory.rglob("review.txt")
+                            ],
+                            "events": list(session.events),
+                        },
+                        ensure_ascii=False,
+                    ),
+                )
                 self.assertEqual(
                     (session.directory / "review.txt").read_text(), "verified"
                 )
