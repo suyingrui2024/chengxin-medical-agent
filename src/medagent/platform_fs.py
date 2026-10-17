@@ -129,7 +129,7 @@ else:
             # file/device IDs to zero. Query fresh IDs so comparisons with a
             # subsequently opened handle detect replacement without rejecting
             # every ordinary file as changed.
-            info = _os.stat(self.path, follow_symlinks=follow_symlinks)
+            info = os.stat(self.path, follow_symlinks=follow_symlinks)
             if not follow_symlinks and info.st_file_attributes & 0x400:
                 values = {
                     name: getattr(info, name)
@@ -279,10 +279,41 @@ else:
             )
 
         def stat(self, path, *, dir_fd=None, follow_symlinks=True):
-            return _os.stat(
-                child_path(path, dir_fd) if dir_fd is not None else path,
-                follow_symlinks=follow_symlinks,
+            if isinstance(path, int):
+                return _os.fstat(path)
+            name = child_path(path, dir_fd) if dir_fd is not None else path
+            # CPython 3.14 path stat retains birth time as ctime, whereas fstat
+            # reports metadata ChangeTime. Query the actual opened object using
+            # one API on both sides of our replacement/content comparisons.
+            handle = kernel.CreateFileW(
+                _os.fsdecode(name),
+                0x80,
+                7,
+                None,
+                3,
+                0x02000000 | (0 if follow_symlinks else 0x00200000),
+                None,
             )
+            if handle == INVALID:
+                raise C.WinError(C.get_last_error())
+            try:
+                fd = msvcrt.open_osfhandle(handle, _os.O_RDONLY | _os.O_BINARY)
+            except BaseException:
+                kernel.CloseHandle(handle)
+                raise
+            try:
+                info = _os.fstat(fd)
+            finally:
+                _os.close(fd)
+            if not follow_symlinks and info.st_file_attributes & 0x400:
+                values = {
+                    key: getattr(info, key)
+                    for key in dir(info)
+                    if key.startswith("st_")
+                }
+                values["st_mode"] = _stat.S_IFLNK | (info.st_mode & 0o777)
+                return SimpleNamespace(**values)
+            return info
 
         def readlink(self, path, *, dir_fd=None):
             return _os.readlink(
