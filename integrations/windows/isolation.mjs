@@ -61,6 +61,7 @@ export function requestFor({
   const systemRoot = process.env.SystemRoot || process.env.WINDIR;
   if (!systemRoot || !win32.isAbsolute(systemRoot))
     throw new Error("Windows system runtime is unavailable");
+  const powerShellRoot = join(systemRoot, "System32/WindowsPowerShell/v1.0");
   const childEnv = {
     SystemRoot: systemRoot,
     WINDIR: systemRoot,
@@ -70,7 +71,7 @@ export function requestFor({
       dirname(realpathSync(process.execPath)),
       env.CHENGXIN_PYTHON ? dirname(env.CHENGXIN_PYTHON) : "",
       join(systemRoot, "System32"),
-      join(systemRoot, "System32/WindowsPowerShell/v1.0"),
+      powerShellRoot,
     ]
       .filter(Boolean)
       .join(";"),
@@ -81,6 +82,10 @@ export function requestFor({
     TEMP: temporary,
     TMP: temporary,
     CHENGXIN_TEMP: temporary,
+    // PowerShell cmdlets such as Set-Content live in system modules. Search
+    // only this read-only built-in directory, never the host user's modules.
+    PSModulePath: join(powerShellRoot, "Modules"),
+    PSModuleAnalysisCachePath: join(temporary, "ModuleAnalysisCache"),
     DSH_HOME: home,
     NO_COLOR: "1",
     // Node's realpath walk lstats drive-root metadata before loading a file.
@@ -116,6 +121,7 @@ export function requestFor({
         integration,
         realpathAdapter,
         join(root, "package.json"),
+        powerShellRoot,
         ...readonly,
       ],
       deniedPaths: [],
