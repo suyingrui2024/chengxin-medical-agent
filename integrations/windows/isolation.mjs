@@ -134,10 +134,11 @@ export function nativeLaunch(options) {
       probe.error ||
       probe.tier !== "base-container" ||
       probe.needsDaclAugmentation
-    )
-      throw new Error(
-        "Windows native process isolation and loopback support require current Windows 11 updates.",
-      );
+    ) {
+      const failure = new Error("Windows native process isolation and loopback support require current Windows 11 updates.");
+      failure.probe = probe;
+      throw failure;
+    }
     return {
       command: executorPath(),
       args: [file],

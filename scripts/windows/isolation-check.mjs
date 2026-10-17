@@ -79,6 +79,7 @@ try {
       error.cause.stdout || "",
       error.cause.stderr || "",
     );
+  if (error.cause?.probe) console.error("Native host facts:", JSON.stringify(error.cause.probe));
   throw error;
 } finally {
   if (launch?.policyFile) await unlink(launch.policyFile).catch(() => {});

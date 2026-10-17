@@ -24,6 +24,14 @@ jobs:
       - name: Win32 filesystem, locks and process trees
         shell: powershell
         run: ./scripts/windows.ps1 -Mode Test
+      - name: Native isolation host diagnostics
+        if: always()
+        shell: powershell
+        run: |
+          Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' | Select-Object ProductName,DisplayVersion,CurrentBuild,UBR
+          if (Test-Path .runtime/windows/isolation/wxc-exec.exe) {
+            & ./.runtime/windows/isolation/wxc-exec.exe --probe
+          }
       - name: Build Windows desktop with bundled Python and Node
         shell: powershell
         run: ./scripts/windows.ps1 -Mode Build
