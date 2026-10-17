@@ -9,13 +9,13 @@
 | 独立运行时、真实桌面、患者计算与问诊接续 | 已通过 Windows 实测 |
 | 便携包、安装器、桌面／开始菜单快捷方式、卸载清理 | 已通过 Windows Server x64 实测 |
 | Windows 11 文件／环境隔离与 Python／venv／pip | 已通过 x64 兼容环境实测 |
-| 完整 SDK 命令执行、子智能体验证及交付接续 | 命令能运行；产物实际落盘与完整会话接续尚未通过验收 |
-| 打包后的完整 SDK 执行 | 尚未完成验收 |
+| 完整 SDK 命令执行、子智能体验证及交付接续 | 已通过 Windows 11 Arm 上的 x64 应用实测 |
+| 打包后的完整 SDK 执行 | 已通过 Windows 11 Arm 上的 x64 应用实测，便携目录含空格 |
 | Windows 10、实体 Windows 11 x64 | 尚未实际验证 |
 
 ## 安装与启动
 
-工程预览安装包为 `Chengxin-Setup-0.11.17-Windows-x64.exe`，按当前用户安装。桌面与安装流程已有实测，完整执行工作台仍待验收。应用携带 Python 和 Node，安装后从桌面或开始菜单启动，在界面配置模型服务。安装目录不包含开发者的 `.env`。关闭窗口会关闭后端并回收其子进程；卸载程序只处理安装内容，工作区及用户主动导出的文件另行保留。
+工程预览安装包为 `Chengxin-Setup-0.11.17-Windows-x64.exe`，按当前用户安装。桌面、安装与卸载流程已有实测；完整执行工作台已在 Windows 11 Arm 的 x64 兼容环境通过源码与便携包验收。应用携带 Python 和 Node，安装后从桌面或开始菜单启动，在界面配置模型服务。安装目录不包含开发者的 `.env`。关闭窗口会关闭后端并回收其子进程；卸载程序只处理安装内容，工作区及用户主动导出的文件另行保留。
 
 开发者在克隆后的项目根目录运行：
 
@@ -47,7 +47,9 @@ Windows Server 2025 的本轮镜像虽然版本号较新，却没有相应原生
 
 Windows 使用原生 PowerShell 执行命令。上游工具名称仍为 `bash`，系统提示明确说明实际 Shell；用户任务应使用 Windows 命令与路径。Python 自带 venv／pip，但 NumPy、SciPy 等项目依赖不预装，任务应在自己的工作区配置环境。
 
-命令的 PowerShell provider 使用以指定工作目录为根的 `ChengxinWorkspace:` 临时驱动器。文件操作优先使用相对路径；向原生程序传物理路径时使用 `$PWD.ProviderPath`，`workdir` 参数仍使用实际 Windows 路径。调用 npm 使用 `npm.cmd`。这种 provider 视图不扩大操作系统授权，仍须通过下述端到端验收。
+隔离环境显式设置 `PATHEXT=.COM;.EXE;.BAT;.CMD`，避免 PowerShell 将 `.exe` 当作文档处理，同时不继承宿主自定义扩展名。实际探针必须捕获 Python 管道输出 `42`，并验证失败退出码 `23`；仅进程返回成功不作为命令已执行的证据。
+
+命令的 PowerShell provider 使用以指定工作目录为根的 `ChengxinWorkspace:` 临时驱动器。文件操作优先使用相对路径；向原生程序传物理路径时使用 `$PWD.ProviderPath`，`workdir` 参数仍使用实际 Windows 路径。调用 npm 使用 `npm.cmd`。这种 provider 视图不扩大操作系统授权。启动逻辑由实际 SDK 和隔离探针共用；探针先将 Windows 临时目录的 8.3 别名解析为物理路径，与工作台使用的规范路径一致。
 
 ## 工程边界
 
@@ -76,9 +78,12 @@ Windows 使用原生 PowerShell 执行命令。上游工具名称仍为 `bash`�
 | `0a818e6`／[39052406909](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39052406909) | Windows 11 原生隔离与 SDK 启动通过；命令因 PowerShell 文件系统位置错误失败。后续 `6f12c46` 显式设置物理路径仍被拒绝访问，改为工作区临时驱动器 |
 | `3c80271`／[39053147200](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39053147200) | 工作区临时驱动器使原生命令与子智能体中的 Python 命令运行，但文件版本核对失败；后续修复目录遍历文件标识、跨语言精度和 Windows 时间属性一致性 |
 | `90b1210`／[39054263569](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39054263569) | 两套 Windows 的 4 项 Win32 检查和 3 项 Node 元数据／启动器检查通过，包括修改内容并恢复原时间戳的真实哈希验证。Windows 11 SDK 检查命令返回成功，但宿主检查发现产物未出现在预期工作区；端到端测试因此失败，不能把 SDK 上报完成当作验收完成 |
-| `c24ca33`／[39054860472](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39054860472) | 补充原生进程 cwd 绑定和产物实际落盘诊断，正在复验；没有通过证据前，完整执行工作台继续列为未验收 |
+| `c24ca33`／[39054860472](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39054860472) | 补充原生进程 cwd 绑定和产物实际落盘诊断；后续日志确认 cwd 正确，原生命令仍有执行问题 |
+| `29cea2a`／[39067170248](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39067170248) | Server x64 全部通过，包括源码、便携包、安装后的六套皮肤和重启恢复，以及中文／空格配置目录。Windows 11 日志确认工作目录正确，但根命令退出码为 1：缺少 PATHEXT，PowerShell 将 python.exe 作为文档处理；SDK 上报完成没有产生预期产物 |
+| `96b35f2`／[39069386187](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39069386187) | Server x64 全部通过，构建包含新自检卡片与重绘的体温人物。补上隔离环境固定的原生命令扩展名；新管道探针因未初始化 PowerShell 工作目录而先行失败，没有完整 SDK 通过证据 |
+| `9d5d49c`／[39070074396](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39070074396) | 本轮最终代码：Server 2025 build 26100.33438 x64 的源码、便携包、安装器、快捷方式和卸载检查通过；Windows 11 25H2 build 26200.9457 Arm 运行 x64 应用的原生隔离、源码完整 SDK、随包完整 SDK 及会话接续均通过，便携目录含空格 |
 
-安装器、快捷方式和卸载清理已有上述 Server x64 实测；完整命令执行及打包版完整执行仍需通过，当前不能宣称 Windows 完整执行工作台已验收。
+本轮以宿主实际读取产物为验收依据：根任务运行 Python 将结果写入 `result.txt`，调用随包 npm；子智能体独立核对结果并生成 `review.txt`；交付检查必须退出成功。继续原会话后，旧文件仍可读并生成 `notes.txt`。源码与便携包分别执行这一场景，使用回环合成模型服务，不消耗外部模型 API。
 
 微软上游也记录了 PowerShell provider 位置与进程 cwd 不一致的问题，以及把驱动器根目录加入只读策略会扩大内容读取范围的风险。本项目不采用整盘只读授权或全局 ACL 修改来解决这类兼容问题。[工作目录问题](https://github.com/microsoft/mxc/issues/825)、[根目录策略问题与维护者说明](https://github.com/microsoft/mxc/issues/1455)。
 
@@ -94,7 +99,7 @@ Windows 属性比较统一使用实际文件句柄查询：目录遍历的缓存
 
 ## 接续验证
 
-`b504a61` 将两套系统的状态与停止统一到 SDK 管道，移除额外控制监听器。本机真实完整 DSH／交付检查与已关闭管道回归共 31 项通过，目录保护及生命周期另外 7 项通过。真实桌面计算、返回问诊、历史恢复和字体检查通过（本地图形会话 `DISPLAY=:1`）。Windows 正在重新验证，后续结果需据实际工作流补充。
+`b504a61` 将两套系统的状态与停止统一到 SDK 管道，移除额外控制监听器。本机真实完整 DSH／交付检查与已关闭管道回归共 31 项通过，目录保护及生命周期另外 7 项通过。真实桌面计算、返回问诊、历史恢复和字体检查通过（本地图形会话 `DISPLAY=:1`）。这些本机结果不替代 Windows 验收；本轮 Windows 结果见上方 `9d5d49c` 记录。
 
 新增 `scripts/windows/packaged-execution-check.ps1` 使用打包目录中的解释器、Node 和 Python 源码运行完整 Windows 执行场景，避免只测试源码环境。检查包括写代码、实际执行、子智能体验证、交付检查及原会话接续。
 
@@ -104,4 +109,6 @@ Linux 回归：完整 DSH 执行与交付检查 30 项通过；项目目录保�
 
 本轮将 `main` 的六套皮肤与图示改动合入 `windows-native`（合并提交 `10a07fe`）。合并后 macOS 上的浏览器回归 96 项、原生桌面回归 3 项及 Node 路径边界检查 3 项通过。完整离线 Python 回归为 340 项通过、60 项跳过、6 项失败；这 6 项在合并前的 `main` 同样失败，涉及 Linux `/proc`、文件名与临时目录路径假设，以及本机缺少研究工具运行环境，并非 Windows 验收证据。
 
-`scripts/windows/gui-check.mjs` 新增六套皮肤的实际切换与偏好文件检查、关闭后重新启动恢复检查，并使用含空格和中文的配置目录。源码与便携包的现有 Windows 工作流都会运行此检查；本机已通过，真实 Windows 结果待取得对应 Actions 日志后补充。完整 SDK 产物落盘、会话接续与打包版执行仍按上表保留未验收状态。
+`scripts/windows/gui-check.mjs` 新增六套皮肤的实际切换与偏好文件检查、关闭后重新启动恢复检查，并使用含空格和中文的配置目录。本轮 Windows 工作流已在两套系统的源码与便携包中通过此检查，Server x64 安装后的应用也通过。最终构建包含聚焦当前动作的自检卡片、收起的详细文字，以及重新绘制的三步体温人物图示。
+
+本轮将验收通过的 Windows 实现与可视化更改合并回 `main`，并同步 `windows-native`。验收代码提交为 `9d5d49ce7dfb52efc0d349e6df057f30a3149a4f`；随后文档提交仅记录结果，不改变已测试的执行代码。工作流产物保留 3 天；本地已保存安装包、Windows 11 验收的便携包及 SHA256 记录到 `dist/windows-validated/39070074396/`。

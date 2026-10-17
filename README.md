@@ -8,7 +8,7 @@
 
 Python 3.10+；DSH 模式另需 Node 22.19+。以下命令从项目根目录运行。
 
-### Windows 原生环境（适配验证中）
+### Windows 原生环境
 
 Windows 使用独立的 Python、Node 和 Electron，直接显示原生 Windows 桌面窗口，无需 WSL。当前目标 Windows 10 19044+／Windows 11 x64。首次配置在项目根目录的普通 PowerShell 中运行：
 
@@ -32,7 +32,7 @@ notepad .env
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start -Live
 ```
 
-Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。桌面问诊、安装器和快捷方式已有真实 Windows 测试；完整执行工作台的产物落盘与会话接续仍在修复，打包后的完整执行尚未验收。Windows 10 和实体 Windows 11 x64 尚未实际验证，不能将已测环境扩大为全部 Windows。更改保留在 `windows-native` 分支，详见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)。
+Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。[Windows CI 验收](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39070074396)已通过：Server 2025 x64 覆盖桌面、安装器、快捷方式与卸载；Windows 11 Arm 运行 x64 应用覆盖原生隔离、源码与便携包的完整 SDK 执行、产物落盘、子智能体验证及会话接续。六套皮肤及重启恢复也已实测。完整执行要求支持 ProcessContainer 的已更新 Windows 11，启动时实际探测；Windows 10 和实体 Windows 11 x64 尚未实际验证。更改已合并到 `main`，详见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)。
 
 ### 独立桌面应用（推荐）
 
