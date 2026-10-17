@@ -917,6 +917,9 @@ async function setup(payload) {
         "Bash pipelines use pipefail by default.",
         "PowerShell errors stop the command and native exit codes are retained.",
       );
+    // The selected workspace is the instruction boundary. Ancestors outside
+    // that grant are intentionally inaccessible on native Windows.
+    patch += "\n- id: agent-instructions\n  config:\n    projectRootMarkers: [\".\"]\n";
     await writeFile(config.native_patch, patch, { mode: 0o600 });
     resolveNativePath = createPathResolver([
       config.workspace,
