@@ -64,8 +64,15 @@ jobs:
         if: ${{ !matrix.execution }}
         shell: powershell
         run: |
-          & ./.runtime/windows/node/node.exe scripts/build-windows-installer.mjs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $ProgressPreference = 'SilentlyContinue'
+          $compilerSetup = Join-Path $env:RUNNER_TEMP 'innosetup-7.1.0-x64.exe'
+          Invoke-WebRequest -UseBasicParsing 'https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/innosetup-7.1.0-x64.exe' -OutFile $compilerSetup
+          if ((Get-FileHash $compilerSetup -Algorithm SHA256).Hash.ToLowerInvariant() -ne '0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f') { throw 'Inno Setup checksum mismatch' }
+          $compilerRoot = Join-Path $env:RUNNER_TEMP 'Chengxin Inno 7'
+          $setup = Start-Process -FilePath $compilerSetup -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/NOICONS', '/TASKS=', ('/DIR="' + $compilerRoot + '"')) -Wait -PassThru
+          if ($setup.ExitCode -ne 0) { throw 'Inno Setup compiler installation failed' }
+          $env:MEDAGENT_ISCC = Join-Path $compilerRoot 'ISCC.exe'
+          ./scripts/windows.ps1 -Mode Installer
           ./tests/windows-installer-e2e.ps1
       - name: Archive portable native Windows application
         shell: powershell

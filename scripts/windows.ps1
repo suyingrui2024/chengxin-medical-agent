@@ -2,7 +2,7 @@
 <#! Native Windows setup. No WSL, global PATH changes or administrator install. !#>
 [CmdletBinding()]
 param(
-    [ValidateSet('Setup', 'Check', 'Start', 'Build', 'Test', 'ExecutionTest')]
+    [ValidateSet('Setup', 'Check', 'Start', 'Build', 'Installer', 'Test', 'ExecutionTest')]
     [string]$Mode = 'Setup',
     [switch]$Live,
     [switch]$NoShortcut
@@ -164,6 +164,8 @@ try {
             Test-ChengxinInstallation
         } elseif ($Mode -eq 'Build') {
             Invoke-ChengxinCommand $node @('scripts/build-desktop.mjs')
+        } elseif ($Mode -eq 'Installer') {
+            Invoke-ChengxinCommand $node @('scripts/build-windows-installer.mjs')
         } elseif ($Mode -eq 'Test') {
             & (Join-Path $projectRoot 'tests\windows-installer.ps1')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_native.py')

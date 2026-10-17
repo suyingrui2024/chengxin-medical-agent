@@ -25,11 +25,11 @@ const compiler = [
   process.env.MEDAGENT_ISCC,
   ...[process.env["ProgramFiles(x86)"], process.env.ProgramFiles]
     .filter(Boolean)
-    .map((directory) => join(directory, "Inno Setup 6/ISCC.exe")),
+    .map((directory) => join(directory, "Inno Setup 7/ISCC.exe")),
 ].find((file) => file && existsSync(file));
 if (!compiler)
   throw new Error(
-    "Install Inno Setup 6.7+ or set MEDAGENT_ISCC to its ISCC.exe; portable application build is already available.",
+    "Install Inno Setup 7.1+ (long-path support required) or set MEDAGENT_ISCC to its ISCC.exe; portable application build is already available.",
   );
 execFileSync(
   compiler,
