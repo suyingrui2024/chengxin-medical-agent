@@ -25,8 +25,8 @@ export function createArtifactPreview(api, getCurrent) {
     $("execution-artifact-large").replaceChildren();
   }
   function markSelection() {
-    for (const button of $("execution-files").querySelectorAll(
-      "button[data-preview-file]",
+    for (const button of document.querySelectorAll(
+      "#execution-files button[data-preview-file], #execution-quick-files button[data-preview-file]",
     )) {
       const active = button.dataset.path === selected?.path;
       button.classList.toggle("is-selected", active);

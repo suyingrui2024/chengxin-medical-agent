@@ -1,0 +1,165 @@
+.execution-focus {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 20px 12px;
+  padding: 13px 15px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  flex: none;
+}
+.execution-focus-symbol {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--light);
+  color: var(--primary);
+}
+.execution-focus svg,
+.execution-quick-files svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+.execution-focus > div {
+  min-width: 0;
+  flex: 1;
+}
+.execution-focus strong {
+  display: block;
+  font-size: 14px;
+}
+.execution-focus p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.execution-focus[data-state="attention"] .execution-focus-symbol,
+.execution-focus[data-state="waiting"] .execution-focus-symbol {
+  color: var(--orange);
+  background: var(--warning-bg);
+}
+.execution-focus button {
+  flex: none;
+  font-size: 12px;
+  min-height: 36px;
+}
+.execution-quick-look {
+  border-bottom: 1px solid var(--line);
+  padding: 14px 18px;
+}
+.execution-quick-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.execution-quick-heading strong {
+  font-size: 12px;
+}
+.execution-quick-heading small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.execution-quick-files {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.execution-quick-files button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 80px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--primary);
+  background: var(--surface);
+  text-align: left;
+}
+.execution-quick-files button:hover,
+.execution-quick-files button.is-selected {
+  background: var(--light);
+  border-color: var(--primary);
+}
+.execution-quick-files button span {
+  font-size: 11px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+@media (max-width: 600px) {
+  .execution-focus {
+    margin-inline: 12px;
+    padding: 10px;
+    gap: 9px;
+  }
+  .execution-focus-symbol {
+    width: 32px;
+    height: 32px;
+  }
+  .execution-focus strong {
+    font-size: 12px;
+  }
+  .execution-focus p {
+    font-size: 11px;
+  }
+}
+.execution-quick-heading {
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: 0;
+}
+.execution-quick-heading::-webkit-details-marker {
+  display: none;
+}
+.execution-quick-heading::before {
+  content: "▸";
+  color: var(--primary);
+}
+.execution-quick-heading strong {
+  flex: 1;
+}
+.execution-quick-look[open] .execution-quick-heading::before {
+  content: "▾";
+}
+.execution-quick-look[open] .execution-quick-heading {
+  margin-bottom: 10px;
+}
+.execution-file-browser {
+  border-bottom: 1px solid var(--line);
+}
+.execution-file-browser > summary {
+  padding: 13px 18px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--primary);
+}
+/* Anchor the accessible textarea label: its static inline position can otherwise
+   create horizontal page scrolling on a narrow execution workspace. */
+.execution-composer {
+  position: relative;
+}
+.execution-composer .sr-only {
+  top: 0;
+  left: 0;
+}

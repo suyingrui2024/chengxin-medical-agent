@@ -1266,7 +1266,9 @@ class ExecutionSession:
                 "restored": self.restored,
                 "history_trimmed": self.history_trimmed,
                 "title": self.title,
-                "isolation": "bubblewrap-filesystem",
+                "isolation": "windows-processcontainer"
+                if os.name == "nt"
+                else "bubblewrap-filesystem",
                 "network": "enabled",
                 "storage": "workspace_files_and_dsh_history_persist",
                 "capability_binding": self.capability_binding,

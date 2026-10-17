@@ -4,6 +4,7 @@ import { createChangeReview } from "./execution-changes-ui.js";
 import { createClarificationUI } from "./execution-clarification-ui.js";
 import { createArtifactPreview } from "./execution-artifact-ui.js";
 import { createDirectoryUI } from "./execution-directory-ui.js";
+import { createExecutionFocus } from "./execution-focus-ui.js";
 import {
   observationPresentation,
   toolObservationKey,
@@ -15,6 +16,7 @@ export function createExecutionUI(api) {
     available = false,
     pollingFor = null,
     submitting = false;
+  let needsReview = false;
   const events = new Map();
   const rendered = new Set();
   const renderedReceipts = new Set();
@@ -22,12 +24,19 @@ export function createExecutionUI(api) {
   const renderer = createRenderer();
   const changeReview = createChangeReview(api, () => current);
   const artifactPreview = createArtifactPreview(api, () => current);
+  const focusUI = createExecutionFocus(
+    () => current,
+    (file) => artifactPreview.open(file),
+  );
   const directoryUI = createDirectoryUI(
     api,
     () => current,
     (file) => artifactPreview.open(file),
     (files) => {
-      if (current) artifactPreview.update({ ...current, artifacts: files });
+      if (current) {
+        focusUI.update({ ...current, artifacts: files }, needsReview);
+        artifactPreview.update({ ...current, artifacts: files });
+      }
     },
   );
   const clarificationUI = createClarificationUI(
@@ -589,12 +598,14 @@ export function createExecutionUI(api) {
     };
     if (nearEnd) result.scrollTop = result.scrollHeight;
     directoryUI.update(current);
-    artifactPreview.update({ ...current, artifacts: directoryUI.files() });
     $("execution-events").textContent = [...events.values()]
       .map((event) => JSON.stringify(event))
       .join("\n");
     controls();
     clarificationUI.update(current);
+    needsReview = Boolean(issues.size && !rechecked);
+    focusUI.update({ ...current, artifacts: directoryUI.files() }, needsReview);
+    artifactPreview.update({ ...current, artifacts: directoryUI.files() });
     changeReview.update(current);
     const stateKey = `${current.id}:${current.status}:${hasJobs()}`;
     if (stateKey !== catalogState) {
@@ -707,6 +718,7 @@ export function createExecutionUI(api) {
       $("execution-file-count").textContent = "—";
       directoryUI.reset();
       artifactPreview.reset("选择工作区后查看文件。");
+      focusUI.reset();
       $("execution-directory").textContent =
         "工作区文件和已保存记录保留在本机。";
       $("execution-status").textContent = "工作区已关闭";

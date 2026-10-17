@@ -1,0 +1,15 @@
+test_queued_asset_burst_is_served_with_desktop_auth (test_server_asset_burst.AssetBurstTests.test_queued_asset_burst_is_served_with_desktop_auth) ... ERROR
+
+======================================================================
+ERROR: test_queued_asset_burst_is_served_with_desktop_auth (test_server_asset_burst.AssetBurstTests.test_queued_asset_burst_is_served_with_desktop_auth)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/test_server_asset_burst.py", line 29, in test_queued_asset_burst_is_served_with_desktop_auth
+    client.sendall((
+BrokenPipeError: [Errno 32] Broken pipe
+
+----------------------------------------------------------------------
+Ran 1 test in 0.008s
+
+FAILED (errors=1)
+Confirmed: the old five-connection queue fails on the same real socket burst.

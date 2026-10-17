@@ -29,6 +29,11 @@ MAX_BODY_BYTES = 64 * 1024
 
 
 class MedicalAgentServer(ThreadingHTTPServer):
+    # A page loads fonts, CSS and an ES-module graph in parallel. Python 3.12's
+    # default listen backlog of five can reset loopback connections during that
+    # burst, leaving the module graph incomplete and the desktop uninitialized.
+    request_queue_size = 64
+
     def __init__(
         self,
         address,

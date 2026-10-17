@@ -1,0 +1,77 @@
+{
+  "schema": "focused-visual-iteration/v1",
+  "date": "2026-10-18",
+  "platform": "macOS arm64",
+  "parent_commit": "1b90247aa4a493c12c30698af111685645b680cb",
+  "checks": {
+    "browser": {
+      "passed": 108,
+      "log": "logs/ui-final.log"
+    },
+    "native_desktop": {
+      "passed": 5,
+      "log": "logs/desktop-final.log"
+    },
+    "python_asset_burst_and_previews": {
+      "passed": 10,
+      "log": "logs/python-final.log"
+    },
+    "svg_labels": "passed",
+    "format": "passed",
+    "native_gui_script": {
+      "passed": true,
+      "platform": "macOS arm64",
+      "log": "logs/native-gui.log",
+      "scope": "actual glucose calculation, six themes, restart, fonts and execution UI host snapshots"
+    }
+  },
+  "scope": [
+    "faceless three-step temperature guide",
+    "existing patient flows and state preservation",
+    "typed host execution state, background work and clarification navigation",
+    "inert file shortcuts and exclusive directory/quick views",
+    "three execution viewports and six palettes",
+    "24 queued authenticated static requests plus denied unauthenticated request",
+    "full-illustration zoom target without a button obscuring the gesture"
+  ],
+  "controlled_regression": {
+    "old_queue_size": 5,
+    "result": "expected BrokenPipeError from the same real socket burst",
+    "log": "logs/asset-burst-before.log"
+  },
+  "limitations": [
+    "execution UI snapshots are synthetic fixtures; this is not an agent capability benchmark",
+    "latest Windows source and packaged verification pending",
+    "no new clinical review or patient comprehension study"
+  ],
+  "source_files_sha256": {
+    "assets/illustrations/temperature.svg": "d3c199187fa60c9e1aeb10c1b669df364ce38ecb27571d2302ddc773dcb7beba",
+    "src/medagent/web/temperature.svg": "b964129a465ff7087b11a61551f561c787c69092b72b24be6d3fd39ebc91cea0",
+    "src/medagent/web/illustration-labels.json": "76c1f6e456b365487a2ff40717ff6db0aa311c459aace20f852f50651a7e0c33",
+    "src/medagent/web/execution-focus-ui.js": "2b757d44ec09e3645f77979f28bd262eef1f195148fb77f26ac126ff4db0e0ea",
+    "src/medagent/web/execution-focus.css": "eca541528b7545e3f08c673ab5777ecbf91d485e6eae9f7e717bef2b5448ee90",
+    "src/medagent/web/execution-ui.js": "6f99b5fa1e5539a505fc741f6158f999ea3b4a7b59fba9a4d8425f7a72a1f2e0",
+    "src/medagent/web/execution-artifact-ui.js": "d5a3498a88eba0903ace1c4abef14b2706a90bedafa3eb26655736020dd4b795",
+    "src/medagent/web/index.html": "63ce3f07b90b61850acac573be6c6fd92af26abd5ea29e3fd4b199b675ff32f5",
+    "src/medagent/server.py": "9473b36a63844be711cdde81e1f7611685380b9b07f9bc0b4b44195c2959e169",
+    "scripts/windows.ps1": "c2affd41d75fa3cc1ed1402167472f48471a924c6ae407859771f05f9b2f27fe",
+    "scripts/windows/gui-check.mjs": "f14f62cacc834aeade67c20278d3d65868bc2b58fca8bab5a3d9f7d22685faa8",
+    "tests/fixtures/execution-focus.mjs": "06862ad4adcb22cd65f834576733ab2c13e5aded3d184fc8bcf47e8bafad5f67",
+    "tests/ui/execution-focus.spec.mjs": "8a034dc83752bc6b9083c008ce22828a30669a7621a43174a4bd73d4c7772566",
+    "tests/desktop/execution-focus.spec.mjs": "26bbbe9328462de31d9394fbcd0abe9a30cb37698e40ee7857e0e76bddea6cc2",
+    "tests/test_server_asset_burst.py": "6cc2f3508f814c3a7a421d5cb8f25feda20c568c6c8df021ee8d2f53bdb44e77",
+    "src/medagent/web/structured-ui.js": "eea28af6a40d8d4cfdb906482b7741936ae106f7c5c158c717bba5c1fb7306bc",
+    "src/medagent/web/self-check.css": "97d9eba48f2b56663e7864a051bc22a42fc9495f6f9677091367206b7eacb069",
+    "src/medagent/execution.py": "49ecd2e1e2ba7c3d2f2364af06b6eff1bc36a45d241e6d0591edfdf518f9f178",
+    "tests/test_windows_execution.py": "fedd926d1cd61b0ed7f253c1026cb7fa3a7a35cdbf2200b374f4653786dbd487"
+  },
+  "screenshots": {
+    "temperature-mobile.png": "da06e586cdc667c671d36fbf359ec07a53cf8018799cc45f126f28ebae4857e0",
+    "temperature-wide.png": "da678e8834ac7fe8d60e2d18b3be8d4e7312eb391770e2c3ead7d7b410b74847",
+    "temperature-small.png": "d6ea0909a5cf9e8dfaf7e32e11f44503d4eb3cf856760634e56adb8de865f4df",
+    "execution-wide.png": "d0c86500d640c2de674b675d1cc7747cbadc023075d57fd475ae3e9e8859e315",
+    "execution-night.png": "54938af4eb84e63cb15de0dbfe0a0487cb0f3026eedfa85fd62a17a6b78d60c4",
+    "execution-mobile.png": "8084bba88fd6d1f3b329d479c4a2a7b1fad73f905a75281ae5779f12b3b3d494",
+    "execution-small-night.png": "e527ac2c66b5ba7521dc119a95df6ba87eda0b16de436e395fff748b4bf2b52a"
+  }
+}

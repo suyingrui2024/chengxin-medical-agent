@@ -9,6 +9,10 @@ import {
   createGlucoseModel,
   verifyGlucoseCalculation,
 } from "../../tests/fixtures/glucose-calculation.mjs";
+import {
+  installExecutionFocusFixture,
+  openFocusWorkspace,
+} from "../../tests/fixtures/execution-focus.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const scratch = await mkdtemp(join(tmpdir(), "chengxin native gui 中文-"));
 const model = await createGlucoseModel();
@@ -81,6 +85,24 @@ try {
   await expect(
     reopened.locator('input[name="appearance"][value="night"]'),
   ).toBeChecked();
+  await reopened.keyboard.press("Escape");
+  const focusFixture = await installExecutionFocusFixture(reopened);
+  await openFocusWorkspace(reopened);
+  await reopened
+    .getByRole("button", { name: "快速查看：results.csv", exact: true })
+    .click();
+  await expect(reopened.locator("#execution-preview table")).toContainText(
+    "1250",
+  );
+  focusFixture.first.status = "completed";
+  await expect(reopened.locator("#execution-focus-label")).toHaveText(
+    "本轮已完成",
+  );
+  await reopened.locator("#execution-workspace").selectOption("focus-b");
+  await expect(reopened.locator("#execution-focus-label")).toHaveText(
+    "已保存的工作区",
+  );
+  await expect(reopened.locator("#execution-quick-look")).toBeHidden();
   console.log(
     JSON.stringify({
       gui: "passed",
@@ -91,6 +113,7 @@ try {
       patient_calculation_and_resume: "passed",
       appearance_themes: themes,
       appearance_restart: "passed",
+      execution_focus_ui: "passed (host snapshot fixture)",
       profile_path_with_spaces_and_chinese: "passed",
       local_fixture_requests: model.requests.length,
       external_model_calls: 0,

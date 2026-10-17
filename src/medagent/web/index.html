@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="appearance.css" />
     <link rel="stylesheet" href="self-check.css" />
+    <link rel="stylesheet" href="execution-focus.css" />
   </head>
   <body data-mode="patient">
     <svg
@@ -512,6 +513,25 @@
                     >尚未开始</span
                   >
                 </div>
+                <section
+                  id="execution-focus"
+                  class="execution-focus"
+                  aria-label="当前执行状态"
+                  hidden
+                >
+                  <span
+                    id="execution-focus-symbol"
+                    class="execution-focus-symbol"
+                    aria-hidden="true"
+                  ></span>
+                  <div>
+                    <strong id="execution-focus-label"></strong>
+                    <p id="execution-focus-task"></p>
+                  </div>
+                  <button id="execution-focus-respond" type="button" hidden>
+                    回答问题 ↗
+                  </button>
+                </section>
                 <button
                   id="execution-outcome"
                   class="execution-outcome"
@@ -592,6 +612,21 @@
                   <strong>工作区文件</strong
                   ><span id="execution-file-count" class="count">0</span>
                 </div>
+                <details
+                  id="execution-quick-look"
+                  class="execution-quick-look"
+                  aria-label="文件速览"
+                  hidden
+                >
+                  <summary class="execution-quick-heading">
+                    <strong>图表与文件速览</strong
+                    ><small id="execution-quick-note"></small>
+                  </summary>
+                  <div
+                    id="execution-quick-files"
+                    class="execution-quick-files"
+                  ></div>
+                </details>
                 <button
                   id="execution-review-changes"
                   class="execution-review-changes"
@@ -607,74 +642,85 @@
                   role="status"
                   hidden
                 ></div>
-                <div class="directory-toolbar">
-                  <nav
-                    id="execution-directory-breadcrumb"
-                    aria-label="文件目录路径"
-                  ></nav>
-                  <label
-                    ><input
-                      id="execution-directory-hidden"
-                      type="checkbox"
-                      disabled
-                    />
-                    显示隐藏与缓存</label
+                <details
+                  id="execution-file-browser"
+                  class="execution-file-browser"
+                  open
+                >
+                  <summary>浏览全部文件</summary>
+                  <div class="directory-toolbar">
+                    <nav
+                      id="execution-directory-breadcrumb"
+                      aria-label="文件目录路径"
+                    ></nav>
+                    <label
+                      ><input
+                        id="execution-directory-hidden"
+                        type="checkbox"
+                        disabled
+                      />
+                      显示隐藏与缓存</label
+                    >
+                  </div>
+                  <details class="directory-direct">
+                    <summary>按相对路径打开文件</summary>
+                    <form id="execution-file-open">
+                      <input
+                        id="execution-file-path"
+                        aria-label="文件相对路径"
+                        placeholder="例如 outputs/chart.png"
+                        maxlength="4096"
+                        spellcheck="false"
+                        autocomplete="off"
+                        disabled
+                      />
+                      <button
+                        id="execution-file-open-button"
+                        type="submit"
+                        disabled
+                      >
+                        打开文件
+                      </button>
+                    </form>
+                  </details>
+                  <p
+                    id="execution-directory-status"
+                    class="directory-status"
+                    role="status"
                   >
-                </div>
-                <details class="directory-direct">
-                  <summary>按相对路径打开文件</summary>
-                  <form id="execution-file-open">
-                    <input
-                      id="execution-file-path"
-                      aria-label="文件相对路径"
-                      placeholder="例如 outputs/chart.png"
-                      maxlength="4096"
-                      spellcheck="false"
-                      autocomplete="off"
-                      disabled
-                    />
+                    选择工作区后按目录查看文件。
+                  </p>
+                  <div
+                    id="execution-files"
+                    class="execution-files"
+                    role="group"
+                    aria-label="当前目录条目"
+                    tabindex="-1"
+                  >
+                    <p>实际生成后显示</p>
+                  </div>
+                  <div
+                    id="execution-directory-pages"
+                    class="directory-pages"
+                    hidden
+                  >
                     <button
-                      id="execution-file-open-button"
-                      type="submit"
+                      id="execution-directory-previous"
+                      type="button"
                       disabled
                     >
-                      打开文件
+                      上一页
                     </button>
-                  </form>
+                    <span id="execution-directory-page"></span>
+                    <button
+                      id="execution-directory-next"
+                      type="button"
+                      disabled
+                    >
+                      下一页
+                    </button>
+                  </div>
                 </details>
-                <p
-                  id="execution-directory-status"
-                  class="directory-status"
-                  role="status"
-                >
-                  选择工作区后按目录查看文件。
-                </p>
-                <div
-                  id="execution-files"
-                  class="execution-files"
-                  role="group"
-                  aria-label="当前目录条目"
-                  tabindex="-1"
-                >
-                  <p>实际生成后显示</p>
-                </div>
-                <div
-                  id="execution-directory-pages"
-                  class="directory-pages"
-                  hidden
-                >
-                  <button
-                    id="execution-directory-previous"
-                    type="button"
-                    disabled
-                  >
-                    上一页
-                  </button>
-                  <span id="execution-directory-page"></span>
-                  <button id="execution-directory-next" type="button" disabled>
-                    下一页
-                  </button>
-                </div>
                 <div class="execution-preview-head">
                   <strong id="execution-preview-title">文件预览</strong>
                 </div>

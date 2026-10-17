@@ -84,6 +84,9 @@ class WindowsExecutionTests(unittest.TestCase):
                         "MEDAGENT_LLM_MODEL": "fixture",
                     }
                 )
+                self.assertEqual(
+                    session.snapshot()["isolation"], "windows-processcontainer"
+                )
 
                 def finish():
                     deadline = time.monotonic() + 90

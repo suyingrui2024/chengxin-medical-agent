@@ -1,0 +1,12 @@
+
+Running 5 tests using 1 worker
+
+(node:58291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (1.6s)
+  ✓  2 tests/desktop/app.spec.mjs:66:1 › desktop app owns its window, private sidecar and shutdown lifecycle (2.1s)
+  ✓  3 tests/desktop/appearance.spec.mjs:11:1 › appearance survives desktop restarts and a different private service origin (1.9s)
+  ✓  4 tests/desktop/execution-focus.spec.mjs:14:1 › native focused work area renders host snapshots and opens an inert preview (1.8s)
+  ✓  5 tests/desktop/self-check-conversation.spec.mjs:14:1 › native self-check conversation retains drafts and confirms original location evidence (1.9s)
+
+  5 passed (9.7s)

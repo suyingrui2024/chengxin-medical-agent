@@ -5,42 +5,21 @@
   <view id="step-2" viewBox="375 26 245 296" />
   <view id="step-3" viewBox="695 26 245 296" />
   <defs>
-    <linearGradient id="skin" x1="0" x2="1" y2="1">
-      <stop stop-color="#f4d8c3" />
-      <stop offset="1" stop-color="#dfaf90" />
-    </linearGradient>
-    <linearGradient id="shirt" x1="0" x2="1" y2="1">
-      <stop stop-color="#94b9af" />
-      <stop offset="1" stop-color="#65958a" />
-    </linearGradient>
     <g id="portrait" stroke-linecap="round" stroke-linejoin="round">
-      <ellipse cx="179" cy="310" rx="61" ry="5" fill="#234e3b" fill-opacity=".06" />
-      <path d="M165 104v18l-15 8q26 25 52-1l-14-9v-17" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.3" />
-      <path d="M165 108q12 8 23-1v9q-12 6-23-1" fill="#cf9a7a" fill-opacity=".45" />
-      <path d="M150 124q-19 4-27 17c-2 13 3 27 15 35l13 14h66l8-12c4-22-4-44-27-53q-19 22-48-1Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.3" />
-      <path d="M154 125q21 20 43 0l8 6 1 20q1 18 9 28l-2 57 6 65q-42 13-89 1l8-67 15-55q2-18-8-31Z" fill="url(#shirt)" stroke="#4e7c70" stroke-width="1.6" />
-      <path d="M154 126q21 21 43 0M149 138l-4 11q10 13 8 31m53-35q0 20 9 34" fill="none" stroke="#d3e3db" stroke-width="2.5" />
-      <path d="m146 218-5 67m64-66 5 65M143 295q30 7 62 0" fill="none" stroke="#4e7c70" stroke-width="1.3" stroke-opacity=".45" />
-      <path d="M153 75c-10-11-9-27 1-35 12-11 37-8 46 4 8 12 7 27 1 40Z" fill="#344b47" />
-      <ellipse cx="153" cy="83" rx="4.6" ry="7" fill="#e5b79a" stroke="#bf8d71" stroke-width="1" />
-      <ellipse cx="200" cy="83" rx="4" ry="6.5" fill="#e5b79a" stroke="#bf8d71" stroke-width="1" />
-      <path d="M154 63c2-16 43-18 45 2l-1 24c-1 15-11 25-21 25s-22-10-23-25Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.3" />
-      <path d="M151 76c-5-20 5-35 23-35 15 0 27 9 27 27-10-1-17-6-22-13-5 8-14 13-24 13l-1 11Z" fill="#344b47" />
-      <path d="M159 57q12-13 27-7" fill="none" stroke="#5e7266" stroke-width="2.5" />
-      <path d="m161 80 6-1m18 0 6 1M176 85l-2 11h5M171 103q6 3 12-1" fill="none" stroke="#6b5145" stroke-width="1.4" />
-      <g fill="#6b5145">
-        <circle cx="164" cy="86" r="1.2" />
-        <circle cx="187" cy="86" r="1.2" />
-      </g>
+      <ellipse cx="179" cy="310" rx="61" ry="5" fill="#234e3b" fill-opacity=".05" />
+      <path d="M165 103v19l-15 8q26 25 52-1l-14-9v-17" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.3" />
+      <path d="M150 124q-19 4-27 17c-2 13 3 27 15 35l13 14h66l8-12c4-22-4-44-27-53q-19 22-48-1Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.3" />
+      <path d="M154 125q21 20 43 0l8 6 1 20q1 18 9 28l-2 57 6 65q-42 13-89 1l8-67 15-55q2-18-8-31Z" fill="#8daf9f" stroke="#618777" stroke-width="1.6" />
+      <path d="M154 126q21 21 43 0M149 138l-4 11q10 13 8 31m53-35q0 20 9 34" fill="none" stroke="#dbe8df" stroke-width="2.5" />
+      <ellipse cx="176" cy="79" rx="24" ry="30" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.3" />
     </g>
     <g id="arm-raised" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M136 137c-11-12-26-17-36-25l13-35c3-8-11-13-14-5l-21 37c-4 10-1 20 8 27l34 25c8 6 24-15 16-24Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.4" />
-      <path d="M100 77c-3-5-4-11-2-16l2-8q1-6 6-4l8 2q5 2 3 7l-3 12q-1 7-5 9Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.3" />
-      <path d="M99 61q-1-6 4-5l7 3q4 2 2 5l-6-1m-2-11-1 4m6-3-1 4m5-3-1 3M86 120q14 9 35 25" fill="none" stroke="#c49377" stroke-width="1.3" />
+      <path d="M136 137c-11-12-26-17-36-25l13-35c3-8-11-13-14-5l-21 37c-4 10-1 20 8 27l34 25c8 6 24-15 16-24Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.4" />
+      <path d="M100 77c-3-5-4-11-2-16l2-8q1-6 6-4l8 2q5 2 3 7l-3 12q-1 7-5 9Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.3" />
       <path d="M126 149q1 9 10 15" fill="none" stroke="#ad7a61" stroke-width="1.6" />
     </g>
     <g id="arm-open" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M133 137c-8-3-15 1-18 11l-19 54-7 35c-2 8 3 15 10 14 6-1 8-6 9-12l8-30 29-53c4-9-3-17-12-19Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.4" />
+      <path d="M133 137c-8-3-15 1-18 11l-19 54-7 35c-2 8 3 15 10 14 6-1 8-6 9-12l8-30 29-53c4-9-3-17-12-19Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.4" />
       <path d="m105 208-6 27m27-82q0 8 9 12" fill="none" stroke="#bd8b70" stroke-width="1.5" />
     </g>
     <g id="thermometer" stroke-linecap="round" stroke-linejoin="round">
@@ -116,11 +95,11 @@
       </g>
       <use href="#portrait" />
       <use href="#arm-raised" />
-      <path d="M219 145c11 1 16 15 20 31l9 33c3 10-3 19-12 20-6 0-10-2-15-5l-84-42-12-7c-6-4-8-10-4-15 3-5 9-5 15-1l86 39-14-35c-4-10 1-18 11-18Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.4" stroke-linejoin="round" />
+      <path d="M219 145c11 1 16 15 20 31l9 33c3 10-3 19-12 20-6 0-10-2-15-5l-84-42-12-7c-6-4-8-10-4-15 3-5 9-5 15-1l86 39-14-35c-4-10 1-18 11-18Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.4" stroke-linejoin="round" />
       <path d="m223 207-69-33m72 38 8 5" fill="none" stroke="#c39174" stroke-width="1.3" stroke-linecap="round" />
       <path d="m110 148 25-9 17 27-28 14Z" fill="#fffefd" stroke="#789c8a" stroke-width="1.5" stroke-linejoin="round" />
       <path d="m116 153 20-7m-15 15 20-7m-14 15 16-6" fill="none" stroke="#d0ddd1" stroke-width="1.5" />
-      <path d="m139 162 8 5q4 3 2 6t-6 1l-8-4m-1 1 7 4" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.3" stroke-linecap="round" />
+      <path d="m139 162 8 5q4 3 2 6t-6 1l-8-4m-1 1 7 4" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.3" stroke-linecap="round" />
       <path d="M104 145q-9 6-8 15m-3-6 3 6 5-3" fill="none" stroke="#477c68" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       <g aria-label="先擦干腋窝" transform="translate(105 359) scale(0.022 -0.022)" stroke="#234e3b" stroke-width="10" stroke-linejoin="round">
         <title>先擦干腋窝</title>
@@ -152,10 +131,10 @@
       <use href="#portrait" />
       <use href="#arm-open" />
       <circle cx="143" cy="166" r="18" fill="#f6f8df" fill-opacity=".55" stroke="#6b9476" stroke-width="1.6" stroke-dasharray="3 4" />
-      <path d="M219 146c12 2 17 14 20 29l8 38c2 10-5 18-15 18l-114-6-17-3c-7-1-12-7-9-13 2-6 8-7 15-5l116 3-15-44c-3-9 2-18 11-17Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.4" stroke-linejoin="round" />
+      <path d="M219 146c12 2 17 14 20 29l8 38c2 10-5 18-15 18l-114-6-17-3c-7-1-12-7-9-13 2-6 8-7 15-5l116 3-15-44c-3-9 2-18 11-17Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.4" stroke-linejoin="round" />
       <path d="m126 216 98 1m1-6 9 5" fill="none" stroke="#c39174" stroke-width="1.3" stroke-linecap="round" />
       <use href="#thermometer" transform="translate(82 207) rotate(-34) scale(.76)" />
-      <path d="m99 206 8-3q6-1 7 3t-4 5l-7 3m-2 2 8-2" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.3" stroke-linecap="round" />
+      <path d="m99 206 8-3q6-1 7 3t-4 5l-7 3m-2 2 8-2" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.3" stroke-linecap="round" />
       <circle cx="143" cy="166" r="3" fill="#346d60" />
       <path d="M162 160h54" fill="none" stroke="#739180" stroke-width="1.3" />
       <g aria-label="腋窝中央" transform="translate(220 164) scale(0.013 -0.013)">
@@ -200,10 +179,9 @@
         <use href="#label-glyph-33" x="0" />
       </g>
       <use href="#portrait" />
-      <path d="M219 145c11 2 15 13 18 26l7 62c1 9-4 16-12 15l-10-3c-5-1-7-6-6-12l-8-68c-1-11 1-21 11-20Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.4" />
-      <path d="m228 232 2 8m4-9 2 9" fill="none" stroke="#c39174" stroke-width="1.2" stroke-linecap="round" />
+      <path d="M219 145c11 2 15 13 18 26l7 62c1 9-4 16-12 15l-10-3c-5-1-7-6-6-12l-8-68c-1-11 1-21 11-20Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.4" />
       <use href="#thermometer" transform="translate(100 191) rotate(-29) scale(.52)" />
-      <path d="M130 136c-10 0-17 8-17 21l2 66c0 10 5 18 14 22l44 21c8 4 16 1 18-5 2-5-1-10-7-13l-45-25 7-65c2-13-4-22-16-22Z" fill="url(#skin)" stroke="#bf8d71" stroke-width="1.4" stroke-linejoin="round" />
+      <path d="M130 136c-10 0-17 8-17 21l2 66c0 10 5 18 14 22l44 21c8 4 16 1 18-5 2-5-1-10-7-13l-45-25 7-65c2-13-4-22-16-22Z" fill="#e8c9b3" stroke="#c39b80" stroke-width="1.4" stroke-linejoin="round" />
       <path d="m129 158 1 56m7 18 35 19m5 2 8 4m-9 1 7 4" fill="none" stroke="#bd8b70" stroke-width="1.3" stroke-linecap="round" />
       <path d="M93 240h15m-5-5 5 5-5 5" fill="none" stroke="#477c68" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       <circle cx="259" cy="78" r="20" fill="#fffefd" stroke="#adc4b4" stroke-width="1.5" />

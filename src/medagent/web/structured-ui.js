@@ -1031,7 +1031,9 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         );
         zoom.setAttribute("aria-haspopup", "dialog");
         zoom.setAttribute("aria-label", "放大图示");
-        zoom.replaceChildren(visualIcon("expand"), el("span", "", "放大图示"));
+        // Make the complete illustration the touch target. A text button over
+        // a small figure hides the very gesture the patient needs to see.
+        zoom.replaceChildren(image, visualIcon("expand"));
         viewer.append(heading, description, large, close);
         figure.append(zoom, viewer);
         image.addEventListener("error", () => {
