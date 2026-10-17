@@ -32,7 +32,7 @@ notepad .env
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start -Live
 ```
 
-Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。当前仍在进行 Windows 实际验证，通用执行工作台的原生隔离也在接续中；不能把 Linux 通过的结果当成 Windows 已验收。进展以 `windows-native` 分支及 Windows 验收记录为准。
+Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。桌面问诊、安装器和快捷方式已有真实 Windows 测试；完整执行工作台的产物落盘与会话接续仍在修复，打包后的完整执行尚未验收。Windows 10 和实体 Windows 11 x64 尚未实际验证，不能将已测环境扩大为全部 Windows。更改保留在 `windows-native` 分支，详见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)。
 
 ### 独立桌面应用（推荐）
 
