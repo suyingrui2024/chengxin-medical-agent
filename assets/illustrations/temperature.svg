@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
   <title id="title">数字体温计腋温测量：三步示意</title>
   <desc id="desc">先阅读设备说明并擦干腋窝，将探头放在腋窝中央，手臂贴紧身体，依设备说明等待测量完成。本图是原型示意，不能核验实际动作。</desc>
-  <view id="step-1" viewBox="0 0 320 420"/>
-  <view id="step-2" viewBox="320 0 320 420"/>
-  <view id="step-3" viewBox="640 0 320 420"/>
+  <view id="step-1" viewBox="0 52 320 278"/>
+  <view id="step-2" viewBox="320 52 320 278"/>
+  <view id="step-3" viewBox="640 52 320 278"/>
   <defs>
     <g id="torso"><circle cx="168" cy="82" r="30" fill="#e8bea0"/><path d="M139 115h58c29 0 46 24 46 54v147H102V169c0-30 12-54 37-54Z" fill="#efd0b5"/><path d="M140 115c10 13 47 13 57 0" fill="none" stroke="#bf9275" stroke-width="2"/></g>
-    <g id="step-number"><circle cx="40" cy="38" r="19" fill="#d6e6bd"/></g>
+    <g id="step-number"><circle cx="40" cy="38" r="12" fill="#d6e6bd"/></g>
   </defs>
   <rect width="960" height="420" fill="#eff4ec"/>
   <g font-family="Arial, 'PingFang SC', sans-serif" fill="#234e3b" text-anchor="middle">

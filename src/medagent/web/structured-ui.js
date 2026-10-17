@@ -12,6 +12,23 @@ import {
 } from "./location-answer-ui.js";
 export const UI_VERSION = "medical-ui/v1";
 let illustrationSequence = 0;
+// Compact captions only apply to this exact, repository-owned instruction set.
+// Other capability versions retain their complete supplied instructions.
+const temperatureGuide = [
+  ["先阅读体温计说明书；擦干腋窝。", "擦干腋窝", "先阅读体温计说明书", "准备"],
+  [
+    "将探头放在腋窝中央，手臂贴紧身体。",
+    "探头放在腋窝中央",
+    "手臂贴紧身体",
+    "放置",
+  ],
+  [
+    "按设备说明等待测量完成，记录数值、腋温和测量时间。",
+    "等待完成，再记录",
+    "按设备说明等待 · 记录数值、腋温和时间",
+    "读数",
+  ],
+];
 
 const sourceNames = {
   patient: "患者自述",
@@ -887,6 +904,17 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
     },
     (data, context) => {
       const card = el("article", "task-card structured-task");
+      const compactGuide =
+        data.id === "axillary_temperature" &&
+        data.steps.length === temperatureGuide.length &&
+        temperatureGuide.every(
+          (item, index) => data.steps[index] === item[0],
+        ) &&
+        data.step_assets?.every(
+          (value, index) => value === `/temperature.svg#step-${index + 1}`,
+        ) &&
+        data.step_assets.length === temperatureGuide.length;
+      if (compactGuide) card.classList.add("illustrated-task");
       const header = el("div", "task-header");
       const title = el("div");
       title.append(
@@ -965,6 +993,16 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       const figure = el("figure", "step-figure");
       const image = el("img", "task-image");
       const caption = el("figcaption");
+      const fullInstruction = el("details", "step-full-instruction");
+      const originalInstruction = el("ol", "step-full-list");
+      data.steps.forEach((item) =>
+        originalInstruction.append(el("li", "", item)),
+      );
+      fullInstruction.append(
+        el("summary", "", "完整操作说明"),
+        originalInstruction,
+      );
+      if (compactGuide) caption.classList.add("sr-only");
       figure.append(image, caption);
       if (data.id !== "body_location" || context.preview) {
         const viewer = el("dialog", "illustration-dialog");
@@ -992,6 +1030,8 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           "illustration-zoom",
         );
         zoom.setAttribute("aria-haspopup", "dialog");
+        zoom.setAttribute("aria-label", "放大图示");
+        zoom.replaceChildren(visualIcon("expand"), el("span", "", "放大图示"));
         viewer.append(heading, description, large, close);
         figure.append(zoom, viewer);
         image.addEventListener("error", () => {
@@ -1000,11 +1040,14 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           caption.textContent =
             "图示暂时无法加载，请阅读右侧或下方的分步说明。";
           caption.setAttribute("role", "alert");
+          caption.classList.remove("sr-only");
+          if (compactGuide) fullInstruction.open = true;
         });
         image.addEventListener("load", () => {
           image.hidden = false;
           zoom.hidden = false;
           caption.removeAttribute("role");
+          if (compactGuide) caption.classList.add("sr-only");
           caption.textContent = `步骤 ${step + 1} · ${data.step_assets ? "当前步骤示意" : "请结合图示阅读当前步骤"}`;
         });
       }
@@ -1012,6 +1055,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       const progress = el("div", "step-progress");
       const instruction = el("p", "step-text");
       instruction.setAttribute("aria-live", "polite");
+      const cue = el("p", "step-cue");
       const controls = el("div", "step-controls");
       const progressKey = `${context.sessionId || "preview"}:${data.id}:${data.provider?.version || "1"}:${data.interaction_id || data.repeat?.attempt_id || context.actionId || "preview"}`;
       let step = Math.min(
@@ -1034,6 +1078,9 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       });
       controls.append(previous, next);
       view.append(progress, instruction, controls);
+      if (compactGuide) {
+        instruction.after(cue);
+      }
       stage.append(figure, view);
       let stepSummary;
       if (data.id === "body_location" && data.answer_spec && !context.preview) {
@@ -1054,16 +1101,37 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       card.append(stage);
       function update() {
         step = Math.max(0, Math.min(step, data.steps.length - 1));
+        if (compactGuide) card.dataset.guideStep = String(step + 1);
         taskProgress.set(progressKey, step);
         progress.replaceChildren(
           el("span", "", `${step + 1} / ${data.steps.length}`),
         );
-        data.steps.forEach((_, index) =>
-          progress.append(el("i", index === step ? "current" : "")),
-        );
+        if (compactGuide) {
+          const track = el("ol", "step-track");
+          track.setAttribute("aria-label", "测温步骤");
+          temperatureGuide.forEach((item, index) => {
+            const point = el(
+              "li",
+              index === step ? "current" : index < step ? "visited" : "",
+            );
+            if (index === step) point.setAttribute("aria-current", "step");
+            point.append(
+              el("b", "", String(index + 1)),
+              el("span", "", item[3]),
+            );
+            track.append(point);
+          });
+          progress.append(track);
+        } else
+          data.steps.forEach((_, index) =>
+            progress.append(el("i", index === step ? "current" : "")),
+          );
         if (stepSummary)
           stepSummary.textContent = `分步说明 · ${step + 1} / ${data.steps.length}`;
-        instruction.textContent = data.steps[step];
+        instruction.textContent = compactGuide
+          ? temperatureGuide[step][1]
+          : data.steps[step];
+        cue.textContent = compactGuide ? temperatureGuide[step][2] : "";
         image.src = data.step_assets?.[step] || data.asset;
         image.alt = `${data.title}：第 ${step + 1} 步，${data.steps[step]}`;
         caption.textContent = `步骤 ${step + 1} · ${data.step_assets ? "当前步骤示意" : "请结合图示阅读当前步骤"}`;
@@ -1087,23 +1155,34 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           (!context.preview && Boolean(context.isBusy?.()));
       }
       update();
-      const details = el("details", "task-details");
-      details.append(
-        el("summary", "", "为什么观察 · 使用限制"),
-        el("p", "task-purpose", data.purpose),
-      );
+      const details = compactGuide
+        ? fullInstruction
+        : el("details", "task-details");
+      if (compactGuide) {
+        details.classList.add("task-details");
+        details.querySelector("summary").textContent =
+          "完整操作说明 · 使用限制";
+      } else details.append(el("summary", "", "为什么观察 · 使用限制"));
+      details.append(el("p", "task-purpose", data.purpose));
+      if (compactGuide && data.equipment.length)
+        details.append(el("p", "", `准备：${data.equipment.join("、")}`));
       data.clinical_limits.forEach((item) => details.append(el("p", "", item)));
+      const prompt = el(
+        "p",
+        "task-prompt",
+        context.preview
+          ? "这是素材预览，不会记录结果或改变问诊进度。"
+          : data.response_prompt,
+      );
+      // The action and composer already supply the short prompt; retain its full
+      // wording on demand instead of repeating it next to the illustration.
+      if (!context.preview && (compactGuide || data.id === "body_location"))
+        details.append(prompt);
       card.append(
         el("p", "task-stop", `停止 / 跳过：${data.stop_conditions.join("、")}`),
         details,
-        el(
-          "p",
-          "task-prompt",
-          context.preview
-            ? "这是素材预览，不会记录结果或改变问诊进度。"
-            : data.response_prompt,
-        ),
       );
+      if (!prompt.parentNode) card.append(prompt);
       return card;
     },
   );

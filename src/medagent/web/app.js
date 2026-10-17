@@ -226,6 +226,14 @@ function setBusy(busy) {
     .forEach((node) => {
       node.disabled = busy || node.dataset.actionable !== "true";
     });
+  document.querySelectorAll(".body-region-target").forEach((node) => {
+    const disabled = busy || node.dataset.actionable !== "true";
+    node.setAttribute("aria-disabled", String(disabled));
+    node.setAttribute(
+      "tabindex",
+      disabled || node.hasAttribute("hidden") ? "-1" : "0",
+    );
+  });
   document
     .querySelectorAll(
       ".severity-confirm,.map-confirm,.body-proposal-edit,.step-controls button,.location-answer-control,.location-area-input,.location-answer-note",

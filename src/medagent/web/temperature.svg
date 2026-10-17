@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
   <title id="title">数字体温计腋温测量：三步示意</title>
   <desc id="desc">先阅读设备说明并擦干腋窝，将探头放在腋窝中央，手臂贴紧身体，依设备说明等待测量完成。本图是原型示意，不能核验实际动作。</desc>
-  <view id="step-1" viewBox="0 0 320 420" />
-  <view id="step-2" viewBox="320 0 320 420" />
-  <view id="step-3" viewBox="640 0 320 420" />
+  <view id="step-1" viewBox="0 52 320 278" />
+  <view id="step-2" viewBox="320 52 320 278" />
+  <view id="step-3" viewBox="640 52 320 278" />
   <defs>
     <g id="torso">
       <circle cx="168" cy="82" r="30" fill="#e8bea0" />
@@ -11,7 +11,7 @@
       <path d="M140 115c10 13 47 13 57 0" fill="none" stroke="#bf9275" stroke-width="2" />
     </g>
     <g id="step-number">
-      <circle cx="40" cy="38" r="19" fill="#d6e6bd" />
+      <circle cx="40" cy="38" r="12" fill="#d6e6bd" />
     </g>
     <path id="label-glyph-31" d="M88 0H490V76H343V733H273C233 710 186 693 121 681V623H252V76H88Z" />
     <path id="label-glyph-5148" d="M462 840V684H285C299 724 312 764 322 801L246 817C221 712 171 579 102 494C121 487 150 470 167 459C201 501 231 555 256 612H462V410H61V337H322C305 172 260 44 47 -22C65 -37 86 -66 95 -85C323 -6 379 141 400 337H591V43C591 -40 613 -64 703 -64C721 -64 825 -64 844 -64C925 -64 946 -25 954 127C933 133 901 145 885 158C881 28 875 8 838 8C815 8 729 8 711 8C673 8 666 13 666 43V337H940V410H538V612H868V684H538V840Z" />

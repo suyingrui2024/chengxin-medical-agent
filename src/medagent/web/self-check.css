@@ -1,0 +1,381 @@
+/* Show one action at a time; complete instructions remain available in details. */
+.illustrated-task .task-equipment {
+  margin: 0 20px 6px;
+  padding: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.illustrated-task .step-figure {
+  position: relative;
+}
+.illustrated-task:not([data-guide-step="1"]) > .task-equipment {
+  display: none;
+}
+.illustrated-task .illustration-zoom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.illustration-zoom > svg {
+  width: 16px;
+  height: 16px;
+}
+body:has(#active-task .illustrated-task) .conversation-footer {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+body:has(#active-task .illustrated-task) .quick-replies:not(:empty) {
+  margin-bottom: 8px;
+}
+body:has(#active-task .illustrated-task) #composer-context {
+  display: none;
+}
+body:has(#active-task .illustrated-task) .quick-replies {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+body:has(#active-task .illustrated-task) .quick-replies button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 4px;
+  font-size: 12px;
+}
+body:has(#active-task .illustrated-task) .composer-note {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  margin: 0;
+}
+.illustrated-task .task-stage {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 24px;
+  padding: 8px 20px 16px;
+}
+.active-task .illustrated-task .task-image,
+.illustrated-task .task-image {
+  height: clamp(180px, 24dvh, 260px);
+  padding: 8px;
+}
+.illustrated-task .step-progress {
+  display: block;
+  margin: 0 0 20px;
+}
+.illustrated-task .step-progress > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.step-track {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+}
+.step-track li {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.step-track b {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font: 500 12px var(--sans);
+}
+.step-track .current {
+  color: var(--primary);
+  font-weight: 600;
+}
+.step-track .current b {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+  outline: 3px solid var(--light);
+  outline-offset: 2px;
+}
+.step-track .visited b {
+  background: var(--light);
+  color: var(--primary);
+}
+.structured-task.illustrated-task .step-text {
+  min-height: 0;
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.45;
+  font-weight: 550;
+  margin: 0;
+  text-wrap: balance;
+}
+.step-cue {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--primary);
+}
+.illustrated-task .step-controls {
+  margin-top: 18px;
+}
+.illustrated-task .step-controls button {
+  flex: 1;
+}
+.step-full-instruction {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--primary);
+}
+.step-full-instruction > summary {
+  cursor: pointer;
+  min-height: 44px;
+  align-content: center;
+  color: var(--muted);
+}
+.step-full-instruction p {
+  margin: 4px 0 8px;
+}
+.step-full-list {
+  padding-left: 20px;
+}
+.step-full-list li + li {
+  margin-top: 8px;
+}
+.illustrated-task .task-stop {
+  padding: 6px 10px;
+  line-height: 1.6;
+}
+.structured-task .task-details .task-prompt {
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.body-selection-marker {
+  pointer-events: none;
+}
+.body-region-target {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2;
+  cursor: pointer;
+  outline: none;
+}
+.body-region-target:hover,
+.body-region-target:focus-visible {
+  fill: var(--primary);
+  fill-opacity: 0.15;
+  stroke: var(--primary);
+  stroke-dasharray: 4 3;
+}
+.body-region-target[aria-disabled="true"] {
+  cursor: default;
+}
+.body-region-target[aria-disabled="true"]:hover {
+  fill: transparent;
+  stroke: transparent;
+}
+.location-option-icon {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.location-answer-choice:has(.location-option-icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+@media (max-width: 700px) {
+  body:has(#active-task .illustrated-task) .active-task {
+    padding: 10px 12px;
+  }
+  body:has(#active-task .illustrated-task) .task-header {
+    padding: 10px 14px;
+  }
+  body:has(#active-task .illustrated-task) .task-header h3 {
+    margin: 0;
+    line-height: 1.4;
+  }
+  .illustrated-task .task-stage {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8px 12px;
+    padding: 6px 14px 8px;
+  }
+  .illustrated-task .step-figure {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+  }
+  .active-task .illustrated-task .task-image {
+    height: 132px;
+  }
+  .illustrated-task .illustration-zoom {
+    position: absolute;
+    right: 2px;
+    bottom: 0;
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .illustrated-task .step-view {
+    display: contents;
+  }
+  .illustrated-task .step-progress {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 4px;
+  }
+  .illustrated-task .step-progress > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .step-track {
+    margin: 4px 0;
+  }
+  .structured-task.illustrated-task .step-text {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    font-size: 20px;
+  }
+  .step-cue {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: start;
+    margin: 0;
+    font-size: 12px;
+  }
+  .illustrated-task .step-controls {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    margin-top: 0;
+  }
+  .step-full-instruction {
+    margin-top: 0;
+  }
+}
+@media (min-width: 701px) and (max-height: 800px) {
+  body:has(#active-task .illustrated-task) main {
+    padding-top: 18px;
+  }
+  body:has(#active-task .illustrated-task) #view-consultation .page-heading {
+    display: none;
+  }
+  body:has(#active-task .illustrated-task) .conversation-panel {
+    height: calc(100dvh - 130px);
+    min-height: 0;
+  }
+  body:has(#active-task .illustrated-task) .conversation-header {
+    height: 48px;
+  }
+  body:has(#active-task .illustrated-task) .task-focus-bar {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  body:has(#active-task .illustrated-task) .active-task {
+    padding: 8px 12px;
+  }
+  body:has(#active-task .illustrated-task) .task-header {
+    padding: 8px 14px;
+  }
+  body:has(#active-task .illustrated-task) .task-header h3 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+  .illustrated-task .task-stage {
+    gap: 16px;
+    padding-bottom: 10px;
+  }
+  .active-task .illustrated-task .task-image {
+    height: 138px;
+  }
+  .illustrated-task .step-progress {
+    margin-bottom: 10px;
+  }
+  .illustrated-task .step-progress > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .illustrated-task .step-track {
+    margin-top: 4px;
+  }
+  .structured-task.illustrated-task .step-text {
+    font-size: 21px;
+  }
+  .illustrated-task .step-controls {
+    margin-top: 10px;
+  }
+}
+@media (max-width: 700px) and (max-height: 720px) {
+  body:has(#active-task .illustrated-task) main {
+    padding-top: 10px;
+  }
+  body:has(#active-task .illustrated-task) #view-consultation .page-heading {
+    display: none;
+  }
+  body:has(#active-task .illustrated-task) .conversation-panel {
+    height: calc(100dvh - 90px);
+    min-height: 0;
+  }
+  body:has(#active-task .illustrated-task) .conversation-header {
+    height: 48px;
+    padding: 0 12px;
+  }
+  body:has(#active-task .illustrated-task) .task-focus-bar {
+    padding: 4px 12px;
+  }
+  body:has(#active-task .illustrated-task) .conversation-footer {
+    padding: 8px 12px;
+  }
+  body:has(#active-task .illustrated-task) .quick-replies button {
+    font-size: 11px;
+  }
+  .active-task .illustrated-task .task-image {
+    height: 100px;
+  }
+  .illustrated-task .illustration-zoom {
+    min-width: 44px;
+    padding: 8px;
+  }
+  .illustrated-task .illustration-zoom > span {
+    display: none;
+  }
+  .illustrated-task .step-track {
+    margin: 0;
+  }
+  .illustrated-task .step-progress {
+    margin-bottom: 0;
+  }
+  .structured-task.illustrated-task .step-text {
+    font-size: 18px;
+  }
+  .step-cue {
+    line-height: 1.5;
+  }
+}

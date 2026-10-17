@@ -35,10 +35,13 @@ test("native self-check conversation retains drafts and confirms original locati
       args: executablePath ? [] : [root],
       env,
     });
+    const page = await app.firstWindow();
+    await page.waitForURL(/http:\/\/127\.0\.0\.1:\d+\//);
+    await page.getByText("本机服务已连接").waitFor({ timeout: 15000 });
     await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setSize(900, 680),
     );
-    await verifySelfCheckConversation(await app.firstWindow(), model, {
+    await verifySelfCheckConversation(page, model, {
       shot: "docs/assets/ui/75-native-self-check-conversation.png",
     });
   } finally {

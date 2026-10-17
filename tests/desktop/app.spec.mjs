@@ -1,5 +1,5 @@
 import { _electron as electron, test, expect } from "@playwright/test";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,9 +9,12 @@ const root = path.resolve(
 );
 
 test("explicit live mode configures a model without making an automatic model call", async () => {
+  const profile = await mkdtemp(
+    path.join(root, ".runtime", "desktop-test-live-"),
+  );
   const environment = {
     ...process.env,
-    MEDAGENT_DESKTOP_PROFILE: path.join(root, ".runtime", "desktop-test-live"),
+    MEDAGENT_DESKTOP_PROFILE: profile,
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "compatible",
     MEDAGENT_LLM_BASE_URL: "https://fixture.invalid/v1",
@@ -27,6 +30,9 @@ test("explicit live mode configures a model without making an automatic model ca
   });
   try {
     const window = await desktop.firstWindow();
+    await expect(window.getByText("本机服务已连接")).toBeVisible({
+      timeout: 15000,
+    });
     await expect(window.locator("#backend-pill")).toContainText("直接模型");
     const result = await window.evaluate(async () => {
       const settings = await (await fetch("/api/settings")).json();
@@ -53,17 +59,16 @@ test("explicit live mode configures a model without making an automatic model ca
     expect(JSON.stringify(result)).not.toContain("desktop-test-only-secret");
   } finally {
     await desktop.close();
+    await rm(profile, { recursive: true, force: true });
   }
 });
 
 test("desktop app owns its window, private sidecar and shutdown lifecycle", async () => {
+  const profile = await mkdtemp(path.join(root, ".runtime", "desktop-test-"));
   const environment = { ...process.env };
   delete environment.ELECTRON_RUN_AS_NODE;
-  environment.MEDAGENT_DESKTOP_PROFILE = path.join(
-    root,
-    ".runtime",
-    "desktop-test",
-  );
+  environment.MEDAGENT_DESKTOP_PROFILE = profile;
+  environment.MEDAGENT_DESKTOP_LIVE = "0";
   const executablePath = process.env.MEDAGENT_DESKTOP_BINARY;
   const desktop = await electron.launch({
     executablePath,
@@ -178,6 +183,7 @@ test("desktop app owns its window, private sidecar and shutdown lifecycle", asyn
   } finally {
     await desktop.close();
   }
+  await rm(profile, { recursive: true, force: true });
   await expect
     .poll(async () => {
       try {

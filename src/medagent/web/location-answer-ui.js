@@ -13,6 +13,36 @@ function node(tag, cls, text) {
   if (text !== undefined) e.textContent = text;
   return e;
 }
+function locationOptionIcon(field, value) {
+  if (!["side", "extent"].includes(field)) return null;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 48 48");
+  svg.setAttribute("class", "location-option-icon");
+  svg.setAttribute("aria-hidden", "true");
+  // Fixed visual vocabulary only. The front-facing figure uses the patient's
+  // left and right; it never copies labels or markup from model output.
+  const unknown =
+    '<circle cx="24" cy="24" r="16"/><path d="M19 19c0-7 11-7 11 0 0 5-6 4-6 10M24 34v1"/>';
+  if (value === "unknown") svg.innerHTML = unknown;
+  else if (field === "extent")
+    svg.innerHTML =
+      value === "point"
+        ? '<circle cx="24" cy="24" r="17" opacity=".3"/><circle cx="24" cy="24" r="3" fill="currentColor"/>'
+        : '<circle cx="24" cy="24" r="17" opacity=".3"/><ellipse cx="24" cy="24" rx="12" ry="9" fill="currentColor" fill-opacity=".2" stroke-dasharray="3 3"/>';
+  else {
+    const fills = {
+      left: '<path d="M24 19h5q8 0 8 9v13H24Z" fill="currentColor" fill-opacity=".35" stroke="none"/>',
+      right:
+        '<path d="M24 19h-5q-8 0-8 9v13h13Z" fill="currentColor" fill-opacity=".35" stroke="none"/>',
+      both: '<path d="M19 19h10q8 0 8 9v13H11V28q0-9 8-9" fill="currentColor" fill-opacity=".35" stroke="none"/>',
+      midline: '<path d="M24 19v22" stroke-width="3"/>',
+    };
+    svg.innerHTML =
+      '<circle cx="24" cy="10" r="6"/><path d="M11 41V28q0-9 8-9h10q8 0 8 9v13M17 30v11m14-11v11"/>' +
+      (fills[value] || "");
+  }
+  return svg;
+}
 export function validateLocationAnswerSpec(spec) {
   if (
     !spec ||
@@ -385,15 +415,8 @@ export function renderLocationAnswer(data, context) {
         "location-answer-choice",
       );
       control.setAttribute("aria-pressed", String(current === option.value));
-      if (field === "extent" && option.value !== "unknown") {
-        const symbol = node(
-          "span",
-          `extent-symbol ${option.value}`,
-          option.value === "point" ? "•" : "●",
-        );
-        symbol.setAttribute("aria-hidden", "true");
-        control.prepend(symbol);
-      }
+      const icon = locationOptionIcon(field, option.value);
+      if (icon) control.prepend(icon);
       choices.append(control);
     }
     panel.append(choices);

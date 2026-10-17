@@ -1,0 +1,93 @@
+{
+  "schema": "self-check-visual-review/v1",
+  "review_date": "2026-10-18",
+  "verified_at": "2026-10-18T04:55:07.642889+08:00",
+  "base_commit": "29cea2a135cb7818774141a6e0160abee5d9be42",
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "python": "3.12.13",
+    "node": "v24.14.0",
+    "development_fonttools": "4.25.0 (installed under .runtime/tooling/python)"
+  },
+  "checks": {
+    "browser": {
+      "startTime": "2026-10-17T20:51:44.723Z",
+      "duration": 130734.73000000001,
+      "expected": 102,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "native_desktop": {
+      "startTime": "2026-10-17T20:53:55.689Z",
+      "duration": 17033.531,
+      "expected": 7,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "additional_checks": {
+    "prettier": "passed",
+    "svg_generation_consistency": "passed"
+  },
+  "viewports": [
+    [
+      1440,
+      1080
+    ],
+    [
+      900,
+      648
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      320,
+      640
+    ]
+  ],
+  "scope": [
+    "Current action, illustration, controls and full stop conditions remain inside the task pane at all four viewports.",
+    "Six appearances, image failure fallback and enlarged current-step artwork.",
+    "Diagram pointer and keyboard selection, explicit confirmation, read-only protection, retained drafts and source records.",
+    "Native desktop checks run on macOS; this is not Windows execution or clinical validation."
+  ],
+  "source_sha256": {
+    "assets/illustrations/temperature.svg": "b79250f178491dcc82494b0184892698eb5b50023cc1e82cd2f16dffc9ca4dc9",
+    "src/medagent/web/app.js": "1d5032dc13638419f098f6a8549c144e0e04d95022b57f7e22a77aee34fc5f05",
+    "src/medagent/web/structured-ui.js": "904455bac7a47a9cce36f0e733f081c21292fd25462588f22b455abd871fb842",
+    "src/medagent/web/visual-question.js": "59b18cca8004b8d2aef3a84b4dbfc52daff02961727ff9c45a65c222f64735e3",
+    "src/medagent/web/location-answer-ui.js": "e021f5777f77511fad6850e226038e38d5a0ffa98397acdd78076917095cb081",
+    "src/medagent/web/index.html": "b9ddecf92f5bf2ed08ace8301272f027936f6a901a2fa04808601d1817b18ea8",
+    "src/medagent/web/self-check.css": "e6e91a2d0fa0c3da3e61f6bc4c94124718ebe8f51d4703b4222a61263beea549",
+    "src/medagent/web/temperature.svg": "be279350b7f8653969d8e0e1237083a5ed1d2f44670d75831f104c3acddaffec",
+    "src/medagent/web/illustration-labels.json": "f8fda6a53985e89e59c0c5c9a486af18f0cd6a917e87579a480a532535335746",
+    "tests/ui/self-check-visuals.spec.mjs": "852094cc289ba9e9d0fa836b9ee86027eba3bf58481f098e037bc19f7b2bdb6a",
+    "tests/desktop/app.spec.mjs": "868fef8a0284073b5d7317e93bf407e70f2e34f3dc1959e8c716404778c2df13",
+    "tests/desktop/appearance.spec.mjs": "bec55523112c6b5d9ad0a7e8df9a47802184a7c48660d57708e4320e6ca3522b",
+    "tests/desktop/self-check-drafts.spec.mjs": "d313ba235e8da157dbd0e5c860771f26a826376d34d2c0c76452a50ae4156b4d",
+    "tests/desktop/self-check-conversation.spec.mjs": "cd1bc10811b1fd11d85e7ce3f91002d43e1b344d1acfc6c5ba778919b1e7ac12",
+    "tests/desktop/location-answers.spec.mjs": "6d5883368d28d5848b06e4e11b1433585a64410de21d4daf3d60f84deddad93d",
+    "tests/desktop/location-revisions.spec.mjs": "7febe562c2d17719279ac70ac575abe1de4abdb91823e4bbadc881d3cf5869ac"
+  },
+  "screenshots_sha256": {
+    "body-selection.png": "2706981e4352a1a7329a2afcd63ad527bfedc434acc87f83859c3cf59841bd93",
+    "extent.png": "c0578a10ff2b8f47b26eecb9cda82769e14bee62feeb702cc7fd11b9b4c7b9ef",
+    "side.png": "a1e68ed9f242ee92ae0681afc788870c1d9833e2c12bb43256398067b2d4b1a0",
+    "temperature-mobile.png": "bd6d6a0337953b01be4c35498b2e7e4401127ae9aab97198d55ee757f8cece59",
+    "temperature-night.png": "76b3bbe1f8fa8eb5b0b47e10ea750a68df340a41bd89971884d7debbdb8f06ff",
+    "temperature-short.png": "8f7ae4763d6256924f9938677a1720dd0354dd34ef845c827538bbb6e63ecb41",
+    "temperature-small.png": "2df17695bf6acdf064b2095e13e6a8fb5fa19d6f3c474408fba57ad70d2edc62",
+    "temperature-wide.png": "dd95c6258665df8c5ae0e318d186a5b70ee906814d4d67315bcd7a53d9838ee0"
+  },
+  "commands": [
+    "CHROME_BIN='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' node node_modules/@playwright/test/cli.js test --reporter=line,json",
+    "node node_modules/@playwright/test/cli.js test --config playwright.desktop.config.mjs tests/desktop/app.spec.mjs tests/desktop/appearance.spec.mjs tests/desktop/self-check-drafts.spec.mjs tests/desktop/self-check-conversation.spec.mjs tests/desktop/location-answers.spec.mjs tests/desktop/location-revisions.spec.mjs",
+    "npm run format:check",
+    "PYTHONPATH=.runtime/tooling/python python3 scripts/outline_illustration_labels.py --check"
+  ]
+}

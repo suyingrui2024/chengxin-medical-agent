@@ -28,14 +28,17 @@ test("native self-check drafts restore selections and keep measurement progress 
       args: executablePath ? [] : [root],
       env,
     });
+    const page = await app.firstWindow();
+    await page.waitForURL(/http:\/\/127\.0\.0\.1:\d+\//);
+    await page.getByText("本机服务已连接").waitFor({ timeout: 15000 });
     await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setSize(900, 680),
     );
-    const page = await app.firstWindow();
     await verifyLocationDraft(page, {
       shot: path.join(root, "docs/assets/ui/73-native-location-draft.png"),
     });
     await page.reload();
+    await page.getByText("本机服务已连接").waitFor({ timeout: 15000 });
     await verifyTemperatureProgress(page, {
       shot: path.join(
         root,

@@ -1,6 +1,7 @@
 // First-party visual vocabulary. Model output supplies text/data, never SVG or code.
 const ns = "http://www.w3.org/2000/svg";
 const paths = {
+  expand: ['<path d="M6 19V6h13M29 6h13v13M42 29v13H29M19 42H6V29"/>'],
   person: [
     '<circle cx="24" cy="14" r="7"/>',
     '<path d="M10 41v-7c0-13 28-13 28 0v7M18 30v11M30 30v11"/>',
@@ -364,12 +365,17 @@ export function renderBodyMap(data, context) {
   const canvas = node("div", "body-map-canvas");
   const figure = document.createElementNS(ns, "svg");
   figure.setAttribute("viewBox", "14 0 200 348");
-  figure.setAttribute("aria-hidden", "true");
+  figure.setAttribute("role", "group");
+  figure.setAttribute("aria-label", "人体部位示意图");
   // Repository-owned anatomy only. Broad regions never imply a measured point.
   figure.innerHTML =
     '<g class="body-anatomy"><ellipse cx="114" cy="45" rx="22" ry="28"/><path class="body-silhouette" d="M103 72v12l-26 9q-13 4-17 23L41 195q-2 8 5 11l5 2q7 1 10-7l20-63-1 66-7 114q-1 9 8 9h10q7 0 8-8l15-93 15 93q1 8 8 8h10q9 0 8-9l-7-114-1-66 20 63q3 8 10 7l5-2q7-3 5-11l-19-79q-4-19-17-23l-26-9V72"/></g><g class="body-landmarks body-front"><path d="M106 43h1m14 0h1m-11 14q3 2 6 0M96 96q18 8 36 0M94 151q20 5 40 0"/><circle cx="114" cy="183" r="1.5"/></g><g class="body-landmarks body-back" hidden><path d="M103 32q11-5 22 0M97 108q-9 12 0 23m34-23q9 12 0 23M114 100v99M96 203q18-8 36 0"/></g><g class="body-landmarks body-side-labels" font-size="13" fill="currentColor" stroke="none"><text x="24" y="112" class="body-right-label">右</text><text x="192" y="112" class="body-left-label">左</text></g>';
   const marker = document.createElementNS(ns, "g");
   marker.setAttribute("class", "body-selection-marker");
+  marker.setAttribute("aria-hidden", "true");
+  figure
+    .querySelectorAll(":scope > g")
+    .forEach((group) => group.setAttribute("aria-hidden", "true"));
   figure.append(marker);
   const orientations = node("div", "body-map-orientations", "正面示意");
   canvas.append(figure, orientations);
@@ -416,6 +422,7 @@ export function renderBodyMap(data, context) {
   );
   const actionable =
     !context.readOnly && typeof context.onChoose === "function";
+  const targets = [];
   let selected =
     [
       ...options,
@@ -449,6 +456,18 @@ export function renderBodyMap(data, context) {
           ? "手臂／腿示意"
           : "正面示意";
     const back = selected?.value === "back";
+    targets.forEach(({ target, value }) => {
+      const hidden = back
+        ? ["chest", "abdomen"].includes(value)
+        : value === "back";
+      target.toggleAttribute("hidden", hidden);
+      target.setAttribute("tabindex", !hidden && actionable ? "0" : "-1");
+      target.setAttribute("aria-pressed", String(selected?.value === value));
+      target.setAttribute(
+        "aria-disabled",
+        String(!actionable || Boolean(context.isBusy?.())),
+      );
+    });
     figure.querySelector(".body-front").toggleAttribute("hidden", back);
     figure.querySelector(".body-back").toggleAttribute("hidden", !back);
     figure.querySelector(".body-right-label").textContent = back ? "左" : "右";
@@ -479,25 +498,54 @@ export function renderBodyMap(data, context) {
     confirm.dataset.ready = String(actionable && Boolean(selected));
     confirm.disabled = !actionable || !selected || Boolean(context.isBusy?.());
   }
+  const select = (choice) => {
+    if (!actionable || context.isBusy?.()) return;
+    selected = choice;
+    useProposal = false;
+    context.onTaskDraft?.({
+      location: choice.value,
+      ...(proposal ? { proposalId: proposal.choice } : {}),
+    });
+    update();
+    const pane = map.closest(".active-task");
+    if (pane && map.getBoundingClientRect().height <= pane.clientHeight)
+      map.scrollIntoView({ block: "nearest", inline: "nearest" });
+  };
   options.forEach((choice) => {
     const pin = node("button", `body-pin pin-${choice.value}`, choice.label);
     pin.type = "button";
     pin.dataset.location = choice.value;
     pin.dataset.actionable = String(actionable);
-    pin.addEventListener("click", () => {
-      if (!actionable || context.isBusy?.()) return;
-      selected = choice;
-      useProposal = false;
-      context.onTaskDraft?.({
-        location: choice.value,
-        ...(proposal ? { proposalId: proposal.choice } : {}),
-      });
-      update();
-      const pane = map.closest(".active-task");
-      if (pane && map.getBoundingClientRect().height <= pane.clientHeight)
-        map.scrollIntoView({ block: "nearest", inline: "nearest" });
-    });
+    pin.addEventListener("click", () => select(choice));
     choices.append(pin);
+    if (Object.hasOwn(regions, choice.value)) {
+      const target = document.createElementNS(ns, "g");
+      target.setAttribute("class", "body-region-target");
+      target.dataset.actionable = String(actionable);
+      target.setAttribute("role", "button");
+      target.setAttribute("aria-label", `在图上选择${choice.label}`);
+      regions[choice.value].forEach(([cx, cy, rx, ry, rotation = 0]) => {
+        const shape = document.createElementNS(ns, "ellipse");
+        for (const [key, value] of Object.entries({
+          cx,
+          cy,
+          rx,
+          ry,
+          transform: `rotate(${rotation} ${cx} ${cy})`,
+        }))
+          shape.setAttribute(key, String(value));
+        target.append(shape);
+      });
+      target.addEventListener("click", () => select(choice));
+      target.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          select(choice);
+        }
+      });
+      targets.push({ target, value: choice.value });
+      figure.insertBefore(target, marker);
+    }
   });
   update();
   confirm.addEventListener("click", () => {
