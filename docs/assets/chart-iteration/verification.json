@@ -106,7 +106,7 @@
         "logs/unit.log",
         "logs/python.log"
       ],
-      "windows": "Current chart and full faceless body revision pending Windows CI; a5d5577 foundation passed run 39072806249."
+      "windows": "Passed source, packaged and installer checks in https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39075312555; see the Windows field for exact scope."
     }
   ],
   "scope": [
@@ -154,5 +154,25 @@
     "condensed-results.png": "52a8622ea1e01d57f205e3fddef5c9d79fa4156d23c874127a3ca4c3f608b405",
     "location-mobile.png": "4159f0726835a020b6cdab63b5159daa656090cd00e37b151618d9922fe08018",
     "temperature-mobile.png": "da06e586cdc667c671d36fbf359ec07a53cf8018799cc45f126f28ebae4857e0"
+  },
+  "windows": {
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39075312555",
+    "tested_code_commit": "8ff72286b27eb70ebfed29b46e4bc8800dc4bda5",
+    "status": "passed",
+    "actual_csv_gui_receipts": {
+      "arm": 2,
+      "server": 3
+    },
+    "jobs": [
+      {
+        "name": "Windows 11 on Arm running x64 application",
+        "conclusion": "success"
+      },
+      {
+        "name": "Windows Server x64 desktop",
+        "conclusion": "success"
+      }
+    ],
+    "local_package_proof": "dist/windows-validated/39075312555/verification.json"
   }
 }
