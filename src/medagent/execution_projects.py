@@ -34,26 +34,36 @@ def project_path(value, storage_root, source_root):
     node = shutil.which("node")
     if node:
         protected.append(Path(node).resolve().parent.parent)
-    protected += [
-        Path(name)
-        for name in [
-            "/usr",
-            "/etc",
-            "/proc",
-            "/sys",
-            "/dev",
-            "/lib",
-            "/lib64",
-            "/bin",
-            "/sbin",
-            "/boot",
-            "/run",
+    protected += (
+        [
+            Path(name)
+            for name in [
+                "/usr",
+                "/etc",
+                "/proc",
+                "/sys",
+                "/dev",
+                "/lib",
+                "/lib64",
+                "/bin",
+                "/sbin",
+                "/boot",
+                "/run",
+            ]
         ]
-    ] if os.name != "nt" else [
-        Path(os.environ[name]).resolve()
-        for name in ("SystemRoot", "ProgramFiles", "ProgramFiles(x86)", "APPDATA", "LOCALAPPDATA")
-        if os.environ.get(name)
-    ]
+        if os.name != "nt"
+        else [
+            Path(os.environ[name]).resolve()
+            for name in (
+                "SystemRoot",
+                "ProgramFiles",
+                "ProgramFiles(x86)",
+                "APPDATA",
+                "LOCALAPPDATA",
+            )
+            if os.environ.get(name)
+        ]
+    )
     if candidate in {
         Path(candidate.anchor),
         Path("/home"),

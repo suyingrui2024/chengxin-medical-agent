@@ -165,6 +165,7 @@ try {
             & (Join-Path $projectRoot 'tests\windows-installer.ps1')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_native.py')
             Invoke-ChengxinCommand $node @('scripts/windows/isolation-check.mjs')
+            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_execution.py')
         } elseif ($Live) {
             Invoke-ChengxinPython (Join-Path $PSScriptRoot 'start_live_desktop.py')
         } else {
