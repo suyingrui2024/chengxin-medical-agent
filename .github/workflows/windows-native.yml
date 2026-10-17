@@ -60,6 +60,13 @@ jobs:
           $env:MEDAGENT_PYTHON = $null
           & ./.runtime/windows/node/node.exe scripts/windows/gui-check.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Compile and verify native Windows installer
+        if: ${{ !matrix.execution }}
+        shell: powershell
+        run: |
+          & ./.runtime/windows/node/node.exe scripts/build-windows-installer.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tests/windows-installer-e2e.ps1
       - name: Archive portable native Windows application
         shell: powershell
         run: |
@@ -70,4 +77,10 @@ jobs:
         with:
           name: Chengxin-${{ matrix.artifact }}
           path: dist/Chengxin-Windows-x64.zip
+          retention-days: 3
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: ${{ !matrix.execution }}
+        with:
+          name: Chengxin-Setup-Windows-x64
+          path: dist/windows/*.exe
           retention-days: 3
