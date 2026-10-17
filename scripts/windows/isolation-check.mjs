@@ -7,6 +7,7 @@ import {
   mkdir,
   writeFile,
   readFile,
+  realpath,
   rm,
   unlink,
 } from "node:fs/promises";
@@ -20,7 +21,12 @@ import { randomUUID } from "node:crypto";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 if (process.platform !== "win32")
   throw new Error("This check requires real Windows");
-const scratch = await mkdtemp(join(tmpdir(), "chengxin-native-isolation-"));
+// Windows' TEMP may use an 8.3 alias (RUNNER~1). Match the canonical paths
+// supplied by ExecutionManager; PowerShell providers cannot traverse the alias
+// under a policy granting only the physical directory.
+const scratch = await realpath(
+  await mkdtemp(join(tmpdir(), "chengxin-native-isolation-")),
+);
 const gateway = createServer((_req, res) => res.end("fixture-gateway"));
 let launch;
 const applicationSecret = join(root, `.native-host-only-${randomUUID()}.txt`);
