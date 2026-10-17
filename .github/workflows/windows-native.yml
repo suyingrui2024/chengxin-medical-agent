@@ -58,6 +58,11 @@ jobs:
       - name: Win32 filesystem, locks and process trees
         shell: powershell
         run: ./scripts/windows.ps1 -Mode Test
+      - name: Path metadata boundaries and Node compatibility
+        shell: powershell
+        run: |
+          & ./.runtime/windows/node/node.exe --test integrations/dsh/tests/windows-path-broker.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Native Windows isolation and full SDK execution
         if: matrix.execution
         shell: powershell

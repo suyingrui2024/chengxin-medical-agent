@@ -13,6 +13,7 @@ import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const realpathAdapter = join(root, "integrations/windows/realpath-adapter.cjs");
 
 export function windowsArgument(value) {
   return (
@@ -84,7 +85,9 @@ export function requestFor({
     // Node's realpath walk lstats drive-root metadata before loading a file.
     // Keep the host-canonicalized, read-only bundle paths rather than granting
     // recursive read access to C:\ merely to satisfy module resolution.
-    NODE_OPTIONS: "--preserve-symlinks --preserve-symlinks-main",
+    NODE_OPTIONS:
+      "--preserve-symlinks --preserve-symlinks-main --require=" +
+      JSON.stringify(realpathAdapter.replaceAll("\\", "/")),
     PYTHONUTF8: "1",
     PYTHONNOUSERSITE: "1",
   };
@@ -107,7 +110,7 @@ export function requestFor({
     },
     filesystem: {
       readwritePaths: [workspace, state],
-      readonlyPaths: [modules, integration, ...readonly],
+      readonlyPaths: [modules, integration, realpathAdapter, ...readonly],
       deniedPaths: [],
     },
     network: {

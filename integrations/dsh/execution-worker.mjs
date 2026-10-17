@@ -8,6 +8,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFile } from "node:child_process";
+import { createPathResolver } from "../windows/path-broker.mjs";
 import { hasActiveJobs, observationKey } from "./execution-observations.mjs";
 import { ClarificationBroker } from "./execution-clarifications.mjs";
 import { checkArguments } from "./execution-delivery-contract.mjs";
@@ -24,6 +25,8 @@ let config,
   gateway,
   active = null,
   closing = false;
+let resolveNativePath,
+  metadataCalls = 0;
 const token = randomBytes(32).toString("hex");
 let sequence = 0,
   calls = 0,
@@ -646,6 +649,30 @@ async function proxy(request, response) {
     !timingSafeEqual(Buffer.from(supplied), Buffer.from(token))
   )
     return errorResponse(response, 401);
+  if (request.method === "POST" && request.url === "/model/runtime/realpath") {
+    if (!resolveNativePath) return errorResponse(response, 404);
+    if (++metadataCalls > 65536) return errorResponse(response, 429);
+    const chunks = [];
+    let size = 0;
+    for await (const chunk of request) {
+      size += chunk.length;
+      if (size > 131072) return errorResponse(response, 413);
+      chunks.push(chunk);
+    }
+    let result;
+    try {
+      const value = JSON.parse(Buffer.concat(chunks));
+      result =
+        value && Object.keys(value).length === 1
+          ? resolveNativePath(value.path)
+          : { ok: false, code: "EINVAL" };
+    } catch {
+      result = { ok: false, code: "EINVAL" };
+    }
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify(result));
+    return;
+  }
   if (
     (request.method === "GET" && request.url === "/model/capabilities") ||
     (request.method === "POST" && request.url === "/model/capabilities/execute")
@@ -811,6 +838,7 @@ async function makeHarness() {
             TMP: process.env.TMP,
             CHENGXIN_PYTHON: config.python,
             CHENGXIN_NATIVE_PATCH: config.native_patch,
+            CHENGXIN_PATH_BROKER: `http://127.0.0.1:${gateway.address().port}/model/runtime/realpath`,
           }
         : {}),
       ...Object.fromEntries(
@@ -884,6 +912,16 @@ async function setup(payload) {
         "PowerShell errors stop the command and native exit codes are retained.",
       );
     await writeFile(config.native_patch, patch, { mode: 0o600 });
+    resolveNativePath = createPathResolver([
+      config.workspace,
+      config.state,
+      join(integration, "../../node_modules"),
+      dirname(integration),
+      dirname(process.execPath),
+      dirname(config.python),
+      config.native_patch,
+      join(process.env.SystemRoot, "System32/WindowsPowerShell/v1.0"),
+    ]);
   }
   gateway = createServer((req, res) =>
     proxy(req, res).catch(() => errorResponse(res, 500)),
