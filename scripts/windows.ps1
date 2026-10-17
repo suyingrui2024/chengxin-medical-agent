@@ -22,6 +22,7 @@ $previousPython = $env:MEDAGENT_PYTHON
 $previousNpm = $env:MEDAGENT_NPM_CLI
 $previousElectronMode = $env:ELECTRON_RUN_AS_NODE
 $previousSecurityProtocol = [Net.ServicePointManager]::SecurityProtocol
+$previousProgress = $ProgressPreference
 
 function ConvertTo-ChengxinArgument {
     param([AllowEmptyString()][string]$Value)
@@ -137,6 +138,7 @@ try {
     $OutputEncoding = New-Object Text.UTF8Encoding($false)
     [Console]::OutputEncoding = $OutputEncoding
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $ProgressPreference = 'SilentlyContinue'
     Push-Location -LiteralPath $projectRoot
     try {
         if ($Mode -eq 'Setup') {
@@ -181,6 +183,7 @@ try {
     $env:MEDAGENT_NPM_CLI = $previousNpm
     $env:ELECTRON_RUN_AS_NODE = $previousElectronMode
     [Net.ServicePointManager]::SecurityProtocol = $previousSecurityProtocol
+    $ProgressPreference = $previousProgress
     [Console]::OutputEncoding = $previousEncoding
     $OutputEncoding = $previousPipelineEncoding
 }

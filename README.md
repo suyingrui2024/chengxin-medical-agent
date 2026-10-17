@@ -22,7 +22,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode 
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Test
 ```
 
-安装脚本下载 SHA256 固定的 Windows Python 3.14.8 与 Node 22.23.3 到 `.runtime/windows`，安装锁定依赖和 Electron，检查成功后创建桌面快捷方式。不修改系统 PATH，不要求预装 Windows Python、Node、Conda 或 pip。首次下载需要网络。
+安装脚本下载 SHA256 固定的完整便携 Windows Python 3.14.8、Node 22.23.3 与 Microsoft MXC 原生执行器到 `.runtime/windows`，安装锁定依赖和 Electron，检查成功后创建桌面快捷方式。不修改系统 PATH，不要求预装 Windows Python、Node、Conda 或 pip。首次下载需要网络；Python 随带 venv 和 pip，工作台可在自己的工作区建立项目环境。
 
 真实问诊可在界面配置模型；也可在原项目根目录自行填写 `.env` 后显式启动：
 

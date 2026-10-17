@@ -3,9 +3,9 @@
   "platform": "win32-x64",
   "python": {
     "version": "3.14.8",
-    "url": "https://www.python.org/ftp/python/3.14.8/python-3.14.8-embed-amd64.zip",
-    "sha256": "a93abe456ab01bd96d7a085b3cdb6566b3063f4241360d114142fbdb07f0a310",
-    "checksum_source": "https://www.python.org/ftp/python/3.14.8/python-3.14.8-embed-amd64.zip.spdx.json"
+    "url": "https://www.python.org/ftp/python/3.14.8/python-3.14.8-amd64.zip",
+    "sha256": "4873947a8afc037846b180312b83c744a4146a851cfd316a75c3125a4d8299da",
+    "checksum_source": "https://www.python.org/ftp/python/3.14.8/python-3.14.8-amd64.zip.spdx.json"
   },
   "isolation": {
     "version": "1.0.1",
