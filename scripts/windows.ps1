@@ -76,9 +76,23 @@ function Install-ChengxinRuntime {
         Invoke-WebRequest -UseBasicParsing -Uri $Specification.url -OutFile $archive
         if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $Specification.sha256) { throw "SHA256 verification failed: $Name" }
         $expanded = Join-Path $stage 'expanded'
-        Expand-Archive -LiteralPath $archive -DestinationPath $expanded
+        if ($Name -eq 'isolation') {
+            New-Item -ItemType Directory -Path $expanded | Out-Null
+            Invoke-ChengxinCommand (Join-Path $env:SystemRoot 'System32\tar.exe') @('-xzf', $archive, '-C', $expanded)
+        } else {
+            Expand-Archive -LiteralPath $archive -DestinationPath $expanded
+        }
         $content = $expanded
-        if ($Name -eq 'node') { $content = Join-Path $expanded $Specification.archive_directory }
+        if ($Name -in @('node', 'isolation')) { $content = Join-Path $expanded $Specification.archive_directory }
+        if ($Name -eq 'isolation') {
+            $selected = Join-Path $stage 'native-executor'
+            New-Item -ItemType Directory -Path $selected | Out-Null
+            foreach ($binary in @('wxc-exec.exe', 'wxc-host-prep.exe')) {
+                Copy-Item -LiteralPath (Join-Path $content $binary) -Destination $selected
+            }
+            Copy-Item -LiteralPath (Join-Path $expanded 'package\LICENSE.md') -Destination (Join-Path $selected 'LICENSE.md')
+            $content = $selected
+        }
         $specJson = $Specification | ConvertTo-Json -Depth 5
         [IO.File]::WriteAllText((Join-Path $content 'chengxin-runtime.json'), $specJson, (New-Object Text.UTF8Encoding($false)))
         Move-Item -LiteralPath $content -Destination $target
@@ -130,6 +144,7 @@ try {
             $lock = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'windows\runtime-lock.json') -Raw -Encoding UTF8 | ConvertFrom-Json
             Install-ChengxinRuntime 'python' $lock.python
             Install-ChengxinRuntime 'node' $lock.node
+            Install-ChengxinRuntime 'isolation' $lock.isolation
         }
         if (-not (Test-Path -LiteralPath $python -PathType Leaf) -or -not (Test-Path -LiteralPath $node -PathType Leaf)) { throw 'Run .\scripts\windows.ps1 -Mode Setup first.' }
         $env:PATH = (Split-Path -Parent $node) + [IO.Path]::PathSeparator + $previousPath
@@ -149,6 +164,7 @@ try {
         } elseif ($Mode -eq 'Test') {
             & (Join-Path $projectRoot 'tests\windows-installer.ps1')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_native.py')
+            Invoke-ChengxinCommand $node @('scripts/windows/isolation-check.mjs')
         } elseif ($Live) {
             Invoke-ChengxinPython (Join-Path $PSScriptRoot 'start_live_desktop.py')
         } else {

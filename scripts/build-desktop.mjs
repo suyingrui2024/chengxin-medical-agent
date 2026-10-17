@@ -31,7 +31,9 @@ try {
     await cp(path.join(root, name), path.join(staging, name), {
       recursive: true,
       filter: (source) =>
-        !source.includes("__pycache__") && !source.endsWith(".pyc"),
+        !source.includes("__pycache__") &&
+        !source.endsWith(".pyc") &&
+        !source.split(path.sep).includes("node_modules"),
     });
   const npmArguments = [
     "ci",
@@ -53,7 +55,7 @@ try {
   );
   if (windows) {
     // A Windows distribution carries its own interpreter and Node runtime.
-    for (const name of ["python", "node"]) {
+    for (const name of ["python", "node", "isolation"]) {
       await cp(
         path.join(root, ".runtime/windows", name),
         path.join(staging, "runtime", name),

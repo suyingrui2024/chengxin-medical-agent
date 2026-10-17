@@ -4,7 +4,7 @@ import { DeepSeekHarness } from "@deepseek-ai/dsh-sdk-client";
 import { createServer, request as httpRequest } from "node:http";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { createInterface } from "node:readline";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { openSync, closeSync, constants } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -286,19 +286,34 @@ function errorResponse(response, code) {
 }
 function control(method, path) {
   return new Promise((resolve, reject) => {
-    const directory = openSync(
-      config.state,
-      constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW,
-    );
+    const native = process.platform === "win32";
+    const directory = native
+      ? null
+      : openSync(
+          config.state,
+          constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW,
+        );
     let closed = false;
     const release = () => {
       if (!closed) {
-        closeSync(directory);
+        if (directory !== null) closeSync(directory);
         closed = true;
       }
     };
     const request = httpRequest(
-      { socketPath: `/proc/self/fd/${directory}/control.sock`, method, path },
+      native
+        ? {
+            hostname: "127.0.0.1",
+            port: config.native_control_port,
+            headers: { "x-chengxin-control": config.native_control_token },
+            method,
+            path,
+          }
+        : {
+            socketPath: `/proc/self/fd/${directory}/control.sock`,
+            method,
+            path,
+          },
       (response) => {
         let body = "";
         response.setEncoding("utf8");
@@ -786,13 +801,18 @@ async function proxy(request, response) {
   }
 }
 async function makeHarness() {
+  const native = process.platform === "win32";
   return new DeepSeekHarness({
     dshBin: join(integration, "isolated-entry.mjs"),
     profile: "sdk",
-    patches: ["/opt/medical-agent/integrations/dsh/execution.patch.yml"],
-    dshHome: "/state/home",
+    patches: [
+      native
+        ? config.native_patch
+        : "/opt/medical-agent/integrations/dsh/execution.patch.yml",
+    ],
+    dshHome: native ? join(config.state, "home") : "/state/home",
     processCwd: config.workspace,
-    cwd: "/workspace",
+    cwd: native ? config.workspace : "/workspace",
     provider: "deepseek-official",
     model: config.model,
     maxTokens: 8192,
@@ -809,6 +829,17 @@ async function makeHarness() {
       CHENGXIN_RESUME_SESSION_ID: config.require_resume ? config.id : "",
       DEEPSEEK_API_KEY: token,
       DEEPSEEK_BASE_URL: `http://127.0.0.1:${gateway.address().port}/model`,
+      ...(native
+        ? {
+            SystemRoot: process.env.SystemRoot,
+            TEMP: process.env.TEMP,
+            TMP: process.env.TMP,
+            CHENGXIN_PYTHON: config.python,
+            CHENGXIN_NATIVE_PATCH: config.native_patch,
+            CHENGXIN_CONTROL_PORT: String(config.native_control_port),
+            CHENGXIN_CONTROL_TOKEN: config.native_control_token,
+          }
+        : {}),
       ...Object.fromEntries(
         ["HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy", "NO_PROXY"]
           .filter((key) => process.env[key])
@@ -844,6 +875,51 @@ async function setup(payload) {
     ? payload.user_turns.slice(-64)
     : [];
   await mkdir(join(config.state, "home"), { recursive: true });
+  if (process.platform === "win32") {
+    const portProbe = createServer();
+    await new Promise((resolve, reject) => {
+      portProbe.once("error", reject);
+      portProbe.listen(0, "127.0.0.1", resolve);
+    });
+    config.native_control_port = portProbe.address().port;
+    await new Promise((resolve) => portProbe.close(resolve));
+    config.native_control_token = randomBytes(32).toString("hex");
+    const patches = join(config.state, "..", ".native-patches");
+    await mkdir(patches, { recursive: true });
+    config.native_patch = join(patches, config.id + ".yml");
+    let patch = await readFile(
+      join(integration, "execution.patch.yml"),
+      "utf8",
+    );
+    patch = patch
+      .replace(
+        /name: \/opt\/medical-agent\/integrations\/dsh\/([^\r\n]+)/g,
+        (_all, name) => {
+          const file =
+            name === "execution-shell.mjs"
+              ? join(integration, "../windows/powershell-executor.mjs")
+              : join(integration, name);
+          return "name: " + JSON.stringify(file.replaceAll("\\", "/"));
+        },
+      )
+      .replace(
+        "workspaceRoot: /workspace",
+        "workspaceRoot: " + JSON.stringify(config.workspace),
+      )
+      .replace(
+        "Work in /workspace;",
+        "Work in the selected Windows project directory;",
+      )
+      .replace(
+        "The validated Linux environment provides python3; do not assume python or pip is installed.",
+        "This is native Windows. The bash-named tool runs Windows PowerShell, not bash or WSL. Use PowerShell syntax. Python is available as python.exe; pip and third-party scientific packages are not assumed. Native command failures preserve their exit code.",
+      )
+      .replace(
+        "Bash pipelines use pipefail by default.",
+        "PowerShell errors stop the command and native exit codes are retained.",
+      );
+    await writeFile(config.native_patch, patch, { mode: 0o600 });
+  }
   gateway = createServer((req, res) =>
     proxy(req, res).catch(() => errorResponse(res, 500)),
   );
@@ -857,7 +933,10 @@ async function setup(payload) {
   emit("ready", {
     runtime: "dsh-sdk",
     version: "0.2.0-rc.2",
-    isolation: "bubblewrap-filesystem",
+    isolation:
+      process.platform === "win32"
+        ? "windows-processcontainer"
+        : "bubblewrap-filesystem",
     network: "enabled",
     model: config.model,
   });

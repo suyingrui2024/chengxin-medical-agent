@@ -92,15 +92,27 @@ export async function apply(ctx) {
     },
     { prepend: true },
   );
+  const native = process.platform === "win32";
   const socket = "/state/control.sock";
-  try {
-    const info = await lstat(socket);
-    if (!info.isSocket()) throw new Error("Invalid control socket");
-    await unlink(socket);
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
+  if (!native)
+    try {
+      const info = await lstat(socket);
+      if (!info.isSocket()) throw new Error("Invalid control socket");
+      await unlink(socket);
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
   const server = createServer(async (request, response) => {
+    if (
+      native &&
+      (!process.env.CHENGXIN_CONTROL_TOKEN ||
+        request.headers["x-chengxin-control"] !==
+          process.env.CHENGXIN_CONTROL_TOKEN)
+    ) {
+      response.writeHead(401);
+      response.end();
+      return;
+    }
     const url = new URL(request.url, "http://runtime.local");
     if (request.method === "GET" && url.pathname === "/status") {
       const requested = Number(url.searchParams.get("after") || 0);
@@ -168,7 +180,13 @@ export async function apply(ctx) {
   });
   await new Promise((resolve, reject) => {
     server.once("error", reject);
-    server.listen(socket, resolve);
+    if (native)
+      server.listen(
+        Number(process.env.CHENGXIN_CONTROL_PORT),
+        "127.0.0.1",
+        resolve,
+      );
+    else server.listen(socket, resolve);
   });
   ctx.effect(() => () => {
     server.closeAllConnections();

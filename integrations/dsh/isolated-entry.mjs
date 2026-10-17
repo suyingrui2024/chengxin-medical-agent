@@ -5,6 +5,8 @@ import { spawn } from "node:child_process";
 import { realpathSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { nativeLaunch } from "../windows/isolation.mjs";
+import { unlinkSync } from "node:fs";
 
 export function isolatedLaunch({
   workspace,
@@ -16,6 +18,26 @@ export function isolatedLaunch({
   argv,
   command,
 }) {
+  if (process.platform === "win32") {
+    return nativeLaunch({
+      workspace,
+      state,
+      modules,
+      integration,
+      env,
+      command: command || [
+        process.execPath,
+        resolve(modules, "@deepseek-ai/dsh/lib/bin.js"),
+        ...argv,
+      ],
+      readonly: [
+        dirname(process.execPath),
+        dirname(env.CHENGXIN_PYTHON),
+        dirname(integration),
+        env.CHENGXIN_NATIVE_PATCH,
+      ].filter(Boolean),
+    });
+  }
   for (const path of [workspace, state, nodeRoot, modules, integration]) {
     if (typeof path !== "string" || !path.startsWith("/") || !existsSync(path))
       throw new Error("Invalid runtime mount");
@@ -118,6 +140,14 @@ if (
         CHENGXIN_MODEL: process.env.CHENGXIN_MODEL,
         CHENGXIN_RESUME_SESSION_ID:
           process.env.CHENGXIN_RESUME_SESSION_ID || "",
+        ...(process.platform === "win32"
+          ? {
+              CHENGXIN_PYTHON: process.env.CHENGXIN_PYTHON,
+              CHENGXIN_NATIVE_PATCH: process.env.CHENGXIN_NATIVE_PATCH,
+              CHENGXIN_CONTROL_PORT: process.env.CHENGXIN_CONTROL_PORT,
+              CHENGXIN_CONTROL_TOKEN: process.env.CHENGXIN_CONTROL_TOKEN,
+            }
+          : {}),
         ...Object.fromEntries(
           ["HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy", "NO_PROXY"]
             .filter((key) => process.env[key])
@@ -128,7 +158,15 @@ if (
     });
     const child = spawn(launch.command, launch.args, {
       stdio: "inherit",
-      env: { PATH: "/usr/bin:/bin" },
+      env:
+        process.platform === "win32"
+          ? {
+              PATH: process.env.PATH,
+              SystemRoot: process.env.SystemRoot,
+              TEMP: process.env.TEMP,
+              TMP: process.env.TMP,
+            }
+          : { PATH: "/usr/bin:/bin" },
     });
     for (const signal of ["SIGTERM", "SIGINT"])
       process.on(signal, () => child.kill(signal));
@@ -137,6 +175,11 @@ if (
       process.exitCode = 1;
     });
     child.on("exit", (code, signal) => {
+      if (launch.policyFile) {
+        try {
+          unlinkSync(launch.policyFile);
+        } catch {}
+      }
       process.exitCode = code ?? (signal ? 1 : 0);
     });
   } catch {

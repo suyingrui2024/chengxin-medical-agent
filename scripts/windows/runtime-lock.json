@@ -7,6 +7,13 @@
     "sha256": "a93abe456ab01bd96d7a085b3cdb6566b3063f4241360d114142fbdb07f0a310",
     "checksum_source": "https://www.python.org/ftp/python/3.14.8/python-3.14.8-embed-amd64.zip.spdx.json"
   },
+  "isolation": {
+    "version": "1.0.1",
+    "url": "https://registry.npmjs.org/@microsoft/mxc-sdk/-/mxc-sdk-1.0.1.tgz",
+    "sha256": "416d9607c9d4652395d95c3d9c5f5605f1f2f845da1a63228bee41b7392cef49",
+    "archive_directory": "package/bin/x64",
+    "checksum_source": "https://registry.npmjs.org/@microsoft/mxc-sdk/1.0.1"
+  },
   "node": {
     "version": "22.23.3",
     "url": "https://nodejs.org/dist/v22.23.3/node-v22.23.3-win-x64.zip",

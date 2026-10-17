@@ -664,12 +664,12 @@ class ExecutionSession:
     def _start(self):
         if self.process and self.process.poll() is None:
             return
-        if not shutil.which("bwrap") or not shutil.which("node"):
+        if (os.name != "nt" and not shutil.which("bwrap")) or not shutil.which("node"):
             raise ExecutionError("执行工作台需要 Linux bubblewrap 和 Node")
         self.ready.clear()
         environment = {
             key: os.environ[key]
-            for key in ("PATH", "LANG", "TMPDIR")
+            for key in ("PATH", "LANG", "TMPDIR", "SystemRoot", "WINDIR", "TEMP", "TMP")
             if key in os.environ
         }
         for key in ("HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"):
@@ -683,7 +683,8 @@ class ExecutionSession:
             ):
                 environment[key] = value
         environment["NO_PROXY"] = "127.0.0.1,localhost,::1"
-        self.process = subprocess.Popen(
+        from .processes import popen
+        self.process = popen(
             [
                 shutil.which("node"),
                 str(self.source_root / "integrations/dsh/execution-worker.mjs"),
@@ -695,7 +696,6 @@ class ExecutionSession:
             text=True,
             bufsize=1,
             env=environment,
-            start_new_session=True,
         )
         process = self.process
         self.reader_thread = threading.Thread(
@@ -985,15 +985,22 @@ class ExecutionSession:
                 try:
                     process.wait(timeout=6)
                 except subprocess.TimeoutExpired:
-                    os.killpg(process.pid, signal.SIGTERM)
+                    if os.name == "nt":
+                        from .processes import terminate
+                        terminate(process)
+                    else:
+                        os.killpg(process.pid, signal.SIGTERM)
                     try:
                         process.wait(timeout=3)
                     except subprocess.TimeoutExpired:
-                        os.killpg(process.pid, signal.SIGKILL)
+                        from .processes import terminate
+                        terminate(process)
                         process.wait(timeout=3)
         except (OSError, ProcessLookupError):
             pass
         finally:
+            from .processes import release
+            release(process)
             if process.stdin and not process.stdin.closed:
                 process.stdin.close()
             if (
