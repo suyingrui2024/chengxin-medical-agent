@@ -39,6 +39,10 @@ try {
   await new Promise((resolve) => gateway.listen(0, "127.0.0.1", resolve));
   const python = process.env.MEDAGENT_PYTHON;
   assert(python, "The installation must select the dedicated Windows Python");
+  const nativePipeline =
+    "$ErrorActionPreference='Stop'; & '" +
+    python.replaceAll("'", "''") +
+    "' -I -c 'print(42)' | ForEach-Object { $_ }; exit $LASTEXITCODE";
   const pathProbe = `import ctypes as c,json,sys
 from ctypes import wintypes as w
 k=c.WinDLL('kernel32',use_last_error=True)
@@ -63,10 +67,12 @@ print(json.dumps(rows))`;
     assert.throws(()=>fs.readFileSync(${JSON.stringify(applicationSecret)}));
     assert.equal(typeof JSON.parse(fs.readFileSync(${JSON.stringify(join(root, "package.json"))},'utf8')).name,'string');
     assert.equal(process.env.CHENGXIN_HOST_ONLY_SECRET,undefined);
+    assert.equal(process.env.PATHEXT,'.COM;.EXE;.BAT;.CMD');
     assert.equal(fs.readFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'utf8'),'immutable-reference');
     assert.throws(()=>fs.writeFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'must-not-write'));
     fs.writeFileSync('artifact.txt','native-isolated');
     assert.equal(cp.execFileSync(${JSON.stringify(python)},['-I','-c','print(6*7)'],{encoding:'utf8'}).trim(),'42');
+    assert.equal(cp.execFileSync(require('node:path').join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoLogo','-NoProfile','-NonInteractive','-EncodedCommand',${JSON.stringify(Buffer.from(nativePipeline, "utf16le").toString("base64"))}],{encoding:'utf8'}).trim(),'42');
     cp.execFileSync(${JSON.stringify(python)},['-I','-m','venv','.venv'],{encoding:'utf8'});
     const projectPython=require('node:path').resolve('.venv/Scripts/python.exe');
     assert.equal(cp.execFileSync(projectPython,['-c','import sys; assert sys.prefix != sys.base_prefix; print(42)'],{encoding:'utf8'}).trim(),'42');
@@ -93,6 +99,7 @@ print(json.dumps(rows))`;
         PATH: process.env.PATH,
         TEMP: process.env.TEMP,
         CHENGXIN_HOST_ONLY_SECRET: "must-not-leak",
+        PATHEXT: ".PRIVATE_HOST_EXTENSION",
       },
     },
   );
@@ -108,6 +115,7 @@ print(json.dumps(rows))`;
       isolation: "windows-processcontainer",
       ...result,
       model_calls: 0,
+      powershell_native_pipeline: "passed",
     }),
   );
 } catch (error) {

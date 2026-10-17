@@ -67,6 +67,9 @@ export function requestFor({
     WINDIR: systemRoot,
     SystemDrive: win32.parse(systemRoot).root.slice(0, 2),
     ComSpec: join(systemRoot, "System32/cmd.exe"),
+    // PowerShell otherwise classifies even python.exe as a document. Supply
+    // only native command extensions, independently of the host's PATHEXT.
+    PATHEXT: ".COM;.EXE;.BAT;.CMD",
     PATH: [
       dirname(realpathSync(process.execPath)),
       env.CHENGXIN_PYTHON ? dirname(env.CHENGXIN_PYTHON) : "",
