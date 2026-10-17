@@ -191,7 +191,7 @@ else:
                 disposition = 5  # OVERWRITE_IF
             if dir_fd is not None:
                 name = checked_name(path)
-                text = C.create_unicode_buffer(name)
+                text = C.create_unicode_buffer(name, len(name.encode("utf-16-le")) // 2 + 1)
                 unicode = UNICODE_STRING(
                     len(name.encode("utf-16-le")),
                     len(name.encode("utf-16-le")) + 2,

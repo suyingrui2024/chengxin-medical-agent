@@ -23,7 +23,8 @@ try {
     $han = [string][char]0x4E2D + [string][char]0x6587
     $values = @('', 'contains spaces', "a project's path", 'quoted "value"', 'C:\trailing\', '$(do-not-evaluate)', $han)
     Invoke-ChengxinCommand $node (@($program, $output) + $values)
-    $actual = @(Get-Content -LiteralPath $output -Raw -Encoding UTF8 | ConvertFrom-Json)
+    $decoded = Get-Content -LiteralPath $output -Raw -Encoding UTF8 | ConvertFrom-Json
+    $actual = @($decoded)
     if ($actual.Count -ne $values.Count) { throw 'Native argv length changed.' }
     for ($i = 0; $i -lt $values.Count; $i++) {
         if ($actual[$i] -cne $values[$i]) { throw "Native argument $i changed." }
