@@ -9,7 +9,8 @@ import {
   realpath,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, toNamespacedPath } from "node:path";
+import { statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
@@ -63,7 +64,13 @@ test("native realpath adapter preserves sync, callback, promise and error result
   await mkdir(workspace);
   const file = join(workspace, "中文.txt");
   await writeFile(file, "fixture");
-  const lookup = createPathResolver([workspace]);
+  const privateFile = join(root, "private-marker.txt");
+  await writeFile(privateFile, "synthetic-private-marker");
+  const lookup = createPathResolver([workspace], { ancestorMetadata: true });
+  assert.equal(lookup(root).ok, true);
+  assert.equal(lookup(privateFile).code, "EACCES");
+  assert.equal(lookup.statDirectory(file).code, "EACCES");
+  const expectedInfo = statSync(root, { bigint: true });
   let requests = 0;
   const server = createServer(async (request, response) => {
     if (request.headers["x-api-key"] !== "path-fixture") {
@@ -74,7 +81,14 @@ test("native realpath adapter preserves sync, callback, promise and error result
     let raw = "";
     for await (const chunk of request) raw += chunk;
     requests++;
-    response.end(JSON.stringify(lookup(JSON.parse(raw).path)));
+    const payload = JSON.parse(raw);
+    response.end(
+      JSON.stringify(
+        payload.operation === "directory-stat"
+          ? lookup.statDirectory(payload.path)
+          : lookup(payload.path),
+      ),
+    );
   });
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const adapter = fileURLToPath(
@@ -82,6 +96,13 @@ test("native realpath adapter preserves sync, callback, promise and error result
   );
   const code = `
     const fs=require('node:fs'),assert=require('node:assert/strict'),{promisify}=require('node:util');
+    // Inject the precise OS-denial observed in Windows, without claiming this
+    // host test runs a process container.
+    const denied = new Set(${JSON.stringify([root, toNamespacedPath(root), privateFile])});
+    const originalSync=fs.statSync, originalAsync=fs.promises.stat;
+    fs.statSync=(path,...args)=>{if(denied.has(path))throw Object.assign(new Error('fixture OS denial'),{code:'EPERM'});return originalSync(path,...args);};
+    fs.promises.stat=async(path,...args)=>{if(denied.has(path))throw Object.assign(new Error('fixture OS denial'),{code:'EPERM'});return originalAsync(path,...args);};
+    require(${JSON.stringify(adapter)});
     (async()=>{
       const file=${JSON.stringify(file)}, expected=${JSON.stringify(await realpath(file))};
       assert.equal(fs.realpathSync.native(file),expected);
@@ -91,11 +112,18 @@ test("native realpath adapter preserves sync, callback, promise and error result
       assert.equal(await fs.promises.realpath(file),expected);
       assert.throws(()=>fs.realpathSync(${JSON.stringify(join(root, "outside"))}),{code:'EACCES'});
       await assert.rejects(fs.promises.realpath(${JSON.stringify(join(workspace, "missing"))}),{code:'ENOENT'});
+      const normal=fs.statSync(${JSON.stringify(root)});
+      const big=await fs.promises.stat(${JSON.stringify(toNamespacedPath(root))},{bigint:true});
+      assert(normal instanceof fs.Stats); assert(normal.isDirectory());
+      assert.equal(big.ino,BigInt(${JSON.stringify(String(expectedInfo.ino))}));
+      assert.equal(big.mtimeNs,BigInt(${JSON.stringify(String(expectedInfo.mtimeNs))}));
+      assert.equal(typeof normal.ino,'number'); assert(normal.mtime instanceof Date);
+      assert.throws(()=>fs.statSync(${JSON.stringify(privateFile)}),{code:'EPERM'});
       console.log('passed');
     })().catch(error=>{console.error(error);process.exitCode=1;});`;
   let child;
   try {
-    child = spawn(process.execPath, ["--require", adapter, "-e", code], {
+    child = spawn(process.execPath, ["-e", code], {
       env: {
         ...process.env,
         CHENGXIN_PATH_BROKER: `http://127.0.0.1:${server.address().port}/metadata`,
@@ -119,7 +147,7 @@ test("native realpath adapter preserves sync, callback, promise and error result
     clearTimeout(timer);
     assert.equal(exit, 0, stderr);
     assert.equal(stdout.trim(), "passed");
-    assert.equal(requests, 7);
+    assert.equal(requests, 10);
   } finally {
     child?.kill();
     server.closeAllConnections();

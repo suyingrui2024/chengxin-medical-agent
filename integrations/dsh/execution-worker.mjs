@@ -669,8 +669,13 @@ async function proxy(request, response) {
     try {
       const value = JSON.parse(Buffer.concat(chunks));
       result =
-        value && Object.keys(value).length === 1
-          ? resolveNativePath(value.path)
+        value &&
+        Object.keys(value).every((key) => ["path", "operation"].includes(key))
+          ? value.operation === "directory-stat"
+            ? resolveNativePath.statDirectory(value.path)
+            : !value.operation || value.operation === "realpath"
+              ? resolveNativePath(value.path)
+              : { ok: false, code: "EINVAL" }
           : { ok: false, code: "EINVAL" };
     } catch {
       result = { ok: false, code: "EINVAL" };
@@ -919,20 +924,29 @@ async function setup(payload) {
       );
     // The selected workspace is the instruction boundary. Ancestors outside
     // that grant are intentionally inaccessible on native Windows.
-    patch += "\n- id: agent-instructions\n  config:\n    projectRootMarkers: [\".\"]\n";
+    patch +=
+      '\n- id: agent-instructions\n  config:\n    maxBytes: 65536\n    projectRootMarkers: ["."]\n';
+    // The SDK normally switches to its pwsh tool/provider on Windows. This
+    // adapter keeps the shared bash-named tool and supplies native PowerShell
+    // through the same official job/result lifecycle, with one shell provider.
+    patch +=
+      "- id: pwsh-sandbox\n  disabled: true\n- id: tool-pwsh\n  disabled: true\n- id: tool-bash\n  disabled: false\n";
     await writeFile(config.native_patch, patch, { mode: 0o600 });
-    resolveNativePath = createPathResolver([
-      config.workspace,
-      config.state,
-      join(integration, "../../node_modules"),
-      dirname(integration),
-      dirname(process.execPath),
-      dirname(config.python),
-      config.native_patch,
-      join(integration, "../../package.json"),
-      { path: join(integration, "../.."), recursive: false },
-      join(process.env.SystemRoot, "System32/WindowsPowerShell/v1.0"),
-    ]);
+    resolveNativePath = createPathResolver(
+      [
+        config.workspace,
+        config.state,
+        join(integration, "../../node_modules"),
+        dirname(integration),
+        dirname(process.execPath),
+        dirname(config.python),
+        config.native_patch,
+        join(integration, "../../package.json"),
+        { path: join(integration, "../.."), recursive: false },
+        join(process.env.SystemRoot, "System32/WindowsPowerShell/v1.0"),
+      ],
+      { ancestorMetadata: true },
+    );
   }
   gateway = createServer((req, res) =>
     proxy(req, res).catch(() => errorResponse(res, 500)),

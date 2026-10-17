@@ -23,8 +23,12 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
     url.password
   )
     throw new Error("Invalid native path metadata gateway");
-  // Preserve the caller when the SDK serializes an access error's message but
-  // drops its stack; this does not change any filesystem decision.
+  const statPrototypes = {
+    number: fs.Stats.prototype,
+    bigint: Object.getPrototypeOf(fs.statSync(__filename, { bigint: true })),
+  };
+  // Only a denied directory query may fall back to host metadata. Actual file
+  // operations and all successful OS queries retain their original behavior.
   for (const name of ["stat", "lstat"]) {
     const original = fs.promises[name].bind(fs.promises);
     fs.promises[name] = async (...args) => {
@@ -32,8 +36,13 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
       try {
         return await original(...args);
       } catch (error) {
-        if (["EPERM", "EACCES"].includes(error.code))
+        if (["EPERM", "EACCES"].includes(error.code)) {
+          if (name === "stat")
+            try {
+              return directoryStats(args[0], args[1]);
+            } catch {}
           error.message += "\n" + caller;
+        }
         throw error;
       }
     };
@@ -43,8 +52,13 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
       try {
         return originalSync(...args);
       } catch (error) {
-        if (["EPERM", "EACCES"].includes(error.code))
+        if (["EPERM", "EACCES"].includes(error.code)) {
+          if (name === "stat")
+            try {
+              return directoryStats(args[0], args[1]);
+            } catch {}
           error.message += "\n" + error.stack;
+        }
         throw error;
       }
     };
@@ -54,7 +68,7 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
     const http = require('node:http');
     const header = new Int32Array(workerData.shared, 0, 2);
     const output = new Uint8Array(workerData.shared, 8);
-    parentPort.on('message', path => {
+    parentPort.on('message', payload => {
       let finished = false;
       const finish = result => {
         if (finished) return; finished = true;
@@ -78,7 +92,7 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
       });
       request.setTimeout(2500, () => request.destroy(new Error('Metadata timeout')));
       request.on('error', () => finish({ok:false,code:'EIO'}));
-      request.end(JSON.stringify({path}));
+      request.end(JSON.stringify(payload));
     });`;
   let bridge;
   function startBridge() {
@@ -97,17 +111,23 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
       output: new Uint8Array(shared, 8),
     };
   }
-  function canonical(path, options) {
-    const input = resolve(
+  function inputPath(path) {
+    let value =
       path instanceof URL
         ? fileURLToPath(path)
         : Buffer.isBuffer(path)
           ? path.toString()
-          : path,
-    );
+          : path;
+    if (process.platform === "win32" && typeof value === "string") {
+      if (value.startsWith("\\\\?\\UNC\\")) value = "\\\\" + value.slice(8);
+      else if (value.startsWith("\\\\?\\")) value = value.slice(4);
+    }
+    return resolve(value);
+  }
+  function metadata(input, operation) {
     bridge ||= startBridge();
     Atomics.store(bridge.header, 0, 0);
-    bridge.worker.postMessage(input);
+    bridge.worker.postMessage({ path: input, operation });
     const completed = Atomics.wait(bridge.header, 0, 0, 3500);
     if (completed === "timed-out") {
       bridge.worker.terminate();
@@ -123,15 +143,46 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
         bridge.output.subarray(0, Atomics.load(bridge.header, 1)),
       ).toString(),
     );
-    if (!result.ok || typeof result.path !== "string")
+    if (!result.ok)
       throw Object.assign(
         new Error(`${result.code || "EIO"}: realpath '${input}'`),
         { code: result.code || "EIO", syscall: "realpath", path: input },
       );
+    return result;
+  }
+  function canonical(path, options) {
+    const result = metadata(inputPath(path), "realpath");
+    if (typeof result.path !== "string")
+      throw new Error("Invalid canonical path metadata");
     const encoding =
       typeof options === "string" ? options : options?.encoding || "utf8";
     const value = Buffer.from(result.path);
     return encoding === "buffer" ? value : value.toString(encoding);
+  }
+  function directoryStats(path, options) {
+    const result = metadata(inputPath(path), "directory-stat");
+    if (!result.stats || typeof result.stats.mode !== "string")
+      throw new Error("Invalid directory metadata");
+    const bigint = Boolean(options?.bigint);
+    const value = Object.create(
+      bigint ? statPrototypes.bigint : statPrototypes.number,
+    );
+    for (const [key, field] of Object.entries(result.stats)) {
+      if (!bigint && key.endsWith("Ns")) continue;
+      value[key] = bigint
+        ? BigInt(field)
+        : key.endsWith("Ms") && result.stats[key.slice(0, -2) + "Ns"]
+          ? Number(result.stats[key.slice(0, -2) + "Ns"]) / 1e6
+          : Number(field);
+    }
+    for (const key of ["atime", "mtime", "ctime", "birthtime"])
+      Object.defineProperty(value, key, {
+        value: new Date(Number(value[key + "Ms"])),
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
+    return value;
   }
   function asynchronous(path, options, callback) {
     if (typeof options === "function") {

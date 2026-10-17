@@ -11,8 +11,26 @@ function within(path, root) {
   );
 }
 
-export function createPathResolver(roots) {
-  const allowed = roots.map((path) => {
+export function createPathResolver(roots, { ancestorMetadata = false } = {}) {
+  const expanded = [...roots];
+  if (ancestorMetadata) {
+    const seen = new Set();
+    for (const item of roots) {
+      let parent = dirname(
+        resolve(typeof item === "string" ? item : item.path),
+      );
+      for (;;) {
+        if (!seen.has(parent)) {
+          expanded.push({ path: parent, recursive: false });
+          seen.add(parent);
+        }
+        const next = dirname(parent);
+        if (next === parent) break;
+        parent = next;
+      }
+    }
+  }
+  const allowed = expanded.map((path) => {
     const recursive = typeof path === "string" || path.recursive !== false;
     path = typeof path === "string" ? path : path.path;
     const canonical = realpathSync.native(path);
@@ -24,7 +42,7 @@ export function createPathResolver(roots) {
       directory: recursive && statSync(canonical).isDirectory(),
     };
   });
-  return (path) => {
+  const lookup = (path) => {
     if (
       typeof path !== "string" ||
       path.length > 32768 ||
@@ -77,4 +95,28 @@ export function createPathResolver(roots) {
       };
     }
   };
+  lookup.statDirectory = (path) => {
+    const resolved = lookup(path);
+    if (!resolved.ok) return resolved;
+    try {
+      const info = statSync(resolved.path, { bigint: true });
+      if (!info.isDirectory()) return { ok: false, code: "EACCES" };
+      return {
+        ok: true,
+        stats: Object.fromEntries(
+          Object.entries(info)
+            .filter(([, value]) => typeof value === "bigint")
+            .map(([key, value]) => [key, String(value)]),
+        ),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        code: ["ENOENT", "ENOTDIR", "EACCES", "EPERM"].includes(error.code)
+          ? error.code
+          : "EIO",
+      };
+    }
+  };
+  return lookup;
 }
