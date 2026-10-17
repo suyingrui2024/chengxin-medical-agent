@@ -1,0 +1,362 @@
+.appearance-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.appearance-trigger:hover {
+  color: var(--primary);
+  background: var(--light);
+  border-color: var(--line-strong);
+}
+.appearance-trigger .icon {
+  width: 17px;
+  height: 17px;
+}
+.appearance-dialog {
+  width: min(660px, calc(100% - 28px));
+  padding: 30px;
+  background: var(--surface);
+}
+.appearance-dialog .dialog-heading h2 {
+  font-size: 25px;
+}
+.appearance-description {
+  margin: 12px 0 24px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.appearance-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+.appearance-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 16px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.appearance-option {
+  position: relative;
+  cursor: pointer;
+  min-width: 0;
+}
+.appearance-option > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  z-index: 1;
+  cursor: pointer;
+  opacity: 0;
+}
+.theme-swatch {
+  display: grid;
+  grid-template-columns: 28% 1fr;
+  height: 100px;
+  padding: 9px;
+  gap: 8px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  position: relative;
+  transition: transform 160ms ease;
+}
+.swatch-sidebar {
+  background: var(--sidebar);
+  border-radius: 5px;
+  border-top: 14px solid var(--primary);
+}
+.swatch-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--panel-radius);
+}
+.swatch-content i {
+  width: 60%;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 5px;
+}
+.swatch-content b {
+  width: 90%;
+  height: 3px;
+  background: var(--line-strong);
+  border-radius: 5px;
+}
+.swatch-content em {
+  width: 32px;
+  height: 14px;
+  background: var(--primary);
+  border-radius: 4px;
+  margin-top: auto;
+}
+.swatch-check {
+  position: absolute;
+  display: none;
+  place-items: center;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 13px;
+}
+.appearance-option input:checked + .theme-swatch {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+.appearance-option input:checked + .theme-swatch .swatch-check {
+  display: grid;
+}
+.appearance-option input:focus-visible + .theme-swatch {
+  outline: 3px solid var(--primary);
+  outline-offset: 5px;
+}
+.appearance-option:hover .theme-swatch {
+  transform: translateY(-2px);
+}
+.theme-title {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+}
+.theme-title strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.theme-title small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.appearance-system {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  grid-column: 1 / -1;
+  padding: 14px;
+  min-height: 64px;
+  border-radius: 10px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.appearance-system span {
+  display: grid;
+  gap: 4px;
+}
+.appearance-system strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+.appearance-system small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.appearance-system .icon {
+  margin-left: auto;
+  color: var(--muted);
+}
+.appearance-system:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--light);
+}
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--primary);
+}
+.appearance-status {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+  min-height: 21px;
+}
+/* The same typography and surface roles cover all established app views. */
+h1,
+.welcome h2,
+.dialog-heading h2 {
+  font-family: var(--heading-font, var(--serif));
+}
+.conversation-panel,
+.surface,
+.facts-panel {
+  border-radius: var(--panel-radius);
+}
+dialog {
+  background: var(--surface);
+  box-shadow: var(--elevation);
+}
+dialog::backdrop {
+  background: var(--overlay);
+}
+input,
+textarea,
+select {
+  color: var(--ink);
+  background-color: var(--surface);
+}
+button:disabled {
+  cursor: default;
+}
+.new-button:hover,
+.primary-button:hover {
+  background: var(--primary-hover);
+}
+.status-dot {
+  background: var(--success);
+}
+/* Static instructional artwork keeps its reviewed colours across appearances. */
+.structured-task .task-image {
+  background: #eff4ec;
+  border-radius: 14px;
+}
+.body-map-canvas > svg {
+  color: var(--primary);
+}
+.body-anatomy {
+  fill: var(--silhouette);
+  stroke: var(--anatomy-line);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+.body-landmarks {
+  fill: none;
+  stroke: var(--anatomy-line);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.body-side-labels {
+  fill: var(--muted);
+  stroke: none;
+}
+.body-region {
+  fill: var(--primary);
+  fill-opacity: 0.24;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+.body-region-ring {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+.body-map-scope {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: left;
+}
+.illustration-zoom {
+  display: block;
+  min-height: 44px;
+  margin: 4px auto 0;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--primary);
+  background: transparent;
+  font-size: 12px;
+}
+.illustration-zoom:hover {
+  background: var(--light);
+}
+.illustration-dialog {
+  width: min(720px, calc(100% - 24px));
+  padding: 24px;
+}
+.illustration-dialog h2 {
+  font-family: var(--heading-font, var(--serif));
+  font-weight: 500;
+  font-size: 21px;
+  margin: 0 0 10px;
+}
+.illustration-large {
+  display: block;
+  width: 100%;
+  height: min(58dvh, 580px);
+  object-fit: contain;
+  margin: 16px 0;
+  border-radius: 12px;
+  background: #eff4ec;
+}
+.illustration-instruction {
+  color: var(--ink);
+  line-height: 1.8;
+  text-align: left;
+}
+.illustration-dialog .secondary-button {
+  display: flex;
+  margin-left: auto;
+}
+@media (max-width: 700px) {
+  .top-actions {
+    gap: 8px;
+  }
+  .appearance-trigger {
+    padding: 8px;
+    min-width: 44px;
+  }
+  .appearance-trigger > span {
+    display: none;
+  }
+  .appearance-dialog {
+    padding: 22px 18px;
+  }
+  .appearance-dialog .dialog-heading h2 {
+    font-size: 21px;
+    line-height: 1.5;
+  }
+  .appearance-dialog .eyebrow {
+    font-size: 7px;
+  }
+  .appearance-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 14px;
+  }
+  .theme-swatch {
+    height: 80px;
+  }
+  .appearance-description {
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-swatch {
+    transition: none;
+  }
+  .appearance-option:hover .theme-swatch {
+    transform: none;
+  }
+}
+@media (forced-colors: active) {
+  .appearance-option input:checked + .theme-swatch {
+    outline: 3px solid Highlight;
+  }
+  .swatch-check {
+    forced-color-adjust: none;
+  }
+  .body-region,
+  .body-region-ring {
+    stroke: Highlight;
+  }
+}

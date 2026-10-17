@@ -4,4 +4,8 @@ const { contextBridge, ipcRenderer } = require("electron");
 // The main process obtains the path from the native picker itself.
 contextBridge.exposeInMainWorld("chengxinDesktop", {
   openProject: () => ipcRenderer.invoke("execution:open-project"),
+  appearance: {
+    initial: ipcRenderer.sendSync("appearance:read"),
+    save: (value) => ipcRenderer.invoke("appearance:save", value),
+  },
 });

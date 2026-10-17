@@ -17,10 +17,11 @@
     "test:execution:benchmark": "PYTHONPATH=src python3 scripts/benchmark_execution.py",
     "test:execution:persistence": "PYTHONPATH=src python3 scripts/evaluate_persistence.py",
     "test:ui": "playwright test",
-    "format:check": "prettier --check src/medagent/web/index.html src/medagent/web/styles.css src/medagent/web/fonts.css src/medagent/web/*.js src/medagent/extensions/**/*.json playwright*.mjs tests/fixtures/*.mjs tests/ui/*.mjs tests/desktop/*.mjs tests/live/*.mjs desktop/*.{cjs,html,css} scripts/*desktop*.mjs scripts/check-bundled-fonts.mjs",
+    "format:check": "prettier --check src/medagent/web/index.html src/medagent/web/*.css src/medagent/web/*.js src/medagent/extensions/**/*.json playwright*.mjs tests/fixtures/*.mjs tests/ui/*.mjs tests/desktop/*.mjs tests/live/*.mjs desktop/*.{cjs,html,css} scripts/*desktop*.mjs scripts/check-bundled-fonts.mjs",
     "dsh:check": "node integrations/dsh/check.mjs",
     "test:dsh": "node --test integrations/dsh/tests/*.test.mjs",
-    "test:dsh:integration": "node integrations/dsh/tests/runtime-smoke.mjs"
+    "test:dsh:integration": "node integrations/dsh/tests/runtime-smoke.mjs",
+    "test:appearance": "playwright test tests/ui/appearance.spec.mjs"
   },
   "dependencies": {
     "@deepseek-ai/dsh": "0.2.0-rc.2",
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@electron/packager": "20.3.0",
     "@playwright/test": "1.64.1",
+    "axe-core": "4.10.3",
     "electron": "44.7.2",
     "prettier": "3.9.10"
   }

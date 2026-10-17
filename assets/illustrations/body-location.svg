@@ -1,11 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" role="img" aria-labelledby="title desc">
-  <title id="title">主观症状部位示意</title>
-  <desc id="desc">以人体正面和背面示意头面、胸、腹、四肢以及背腰位置。仅用于说明症状位置，不要求触摸或按压。</desc>
-  <rect width="720" height="420" rx="20" fill="#eaf1ec"/>
-  <defs><g id="person" fill="#f0c8aa" stroke="#b99a81" stroke-width="2"><circle cx="0" cy="70" r="32"/><path d="M-17 104h34l12 17h25l29 134-24 7-30-100v95l19 127h-29l-19-112-19 112h-29l19-127v-95l-30 100-24-7 29-134h25z"/></g></defs>
-  <use href="#person" transform="translate(235)"/>
-  <use href="#person" transform="translate(505)"/>
-  <g fill="#d9ed99" stroke="#17685b" stroke-width="2"><ellipse cx="235" cy="70" rx="22" ry="25"/><rect x="212" y="137" width="46" height="45" rx="8"/><rect x="212" y="189" width="46" height="48" rx="8"/><rect x="482" y="140" width="46" height="98" rx="8"/></g>
-  <g fill="none" stroke="#17685b" stroke-width="2"><path d="M100 70h110M100 160h110M100 213h110M303 295h35M530 187h92"/></g>
-  <g font-family="Arial,'PingFang SC',sans-serif" font-size="19" fill="#18312d"><text x="24" y="77">头/面部</text><text x="24" y="167">胸部</text><text x="24" y="220">腹部</text><text x="320" y="289">四肢</text><text x="627" y="194">背/腰</text><text x="215" y="410" font-size="16">正面</text><text x="485" y="410" font-size="16">背面</text></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
+  <title id="title">主观症状部位：正面与背面</title>
+  <desc id="desc">正面与背面分别显示头面、胸部、腹部、四肢及背腰的大范围。左右按患者自身标注。虚线仅作区域示意，不代表精确位置、测量或疾病，不需要按压身体。</desc>
+  <defs>
+    <g id="person" fill="#e0e8e3" stroke="#718a7d" stroke-width="1.8" stroke-linejoin="round">
+      <ellipse cx="114" cy="45" rx="22" ry="28"/>
+      <path d="M103 72v12l-26 9q-13 4-17 23L41 195q-2 8 5 11l5 2q7 1 10-7l20-63-1 66-7 114q-1 9 8 9h10q7 0 8-8l15-93 15 93q1 8 8 8h10q9 0 8-9l-7-114-1-66 20 63q3 8 10 7l5-2q7-3 5-11l-19-79q-4-19-17-23l-26-9V72"/>
+    </g>
+  </defs>
+  <rect width="720" height="440" rx="20" fill="#f4f7f3"/>
+  <rect x="16" y="16" width="334" height="408" rx="16" fill="#fff" stroke="#dce5da"/>
+  <rect x="370" y="16" width="334" height="408" rx="16" fill="#fff" stroke="#dce5da"/>
+  <g transform="translate(70 42)">
+    <use href="#person"/>
+    <g fill="none" stroke="#718a7d" stroke-width="1.5" stroke-linecap="round"><path d="M106 43h1m14 0h1m-11 14q3 2 6 0M96 96q18 8 36 0M94 151q20 5 40 0"/><circle cx="114" cy="183" r="1.5"/></g>
+    <g fill="#dcebdc" fill-opacity=".75" stroke="#235f4e" stroke-width="1.8" stroke-dasharray="4 3"><ellipse cx="114" cy="45" rx="25" ry="31"/><ellipse cx="114" cy="123" rx="29" ry="26"/><ellipse cx="114" cy="179" rx="27" ry="26"/><ellipse cx="60" cy="162" rx="13" ry="43" transform="rotate(15 60 162)"/><ellipse cx="168" cy="162" rx="13" ry="43" transform="rotate(-15 168 162)"/><ellipse cx="91" cy="272" rx="13" ry="46" transform="rotate(6 91 272)"/><ellipse cx="137" cy="272" rx="13" ry="46" transform="rotate(-6 137 272)"/></g>
+  </g>
+  <g transform="translate(424 42)">
+    <use href="#person"/>
+    <g fill="none" stroke="#718a7d" stroke-width="1.5" stroke-linecap="round"><path d="M103 32q11-5 22 0M97 108q-9 12 0 23m34-23q9 12 0 23M114 100v99M96 203q18-8 36 0"/></g>
+    <ellipse cx="114" cy="155" rx="28" ry="52" fill="#dcebdc" fill-opacity=".75" stroke="#235f4e" stroke-width="1.8" stroke-dasharray="4 3"/>
+  </g>
+  <g fill="none" stroke="#718a7d" stroke-width="1.4"><path d="M210 87h44M214 165h40M212 221h42M138 310H99M567 197h45"/></g>
+  <g font-family="Arial,'PingFang SC',sans-serif" font-size="18" fill="#203c33">
+    <text x="260" y="94">头/面部</text><text x="260" y="172">胸部</text><text x="260" y="228">腹部</text><text x="43" y="317">四肢</text><text x="618" y="204">背/腰</text>
+    <text x="162" y="398" font-size="17">正面</text><text x="516" y="398" font-size="17">背面</text>
+    <text x="91" y="155" font-size="13" fill="#586b60">右</text><text x="270" y="155" font-size="13" fill="#586b60">左</text><text x="445" y="155" font-size="13" fill="#586b60">左</text><text x="624" y="155" font-size="13" fill="#586b60">右</text>
+  </g>
 </svg>
