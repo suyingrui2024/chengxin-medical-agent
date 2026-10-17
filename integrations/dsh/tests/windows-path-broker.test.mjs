@@ -39,6 +39,11 @@ test("path metadata rejects siblings, escaping links and undeclared files", asyn
     assert.equal(lookup(join(root, "other.json")).code, "EACCES");
     assert.equal(lookup("relative").code, "EINVAL");
     assert.equal(lookup(workspace + "\0").code, "EINVAL");
+    const alias = join(root, "selected-alias");
+    await symlink(workspace, alias, "junction");
+    const aliased = createPathResolver([alias]);
+    assert.equal(aliased(join(workspace, "中文.txt")).ok, true);
+    assert.equal(aliased(join(alias, "escape")).code, "EACCES");
   } finally {
     await rm(root, { recursive: true, force: true });
   }

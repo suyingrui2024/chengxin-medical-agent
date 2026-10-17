@@ -30,7 +30,9 @@ export function createPathResolver(roots) {
       return { ok: false, code: "EINVAL" };
     const input = resolve(path);
     const candidates = allowed.filter((root) =>
-      root.directory ? within(input, root.input) : !relative(root.input, input),
+      root.directory
+        ? within(input, root.input) || within(input, root.canonical)
+        : !relative(root.input, input) || !relative(root.canonical, input),
     );
     if (!candidates.length) return { ok: false, code: "EACCES" };
     try {
