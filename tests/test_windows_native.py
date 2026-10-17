@@ -34,7 +34,25 @@ class NativeWindowsTests(unittest.TestCase):
             source.write_text("answer=2", encoding="utf-8")
             os.utime(source, ns=(named.st_atime_ns, named.st_mtime_ns))
             changed = checkpoint(root, (info.st_dev, info.st_ino), ["."])
-            self.assertTrue(changed["complete"])
+            if not changed["complete"]:
+                from medagent.execution_changes import capture, fingerprint
+
+                fd = workspace_os.open(
+                    source, workspace_os.O_RDONLY | workspace_os.O_NOFOLLOW
+                )
+                try:
+                    diagnostic = {
+                        "scan": capture(root, (info.st_dev, info.st_ino)),
+                        "handle": fingerprint(workspace_os.fstat(fd)),
+                        "path": fingerprint(source.stat()),
+                    }
+                finally:
+                    workspace_os.close(fd)
+            else:
+                diagnostic = {}
+            self.assertTrue(
+                changed["complete"], json.dumps(diagnostic, ensure_ascii=False)
+            )
             self.assertNotEqual(first["sha256"], changed["sha256"])
 
     def test_handle_relative_unicode_files_reparse_points_and_preview(self):
