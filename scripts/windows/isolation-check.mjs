@@ -15,13 +15,18 @@ import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { createServer } from "node:http";
+import { randomUUID } from "node:crypto";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 if (process.platform !== "win32")
   throw new Error("This check requires real Windows");
 const scratch = await mkdtemp(join(tmpdir(), "chengxin-native-isolation-"));
 const gateway = createServer((_req, res) => res.end("fixture-gateway"));
 let launch;
+const applicationSecret = join(root, `.native-host-only-${randomUUID()}.txt`);
 try {
+  await writeFile(applicationSecret, "synthetic-private-application-marker", {
+    flag: "wx",
+  });
   const workspace = join(scratch, "workspace"),
     state = join(scratch, "state");
   await mkdir(workspace);
@@ -55,6 +60,8 @@ print(json.dumps(rows))`;
   const code = `const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
     console.error(cp.execFileSync(${JSON.stringify(python)},['-I','-c',${JSON.stringify(pathProbe)},${JSON.stringify(join(root, "node_modules/@deepseek-ai/dsh"))},${JSON.stringify(workspace)}],{encoding:'utf8'}).trim());
     assert.throws(()=>fs.readFileSync(${JSON.stringify(marker)}));
+    assert.throws(()=>fs.readFileSync(${JSON.stringify(applicationSecret)}));
+    assert.equal(typeof JSON.parse(fs.readFileSync(${JSON.stringify(join(root, "package.json"))},'utf8')).name,'string');
     assert.equal(process.env.CHENGXIN_HOST_ONLY_SECRET,undefined);
     assert.equal(fs.readFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'utf8'),'immutable-reference');
     assert.throws(()=>fs.writeFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'must-not-write'));
@@ -117,6 +124,7 @@ print(json.dumps(rows))`;
   throw error;
 } finally {
   if (launch?.policyFile) await unlink(launch.policyFile).catch(() => {});
+  await unlink(applicationSecret).catch(() => {});
   gateway.closeAllConnections();
   await new Promise((resolve) => gateway.close(resolve));
   await rm(scratch, { recursive: true, force: true });
