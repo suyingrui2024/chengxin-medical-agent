@@ -22,6 +22,7 @@ from .execution_capabilities import freeze_binding, validate_receipt
 from .execution_observations import ACTIVE_JOB_STATES, validate_observation
 from .execution_limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
 from .execution_changes import ChangeTracker
+from .execution_identity import encode_identity
 from .execution_clarifications import (
     validate_clarification,
     ACTIVE_CLARIFICATION_STATES,
@@ -719,7 +720,7 @@ class ExecutionSession:
                 "require_resume": self.require_resume,
                 "python": sys.executable,
                 "capability_binding": self.capability_binding,
-                "directory_identity": list(self.directory_identity),
+                "directory_identity": encode_identity(self.directory_identity),
                 "store_root": str(self.storage_root),
                 "user_turns": [
                     {"id": turn["id"], "text": turn["text"]}

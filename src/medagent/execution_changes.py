@@ -14,6 +14,7 @@ import time
 from uuid import uuid4
 
 from .execution_store import identifier
+from .execution_identity import decode_identity
 
 FORMAT = "workspace-baseline/v1"
 MAX_RECORD_BYTES = 4_000_000
@@ -692,7 +693,7 @@ def main():
         data = json.loads(sys.stdin.buffer.read(32001))
         tracker = ChangeTracker(
             data["directory"],
-            data["identity"],
+            decode_identity(data["identity"]),
             data["store_root"],
             data["workspace_id"],
             data.get("secret", ""),

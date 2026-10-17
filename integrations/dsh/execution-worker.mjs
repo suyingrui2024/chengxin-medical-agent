@@ -614,7 +614,14 @@ async function workspaceCheckpoint(paths, owned) {
       !result.ok ||
       !validCheckpoint(result.result)
     )
-      throw new Error("文件版本核对未能完成");
+      throw new Error(
+        "文件版本核对未能完成: " +
+          JSON.stringify({
+            helper_ok: result.ok === true,
+            complete: result.result?.complete,
+            files: result.result?.files,
+          }),
+      );
     return result.result;
   } catch (error) {
     emit("workspace.checkpoint_unavailable", {
@@ -923,7 +930,7 @@ async function setup(payload) {
       )
       .replace(
         "The validated Linux environment provides python3; do not assume python or pip is installed.",
-        "This is native Windows. The bash-named tool runs Windows PowerShell. Use PowerShell syntax. Python and pip are bundled; use python.exe -m venv .venv for project dependencies, then .venv/Scripts/python.exe -m pip. The bundled runtime is read-only; scientific packages are not preinstalled. Native command failures preserve their exit code.",
+        "This is native Windows. The bash-named tool runs Windows PowerShell. Use PowerShell syntax and npm.cmd for npm. Each command uses a ChengxinWorkspace: PSDrive rooted at its workdir. Use relative paths for files and $PWD.ProviderPath when native programs need a physical path; the workdir tool parameter uses physical Windows paths. Python and pip are bundled; use python.exe -m venv .venv for project dependencies, then .venv/Scripts/python.exe -m pip. The bundled runtime is read-only; scientific packages are not preinstalled. Native command failures preserve their exit code.",
       )
       .replace(
         "Bash pipelines use pipefail by default.",

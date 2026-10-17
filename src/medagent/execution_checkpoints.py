@@ -5,6 +5,7 @@ import json
 import sys
 
 from .execution_changes import capture, relative_path, watch_path_covers
+from .execution_identity import decode_identity
 
 
 def normalize_paths(paths):
@@ -61,7 +62,9 @@ def checkpoint(directory, identity, paths, **limits):
 def main():
     try:
         value = json.load(sys.stdin)
-        result = checkpoint(value["directory"], value["identity"], value["paths"])
+        result = checkpoint(
+            value["directory"], decode_identity(value["identity"]), value["paths"]
+        )
         print(json.dumps({"ok": True, "result": result}))
     except (OSError, ValueError, TypeError, KeyError):
         print(json.dumps({"ok": False, "error": "Checkpoint unavailable"}))

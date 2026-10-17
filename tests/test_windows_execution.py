@@ -40,8 +40,9 @@ class WindowsExecutionTests(unittest.TestCase):
                 )
                 return tool(
                     "bash",
-                    command="'print(1250)' | Set-Content -Encoding UTF8 calc.py; python.exe calc.py | Set-Content -Encoding UTF8 result.txt; npm --version | Set-Content -Encoding UTF8 npm-version.txt",
+                    command="'print(1250)' | Set-Content -Encoding UTF8 calc.py; python.exe calc.py | Set-Content -Encoding UTF8 result.txt; npm.cmd --version | Set-Content -Encoding UTF8 npm-version.txt",
                     description="Write and run Python on Windows",
+                    timeoutMs=30000,
                 )
             if step == 1:
                 return tool(
@@ -66,8 +67,9 @@ class WindowsExecutionTests(unittest.TestCase):
             if step == 5:
                 return tool(
                     "bash",
-                    command="if (-not (Test-Path review.txt)) { throw 'missing previous result' }; 'continued' | Set-Content -Encoding UTF8 notes.txt",
+                    command="if (-not (Test-Path -LiteralPath review.txt)) { throw 'missing previous result' }; 'continued' | Set-Content -Encoding UTF8 notes.txt",
                     description="Continue the original Windows session",
+                    timeoutMs=30000,
                 )
             return final("Native Windows task complete")
 

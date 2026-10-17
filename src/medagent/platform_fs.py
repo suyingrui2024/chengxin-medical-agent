@@ -125,7 +125,11 @@ else:
             self.name, self.path = value.name, value.path
 
         def stat(self, *, follow_symlinks=True):
-            info = self.value.stat(follow_symlinks=follow_symlinks)
+            # DirEntry.stat() on Windows caches enumeration metadata and sets
+            # file/device IDs to zero. Query fresh IDs so comparisons with a
+            # subsequently opened handle detect replacement without rejecting
+            # every ordinary file as changed.
+            info = _os.stat(self.path, follow_symlinks=follow_symlinks)
             if not follow_symlinks and info.st_file_attributes & 0x400:
                 values = {
                     name: getattr(info, name)

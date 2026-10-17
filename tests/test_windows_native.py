@@ -12,10 +12,31 @@ import unittest
 from medagent.execution import ExecutionManager, safe_file
 from medagent.platform_fs import os as workspace_os
 from medagent.processes import popen, terminate, release
+from medagent.execution_checkpoints import checkpoint
 
 
 @unittest.skipUnless(os.name == "nt", "requires the real Windows kernel")
 class NativeWindowsTests(unittest.TestCase):
+    def test_nonempty_checkpoint_uses_real_file_ids_and_detects_content_changes(self):
+        with tempfile.TemporaryDirectory(prefix="chengxin-checkpoint-") as raw:
+            root = Path(raw)
+            source = root / "中文.py"
+            source.write_text("answer=1", encoding="utf-8")
+            info = root.stat()
+            with workspace_os.scandir(root) as entries:
+                entry = next(entries).stat(follow_symlinks=False)
+            named = source.stat()
+            self.assertNotEqual(entry.st_ino, 0)
+            self.assertEqual((entry.st_dev, entry.st_ino), (named.st_dev, named.st_ino))
+            first = checkpoint(root, (info.st_dev, info.st_ino), ["."])
+            self.assertTrue(first["complete"])
+            self.assertEqual(first["files"], 1)
+            source.write_text("answer=2", encoding="utf-8")
+            os.utime(source, ns=(named.st_atime_ns, named.st_mtime_ns))
+            changed = checkpoint(root, (info.st_dev, info.st_ino), ["."])
+            self.assertTrue(changed["complete"])
+            self.assertNotEqual(first["sha256"], changed["sha256"])
+
     def test_handle_relative_unicode_files_reparse_points_and_preview(self):
         with tempfile.TemporaryDirectory(prefix="chengxin ") as raw:
             root = Path(raw) / "中文 project's workspace"
