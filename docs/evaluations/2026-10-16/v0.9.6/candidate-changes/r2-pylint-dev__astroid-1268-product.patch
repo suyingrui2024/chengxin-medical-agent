@@ -1,0 +1,37 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -643,6 +643,10 @@
+     def visit_evaluatedobject(self, node):
+         return node.original.accept(self)
+ 
++    def visit_unknown(self, node):
++        """Unknown nodes are not representable in Python space."""
++        return ""
++
+ 
+ def _import_string(names):
+     """return a list of (name, asname) formatted as a string"""
+--- a/tests/unittest_unknown_as_string.py
++++ b/tests/unittest_unknown_as_string.py
+@@ -0,0 +1,21 @@
++# Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
++# For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
++
++"""Regression test: calling as_string() on an Unknown node must not crash.
++
++See the reported traceback::
++
++    AttributeError: 'AsStringVisitor' object has no attribute 'visit_unknown'
++"""
++from astroid import nodes
++
++
++def test_unknown_as_string_does_not_raise() -> None:
++    unknown = nodes.Unknown()
++    assert unknown.as_string() == ""
++
++
++def test_unknown_to_code_does_not_raise() -> None:
++    from astroid.nodes.as_string import to_code
++
++    assert to_code(nodes.Unknown()) == ""

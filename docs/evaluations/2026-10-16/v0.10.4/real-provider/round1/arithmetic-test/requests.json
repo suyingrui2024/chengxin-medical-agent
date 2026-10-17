@@ -1,0 +1,37 @@
+{
+  "attempted_calls": 6,
+  "maximum_calls": 12,
+  "injected_failures": 0,
+  "calls": [
+    {
+      "index": 1,
+      "status": 200,
+      "duration_ms": 1256
+    },
+    {
+      "index": 2,
+      "status": 200,
+      "duration_ms": 742
+    },
+    {
+      "index": 3,
+      "status": 200,
+      "duration_ms": 1167
+    },
+    {
+      "index": 4,
+      "status": 200,
+      "duration_ms": 1394
+    },
+    {
+      "index": 5,
+      "status": 200,
+      "duration_ms": 1291
+    },
+    {
+      "index": 6,
+      "status": 200,
+      "duration_ms": 1986
+    }
+  ]
+}

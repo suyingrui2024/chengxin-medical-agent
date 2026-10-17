@@ -1,0 +1,25 @@
+--- a/astroid/nodes/node_classes.py
++++ b/astroid/nodes/node_classes.py
+@@ -2362,6 +2362,22 @@
+             if isinstance(key, DictUnpack):
+                 try:
+                     return value.getitem(index, context)
++                except AttributeError:
++                    # The value is not directly subscriptable, e.g. it is a
++                    # reference to another object (``{**other}``); try to
++                    # infer it and look the index up on the inferred nodes.
++                    try:
++                        inferred_values = list(value.infer(context))
++                    except InferenceError:
++                        continue
++                    for inferred in inferred_values:
++                        if inferred is util.Uninferable:
++                            continue
++                        try:
++                            return inferred.getitem(index, context)
++                        except (AttributeError, AstroidTypeError, AstroidIndexError):
++                            continue
++                    continue
+                 except (AstroidTypeError, AstroidIndexError):
+                     continue
+             for inferredkey in key.infer(context):

@@ -1,0 +1,16 @@
+{
+  "algorithm": "sha256",
+  "file_count": 10,
+  "files": {
+    "completion-audit.json": "cbce0887c02be590b05f5ae10b4515ea1f4467bf25b6a60501d828bb724fd8bc",
+    "credential-scan.json": "400fb613e1edf0c6beaa3eb7556624080b2667b86e8167d31ae5212a88980b72",
+    "documents/实验与验收方案.md": "6dd13200bbd7b0ddd7e45a121919ffcdd504c25dd3a0a0004520e12560fa4f01",
+    "documents/当前版本完成审查与后续接续.md": "9ac4aa640b8eb941dee23a2fc63b24185cc7f139d8c7c5cd9d74348e60fa6f64",
+    "final-verification.json": "8539b921c379358f29a12de6c9f3b49ce0ec8a241447ada6769cf5709f08afe7",
+    "package-verification.json": "7f5f85f3257c0c014561bf089cf19b1f11ef5d7c100d55cbe3f05e0f6ffdd7a2",
+    "record.py": "5eb0d2cb4eb6bebdd6330bf82c2d641c24a40fe593710749128394b0657f322c",
+    "review-packet-verification.json": "691b35576976f2f3653c6378189e982667601112c920670eaafa37a929ff4d08",
+    "v01116-evidence.json": "7c71d8178823637030039f9a30006911df52fbcb405f02589ce8e61d50edb73c",
+    "v01117-evidence.json": "4c10283864611593fd3e8694bfb66a8552956afc9d304c128293dc4485ffa1ab"
+  }
+}

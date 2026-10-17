@@ -1,0 +1,7 @@
+test_same_three_requests_collect_a_34_second_job_only_with_explicit_long_wait (tests.test_explicit_job_wait.ExplicitWaitTests) ... {"explicit_wait_comparison": [{"configuration": "old", "model_calls": 3, "wait_seconds": 30.06, "actual_artifact_collected": false}, {"configuration": "candidate", "model_calls": 3, "wait_seconds": 34.04, "actual_artifact_collected": true}]}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 66.873s
+
+OK

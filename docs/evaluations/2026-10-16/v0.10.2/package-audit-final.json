@@ -1,0 +1,12 @@
+{
+  "checked_source_files": 90,
+  "all_source_matches": true,
+  "source_mismatches": [],
+  "checked_production_dependencies": 544,
+  "all_production_versions_match": true,
+  "dependency_mismatches": [],
+  "metadata_version_matches": true,
+  "metadata_dependencies_match": true,
+  "audit_correction": "Two initial audit failures retained. Final audit compares 90 own source/document files, version and production dependency metadata, and the locked production packages applicable to Linux x64. Electron packager strips development metadata and lockfile; other-platform optional binaries are not required.",
+  "excluded_other_platform_optional_dependencies": 65
+}

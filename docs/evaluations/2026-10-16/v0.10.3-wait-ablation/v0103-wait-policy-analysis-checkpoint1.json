@@ -1,0 +1,226 @@
+{
+  "scope": "Two known development tasks, two repetitions. Descriptive policy-bundle ablation, no holdout, clinical validity, statistical superiority or overall SDK parity claim. Wait durations measure tool wall time; completion and exit status come only from structured observations and independent tests.",
+  "report_sha256": "d4b5b91df80d3c83341906cf16ad3dd838e28712ee09f645df2b538c0fdd9596",
+  "analysis_source_sha256": "144a56cb227918c58d2548adcbe8f58c5a8ce5b3703615934429f80c986410fd",
+  "plan_finished": false,
+  "frozen_source_unchanged": true,
+  "runs": [
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 1,
+      "arm": "wait-30",
+      "runtime_completed": true,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": true,
+      "requests": 20,
+      "execution_ms": 203355,
+      "all_provider_http200": true,
+      "reason": null,
+      "tool_counts": {
+        "bash": 17,
+        "read": 2,
+        "edit": 1,
+        "write": 1,
+        "job_output": 2
+      },
+      "waits": [
+        {
+          "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+          "call_id": "call_00_MJI75RrkCzprj5iAEVrJ6028",
+          "arguments": {
+            "job_id": "bash-17",
+            "wait": true,
+            "timeout_ms": 30000
+          },
+          "elapsed_ms": 30007,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "37323b8c-bef6-4523-bb2d-c021eb722adb",
+            "sequence": 18,
+            "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+            "call_id": "call_00_MJI75RrkCzprj5iAEVrJ6028",
+            "sdk_turn": 1,
+            "sdk_step": 18,
+            "call_sequence": 124,
+            "tool": "job_output",
+            "state": "running",
+            "exit_code": null,
+            "signal": null,
+            "job_id": "bash-17",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "ab3d6afd-f547-4987-af89-ff15fc34712f",
+            "observation_id": "37323b8c-bef6-4523-bb2d-c021eb722adb:18"
+          }
+        },
+        {
+          "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+          "call_id": "call_00_90SSJnQIXXLJHQl2RfU76656",
+          "arguments": {
+            "job_id": "bash-17",
+            "timeout_ms": 30000,
+            "wait": true
+          },
+          "elapsed_ms": 21638,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "37323b8c-bef6-4523-bb2d-c021eb722adb",
+            "sequence": 19,
+            "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+            "call_id": "call_00_90SSJnQIXXLJHQl2RfU76656",
+            "sdk_turn": 1,
+            "sdk_step": 19,
+            "call_sequence": 130,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-17",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "ab3d6afd-f547-4987-af89-ff15fc34712f",
+            "observation_id": "37323b8c-bef6-4523-bb2d-c021eb722adb:19"
+          }
+        }
+      ],
+      "wait_tool_calls": 2,
+      "explicit_waits_above_30_requested": 0,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 27
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 1,
+      "arm": "wait-600",
+      "runtime_completed": false,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": false,
+      "requests": 20,
+      "execution_ms": 179832,
+      "all_provider_http200": true,
+      "reason": "model_call_budget_exhausted",
+      "tool_counts": {
+        "bash": 16,
+        "grep": 1,
+        "read": 2,
+        "edit": 1,
+        "write": 1,
+        "job_output": 2,
+        "workspace_changes": 1
+      },
+      "waits": [
+        {
+          "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+          "call_id": "call_00_ET_Nb0EJa3R83hl5BtbHIMp3048",
+          "arguments": {
+            "job_id": "bash-15",
+            "wait": true,
+            "timeout_ms": 300000
+          },
+          "elapsed_ms": 24127,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "e99b1136-2644-44d8-9128-42ed2d5254c8",
+            "sequence": 16,
+            "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+            "call_id": "call_00_ET_Nb0EJa3R83hl5BtbHIMp3048",
+            "sdk_turn": 1,
+            "sdk_step": 17,
+            "call_sequence": 118,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-15",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "8870de55-7680-4042-a478-c9abcbb29ce8",
+            "observation_id": "e99b1136-2644-44d8-9128-42ed2d5254c8:16"
+          }
+        },
+        {
+          "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+          "call_id": "call_00_ET_Q1wlfEGNfhjKBfTWLZOO6844",
+          "arguments": {
+            "job_id": "bash-16",
+            "timeout_ms": 420000,
+            "wait": true
+          },
+          "elapsed_ms": 30345,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "e99b1136-2644-44d8-9128-42ed2d5254c8",
+            "sequence": 18,
+            "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+            "call_id": "call_00_ET_Q1wlfEGNfhjKBfTWLZOO6844",
+            "sdk_turn": 1,
+            "sdk_step": 19,
+            "call_sequence": 130,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-16",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "8870de55-7680-4042-a478-c9abcbb29ce8",
+            "observation_id": "e99b1136-2644-44d8-9128-42ed2d5254c8:18"
+          }
+        }
+      ],
+      "wait_tool_calls": 2,
+      "explicit_waits_above_30_requested": 2,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 27
+      },
+      "pytest_exit_code": 0
+    }
+  ],
+  "arms": {
+    "wait-30": {
+      "runs": 1,
+      "requests": 20,
+      "source_passed": 1,
+      "source_failed": 0,
+      "source_unavailable": 0,
+      "file_and_source_passed": 1,
+      "runtime_completed": 1,
+      "end_to_end_completed": 1,
+      "job_output_calls": 2,
+      "explicit_waits_above_30_requested": 0,
+      "waits_above_30_observed": 0
+    },
+    "wait-600": {
+      "runs": 1,
+      "requests": 20,
+      "source_passed": 1,
+      "source_failed": 0,
+      "source_unavailable": 0,
+      "file_and_source_passed": 1,
+      "runtime_completed": 0,
+      "end_to_end_completed": 0,
+      "job_output_calls": 2,
+      "explicit_waits_above_30_requested": 2,
+      "waits_above_30_observed": 0
+    }
+  },
+  "pairs": [
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 1,
+      "candidate_minus_control_requests": 0,
+      "candidate_minus_control_execution_ms": -23523,
+      "control_source_passed": true,
+      "candidate_source_passed": true,
+      "control_joint_passed": true,
+      "candidate_joint_passed": false
+    }
+  ],
+  "model_requests_for_analysis": 0
+}

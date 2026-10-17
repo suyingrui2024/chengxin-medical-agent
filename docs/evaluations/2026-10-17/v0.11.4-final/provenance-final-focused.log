@@ -1,0 +1,9 @@
+test_missing_foreign_or_non_patient_sources_are_not_fabricated_as_patient_context (tests.test_present_provenance.PresentProvenanceTests) ... ok
+test_new_field_correction_replaces_its_quote_and_reference_but_keeps_history (tests.test_present_provenance.PresentProvenanceTests) ... ok
+test_old_sources_are_deduplicated_only_after_the_recent_window_and_do_not_revert_corrections (tests.test_present_provenance.PresentProvenanceTests) ... ok
+test_true_partial_report_keeps_its_quote_and_whole_source_without_inventing_a_dose (tests.test_present_provenance.PresentProvenanceTests) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.035s
+
+OK

@@ -1,0 +1,17 @@
+test_changes_after_a_passing_check_require_actual_revalidation (tests.test_execution_delivery.DeliveryRuntimeTests) ... FAIL
+
+======================================================================
+FAIL: test_changes_after_a_passing_check_require_actual_revalidation (tests.test_execution_delivery.DeliveryRuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_execution_delivery.py", line 236, in test_changes_after_a_passing_check_require_actual_revalidation
+    self.assertEqual(snapshot["status"], "failed")
+AssertionError: 'completed' != 'failed'
+- completed
++ failed
+
+
+----------------------------------------------------------------------
+Ran 1 test in 1.436s
+
+FAILED (failures=1)

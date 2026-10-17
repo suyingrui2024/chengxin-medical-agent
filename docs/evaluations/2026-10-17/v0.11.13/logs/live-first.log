@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/scripts/evaluate_self_check_conversation.py", line 15, in <module>
+    from tests.test_self_check_conversation import SelfCheckConversationTests
+ModuleNotFoundError: No module named 'tests'

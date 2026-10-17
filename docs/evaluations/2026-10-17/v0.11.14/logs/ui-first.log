@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:1253529) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/observation-completion.spec.mjs:12:3 › location clarification stays graphical and completed results survive retry on wide (1.4s)
+  ✓  2 tests/ui/observation-completion.spec.mjs:12:3 › location clarification stays graphical and completed results survive retry on mobile (1.3s)
+  ✓  3 tests/ui/observation-completion.spec.mjs:12:3 › location clarification stays graphical and completed results survive retry on short (1.3s)
+
+  3 passed (8.3s)

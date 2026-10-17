@@ -1,0 +1,194 @@
+{
+  "r1-pydicom__pydicom-1139-official-sdk": [
+    {
+      "file": "pydicom/tests/test_personname_iterable.py",
+      "before_sha256": null,
+      "after_sha256": "e7f7057a61edaa84887bb943d52a2e955ddc5e77d8aa937c4ef7b92dfb97d4de",
+      "text_patch_archived": true
+    },
+    {
+      "file": "pydicom/valuerep.py",
+      "before_sha256": "d219b72c30bfe5a64e3ec8d0ef29ffc10dc2bddb8435e05dbe5a3827e32458a2",
+      "after_sha256": "c40c7fea670d07f8d36fb9175f867539f92de4b7ea12169058a535f78545327a",
+      "text_patch_archived": true
+    }
+  ],
+  "r1-pydicom__pydicom-1139-product": [
+    {
+      "file": "pydicom/tests/test_personname_iterable.py",
+      "before_sha256": null,
+      "after_sha256": "2e4025aaddbb146453f4b9d8298abf1846d30c26d21e1fe24e4d750f93066240",
+      "text_patch_archived": true
+    },
+    {
+      "file": "pydicom/valuerep.py",
+      "before_sha256": "d219b72c30bfe5a64e3ec8d0ef29ffc10dc2bddb8435e05dbe5a3827e32458a2",
+      "after_sha256": "c40c7fea670d07f8d36fb9175f867539f92de4b7ea12169058a535f78545327a",
+      "text_patch_archived": true
+    }
+  ],
+  "r1-pydicom__pydicom-1694-product": [
+    {
+      "file": "pydicom/dataset.py",
+      "before_sha256": "20efd959a53f7fa5a9eb43369c0d58a98bffb4f7941dfd12b176b3f95fd2a329",
+      "after_sha256": "df51d0173d3276abdd9275381a9998669c3386949b387eb033481d6ede64ccb6",
+      "text_patch_archived": true
+    },
+    {
+      "file": "pydicom/tests/test_json.py",
+      "before_sha256": "d1f3457a267fad62faf01c49addc21b49a884a45299676ad2d5ac1a63ffff804",
+      "after_sha256": "9fe1ec4557a245b64cb5b11ce29772be56320abe6a8856cda0d82905d9215634",
+      "text_patch_archived": true
+    }
+  ],
+  "r1-pydicom__pydicom-1694-official-sdk": [
+    {
+      "file": "pydicom/dataset.py",
+      "before_sha256": "20efd959a53f7fa5a9eb43369c0d58a98bffb4f7941dfd12b176b3f95fd2a329",
+      "after_sha256": "df51d0173d3276abdd9275381a9998669c3386949b387eb033481d6ede64ccb6",
+      "text_patch_archived": true
+    },
+    {
+      "file": "pydicom/tests/test_json.py",
+      "before_sha256": "d1f3457a267fad62faf01c49addc21b49a884a45299676ad2d5ac1a63ffff804",
+      "after_sha256": "785261ecd6b15a0850013ee0259cbe101c8af23a34a63be2ec91a77efc2c2181",
+      "text_patch_archived": true
+    }
+  ],
+  "r1-marshmallow-code__marshmallow-1359-product": [
+    {
+      "file": "src/marshmallow/fields.py",
+      "before_sha256": "e6e21feffd02ece1ca6fe7503cf930a347368ae44a58a743feb0ece583d412c4",
+      "after_sha256": "d31e3884e127fbf3f2ad05f2e1f8a32dc25ca04a589c05ab8f88212603f991e6",
+      "text_patch_archived": true
+    },
+    {
+      "file": "tests/test_datetime_container_regression.py",
+      "before_sha256": null,
+      "after_sha256": "357c26c9c6fb99964760481857b1810d6913645f03419a7d5f8a9b5ab1c750c4",
+      "text_patch_archived": true
+    }
+  ],
+  "r1-marshmallow-code__marshmallow-1359-official-sdk": [],
+  "r1-pylint-dev__astroid-1268-product": [
+    {
+      "file": "astroid/nodes/as_string.py",
+      "before_sha256": "bd9458fdc462f08dc1ff4105d51f645e69fce11ac2f05e4cf8a242a9b2db7af2",
+      "after_sha256": "caeb31fbc1ad5ec093d81fe5b8fa019b6898bf707fe54367146d4732bfa0fbb5",
+      "text_patch_archived": true
+    },
+    {
+      "file": "tests/unittest_unknown_as_string.py",
+      "before_sha256": null,
+      "after_sha256": "b4d2c6ed168fa4d46af93862550d878fdeec1452d4833e7e4db060ce5ddaca29",
+      "text_patch_archived": true
+    }
+  ],
+  "r1-pylint-dev__astroid-1268-official-sdk": [
+    {
+      "file": "astroid/nodes/as_string.py",
+      "before_sha256": "bd9458fdc462f08dc1ff4105d51f645e69fce11ac2f05e4cf8a242a9b2db7af2",
+      "after_sha256": "a7b23e4f3422ae9061e2adb789b6f7bd2c28270523cb4ff5a167fe8a5142fe0c",
+      "text_patch_archived": true
+    },
+    {
+      "file": "tests/unittest_unknown_as_string.py",
+      "before_sha256": null,
+      "after_sha256": "bd64ef3ddd374877266b278408650c4ddc21d7beb78a1d296f1b735843dd759b",
+      "text_patch_archived": true
+    }
+  ],
+  "r2-pydicom__pydicom-1139-official-sdk": [],
+  "r2-pydicom__pydicom-1139-product": [
+    {
+      "file": "pydicom/tests/test_personname_iterable.py",
+      "before_sha256": null,
+      "after_sha256": "b9575faf31703a8f0dd20635420deb3d68e434a23c35b6ab184e60ecb250977f",
+      "text_patch_archived": true
+    },
+    {
+      "file": "pydicom/valuerep.py",
+      "before_sha256": "d219b72c30bfe5a64e3ec8d0ef29ffc10dc2bddb8435e05dbe5a3827e32458a2",
+      "after_sha256": "79ec9485ffc5810bba470fb355c8637d0d5c58ce6bd7170daa3d4a7b378d1436",
+      "text_patch_archived": true
+    }
+  ],
+  "r2-pydicom__pydicom-1694-official-sdk": [
+    {
+      "file": "pydicom/dataset.py",
+      "before_sha256": "20efd959a53f7fa5a9eb43369c0d58a98bffb4f7941dfd12b176b3f95fd2a329",
+      "after_sha256": "df51d0173d3276abdd9275381a9998669c3386949b387eb033481d6ede64ccb6",
+      "text_patch_archived": true
+    },
+    {
+      "file": "pydicom/tests/test_regression_suppress_invalid_tags.py",
+      "before_sha256": null,
+      "after_sha256": "7b182b8a897614a261c0ff73f9339ffb8e36dd90448a43180562d33b5fa56b30",
+      "text_patch_archived": true
+    }
+  ],
+  "r2-pydicom__pydicom-1694-product": [
+    {
+      "file": "pydicom/dataset.py",
+      "before_sha256": "20efd959a53f7fa5a9eb43369c0d58a98bffb4f7941dfd12b176b3f95fd2a329",
+      "after_sha256": "df51d0173d3276abdd9275381a9998669c3386949b387eb033481d6ede64ccb6",
+      "text_patch_archived": true
+    },
+    {
+      "file": "pydicom/tests/test_json.py",
+      "before_sha256": "d1f3457a267fad62faf01c49addc21b49a884a45299676ad2d5ac1a63ffff804",
+      "after_sha256": "04191910d0a9e8b127f591e127cc9a094a2717a6feb0f83351af760f08508a59",
+      "text_patch_archived": true
+    }
+  ],
+  "r2-marshmallow-code__marshmallow-1359-official-sdk": [
+    {
+      "file": "src/marshmallow/fields.py",
+      "before_sha256": "e6e21feffd02ece1ca6fe7503cf930a347368ae44a58a743feb0ece583d412c4",
+      "after_sha256": "7b47fcc5d17fb08f2e7c4179789d49c20edbee926ffe040fba7bff877b46ca88",
+      "text_patch_archived": true
+    }
+  ],
+  "r2-marshmallow-code__marshmallow-1359-product": [
+    {
+      "file": "src/marshmallow/fields.py",
+      "before_sha256": "e6e21feffd02ece1ca6fe7503cf930a347368ae44a58a743feb0ece583d412c4",
+      "after_sha256": "5c7fc0bd16be9166f5a1cc32c5892d9901d327996ab13e60537e894fb72e0e41",
+      "text_patch_archived": true
+    },
+    {
+      "file": "tests/test_regression_container_datetime.py",
+      "before_sha256": null,
+      "after_sha256": "d06ee49d7998b3798f1cc80a2b463a579b77f4a844c11ccc914a7f1280de5d7d",
+      "text_patch_archived": true
+    }
+  ],
+  "r2-pylint-dev__astroid-1268-product": [
+    {
+      "file": "astroid/nodes/as_string.py",
+      "before_sha256": "bd9458fdc462f08dc1ff4105d51f645e69fce11ac2f05e4cf8a242a9b2db7af2",
+      "after_sha256": "81808159d84b1a563967a7a09e10d186d1f2e02c654dcf9a64b62c6e6091e102",
+      "text_patch_archived": true
+    },
+    {
+      "file": "tests/unittest_regression_unknown_as_string.py",
+      "before_sha256": null,
+      "after_sha256": "8b4af45acb151d5aa0c6b11afa2af7a8c38835c7a4cf1502466f1caaec2f3a1d",
+      "text_patch_archived": true
+    }
+  ],
+  "r2-pylint-dev__astroid-1268-official-sdk": [
+    {
+      "file": "astroid/nodes/as_string.py",
+      "before_sha256": "bd9458fdc462f08dc1ff4105d51f645e69fce11ac2f05e4cf8a242a9b2db7af2",
+      "after_sha256": "0a53517c056e722bcfce60825783a4b6fa1edc2a73a1e2dc37a311bb71ed183f",
+      "text_patch_archived": true
+    },
+    {
+      "file": "tests/unittest_unknown_as_string.py",
+      "before_sha256": null,
+      "after_sha256": "2d361ae0d7edf4e9d8e9bffe69959b4e8bdd188e8e686f72f90a90f475952f30",
+      "text_patch_archived": true
+    }
+  ]
+}

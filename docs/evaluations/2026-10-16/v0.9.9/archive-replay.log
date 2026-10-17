@@ -1,0 +1,1 @@
+{"model_calls": 0, "verification": {"passed": true, "stdout": "independent addition and regression checks passed\n", "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n.....\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n", "exit_code": 0}}

@@ -1,0 +1,38 @@
+
+> medical-agent-dsh-integration@0.10.3 test:dsh
+> node --test integrations/dsh/tests/*.test.mjs
+
+TAP version 13
+# Subtest: integrations/dsh/tests/bridge.test.mjs
+ok 1 - integrations/dsh/tests/bridge.test.mjs
+  ---
+  duration_ms: 52.300234
+  type: 'test'
+  ...
+# Subtest: integrations/dsh/tests/execution-clarifications.test.mjs
+ok 2 - integrations/dsh/tests/execution-clarifications.test.mjs
+  ---
+  duration_ms: 67.57261
+  type: 'test'
+  ...
+# Subtest: integrations/dsh/tests/execution-observations.test.mjs
+ok 3 - integrations/dsh/tests/execution-observations.test.mjs
+  ---
+  duration_ms: 40.559367
+  type: 'test'
+  ...
+# Subtest: integrations/dsh/tests/execution-workspace.test.mjs
+ok 4 - integrations/dsh/tests/execution-workspace.test.mjs
+  ---
+  duration_ms: 61.697276
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 78.413088

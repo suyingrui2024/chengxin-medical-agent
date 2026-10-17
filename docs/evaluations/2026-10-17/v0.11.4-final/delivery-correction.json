@@ -1,0 +1,11 @@
+{
+  "original_manifest": "docs/evaluations/2026-10-17/v0.11.4/archive-manifest.json",
+  "original_archive_preserved": true,
+  "original_missing_file": "verification.json",
+  "source_delta_only_documents": [
+    "docs/实验与验收方案.md",
+    "docs/长问诊的信息保留与原话核对.md",
+    "docs/首版产品与技术设计.md"
+  ],
+  "runtime_and_test_source_unchanged": true
+}

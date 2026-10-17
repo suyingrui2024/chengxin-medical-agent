@@ -1,0 +1,7 @@
+test_check_continues_same_job_across_the_600_second_wait_boundary (tests.test_execution_long_delivery.LongDeliveryTests) ... CHUNKED_DELIVERY_PROOF={"elapsed_seconds": 606.548, "model_fixture_requests": 2, "wait_cycles": 2, "actual_exit": 0, "same_job": "bash-1", "status": "completed"}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 607.073s
+
+OK

@@ -1,0 +1,47 @@
+{
+  "baseline_traces_with_overlap": 2,
+  "final": [
+    {
+      "label": "wide",
+      "viewport": {
+        "width": 1440,
+        "height": 1080
+      },
+      "targets": 5,
+      "alternatives": 2,
+      "selected_categories": 5,
+      "geometry_observations": 35,
+      "overlap_pairs": 0,
+      "all_measured_targets_at_least_44px": true
+    },
+    {
+      "label": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "targets": 5,
+      "alternatives": 2,
+      "selected_categories": 5,
+      "geometry_observations": 35,
+      "overlap_pairs": 0,
+      "all_measured_targets_at_least_44px": true
+    },
+    {
+      "label": "short",
+      "viewport": {
+        "width": 900,
+        "height": 648
+      },
+      "targets": 5,
+      "alternatives": 2,
+      "selected_categories": 5,
+      "geometry_observations": 35,
+      "overlap_pairs": 0,
+      "all_measured_targets_at_least_44px": true
+    }
+  ],
+  "new_provider_calls": 0,
+  "scope": "Actual browser rectangles and controlled selections; does not measure patient comprehension or clinical validity.",
+  "passed": true
+}

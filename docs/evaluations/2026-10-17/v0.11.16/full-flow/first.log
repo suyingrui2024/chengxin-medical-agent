@@ -1,0 +1,80 @@
+
+Running 1 test using 1 worker
+
+(node:1364492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 58830)
+Traceback (most recent call last):
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/home/suyingrui/anaconda3/lib/python3.10/http/server.py", line 433, in handle
+    self.handle_one_request()
+  File "/home/suyingrui/anaconda3/lib/python3.10/http/server.py", line 421, in handle_one_request
+    method()
+  File "/home/suyingrui/Desktop/medical-agent/scripts/test_live_desktop.py", line 150, in do_POST
+    self.respond(status, data, mime)
+  File "/home/suyingrui/Desktop/medical-agent/scripts/test_live_desktop.py", line 62, in respond
+    self.wfile.write(body)
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 826, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+{"case":"native_full_interview","passed":false,"live_calls":21}
+{"case":"native_emergency_gate","passed":true,"live_calls":0}
+{"case":"native_service_failure_recovery","passed":true,"live_calls":2}
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 45928)
+Traceback (most recent call last):
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/home/suyingrui/anaconda3/lib/python3.10/http/server.py", line 433, in handle
+    self.handle_one_request()
+  File "/home/suyingrui/anaconda3/lib/python3.10/http/server.py", line 421, in handle_one_request
+    method()
+  File "/home/suyingrui/Desktop/medical-agent/scripts/test_live_desktop.py", line 150, in do_POST
+    self.respond(status, data, mime)
+  File "/home/suyingrui/Desktop/medical-agent/scripts/test_live_desktop.py", line 62, in respond
+    self.wfile.write(body)
+  File "/home/suyingrui/anaconda3/lib/python3.10/socketserver.py", line 826, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+{"case":"native_full_location_interview","passed":false,"live_calls":1}
+  ✘  1 tests/live/workflow.spec.mjs:12:1 › synthetic patient completes a native live consultation, emergency routing and service recovery (2.4m)
+
+
+  1) tests/live/workflow.spec.mjs:12:1 › synthetic patient completes a native live consultation, emergency routing and service recovery 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 4
+
+    - Array []
+    + Array [
+    +   "native_full_interview",
+    +   "native_full_location_interview",
+    + ]
+
+      414 |   expect(
+      415 |     report.cases.filter((item) => !item.passed).map((item) => item.id),
+    > 416 |   ).toEqual([]);
+          |     ^
+      417 | });
+      418 |
+        at /home/suyingrui/Desktop/medical-agent/tests/live/workflow.spec.mjs:416:5
+
+    Error Context: test-results/live/workflow-synthetic-patient-5acab-outing-and-service-recovery/error-context.md
+
+  1 failed
+    tests/live/workflow.spec.mjs:12:1 › synthetic patient completes a native live consultation, emergency routing and service recovery 
+{"passed": false, "attempted_calls": 24, "injected_failures": 1}

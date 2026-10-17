@@ -1,0 +1,12 @@
+{
+  "package_version": "0.11.16",
+  "binary_sha256": "433b343850ed9087fdb6548c48e1bb30011a87210cc3609f7b03061a7ac36c4f",
+  "driver_sha256": "b039af414d53c73bb56abc2cbb56fbcff2012907d0afaa322015fdfafac04912",
+  "launcher_sha256": "df63aa46c3fe7702989a7f993b1c037051504d2ff891dac55e54ccbf3a736437",
+  "display_shared_with_host": true,
+  "host_system_libraries_readonly": true,
+  "external_network_namespace_shared": false,
+  "development_checkout_mounted": false,
+  "model_requests": 0,
+  "scope": "Same-host isolated empty-user-environment check, not a new-machine or independent operating-system installation."
+}

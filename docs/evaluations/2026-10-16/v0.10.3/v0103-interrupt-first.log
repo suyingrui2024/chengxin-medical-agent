@@ -1,0 +1,20 @@
+test_compatible_http_snapshot_and_priority_input_preempt_socket_wait (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_real_dsh_http_priority_input_cancels_bridge_and_discards_proposal (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_explicit_help_records_request_origin_without_inventing_symptoms (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_late_failure_cannot_replace_emergency_with_retry (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_priority_correction_precedes_field_and_version_checks (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_raw_emergency_preempts_and_late_valid_facts_are_discarded (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_repeated_help_request_is_idempotent (tests.test_consultation_interrupt.InterruptTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.420s
+
+OK
+[16/Oct/2026 18:39:43] "GET /api/sessions/1f8f2b24-5055-4d9f-8114-664de3f84cdd/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 18:39:43] "POST /api/sessions/1f8f2b24-5055-4d9f-8114-664de3f84cdd/messages HTTP/1.1" 409 -
+[16/Oct/2026 18:39:43] "POST /api/sessions/1f8f2b24-5055-4d9f-8114-664de3f84cdd/messages HTTP/1.1" 200 -
+[16/Oct/2026 18:39:43] "POST /api/sessions/1f8f2b24-5055-4d9f-8114-664de3f84cdd/messages HTTP/1.1" 200 -
+[16/Oct/2026 18:39:45] "GET /api/sessions/7711f1d2-c80b-41bd-bafc-efe5ab80154e/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 18:39:45] "POST /api/sessions/7711f1d2-c80b-41bd-bafc-efe5ab80154e/messages HTTP/1.1" 409 -
+[16/Oct/2026 18:39:45] "POST /api/sessions/7711f1d2-c80b-41bd-bafc-efe5ab80154e/messages HTTP/1.1" 200 -
+[16/Oct/2026 18:39:45] "POST /api/sessions/7711f1d2-c80b-41bd-bafc-efe5ab80154e/messages HTTP/1.1" 200 -

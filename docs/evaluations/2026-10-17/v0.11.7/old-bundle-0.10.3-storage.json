@@ -1,0 +1,10 @@
+{
+  "version": "0.10.3",
+  "archive": "dist/desktop/archives/Chengxin-0.10.3-linux-x64.tar.gz",
+  "entries": 29539,
+  "archive_bytes": 290372676,
+  "sha256": "94e0a27ccbb3ed47b2e5f2033ff9f5c5c1ce40efd4447e526c46ab7ae8a37b12",
+  "file_content_modes_links_verified": true,
+  "restore": "tar -xzf dist/desktop/archives/Chengxin-0.10.3-linux-x64.tar.gz -C dist/desktop",
+  "expanded_copy_removed": true
+}

@@ -1,0 +1,48 @@
+
+Running 3 tests using 1 worker
+
+(node:931148) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts (1.7s)
+  ✓  2 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts on a narrow screen (1.5s)
+  ✘  3 tests/ui/present-provenance.spec.mjs:40:1 › recorded evidence is inert, malformed sources fall back and old summaries remain readable (5.4s)
+
+
+  1) tests/ui/present-provenance.spec.mjs:40:1 › recorded evidence is inert, malformed sources fall back and old summaries remain readable 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('#known-contract img, #known-contract svg, #known-contract script')
+    Expected: 0
+    Received: 2
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" locator('#known-contract img, #known-contract svg, #known-contract script') with timeout 5000ms
+      - waiting for locator('#known-contract img, #known-contract svg, #known-contract script')
+        14 × locator resolved to 2 elements
+           - unexpected value "2"
+
+
+      101 |       "#known-contract img, #known-contract svg, #known-contract script",
+      102 |     ),
+    > 103 |   ).toHaveCount(0);
+          |     ^
+      104 |   expect(await page.evaluate(() => window.KNOWN_EXECUTED)).toBeUndefined();
+      105 |   await expect(
+      106 |     page.locator("#known-contract .structured-fallback"),
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/present-provenance.spec.mjs:103:5
+
+    Error Context: test-results/ui/present-provenance-recorde-58018-d-summaries-remain-readable/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/present-provenance-recorde-58018-d-summaries-remain-readable/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/present-provenance-recorde-58018-d-summaries-remain-readable/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/present-provenance.spec.mjs:40:1 › recorded evidence is inert, malformed sources fall back and old summaries remain readable 
+  2 passed (13.0s)

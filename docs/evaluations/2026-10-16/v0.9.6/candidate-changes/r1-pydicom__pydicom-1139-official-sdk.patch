@@ -1,0 +1,41 @@
+--- a/pydicom/tests/test_personname_iterable.py
++++ b/pydicom/tests/test_personname_iterable.py
+@@ -0,0 +1,23 @@
++"""Regression tests for PersonName iteration (issue: make PersonName iterable)."""
++from pydicom import Dataset
++from pydicom.valuerep import PersonName
++
++
++class TestPersonNameIterable:
++    def test_contains_single_character(self):
++        ds = Dataset()
++        ds.PatientName = 'SomeName'
++        assert 'S' in ds.PatientName
++
++    def test_contains_substring(self):
++        pn = PersonName('Family^Given')
++        assert 'Family' in pn
++        assert 'Given' in pn
++        assert 'Missing' not in pn
++
++    def test_iter_matches_str(self):
++        pn = PersonName('Some^Name')
++        assert list(pn) == list('Some^Name')
++
++    def test_contains_empty(self):
++        assert '' in PersonName('Some^Name')
+--- a/pydicom/valuerep.py
++++ b/pydicom/valuerep.py
+@@ -756,6 +756,12 @@
+     def __hash__(self):
+         return hash(self.components)
+ 
++    def __iter__(self):
++        yield from str(self)
++
++    def __contains__(self, item):
++        return item in str(self)
++
+     def decode(self, encodings=None):
+         """Return the patient name decoded by the given `encodings`.
+ 

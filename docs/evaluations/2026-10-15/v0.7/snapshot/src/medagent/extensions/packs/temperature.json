@@ -1,0 +1,76 @@
+{
+  "id": "observe.temperature",
+  "name": "测一次腋下体温",
+  "version": "0.4.0",
+  "api_version": "medical-capability/v1",
+  "kind": "self_check",
+  "description": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+  "permissions": [],
+  "review_status": "prototype_requires_clinical_review",
+  "ui": "step_task",
+  "task": {
+    "id": "axillary_temperature",
+    "result_key": "temperature_c",
+    "input_kind": "temperature",
+    "invalidate_on": [],
+    "request_phrases": [
+      "想按图测一下腋温",
+      "想按图测温",
+      "想测腋温",
+      "想测体温",
+      "想量体温"
+    ],
+    "cancel_phrases": [
+      "取消测温",
+      "先不测体温",
+      "不想测体温",
+      "不测腋温了",
+      "先不测腋温",
+      "暂时不测体温",
+      "不想按图测一下腋温"
+    ],
+    "title": "测一次腋下体温",
+    "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+    "applies_when": {
+      "chief_complaint_contains_any": ["发热", "发烧", "低烧", "高烧", "体温"]
+    },
+    "equipment": ["可正常使用的数字体温计"],
+    "asset": "/temperature.svg",
+    "step_assets": [
+      "/temperature.svg#step-1",
+      "/temperature.svg#step-2",
+      "/temperature.svg#step-3"
+    ],
+    "steps": [
+      "先阅读体温计说明书；擦干腋窝。",
+      "将探头放在腋窝中央，手臂贴紧身体。",
+      "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+    ],
+    "stop_conditions": ["设备破损", "操作引起明显不适", "患者无法安全配合"],
+    "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+    "options": [
+      {
+        "label": "没有体温计",
+        "value": "not_available"
+      },
+      {
+        "label": "做不到/不舒服",
+        "value": "unable"
+      },
+      {
+        "label": "暂时跳过",
+        "value": "skip"
+      }
+    ],
+    "clinical_limits": [
+      "一次体温不能排除病情变化。",
+      "不同部位和设备的读数不能直接视为完全等价。",
+      "本任务不负责判断发热原因。"
+    ],
+    "review_status": "prototype_requires_clinical_review"
+  },
+  "validation": {
+    "status": "prototype_requires_clinical_review",
+    "scope": "工程流程已测试；图示理解与操作尚未临床审核"
+  }
+}

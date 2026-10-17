@@ -1,0 +1,18 @@
+{
+  "legacy_overview_count": 0,
+  "legacy_scan": {
+    "performed": true,
+    "complete": false,
+    "reasons": [
+      "depth_limit"
+    ],
+    "visited_entries": 9,
+    "scope": "visible regular files only; links and common caches excluded"
+  },
+  "actual_file_exists": true,
+  "directory_scan_complete": true,
+  "directory_total_entries": 1,
+  "actual_preview_works": true,
+  "cheap_status_scan_performed": false,
+  "external_model_calls": 0
+}

@@ -1,0 +1,24 @@
+
+> medical-agent-dsh-integration@0.10.3 test:desktop
+> playwright test --config playwright.desktop.config.mjs
+
+
+Running 13 tests using 1 worker
+
+(node:692505) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (706ms)
+  ✓   2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.5s)
+  ✓   3 tests/desktop/changes.spec.mjs:45:1 › desktop reviews actual file changes and restores ten-minute history offline (4.6s)
+  ✓   4 tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history (6.3s)
+  ✓   5 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (3.6s)
+  ✓   6 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (10.6s)
+  ✓   7 tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output (5.2s)
+  ✓   8 tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (8.6s)
+  ✓   9 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.4s)
+  ✓  10 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.5s)
+  ✓  11 tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline (3.9s)
+  ✓  12 tests/desktop/startup-close.spec.mjs:11:1 › closing the startup window stops a delayed sidecar without a blocking error dialog (2.4s)
+  ✓  13 tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting (1.5s)
+
+  13 passed (1.0m)

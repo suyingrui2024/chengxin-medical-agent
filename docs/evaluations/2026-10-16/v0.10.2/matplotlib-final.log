@@ -1,0 +1,15 @@
+test_budget_failures_are_not_reported_as_success_and_auxiliary_search_shares_budget (test_execution.FullDshExecutionTests) ... ok
+test_real_shell_repairs_code_executes_it_delegates_and_keeps_session (test_execution.FullDshExecutionTests) ... ok
+test_unauthed_development_server_cannot_expose_execution (test_execution.FullDshExecutionTests) ... ok
+test_artifact_listing_never_follows_directory_or_file_links (test_execution.WorkspaceFileTests) ... ok
+test_creating_workspace_requires_model_config_but_does_not_call_model (test_execution.WorkspaceFileTests) ... ok
+test_invalid_preview_roots_raise_controlled_errors_and_close_releases_inode (test_execution.WorkspaceFileTests) ... ok
+test_missing_linked_or_replaced_workspace_roots_remain_controllable (test_execution.WorkspaceFileTests) ... ok
+test_text_files_cannot_escape_through_paths_symlinks_or_special_files (test_execution.WorkspaceFileTests) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.871s
+
+OK
+[16/Oct/2026 16:58:00] "GET /api/execution HTTP/1.1" 403 -
+[16/Oct/2026 16:58:00] "POST /api/execution HTTP/1.1" 403 -

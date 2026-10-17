@@ -1,0 +1,23 @@
+test_compatible_http_snapshot_and_priority_input_preempt_socket_wait (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_real_dsh_http_priority_input_cancels_bridge_and_discards_proposal (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_explicit_help_records_request_origin_without_inventing_symptoms (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_facts_committed_before_the_wait_survive_but_late_corrections_do_not (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_late_failure_cannot_replace_emergency_with_retry (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_new_information_in_another_help_request_is_retained (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_priority_correction_precedes_field_and_version_checks (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_raw_emergency_preempts_and_late_valid_facts_are_discarded (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_repeated_help_request_is_idempotent (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_worker_capacity_is_bounded_without_blocking_priority_or_other_sessions (tests.test_consultation_interrupt.InterruptTests) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 2.450s
+
+OK
+[16/Oct/2026 18:54:22] "GET /api/sessions/7303fc77-151a-4c12-b9dc-a3e1daf6c895/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 18:54:22] "POST /api/sessions/7303fc77-151a-4c12-b9dc-a3e1daf6c895/messages HTTP/1.1" 409 -
+[16/Oct/2026 18:54:22] "POST /api/sessions/7303fc77-151a-4c12-b9dc-a3e1daf6c895/messages HTTP/1.1" 200 -
+[16/Oct/2026 18:54:22] "POST /api/sessions/7303fc77-151a-4c12-b9dc-a3e1daf6c895/messages HTTP/1.1" 200 -
+[16/Oct/2026 18:54:23] "GET /api/sessions/5bcfc5bc-c195-4a05-a110-24d0800907a1/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 18:54:23] "POST /api/sessions/5bcfc5bc-c195-4a05-a110-24d0800907a1/messages HTTP/1.1" 409 -
+[16/Oct/2026 18:54:23] "POST /api/sessions/5bcfc5bc-c195-4a05-a110-24d0800907a1/messages HTTP/1.1" 200 -
+[16/Oct/2026 18:54:23] "POST /api/sessions/5bcfc5bc-c195-4a05-a110-24d0800907a1/messages HTTP/1.1" 200 -

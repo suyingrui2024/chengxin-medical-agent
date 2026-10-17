@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.11.5 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native repeat resumes
+
+
+Running 1 test using 1 worker
+
+(node:988400) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible (1.2s)
+
+  1 passed (1.5s)

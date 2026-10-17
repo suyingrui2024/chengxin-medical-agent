@@ -1,0 +1,315 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: measurement-supplements.spec.mjs >> full measurement reports retain medication updates through failure and retry
+- Location: tests/ui/measurement-supplements.spec.mjs:8:3
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - link "跳到主要内容" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=e3]:
+    - complementary "主导航" [ref=e4]:
+      - link "澄心 CHENGXIN HEALTH" [ref=e5] [cursor=pointer]:
+        - /url: "#consultation"
+        - generic [ref=e6]:
+          - strong [ref=e7]: 澄心
+          - generic [ref=e8]: CHENGXIN HEALTH
+      - button "新的问诊 ↗" [ref=e9] [cursor=pointer]:
+        - text: 新的问诊
+        - generic [ref=e12]: ↗
+      - generic [ref=e13]:
+        - text: 界面模式
+        - combobox "界面模式" [ref=e14]:
+          - option "患者视图" [selected]
+          - option "研发视图"
+      - paragraph [ref=e15]: 工作空间
+      - navigation [ref=e16]:
+        - button "问诊" [ref=e17] [cursor=pointer]
+        - button "会谈记录 1" [ref=e21] [cursor=pointer]:
+          - text: 会谈记录
+          - generic [ref=e24]: "1"
+      - generic [ref=e25]:
+        - generic [ref=e26]: 最近问诊
+        - generic [ref=e27]: "1"
+      - button "·咳嗽发烧" [ref=e29] [cursor=pointer]
+      - generic [ref=e30]:
+        - generic [ref=e33]:
+          - text: 本机工作空间
+          - generic [ref=e34]: 会谈仅保留到服务关闭
+        - generic [ref=e35]:
+          - generic [ref=e36]: 研究原型
+          - generic [ref=e37]: 能力协议 v1
+    - generic [ref=e38]:
+      - banner [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: 工作空间
+          - generic [ref=e42]: /
+          - strong [ref=e43]: 问诊
+        - generic [ref=e44]:
+          - generic [ref=e45]: 本机服务已连接
+          - generic [ref=e47]: 直接模型
+      - main [ref=e48]:
+        - region "问诊" [ref=e49]:
+          - generic [ref=e50]:
+            - heading "核对本次记录" [level=1] [ref=e52]
+            - button "问诊记录 16" [ref=e53] [cursor=pointer]:
+              - text: 问诊记录
+              - generic [ref=e56]: "16"
+          - generic [ref=e57]:
+            - region "问诊对话" [ref=e58]:
+              - generic [ref=e59]:
+                - generic [ref=e62]:
+                  - strong [ref=e63]: 澄心问诊助手
+                  - generic [ref=e64]: 直接模型 · 本次会谈
+                - generic [ref=e65]:
+                  - generic [ref=e66]: 待核对
+                  - button "紧急求助" [ref=e67] [cursor=pointer]
+              - generic [ref=e70]:
+                - status [ref=e71]: 核对记录 · 可以更正
+                - button "展开对话记录" [ref=e72] [cursor=pointer]
+              - log "会谈消息" [ref=e74]:
+                - article [ref=e75]:
+                  - heading "本次问诊摘要" [active] [level=3] [ref=e76]
+                  - paragraph [ref=e77]: 请核对已记录的信息。“未知”表示尚未确认。
+                  - generic [ref=e78]:
+                    - generic [ref=e79]:
+                      - generic [ref=e80]: 腋温记录
+                      - button "再测一次" [disabled] [ref=e81]
+                    - generic [ref=e82]: 最新记录
+                    - strong [ref=e83]: 38.25 ℃
+                    - paragraph [ref=e84]: 患者自述 · 质量未评价
+                    - group [ref=e85]:
+                      - generic "查看记录 · 1条" [ref=e86] [cursor=pointer]
+                  - generic [ref=e87]:
+                    - generic [ref=e88]:
+                      - generic [ref=e89]: 年龄
+                      - generic [ref=e93]:
+                        - strong [ref=e94]: 32 岁
+                        - group [ref=e95]:
+                          - generic "原话与来源" [ref=e96] [cursor=pointer]
+                      - button "更正" [disabled] [ref=e97]
+                    - generic [ref=e98]:
+                      - generic [ref=e99]: 影响程度
+                      - generic [ref=e103]:
+                        - strong [ref=e104]: 3 / 10
+                        - group [ref=e105]:
+                          - generic "原话与来源" [ref=e106] [cursor=pointer]
+                      - button "更正" [disabled] [ref=e107]
+                  - generic [ref=e108]:
+                    - strong [ref=e109]: 仍待确认
+                    - generic [ref=e111]:
+                      - generic [ref=e112]:
+                        - strong [ref=e113]: 过敏信息
+                        - button "补充 / 更正" [disabled] [ref=e114]
+                      - blockquote "过敏信息：原话，待确认" [ref=e115]: 过敏不知道
+                      - text: 患者自述 · 尚未确认
+                      - group [ref=e116]:
+                        - generic "查看同轮原话" [ref=e117]
+                  - generic [ref=e118]:
+                    - heading "当前不适" [level=4] [ref=e119]
+                    - generic [ref=e124]:
+                      - generic [ref=e125]:
+                        - generic [ref=e126]: 主要问题
+                        - generic [ref=e127]:
+                          - strong [ref=e128]: 咳嗽发烧
+                          - group [ref=e129]:
+                            - generic "原话与来源" [ref=e130] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e131]
+                      - generic [ref=e132]:
+                        - generic [ref=e133]: 开始与起病方式
+                        - generic [ref=e134]:
+                          - strong [ref=e135]: 两天
+                          - group [ref=e136]:
+                            - generic "原话与来源" [ref=e137] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e138]
+                      - generic [ref=e139]:
+                        - generic [ref=e140]: 急症筛查
+                        - generic [ref=e141]:
+                          - strong [ref=e142]: 患者否认上述危险信号
+                          - group [ref=e143]:
+                            - generic "原话与来源" [ref=e144] [cursor=pointer]
+                      - generic [ref=e145]:
+                        - generic [ref=e146]: 变化趋势
+                        - generic [ref=e147]:
+                          - strong [ref=e148]: 变化不大
+                          - group [ref=e149]:
+                            - generic "原话与来源" [ref=e150] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e151]
+                      - generic [ref=e152]:
+                        - generic [ref=e153]: 伴随不适
+                        - generic [ref=e154]:
+                          - strong [ref=e155]: 否认/没有
+                          - group [ref=e156]:
+                            - generic "原话与来源" [ref=e157] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e158]
+                      - generic [ref=e159]:
+                        - generic [ref=e160]: 呼吸情况
+                        - generic [ref=e161]:
+                          - strong [ref=e162]: 没有气促，能完整说话
+                          - group [ref=e163]:
+                            - generic "原话与来源" [ref=e164] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e165]
+                      - generic [ref=e166]:
+                        - generic [ref=e167]: 咳嗽细节
+                        - generic [ref=e168]:
+                          - strong [ref=e169]: 干咳，没有咳血
+                          - group [ref=e170]:
+                            - generic "原话与来源" [ref=e171] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e172]
+                      - generic [ref=e173]:
+                        - generic [ref=e174]: 饮水进食与排尿
+                        - generic [ref=e175]:
+                          - strong [ref=e176]: 能正常喝水吃饭，排尿正常
+                          - group [ref=e177]:
+                            - generic "原话与来源" [ref=e178] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e179]
+                  - generic [ref=e180]:
+                    - heading "用药与背景" [level=4] [ref=e181]
+                    - generic [ref=e186]:
+                      - generic [ref=e187]:
+                        - generic [ref=e188]: 咨询对象
+                        - generic [ref=e189]:
+                          - strong [ref=e190]: 本人
+                          - group [ref=e191]:
+                            - generic "原话与来源" [ref=e192] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e193]
+                      - generic [ref=e194]:
+                        - generic [ref=e195]: 已做处理/用药
+                        - generic [ref=e196]:
+                          - strong [ref=e197]: 否认/没有
+                          - group [ref=e198]:
+                            - generic "原话与来源" [ref=e199] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e200]
+                      - generic [ref=e201]:
+                        - generic [ref=e202]: 相关病史
+                        - generic [ref=e203]:
+                          - strong [ref=e204]: 否认/没有
+                          - group [ref=e205]:
+                            - generic "原话与来源" [ref=e206] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e207]
+                      - generic [ref=e208]:
+                        - generic [ref=e209]: 期望与担心
+                        - generic [ref=e210]:
+                          - strong [ref=e211]: 整理信息去就医
+                          - group [ref=e212]:
+                            - generic "原话与来源" [ref=e213] [cursor=pointer]
+                        - button "更正" [disabled] [ref=e214]
+                  - generic [ref=e215]: 本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。
+                  - group [ref=e216]:
+                    - generic "哪些变化需要立即求助" [ref=e217]
+              - generic [ref=e218]:
+                - generic "快捷回答" [ref=e219]:
+                  - button "重试这一轮" [ref=e220] [cursor=pointer]
+                - generic [ref=e221]: 请先核对摘要。你可以确认，也可以直接说需要更正的地方。
+                - generic [ref=e222]:
+                  - generic [ref=e223]: 输入你的描述
+                  - textbox "输入你的描述" [ref=e224]:
+                    - /placeholder: 按自己的话说，也可以补充或更正…
+                  - button "发送回答" [ref=e225] [cursor=pointer]
+                - paragraph [ref=e228]:
+                  - generic [ref=e229]: 0 / 2000
+            - complementary "问诊记录" [ref=e230]:
+              - generic [ref=e231]:
+                - generic [ref=e232]: 本次问诊
+                - generic [ref=e233]: 待核对
+              - strong [ref=e235]: 请核对整理的内容
+              - generic [ref=e236]:
+                - heading "已记录的信息" [level=2] [ref=e237]
+                - generic [ref=e238]: 16 项
+              - generic [ref=e239]:
+                - generic [ref=e240]:
+                  - generic [ref=e241]:
+                    - generic [ref=e242]: 咨询对象
+                    - button "更正" [ref=e243] [cursor=pointer]
+                  - paragraph [ref=e244]: 本人
+                - generic [ref=e245]:
+                  - generic [ref=e246]:
+                    - generic [ref=e247]: 年龄
+                    - button "更正" [ref=e248] [cursor=pointer]
+                  - paragraph [ref=e249]: 32 岁
+                - generic [ref=e250]:
+                  - generic [ref=e251]:
+                    - generic [ref=e252]: 主要问题
+                    - button "更正" [ref=e253] [cursor=pointer]
+                  - paragraph [ref=e254]: 咳嗽发烧
+                - generic [ref=e255]:
+                  - generic [ref=e256]:
+                    - generic [ref=e257]: 开始时间
+                    - button "更正" [ref=e258] [cursor=pointer]
+                  - paragraph [ref=e259]: 两天
+                - generic [ref=e260]:
+                  - generic [ref=e261]: 紧急信号筛查
+                  - paragraph [ref=e263]: 用户否认上述紧急信号
+                - generic [ref=e264]:
+                  - generic [ref=e265]: 报告的腋温
+                  - paragraph [ref=e267]: 37.6 ℃
+                - generic [ref=e268]:
+                  - generic [ref=e269]:
+                    - generic [ref=e270]: 变化趋势
+                    - button "更正" [ref=e271] [cursor=pointer]
+                  - paragraph [ref=e272]: 变化不大
+                - generic [ref=e273]:
+                  - generic [ref=e274]:
+                    - generic [ref=e275]: 影响程度
+                    - button "更正" [ref=e276] [cursor=pointer]
+                  - paragraph [ref=e277]: "3"
+                - generic [ref=e278]:
+                  - generic [ref=e279]:
+                    - generic [ref=e280]: 伴随不适
+                    - button "更正" [ref=e281] [cursor=pointer]
+                  - paragraph [ref=e282]: 明确否认
+                - generic [ref=e283]:
+                  - generic [ref=e284]:
+                    - generic [ref=e285]: 呼吸情况
+                    - button "更正" [ref=e286] [cursor=pointer]
+                  - paragraph [ref=e287]: 没有气促，能完整说话
+                - generic [ref=e288]:
+                  - generic [ref=e289]:
+                    - generic [ref=e290]: 咳嗽情况
+                    - button "更正" [ref=e291] [cursor=pointer]
+                  - paragraph [ref=e292]: 干咳，没有咳血
+                - generic [ref=e293]:
+                  - generic [ref=e294]:
+                    - generic [ref=e295]: 饮水、进食与排尿
+                    - button "更正" [ref=e296] [cursor=pointer]
+                  - paragraph [ref=e297]: 能正常喝水吃饭，排尿正常
+                - generic [ref=e298]:
+                  - generic [ref=e299]:
+                    - generic [ref=e300]: 用药与处理
+                    - button "更正" [ref=e301] [cursor=pointer]
+                  - paragraph [ref=e302]: 明确否认
+                - generic [ref=e303]:
+                  - generic [ref=e304]:
+                    - generic [ref=e305]: 过敏信息
+                    - button "更正" [ref=e306] [cursor=pointer]
+                  - paragraph [ref=e307]: 未知 / 尚未确认
+                - generic [ref=e308]:
+                  - generic [ref=e309]:
+                    - generic [ref=e310]: 相关病史
+                    - button "更正" [ref=e311] [cursor=pointer]
+                  - paragraph [ref=e312]: 明确否认
+                - generic [ref=e313]:
+                  - generic [ref=e314]:
+                    - generic [ref=e315]: 期望与担心
+                    - button "更正" [ref=e316] [cursor=pointer]
+                  - paragraph [ref=e317]: 整理信息去就医
+              - generic [ref=e318]:
+                - generic [ref=e319]: 已提供
+                - generic [ref=e321]: 待确认 / 未知
+              - paragraph [ref=e323]: 记录可以更正。没有提到的信息，不会自动记为“没有”。
+          - generic [ref=e324]: 研究原型用于信息采集与流程评审。请勿输入姓名、证件号等身份信息；紧急情况请立即拨打 120。
+```

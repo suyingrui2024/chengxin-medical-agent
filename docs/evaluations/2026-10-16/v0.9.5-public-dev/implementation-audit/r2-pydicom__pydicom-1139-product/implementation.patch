@@ -1,0 +1,21 @@
+--- a/pydicom/valuerep.py
++++ b/pydicom/valuerep.py
+@@ -753,6 +753,18 @@
+     def __repr__(self):
+         return '='.join(self.components).__repr__()
+ 
++    def __iter__(self):
++        yield from str(self)
++
++    def __contains__(self, x):
++        return x in str(self)
++
++    def __getitem__(self, x):
++        return str(self)[x]
++
++    def __len__(self):
++        return len(str(self))
++
+     def __hash__(self):
+         return hash(self.components)
+ 

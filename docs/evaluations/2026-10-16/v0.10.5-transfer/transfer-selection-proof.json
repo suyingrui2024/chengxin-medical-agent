@@ -1,0 +1,20 @@
+{
+  "frozen_draw_reproduced": true,
+  "dataset_files_hashes_match": true,
+  "selected_instance_rows_match": true,
+  "selected_ids": [
+    "matplotlib__matplotlib-25498",
+    "pallets__flask-4045",
+    "sphinx-doc__sphinx-8474",
+    "sympy__sympy-20049"
+  ],
+  "eligible_counts": {
+    "matplotlib/matplotlib": 21,
+    "pallets/flask": 2,
+    "sphinx-doc/sphinx": 14,
+    "sympy/sympy": 76
+  },
+  "excluded_before_selection": 14,
+  "scope": "Uses the frozen exposure set, not the later on-disk fixture catalog. Parquet/JSON equality independently checked in the archived dataset proof.",
+  "external_model_calls": 0
+}

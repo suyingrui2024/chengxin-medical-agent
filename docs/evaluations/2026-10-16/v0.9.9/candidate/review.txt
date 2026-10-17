@@ -1,0 +1,32 @@
+独立复核结论：PASS
+
+被检查文件
+- /workspace/calculator.py （modified，before_size=32 / after_size=32）
+- /workspace/regressions/test_add_regression.py （added，560 字节）
+- /workspace/tests/transient-output.txt （added，23 字节）
+
+workspace_changes 观察到的 calculator.py diff（path 参数 "calculator.py"，detail.diff 原文）
+--- a/calculator.py
++++ b/calculator.py
+@@ -1,2 +1,2 @@
+ def add(a, b):
+-    return a - b
++    return a + b
+
+sha256: e1a89402…fdf7edc8 → ba1a531f…7f18bc77
+
+实际运行的命令与真实输出
+1) python3 -c "from calculator import add; print(add(2,3), add(-4,-6), add(-7,3), add(0,0), add(10,3))"
+   输出: 5 -10 -4 0 13   exit=0   （与期望值一致）
+2) python3 -m unittest discover -s regressions -p 'test_*.py' -v
+   输出: Ran 5 tests ... OK   exit=0
+   用例: test_is_not_subtraction / test_mixed_sign / test_negative_integers /
+         test_positive_integers / test_zero_identity 均 ok
+
+按指令未重新运行 run_checks.py（主智能体已执行，避免重复）。
+
+结论
+- calculator.py 的真实前后差异为 return a - b → return a + b，与修复目标一致。
+- 正整数、负整数、混合符号、零元、非减法语义均通过；判定 PASS。
+- 本轮其它文件变化：新增 regressions/test_add_regression.py、新增
+  tests/transient-output.txt（23 字节，未在本次复核中追踪来源，未删除）。

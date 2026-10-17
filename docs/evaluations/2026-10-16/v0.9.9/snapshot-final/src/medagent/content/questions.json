@@ -1,0 +1,130 @@
+{
+  "version": "2026-10-15.v1",
+  "questions": [
+    {
+      "id": "consult_for",
+      "phase": "opening",
+      "fact_key": "consult_for",
+      "prompt": "先确认一下：这次是为谁咨询？",
+      "input": "choice",
+      "options": [
+        {"label": "我自己", "value": "self"},
+        {"label": "孩子", "value": "child"},
+        {"label": "其他家人", "value": "other_adult"}
+      ]
+    },
+    {
+      "id": "age",
+      "phase": "opening",
+      "fact_key": "age_years",
+      "prompt": "患者多大？婴幼儿请尽量写清月龄，例如“8个月”；其他人可写“32岁”。",
+      "input": "age"
+    },
+    {
+      "id": "chief_complaint",
+      "phase": "opening",
+      "fact_key": "chief_complaint",
+      "prompt": "这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。",
+      "input": "text"
+    },
+    {
+      "id": "emergency_screen",
+      "phase": "emergency_screen",
+      "fact_key": "emergency_screen",
+      "prompt": "此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+      "input": "yes_no_unknown",
+      "options": [
+        {"label": "有任一项", "value": "yes"},
+        {"label": "都没有", "value": "no"},
+        {"label": "不确定", "value": "unknown"}
+      ]
+    },
+    {
+      "id": "onset",
+      "phase": "history",
+      "fact_key": "onset",
+      "prompt": "这个问题从什么时候开始？是突然出现，还是逐渐出现？",
+      "input": "text"
+    },
+    {
+      "id": "trajectory",
+      "phase": "history",
+      "fact_key": "trajectory",
+      "prompt": "从开始到现在，总体是在加重、减轻，还是变化不大？",
+      "input": "choice",
+      "options": [
+        {"label": "在加重", "value": "worsening"},
+        {"label": "在减轻", "value": "improving"},
+        {"label": "变化不大", "value": "stable"},
+        {"label": "说不清", "value": "unknown"}
+      ]
+    },
+    {
+      "id": "severity",
+      "phase": "history",
+      "fact_key": "severity",
+      "prompt": "如果 0 分是完全不影响，10 分是难以忍受，现在大约几分？也可以直接描述对吃饭、睡觉、活动的影响。",
+      "input": "severity"
+    },
+    {
+      "id": "associated_symptoms",
+      "phase": "history",
+      "fact_key": "associated_symptoms",
+      "prompt": "除了最主要的问题，还有哪些同时出现的不舒服？没有也请直接说没有。",
+      "input": "text_or_absent"
+    },
+    {
+      "id": "resp_breathing",
+      "phase": "history",
+      "fact_key": "resp_breathing",
+      "prompt": "现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+      "input": "text_or_absent",
+      "applies_when": {"chief_complaint_contains_any": ["咳", "喘", "呼吸", "感冒", "发热", "发烧", "喉咙", "咽痛"]}
+    },
+    {
+      "id": "resp_cough_details",
+      "phase": "history",
+      "fact_key": "resp_cough_details",
+      "prompt": "如果有咳嗽，是干咳还是有痰？有没有咳血、胸痛，或夜间明显加重？没有咳嗽请直接说没有。",
+      "input": "text_or_absent",
+      "applies_when": {"chief_complaint_contains_any": ["咳", "喘", "呼吸", "感冒", "发热", "发烧", "喉咙", "咽痛"]}
+    },
+    {
+      "id": "resp_intake",
+      "phase": "history",
+      "fact_key": "resp_intake",
+      "prompt": "现在能正常喝水、进食和排尿吗？如果明显减少，请描述大约到什么程度。",
+      "input": "text",
+      "applies_when": {"chief_complaint_contains_any": ["咳", "喘", "呼吸", "感冒", "发热", "发烧", "喉咙", "咽痛"]}
+    },
+    {
+      "id": "medications_taken",
+      "phase": "background",
+      "fact_key": "medications_taken",
+      "prompt": "这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。",
+      "input": "text_or_absent"
+    },
+    {
+      "id": "allergies",
+      "phase": "background",
+      "fact_key": "allergies",
+      "prompt": "有没有已知的药物或食物过敏？不知道和没有需要分开说。",
+      "input": "text_or_absent"
+    },
+    {
+      "id": "relevant_history",
+      "phase": "background",
+      "fact_key": "relevant_history",
+      "prompt": "有没有正在治疗的疾病、近期手术，或其他可能影响这次情况的病史？没有请说没有。",
+      "input": "text_or_absent"
+    },
+    {
+      "id": "patient_goal",
+      "phase": "background",
+      "fact_key": "patient_goal",
+      "prompt": "你现在最希望得到什么帮助，或者最担心什么？",
+      "input": "text"
+    }
+  ]
+}
+

@@ -1,0 +1,24 @@
+{
+  "version": "0.9.7",
+  "backend_tests_passed": 156,
+  "ui_scenarios_passed": 21,
+  "native_source_scenarios_passed": 8,
+  "native_package_scenarios_passed": 8,
+  "bridge_and_status_assertions_passed": 6,
+  "format_check_passed": true,
+  "real_provider_requests": 7,
+  "maximum_requests": 24,
+  "real_provider_checks_passed": 11,
+  "online_source_files_unchanged": 69,
+  "all_provider_requests_http_200": true,
+  "package_files_matched": 75,
+  "locked_installed_packages_verified": 544,
+  "full_dsh_parity_proven": false,
+  "clinical_validation_complete": false,
+  "scope": "Synthetic structured-status and lifecycle checks; broad coding ability was not remeasured. Prior known public DEV source correctness remains 4/8 versus SDK 4/8 as historical evidence.",
+  "historical_results": {
+    "version": "0.9.6",
+    "product_public_dev_source_correctness": "4/8",
+    "official_sdk_public_dev_source_correctness": "4/8"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "source_report": "docs/evaluations/2026-10-17/v0.11.13/live-final.json",
+  "source_sha256": "20eea8296f4e51856401e1d8f72f87dee7811c5c329fff7d550a02c68d082e08",
+  "old_gate_passed": true,
+  "new_uncertain_location_not_associated_criterion_passed": false,
+  "old_report_mutated": false,
+  "scope": "New criterion applied to the already recorded old trace; not an additional provider run."
+}

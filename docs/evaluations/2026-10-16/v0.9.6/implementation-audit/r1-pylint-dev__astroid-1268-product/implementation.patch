@@ -1,0 +1,12 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -637,6 +637,9 @@
+     def visit_uninferable(self, node):
+         return str(node)
+ 
++    def visit_unknown(self, node):
++        return "Unknown"
++
+     def visit_property(self, node):
+         return node.function.accept(self)
+ 

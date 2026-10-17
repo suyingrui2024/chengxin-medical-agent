@@ -1,0 +1,64 @@
+{
+  "version": "0.11.14",
+  "backend": {
+    "collected": 365,
+    "passed": 311,
+    "skipped": 54,
+    "new_tests": 9,
+    "optional_sdk_suite_rerun": false,
+    "three_long_opt_in_checks_rerun": false,
+    "medical_bridge_integration_passed": 1
+  },
+  "ui": {
+    "full_passed": 65,
+    "new_tests": 3
+  },
+  "native": {
+    "source_full_passed": 33,
+    "package_full_passed": 33,
+    "new_tests": 1,
+    "extra_actual_question_replay_passed": true
+  },
+  "frozen": {
+    "source_files": 295,
+    "selected_tests": 187
+  },
+  "package": {
+    "own_files": 111,
+    "production_dependency_versions": 544,
+    "passed": true
+  },
+  "provider": {
+    "attempted_calls": 11,
+    "maximum_this_run": 14,
+    "maximum_this_directory": 28,
+    "all_statuses_200": true,
+    "directed_cases": 4,
+    "stricter_checks_passed": true,
+    "stage_requests": {
+      "after_location_confirmation_calls": 1,
+      "after_temperature_entry_calls": 1
+    },
+    "tool_rejections": [
+      {
+        "case": 4,
+        "tool": "propose_self_check_result",
+        "error": "原话的部位范围仍有不确定限定，请先澄清或继续原图由患者选择／跳过；不能截短引文删除限定。"
+      }
+    ]
+  },
+  "bridge_unit_passed": 21,
+  "prettier_passed": true,
+  "black_checked_files": 8,
+  "remaining_work": [
+    "Bind clarification question intent to matching answer components; current coarse body buttons cannot answer region/side questions.",
+    "Fresh complete native consultation evaluation after this protocol change.",
+    "Independent clinical and patient comprehension review before clinical claims."
+  ],
+  "clinical_validation": false,
+  "human_usability_validation": false,
+  "general_dsh_or_codex_parity_proven": false,
+  "overall_goal_complete": false,
+  "semantic_visual_answer_alignment_verified": false,
+  "known_visual_mismatch": "实际回放中，模型询问头部具体区域、左右与范围，但当前body_location图只有大范围部位选项；文字输入仍可回答，现有按钮不能单独表达这些细节。下一步须把提问绑定到匹配的结构化答题组件。"
+}

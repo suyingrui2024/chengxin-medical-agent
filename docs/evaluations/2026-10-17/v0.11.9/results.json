@@ -1,0 +1,75 @@
+{
+  "version": "0.11.9",
+  "backend": {
+    "collected": 331,
+    "default_passed": 277,
+    "default_skipped": 54,
+    "separately_passed_sdk": 51,
+    "unique_passed": 328,
+    "sdk_initial_passed": 50,
+    "sdk_initial_import_errors": 1,
+    "sdk_fixed_path_retry_passed": 1,
+    "sdk_final_affected_medical_passed": 2,
+    "three_long_opt_in_checks_not_rerun": true
+  },
+  "ui": {
+    "full_passed": 48,
+    "final_affected_passed": 4
+  },
+  "native": {
+    "source_full_passed": 29,
+    "package_full_passed": 29
+  },
+  "bridge_passed": 21,
+  "frozen": {
+    "source_files": 271,
+    "selected_tests": 153,
+    "files_changed_between_first_and_final_provider_runs": [
+      "docs/就诊对象与会谈草稿隔离.md",
+      "src/medagent/consultation_subject.py",
+      "tests/test_consultation_subjects.py"
+    ],
+    "changes_after_final_provider": []
+  },
+  "provider": {
+    "requests": 17,
+    "initial_requests": 10,
+    "final_requests": 7,
+    "statuses": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "fresh_synthetic_cases_total": 4,
+    "final_fresh_cases": 2,
+    "initial_change_subject_tool_attempts": 3,
+    "final_change_subject_tool_attempts": 1,
+    "background_recorded_initially_but_only_acknowledged_in_final_run": true
+  },
+  "package": {
+    "own_files": 109,
+    "dependency_versions": 544,
+    "passed": true
+  },
+  "format": {
+    "prettier_passed": true,
+    "changed_python_files_black_passed": 10
+  },
+  "draft_persistence": "Current-page memory only; no refresh or app-close guarantee",
+  "clinical_validation": false,
+  "general_dsh_or_codex_parity_proven": false
+}

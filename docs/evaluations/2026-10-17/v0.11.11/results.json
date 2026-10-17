@@ -1,0 +1,52 @@
+{
+  "version": "0.11.11",
+  "backend": {
+    "collected": 340,
+    "default_passed": 286,
+    "default_skipped": 54,
+    "separately_passed_sdk": 51,
+    "unique_passed": 337,
+    "three_long_opt_in_checks_not_rerun": true
+  },
+  "ui": {
+    "full_passed": 56,
+    "new_tests": 4
+  },
+  "native": {
+    "source_full_passed": 31,
+    "package_full_passed": 31,
+    "new_tests": 1
+  },
+  "bridge_passed": 21,
+  "format": {
+    "prettier_passed": true,
+    "changed_python_files_black_passed": 4
+  },
+  "frozen": {
+    "source_files": 281,
+    "selected_tests": 162,
+    "source_unchanged": true
+  },
+  "provider": {
+    "new_requests": 0,
+    "static_prompt_prefix_equal_to_v01110": true,
+    "tool_count": 11,
+    "scope": "Only static prompt bytes compared in two local processes; does not prove clinical or all dynamic behavior unchanged."
+  },
+  "package": {
+    "own_files": 110,
+    "dependency_versions": 544,
+    "passed": true
+  },
+  "early_failures": {
+    "location_selection_loss_reproduced": true,
+    "restored_old_offer_feedback_identity_reproduced": true,
+    "mobile_menu_and_temperature_question_assumptions_corrected_in_test_driver": true,
+    "error_visibility_failed_before_and_after_initial_scroll_fix": true,
+    "visibility_assertion_retained": true
+  },
+  "draft_persistence": "Current-page memory only, bound to session, task version and host occurrence; no refresh or close guarantee",
+  "clinical_validation": false,
+  "human_usability_validation": false,
+  "general_dsh_or_codex_parity_proven": false
+}

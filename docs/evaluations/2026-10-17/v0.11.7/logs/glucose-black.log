@@ -1,0 +1,17 @@
+would reformat scripts/fetch_dsh.py
+would reformat src/medagent/__init__.py
+would reformat src/medagent/cli.py
+would reformat src/medagent/content/__init__.py
+would reformat src/medagent/events.py
+would reformat src/medagent/knowledge.py
+would reformat src/medagent/plugins.py
+would reformat src/medagent/runtime.py
+would reformat src/medagent/self_checks.py
+would reformat src/medagent/web/__init__.py
+would reformat tests/test_desktop_lifecycle.py
+would reformat tests/test_execution.py
+would reformat tests/test_runtime.py
+would reformat tests/test_workspace.py
+
+Oh no! 💥 💔 💥
+14 files would be reformatted, 125 files would be left unchanged.

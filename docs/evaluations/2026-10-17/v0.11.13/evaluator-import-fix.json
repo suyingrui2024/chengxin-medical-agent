@@ -1,0 +1,10 @@
+{
+  "changes": {
+    "scripts/evaluate_self_check_conversation.py": {
+      "before": "cb2c011a58fbeb21fb57c44025141357729544165a73a02b652c5d6f50b38819",
+      "after": "06b77d1561af39b027c45e1376e06d12f8a2db76fae01c4db37a6adb63f07a95"
+    }
+  },
+  "first_attempt_external_calls": 0,
+  "reason": "Make the documented PYTHONPATH=src command find repository test fixtures."
+}

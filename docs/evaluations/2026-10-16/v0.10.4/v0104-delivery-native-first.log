@@ -1,0 +1,43 @@
+
+> medical-agent-dsh-integration@0.10.3 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native delivery
+
+
+Running 1 test using 1 worker
+
+(node:716386) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history (775ms)
+
+
+  1) tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history 
+
+    Error: locator.fill: Error: strict mode violation: getByLabel('执行任务') resolved to 2 elements:
+        1) <section aria-label="执行任务" class="surface execution-main">…</section> aka getByRole('region', { name: '执行任务' })
+        2) <textarea rows="3" maxlength="16000" id="execution-input" placeholder="例如：创建一个单位换算脚本，编写并运行测试，把结果保存到报告中。"></textarea> aka getByRole('textbox', { name: '描述执行任务' })
+
+    Call log:
+      - waiting for getByLabel('执行任务')
+
+
+      120 |     await page
+      121 |       .getByLabel("执行任务")
+    > 122 |       .fill("创建并实际检查错误预期，按工具结果修正并复验。");
+          |        ^
+      123 |     await page.getByRole("button", { name: "开始执行", exact: true }).click();
+      124 |     await expect.poll(() => requests.length).toBe(4);
+      125 |     await expect(page.locator("#execution-status")).toHaveText("正在执行");
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/delivery.spec.mjs:122:8
+
+    Error Context: test-results/desktop/delivery-native-delivery-c-18db2-tore-the-real-check-history/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/delivery-native-delivery-c-18db2-tore-the-real-check-history/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/delivery-native-delivery-c-18db2-tore-the-real-check-history/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history 

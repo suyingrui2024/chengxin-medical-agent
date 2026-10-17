@@ -1,0 +1,6 @@
+test_host_rejects_incomplete_evidence_then_parent_and_child_compute_and_restore (tests.test_glucose_sdk.GlucoseSdkTests) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.773s
+
+OK

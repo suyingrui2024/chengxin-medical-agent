@@ -1,0 +1,37 @@
+test_cancel_keeps_the_original_fact_and_invalidates_the_form (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_skip_cancels_the_revision_instead_of_overwriting_a_known_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_wrong_fact_version_is_rejected_before_journaling (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_confirmation_records_typed_choices_without_quality_upgrade (tests.test_location_answers.LocationAnswerTests) ... ok
+test_declared_dimensions_have_registered_inputs_and_no_default_facts (tests.test_location_answers.LocationAnswerTests) ... ok
+test_exact_quote_with_trailing_punctuation_keeps_its_field_scope (tests.test_location_answers.LocationAnswerTests) ... ok
+test_field_quote_cannot_cut_off_a_same_clause_qualifier (tests.test_location_answers.LocationAnswerTests) ... ok
+test_field_quotes_preserve_clear_location_and_uncertain_extent (tests.test_location_answers.LocationAnswerTests) ... ok
+test_invalid_implicit_draft_cannot_leave_a_new_form_behind (tests.test_location_answers.LocationAnswerTests) ... ok
+test_missing_or_cross_region_answers_are_rejected_before_journaling (tests.test_location_answers.LocationAnswerTests) ... ok
+test_natural_description_prefills_only_reported_dimensions (tests.test_location_answers.LocationAnswerTests) ... ok
+test_old_coarse_button_cannot_bypass_requested_side_and_area (tests.test_location_answers.LocationAnswerTests) ... ok
+test_patient_can_correct_a_model_draft_without_borrowing_the_old_quote (tests.test_location_answers.LocationAnswerTests) ... ok
+test_repeated_confirmation_does_not_duplicate_a_fact_or_user_turn (tests.test_location_answers.LocationAnswerTests) ... ok
+test_service_retry_keeps_the_same_confirmed_structured_fact (tests.test_location_answers.LocationAnswerTests) ... ok
+test_spontaneous_details_can_create_a_reviewable_form_without_an_extra_question (tests.test_location_answers.LocationAnswerTests) ... ok
+test_uncertain_or_unsupported_words_cannot_become_positive_drafts (tests.test_location_answers.LocationAnswerTests) ... ok
+test_uncertain_verbatim_text_remains_uncertain_in_the_confirmed_answer (tests.test_location_answers.LocationAnswerTests) ... ok
+test_unknown_subfields_stay_unknown_under_known_broad_region (tests.test_location_answers.LocationAnswerTests) ... ok
+test_unsupported_registered_contract_fails_before_a_patient_can_use_it (tests.test_location_answers.LocationAnswerTests) ... ok
+test_urgent_note_precedes_old_form_validation_and_does_not_record_location (tests.test_location_answers.LocationAnswerTests) ... ok
+test_a_later_correction_does_not_present_invalidated_completion_as_current (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_clarifying_location_keeps_it_in_the_graphical_task_without_associated_fact (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_completed_context_survives_service_retry_and_does_not_replay_on_new_input (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_fixed_location_is_explicitly_completed_before_next_model_decision (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_location_clarification_does_not_grant_fact_write_permission (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_location_clarification_requires_a_current_task_and_remains_bounded (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_overlong_or_blank_location_questions_do_not_consume_a_followup (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_preserved_previous_reading_is_not_reported_as_newly_recorded (tests.test_observation_completion.ObservationCompletionTests) ... ok
+test_temperature_completion_cannot_be_confused_with_a_model_writable_fact (tests.test_observation_completion.ObservationCompletionTests) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.326s
+
+OK

@@ -1,0 +1,22 @@
+{
+  "same_scripted_commands": true,
+  "external_model_calls": 0,
+  "before": {
+    "version": "0.11.8",
+    "age_before": 68,
+    "age_after": 65,
+    "reply": "question",
+    "facts_unchanged": false,
+    "extra_model_decisions": 2
+  },
+  "after": {
+    "version": "0.11.9",
+    "age_before": 68,
+    "age_after": 68,
+    "reply": "subject_change",
+    "facts_unchanged": true,
+    "extra_model_decisions": 0
+  },
+  "scope": "Same deterministic commands against copied v0.11.8 and frozen v0.11.9; this checks controller behavior, not model intelligence or clinical validity.",
+  "passed": true
+}

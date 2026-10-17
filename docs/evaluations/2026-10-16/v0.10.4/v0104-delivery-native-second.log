@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.10.3 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native delivery
+
+
+Running 1 test using 1 worker
+
+(node:716789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history (5.6s)
+
+  1 passed (6.0s)

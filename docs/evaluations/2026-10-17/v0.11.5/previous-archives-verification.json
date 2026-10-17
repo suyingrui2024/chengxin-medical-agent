@@ -1,0 +1,153 @@
+{
+  "archives": [
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.0",
+      "files": 159,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.1",
+      "files": 432,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.2",
+      "files": 737,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.3",
+      "files": 371,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.3-wait-ablation",
+      "files": 245,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.3-wait-experiment",
+      "files": 13,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.4",
+      "files": 403,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.5",
+      "files": 519,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.10.5-transfer",
+      "files": 690,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.9.5-public-dev",
+      "files": 190,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.9.6",
+      "files": 334,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.9.7",
+      "files": 215,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.9.8",
+      "files": 394,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-16/v0.9.9",
+      "files": 192,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-17/v0.10.6",
+      "files": 443,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-17/v0.11.0",
+      "files": 548,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-17/v0.11.1",
+      "files": 282,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-17/v0.11.2",
+      "files": 345,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-17/v0.11.3",
+      "files": 443,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-17/v0.11.4",
+      "files": 758,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    },
+    {
+      "archive": "docs/evaluations/2026-10-17/v0.11.4-final",
+      "files": 762,
+      "mismatches": [],
+      "unexpected_files": [],
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "audit_correction": "First auditor assumed one manifest schema. Final audit supports flat maps and nested string/object sha256 maps; no prior archive was changed."
+}

@@ -1,0 +1,31 @@
+{
+  "external_requests": 27,
+  "first_three_case_run_passed": true,
+  "final_four_case_run_passed": true,
+  "all_upstream_statuses_200": true,
+  "final_tool_rejections": [
+    {
+      "case": 1,
+      "tool": "propose_self_check_result",
+      "error": "只能为当前未完成的部位定位提议选项；不能提议体温或新查体。"
+    },
+    {
+      "case": 1,
+      "tool": "propose_self_check_result",
+      "error": "只能为当前未完成的部位定位提议选项；不能提议体温或新查体。"
+    },
+    {
+      "case": 2,
+      "tool": "record_facts",
+      "error": "字段必须已注册且在本批次内唯一"
+    },
+    {
+      "case": 4,
+      "tool": "propose_self_check_result",
+      "error": "原话的部位范围仍有不确定限定，请先澄清或继续原图由患者选择／跳过；不能截短引文删除限定。"
+    }
+  ],
+  "preflight_import_failure_external_requests": 0,
+  "population_accuracy_proven": false,
+  "clinical_validity_proven": false
+}

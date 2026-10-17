@@ -1,0 +1,14 @@
+
+> medical-agent-dsh-integration@0.11.5 test:ui
+> playwright test --grep a narrow-screen repeat|repeated temperatures
+
+
+Running 3 tests using 1 worker
+
+(node:978600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/repeated-observations.spec.mjs:9:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk (2.3s)
+  ✓  2 tests/ui/repeated-observations.spec.mjs:9:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen (2.0s)
+  ✓  3 tests/ui/repeated-observations.spec.mjs:107:1 › a narrow-screen repeat returns to the same question with its measurement visible (965ms)
+
+  3 passed (8.6s)

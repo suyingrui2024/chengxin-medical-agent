@@ -1,0 +1,17 @@
+{
+  "changes": {
+    "docs/就诊对象与会谈草稿隔离.md": {
+      "before": "cd0ddd7c9d472f7d4cbcad4ccf49f720f0b522e681238266acb6221a020d9c08",
+      "after": "065637cc8ec66567e5c17de434b311fc1b8d99a3236157e42d2afb70e29e37d7"
+    },
+    "src/medagent/consultation_subject.py": {
+      "before": "064babb4354d73f6a236d95011aa1b156ebc420ae1095638700e5c46fbcff94d",
+      "after": "e38be6fb942297607e56474eaa11d7c28ed11926b52f3ba61e34e960e379f434"
+    },
+    "tests/test_consultation_subjects.py": {
+      "before": "9942d4c86bfa9b3d368164bc09728c705891212467139042c3a0dc8a6c5b3512",
+      "after": "a9b4db54fb9c8974cf4a6a5d8b95b497877dda5b67cd38706a0f9ced0cc0d90a"
+    }
+  },
+  "reason": "The first real-provider trace exposed false reporter identity in third-person reflexives; corrected bounded relationship parsing and added regression coverage before a fresh bounded run."
+}

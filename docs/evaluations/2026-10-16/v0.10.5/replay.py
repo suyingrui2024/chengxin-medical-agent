@@ -1,0 +1,215 @@
+"""Replay saved round-2 decisions with the final runtime and synthetic fault boundary."""
+import argparse
+import hashlib
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import json
+from pathlib import Path
+import shutil
+import sys
+import tempfile
+import threading
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+
+
+def decisions(row):
+    root = row["snapshot"]["id"]
+    groups = {}
+    seen = set()
+    for envelope in row["snapshot"]["events"]:
+        notification = envelope.get("notification", {})
+        params = notification.get("params", {})
+        event = params.get("event", {})
+        if (
+            notification.get("method") != "session.event"
+            or params.get("sessionId") != root
+        ):
+            continue
+        kind = event.get("type")
+        identity = (kind, event.get("seq"), event.get("time"))
+        if identity in seen or kind not in {"assistant/message", "tool/call"}:
+            continue
+        seen.add(identity)
+        data = event["data"]
+        group = groups.setdefault(
+            (data["turn"], data["step"]), {"text": [], "tools": []}
+        )
+        if kind == "assistant/message":
+            group["text"] += [
+                value
+                for value in data.get("message", {}).get("content", [])
+                if value.get("type") == "text"
+            ]
+        else:
+            arguments = data["arguments"]
+            if isinstance(arguments, str):
+                arguments = json.loads(arguments)
+            group["tools"].append(
+                {
+                    "type": "tool_use",
+                    "id": data["callId"],
+                    "name": data["name"],
+                    "input": arguments,
+                }
+            )
+    return [group["text"] + group["tools"] for _, group in sorted(groups.items())]
+
+
+class LocalProvider(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def __init__(self, frames):
+        self.frames, self.requests = frames, []
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args):
+                pass
+
+            def do_POST(self):
+                body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                self.server.requests.append(body)
+                index = len(self.server.requests) - 1
+                content = (
+                    self.server.frames[index]
+                    if index < len(self.server.frames)
+                    else [{"type": "text", "text": "Unexpected replay request"}]
+                )
+                events = [
+                    {
+                        "type": "message_start",
+                        "message": {
+                            "id": f"replay-{index}",
+                            "model": "saved-decisions",
+                            "usage": {"input_tokens": 10, "output_tokens": 1},
+                        },
+                    }
+                ]
+                for position, block in enumerate(content):
+                    events.extend(
+                        [
+                            {
+                                "type": "content_block_start",
+                                "index": position,
+                                "content_block": block,
+                            },
+                            {"type": "content_block_stop", "index": position},
+                        ]
+                    )
+                events.extend(
+                    [
+                        {
+                            "type": "message_delta",
+                            "delta": {
+                                "stop_reason": "tool_use"
+                                if any(block["type"] == "tool_use" for block in content)
+                                else "end_turn"
+                            },
+                            "usage": {"output_tokens": 10},
+                        },
+                        {"type": "message_stop"},
+                    ]
+                )
+                data = "".join(
+                    f"event: {event['type']}\ndata: {json.dumps(event)}\n\n"
+                    for event in events
+                ).encode()
+                try:
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/event-stream")
+                    self.send_header("Content-Length", str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
+
+        super().__init__(("127.0.0.1", 0), Handler)
+        threading.Thread(target=self.serve_forever, daemon=True).start()
+
+
+def replay(root, output):
+    evidence = json.loads((HERE / "verification.json").read_text())
+    checked = evidence["final_runtime_source_sha256"]
+    for name, expected in checked.items():
+        if (
+            not (root / name).is_file()
+            or hashlib.sha256((root / name).read_bytes()).hexdigest() != expected
+        ):
+            raise SystemExit("Source drift: " + name)
+    sys.path[:0] = [str(root / "scripts"), str(root / "src")]
+    from evaluate_freshness import run_case
+
+    original = json.loads((HERE / "real-provider/round2.json").read_text())["case"]
+    provider = LocalProvider(decisions(original))
+    try:
+        with tempfile.TemporaryDirectory(prefix="freshness-saved-decisions-") as raw:
+            result = run_case(
+                {
+                    "MEDAGENT_LLM_BASE_URL": f"http://127.0.0.1:{provider.server_port}/anthropic",
+                    "MEDAGENT_LLM_API_KEY": "local-saved-freshness",
+                    "MEDAGENT_LLM_MODEL": "saved-decisions",
+                },
+                Path(raw) / "case",
+            )
+            checks = {
+                "same_complete_conformance": result["passed"]
+                is original["passed"]
+                is True,
+                "same_number_of_model_decisions": len(provider.requests)
+                == original["gateway"]["attempted_calls"],
+                "same_check_exits": [v["exit_code"] for v in result["observations"]]
+                == [v["exit_code"] for v in original["observations"]],
+                "same_freshness_states": [e["freshness"] for e in result["freshness"]]
+                == [e["freshness"] for e in original["freshness"]],
+                "actual_final_response_fault_boundary": result["injection"]["boundary"]
+                == "actual-final-response-before-runtime",
+            }
+            report = {
+                "kind": "saved-freshness-decisions/v1",
+                "scope": "Assistant text and ordered tool calls, without reasoning or byte-identical provider transport frames. Synthetic edit at actual local final response boundary.",
+                "checked_runtime_files": len(checked),
+                "external_model_requests": 0,
+                "local_fixture_requests": len(provider.requests),
+                "checks": checks,
+                "replay": result,
+                "passed": all(checks.values()),
+            }
+            output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+            print(
+                json.dumps(
+                    {k: v for k, v in report.items() if k not in {"replay", "scope"}},
+                    ensure_ascii=False,
+                )
+            )
+            return report["passed"]
+    finally:
+        provider.shutdown()
+        provider.server_close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--project-root", type=Path, default=HERE.parents[3])
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--restore", action="store_true")
+    args = parser.parse_args()
+    if args.output.exists():
+        raise SystemExit("Fresh output required")
+    root = args.project_root.resolve()
+    output = args.output.resolve()
+    if args.restore:
+        with tempfile.TemporaryDirectory(prefix="freshness-frozen-source-") as raw:
+            restored = Path(raw) / "project"
+            shutil.copytree(HERE / "snapshot-final", restored)
+            assert not any(restored.rglob(".env*"))
+            (restored / "node_modules").symlink_to(
+                root / "node_modules", target_is_directory=True
+            )
+            passed = replay(restored, output)
+    else:
+        passed = replay(root, output)
+    raise SystemExit(0 if passed else 1)
+
+
+if __name__ == "__main__":
+    main()

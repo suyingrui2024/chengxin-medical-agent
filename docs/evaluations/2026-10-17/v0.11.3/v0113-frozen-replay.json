@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "external_model_calls": 0,
+  "cases": [
+    {
+      "round": "live-round1.json",
+      "id": "uncertain-allergy",
+      "saved_proposals_replayed": 4,
+      "passed": true
+    },
+    {
+      "round": "live-round1.json",
+      "id": "trimmed-medication",
+      "saved_proposals_replayed": 3,
+      "passed": true
+    },
+    {
+      "round": "live-round2.json",
+      "id": "uncertain-allergy-present-text",
+      "saved_proposals_replayed": 4,
+      "passed": true
+    },
+    {
+      "round": "live-round2.json",
+      "id": "trimmed-medication",
+      "saved_proposals_replayed": 3,
+      "passed": true
+    }
+  ],
+  "scope": "Counterfactual replay of saved injected and actual decisions through the final frozen controller; not new model trials."
+}

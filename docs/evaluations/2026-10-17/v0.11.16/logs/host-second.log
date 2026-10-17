@@ -1,0 +1,10 @@
+test_cancel_keeps_the_original_fact_and_invalidates_the_form (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_skip_cancels_the_revision_instead_of_overwriting_a_known_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_wrong_fact_version_is_rejected_before_journaling (tests.test_location_revisions.LocationRevisionTests) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.058s
+
+OK

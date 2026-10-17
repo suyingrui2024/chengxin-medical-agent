@@ -1,0 +1,76 @@
+Setting up fontconfig-config (2.14.1-4) ...
+Setting up ca-certificates (20250419~deb12u1) ...
+Updating certificates in /etc/ssl/certs...
+150 added, 0 removed; done.
+Setting up dbus (1.14.10-1~deb12u1) ...
+dpkg-statoverride: error: error setting ownership of '/usr/lib/dbus-1.0/dbus-daemon-launch-helper': Invalid argument
+dpkg: error processing package dbus (--configure):
+ installed dbus package post-installation script subprocess returned error exit status 2
+dpkg: dependency problems prevent configuration of libpam-systemd:amd64:
+ libpam-systemd:amd64 depends on default-dbus-system-bus | dbus-system-bus; however:
+  Package default-dbus-system-bus is not installed.
+  Package dbus which provides default-dbus-system-bus is not configured yet.
+  Package dbus-system-bus is not installed.
+  Package dbus which provides dbus-system-bus is not configured yet.
+
+dpkg: error processing package libpam-systemd:amd64 (--configure):
+ dependency problems - leaving unconfigured
+Setting up libfontconfig1:amd64 (2.14.1-4) ...
+Setting up fontconfig (2.14.1-4) ...
+Regenerating fonts cache... done.
+Setting up libpango-1.0-0:amd64 (1.50.12+ds-1) ...
+Setting up libcairo2:amd64 (1.16.0-7) ...
+dpkg: dependency problems prevent configuration of dbus-user-session:
+ dbus-user-session depends on libpam-systemd; however:
+  Package libpam-systemd:amd64 is not configured yet.
+
+dpkg: error processing package dbus-user-session (--configure):
+ dependency problems - leaving unconfigured
+Setting up libcairo-gobject2:amd64 (1.16.0-7) ...
+Setting up libpangoft2-1.0-0:amd64 (1.50.12+ds-1) ...
+Setting up libpangocairo-1.0-0:amd64 (1.50.12+ds-1) ...
+dpkg: dependency problems prevent configuration of dconf-service:
+ dconf-service depends on default-dbus-session-bus | dbus-session-bus; however:
+  Package default-dbus-session-bus is not installed.
+  Package dbus-user-session which provides default-dbus-session-bus is not configured yet.
+  Package dbus-session-bus is not installed.
+  Package dbus-user-session which provides dbus-session-bus is not configured yet.
+
+dpkg: error processing package dconf-service (--configure):
+ dependency problems - leaving unconfigured
+dpkg: dependency problems prevent configuration of dconf-gsettings-backend:amd64:
+ dconf-gsettings-backend:amd64 depends on dconf-service (<< 0.40.0-4.1~); however:
+  Package dconf-service is not configured yet.
+ dconf-gsettings-backend:amd64 depends on dconf-service (>= 0.40.0-4); however:
+  Package dconf-service is not configured yet.
+
+dpkg: error processing package dconf-gsettings-backend:amd64 (--configure):
+ dependency problems - leaving unconfigured
+dpkg: dependency problems prevent configuration of libgtk-3-common:
+ libgtk-3-common depends on dconf-gsettings-backend | gsettings-backend; however:
+  Package dconf-gsettings-backend:amd64 is not configured yet.
+  Package gsettings-backend is not installed.
+  Package dconf-gsettings-backend:amd64 which provides gsettings-backend is not configured yet.
+
+dpkg: error processing package libgtk-3-common (--configure):
+ dependency problems - leaving unconfigured
+dpkg: dependency problems prevent configuration of libgtk-3-0:amd64:
+ libgtk-3-0:amd64 depends on libgtk-3-common (>= 3.24.38-2~deb12u3); however:
+  Package libgtk-3-common is not configured yet.
+
+dpkg: error processing package libgtk-3-0:amd64 (--configure):
+ dependency problems - leaving unconfigured
+Processing triggers for ca-certificates (20250419~deb12u1) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+Processing triggers for libc-bin (2.36-9+deb12u14) ...
+Errors were encountered while processing:
+ dbus
+ libpam-systemd:amd64
+ dbus-user-session
+ dconf-service
+ dconf-gsettings-backend:amd64
+ libgtk-3-common
+ libgtk-3-0:amd64

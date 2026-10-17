@@ -1,0 +1,52 @@
+--- a/pydicom/dataset.py
++++ b/pydicom/dataset.py
+@@ -2492,8 +2492,8 @@
+         json_dataset = {}
+         for key in self.keys():
+             json_key = '{:08X}'.format(key)
+-            data_element = self[key]
+             try:
++                data_element = self[key]
+                 json_dataset[json_key] = data_element.to_json_dict(
+                     bulk_data_element_handler=bulk_data_element_handler,
+                     bulk_data_threshold=bulk_data_threshold
+--- a/pydicom/tests/test_json.py
++++ b/pydicom/tests/test_json.py
+@@ -1,6 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
+ import json
++from io import BytesIO
+ from unittest import mock
+ 
+ import pytest
+@@ -9,6 +10,7 @@
+ from pydicom.data import get_testdata_file
+ from pydicom.dataelem import DataElement
+ from pydicom.dataset import Dataset
++from pydicom.filereader import read_dataset
+ from pydicom.tag import Tag, BaseTag
+ from pydicom.valuerep import PersonName
+ 
+@@ -286,6 +288,21 @@
+ 
+         assert ds_json.get("00100010") is None
+ 
++    def test_suppress_invalid_tags_on_raw_element(self):
++        """Test invalid raw elements are suppressed when reading the value."""
++        # IS element (0020, 0013) with an invalid value that raises during
++        # conversion of the raw element in Dataset.__getitem__
++        raw = b"\x20\x00\x13\x00" + (4).to_bytes(4, "little") + b"abc "
++        ds = read_dataset(
++            BytesIO(raw), is_implicit_VR=True, is_little_endian=True
++        )
++
++        with pytest.raises(ValueError):
++            ds.to_json_dict()
++
++        assert ds.to_json_dict(suppress_invalid_tags=True) == {}
++        assert ds.to_json(suppress_invalid_tags=True) == "{}"
++
+ 
+ class TestSequence:
+     def test_nested_sequences(self, disable_value_validation):

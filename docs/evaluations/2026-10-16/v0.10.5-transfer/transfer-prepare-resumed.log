@@ -1,0 +1,12 @@
+{"downloading": "matplotlib__matplotlib-25498.tar.gz", "maximum_seconds": 120}
+{"source": "matplotlib__matplotlib-25498", "archive_bytes": 37691777}
+{"downloading": "pallets__flask-4045.tar.gz", "maximum_seconds": 120}
+{"source": "pallets__flask-4045", "archive_bytes": 621624}
+{"downloading": "sphinx-doc__sphinx-8474.tar.gz", "maximum_seconds": 120}
+{"source": "sphinx-doc__sphinx-8474", "archive_bytes": 5983933}
+{"downloading": "sympy__sympy-20049.tar.gz", "maximum_seconds": 120}
+{"source": "sympy__sympy-20049", "archive_bytes": 6950659}
+{"case": "matplotlib__matplotlib-25498", "prepared_files": 7221, "native_extensions_and_libraries": 9}
+{"case": "pallets__flask-4045", "prepared_files": 603, "native_extensions_and_libraries": 0}
+{"case": "sphinx-doc__sphinx-8474", "prepared_files": 8742, "native_extensions_and_libraries": 0}
+{"case": "sympy__sympy-20049", "prepared_files": 2070, "native_extensions_and_libraries": 0}

@@ -1,0 +1,7 @@
+{"case": "arithmetic-test", "passed": false, "checks": {"task_completed": true, "actual_check_observed": true, "requested_command_used": true, "initial_failure_observed": true, "same_check_retested_successfully": false, "acceptance_checks_remain_required": false, "protected_files_preserved": true, "independent_artifact_contract": false, "offline_check_history_matches": true, "bounded_requests": true, "all_provider_http200": true}}
+{"case": "versioned-api-test", "passed": false, "checks": {"task_completed": true, "actual_check_observed": false, "requested_command_used": false, "initial_failure_observed": false, "same_check_retested_successfully": false, "acceptance_checks_remain_required": false, "protected_files_preserved": true, "independent_artifact_contract": false, "offline_check_history_matches": true, "bounded_requests": true, "all_provider_http200": true}}
+{"case": "inspection-only", "passed": false, "checks": {"task_completed": true, "actual_check_observed": false, "requested_command_used": false, "failure_retained": false, "inspection_not_a_required_gate": false, "no_automatic_repair": true, "protected_files_preserved": true, "independent_artifact_contract": false, "offline_check_history_matches": true, "bounded_requests": true, "all_provider_http200": true}}
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/.runtime/v0104-delivery-driver-local.py", line 29, in <module>
+    assert all(result['passed'] for result in results)
+AssertionError

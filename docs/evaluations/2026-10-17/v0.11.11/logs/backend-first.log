@@ -1,0 +1,42 @@
+test_actual_invalid_temperature_feedback_keeps_the_same_offer_identity (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_first_offer_identity_is_in_reply_and_projection_without_mutating_catalog (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_host_continuation_can_restore_an_earlier_offer (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_legacy_task_without_offer_falls_back_to_the_specific_action (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_new_offer_of_same_task_gets_a_new_identity_without_result_writes (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_other_session_events_and_unknown_incoming_ids_are_not_accepted (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_repeat_uses_its_registered_attempt_and_feedback_keeps_it (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_unknown_repeat_cannot_reuse_an_initial_offer (tests.test_task_interactions.TaskInteractionTests) ... ok
+test_aliases_refinements_and_age_category_are_separate (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_calculation_failure_source_is_preserved_through_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_child_refinements_do_not_forget_previous_compatible_constraints (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_explicit_and_unambiguous_implicit_changes_keep_original_facts_without_model (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_generic_role_update_does_not_erase_the_specific_reported_label (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_missing_stale_or_reused_resume_action_has_no_state_or_event_mutation (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_model_boundary_restores_the_original_failed_supplement_retry (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_model_has_a_subject_change_tool_and_does_not_write_new_person_facts (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_negative_or_hypothetical_switches_are_not_literal_actions (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_observation_failure_and_emergency_priority_survive_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_ordinary_family_history_stays_in_the_fathers_case (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_repeated_model_boundaries_resume_the_original_question (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_return_does_not_roll_back_legitimate_new_facts_or_reopen_an_obsolete_card (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_same_enum_model_proposal_is_rejected_atomically (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_semantic_boundary_restores_a_cancelled_but_unexecuted_input_card (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_third_person_reflexive_is_not_a_second_reporter_identity (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_completed_calculation_survives_observation_without_duplicate_execution (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_demo_engine_uses_the_same_repeat_controller (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_field_correction_cancels_repeat_and_cannot_restore_an_old_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_history_coverage_keeps_retained_value_visible_after_many_skips (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_hypothetical_input_during_active_repeat_is_not_recorded (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_invalid_retry_and_skip_preserve_old_fact_and_discard_previous_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_literal_repeat_does_not_execute_negated_hypothetical_or_unrelated_requests (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_model_tool_is_registered_but_requires_actual_request_and_task_eligibility (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_new_reading_supersedes_and_restores_the_unanswered_question_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_actions_require_current_version_before_any_mutation_and_do_not_reopen_closed_cases (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_interrupts_and_restores_calculation_then_summary_rebuilds_current_measurement (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_reported_high_candidate_requires_confirmation_then_existing_triage_runs_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_uncertain_number_does_not_become_a_measurement_or_erase_previous_value (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 0.354s
+
+OK

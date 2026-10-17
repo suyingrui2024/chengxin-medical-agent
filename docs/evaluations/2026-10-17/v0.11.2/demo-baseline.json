@@ -1,0 +1,317 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "turns": [
+    {
+      "question_id": "consult_for",
+      "kind": "question",
+      "answer": "我自己"
+    },
+    {
+      "question_id": "age",
+      "kind": "question",
+      "answer": "32岁"
+    },
+    {
+      "question_id": "chief_complaint",
+      "kind": "question",
+      "answer": "手臂不舒服"
+    },
+    {
+      "question_id": "emergency_screen",
+      "kind": "question",
+      "answer": "都没有"
+    },
+    {
+      "question_id": "onset",
+      "kind": "question",
+      "answer": "昨天"
+    },
+    {
+      "question_id": "trajectory",
+      "kind": "question",
+      "answer": "变化不大"
+    },
+    {
+      "question_id": "severity",
+      "kind": "question",
+      "answer": "3分"
+    },
+    {
+      "question_id": "associated_symptoms",
+      "kind": "question",
+      "answer": "没有"
+    },
+    {
+      "question_id": "medications_taken",
+      "kind": "question",
+      "answer": "昨晚用过药物甲，用量不清楚"
+    },
+    {
+      "question_id": "allergies",
+      "kind": "question",
+      "answer": "以前有过皮疹，是否药物过敏不确定"
+    },
+    {
+      "question_id": "relevant_history",
+      "kind": "question",
+      "answer": "没有"
+    },
+    {
+      "question_id": "patient_goal",
+      "kind": "question",
+      "answer": "整理就医记录"
+    }
+  ],
+  "facts": {
+    "medications_taken": {
+      "key": "medications_taken",
+      "value": null,
+      "assertion": "unknown",
+      "source": "patient",
+      "turn_id": "c4fb47c8-bf06-4e5e-a7e5-5285ee3e1993",
+      "recorded_at": "2026-10-16T17:57:10.853099+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "e8a81bb9-7f4e-481e-9b88-eeac043c788a",
+      "evidence": "昨晚用过药物甲，用量不清楚"
+    },
+    "allergies": {
+      "key": "allergies",
+      "value": null,
+      "assertion": "unknown",
+      "source": "patient",
+      "turn_id": "ef0786c9-60e2-4101-a522-9128c27ab3bd",
+      "recorded_at": "2026-10-16T17:57:10.853435+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "38f37664-ced8-48cd-a2f9-56d7b4366b57",
+      "evidence": "以前有过皮疹，是否药物过敏不确定"
+    }
+  },
+  "reply": {
+    "message": "问诊信息已整理完成。请先核对摘要；其中“未知”不代表没有，测量结果也保留了来源和质量。",
+    "phase": "summary",
+    "kind": "summary",
+    "question_id": null,
+    "quick_replies": [
+      {
+        "label": "摘要准确",
+        "value": "confirm_summary"
+      },
+      {
+        "label": "我需要更正",
+        "value": "correct_summary"
+      }
+    ],
+    "task": null,
+    "summary": {
+      "content_versions": {
+        "questions": "2026-10-15.v1",
+        "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+        "self_checks": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3"
+      },
+      "known": [
+        {
+          "key": "consult_for",
+          "label": "咨询对象",
+          "value": "本人",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "age_years",
+          "label": "年龄",
+          "value": "32 岁",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "chief_complaint",
+          "label": "主要问题",
+          "value": "手臂不舒服",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "emergency_screen",
+          "label": "急症筛查",
+          "value": "患者否认上述危险信号",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "onset",
+          "label": "开始与起病方式",
+          "value": "昨天",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "trajectory",
+          "label": "变化趋势",
+          "value": "变化不大",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "severity",
+          "label": "影响程度",
+          "value": 3,
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "associated_symptoms",
+          "label": "伴随不适",
+          "value": "否认/没有",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "relevant_history",
+          "label": "相关病史",
+          "value": "否认/没有",
+          "source": "patient",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "patient_goal",
+          "label": "期望与担心",
+          "value": "整理就医记录",
+          "source": "patient",
+          "quality": "not_assessed"
+        }
+      ],
+      "unknown": [
+        "已做处理/用药",
+        "过敏信息"
+      ],
+      "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+      "risk_level": "routine",
+      "risk_triggers": [],
+      "return_now_if": [
+        "意识异常或抽搐",
+        "严重呼吸困难或嘴唇发紫",
+        "持续压榨样胸痛",
+        "大量或无法控制的出血"
+      ]
+    },
+    "developer_trace": {
+      "reason": "必要通用字段与适用的定向字段均已处理"
+    },
+    "action_id": "f5ed4fda-32b2-406c-ac54-3d79a92a999b:13",
+    "input_error": false,
+    "calculation_input": null,
+    "calculation_result": null,
+    "presentation": {
+      "schema_version": "medical-ui/v1",
+      "blocks": [
+        {
+          "id": "message:f5ed4fda-32b2-406c-ac54-3d79a92a999b:13",
+          "type": "message",
+          "data": {
+            "text": "问诊信息已整理完成。请先核对摘要；其中“未知”不代表没有，测量结果也保留了来源和质量。",
+            "kind": "summary"
+          }
+        },
+        {
+          "id": "summary:f5ed4fda-32b2-406c-ac54-3d79a92a999b:13",
+          "type": "summary",
+          "data": {
+            "content_versions": {
+              "questions": "2026-10-15.v1",
+              "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+              "self_checks": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3"
+            },
+            "known": [
+              {
+                "key": "consult_for",
+                "label": "咨询对象",
+                "value": "本人",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "age_years",
+                "label": "年龄",
+                "value": "32 岁",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "chief_complaint",
+                "label": "主要问题",
+                "value": "手臂不舒服",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "emergency_screen",
+                "label": "急症筛查",
+                "value": "患者否认上述危险信号",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "onset",
+                "label": "开始与起病方式",
+                "value": "昨天",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "trajectory",
+                "label": "变化趋势",
+                "value": "变化不大",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "severity",
+                "label": "影响程度",
+                "value": 3,
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "associated_symptoms",
+                "label": "伴随不适",
+                "value": "否认/没有",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "relevant_history",
+                "label": "相关病史",
+                "value": "否认/没有",
+                "source": "patient",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "patient_goal",
+                "label": "期望与担心",
+                "value": "整理就医记录",
+                "source": "patient",
+                "quality": "not_assessed"
+              }
+            ],
+            "unknown": [
+              "已做处理/用药",
+              "过敏信息"
+            ],
+            "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+            "risk_level": "routine",
+            "risk_triggers": [],
+            "return_now_if": [
+              "意识异常或抽搐",
+              "严重呼吸困难或嘴唇发紫",
+              "持续压榨样胸痛",
+              "大量或无法控制的出血"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

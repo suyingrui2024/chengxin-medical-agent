@@ -1,0 +1,100 @@
+{
+  "synthetic_only": true,
+  "checks": {
+    "empty_user_environment": true,
+    "separate_os_files_reported": true,
+    "packaged_application_mount_readonly": true,
+    "host_credentials_not_inherited": true,
+    "only_packaged_python_source": true,
+    "external_network_disconnected": true,
+    "packaged_native_start": true,
+    "private_service_rejects_unauthenticated_access": true,
+    "bundled_chinese_glyphs_rendered": true,
+    "complete_demo_interview": true,
+    "packaged_image_loaded": true,
+    "invalid_reading_rejected": true,
+    "unknown_and_measurement_provenance_preserved": true,
+    "no_model_requests": true,
+    "no_renderer_errors": true,
+    "private_service_stopped": true
+  },
+  "scope": "Same host kernel and display, independently prepared OS libraries, empty HOME, readonly package and no external network. Not another physical machine or clinical validation.",
+  "system": {
+    "source": "separate-rootfs",
+    "os_release": "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"12\"\nVERSION=\"12 (bookworm)\"\nVERSION_CODENAME=bookworm\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n"
+  },
+  "runtime": {
+    "executable": "/usr/bin/python3",
+    "version": "3.11.2",
+    "module": "/app/resources/app/src/medagent/__init__.py",
+    "sys_path": [
+      "/app/resources/app/src",
+      "",
+      "/usr/lib/python311.zip",
+      "/usr/lib/python3.11",
+      "/usr/lib/python3.11/lib-dynload",
+      "/usr/local/lib/python3.11/dist-packages",
+      "/usr/lib/python3/dist-packages"
+    ],
+    "external_connect_errno": 101,
+    "interfaces": [
+      "lo"
+    ]
+  },
+  "node": "v22.23.3",
+  "application": {
+    "version": "0.11.17",
+    "path": "/app/resources/app",
+    "profile": "/home/clean/.config/chengxin-medagent-0.11.17",
+    "argv": [
+      "/app/Chengxin",
+      "--no-sandbox",
+      "--inspect=0",
+      "--remote-debugging-port=0"
+    ],
+    "preferences": {
+      "sandbox": true,
+      "nodeIntegration": false,
+      "contextIsolation": true
+    }
+  },
+  "bundled_fonts": [
+    {
+      "family": "Chengxin Sans SC",
+      "sample": "跳到主要内容澄心新的问诊界面模式患者视图研发工作空间会谈记录最近本人咳嗽烧两天机仅保留服务关闭究原型能力协议已连接离线演示核对次助手待紧急求可以更正展开话摘请信息未知表尚确认腋温再测一自述质量评价查看条年龄岁与来源影响程度仍过敏补充不道当前适题症筛否上危险号始起病方逐渐出现变化趋势大伴随喉咙痛呼吸情况没有细节干血饮水进食排尿常喝用药背景咨询象做处理相史期望担想整去就医完成结构系统据此断合状和专业疗估决定下步哪些需立即准我先你也直说地输入描项户时明报告提供动为于采集流审勿姓名证件等身份拨打",
+      "loaded": [
+        {
+          "family": "Chengxin Sans SC",
+          "status": "loaded"
+        }
+      ],
+      "platform_fonts": [
+        {
+          "familyName": "Noto Sans CJK SC",
+          "postScriptName": "NotoSansCJKsc-Regular",
+          "isCustomFont": true,
+          "glyphCount": 246
+        }
+      ]
+    },
+    {
+      "family": "Chengxin Serif SC",
+      "sample": "跳到主要内容澄心新的问诊界面模式患者视图研发工作空间会谈记录最近本人咳嗽烧两天机仅保留服务关闭究原型能力协议已连接离线演示核对次助手待紧急求可以更正展开话摘请信息未知表尚确认腋温再测一自述质量评价查看条年龄岁与来源影响程度仍过敏补充不道当前适题症筛否上危险号始起病方逐渐出现变化趋势大伴随喉咙痛呼吸情况没有细节干血饮水进食排尿常喝用药背景咨询象做处理相史期望担想整去就医完成结构系统据此断合状和专业疗估决定下步哪些需立即准我先你也直说地输入描项户时明报告提供动为于采集流审勿姓名证件等身份拨打",
+      "loaded": [
+        {
+          "family": "Chengxin Serif SC",
+          "status": "loaded"
+        }
+      ],
+      "platform_fonts": [
+        {
+          "familyName": "Noto Serif CJK SC",
+          "postScriptName": "NotoSerifCJKsc-Regular",
+          "isCustomFont": true,
+          "glyphCount": 246
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

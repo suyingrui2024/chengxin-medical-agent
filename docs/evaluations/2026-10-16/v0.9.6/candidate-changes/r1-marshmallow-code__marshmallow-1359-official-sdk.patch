@@ -1,0 +1,109 @@
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -1114,7 +1114,7 @@
+         super()._bind_to_schema(field_name, schema)
+         self.format = (
+             self.format
+-            or getattr(schema.opts, self.SCHEMA_OPTS_VAR_NAME)
++            or getattr(self.root.opts, self.SCHEMA_OPTS_VAR_NAME)
+             or self.DEFAULT_FORMAT
+         )
+ 
+--- a/tests/test_datetime_container_regression.py
++++ b/tests/test_datetime_container_regression.py
+@@ -0,0 +1,95 @@
++"""Regression tests for DateTime fields used inside container fields.
++
++See: DateTime fields cannot be used as inner field for List or Tuple fields.
++``DateTime._bind_to_schema`` used to assume its parent was always a Schema,
++which raised ``AttributeError: 'List' object has no attribute 'opts'`` when the
++field was nested inside a container such as ``List``, ``Tuple`` or ``Mapping``.
++"""
++import datetime as dt
++
++from marshmallow import Schema, fields
++
++
++def test_datetime_in_list_binds_to_schema():
++    class MySchema(Schema):
++        times = fields.List(fields.DateTime())
++
++    schema = MySchema()
++    assert schema.fields["times"].inner.format == fields.DateTime.DEFAULT_FORMAT
++
++
++def test_datetime_in_tuple_binds_to_schema():
++    class MySchema(Schema):
++        times = fields.Tuple([fields.DateTime(), fields.Integer()])
++
++    schema = MySchema()
++    assert (
++        schema.fields["times"].tuple_fields[0].format
++        == fields.DateTime.DEFAULT_FORMAT
++    )
++
++
++def test_datetime_in_mapping_binds_to_schema():
++    class MySchema(Schema):
++        times = fields.Mapping(keys=fields.Str(), values=fields.DateTime())
++
++    schema = MySchema()
++    assert (
++        schema.fields["times"].value_field.format == fields.DateTime.DEFAULT_FORMAT
++    )
++
++
++def test_datetime_in_list_uses_schema_meta_option():
++    class MySchema(Schema):
++        times = fields.List(fields.DateTime())
++
++        class Meta:
++            datetimeformat = "%Y-%m"
++
++    schema = MySchema()
++    value = dt.datetime(2020, 3, 4, 5, 6)
++    assert schema.dump({"times": [value]}) == {"times": ["2020-03"]}
++
++
++def test_date_in_list_uses_schema_meta_option():
++    class MySchema(Schema):
++        dates = fields.List(fields.Date())
++
++        class Meta:
++            dateformat = "%Y"
++
++    schema = MySchema()
++    value = dt.date(2020, 3, 4)
++    assert schema.dump({"dates": [value]}) == {"dates": ["2020"]}
++
++
++def test_datetime_in_container_field_format_argument_wins():
++    class MySchema(Schema):
++        times = fields.List(fields.DateTime("%m-%d"))
++
++        class Meta:
++            datetimeformat = "%Y-%m"
++
++    schema = MySchema()
++    value = dt.datetime(2020, 3, 4, 5, 6)
++    assert schema.dump({"times": [value]}) == {"times": ["03-04"]}
++
++
++def test_datetime_in_list_round_trip():
++    class MySchema(Schema):
++        times = fields.List(fields.DateTime())
++        row = fields.Tuple([fields.DateTime(), fields.Integer()])
++        mapping = fields.Dict(keys=fields.Str(), values=fields.DateTime())
++
++    value = dt.datetime(2020, 3, 4, 5, 6, 7)
++    payload = {
++        "times": [value.isoformat()],
++        "row": [value.isoformat(), 42],
++        "mapping": {"when": value.isoformat()},
++    }
++    loaded = MySchema().load(payload)
++    assert loaded == {
++        "times": [value],
++        "row": (value, 42),
++        "mapping": {"when": value},
++    }

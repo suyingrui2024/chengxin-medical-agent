@@ -1,0 +1,25 @@
+test_conventional_factor_direction_identity_and_rounding_are_explicit (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_disabled_and_frozen_versions_cannot_gain_a_new_calculation (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_dispatch_keeps_source_formula_references_and_old_receipts_readable (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_missing_sources_or_unregistered_form_policy_are_rejected_at_registration (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_non_numeric_and_foreign_units_never_produce_a_registered_result (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_origin_cannot_be_fabricated_and_another_analyte_in_another_clause_is_not_borrowed (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_source_policy_requires_blood_glucose_and_matches_full_tokens (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_source_qualifiers_cannot_be_trimmed_into_a_single_exact_reading (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_invalid_input_preserves_legal_draft_values_and_cannot_compute_twice (tests.test_glucose_capability.PatientGlucoseTests) ... ok
+test_missing_inputs_stay_blank_and_foreign_lab_is_not_prefilled (tests.test_glucose_capability.PatientGlucoseTests) ... ok
+test_patient_can_check_and_edit_inputs_without_a_new_model_request_or_fact_write (tests.test_glucose_capability.PatientGlucoseTests) ... ok
+test_host_rejects_incomplete_evidence_then_parent_and_child_compute_and_restore (tests.test_glucose_sdk.GlucoseSdkTests) ... ok
+test_sdk_observes_rejection_repairs_calculation_delegates_and_restores_receipts (tests.test_execution_capabilities.CapabilitySdkTests) ... ok
+test_cross_dimension_requires_explicit_density_and_is_rejected (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_decimal_result_has_host_provenance_and_unconfirmed_status (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_forged_omitted_and_different_quantity_or_unit_cannot_pass (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_frozen_binding_disabled_capability_and_version_change (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_legacy_workspace_does_not_gain_calculation_permissions (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_old_receipt_stays_readable_when_implementation_unavailable_and_corrupt_presentation_is_rejected (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_trimming_sign_exponent_ranges_or_density_does_not_launder_source (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 3.797s
+
+OK

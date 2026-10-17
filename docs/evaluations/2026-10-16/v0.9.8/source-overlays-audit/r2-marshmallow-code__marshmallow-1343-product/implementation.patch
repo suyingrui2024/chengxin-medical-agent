@@ -1,0 +1,27 @@
+--- a/src/marshmallow/schema.py
++++ b/src/marshmallow/schema.py
+@@ -874,10 +874,14 @@
+                 raise ValueError('"{0}" field does not exist.'.format(field_name))
+ 
+             if many:
++                if data is None:
++                    continue
+                 for idx, item in enumerate(data):
+                     try:
+                         value = item[field_obj.attribute or field_name]
+-                    except KeyError:
++                    except (KeyError, TypeError):
++                        # Skip items that failed to deserialize (e.g. None
++                        # placeholders) or that are not mappings.
+                         pass
+                     else:
+                         validated_value = unmarshal.call_and_store(
+@@ -890,6 +894,8 @@
+                         if validated_value is missing:
+                             data[idx].pop(field_name, None)
+             else:
++                if data is None:
++                    continue
+                 try:
+                     value = data[field_obj.attribute or field_name]
+                 except KeyError:

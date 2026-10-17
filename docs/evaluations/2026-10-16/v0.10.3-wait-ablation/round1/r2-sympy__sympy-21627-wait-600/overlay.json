@@ -1,0 +1,9 @@
+{
+  "files": {
+    "sympy/functions/elementary/complexes.py": "9b7c68c3a1dd1a3c83dfdee4b075b067c786a95836baee91bdbc3815685aafca",
+    "regressions/test_cosh_is_zero_recursion.py": "2422c92185e713639c8c39ffa6e25d0005e8ee7899694ca04b700502696d7249"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

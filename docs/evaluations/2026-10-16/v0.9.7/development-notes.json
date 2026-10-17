@@ -1,0 +1,8 @@
+{
+  "initial_fixture_failures": [
+    "Expected a starting job, but pinned SDK marks process preparation running; inspected published installed source and corrected fixture.",
+    "The verification artifact existed before the final mock request arrived; synchronized the assertion to actual request completion."
+  ],
+  "sandbox_check_limitation": "Initial restricted Node command returned file-level output; final validated run contains all 6 named assertions.",
+  "production_test_hooks_added": false
+}

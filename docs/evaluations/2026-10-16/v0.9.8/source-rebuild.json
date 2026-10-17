@@ -1,0 +1,23 @@
+{
+  "rebuilt_from_pinned_archives_and_wheels": true,
+  "cases": [
+    {
+      "case": "marshmallow-code__marshmallow-1343",
+      "cache_rebuilt": true
+    },
+    {
+      "case": "pylint-dev__astroid-1196",
+      "cache_rebuilt": true
+    },
+    {
+      "case": "pvlib__pvlib-python-1707",
+      "cache_rebuilt": true
+    },
+    {
+      "case": "sqlfluff__sqlfluff-1625",
+      "cache_rebuilt": true
+    }
+  ],
+  "external_model_requests": 0,
+  "network_downloads": 0
+}

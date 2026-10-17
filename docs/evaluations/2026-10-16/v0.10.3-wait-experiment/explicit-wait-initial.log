@@ -1,0 +1,28 @@
+test_same_three_requests_collect_a_34_second_job_only_with_explicit_long_wait (tests.test_explicit_job_wait.ExplicitWaitTests) ... FAIL
+test_task_deadline_still_cancels_the_long_tool_wait_and_its_command (tests.test_explicit_job_wait.ExplicitWaitTests) ... FAIL
+test_user_cancel_interrupts_one_long_tool_wait_and_preserves_process (tests.test_explicit_job_wait.ExplicitWaitTests) ... {"cancel_wait_seconds": 0.05, "same_process_continued": true}
+ok
+
+======================================================================
+FAIL: test_same_three_requests_collect_a_34_second_job_only_with_explicit_long_wait (tests.test_explicit_job_wait.ExplicitWaitTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/.runtime/v0103-wait-experiment/tests/test_explicit_job_wait.py", line 107, in test_same_three_requests_collect_a_34_second_job_only_with_explicit_long_wait
+    self.assertEqual('WAIT_FINISHED' in fixture.outputs[-1], expected)
+AssertionError: True != False
+
+======================================================================
+FAIL: test_task_deadline_still_cancels_the_long_tool_wait_and_its_command (tests.test_explicit_job_wait.ExplicitWaitTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/.runtime/v0103-wait-experiment/tests/test_explicit_job_wait.py", line 145, in test_task_deadline_still_cancels_the_long_tool_wait_and_its_command
+    self.assertEqual(snapshot['status'], 'failed')
+AssertionError: 'cancelled' != 'failed'
+- cancelled
++ failed
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 38.070s
+
+FAILED (failures=2)

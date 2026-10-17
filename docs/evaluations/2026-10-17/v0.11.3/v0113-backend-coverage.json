@@ -1,0 +1,13 @@
+{
+  "discovered": 262,
+  "default_passed": 209,
+  "default_skipped": 53,
+  "initially_skipped_executed_and_passed": 50,
+  "unique_passed": 259,
+  "remaining_skipped": [
+    "test_execution_long_budget.LongBudgetTests.test_ten_minute_budget_survives_old_rpc_deadline_and_collects_same_job",
+    "test_execution_long_delivery.LongDeliveryTests.test_check_continues_same_job_across_the_600_second_wait_boundary",
+    "test_execution_long_delivery.LongDeliveryTests.test_check_runs_beyond_the_old_tool_cap_and_collects_the_same_job"
+  ],
+  "scope": "Actual unittest identity union. Focused checks, prior phase checks and frozen repeats add no new unique tests."
+}

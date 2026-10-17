@@ -1,0 +1,123 @@
+{"source": "sphinx-doc__sphinx-8627", "bytes": 5995216}
+{"source": "sphinx-doc__sphinx-7975", "bytes": 5958119}
+{"source": "sympy__sympy-21627", "bytes": 7232120}
+{"source": "pallets__flask-5063", "bytes": 691901}
+{"source": "matplotlib__matplotlib-25311", "bytes": 37682384}
+{"source": "matplotlib__matplotlib-26011", "bytes": 35415318}
+{"downloading": "snowballstemmer-2.2.0-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"wheel": "Jinja2", "version": "3.0.3", "bytes": 133630}
+{"downloading": "Babel-2.11.0.json", "maximum_seconds": 120}
+{"downloading": "packaging-21.3.json", "maximum_seconds": 120}
+{"wheel": "pytest-mock", "version": "3.11.1", "bytes": 9590}
+{"wheel": "MarkupSafe", "version": "2.1.3", "bytes": 25691}
+{"downloading": "pyparsing-3.0.9.json", "maximum_seconds": 120}
+{"wheel": "mpmath", "version": "1.2.1", "bytes": 532568}
+{"wheel": "docutils", "version": "0.16", "bytes": 548181}
+{"wheel": "Pygments", "version": "2.13.0", "bytes": 1098748}
+{"downloading": "Babel-2.11.0-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "pyparsing-3.0.9-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "packaging-21.3-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "alabaster-0.7.13.json", "maximum_seconds": 120}
+{"wheel": "snowballstemmer", "version": "2.2.0", "bytes": 93002}
+{"downloading": "alabaster-0.7.13-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "imagesize-1.4.1.json", "maximum_seconds": 120}
+{"wheel": "packaging", "version": "21.3", "bytes": 40750}
+{"downloading": "sphinxcontrib-applehelp-1.0.2.json", "maximum_seconds": 120}
+{"wheel": "pyparsing", "version": "3.0.9", "bytes": 98338}
+{"downloading": "imagesize-1.4.1-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "sphinxcontrib-devhelp-1.0.2.json", "maximum_seconds": 120}
+{"wheel": "alabaster", "version": "0.7.13", "bytes": 13857}
+{"downloading": "sphinxcontrib-htmlhelp-1.0.3.json", "maximum_seconds": 120}
+{"wheel": "imagesize", "version": "1.4.1", "bytes": 8769}
+{"downloading": "sphinxcontrib_devhelp-1.0.2-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "sphinxcontrib_htmlhelp-1.0.3-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "sphinxcontrib_applehelp-1.0.2-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "sphinxcontrib-jsmath-1.0.1.json", "maximum_seconds": 120}
+{"wheel": "sphinxcontrib-devhelp", "version": "1.0.2", "bytes": 84690}
+{"downloading": "sphinxcontrib-qthelp-1.0.3.json", "maximum_seconds": 120}
+{"wheel": "Babel", "version": "2.11.0", "bytes": 9501187}
+{"downloading": "sphinxcontrib-serializinghtml-1.1.5.json", "maximum_seconds": 120}
+{"wheel": "sphinxcontrib-htmlhelp", "version": "1.0.3", "bytes": 96302}
+{"downloading": "sphinxcontrib_jsmath-1.0.1-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "Werkzeug-2.3.3.json", "maximum_seconds": 120}
+{"wheel": "sphinxcontrib-applehelp", "version": "1.0.2", "bytes": 121180}
+{"downloading": "sphinxcontrib_serializinghtml-1.1.5-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "itsdangerous-2.1.2.json", "maximum_seconds": 120}
+{"wheel": "sphinxcontrib-jsmath", "version": "1.0.1", "bytes": 5071}
+{"downloading": "Werkzeug-2.3.3-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "sphinxcontrib_qthelp-1.0.3-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "itsdangerous-2.1.2-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "click-8.1.3.json", "maximum_seconds": 120}
+{"wheel": "sphinxcontrib-serializinghtml", "version": "1.1.5", "bytes": 94021}
+{"downloading": "blinker-1.6.2.json", "maximum_seconds": 120}
+{"wheel": "itsdangerous", "version": "2.1.2", "bytes": 15749}
+{"downloading": "python-dotenv-1.0.0.json", "maximum_seconds": 120}
+{"downloading": "importlib-metadata-6.6.0.json", "maximum_seconds": 120}
+{"wheel": "Werkzeug", "version": "2.3.3", "bytes": 242316}
+{"wheel": "sphinxcontrib-qthelp", "version": "1.0.3", "bytes": 90609}
+{"downloading": "click-8.1.3-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "importlib_metadata-6.6.0-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "blinker-1.6.2-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "zipp-3.15.0.json", "maximum_seconds": 120}
+{"wheel": "click", "version": "8.1.3", "bytes": 96588}
+{"downloading": "matplotlib-3.7.1.json", "maximum_seconds": 120}
+{"wheel": "blinker", "version": "1.6.2", "bytes": 13665}
+{"downloading": "contourpy-1.0.7.json", "maximum_seconds": 120}
+{"wheel": "importlib-metadata", "version": "6.6.0", "bytes": 22930}
+{"downloading": "zipp-3.15.0-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "matplotlib-3.7.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "maximum_seconds": 120}
+{"downloading": "python_dotenv-1.0.0-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "cycler-0.11.0.json", "maximum_seconds": 120}
+{"wheel": "zipp", "version": "3.15.0", "bytes": 6758}
+{"downloading": "contourpy-1.0.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "maximum_seconds": 120}
+{"downloading": "fonttools-4.39.3.json", "maximum_seconds": 120}
+{"wheel": "python-dotenv", "version": "1.0.0", "bytes": 19482}
+{"downloading": "fonttools-4.39.3-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "cycler-0.11.0-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "kiwisolver-1.4.4.json", "maximum_seconds": 120}
+{"wheel": "cycler", "version": "0.11.0", "bytes": 6389}
+{"downloading": "Pillow-9.5.0.json", "maximum_seconds": 120}
+{"wheel": "contourpy", "version": "1.0.7", "bytes": 300258}
+{"downloading": "kiwisolver-1.4.4-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", "maximum_seconds": 120}
+{"downloading": "Pillow-9.5.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "maximum_seconds": 120}
+{"downloading": "python-dateutil-2.8.2.json", "maximum_seconds": 120}
+{"wheel": "kiwisolver", "version": "1.4.4", "bytes": 1617970}
+{"downloading": "six-1.16.0.json", "maximum_seconds": 120}
+{"wheel": "matplotlib", "version": "3.7.1", "bytes": 11571945}
+{"downloading": "python_dateutil-2.8.2-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "six-1.16.0-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "pytz-2022.7.1.json", "maximum_seconds": 120}
+{"wheel": "six", "version": "1.16.0", "bytes": 11053}
+{"downloading": "Jinja2-3.1.2.json", "maximum_seconds": 120}
+{"wheel": "Pillow", "version": "9.5.0", "bytes": 3308572}
+{"downloading": "pandas-1.5.3.json", "maximum_seconds": 120}
+{"wheel": "python-dateutil", "version": "2.8.2", "bytes": 247702}
+{"downloading": "pytz-2022.7.1-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "Jinja2-3.1.2-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "pandas-1.5.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "maximum_seconds": 120}
+{"downloading": "html5lib-1.1.json", "maximum_seconds": 120}
+{"wheel": "pytz", "version": "2022.7.1", "bytes": 499377}
+{"downloading": "webencodings-0.5.1.json", "maximum_seconds": 120}
+{"wheel": "Jinja2@3.1.2", "version": "3.1.2", "bytes": 133101}
+{"downloading": "pytest-7.4.4.json", "maximum_seconds": 120}
+{"wheel": "pandas", "version": "1.5.3", "bytes": 12062104}
+{"downloading": "webencodings-0.5.1-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "html5lib-1.1-py2.py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "pytest-7.4.4-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "pluggy-1.3.0.json", "maximum_seconds": 120}
+{"wheel": "webencodings", "version": "0.5.1", "bytes": 11774}
+{"downloading": "iniconfig-2.0.0.json", "maximum_seconds": 120}
+{"wheel": "pytest", "version": "7.4.4", "bytes": 325287}
+{"downloading": "exceptiongroup-1.1.3.json", "maximum_seconds": 120}
+{"wheel": "html5lib", "version": "1.1", "bytes": 112173}
+{"downloading": "pluggy-1.3.0-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "exceptiongroup-1.1.3-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "iniconfig-2.0.0-py3-none-any.whl", "maximum_seconds": 120}
+{"downloading": "tomli-2.0.1.json", "maximum_seconds": 120}
+{"wheel": "exceptiongroup", "version": "1.1.3", "bytes": 14710}
+{"wheel": "iniconfig", "version": "2.0.0", "bytes": 5892}
+{"downloading": "tomli-2.0.1-py3-none-any.whl", "maximum_seconds": 120}
+{"wheel": "pluggy", "version": "1.3.0", "bytes": 18934}
+{"wheel": "tomli", "version": "2.0.1", "bytes": 12757}
+{"transport_fallback": "fonttools-4.39.3-py3-none-any.whl", "curl_exit_code": 28}
+{"wheel": "fonttools", "version": "4.39.3", "bytes": 1009099}

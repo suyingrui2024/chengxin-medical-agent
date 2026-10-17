@@ -1,0 +1,13 @@
+{
+  "parquet_and_json_rows_identical": true,
+  "rows": 300,
+  "parquet_sha256": "7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4",
+  "selected_ids": [
+    "matplotlib__matplotlib-25498",
+    "pallets__flask-4045",
+    "sphinx-doc__sphinx-8474",
+    "sympy__sympy-20049"
+  ],
+  "reader_policy": "Pinned pyarrow without optional host pandas import; no dataset changes.",
+  "external_model_calls": 0
+}

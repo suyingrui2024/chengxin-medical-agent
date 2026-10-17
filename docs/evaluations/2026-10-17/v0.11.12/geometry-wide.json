@@ -1,0 +1,709 @@
+{
+  "targets": [
+    {
+      "text": "头/面部",
+      "x": 596.171875,
+      "y": 426.5,
+      "width": 151.265625,
+      "height": 44
+    },
+    {
+      "text": "胸部",
+      "x": 753.4375,
+      "y": 426.5,
+      "width": 151.28125,
+      "height": 44
+    },
+    {
+      "text": "腹部",
+      "x": 910.71875,
+      "y": 426.5,
+      "width": 151.28125,
+      "height": 44
+    },
+    {
+      "text": "背/腰部",
+      "x": 596.171875,
+      "y": 476.5,
+      "width": 151.265625,
+      "height": 44
+    },
+    {
+      "text": "四肢",
+      "x": 753.4375,
+      "y": 476.5,
+      "width": 151.28125,
+      "height": 44
+    }
+  ],
+  "overlaps": [],
+  "alternatives": [
+    {
+      "width": 72.015625,
+      "height": 44,
+      "bottom": 914.203125
+    },
+    {
+      "width": 88.71875,
+      "height": 44,
+      "bottom": 914.203125
+    }
+  ],
+  "states": [
+    {
+      "value": "head",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 330,
+            "bottom": 359,
+            "left": 312,
+            "right": 512
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 382,
+            "bottom": 619,
+            "left": 314,
+            "right": 580.171875
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 426.5,
+            "bottom": 520.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 530.5,
+            "bottom": 574.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 935.203125,
+            "bottom": 973,
+            "left": 302,
+            "right": 1031
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 181,
+            "bottom": 225,
+            "left": 985.15625,
+            "right": 1081
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 1034,
+            "bottom": 1050.1875,
+            "left": 272,
+            "right": 1122
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "chest",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 330,
+            "bottom": 359,
+            "left": 312,
+            "right": 512
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 382,
+            "bottom": 619,
+            "left": 314,
+            "right": 580.171875
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 426.5,
+            "bottom": 520.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 530.5,
+            "bottom": 574.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 935.203125,
+            "bottom": 973,
+            "left": 302,
+            "right": 1031
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 181,
+            "bottom": 225,
+            "left": 985.15625,
+            "right": 1081
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 1034,
+            "bottom": 1050.1875,
+            "left": 272,
+            "right": 1122
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "abdomen",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 330,
+            "bottom": 359,
+            "left": 312,
+            "right": 512
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 382,
+            "bottom": 619,
+            "left": 314,
+            "right": 580.171875
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 426.5,
+            "bottom": 520.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 530.5,
+            "bottom": 574.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 935.203125,
+            "bottom": 973,
+            "left": 302,
+            "right": 1031
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 181,
+            "bottom": 225,
+            "left": 985.15625,
+            "right": 1081
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 1034,
+            "bottom": 1050.1875,
+            "left": 272,
+            "right": 1122
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "back",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 330,
+            "bottom": 359,
+            "left": 312,
+            "right": 512
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 382,
+            "bottom": 619,
+            "left": 314,
+            "right": 580.171875
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 426.5,
+            "bottom": 520.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 530.5,
+            "bottom": 574.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 935.203125,
+            "bottom": 973,
+            "left": 302,
+            "right": 1031
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 181,
+            "bottom": 225,
+            "left": 985.15625,
+            "right": 1081
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 1034,
+            "bottom": 1050.1875,
+            "left": 272,
+            "right": 1122
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "limbs",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 330,
+            "bottom": 359,
+            "left": 312,
+            "right": 512
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 382,
+            "bottom": 619,
+            "left": 314,
+            "right": 580.171875
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 426.5,
+            "bottom": 520.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 530.5,
+            "bottom": 574.5,
+            "left": 596.171875,
+            "right": 1062
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 935.203125,
+            "bottom": 973,
+            "left": 302,
+            "right": 1031
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 181,
+            "bottom": 225,
+            "left": 985.15625,
+            "right": 1081
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 1034,
+            "bottom": 1050.1875,
+            "left": 272,
+            "right": 1122
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1080
+          },
+          "pane": {
+            "top": 288,
+            "bottom": 857.203125
+          },
+          "visible": true
+        }
+      ]
+    }
+  ]
+}

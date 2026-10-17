@@ -1,0 +1,1 @@
+{"kind": "frozen-directory-preview-verification/v1", "source_files_checked": 214, "external_model_calls": 0, "network_downloads": 0, "checks": {"all_24_selected_tests_ran": true, "no_skips": true, "selected_backend_tests_passed": true, "source_unchanged": true}, "passed": true}

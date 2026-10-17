@@ -1,0 +1,15 @@
+{
+  "report": ".runtime/location-answers-20261017/live-second.json",
+  "report_sha256": "a2863ec3aa5ab9dde606d3bf814339b9a05a596130a48c54d51414b7b541b611",
+  "case": "uncertain_location",
+  "actual_question": "头疼主要在头部哪个部位？左右和范围能大致说清吗？",
+  "actual_fields": [
+    "region",
+    "area",
+    "side",
+    "extent"
+  ],
+  "local_replay": true,
+  "external_provider_calls_in_replay": 0,
+  "scope": "Copy current scripted location fixture, replacing its question with the actual model question; the registered four fields match the actual model declaration. Other setup and follow-up responses remain local scripted fixtures."
+}

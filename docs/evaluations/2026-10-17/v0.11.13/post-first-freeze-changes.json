@@ -1,0 +1,33 @@
+{
+  "changes": {
+    "docs/图示期间的对话与结果核对.md": {
+      "before": "403074125865e95aee640a81d10fdd24058d152f30d9caf0c6842fcc3403af76",
+      "after": "2e77e5a907995307a4b908c5f1b6f3ca67ead62ab6f4431022198657c7cec5b3"
+    },
+    "scripts/evaluate_self_check_conversation.py": {
+      "before": "cb2c011a58fbeb21fb57c44025141357729544165a73a02b652c5d6f50b38819",
+      "after": "a031a263872534775a72c3f24f38871ea67dfd5afe43a2e05a02be7d9d66559c"
+    },
+    "src/medagent.egg-info/PKG-INFO": {
+      "before": "0775e45cdb15bfd95651dc86ead9b25879ba592722b193f20a995042a65c625b",
+      "after": "4ae60e0545958c0216cefdeee894148f14ad10d083d3b8b2036bc600f272a1c1"
+    },
+    "src/medagent.egg-info/SOURCES.txt": {
+      "before": "a13e9044459ded012f51026790fd23dafe6e6ca790af6d44cde0769ff07badf3",
+      "after": "725af94320f738a3c45d148676bb4d2461a99e5b97097da26ce98631c1e723a3"
+    },
+    "src/medagent/agent.py": {
+      "before": "08dfd624262b49a176752923263cd4778a62c04b6ee05c6f961f1b91fe67a0fc",
+      "after": "7c432d17797db7c4f1afc6f1c4e3f6ae3de6f50f52a45bc39f8b58f42aa59ee4"
+    },
+    "src/medagent/task_conversation.py": {
+      "before": "a2677b322e670de9159a0a39fc645ffedf3c60495d5c5d0449c1d22dc90fa191",
+      "after": "f4caf0e9601b32ddd7f911f07d4f18561a6cc0a66ae0757c86fd226e0fab44d4"
+    },
+    "tests/test_self_check_conversation.py": {
+      "before": "06a2223fe76a978f9aebba162bcd0c9d6124fa22d98ab35bc83994f0273252aa",
+      "after": "65a34ed7249fe2a641eefacb847f008304843af0dfd8b9b1570ca6cc63105c06"
+    }
+  },
+  "reason": "Evaluator import path; preserve source-clause uncertainty and controlled invalid input; avoid duplicate resume actions after subject boundary; additional tests and evaluator scenario."
+}

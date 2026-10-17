@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "engineering_requirements": 12,
+  "current_requirement_evidence_matches": true,
+  "documentation_local_links_checked": 59,
+  "missing_links": [],
+  "changes_to_prior_frozen_set": [
+    "docs/实验与验收方案.md",
+    "docs/当前版本完成审查与后续接续.md"
+  ],
+  "production_code_changed_since_v01117": false,
+  "scope_confirmed_by_user": "工程原型设计与工程验收"
+}

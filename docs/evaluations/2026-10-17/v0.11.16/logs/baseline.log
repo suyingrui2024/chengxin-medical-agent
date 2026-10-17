@@ -1,0 +1,46 @@
+test_cancel_keeps_the_original_fact_and_invalidates_the_form (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+test_skip_cancels_the_revision_instead_of_overwriting_a_known_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+test_wrong_fact_version_is_rejected_before_journaling (tests.test_location_revisions.LocationRevisionTests) ... FAIL
+
+======================================================================
+ERROR: test_cancel_keeps_the_original_fact_and_invalidates_the_form (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 76, in test_cancel_keeps_the_original_fact_and_invalidates_the_form
+    resumed = self.cancel(reply)
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 40, in cancel
+    reply.task["location_revision"]["cancel_choice"],
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 50, in test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call
+    self.original_reply.location_revision_action["fact_id"],
+AttributeError: 'AgentReply' object has no attribute 'location_revision_action'
+
+======================================================================
+ERROR: test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 108, in test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location
+    payload = self.flow.payload(reply)
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_answers.py", line 37, in payload
+    "form_id": reply.task["answer_spec"]["id"],
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+FAIL: test_wrong_fact_version_is_rejected_before_journaling (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 92, in test_wrong_fact_version_is_rejected_before_journaling
+    with self.assertRaises(StaleActionError):
+AssertionError: StaleActionError not raised
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.055s
+
+FAILED (failures=1, errors=3)

@@ -1,0 +1,36 @@
+test_a_different_passing_command_cannot_erase_an_unresolved_check (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_a_missing_retry_cannot_reuse_an_earlier_passing_receipt (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_a_required_command_cannot_be_downgraded_with_the_optional_flag (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_changes_after_a_passing_check_require_actual_revalidation (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_check_timeout_stops_its_job_instead_of_leaving_a_late_write (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_child_check_uses_shared_budget_and_retains_child_lineage (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_failed_check_reaches_model_then_one_repair_retests_same_command_and_restores (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_inspection_only_records_failure_without_authorizing_repair (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_missing_check_result_cannot_silently_pass_the_completion_gate (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_missing_optional_result_stays_a_report_without_authorizing_repair (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_narrower_retry_cannot_drop_previously_watched_test_files (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_no_repair_renews_an_exhausted_model_budget (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_optional_stale_check_reports_without_automatic_repair (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_retry_of_the_same_command_resolves_a_previously_missing_receipt (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_same_command_revalidation_accepts_the_updated_files (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_unrelated_report_does_not_invalidate_explicit_input_scope (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_unresolved_check_is_not_completion_and_repair_does_not_loop (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_user_cancel_interrupts_a_check_and_same_runtime_accepts_next_task (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_content_change_is_detected_despite_restored_timestamp_and_same_size (tests.test_execution_checkpoints.CheckpointTests) ... ok
+test_explicit_dependency_path_overrides_default_cache_directory_exclusion (tests.test_execution_checkpoints.CheckpointTests) ... ok
+test_incomplete_scan_has_no_proof_digest_and_never_returns_file_text (tests.test_execution_checkpoints.CheckpointTests) ... ok
+test_replaced_workspace_and_escape_paths_are_rejected (tests.test_execution_checkpoints.CheckpointTests) ... ok
+test_scoped_inputs_ignore_reports_but_track_new_and_deleted_code (tests.test_execution_checkpoints.CheckpointTests) ... ok
+test_symbolic_link_input_is_unknown_and_outside_target_is_never_followed (tests.test_execution_checkpoints.CheckpointTests) ... ok
+test_content_changes_diff_and_offline_baseline_do_not_depend_on_git_or_mtime (tests.test_execution_changes.ChangeObservationTests) ... ok
+test_corrupt_baselines_and_linked_store_files_are_rejected (tests.test_execution_changes.ChangeObservationTests) ... ok
+test_links_special_files_and_replaced_roots_do_not_expose_external_content (tests.test_execution_changes.ChangeObservationTests) ... ok
+test_partial_observations_never_fabricate_additions_deletions_or_clean_content (tests.test_execution_changes.ChangeObservationTests) ... ok
+test_main_and_child_query_actual_changes_cleanup_and_continue_with_new_baseline (tests.test_execution_changes.ChangeSdkTests) ... ok
+test_invalid_status_payloads_cannot_enter_history_as_valid_observations (tests.test_execution_observations.ObservationContractTests) ... ok
+test_preparing_job_retains_wakeup_budget_and_can_be_cancelled (tests.test_execution_observations.PreparingJobTests) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 43.304s
+
+OK

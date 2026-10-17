@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/deepseek-ai/deepseek-harness.git",
+  "inspected_source_commit": "571902028a75c64c1d767f4ae5fd099485f0ddf0",
+  "runtime_packages": {
+    "@deepseek-ai/dsh": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sdk-client": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sdk-protocol": "0.2.0-rc.2"
+  },
+  "source_directory": "vendor/deepseek-harness",
+  "upstream_modified": false,
+  "note": "Source checkout is for inspection. Runtime uses the pinned published artifacts in package-lock.json, whose SDK API differs from master."
+}

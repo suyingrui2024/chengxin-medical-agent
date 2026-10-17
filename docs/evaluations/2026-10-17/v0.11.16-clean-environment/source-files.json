@@ -1,0 +1,5 @@
+{
+  "scripts/verify_clean_desktop.py": "df63aa46c3fe7702989a7f993b1c037051504d2ff891dac55e54ccbf3a736437",
+  "scripts/clean-desktop-probe.mjs": "b039af414d53c73bb56abc2cbb56fbcff2012907d0afaa322015fdfafac04912",
+  "docs/当前版本完成审查与后续接续.md": "65e6f276baee19012308310ef25c26ba43fc7d08a24475eb17ae9b627efa7481"
+}

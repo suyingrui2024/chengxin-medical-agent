@@ -1,0 +1,120 @@
+test_cancel_keeps_the_original_fact_and_invalidates_the_form (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+test_skip_cancels_the_revision_instead_of_overwriting_a_known_location (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+test_wrong_fact_version_is_rejected_before_journaling (tests.test_location_revisions.LocationRevisionTests) ... ERROR
+
+======================================================================
+ERROR: test_cancel_keeps_the_original_fact_and_invalidates_the_form (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 21, in setUp
+    self.original_reply = self.flow.confirm(offered, self.flow.payload(offered))
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_answers.py", line 48, in confirm
+    return self.engine.submit(
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 209, in submit
+    return self._submit(state, user_input)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 301, in _submit
+    return self._run(state, text, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 644, in _run
+    return self._deliver(state, result, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 959, in _deliver
+    self._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/consultation.py", line 1556, in _record_reply
+    {"reply": reply.to_dict(), "reason": reason},
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/domain.py", line 222, in to_dict
+    payload["location_revision_action"] = deepcopy(
+NameError: name 'deepcopy' is not defined
+
+======================================================================
+ERROR: test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 21, in setUp
+    self.original_reply = self.flow.confirm(offered, self.flow.payload(offered))
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_answers.py", line 48, in confirm
+    return self.engine.submit(
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 209, in submit
+    return self._submit(state, user_input)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 301, in _submit
+    return self._run(state, text, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 644, in _run
+    return self._deliver(state, result, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 959, in _deliver
+    self._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/consultation.py", line 1556, in _record_reply
+    {"reply": reply.to_dict(), "reason": reason},
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/domain.py", line 222, in to_dict
+    payload["location_revision_action"] = deepcopy(
+NameError: name 'deepcopy' is not defined
+
+======================================================================
+ERROR: test_skip_cancels_the_revision_instead_of_overwriting_a_known_location (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 21, in setUp
+    self.original_reply = self.flow.confirm(offered, self.flow.payload(offered))
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_answers.py", line 48, in confirm
+    return self.engine.submit(
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 209, in submit
+    return self._submit(state, user_input)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 301, in _submit
+    return self._run(state, text, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 644, in _run
+    return self._deliver(state, result, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 959, in _deliver
+    self._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/consultation.py", line 1556, in _record_reply
+    {"reply": reply.to_dict(), "reason": reason},
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/domain.py", line 222, in to_dict
+    payload["location_revision_action"] = deepcopy(
+NameError: name 'deepcopy' is not defined
+
+======================================================================
+ERROR: test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 21, in setUp
+    self.original_reply = self.flow.confirm(offered, self.flow.payload(offered))
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_answers.py", line 48, in confirm
+    return self.engine.submit(
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 209, in submit
+    return self._submit(state, user_input)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 301, in _submit
+    return self._run(state, text, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 644, in _run
+    return self._deliver(state, result, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 959, in _deliver
+    self._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/consultation.py", line 1556, in _record_reply
+    {"reply": reply.to_dict(), "reason": reason},
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/domain.py", line 222, in to_dict
+    payload["location_revision_action"] = deepcopy(
+NameError: name 'deepcopy' is not defined
+
+======================================================================
+ERROR: test_wrong_fact_version_is_rejected_before_journaling (tests.test_location_revisions.LocationRevisionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_revisions.py", line 21, in setUp
+    self.original_reply = self.flow.confirm(offered, self.flow.payload(offered))
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_location_answers.py", line 48, in confirm
+    return self.engine.submit(
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 209, in submit
+    return self._submit(state, user_input)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 301, in _submit
+    return self._run(state, text, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 644, in _run
+    return self._deliver(state, result, turn_id)
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/agent.py", line 959, in _deliver
+    self._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/consultation.py", line 1556, in _record_reply
+    {"reply": reply.to_dict(), "reason": reason},
+  File "/home/suyingrui/Desktop/medical-agent/src/medagent/domain.py", line 222, in to_dict
+    payload["location_revision_action"] = deepcopy(
+NameError: name 'deepcopy' is not defined
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.048s
+
+FAILED (errors=5)

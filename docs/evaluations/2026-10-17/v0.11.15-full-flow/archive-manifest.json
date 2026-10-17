@@ -1,0 +1,17 @@
+{
+  "algorithm": "sha256",
+  "file_count": 11,
+  "files": {
+    "README.md": "c15432d0740a7d4230124cde58088b3cb2d81b1b97c5426524c7922cad7575a1",
+    "artifacts/live-corrected-summary.png": "3bd4e17824f8212518b5c06b5c2077510fecdcddf740072139a09446bb49aa7c",
+    "artifacts/live-partial-report.png": "3eef3fa76597e3d34d3906a58849e554da963dbd6cd1613169dca21d10e7ce33",
+    "artifacts/live-self-check.png": "f54156b66fb3921c64d8770bf227d2d72fddc7e2250341483c4a3daaa132b92e",
+    "artifacts/synthetic-session-export.json": "30d5674f60f0584ce4146dfae69cf7f7d67ce3a9e19d38b3cca23651c0510ae7",
+    "credential-scan.json": "ac11cce051b0d616a83eef33fc6a7852fa485ed34041ee4c68900060b3f932bc",
+    "live-first.json": "2529c270bffe02177461d0879afc3d2fc8fd41b2d3a51080e900d78647b4fc12",
+    "live-first.log": "4f982538bbbfbd93311a540207b41054dfd742e76baec543fb2fcd0f463a734f",
+    "scope.json": "e89ad178c09679941d593aa9686380670d2e336617ce7d4b28945d29e4a76dc6",
+    "source-first.json": "c99aa576239e18eebef8477fbe6185307151edec0f2cdc9086538e088f9c20fb",
+    "validation.json": "51909b204bc6e38c7322c67594a2fc36dc6f5ac7634f2f24ba1099c6b48bdc62"
+  }
+}

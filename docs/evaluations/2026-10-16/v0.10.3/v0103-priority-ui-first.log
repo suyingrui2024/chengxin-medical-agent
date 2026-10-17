@@ -1,0 +1,92 @@
+
+> medical-agent-dsh-integration@0.10.3 test:ui
+> playwright test --grep priority help
+
+
+Running 3 tests using 1 worker
+
+(node:681013) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late response (5.6s)
+(node:681242) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late error (5.6s)
+(node:681437) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 tests/ui/urgent-interrupt.spec.mjs:66:1 › priority help preserves a failed request draft and works at a narrow viewport (574ms)
+
+
+  1) tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late response 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('#busy-indicator')
+    Expected: visible
+    Received: hidden
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" locator('#busy-indicator') with timeout 5000ms
+      - waiting for locator('#busy-indicator')
+        14 × locator resolved to <div id="busy-indicator" class="busy-indicator">…</div>
+           - unexpected value "hidden"
+
+
+      27 |       await page.getByRole("button", { name: "我自己", exact: true }).click();
+      28 |       await expect.poll(() => held).toBe(true);
+    > 29 |       await expect(page.locator("#busy-indicator")).toBeVisible();
+         |                                                     ^
+      30 |       await expect(page.locator("#message-input")).toBeDisabled();
+      31 |       const help = page.getByRole("button", { name: "紧急求助", exact: true });
+      32 |       await expect(help).toBeEnabled();
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/urgent-interrupt.spec.mjs:29:53
+
+    Error Context: test-results/ui/urgent-interrupt-priority--f2ccb-d-ignores-its-late-response/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/urgent-interrupt-priority--f2ccb-d-ignores-its-late-response/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/urgent-interrupt-priority--f2ccb-d-ignores-its-late-response/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late error 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('#busy-indicator')
+    Expected: visible
+    Received: hidden
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" locator('#busy-indicator') with timeout 5000ms
+      - waiting for locator('#busy-indicator')
+        14 × locator resolved to <div id="busy-indicator" class="busy-indicator">…</div>
+           - unexpected value "hidden"
+
+
+      27 |       await page.getByRole("button", { name: "我自己", exact: true }).click();
+      28 |       await expect.poll(() => held).toBe(true);
+    > 29 |       await expect(page.locator("#busy-indicator")).toBeVisible();
+         |                                                     ^
+      30 |       await expect(page.locator("#message-input")).toBeDisabled();
+      31 |       const help = page.getByRole("button", { name: "紧急求助", exact: true });
+      32 |       await expect(help).toBeEnabled();
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/urgent-interrupt.spec.mjs:29:53
+
+    Error Context: test-results/ui/urgent-interrupt-priority--2cb9f--and-ignores-its-late-error/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/urgent-interrupt-priority--2cb9f--and-ignores-its-late-error/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/urgent-interrupt-priority--2cb9f--and-ignores-its-late-error/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late response 
+    tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late error 
+  1 passed (16.3s)

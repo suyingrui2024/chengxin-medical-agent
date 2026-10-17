@@ -1,0 +1,4 @@
+{"case": "matplotlib__matplotlib-25498", "qualified": true, "error_type": null, "original_bug_reproduced": true, "reference_passed": true}
+{"case": "pallets__flask-4045", "qualified": true, "error_type": null, "original_bug_reproduced": true, "reference_passed": true}
+{"case": "sphinx-doc__sphinx-8474", "qualified": true, "error_type": null, "original_bug_reproduced": true, "reference_passed": true}
+{"case": "sympy__sympy-20049", "qualified": true, "error_type": null, "original_bug_reproduced": true, "reference_passed": true}

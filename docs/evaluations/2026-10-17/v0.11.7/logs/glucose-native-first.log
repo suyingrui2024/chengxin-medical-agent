@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.11.7 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/glucose-calculation.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:1042356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/glucose-calculation.spec.mjs:14:1 › native glucose conversion keeps sources folded and resumes the medical interview (1.5s)
+
+  1 passed (1.9s)

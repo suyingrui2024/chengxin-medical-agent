@@ -1,0 +1,9 @@
+{
+  "files": {
+    "regressions/test_util_typing_struct.py": "0a45fef13405224f5defee6b8fbb60da9ea9359f3e07f93eb099cdf75974c2a5",
+    "sphinx/util/typing.py": "bea78565d7d6a1d152ee7478781a19378ac8ba9d770bc58d5e93843b797e45d6"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

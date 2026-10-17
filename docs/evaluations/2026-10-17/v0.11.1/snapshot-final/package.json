@@ -1,0 +1,40 @@
+{
+  "name": "medical-agent-dsh-integration",
+  "version": "0.11.1",
+  "private": true,
+  "type": "module",
+  "main": "desktop/main.cjs",
+  "productName": "澄心问诊",
+  "scripts": {
+    "start": "electron .",
+    "desktop:setup": "node node_modules/electron/install.js",
+    "desktop:build": "node scripts/build-desktop.mjs",
+    "desktop:shortcut": "node scripts/create-desktop-shortcut.mjs",
+    "test:desktop": "playwright test --config playwright.desktop.config.mjs",
+    "test:desktop:live": "PYTHONPATH=src python3 scripts/test_live_desktop.py",
+    "test:execution": "RUN_DSH_EXECUTION=1 PYTHONPATH=src python3 -m unittest discover -s tests -p test_execution.py -v",
+    "test:execution:live": "PYTHONPATH=src python3 scripts/evaluate_execution.py",
+    "test:execution:benchmark": "PYTHONPATH=src python3 scripts/benchmark_execution.py",
+    "test:execution:persistence": "PYTHONPATH=src python3 scripts/evaluate_persistence.py",
+    "test:ui": "playwright test",
+    "format:check": "prettier --check src/medagent/web/index.html src/medagent/web/styles.css src/medagent/web/*.js src/medagent/extensions/**/*.json playwright*.mjs tests/fixtures/*.mjs tests/ui/*.mjs tests/desktop/*.mjs tests/live/*.mjs desktop/*.{cjs,html,css} scripts/*desktop*.mjs",
+    "dsh:check": "node integrations/dsh/check.mjs",
+    "test:dsh": "node --test integrations/dsh/tests/*.test.mjs",
+    "test:dsh:integration": "node integrations/dsh/tests/runtime-smoke.mjs"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sdk-client": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sdk-protocol": "0.2.0-rc.2",
+    "js-yaml": "4.3.2"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "@playwright/test": "1.64.1",
+    "electron": "44.7.2",
+    "prettier": "3.9.10"
+  }
+}

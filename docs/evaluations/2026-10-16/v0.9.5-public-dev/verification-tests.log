@@ -1,0 +1,11 @@
+test_all_original_defects_fail_and_all_reference_tests_pass (tests.test_public_execution_benchmark.PublicFixtureTests) ... ok
+test_frozen_tests_and_runner_cannot_be_replaced (tests.test_public_execution_benchmark.PublicFixtureTests) ... ok
+test_public_data_integrity_and_complete_test_id_mappings (tests.test_public_execution_benchmark.PublicFixtureTests) ... ok
+test_direct_official_sdk_baseline_reuses_process_and_real_files (tests.test_execution_benchmark.BenchmarkCheckerTests) ... ok
+test_hidden_checkers_reject_broken_seeds_accept_references_and_reject_bad_continuation (tests.test_execution_benchmark.BenchmarkCheckerTests) ... ok
+test_authenticated_gateway_persists_calls_and_enforces_turn_and_total_caps (tests.test_execution_benchmark.BenchmarkGatewayTests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 11.718s
+
+OK

@@ -1,0 +1,6 @@
+{"case": "sphinx-doc__sphinx-8627", "qualified": false, "setup_error": "ValueError", "original_bug_reproduced": null, "reference_passed": null}
+{"case": "sphinx-doc__sphinx-7975", "qualified": false, "setup_error": "ValueError", "original_bug_reproduced": null, "reference_passed": null}
+{"case": "sympy__sympy-21627", "qualified": false, "setup_error": "ValueError", "original_bug_reproduced": null, "reference_passed": null}
+{"case": "pallets__flask-5063", "qualified": false, "setup_error": "ValueError", "original_bug_reproduced": null, "reference_passed": null}
+{"case": "matplotlib__matplotlib-25311", "qualified": false, "setup_error": "ValueError", "original_bug_reproduced": null, "reference_passed": null}
+{"case": "matplotlib__matplotlib-26011", "qualified": false, "setup_error": "ValueError", "original_bug_reproduced": null, "reference_passed": null}

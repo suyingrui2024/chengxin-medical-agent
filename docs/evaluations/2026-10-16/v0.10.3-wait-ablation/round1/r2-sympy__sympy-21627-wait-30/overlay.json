@@ -1,0 +1,9 @@
+{
+  "files": {
+    "sympy/functions/elementary/complexes.py": "e521b71b54b8a6b86caa772ca7e9decab77d70e2f62565341eb22c8d15639e89",
+    "regressions/test_abs_recursion.py": "3a5d72f012d9e00f8e3f536748b8d04979c68b01ea68251aa96d6a81e16d646c"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

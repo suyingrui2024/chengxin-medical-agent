@@ -1,0 +1,1 @@
+{"implementation_passed": true, "file_contract": true, "new_regression_passed": false, "overall_passed": false, "collected": ["regressions/test_new.py::test_wrong"]}

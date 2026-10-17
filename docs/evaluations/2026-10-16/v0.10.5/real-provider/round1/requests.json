@@ -1,0 +1,47 @@
+{
+  "attempted_calls": 8,
+  "maximum_calls": 12,
+  "injected_failures": 0,
+  "calls": [
+    {
+      "index": 1,
+      "status": 200,
+      "duration_ms": 843
+    },
+    {
+      "index": 2,
+      "status": 200,
+      "duration_ms": 1810
+    },
+    {
+      "index": 3,
+      "status": 200,
+      "duration_ms": 1534
+    },
+    {
+      "index": 4,
+      "status": 200,
+      "duration_ms": 2244
+    },
+    {
+      "index": 5,
+      "status": 200,
+      "duration_ms": 2029
+    },
+    {
+      "index": 6,
+      "status": 200,
+      "duration_ms": 1251
+    },
+    {
+      "index": 7,
+      "status": 200,
+      "duration_ms": 2884
+    },
+    {
+      "index": 8,
+      "status": 200,
+      "duration_ms": 2697
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checks": {
+    "existing_output_refused": true,
+    "changed_content_rejected": true,
+    "unexpected_file_rejected": true,
+    "deterministic_roundtrip": true,
+    "original_snapshot_still_valid": true
+  },
+  "scope": "Exporter integrity and offline review preparation; no clinical review."
+}

@@ -1,0 +1,60 @@
+{
+  "version": "0.11.6",
+  "synthetic_only": true,
+  "passed": true,
+  "checks": {
+    "default_backend": {
+      "collected": 291,
+      "passed": 238,
+      "skipped": 53
+    },
+    "separate_sdk_and_isolated_passed": 50,
+    "unique_backend_passed": 288,
+    "long_running_not_rerun": 3,
+    "ui_full_passed": 40,
+    "native_source_full_passed": 25,
+    "native_source_after_labels_targeted_passed": 1,
+    "native_package_full_passed": 25,
+    "frozen_passed": 95,
+    "source_files_checked": 254,
+    "own_packaged_files_checked": 104,
+    "applicable_dependency_versions_checked": 544,
+    "provider_calls": 5,
+    "upstream_statuses": [
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "pre_run_source_matches": true,
+    "final_source_matches_current": true,
+    "post_live_python_controller_parser_prompt_pack_and_driver_unchanged": true,
+    "previous_sealed_archives_unchanged": 22
+  },
+  "logs": [
+    "backend-final.log",
+    "sdk.log",
+    "ui-final.log",
+    "native-source.log",
+    "native-source-targeted.log",
+    "native-package.log",
+    "format-final.log"
+  ],
+  "artifacts": [
+    "README.md",
+    "baseline.json",
+    "baseline-reproduced.json",
+    "fixed-probe.json",
+    "compare_probe.py",
+    "live.json",
+    "source-files.json",
+    "source-before-live.json",
+    "post-live-changes.json",
+    "package-audit.json",
+    "frozen-verification.json",
+    "previous-archives-verification.json",
+    "old-bundle-storage.json"
+  ],
+  "scope": "Engineering validation and real provider decisions on an explicitly seeded synthetic case; not a complete fresh consultation, clinical evaluation or broad DSH parity."
+}

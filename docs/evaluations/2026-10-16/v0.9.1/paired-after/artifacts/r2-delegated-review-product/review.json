@@ -1,0 +1,71 @@
+{
+  "reviewer": "independent-adversarial-reviewer (DSH subagent)",
+  "artifacts_reviewed": [
+    "/workspace/invoice.py",
+    "/workspace/tests/test_existing.py",
+    "/workspace/tests/test_total.py",
+    "/workspace/fixture_identity.json"
+  ],
+  "notes": "No file under /workspace was modified except this review.json. Expectations were derived independently with exact integer arithmetic on prices scaled by 10**6 (cents = (S + 5000) // 10000), not by comparing against the implementation.",
+  "checks": [
+    {
+      "name": "existing-test-suite",
+      "command_or_input": "cd /workspace && python3 -m unittest discover -s tests",
+      "expected": "21 tests, OK, no failures/errors",
+      "observed": "Ran 21 tests in 0.001s - OK",
+      "passed": true,
+      "finding": "Frozen suite passes unchanged; fixture_identity.json untouched ({\"fixture\":\"frozen-synthetic-v1\"})."
+    },
+    {
+      "name": "half-up-tie-at-total",
+      "command_or_input": "total([{price:'0.005',qty:1}]) ; 0.015 ; 3x0.005 ; 0.025+0.125+1.005",
+      "expected": "0.01 ; 0.02 ; 0.02 ; 1.16",
+      "observed": "0.01 ; 0.02 ; 0.02 ; 1.16",
+      "passed": true,
+      "finding": "Ties at the final total round half-up (away from zero), e.g. 3x0.005 = 0.015 -> 0.02."
+    },
+    {
+      "name": "no-per-line-rounding",
+      "command_or_input": "3 lines of price '0.004', qty 1 ; 2 lines of '0.005' ; 1000 lines of '0.000001'",
+      "expected": "0.01 ; 0.01 ; 0.00",
+      "observed": "0.01 ; 0.01 ; 0.00",
+      "passed": true,
+      "finding": "Sum is exact before the single final rounding: 3x0.004 = 0.012 -> 0.01 (per-line rounding would give 0.00); 2x0.005 = 0.010 -> 0.01 (per-line would give 0.02)."
+    },
+    {
+      "name": "extreme-domain-values",
+      "command_or_input": "'9999999999999999.999999' x1000 ; x3 lines ; '0.124999' ; '1.999999' ; '9'*16 x1000",
+      "expected": "10000000000000000000.00 ; 30000000000000000.00 ; 0.12 ; 2.00 ; 9999999999999999000.00",
+      "observed": "10000000000000000000.00 ; 30000000000000000.00 ; 0.12 ; 2.00 ; 9999999999999999000.00",
+      "passed": true,
+      "finding": "16-integer-digit / 6-fractional-digit boundary is exact; no float drift (e.g. 9007199254740993.99 is preserved)."
+    },
+    {
+      "name": "low-caller-precision-and-context-immutability",
+      "command_or_input": "getcontext().prec = 8; total([{'price':'0.005','quantity':3}]); total([{'price':'1234567890123456.123456','quantity':1000}]); re-read getcontext()",
+      "expected": "'0.02' and '1234567890123456123.46' with prec/rounding/Emax/Emin identical before and after",
+      "observed": "'0.02' and '1234567890123456123.46'; global prec == 8 afterwards (prec, rounding, Emax, Emin unchanged)",
+      "passed": true,
+      "finding": "Exactness is preserved under a tiny caller precision because the module uses integer-scaled arithmetic plus a localcontext; the global decimal context is not mutated."
+    },
+    {
+      "name": "invalid-input-rejection",
+      "command_or_input": "25 probes: prices '-1.00','nan','inf','Infinity','1e3','+1','1'+'0'*16,'0.0000001','',' 1',1,1.5,True,None; quantities True,False,1.0,Decimal?,1001,-1,10**9,'3',None; rows missing price/quantity, row='1', row=None",
+      "expected": "ValueError for every probe",
+      "observed": "ValueError for all 25 probes (no wrong exception type, no silent acceptance)",
+      "passed": true,
+      "finding": "bool quantity/price is rejected before the int/str check; float quantities are rejected; out-of-range (1001, -1, 10**9) rejected; missing keys and non-mapping rows raise ValueError (not TypeError/KeyError)."
+    }
+  ],
+  "issues": [
+    {
+      "severity": "none",
+      "description": "No genuine discrepancy found. One initial probe case used the input '0.1249999' (7 fractional digits), which is illegal per spec, so the ValueError raised was correct; re-run with the legal '0.124999' produced the independently expected '0.12'. This was a reviewer-probe error, not an implementation defect."
+    },
+    {
+      "severity": "informational",
+      "description": "Spec ambiguity only: price strings with redundant leading zeros (e.g. '00.50') are accepted when the total integer digit count is <= 16, consistent with the frozen test test_zero_padded_and_plain_forms; 17+ integer digits (including leading zeros) are rejected. None of this contradicts the stated spec."
+    }
+  ],
+  "verdict": "PASS - invoice.total conforms to the stated spec on all independent probes (half-up final rounding only, exact decimal summation, extreme 16-digit/6-decimal values, low caller precision without global-context mutation, and strict ValueError validation). No real discrepancy found."
+}

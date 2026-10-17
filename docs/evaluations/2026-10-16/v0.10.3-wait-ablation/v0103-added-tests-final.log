@@ -1,0 +1,8 @@
+{"case": "sympy__sympy-21627", "arm": "wait-30", "repetition": 1, "new_regression_status": "passed", "joint_plus_delivered_tests_passed": true}
+{"case": "sympy__sympy-21627", "arm": "wait-600", "repetition": 1, "new_regression_status": "passed", "joint_plus_delivered_tests_passed": false}
+{"case": "sphinx-doc__sphinx-8627", "arm": "wait-600", "repetition": 1, "new_regression_status": "passed", "joint_plus_delivered_tests_passed": false}
+{"case": "sphinx-doc__sphinx-8627", "arm": "wait-30", "repetition": 1, "new_regression_status": "passed", "joint_plus_delivered_tests_passed": false}
+{"case": "sympy__sympy-21627", "arm": "wait-600", "repetition": 2, "new_regression_status": "failed", "joint_plus_delivered_tests_passed": false}
+{"case": "sympy__sympy-21627", "arm": "wait-30", "repetition": 2, "new_regression_status": "passed", "joint_plus_delivered_tests_passed": true}
+{"case": "sphinx-doc__sphinx-8627", "arm": "wait-30", "repetition": 2, "new_regression_status": "passed", "joint_plus_delivered_tests_passed": true}
+{"case": "sphinx-doc__sphinx-8627", "arm": "wait-600", "repetition": 2, "new_regression_status": "failed", "joint_plus_delivered_tests_passed": false}

@@ -1,0 +1,50 @@
+
+> medical-agent-dsh-integration@0.11.6 test:ui
+> playwright test
+
+
+Running 39 tests using 1 worker
+
+(node:1010108) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/ui/assertion-flow.spec.mjs:7:1 › uncertain denials are rejected atomically, repaired and preserved through patient correction (1.0s)
+  ✓   2 tests/ui/capabilities.spec.mjs:9:1 › patient view removes developer navigation while keeping the same conversation (469ms)
+  ✓   3 tests/ui/capabilities.spec.mjs:35:1 › capability workspace calculates without writing cases and pins old session versions (910ms)
+  ✓   4 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry (1.8s)
+  ✓   5 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen (1.8s)
+  ✓   6 tests/ui/patient-calculation.spec.mjs:7:1 › patient calculation confirms editable inputs, recovers a lost response and stays readable on mobile (1.6s)
+  ✓   7 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts (1.6s)
+  ✓   8 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts on a narrow screen (1.4s)
+  ✓   9 tests/ui/present-provenance.spec.mjs:40:1 › recorded evidence is inert, malformed sources fall back and old summaries remain readable (452ms)
+  ✓  10 tests/ui/readiness.spec.mjs:3:1 › workspace mode cannot lose an interaction before module hydration (325ms)
+  ✓  11 tests/ui/repeated-observations.spec.mjs:9:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk (2.0s)
+  ✓  12 tests/ui/repeated-observations.spec.mjs:9:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen (2.0s)
+  ✓  13 tests/ui/repeated-observations.spec.mjs:41:1 › observation rendering rejects malformed histories and treats evidence as inert text (304ms)
+  ✓  14 tests/ui/repeated-observations.spec.mjs:107:1 › a narrow-screen repeat returns to the same question with its measurement visible (1.0s)
+  ✓  15 tests/ui/repeated-observations.spec.mjs:135:3 › short desktop observation keeps choices visible at 900x680 (1.1s)
+  ✓  16 tests/ui/repeated-observations.spec.mjs:135:3 › short desktop observation keeps choices visible at 900x760 (1.0s)
+  ✓  17 tests/ui/uncertain-reports.spec.mjs:4:1 › unresolved narratives remain visible and editable through a complete consultation (2.2s)
+  ✓  18 tests/ui/uncertain-reports.spec.mjs:14:1 › a narrow patient window preserves reports and usable correction controls (2.1s)
+  ✓  19 tests/ui/uncertain-reports.spec.mjs:25:1 › unresolved reports render inertly, validate their contract and preserve older summaries (462ms)
+  ✓  20 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late response (796ms)
+  ✓  21 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late error (945ms)
+  ✓  22 tests/ui/urgent-interrupt.spec.mjs:87:1 › priority help preserves a failed request draft and works at a narrow viewport (655ms)
+  ✓  23 tests/ui/visual-consultation.spec.mjs:25:1 › visual choices show actual questions, keep history available and send one explicit answer (1.0s)
+  ✓  24 tests/ui/visual-consultation.spec.mjs:67:1 › degree scale never submits on selection and reflects edits to the actual draft (1.2s)
+  ✓  25 tests/ui/visual-consultation.spec.mjs:105:1 › body location uses a deliberate selection and confirmation, preserving self-report quality (1.2s)
+  ✓  26 tests/ui/visual-consultation.spec.mjs:134:1 › mobile visual screen and degree scale stay readable without overlapping targets (934ms)
+  ✓  27 tests/ui/visual-consultation.spec.mjs:174:1 › custom and malformed visual components preserve question meaning and isolate unsafe data (236ms)
+  ✓  28 tests/ui/visual-consultation.spec.mjs:221:1 › the smallest desktop window keeps the actual response controls inside the viewport (704ms)
+  ✓  29 tests/ui/workspace.spec.mjs:9:1 › patient conversation, self-check, history, evidence and export use actual server state (3.3s)
+  ✓  30 tests/ui/workspace.spec.mjs:125:1 › structured components isolate errors and keep patient text inert (268ms)
+  ✓  31 tests/ui/workspace.spec.mjs:179:1 › unknown result components produce a visible fallback instead of disappearing (354ms)
+  ✓  32 tests/ui/workspace.spec.mjs:197:1 › an emergency notice remains visible through the structured renderer (390ms)
+  ✓  33 tests/ui/workspace.spec.mjs:219:1 › settings are real, keep old sessions, and never return credentials (1.1s)
+  ✓  34 tests/ui/workspace.spec.mjs:249:1 › task library preview cannot write observations and has step navigation (549ms)
+  ✓  35 tests/ui/workspace.spec.mjs:275:1 › mobile layout has no horizontal overflow and exposes records and navigation (862ms)
+  ✓  36 tests/ui/workspace.spec.mjs:324:1 › editing a fact updates the actual case and retains the previous value (592ms)
+  ✓  37 tests/ui/workspace.spec.mjs:352:1 › a stale fact editor preserves the draft and refreshes the current record (960ms)
+  ✓  38 tests/ui/workspace.spec.mjs:399:1 › changing the consultation subject opens a separate case and retains the original (504ms)
+  ✓  39 tests/ui/workspace.spec.mjs:431:1 › a lost response recovers persisted progress and patient markup stays plain text (537ms)
+
+  39 passed (45.3s)

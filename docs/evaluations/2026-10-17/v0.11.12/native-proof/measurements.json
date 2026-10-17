@@ -1,0 +1,731 @@
+{
+  "version": "0.11.12",
+  "health": {
+    "status": "ok",
+    "service": "medagent",
+    "version": "0.11.12",
+    "backend": "demo",
+    "execution_available": true
+  },
+  "packaged_binary": "dist/desktop/Chengxin-0.11.12-linux-x64/Chengxin",
+  "window_size": {
+    "width": 900,
+    "height": 680
+  },
+  "viewport": {
+    "width": 900,
+    "height": 648
+  },
+  "measurements": {
+    "targets": [
+      {
+        "text": "头/面部",
+        "x": 460.8125,
+        "y": 288.890625,
+        "width": 116.0625,
+        "height": 44
+      },
+      {
+        "text": "胸部",
+        "x": 582.875,
+        "y": 288.890625,
+        "width": 116.0625,
+        "height": 44
+      },
+      {
+        "text": "腹部",
+        "x": 704.9375,
+        "y": 288.890625,
+        "width": 116.0625,
+        "height": 44
+      },
+      {
+        "text": "背/腰部",
+        "x": 460.8125,
+        "y": 338.890625,
+        "width": 116.0625,
+        "height": 44
+      },
+      {
+        "text": "四肢",
+        "x": 582.875,
+        "y": 338.890625,
+        "width": 116.0625,
+        "height": 44
+      }
+    ],
+    "overlaps": [],
+    "alternatives": [
+      {
+        "width": 72.015625,
+        "height": 44,
+        "bottom": 506.203125
+      },
+      {
+        "width": 87.34375,
+        "height": 44,
+        "bottom": 506.203125
+      }
+    ],
+    "states": [
+      {
+        "value": "head",
+        "geometry": [
+          {
+            "selector": "#active-task h3",
+            "bounds": {
+              "top": 261,
+              "bottom": 283.390625,
+              "left": 243,
+              "right": 403.015625
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-canvas",
+            "bounds": {
+              "top": 287.390625,
+              "bottom": 436.390625,
+              "left": 243,
+              "right": 448.8125
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-options",
+            "bounds": {
+              "top": 288.890625,
+              "bottom": 382.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".map-confirm",
+            "bounds": {
+              "top": 390.890625,
+              "bottom": 434.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#message-input",
+            "bounds": {
+              "top": 527.203125,
+              "bottom": 565,
+              "left": 253,
+              "right": 783
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#urgent-help",
+            "bounds": {
+              "top": 148.5,
+              "bottom": 192.5,
+              "left": 742.15625,
+              "right": 838
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#view-consultation .page-footnote",
+            "bounds": {
+              "top": 626,
+              "bottom": 642.1875,
+              "left": 223,
+              "right": 856
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "value": "chest",
+        "geometry": [
+          {
+            "selector": "#active-task h3",
+            "bounds": {
+              "top": 261,
+              "bottom": 283.390625,
+              "left": 243,
+              "right": 403.015625
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-canvas",
+            "bounds": {
+              "top": 287.390625,
+              "bottom": 436.390625,
+              "left": 243,
+              "right": 448.8125
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-options",
+            "bounds": {
+              "top": 288.890625,
+              "bottom": 382.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".map-confirm",
+            "bounds": {
+              "top": 390.890625,
+              "bottom": 434.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#message-input",
+            "bounds": {
+              "top": 527.203125,
+              "bottom": 565,
+              "left": 253,
+              "right": 783
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#urgent-help",
+            "bounds": {
+              "top": 148.5,
+              "bottom": 192.5,
+              "left": 742.15625,
+              "right": 838
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#view-consultation .page-footnote",
+            "bounds": {
+              "top": 626,
+              "bottom": 642.1875,
+              "left": 223,
+              "right": 856
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "value": "abdomen",
+        "geometry": [
+          {
+            "selector": "#active-task h3",
+            "bounds": {
+              "top": 261,
+              "bottom": 283.390625,
+              "left": 243,
+              "right": 403.015625
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-canvas",
+            "bounds": {
+              "top": 287.390625,
+              "bottom": 436.390625,
+              "left": 243,
+              "right": 448.8125
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-options",
+            "bounds": {
+              "top": 288.890625,
+              "bottom": 382.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".map-confirm",
+            "bounds": {
+              "top": 390.890625,
+              "bottom": 434.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#message-input",
+            "bounds": {
+              "top": 527.203125,
+              "bottom": 565,
+              "left": 253,
+              "right": 783
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#urgent-help",
+            "bounds": {
+              "top": 148.5,
+              "bottom": 192.5,
+              "left": 742.15625,
+              "right": 838
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#view-consultation .page-footnote",
+            "bounds": {
+              "top": 626,
+              "bottom": 642.1875,
+              "left": 223,
+              "right": 856
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "value": "back",
+        "geometry": [
+          {
+            "selector": "#active-task h3",
+            "bounds": {
+              "top": 261,
+              "bottom": 283.390625,
+              "left": 243,
+              "right": 403.015625
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-canvas",
+            "bounds": {
+              "top": 287.390625,
+              "bottom": 436.390625,
+              "left": 243,
+              "right": 448.8125
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-options",
+            "bounds": {
+              "top": 288.890625,
+              "bottom": 382.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".map-confirm",
+            "bounds": {
+              "top": 390.890625,
+              "bottom": 434.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#message-input",
+            "bounds": {
+              "top": 527.203125,
+              "bottom": 565,
+              "left": 253,
+              "right": 783
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#urgent-help",
+            "bounds": {
+              "top": 148.5,
+              "bottom": 192.5,
+              "left": 742.15625,
+              "right": 838
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#view-consultation .page-footnote",
+            "bounds": {
+              "top": 626,
+              "bottom": 642.1875,
+              "left": 223,
+              "right": 856
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "value": "limbs",
+        "geometry": [
+          {
+            "selector": "#active-task h3",
+            "bounds": {
+              "top": 261,
+              "bottom": 283.390625,
+              "left": 243,
+              "right": 403.015625
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-canvas",
+            "bounds": {
+              "top": 287.390625,
+              "bottom": 436.390625,
+              "left": 243,
+              "right": 448.8125
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".body-map-options",
+            "bounds": {
+              "top": 288.890625,
+              "bottom": 382.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": ".map-confirm",
+            "bounds": {
+              "top": 390.890625,
+              "bottom": 434.890625,
+              "left": 460.8125,
+              "right": 821
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#message-input",
+            "bounds": {
+              "top": 527.203125,
+              "bottom": 565,
+              "left": 253,
+              "right": 783
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#urgent-help",
+            "bounds": {
+              "top": 148.5,
+              "bottom": 192.5,
+              "left": 742.15625,
+              "right": 838
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          },
+          {
+            "selector": "#view-consultation .page-footnote",
+            "bounds": {
+              "top": 626,
+              "bottom": 642.1875,
+              "left": 223,
+              "right": 856
+            },
+            "viewport": {
+              "width": 900,
+              "height": 648
+            },
+            "pane": {
+              "top": 247,
+              "bottom": 449.203125
+            },
+            "visible": true
+          }
+        ]
+      }
+    ]
+  },
+  "new_provider_calls": 0,
+  "scope": "Actual packaged Electron viewport and controlled synthetic selections; not patient understanding or clinical validation.",
+  "passed": true
+}

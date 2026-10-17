@@ -1,0 +1,19 @@
+{
+  "case": "sqlfluff__sqlfluff-1625",
+  "raw_instance_sha256": "ef71d593f29d27619dc06bb9017ebe62b83bf5fd512abb131b30971a0c2de320",
+  "reference_test_patch_sha256": "42b09262ea853c68fe0080ae717edcf5bcf9ec9bdff982959f208d44511b73cb",
+  "finding": "The raw issue expects both no-join examples to pass; upstream validation preserves the alias warning and changes its wording. These are different behavioral requirements.",
+  "expected_warning": "Avoid aliases in from clauses and join conditions.",
+  "r1_product_failure": "The implementation suppresses a no-join warning; 68/69 upstream checks pass, directed CLI output differs.",
+  "r1_sdk_failure": "No effective implementation change; the directed CLI check fails.",
+  "original_report_unchanged": true,
+  "exclude_or_rescore_original_runs": false,
+  "interpretation": "Report as alignment with the upstream acceptance tests, not a pure coding-quality or clinical metric. A clarification experiment must be distinct.",
+  "failed_retrieval_attempt": {
+    "arm": "official-sdk",
+    "repetition": 1,
+    "command": "pip download sqlfluff==1.4.5 --no-deps --no-binary :all: -d /tmp/sfl",
+    "outcome": "pip: command not found; no reference source obtained by that command"
+  },
+  "network_policy": "The prompt prohibits retrieving upstream answers. The environment has network access; this is not a network-enforced prohibition."
+}

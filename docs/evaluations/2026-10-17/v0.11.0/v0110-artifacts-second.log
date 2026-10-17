@@ -1,0 +1,24 @@
+test_http_preview_and_image_keep_desktop_auth_and_origin_checks (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_link_fifo_traversal_changed_reads_and_replaced_roots_are_rejected (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_png_crc_dimensions_animation_and_payload_limits (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_preview_is_offline_and_revisions_detect_same_size_restored_timestamp (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_static_image_metadata_and_hash_bound_bytes (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_svg_html_and_fake_image_extensions_never_become_image_payloads (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_table_truncation_and_bad_csv_are_explicit (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_tables_preserve_quotes_newlines_and_literal_formula_strings (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_valid_jpeg_uses_real_fixture_dimensions (tests.test_execution_artifacts.ArtifactTests) ... ok
+test_artifact_listing_never_follows_directory_or_file_links (tests.test_execution.WorkspaceFileTests) ... ok
+test_creating_workspace_requires_model_config_but_does_not_call_model (tests.test_execution.WorkspaceFileTests) ... ok
+test_invalid_preview_roots_raise_controlled_errors_and_close_releases_inode (tests.test_execution.WorkspaceFileTests) ... ok
+test_missing_linked_or_replaced_workspace_roots_remain_controllable (tests.test_execution.WorkspaceFileTests) ... ok
+test_text_files_cannot_escape_through_paths_symlinks_or_special_files (tests.test_execution.WorkspaceFileTests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.782s
+
+OK
+[17/Oct/2026 00:34:25] "GET /api/execution/926ac6be-764f-4d65-9044-afc3d06ba92e/preview?path=plot.png HTTP/1.1" 200 -
+[17/Oct/2026 00:34:25] "GET /api/execution/926ac6be-764f-4d65-9044-afc3d06ba92e/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 200 -
+[17/Oct/2026 00:34:25] "GET /api/execution/926ac6be-764f-4d65-9044-afc3d06ba92e/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 401 -
+[17/Oct/2026 00:34:25] "GET /api/execution/926ac6be-764f-4d65-9044-afc3d06ba92e/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 403 -
+[17/Oct/2026 00:34:25] "GET /api/execution/926ac6be-764f-4d65-9044-afc3d06ba92e/image?path=plot.png&sha256=0000000000000000000000000000000000000000000000000000000000000000 HTTP/1.1" 400 -

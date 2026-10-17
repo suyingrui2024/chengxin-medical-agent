@@ -1,0 +1,15 @@
+--- a/pydicom/valuerep.py
++++ b/pydicom/valuerep.py
+@@ -750,6 +750,12 @@
+     def __str__(self):
+         return '='.join(self.components).__str__()
+ 
++    def __iter__(self):
++        yield from str(self)
++
++    def __contains__(self, item):
++        return item in str(self)
++
+     def __repr__(self):
+         return '='.join(self.components).__repr__()
+ 

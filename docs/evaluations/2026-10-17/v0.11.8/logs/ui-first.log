@@ -1,0 +1,76 @@
+
+> medical-agent-dsh-integration@0.11.7 test:ui
+> playwright test tests/ui/calculation-supplements.spec.mjs tests/ui/patient-calculation.spec.mjs tests/ui/glucose-calculation.spec.mjs
+
+
+Running 5 tests using 1 worker
+
+(node:1061431) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections (1.1s)
+(node:1061647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections on a narrow screen (1.1s)
+(node:1061878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 tests/ui/glucose-calculation.spec.mjs:7:1 › glucose renderer rejects missing basis and unsafe links while preserving legacy results (342ms)
+  ✓  4 tests/ui/glucose-calculation.spec.mjs:100:1 › sourced glucose conversion uses a scoped form, approximate result and original consultation (1.5s)
+  ✓  5 tests/ui/patient-calculation.spec.mjs:7:1 › patient calculation confirms editable inputs, recovers a lost response and stays readable on mobile (1.6s)
+
+
+  1) tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections 
+
+    TypeError: Cannot read properties of undefined (reading 'calculation_followup')
+
+       at ../fixtures/calculation-supplements.mjs:143
+
+      141 |   const failed = await snapshot(id);
+      142 |   expect(failed.state.calculations).toHaveLength(1);
+    > 143 |   expect(failed.reply.calculation_followup.status).toBe("pending");
+          |                       ^
+      144 |   const pending = page
+      145 |     .locator('#messages .interaction-followup[data-status="pending"]')
+      146 |     .last();
+        at verifyCalculationSupplements (/home/suyingrui/Desktop/medical-agent/tests/fixtures/calculation-supplements.mjs:143:23)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/calculation-supplements.spec.mjs:27:7
+
+    Error Context: test-results/ui/calculation-supplements-ca-6bb6e-tries-and-later-corrections/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/calculation-supplements-ca-6bb6e-tries-and-later-corrections/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/calculation-supplements-ca-6bb6e-tries-and-later-corrections/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections on a narrow screen 
+
+    TypeError: Cannot read properties of undefined (reading 'calculation_followup')
+
+       at ../fixtures/calculation-supplements.mjs:143
+
+      141 |   const failed = await snapshot(id);
+      142 |   expect(failed.state.calculations).toHaveLength(1);
+    > 143 |   expect(failed.reply.calculation_followup.status).toBe("pending");
+          |                       ^
+      144 |   const pending = page
+      145 |     .locator('#messages .interaction-followup[data-status="pending"]')
+      146 |     .last();
+        at verifyCalculationSupplements (/home/suyingrui/Desktop/medical-agent/tests/fixtures/calculation-supplements.mjs:143:23)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/calculation-supplements.spec.mjs:27:7
+
+    Error Context: test-results/ui/calculation-supplements-ca-6918c-rections-on-a-narrow-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/calculation-supplements-ca-6918c-rections-on-a-narrow-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/calculation-supplements-ca-6918c-rections-on-a-narrow-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections 
+    tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections on a narrow screen 
+  3 passed (10.0s)

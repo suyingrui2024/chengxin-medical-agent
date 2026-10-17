@@ -1,0 +1,70 @@
+{
+  "version": "0.11.14",
+  "health": {
+    "status": "ok",
+    "service": "medagent",
+    "version": "0.11.14",
+    "backend": "compatible",
+    "execution_available": true
+  },
+  "packaged_binary": "dist/desktop/Chengxin-0.11.14-linux-x64/Chengxin",
+  "viewport": null,
+  "window_size": {
+    "width": 900,
+    "height": 680
+  },
+  "geometry": [
+    {
+      "selector": "#active-task h3",
+      "x": 243,
+      "y": 261,
+      "width": 448.015625,
+      "height": 22.390625,
+      "visible": true
+    },
+    {
+      "selector": ".body-map-options",
+      "x": 460.8125,
+      "y": 288.890625,
+      "width": 360.1875,
+      "height": 94,
+      "visible": true
+    },
+    {
+      "selector": ".body-map-canvas",
+      "x": 243,
+      "y": 287.390625,
+      "width": 205.8125,
+      "height": 149,
+      "visible": true
+    },
+    {
+      "selector": ".map-confirm",
+      "x": 460.8125,
+      "y": 390.890625,
+      "width": 360.1875,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "selector": "#message-input",
+      "x": 253,
+      "y": 527.203125,
+      "width": 530,
+      "height": 37.796875,
+      "visible": true
+    },
+    {
+      "selector": "#urgent-help",
+      "x": 742.15625,
+      "y": 148.5,
+      "width": 95.84375,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "local_fixture_model_requests": 7,
+  "external_provider_calls": 0,
+  "scope": "Actual packaged Electron with a local scripted HTTP model; Replay of a recorded actual model question with the shared local fixture; assertions cover graphical clarification, one recorded fact and a synthetic failed-service retry.",
+  "passed": true
+}

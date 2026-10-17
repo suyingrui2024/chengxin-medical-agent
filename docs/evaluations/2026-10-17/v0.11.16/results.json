@@ -1,0 +1,52 @@
+{
+  "version": "0.11.16",
+  "synthetic_only": true,
+  "software": {
+    "default_python": {
+      "collected": 398,
+      "passed": 344,
+      "skipped": 54
+    },
+    "separate_sdk_calculation_passed": 1,
+    "separate_patient_bridge_passed": 1,
+    "browser_passed": 74,
+    "source_native_passed": 35,
+    "packaged_native_passed": 35,
+    "node_assertions_passed": 21,
+    "frozen_source_files": 312,
+    "selected_frozen_tests_passed": 220,
+    "packaged_project_files_matched": 114,
+    "applicable_production_package_versions_matched": 544
+  },
+  "real_provider": {
+    "directed_attempts": 4,
+    "full_flow_attempts": 72,
+    "version_total_attempts": 76,
+    "full_flow_directory_including_v01115": 93,
+    "full_flow_cumulative_limit": 100,
+    "initial_full_run_passed": false,
+    "selected_rerun_passed": true,
+    "patient_view_followup_passed": true,
+    "all_four_cases_have_passing_evidence_across_runs": true,
+    "single_clean_four_case_invocation": false,
+    "initial_full_run_gateway_timeouts": 2,
+    "initial_full_run_unknown_terminal_outcome": 1,
+    "head_successful_run_retries": [
+      0,
+      0
+    ]
+  },
+  "local_proposal_replay": {
+    "fixture_requests": 6,
+    "external_provider_requests": 0,
+    "passed": true
+  },
+  "limitations": [
+    "No independent clinical validation or target-user usability study",
+    "No overall DSH or Codex capability equivalence established",
+    "Patient cases remain process-local",
+    "Patient interview and general execution remain separate as permitted by current scope",
+    "Independent clean-machine installation not verified"
+  ],
+  "full_objective_complete": false
+}

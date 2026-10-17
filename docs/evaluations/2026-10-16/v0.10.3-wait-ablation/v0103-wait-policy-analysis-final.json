@@ -1,0 +1,567 @@
+{
+  "scope": "Two known development tasks, two repetitions. Descriptive policy-bundle ablation, no holdout, clinical validity, statistical superiority or overall SDK parity claim. Wait durations measure tool wall time; completion and exit status come only from structured observations and independent tests.",
+  "report_sha256": "6a1631b35c0854f0b9eadbda2cf5bd12ad5ee3386498784f2f682bb691900e1b",
+  "analysis_source_sha256": "95f7aa53c54152ba3e772ba29eca70610a5f8fe179c04026a2e89147e5a724e5",
+  "plan_finished": true,
+  "frozen_source_unchanged": true,
+  "runs": [
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 1,
+      "arm": "wait-30",
+      "runtime_completed": true,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": true,
+      "requests": 20,
+      "execution_ms": 203355,
+      "all_provider_http200": true,
+      "reason": null,
+      "tool_counts": {
+        "bash": 17,
+        "read": 2,
+        "edit": 1,
+        "write": 1,
+        "job_output": 2
+      },
+      "waits": [
+        {
+          "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+          "call_id": "call_00_MJI75RrkCzprj5iAEVrJ6028",
+          "arguments": {
+            "job_id": "bash-17",
+            "wait": true,
+            "timeout_ms": 30000
+          },
+          "elapsed_ms": 30007,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "37323b8c-bef6-4523-bb2d-c021eb722adb",
+            "sequence": 18,
+            "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+            "call_id": "call_00_MJI75RrkCzprj5iAEVrJ6028",
+            "sdk_turn": 1,
+            "sdk_step": 18,
+            "call_sequence": 124,
+            "tool": "job_output",
+            "state": "running",
+            "exit_code": null,
+            "signal": null,
+            "job_id": "bash-17",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "ab3d6afd-f547-4987-af89-ff15fc34712f",
+            "observation_id": "37323b8c-bef6-4523-bb2d-c021eb722adb:18"
+          }
+        },
+        {
+          "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+          "call_id": "call_00_90SSJnQIXXLJHQl2RfU76656",
+          "arguments": {
+            "job_id": "bash-17",
+            "timeout_ms": 30000,
+            "wait": true
+          },
+          "elapsed_ms": 21638,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "37323b8c-bef6-4523-bb2d-c021eb722adb",
+            "sequence": 19,
+            "session_id": "7d37089e-5ebe-471d-bc3b-6b15619fb744",
+            "call_id": "call_00_90SSJnQIXXLJHQl2RfU76656",
+            "sdk_turn": 1,
+            "sdk_step": 19,
+            "call_sequence": 130,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-17",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "ab3d6afd-f547-4987-af89-ff15fc34712f",
+            "observation_id": "37323b8c-bef6-4523-bb2d-c021eb722adb:19"
+          }
+        }
+      ],
+      "wait_tool_calls": 2,
+      "explicit_waits_above_30_requested": 0,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 27
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 1,
+      "arm": "wait-600",
+      "runtime_completed": false,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": false,
+      "requests": 20,
+      "execution_ms": 179832,
+      "all_provider_http200": true,
+      "reason": "model_call_budget_exhausted",
+      "tool_counts": {
+        "bash": 16,
+        "grep": 1,
+        "read": 2,
+        "edit": 1,
+        "write": 1,
+        "job_output": 2,
+        "workspace_changes": 1
+      },
+      "waits": [
+        {
+          "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+          "call_id": "call_00_ET_Nb0EJa3R83hl5BtbHIMp3048",
+          "arguments": {
+            "job_id": "bash-15",
+            "wait": true,
+            "timeout_ms": 300000
+          },
+          "elapsed_ms": 24127,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "e99b1136-2644-44d8-9128-42ed2d5254c8",
+            "sequence": 16,
+            "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+            "call_id": "call_00_ET_Nb0EJa3R83hl5BtbHIMp3048",
+            "sdk_turn": 1,
+            "sdk_step": 17,
+            "call_sequence": 118,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-15",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "8870de55-7680-4042-a478-c9abcbb29ce8",
+            "observation_id": "e99b1136-2644-44d8-9128-42ed2d5254c8:16"
+          }
+        },
+        {
+          "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+          "call_id": "call_00_ET_Q1wlfEGNfhjKBfTWLZOO6844",
+          "arguments": {
+            "job_id": "bash-16",
+            "timeout_ms": 420000,
+            "wait": true
+          },
+          "elapsed_ms": 30345,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "e99b1136-2644-44d8-9128-42ed2d5254c8",
+            "sequence": 18,
+            "session_id": "8e57afba-c4d6-4750-9a47-43e5610b4ab6",
+            "call_id": "call_00_ET_Q1wlfEGNfhjKBfTWLZOO6844",
+            "sdk_turn": 1,
+            "sdk_step": 19,
+            "call_sequence": 130,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-16",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "8870de55-7680-4042-a478-c9abcbb29ce8",
+            "observation_id": "e99b1136-2644-44d8-9128-42ed2d5254c8:18"
+          }
+        }
+      ],
+      "wait_tool_calls": 2,
+      "explicit_waits_above_30_requested": 2,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 27
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sphinx-doc__sphinx-8627",
+      "repetition": 1,
+      "arm": "wait-600",
+      "runtime_completed": false,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": false,
+      "requests": 20,
+      "execution_ms": 96601,
+      "all_provider_http200": true,
+      "reason": "model_call_budget_exhausted",
+      "tool_counts": {
+        "bash": 20
+      },
+      "waits": [],
+      "wait_tool_calls": 0,
+      "explicit_waits_above_30_requested": 0,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 19
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sphinx-doc__sphinx-8627",
+      "repetition": 1,
+      "arm": "wait-30",
+      "runtime_completed": false,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": false,
+      "requests": 20,
+      "execution_ms": 167748,
+      "all_provider_http200": true,
+      "reason": "model_call_budget_exhausted",
+      "tool_counts": {
+        "bash": 24,
+        "edit": 3,
+        "write": 1
+      },
+      "waits": [],
+      "wait_tool_calls": 0,
+      "explicit_waits_above_30_requested": 0,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 19
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 2,
+      "arm": "wait-600",
+      "runtime_completed": false,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": false,
+      "requests": 20,
+      "execution_ms": 155892,
+      "all_provider_http200": true,
+      "reason": "model_call_budget_exhausted",
+      "tool_counts": {
+        "bash": 21,
+        "read": 1,
+        "edit": 1,
+        "write": 1,
+        "job_output": 1
+      },
+      "waits": [
+        {
+          "session_id": "b212793d-daec-4106-af05-782357edb4c7",
+          "call_id": "call_00_r84mmJUucipeRv3Ng3cK2334",
+          "arguments": {
+            "job_id": "bash-21",
+            "wait": true,
+            "timeout_ms": 400000
+          },
+          "elapsed_ms": 1979,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "d7602bba-d097-4e54-9c3d-d37e04c41fd7",
+            "sequence": 22,
+            "session_id": "b212793d-daec-4106-af05-782357edb4c7",
+            "call_id": "call_00_r84mmJUucipeRv3Ng3cK2334",
+            "sdk_turn": 1,
+            "sdk_step": 20,
+            "call_sequence": 138,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 1,
+            "signal": null,
+            "job_id": "bash-21",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "0611ff63-9874-4297-a56e-4fdfeddc10d6",
+            "observation_id": "d7602bba-d097-4e54-9c3d-d37e04c41fd7:22"
+          }
+        }
+      ],
+      "wait_tool_calls": 1,
+      "explicit_waits_above_30_requested": 1,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 27
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 2,
+      "arm": "wait-30",
+      "runtime_completed": true,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": true,
+      "requests": 20,
+      "execution_ms": 197425,
+      "all_provider_http200": true,
+      "reason": null,
+      "tool_counts": {
+        "bash": 17,
+        "read": 2,
+        "edit": 1,
+        "workspace_changes": 1,
+        "job_output": 3
+      },
+      "waits": [
+        {
+          "session_id": "c9eb95bf-7b3f-4283-a671-2974c60fe940",
+          "call_id": "call_01_oGlJmj5drkf2hURhtWeO8727",
+          "arguments": {
+            "job_id": "bash-15",
+            "wait": true,
+            "timeout_ms": 240000
+          },
+          "elapsed_ms": 30007,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "830a8f87-9d38-4985-9821-953afe3780d0",
+            "sequence": 16,
+            "session_id": "c9eb95bf-7b3f-4283-a671-2974c60fe940",
+            "call_id": "call_01_oGlJmj5drkf2hURhtWeO8727",
+            "sdk_turn": 1,
+            "sdk_step": 16,
+            "call_sequence": 112,
+            "tool": "job_output",
+            "state": "running",
+            "exit_code": null,
+            "signal": null,
+            "job_id": "bash-15",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "c2579e3e-f261-4f27-84c9-4871beb944cc",
+            "observation_id": "830a8f87-9d38-4985-9821-953afe3780d0:16"
+          }
+        },
+        {
+          "session_id": "c9eb95bf-7b3f-4283-a671-2974c60fe940",
+          "call_id": "call_00_HXgDAQdcY9EWl4fPsHQX6209",
+          "arguments": {
+            "job_id": "bash-15",
+            "timeout_ms": 240000,
+            "wait": true
+          },
+          "elapsed_ms": 30006,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "830a8f87-9d38-4985-9821-953afe3780d0",
+            "sequence": 17,
+            "session_id": "c9eb95bf-7b3f-4283-a671-2974c60fe940",
+            "call_id": "call_00_HXgDAQdcY9EWl4fPsHQX6209",
+            "sdk_turn": 1,
+            "sdk_step": 17,
+            "call_sequence": 118,
+            "tool": "job_output",
+            "state": "running",
+            "exit_code": null,
+            "signal": null,
+            "job_id": "bash-15",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "c2579e3e-f261-4f27-84c9-4871beb944cc",
+            "observation_id": "830a8f87-9d38-4985-9821-953afe3780d0:17"
+          }
+        },
+        {
+          "session_id": "c9eb95bf-7b3f-4283-a671-2974c60fe940",
+          "call_id": "call_00_xeNsfxPYczYlwksxhwOw9407",
+          "arguments": {
+            "job_id": "bash-15",
+            "timeout_ms": 280000,
+            "wait": true
+          },
+          "elapsed_ms": 21390,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "830a8f87-9d38-4985-9821-953afe3780d0",
+            "sequence": 19,
+            "session_id": "c9eb95bf-7b3f-4283-a671-2974c60fe940",
+            "call_id": "call_00_xeNsfxPYczYlwksxhwOw9407",
+            "sdk_turn": 1,
+            "sdk_step": 18,
+            "call_sequence": 126,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-15",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "c2579e3e-f261-4f27-84c9-4871beb944cc",
+            "observation_id": "830a8f87-9d38-4985-9821-953afe3780d0:19"
+          }
+        }
+      ],
+      "wait_tool_calls": 3,
+      "explicit_waits_above_30_requested": 3,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 27
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sphinx-doc__sphinx-8627",
+      "repetition": 2,
+      "arm": "wait-30",
+      "runtime_completed": true,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": true,
+      "requests": 20,
+      "execution_ms": 115990,
+      "all_provider_http200": true,
+      "reason": null,
+      "tool_counts": {
+        "bash": 14,
+        "grep": 3,
+        "read": 3,
+        "edit": 5,
+        "write": 1,
+        "job_output": 1,
+        "workspace_changes": 1
+      },
+      "waits": [
+        {
+          "session_id": "78370df3-8eac-4362-a313-98fed945a6f5",
+          "call_id": "call_00_9rfbr1QpxtEWKZHxmJbg1032",
+          "arguments": {
+            "job_id": "bash-8"
+          },
+          "elapsed_ms": 6,
+          "structured_observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "3b20e23d-2a39-4c7b-87fd-79ae6ea34eea",
+            "sequence": 11,
+            "session_id": "78370df3-8eac-4362-a313-98fed945a6f5",
+            "call_id": "call_00_9rfbr1QpxtEWKZHxmJbg1032",
+            "sdk_turn": 1,
+            "sdk_step": 16,
+            "call_sequence": 121,
+            "tool": "job_output",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-8",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "turn_id": "6c73ac85-f35a-4ef7-997d-d8ee5eede1e0",
+            "observation_id": "3b20e23d-2a39-4c7b-87fd-79ae6ea34eea:11"
+          }
+        }
+      ],
+      "wait_tool_calls": 1,
+      "explicit_waits_above_30_requested": 0,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 19
+      },
+      "pytest_exit_code": 0
+    },
+    {
+      "case": "sphinx-doc__sphinx-8627",
+      "repetition": 2,
+      "arm": "wait-600",
+      "runtime_completed": false,
+      "source_correct": true,
+      "source_and_contract_passed": true,
+      "end_to_end_completed": false,
+      "requests": 20,
+      "execution_ms": 105571,
+      "all_provider_http200": true,
+      "reason": "model_call_budget_exhausted",
+      "tool_counts": {
+        "bash": 12,
+        "grep": 1,
+        "read": 4,
+        "edit": 9,
+        "write": 2
+      },
+      "waits": [],
+      "wait_tool_calls": 0,
+      "explicit_waits_above_30_requested": 0,
+      "waits_above_30_observed": 0,
+      "verified_outcome_counts": {
+        "passed": 19
+      },
+      "pytest_exit_code": 0
+    }
+  ],
+  "arms": {
+    "wait-30": {
+      "runs": 4,
+      "requests": 80,
+      "source_passed": 4,
+      "source_failed": 0,
+      "source_unavailable": 0,
+      "file_and_source_passed": 4,
+      "runtime_completed": 3,
+      "end_to_end_completed": 3,
+      "job_output_calls": 6,
+      "explicit_waits_above_30_requested": 3,
+      "waits_above_30_observed": 0
+    },
+    "wait-600": {
+      "runs": 4,
+      "requests": 80,
+      "source_passed": 4,
+      "source_failed": 0,
+      "source_unavailable": 0,
+      "file_and_source_passed": 4,
+      "runtime_completed": 0,
+      "end_to_end_completed": 0,
+      "job_output_calls": 3,
+      "explicit_waits_above_30_requested": 3,
+      "waits_above_30_observed": 0
+    }
+  },
+  "pairs": [
+    {
+      "case": "sphinx-doc__sphinx-8627",
+      "repetition": 1,
+      "candidate_minus_control_requests": 0,
+      "candidate_minus_control_execution_ms": -71147,
+      "control_source_passed": true,
+      "candidate_source_passed": true,
+      "control_joint_passed": false,
+      "candidate_joint_passed": false
+    },
+    {
+      "case": "sphinx-doc__sphinx-8627",
+      "repetition": 2,
+      "candidate_minus_control_requests": 0,
+      "candidate_minus_control_execution_ms": -10419,
+      "control_source_passed": true,
+      "candidate_source_passed": true,
+      "control_joint_passed": true,
+      "candidate_joint_passed": false
+    },
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 1,
+      "candidate_minus_control_requests": 0,
+      "candidate_minus_control_execution_ms": -23523,
+      "control_source_passed": true,
+      "candidate_source_passed": true,
+      "control_joint_passed": true,
+      "candidate_joint_passed": false
+    },
+    {
+      "case": "sympy__sympy-21627",
+      "repetition": 2,
+      "candidate_minus_control_requests": 0,
+      "candidate_minus_control_execution_ms": -41533,
+      "control_source_passed": true,
+      "candidate_source_passed": true,
+      "control_joint_passed": true,
+      "candidate_joint_passed": false
+    }
+  ],
+  "long_wait_elapsed_threshold_ms": 31000,
+  "model_requests_for_analysis": 0
+}

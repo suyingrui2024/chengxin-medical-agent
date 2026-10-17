@@ -1,0 +1,51 @@
+
+> medical-agent-dsh-integration@0.10.4 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/freshness.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:754887) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/freshness.spec.mjs:13:1 › native checks mark changed inputs as needing revalidation and accept the actual new check (8.0s)
+
+
+  1) tests/desktop/freshness.spec.mjs:13:1 › native checks mark changed inputs as needing revalidation and accept the actual new check 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#execution-status')
+    Expected: "本轮完成"
+    Received: "本轮已完成"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" locator('#execution-status') with timeout 5000ms
+      - waiting for locator('#execution-status')
+        6 × locator resolved to <span role="status" aria-live="polite" class="subtle-pill" id="execution-status">正在执行</span>
+          - unexpected value "正在执行"
+        8 × locator resolved to <span role="status" aria-live="polite" class="subtle-pill" id="execution-status">本轮已完成</span>
+          - unexpected value "本轮已完成"
+
+
+      136 |     });
+      137 |     release();
+    > 138 |     await expect(page.locator("#execution-status")).toHaveText("本轮完成");
+          |                                                     ^
+      139 |     await expect(chip).toHaveClass(/check-succeeded/);
+      140 |     await expect(chip).toContainText("退出 0");
+      141 |     await expect(chip).toHaveAttribute("title", /check.py/);
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/freshness.spec.mjs:138:53
+
+    Error Context: test-results/desktop/freshness-native-checks-ma-60df7-accept-the-actual-new-check/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/freshness-native-checks-ma-60df7-accept-the-actual-new-check/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/freshness-native-checks-ma-60df7-accept-the-actual-new-check/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/freshness.spec.mjs:13:1 › native checks mark changed inputs as needing revalidation and accept the actual new check 

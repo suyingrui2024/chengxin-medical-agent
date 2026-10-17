@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.11.9 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/visual-answer-drafts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:1128302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/visual-answer-drafts.spec.mjs:11:1 › native degree selection preserves independent patient text and confirms explicitly at 900x680 (1.3s)
+
+  1 passed (1.7s)

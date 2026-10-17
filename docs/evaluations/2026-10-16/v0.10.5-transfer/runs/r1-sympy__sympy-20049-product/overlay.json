@@ -1,0 +1,9 @@
+{
+  "files": {
+    "sympy/physics/vector/point.py": "52daf3212e73e24149e081b9274ff60517cbf000a3f54b1a23f22fd910af1e94",
+    "regressions/test_point_vel_calculation.py": "a9f8c0b3fd882d8a1b804d1bce0c955542d4afd8a406cb58d1c8aea3254c6242"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

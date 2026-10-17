@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">澄心问诊患者端界面结构</title>
+  <desc id="desc">左侧为问诊说明、对话和图示任务，右侧为阶段进度、已确认事实和询问理由。</desc>
+  <rect width="1200" height="620" rx="30" fill="#f4f1e9"/>
+  <rect x="36" y="28" width="1128" height="54" rx="12" fill="#18312d"/>
+  <circle cx="68" cy="55" r="15" fill="#d9ed99"/><path d="M68 46v18M59 55h18" stroke="#18312d" stroke-width="3"/>
+  <text x="94" y="62" font-family="Arial,'PingFang SC',sans-serif" font-size="20" font-weight="700" fill="white">澄心问诊</text>
+  <rect x="54" y="110" width="720" height="470" rx="22" fill="#fffcf6" stroke="#d9ded5"/>
+  <text x="84" y="155" font-family="Arial,'PingFang SC',sans-serif" font-size="13" font-weight="700" fill="#17685b">结构化门诊会谈</text>
+  <text x="84" y="196" font-family="Arial,'PingFang SC',sans-serif" font-size="30" font-weight="700" fill="#18312d">每次只问一个真正有用的问题</text>
+  <rect x="84" y="230" width="520" height="68" rx="18" fill="#eaf1ec"/>
+  <circle cx="111" cy="264" r="15" fill="#dcebe5"/><text x="137" y="271" font-family="Arial,'PingFang SC',sans-serif" font-size="16" fill="#18312d">这个问题从什么时候开始？</text>
+  <rect x="218" y="320" width="480" height="58" rx="18" fill="#17685b"/>
+  <text x="244" y="356" font-family="Arial,'PingFang SC',sans-serif" font-size="16" fill="white">两天前逐渐出现</text>
+  <rect x="84" y="400" width="650" height="110" rx="18" fill="#eaf1ec" stroke="#b8c9be"/>
+  <rect x="104" y="422" width="126" height="66" rx="10" fill="#d9ed99"/>
+  <text x="251" y="442" font-family="Arial,'PingFang SC',sans-serif" font-size="13" font-weight="700" fill="#17685b">图示自查 · 可跳过</text>
+  <text x="251" y="475" font-family="Arial,'PingFang SC',sans-serif" font-size="22" font-weight="700" fill="#18312d">测一次腋下体温</text>
+  <rect x="804" y="110" width="342" height="470" rx="22" fill="#fffcf6" stroke="#d9ded5"/>
+  <text x="832" y="150" font-family="Arial,'PingFang SC',sans-serif" font-size="16" font-weight="700" fill="#18312d">当前问诊</text>
+  <g font-family="Arial,'PingFang SC',sans-serif" font-size="14">
+    <rect x="826" y="173" width="294" height="45" rx="10" fill="#dcebe5"/><text x="846" y="201" fill="#18312d">03  了解经过</text>
+    <text x="846" y="248" fill="#6b7974">04  补充背景</text><text x="846" y="285" fill="#6b7974">05  定向观察</text><text x="846" y="322" fill="#6b7974">06  整理交接</text>
+  </g>
+  <path d="M832 350h286" stroke="#d9ded5"/>
+  <text x="832" y="383" font-family="Arial,'PingFang SC',sans-serif" font-size="14" font-weight="700" fill="#18312d">已确认的信息</text>
+  <text x="832" y="419" font-family="Arial,'PingFang SC',sans-serif" font-size="12" fill="#64746f">主要问题</text><text x="832" y="443" font-family="Arial,'PingFang SC',sans-serif" font-size="14" fill="#18312d">咳嗽发烧两天</text>
+  <text x="832" y="480" font-family="Arial,'PingFang SC',sans-serif" font-size="12" fill="#64746f">变化趋势</text><text x="832" y="504" font-family="Arial,'PingFang SC',sans-serif" font-size="14" fill="#18312d">变化不大</text>
+  <text x="832" y="548" font-family="Arial,'PingFang SC',sans-serif" font-size="12" font-weight="700" fill="#17685b">为什么问这一步</text>
+</svg>
+

@@ -1,0 +1,63 @@
+--- a/pydicom/tests/test_personname_iterable.py
++++ b/pydicom/tests/test_personname_iterable.py
+@@ -0,0 +1,45 @@
++# -*- coding: utf-8 -*-
++# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
++"""Regression tests: PersonName should behave like ``str`` for
++iteration and containment (see issue "Make PersonName3 iterable")."""
++
++import pytest
++
++from pydicom import Dataset
++from pydicom.valuerep import PersonName
++
++
++class TestPersonNameIterable:
++    def test_contains_single_char(self):
++        ds = Dataset()
++        ds.PatientName = 'SomeName'
++        assert 'S' in ds.PatientName
++        assert 'z' not in ds.PatientName
++
++    def test_contains_substring(self):
++        pn = PersonName('SomeName')
++        assert 'Some' in pn
++        assert 'meName' in pn
++        assert 'xyz' not in pn
++
++    def test_iter(self):
++        pn = PersonName('SomeName')
++        assert list(pn) == list('SomeName')
++        assert ''.join(pn) == 'SomeName'
++
++    def test_iter_multi_group(self):
++        pn = PersonName('SomeName=Other^Name')
++        assert list(pn) == list(str(pn))
++        assert ''.join(pn) == 'SomeName=Other^Name'
++        assert '=' in pn
++
++    def test_iter_empty(self):
++        pn = PersonName('')
++        assert list(pn) == []
++        assert 'a' not in pn
++
++    def test_iter_bytes_original_string(self):
++        # decoded on demand from the raw byte string
++        pn = PersonName(b'SomeName')
++        assert list(pn) == list(str(pn))
++        assert 'S' in pn
+--- a/pydicom/valuerep.py
++++ b/pydicom/valuerep.py
+@@ -750,6 +750,12 @@
+     def __str__(self):
+         return '='.join(self.components).__str__()
+ 
++    def __iter__(self):
++        yield from str(self)
++
++    def __contains__(self, item):
++        return item in str(self)
++
+     def __repr__(self):
+         return '='.join(self.components).__repr__()
+ 

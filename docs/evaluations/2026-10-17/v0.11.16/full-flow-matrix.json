@@ -1,0 +1,78 @@
+{
+  "version": "0.11.16",
+  "matrix": {
+    "native_emergency_gate": {
+      "report": "live-v01116-first.json",
+      "calls": 0,
+      "checks": {
+        "emergency_route": true,
+        "no_model_call": true,
+        "no_model_request_event": true,
+        "no_renderer_errors": true
+      }
+    },
+    "native_service_failure_recovery": {
+      "report": "live-v01116-first.json",
+      "calls": 2,
+      "checks": {
+        "service_error_visible": true,
+        "recovered": true,
+        "correct_original_facts": true,
+        "original_input_reused": true,
+        "no_renderer_errors": true
+      }
+    },
+    "native_full_interview": {
+      "report": "live-v01116-selected.json",
+      "calls": 18,
+      "checks": {
+        "invalid_reading_not_recorded": true,
+        "invalid_reading_no_model_call": true,
+        "age_edit_without_model_call": true,
+        "reading_kept_after_edit": true,
+        "actual_measurement": true,
+        "unknown_preserved_before_edit": true,
+        "severity_collected_from_its_answer": true,
+        "trajectory_collected_from_its_answer": true,
+        "respiratory_details_collected": true,
+        "associated_symptoms_actually_collected": true,
+        "no_age_requestion_after_explicit_edit": true,
+        "earlier_report_retained_for_model": true,
+        "partial_report_retained_in_summary": true,
+        "read_sources_without_model_call": true,
+        "summary_edit_without_model_call": true,
+        "confirmed": true,
+        "age_corrected": true,
+        "patient_source_and_quality": true,
+        "history_without_model_call": true,
+        "export_completed": true,
+        "no_renderer_errors": true
+      }
+    },
+    "native_full_location_interview": {
+      "report": "live-v01116-patient.json",
+      "calls": 15,
+      "checks": {
+        "patient_view_selected": true,
+        "location_is_uncommitted_until_patient_confirmation": true,
+        "revision_confirmed_without_an_extra_model_request": true,
+        "location_history_and_new_evidence": true,
+        "original_question_is_resumed": true,
+        "location_source_is_not_upgraded": true,
+        "detailed_location_and_revision_completed": true,
+        "latest_location_in_summary": true,
+        "final_summary_confirmed": true,
+        "patient_view_kept_through_confirmation": true,
+        "no_renderer_errors": true
+      }
+    }
+  },
+  "first_full_invocation_passed": false,
+  "selected_failed_case_rerun_passed": true,
+  "version_16_calls": 72,
+  "cumulative_directory_calls": 93,
+  "scope": "Four complete-case requirements have passing evidence across an initial failed run, a selected rerun and a patient-view follow-up; not a single clean four-case invocation or clinical accuracy. All head passes used zero retries.",
+  "passed": true,
+  "cumulative_limit": 100,
+  "patient_view_followup_passed": true
+}

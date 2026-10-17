@@ -1,0 +1,6 @@
+{"case": "marshmallow-code__marshmallow-1343", "cache_verified": true}
+{"case": "pylint-dev__astroid-1196", "cache_verified": true}
+{"case": "pvlib__pvlib-python-1707", "cache_verified": true}
+{"case": "sqlfluff__sqlfluff-1625", "cache_verified": true}
+{"run": "r1-sqlfluff__sqlfluff-1625-official-sdk", "reproduced": true}
+{"run": "r1-sqlfluff__sqlfluff-1625-product", "reproduced": true}

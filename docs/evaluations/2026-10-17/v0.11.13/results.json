@@ -1,0 +1,61 @@
+{
+  "version": "0.11.13",
+  "backend": {
+    "final_default_collected": 356,
+    "final_default_passed": 302,
+    "final_default_skipped": 54,
+    "earlier_combined_collected": 352,
+    "earlier_combined_passed": 349,
+    "earlier_combined_skipped": 3,
+    "optional_sdk_checks_in_earlier_combined_run": 51,
+    "final_medical_bridge_integration_rerun": 1,
+    "new_tests": 16,
+    "three_long_opt_in_checks_rerun": false
+  },
+  "ui": {
+    "earlier_full_passed": 62,
+    "post_source_scope_targeted_passed": 10,
+    "after_native_driver_fix_passed": 3,
+    "new_tests": 3
+  },
+  "native": {
+    "first_source_passed": 31,
+    "first_source_failed": 1,
+    "final_source_full_passed": 32,
+    "final_package_full_passed": 32,
+    "extra_packaged_proof_passed": true,
+    "new_tests": 1
+  },
+  "frozen": {
+    "source_files": 290,
+    "final_selected_tests": 178
+  },
+  "package": {
+    "own_files": 111,
+    "production_dependency_versions": 544,
+    "passed": true
+  },
+  "provider": {
+    "first_run_requests": 11,
+    "final_run_requests": 16,
+    "total_requests": 27,
+    "maximum_cumulative_requests": 36,
+    "all_statuses_200": true,
+    "preflight_failure_requests": 0,
+    "final_directed_cases": 4,
+    "final_directed_checks_passed": true,
+    "scope": "Scripted seed cases followed by real DSH/provider decisions; no population or clinical accuracy claim."
+  },
+  "bridge_unit_passed": 21,
+  "prettier_passed": true,
+  "black_checked_files": 10,
+  "known_remaining_work": [
+    "Reduce redundant proposals after explicit confirmation and unregistered fact-write attempts.",
+    "Improve semantic separation of primary symptom refinement and associated symptoms.",
+    "Independent clinical content and patient comprehension review."
+  ],
+  "clinical_validation": false,
+  "human_usability_validation": false,
+  "general_dsh_or_codex_parity_proven": false,
+  "overall_goal_complete": false
+}

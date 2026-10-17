@@ -1,0 +1,15 @@
+
+> medical-agent-dsh-integration@0.11.7 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/app.spec.mjs tests/desktop/glucose-calculation.spec.mjs
+
+
+Running 4 tests using 1 worker
+
+(node:1051383) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (731ms)
+  ✓  2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.5s)
+  ✓  3 tests/desktop/glucose-calculation.spec.mjs:15:3 › native glucose conversion keeps sources folded and resumes the medical interview at 900x760 (1.5s)
+  ✓  4 tests/desktop/glucose-calculation.spec.mjs:15:3 › native glucose conversion keeps sources folded and resumes the medical interview at 900x680 (1.5s)
+
+  4 passed (5.7s)

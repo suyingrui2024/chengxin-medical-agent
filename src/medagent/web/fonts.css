@@ -1,0 +1,34 @@
+/* Original Noto CJK fonts; provenance and OFL are bundled beside these files. */
+@font-face {
+  font-family: "Chengxin Sans SC";
+  src: url("NotoSansCJKsc-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  unicode-range:
+    U+2E80-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
+    U+FE30-FE4F, U+FF00-FFEF, U+20000-3134F;
+}
+
+@font-face {
+  font-family: "Chengxin Serif SC";
+  src: url("NotoSerifCJKsc-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  unicode-range:
+    U+2E80-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
+    U+FE30-FE4F, U+FF00-FFEF, U+20000-3134F;
+}
+
+/* CJK uses the bundled face; Latin code retains the system monospace face. */
+:root {
+  --mono: "Chengxin Sans SC", ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: var(--mono);
+}

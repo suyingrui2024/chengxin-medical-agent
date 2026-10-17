@@ -1,0 +1,24 @@
+# Overlay the pinned sdk-minimal profile. No model-facing host capabilities.
+- id: persistent-bash
+  disabled: true
+- id: persistent-pwsh
+  disabled: true
+- id: terminal-bash
+  disabled: true
+- id: terminal-pwsh
+  disabled: true
+- id: pty
+  disabled: true
+- id: subprocess
+  disabled: true
+- id: session-log-deepseek
+  disabled: true
+- id: plugin-package-inventory-deepseek
+  disabled: true
+- id: llm-retry
+  disabled: true
+- id: system-prompt
+  config:
+    includeHarnessIdentity: false
+    includeRuntimeContext: false
+    personaPrefix: 'You are the medical-agent decision transport. Follow the enclosed medical coordinator instructions. Return exactly one JSON tool proposal, never execute host commands.'

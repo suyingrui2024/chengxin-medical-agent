@@ -1,0 +1,63 @@
+{
+  "changes_after_provider_evaluation": [
+    {
+      "path": "docs/有来源的计算插件与血糖换算.md",
+      "before": "fd16420f6fb26d0526c3dc44f6350d6a5960b95d525b0d309d04c366e753ac88",
+      "after": "6155b8d3db786b058926aab7ef353418fccde744fb56e363a54dd8af26429aa8"
+    },
+    {
+      "path": "src/medagent/__init__.py",
+      "before": "2acbb8d3894340db63c3eb388de687a58b8403e8c8f8e70a64f6a15494323ce2",
+      "after": "e90a6cea1d8dc5f691a098f7760b15ebfc7bcc14ded1bb3be0918f2f9dd52b45"
+    },
+    {
+      "path": "src/medagent/web/structured-ui.js",
+      "before": "75066a42c798141be91344b8d698af65db39ca4577380ab5621bf1ad0e5ce9f6",
+      "after": "f9bce2d8c202cfafd5811171785fb2cfe13b25cb81f13ad5e72ad1f8daae852f"
+    },
+    {
+      "path": "src/medagent/web/styles.css",
+      "before": "e8d35938980710e1463a77de9ad91ce79d268d511ffeb0ffe14b3ad72c4e440b",
+      "after": "c5c9a7088291c3123f4028d37c5e07f6c59381e3e485443d2fb78d5a8c1f8157"
+    },
+    {
+      "path": "src/medagent.egg-info/PKG-INFO",
+      "before": "0953def88756a9e10664b240f0948a4452ca5823d736b29cab399c1ca6426389",
+      "after": "ddd9b0b3667c1e8af239e78a5f3873f145f67b60e68cd4443ee5b4054322b4ea"
+    },
+    {
+      "path": "src/medagent.egg-info/SOURCES.txt",
+      "before": "cb732cd6d487a4c41ca94184c9259cd87be6f90efbd1d2f0add278fd327ed225",
+      "after": "d81bad694e8b595c8c43375a3b0969e6f419f2f1ea6b3505d2cac6c8ec6cdb27"
+    },
+    {
+      "path": "tests/desktop/app.spec.mjs",
+      "before": "88e40d4a50e844ea63a87b881bef0fd20465f98c65ffa5cb1800ca30163051b5",
+      "after": "7236c21f21680120b423163ee16e119d188959a5d05511b2c6ae299d97f8250d"
+    },
+    {
+      "path": "tests/desktop/glucose-calculation.spec.mjs",
+      "before": "1e79bf86f7e13cfc9122818dbeb0f495219e0c55b3427dd92dec1b4bf5e60203",
+      "after": "55aae4a6087924fabd5fef794db19fa6f9cb53c7cf4ef110541d055db39515f0"
+    },
+    {
+      "path": "tests/fixtures/glucose-calculation.mjs",
+      "before": "19fed0f6018242c89174d3c12342329689c1ca596b7b3c64bd02231b2c09b9ab",
+      "after": "caf34fad7b6572f33f393b647c7cc812a3b66cdc941f55cd18753d2126d8d897"
+    },
+    {
+      "path": "tests/test_glucose_capability.py",
+      "before": "1e0e4c37d9e37b32d07fced26a89c5e072798ac0225a833583d30b22db91fdde",
+      "after": "a8cd05bd9f3e81b5dddd2584d975b8f6a3753a73480a65746cb1450e574e9d06"
+    }
+  ],
+  "additional_documentation": [
+    "docs/首版产品与技术设计.md",
+    "docs/实验与验收方案.md",
+    "docs/桌面应用使用与打包.md",
+    "docs/能力插件与问诊模板.md",
+    "docs/注册计算工具与执行回执.md"
+  ],
+  "logic_and_prompt_unchanged": true,
+  "scope": "Final differences comprise compact-window presentation, warning wording, package metadata, tests and design documentation; no provider re-evaluation is claimed for final presentation. Native/UI checks cover final presentation."
+}

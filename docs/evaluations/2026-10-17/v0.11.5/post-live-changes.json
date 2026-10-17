@@ -1,0 +1,19 @@
+{
+  "changed": [
+    "docs/桌面应用使用与打包.md",
+    "docs/结构化展示协议与组件扩展.md",
+    "docs/重复测量与问诊接续.md",
+    "src/medagent.egg-info/PKG-INFO",
+    "src/medagent.egg-info/SOURCES.txt",
+    "src/medagent/web/app.js",
+    "src/medagent/web/structured-ui.js",
+    "src/medagent/web/styles.css",
+    "tests/desktop/repeated-observations.spec.mjs",
+    "tests/fixtures/repeated-observations.mjs",
+    "tests/ui/repeated-observations.spec.mjs"
+  ],
+  "scope": "After live evaluation: regenerated release metadata, added and corrected the resumed-question UI/native checks, compacted resumed-question observations after screenshot review, and documented that layout. Python runtime, prompt, tool definitions, registered packs and live driver unchanged.",
+  "added_to_final_snapshot": [
+    "docs/能力插件与问诊模板.md"
+  ]
+}

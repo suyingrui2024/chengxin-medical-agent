@@ -1,0 +1,61 @@
+{
+  "version": "0.9.6",
+  "backend_tests_passed": 154,
+  "ui_scenarios_passed": 21,
+  "native_source_scenarios_passed": 8,
+  "native_package_scenarios_passed": 8,
+  "dsh_bridge_tests_passed": 2,
+  "format_checks_passed": true,
+  "online_runs": 16,
+  "real_provider_requests": 308,
+  "maximum_requests": 384,
+  "all_provider_requests_http_200": true,
+  "online_source_files_unchanged": 90,
+  "package": {
+    "version": "0.9.6",
+    "matching_runtime_files": 63,
+    "package_metadata_fields_verified": 6,
+    "installed_locked_versions_verified": 544,
+    "expected_packager_metadata_changes": [
+      "private",
+      "scripts",
+      "devDependencies",
+      "package-lock.json"
+    ]
+  },
+  "independent_source_correctness": {
+    "product": {
+      "attempts": 8,
+      "source_correctness_passed": 4
+    },
+    "official-sdk": {
+      "attempts": 8,
+      "source_correctness_passed": 4
+    }
+  },
+  "original_joint_score": {
+    "product": {
+      "attempts": 8,
+      "passed": 3,
+      "requests": 124,
+      "execution_duration_ms": 379076
+    },
+    "official-sdk": {
+      "attempts": 8,
+      "passed": 0,
+      "requests": 184,
+      "execution_duration_ms": 881332
+    },
+    "paired_outcomes": {
+      "both_passed": 0,
+      "product_only": 3,
+      "official_only": 0,
+      "neither_passed": 5
+    }
+  },
+  "scope": "Known adapted public DEV subset; ambiguous byte-preservation wording retained and qualified. No inference of overall DSH parity or clinical validity.",
+  "full_dsh_parity_proven": false,
+  "data_scope": "Public repository fixtures, including public DICOM files; no user or clinic patient records.",
+  "archived_implementation_outcomes_reproduced": 16,
+  "replay_model_calls": 0
+}

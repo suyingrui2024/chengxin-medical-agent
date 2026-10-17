@@ -1,0 +1,10 @@
+{
+  "filename": "pyarrow-19.0.1-cp310-cp310-manylinux_2_28_x86_64.whl",
+  "url": "https://files.pythonhosted.org/packages/ef/c9/68ab123ee1528699c4d5055f645ecd1dd68ff93e4699527249d02f55afeb/pyarrow-19.0.1-cp310-cp310-manylinux_2_28_x86_64.whl",
+  "size": 42069036,
+  "digests": {
+    "blake2b_256": "efc968ab123ee1528699c4d5055f645ecd1dd68ff93e4699527249d02f55afeb",
+    "md5": "0dc567818b16c8a3e3195cd1377fa9fd",
+    "sha256": "41f9706fbe505e0abc10e84bf3a906a1338905cbbcf1177b71486b03e6ea6608"
+  }
+}

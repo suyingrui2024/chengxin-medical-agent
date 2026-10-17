@@ -1,0 +1,10 @@
+{
+  "kind": "independent-recovery-artifact-check/v1",
+  "live_report_sha256": "3dbdd4f2526ed52b49e9e11d35ce69548e9eff06c25c937235fc347652f30dde",
+  "independent_verification": {
+    "passed": true,
+    "stdout": "independent execution regenerated and verified requested result\n",
+    "stderr": "",
+    "exit_code": 0
+  }
+}

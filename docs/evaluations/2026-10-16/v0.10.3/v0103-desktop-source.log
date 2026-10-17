@@ -1,0 +1,54 @@
+
+> medical-agent-dsh-integration@0.10.3 test:desktop
+> playwright test --config playwright.desktop.config.mjs
+
+
+Running 12 tests using 1 worker
+
+(node:687967) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (676ms)
+  ✓   2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.4s)
+  ✓   3 tests/desktop/changes.spec.mjs:45:1 › desktop reviews actual file changes and restores ten-minute history offline (4.7s)
+  ✓   4 tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history (6.6s)
+  ✓   5 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (3.6s)
+  ✓   6 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (10.8s)
+  ✓   7 tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output (5.3s)
+  ✓   8 tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (8.5s)
+  ✓   9 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.4s)
+  ✓  10 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.1s)
+  ✓  11 tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline (3.8s)
+  ✘  12 tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting (45.0s)
+Worker teardown timeout of 45000ms exceeded.
+
+Failed worker ran 12 tests, last 10 tests were:
+tests/desktop/changes.spec.mjs:45:1 › desktop reviews actual file changes and restores ten-minute history offline
+tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history
+tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline
+tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace
+tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output
+tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors
+tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview
+tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session
+tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline
+tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting
+
+
+  1) tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting 
+
+    Test timeout of 45000ms exceeded.
+
+    Error Context: test-results/desktop/urgent-interrupt-native-pr-cfcb5-e-provider-is-still-waiting/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/urgent-interrupt-native-pr-cfcb5-e-provider-is-still-waiting/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/urgent-interrupt-native-pr-cfcb5-e-provider-is-still-waiting/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting 
+  11 passed (2.4m)
+  1 error was not a part of any test, see above for details

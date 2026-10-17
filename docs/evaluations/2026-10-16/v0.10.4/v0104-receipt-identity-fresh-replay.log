@@ -1,0 +1,1 @@
+{"returncode": 0, "all_final_runtime_files_match": true, "checked_runtime_files": 121, "restored_project_has_no_env": true, "replayed_cases": 3, "all_replayed_cases_passed": true, "external_model_requests": 0, "dependency_policy": "Reuse installed locked dependencies; no downloads."}

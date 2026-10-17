@@ -1,0 +1,78 @@
+### python3 -m unittest discover -s tests -v  (2026-10-15T17:44:19Z)
+test_existing (test_existing.ExistingTests) ... ok
+test_no_float_roundtrip_or_two_decimals (test_regression.CliTests) ... ok
+test_required_example (test_regression.CliTests) ... ok
+test_single_line_output_only (test_regression.CliTests) ... ok
+test_accurate_under_caller_precision_8 (test_regression.DecimalContextTests) ... ok
+test_caller_context_unchanged (test_regression.DecimalContextTests) ... ok
+test_default_high_precision_caller_also_fine (test_regression.DecimalContextTests) ... ok
+test_basic_conversions (test_regression.ExactnessTests) ... ok
+test_cross_check_against_fractions (test_regression.ExactnessTests)
+Seeded random inputs vs exact integer-arithmetic expectations. ... ok
+test_digit_limits_accepted (test_regression.ExactnessTests) ... ok
+test_digit_limits_rejected (test_regression.ExactnessTests) ... ok
+test_no_scientific_notation (test_regression.ExactnessTests) ... ok
+test_roundtrip_is_exact (test_regression.ExactnessTests) ... ok
+test_trailing_zeros_stripped (test_regression.ExactnessTests) ... ok
+test_invalid_units (test_regression.InvalidInputTests) ... ok
+test_negative_and_special_values (test_regression.InvalidInputTests) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.079s
+
+OK
+
+### CLI example
+{"result": "1.234"}
+### CLI huge
+{"result": "123456789012345678901234000000"}
+### CLI 1.005 g->g
+{"result": "1.005"}
+### CLI error path (invalid unit -> non-zero exit)
+Traceback (most recent call last):
+  File "/workspace/cli.py", line 23, in <module>
+    sys.exit(main())
+  File "/workspace/cli.py", line 17, in main
+    result = convert(data["value"], data["from"], data["to"])
+  File "/workspace/units.py", line 78, in convert
+    _validate_unit(source, "source")
+  File "/workspace/units.py", line 37, in _validate_unit
+    raise ValueError(
+ValueError: invalid source unit 'lb': expected one of ['g', 'kg', 'mg']
+exit=1
+
+### prec=8 caller + context immutability
+123456789012345678901234000000
+0.000000999999999999999999999999999999999999
+caller context unchanged: True | prec 8 | rounding ROUND_HALF_EVEN
+ValueError OK for '-1'
+ValueError OK for 'NaN'
+ValueError OK for 'Infinity'
+ValueError OK for '1e3'
+ValueError OK for ''
+ValueError OK for unit lb
+24-digit ok: True
+36-frac ok: True
+
+### sha256 (existing test + fixture must be unchanged)
+c3dd138176a4401ce1a70d944507c5188e883c4ecb91f8c67209b7f8c799ba22  units.py
+36564a455a69e3032c440fe10e6d68043fe83add9a79b4bd49dfb8f1a4a2613e  cli.py
+654d14a1c2d7d37c495891c559fdf5a7699fd1a35bc72667f1eb458eefbc5238  tests/test_existing.py
+914e76079138c2dc40e42714f544fc9afc247c0abd5cf499af16b70260af4999  tests/test_regression.py
+3be40c8ff3e48e3aa35c2584f764fa7fe238881347d8a40517a67fc5aa5e4bc6  fixture_identity.json
+### FINAL RUN 2026-10-15T17:44:28Z
+test_trailing_zeros_stripped (test_regression.ExactnessTests) ... ok
+test_invalid_units (test_regression.InvalidInputTests) ... ok
+test_negative_and_special_values (test_regression.InvalidInputTests) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.081s
+
+OK
+
+### CLI example
+{"result": "1.234"}
+exit=0
+### CLI invalid unit (clean error, no traceback)
+{"error": "invalid source unit 'lb': expected one of ['g', 'kg', 'mg']"}
+exit=2

@@ -1,0 +1,11 @@
+{
+  "model_calls": 0,
+  "mutation": "Restore original subtraction defect, keeping all archived tests.",
+  "verification": {
+    "passed": false,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 5, in <module>\nAssertionError: (2, 3)\n",
+    "exit_code": 1
+  },
+  "expected_failure_detected": true
+}

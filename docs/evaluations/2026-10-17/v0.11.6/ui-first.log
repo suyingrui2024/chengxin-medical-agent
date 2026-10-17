@@ -1,0 +1,68 @@
+
+> medical-agent-dsh-integration@0.11.5 test:ui
+> playwright test --grep full measurement reports
+
+
+Running 2 tests using 1 worker
+
+(node:1007887) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry (30.2s)
+(node:1008164) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen (30.2s)
+
+
+  1) tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: apiRequestContext.post: Target page, context or browser has been closed
+
+      32 |       );
+      33 |     } finally {
+    > 34 |       await request.post("/api/settings", { data: { backend: "demo" } });
+         |                     ^
+      35 |       await model.close();
+      36 |     }
+      37 |   });
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/measurement-supplements.spec.mjs:34:21
+
+    Error Context: test-results/ui/measurement-supplements-fu-56452-s-through-failure-and-retry/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/measurement-supplements-fu-56452-s-through-failure-and-retry/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/measurement-supplements-fu-56452-s-through-failure-and-retry/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: apiRequestContext.post: Target page, context or browser has been closed
+
+      32 |       );
+      33 |     } finally {
+    > 34 |       await request.post("/api/settings", { data: { backend: "demo" } });
+         |                     ^
+      35 |       await model.close();
+      36 |     }
+      37 |   });
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/measurement-supplements.spec.mjs:34:21
+
+    Error Context: test-results/ui/measurement-supplements-fu-1974e-nd-retry-on-a-narrow-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/measurement-supplements-fu-1974e-nd-retry-on-a-narrow-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/measurement-supplements-fu-1974e-nd-retry-on-a-narrow-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry 
+    tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen 

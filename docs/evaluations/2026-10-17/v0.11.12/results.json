@@ -1,0 +1,53 @@
+{
+  "version": "0.11.12",
+  "backend": {
+    "collected": 340,
+    "passed": 286,
+    "skipped": 54,
+    "separate_sdk_suite_rerun": false,
+    "three_long_opt_in_checks_rerun": false
+  },
+  "ui": {
+    "final_full_passed": 59,
+    "extra_geometry_replay_passed": 3,
+    "new_tests": 3
+  },
+  "native": {
+    "source_full_passed": 31,
+    "packaged_full_passed": 31,
+    "extra_packaged_geometry_proof_passed": true
+  },
+  "bridge_passed": 21,
+  "format": {
+    "prettier_passed": true,
+    "changed_python_black_files": 2
+  },
+  "frozen": {
+    "source_files": 283,
+    "selected_tests": 162
+  },
+  "package": {
+    "own_files": 110,
+    "production_dependency_versions": 544
+  },
+  "provider": {
+    "new_requests_for_this_layout_release": 0
+  },
+  "known_unresolved_issues": [
+    {
+      "id": "active-location-task-consumes-medication-as-location",
+      "reproduced_versions": [
+        "0.11.11",
+        "0.11.12"
+      ],
+      "synthetic_input": "昨晚用过药物甲。",
+      "host_writes_wrong_location_even_with_correct_model_medication_extraction": true,
+      "external_model_calls": 0,
+      "priority": "next controller iteration"
+    }
+  ],
+  "clinical_validation": false,
+  "human_usability_validation": false,
+  "general_dsh_or_codex_parity_proven": false,
+  "overall_goal_complete": false
+}

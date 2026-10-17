@@ -1,0 +1,718 @@
+{
+  "kind": "rejected-check-proposal-local-baseline",
+  "expected_after_corrected_actual_check": "completed",
+  "actual_status": "failed",
+  "actual_error": "delivery_checks_failed",
+  "model_fixture_requests": 4,
+  "actual_exits": [
+    null,
+    0
+  ],
+  "mismatch_observed": true,
+  "external_model_requests": 0,
+  "snapshot": {
+    "id": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+    "directory": "/tmp/tmpf499dl1z/b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+    "workspace_kind": "managed",
+    "runtime": "dsh-sdk",
+    "dsh_version": "0.2.0-rc.2",
+    "model": "fixture",
+    "status": "failed",
+    "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+    "final_response": "输入错误已经改正，实际检查通过",
+    "error": "delivery_checks_failed",
+    "sequence": 36,
+    "events": [
+      {
+        "sequence": 1,
+        "type": "workspace.baseline",
+        "time": 1792164437.584641,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "files": 0,
+        "complete": true,
+        "content_complete": true
+      },
+      {
+        "sequence": 2,
+        "type": "task.submitted",
+        "time": 1792164437.5846438,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "text": "合成工具恢复验证：参数错误未执行时允许改正输入后运行正常检查；不需要保留被拒绝的调用形式。"
+      },
+      {
+        "sequence": 3,
+        "type": "ready",
+        "time": 1792164438.2982135,
+        "runtime": "dsh-sdk",
+        "version": "0.2.0-rc.2",
+        "isolation": "bubblewrap-filesystem",
+        "network": "enabled",
+        "model": "fixture"
+      },
+      {
+        "sequence": 4,
+        "type": "turn.started",
+        "time": 1792164438.2992034,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "time_budget_seconds": 30
+      },
+      {
+        "sequence": 5,
+        "type": "runtime.event",
+        "time": 1792164438.3119838,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.status",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "status": "running"
+          }
+        }
+      },
+      {
+        "sequence": 6,
+        "type": "runtime.event",
+        "time": 1792164438.3127117,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "turn/start",
+              "seq": 4,
+              "time": 1792164438312,
+              "data": {
+                "turn": 1
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 7,
+        "type": "jobs.snapshot",
+        "time": 1792164438.330469,
+        "jobs": []
+      },
+      {
+        "sequence": 8,
+        "type": "model.request_started",
+        "time": 1792164438.3863745,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 1,
+        "lifetime_calls": 1
+      },
+      {
+        "sequence": 9,
+        "type": "model.request",
+        "time": 1792164438.398046,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 1,
+        "lifetime_calls": 1,
+        "status": 200
+      },
+      {
+        "sequence": 10,
+        "type": "runtime.event",
+        "time": 1792164438.4047103,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "assistant/message",
+              "seq": 13,
+              "time": 1792164438404,
+              "data": {
+                "turn": 1,
+                "step": 1,
+                "usage": {
+                  "inputTokens": 10,
+                  "outputTokens": 10,
+                  "totalTokens": 20
+                },
+                "message": {
+                  "role": "assistant",
+                  "content": []
+                }
+              },
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 11,
+        "type": "runtime.event",
+        "time": 1792164438.4064682,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "tool/call",
+              "seq": 14,
+              "time": 1792164438405,
+              "data": {
+                "turn": 1,
+                "step": 1,
+                "callId": "delivery-1",
+                "name": "delivery_check",
+                "arguments": "{\"label\":\"参数被拒绝的提议\",\"command\":\"python3 -c 'assert 2+2==4' | tail -1\",\"timeout_ms\":240000}"
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 12,
+        "type": "runtime.event",
+        "time": 1792164438.414229,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "tool/result",
+              "seq": 15,
+              "time": 1792164438413,
+              "data": {
+                "turn": 1,
+                "step": 1,
+                "message": {
+                  "role": "tool",
+                  "source": {
+                    "kind": "tool",
+                    "callId": "delivery-1"
+                  },
+                  "toolCallId": "delivery-1",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Error: 交付检查参数无效"
+                    }
+                  ],
+                  "isError": true,
+                  "id": "2114a619-b0c6-4aae-bc08-7f997bdb102e"
+                }
+              },
+              "sourceEventSeqs": [
+                14
+              ],
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 13,
+        "type": "model.request_started",
+        "time": 1792164438.4349597,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 2,
+        "lifetime_calls": 2
+      },
+      {
+        "sequence": 14,
+        "type": "model.request",
+        "time": 1792164438.4408436,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 2,
+        "lifetime_calls": 2,
+        "status": 200
+      },
+      {
+        "sequence": 15,
+        "type": "runtime.event",
+        "time": 1792164438.4468365,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "assistant/message",
+              "seq": 19,
+              "time": 1792164438442,
+              "data": {
+                "turn": 1,
+                "step": 2,
+                "usage": {
+                  "inputTokens": 10,
+                  "outputTokens": 10,
+                  "totalTokens": 20
+                },
+                "message": {
+                  "role": "assistant",
+                  "content": []
+                }
+              },
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 16,
+        "type": "runtime.event",
+        "time": 1792164438.4468548,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "tool/call",
+              "seq": 20,
+              "time": 1792164438443,
+              "data": {
+                "turn": 1,
+                "step": 2,
+                "callId": "delivery-2",
+                "name": "delivery_check",
+                "arguments": "{\"label\":\"修正参数后的实际检查\",\"command\":\"python3 -c 'assert 2+2==4'\",\"timeout_ms\":120000}"
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 17,
+        "type": "runtime.event",
+        "time": 1792164438.5405645,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "tool/result",
+              "seq": 21,
+              "time": 1792164438539,
+              "data": {
+                "turn": 1,
+                "step": 2,
+                "message": {
+                  "role": "tool",
+                  "source": {
+                    "kind": "tool",
+                    "callId": "delivery-2"
+                  },
+                  "toolCallId": "delivery-2",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"修正参数后的实际检查\",\"check_key\":\"92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a\",\"owner_turn_id\":\"d13d159a-c25c-42fe-97ef-41bdbcf42a55\",\"required\":true,\"state\":\"completed\",\"exit_code\":0,\"job_id\":\"bash-1\",\"output\":\"\",\"checkpoint\":{\"schema\":\"workspace-checkpoint/v1\",\"paths\":[\".\"],\"sha256\":\"d770c7ba7e48336baeac4b1c5147c78803348a20bb7d72184745320733e6db39\",\"complete\":true,\"files\":0,\"ignored_directories\":[\".git\",\".mypy_cache\",\".pytest_cache\",\".ruff_cache\",\"__pycache__\",\"node_modules\"],\"symlink_targets_followed\":false}}"
+                    }
+                  ],
+                  "isError": false,
+                  "id": "de22367c-d7ed-4fb2-a267-cef8a7d821ce"
+                }
+              },
+              "sourceEventSeqs": [
+                20
+              ],
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 18,
+        "type": "model.request_started",
+        "time": 1792164438.5618804,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 3,
+        "lifetime_calls": 3
+      },
+      {
+        "sequence": 19,
+        "type": "model.request",
+        "time": 1792164438.5676427,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 3,
+        "lifetime_calls": 3,
+        "status": 200
+      },
+      {
+        "sequence": 20,
+        "type": "runtime.event",
+        "time": 1792164438.573614,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "assistant/message",
+              "seq": 25,
+              "time": 1792164438567,
+              "data": {
+                "turn": 1,
+                "step": 3,
+                "usage": {
+                  "inputTokens": 10,
+                  "outputTokens": 10,
+                  "totalTokens": 20
+                },
+                "message": {
+                  "role": "assistant",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "实际检查通过"
+                    }
+                  ]
+                }
+              },
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 21,
+        "type": "runtime.event",
+        "time": 1792164438.5736256,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "turn/end",
+              "seq": 27,
+              "time": 1792164438568,
+              "data": {
+                "turn": 1,
+                "reason": {
+                  "kind": "completed"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 22,
+        "type": "runtime.event",
+        "time": 1792164438.5736318,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.status",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "status": "idle"
+          }
+        }
+      },
+      {
+        "sequence": 23,
+        "type": "delivery.freshness",
+        "time": 1792164438.6177735,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "check_key": "92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a",
+        "call_id": "delivery-2",
+        "session_id": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+        "freshness": "current",
+        "watch": [
+          "."
+        ]
+      },
+      {
+        "sequence": 24,
+        "type": "turn.check_repairing",
+        "time": 1792164438.617789,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "attempt": 1,
+        "remaining_calls": 3,
+        "checks": [
+          {
+            "label": "参数被拒绝的提议",
+            "state": "unavailable",
+            "exit_code": null
+          }
+        ]
+      },
+      {
+        "sequence": 25,
+        "type": "runtime.event",
+        "time": 1792164438.6189616,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.status",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "status": "running"
+          }
+        }
+      },
+      {
+        "sequence": 26,
+        "type": "runtime.event",
+        "time": 1792164438.619084,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "turn/start",
+              "seq": 29,
+              "time": 1792164438618,
+              "data": {
+                "turn": 2
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 27,
+        "type": "model.request_started",
+        "time": 1792164438.6376014,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 4,
+        "lifetime_calls": 4
+      },
+      {
+        "sequence": 28,
+        "type": "model.request",
+        "time": 1792164438.6445112,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "index": 4,
+        "lifetime_calls": 4,
+        "status": 200
+      },
+      {
+        "sequence": 29,
+        "type": "runtime.event",
+        "time": 1792164438.6527114,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "assistant/message",
+              "seq": 34,
+              "time": 1792164438641,
+              "data": {
+                "turn": 2,
+                "step": 1,
+                "usage": {
+                  "inputTokens": 10,
+                  "outputTokens": 10,
+                  "totalTokens": 20
+                },
+                "message": {
+                  "role": "assistant",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "输入错误已经改正，实际检查通过"
+                    }
+                  ]
+                }
+              },
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 30,
+        "type": "runtime.event",
+        "time": 1792164438.6527326,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "event": {
+              "type": "turn/end",
+              "seq": 36,
+              "time": 1792164438642,
+              "data": {
+                "turn": 2,
+                "reason": {
+                  "kind": "completed"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 31,
+        "type": "runtime.event",
+        "time": 1792164438.652745,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "notification": {
+          "method": "session.status",
+          "params": {
+            "sessionId": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+            "status": "idle"
+          }
+        }
+      },
+      {
+        "sequence": 32,
+        "type": "delivery.freshness",
+        "time": 1792164438.6968162,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "check_key": "92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a",
+        "call_id": "delivery-2",
+        "session_id": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+        "freshness": "current",
+        "watch": [
+          "."
+        ]
+      },
+      {
+        "sequence": 33,
+        "type": "tool.observed",
+        "time": 1792164438.7004063,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "observation": {
+          "schema": "execution-observation/v1",
+          "epoch": "fc851055-9d1a-4c90-9cfb-3f7e88628138",
+          "sequence": 1,
+          "session_id": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+          "call_id": "delivery-1",
+          "sdk_turn": 1,
+          "sdk_step": 1,
+          "call_sequence": 14,
+          "tool": "delivery_check",
+          "state": "failed",
+          "exit_code": null,
+          "signal": null,
+          "job_id": null,
+          "job_kind": null,
+          "wait_ms": null,
+          "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+          "observation_id": "fc851055-9d1a-4c90-9cfb-3f7e88628138:1"
+        }
+      },
+      {
+        "sequence": 34,
+        "type": "tool.observed",
+        "time": 1792164438.7004104,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "observation": {
+          "schema": "execution-observation/v1",
+          "epoch": "fc851055-9d1a-4c90-9cfb-3f7e88628138",
+          "sequence": 2,
+          "session_id": "b88ed293-65fb-46bc-9960-08be9ab8b1ad",
+          "call_id": "delivery-2",
+          "sdk_turn": 1,
+          "sdk_step": 2,
+          "call_sequence": 20,
+          "tool": "delivery_check",
+          "state": "completed",
+          "exit_code": 0,
+          "signal": null,
+          "job_id": "bash-1",
+          "job_kind": "bash",
+          "wait_ms": null,
+          "check_key": "92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a",
+          "check_label": "修正参数后的实际检查",
+          "check_turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+          "check_required": true,
+          "check_snapshot": {
+            "schema": "workspace-checkpoint/v1",
+            "paths": [
+              "."
+            ],
+            "sha256": "d770c7ba7e48336baeac4b1c5147c78803348a20bb7d72184745320733e6db39",
+            "complete": true,
+            "files": 0,
+            "ignored_directories": [
+              ".git",
+              ".mypy_cache",
+              ".pytest_cache",
+              ".ruff_cache",
+              "__pycache__",
+              "node_modules"
+            ],
+            "symlink_targets_followed": false
+          },
+          "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+          "observation_id": "fc851055-9d1a-4c90-9cfb-3f7e88628138:2"
+        }
+      },
+      {
+        "sequence": 35,
+        "type": "jobs.snapshot",
+        "time": 1792164438.7069736,
+        "jobs": [
+          {
+            "id": "bash-1",
+            "status": "completed",
+            "kind": "bash",
+            "detail": "exit code: 0"
+          }
+        ]
+      },
+      {
+        "sequence": 36,
+        "type": "turn.failed",
+        "time": 1792164438.7069995,
+        "turn_id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "model_calls": 4,
+        "lifetime_calls": 4,
+        "final_response": "输入错误已经改正，实际检查通过",
+        "error_type": "delivery_checks_failed"
+      }
+    ],
+    "turns": [
+      {
+        "id": "d13d159a-c25c-42fe-97ef-41bdbcf42a55",
+        "text": "合成工具恢复验证：参数错误未执行时允许改正输入后运行正常检查；不需要保留被拒绝的调用形式。",
+        "max_calls": 6,
+        "time_budget_seconds": 30,
+        "changes_recorded": true,
+        "status": "failed",
+        "model_calls": 4,
+        "final_response": "输入错误已经改正，实际检查通过"
+      }
+    ],
+    "jobs": [
+      {
+        "id": "bash-1",
+        "status": "completed",
+        "kind": "bash",
+        "detail": "exit code: 0"
+      }
+    ],
+    "artifacts": [],
+    "storage_error": null,
+    "persistence_error": null,
+    "execution_configured": true,
+    "configuration_error": null,
+    "restored": false,
+    "history_trimmed": false,
+    "title": "合成工具恢复验证：参数错误未执行时允许改正输入后运行正常检查；不",
+    "isolation": "bubblewrap-filesystem",
+    "network": "enabled",
+    "storage": "workspace_files_and_dsh_history_persist",
+    "capability_binding": {
+      "protocol": "execution-capabilities/v1",
+      "template_id": "general",
+      "enabled": [
+        "calculate.units",
+        "observe.location",
+        "observe.temperature"
+      ],
+      "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+      "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+    },
+    "calculations": [],
+    "clarifications": [],
+    "change_baseline_available": true
+  }
+}

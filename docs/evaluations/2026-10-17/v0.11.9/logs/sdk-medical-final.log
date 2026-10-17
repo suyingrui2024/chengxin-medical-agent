@@ -1,0 +1,16 @@
+test_patient_api_through_real_dsh_to_validated_multi_fact_update (integration.test_dsh_e2e.DshHttpIntegration) ... ok
+test_real_dsh_http_priority_input_cancels_bridge_and_discards_proposal (test_consultation_interrupt.HttpInterruptTests) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 3.350s
+
+OK
+[17/Oct/2026 06:31:16] "POST /api/sessions HTTP/1.1" 201 -
+[17/Oct/2026 06:31:17] "POST /api/sessions/4ea034bc-f528-46e9-b790-037e774c7fdc/messages HTTP/1.1" 200 -
+[17/Oct/2026 06:31:17] "POST /api/sessions/4ea034bc-f528-46e9-b790-037e774c7fdc/messages HTTP/1.1" 200 -
+[17/Oct/2026 06:31:17] "POST /api/sessions/4ea034bc-f528-46e9-b790-037e774c7fdc/messages HTTP/1.1" 200 -
+[17/Oct/2026 06:31:17] "POST /api/sessions/4ea034bc-f528-46e9-b790-037e774c7fdc/messages HTTP/1.1" 200 -
+[17/Oct/2026 06:31:18] "GET /api/sessions/4f3089d7-bb98-4916-88e0-e75ecbc873b0/snapshot HTTP/1.1" 200 -
+[17/Oct/2026 06:31:18] "POST /api/sessions/4f3089d7-bb98-4916-88e0-e75ecbc873b0/messages HTTP/1.1" 409 -
+[17/Oct/2026 06:31:18] "POST /api/sessions/4f3089d7-bb98-4916-88e0-e75ecbc873b0/messages HTTP/1.1" 200 -
+[17/Oct/2026 06:31:18] "POST /api/sessions/4f3089d7-bb98-4916-88e0-e75ecbc873b0/messages HTTP/1.1" 200 -

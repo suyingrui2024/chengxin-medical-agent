@@ -1,0 +1,52 @@
+--- a/src/sqlfluff/rules/L031.py
++++ b/src/sqlfluff/rules/L031.py
+@@ -69,6 +69,15 @@
+                     "from_expression_element"
+                 )
+ 
++            # Is there a join in this select statement? If there is only a
++            # single table expression in the FROM clause there is no join
++            # (and no join condition), so aliases which are actually used to
++            # qualify columns are not ambiguous and should not be flagged.
++            has_join = (
++                len(list(from_clause_segment.recursive_crawl("from_expression_element")))
++                > 1
++            )
++
+             if not from_expression_element:
+                 return None
+             from_expression_element = from_expression_element.get_child(
+@@ -97,6 +106,7 @@
+                     from_expression_elements,
+                     column_reference_segments,
+                     segment,
++                    has_join,
+                 )
+                 or None
+             )
+@@ -147,7 +157,12 @@
+             )
+ 
+     def _lint_aliases_in_join(
+-        self, base_table, from_expression_elements, column_reference_segments, segment
++        self,
++        base_table,
++        from_expression_elements,
++        column_reference_segments,
++        segment,
++        has_join=True,
+     ):
+         """Lint and fix all aliases in joins - except for self-joins."""
+         # A buffer to keep any violations.
+@@ -195,6 +210,11 @@
+                 # exp_ref.get_child('dot') ensures that the column reference includes a table reference
+                 if used_alias_ref.raw == alias_name and exp_ref.get_child("dot"):
+                     ids_refs.append(used_alias_ref)
++
++            if not has_join and ids_refs:
++                # If the alias is used to qualify a column, and there's no
++                # join in the query, the rule should not trigger.
++                continue
+ 
+             # Fixes for deleting ` as sth` and for editing references to aliased tables
+             fixes = [

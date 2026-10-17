@@ -1,0 +1,26 @@
+
+> medical-agent-dsh-integration@0.9.6 test:dsh
+> node --test integrations/dsh/tests/*.test.mjs
+
+TAP version 13
+# Subtest: bridge launches shipped profile with isolated home and excludes unrelated credentials
+ok 1 - bridge launches shipped profile with isolated home and excludes unrelated credentials
+  ---
+  duration_ms: 0.922984
+  type: 'test'
+  ...
+# Subtest: medical overlay disables shell, subprocesses and log uploading
+ok 2 - medical overlay disables shell, subprocesses and log uploading
+  ---
+  duration_ms: 10.666695
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 60.534076

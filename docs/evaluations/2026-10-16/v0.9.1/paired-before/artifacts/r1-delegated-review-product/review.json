@@ -1,0 +1,71 @@
+{
+  "reviewer": "independent-subagent",
+  "artifact": "invoice.py",
+  "method_summary": "只读审计 + 独立差分参考实现（fraction.Fraction 精确算术，HALF_UP = floor(x*100 + 1/2)），在 decimal 全局精度被设为 8 的进程中执行；未修改 invoice.py 与任何被保护文件。",
+  "checks": [
+    {
+      "name": "随机差分验证 total() 与独立 Fraction 参考实现（100 组）",
+      "method": "python3 heredoc 脚本：随机生成 0..5 行，price 为 1..16 位整数部分 + 0..6 位小数（随机位数），quantity 0..1000；参考实现用 Fraction(Decimal(price))*q 精确求和后仅对总和做 HALF_UP 到分，再格式化为固定 2 位；逐例比较字符串。",
+      "result": "pass",
+      "finding": "100/100 完全一致，0 处不匹配。参考实现与实现均只对总和舍入，未发现逐行舍入。"
+    },
+    {
+      "name": "总和恰为 x.xx5 的 HALF_UP 边界与进位跨整数部分格式化",
+      "method": "显式用例：0.995→1.00；1.005→1.01；0.0025×2→0.01（半值由多行相加产生）；0.01×3+0.0025×2→0.04；0.004×2=0.008→0.01；[]→0.00；另加 300 组随机多行半值用例（price 取 0.0005/0.0015/0.0025/0.0035/0.0075/0.00005，quantity 1..9，1..4 行）与参考实现比较。",
+      "result": "pass",
+      "finding": "全部与参考实现一致；300 组随机半值用例 0 处不匹配。注意：复核脚本中我曾把 1234567890123456.999999×1000 的期望误写为 1234567890123456999.99，正确 HALF_UP 结果应为 1234567890123457000.00，实现给出的正是后者，故该条不构成缺陷。空列表返回 \"0.00\"。"
+    },
+    {
+      "name": "全局 Decimal 精度独立性（prec=8 前后不变）",
+      "method": "decimal.getcontext().prec = 8；在该精度下执行上述全部用例与 100 组随机差分；执行后再次读取 prec。实现使用整数（10**6 标度）+ 内置 round-free 进位，未调用 Decimal 上下文，也未写入 setcontext/localcontext。",
+      "result": "pass",
+      "finding": "prec 执行前=8、执行后=8，结果与精确参考一致；无 ValueError/InvalidOperation，证明实现不依赖也不修改全局精度。"
+    },
+    {
+      "name": "非法价格 / 非法数量抛 ValueError",
+      "method": "23 个非法输入：price ∈ {\"1.2345678\"(7 位小数), \"1e5\", \"-0.01\", \"Infinity\", \"NaN\", \"\", \".5\", \"1.\", \"12345678901234567\"(17 位整数), \"1.0000000\", \" 1\", \"1 \", \"+1\", \"0x1\", \"1,5\"}；quantity ∈ {True, False, 1.5, -1, 1001, \"2\", None, 2**70}。逐一断言抛 ValueError。",
+      "result": "pass",
+      "finding": "23/23 全部抛 ValueError，无漏网、无误抛其它异常类型。bool 作为 price 也被拒绝。"
+    },
+    {
+      "name": "价格字符串是否限定为 ASCII 普通十进制（严格性）",
+      "method": "regex \\A(\\d{1,16})(?:\\.(\\d{1,6}))?\\Z 使用 \\d，在 Python 中 \\d 匹配 Unicode Nd 类数字；实测 total([{\"price\":\"٥\",\"quantity\":1}])、\"١٢\"、\"１２\"(全角)、\"123٤\"。",
+      "result": "fail",
+      "finding": "缺陷（轻）：非 ASCII 十进制数字被接受并解析为对应数值。可复现：total([{\"price\":\"٥\",\"quantity\":1}]) → \"5.00\"；total([{\"price\":\"١٢\",\"quantity\":1}]) → \"12.00\"；total([{\"price\":\"１２\",\"quantity\":1}]) → \"12.00\"；total([{\"price\":\"123٤\",\"quantity\":1}]) → \"1234.00\"。契约要求 price 为“普通十进制字符串”，这些非 ASCII 数字应抛 ValueError。只影响超额接受的输入域，不影响任何合法输入的数值正确性（合法 ASCII 输入全部通过）。"
+    },
+    {
+      "name": "非字符串 price 的接受范围（契约外扩展）",
+      "method": "测试 price ∈ {1, Decimal(\"1.5\"), 0.1, True, None, [1]}。",
+      "result": "pass",
+      "finding": "观察项（非缺陷）：int/Decimal/有限 float 被接受（\"1\"→\"1.00\"、Decimal(\"1.5\")→\"1.50\"、0.1→\"0.10\"），这是 docstring 明确声明的扩展；True/None/[1] 抛 ValueError。契约只要求字符串输入合法，未禁止扩展，故不计为失败。"
+    },
+    {
+      "name": "被保护文件未被改动核对",
+      "method": "复核开始与结束均未对 tests/test_existing.py、fixture_identity.json 执行任何写操作（本复核仅用 read/write 于 invoice.py、review.json）；记录 md5：tests/test_existing.py = 17e251489e2ec7258fefe2703b2a12e1，fixture_identity.json = f7e568f90f646ef9aebb8da25daf2d56。工作目录非 git 仓库，无版本基线可比对。",
+      "result": "pass",
+      "finding": "本复核未改动这两个文件；哈希已记录，可供上游与既有基线比对（无 git，无法自证历史未被改动）。"
+    }
+  ],
+  "failures": [
+    {
+      "name": "非 ASCII 十进制数字被接受（价格字符串未限定 ASCII）",
+      "repro": "total([{\"price\":\"٥\",\"quantity\":1}]) == \"5.00\"（期望 ValueError）；同 \"١٢\"、\"１２\"、\"123٤\"",
+      "cause": "invoice.py:30 中 _PRICE_RE 使用 \\d（Unicode Nd）而非 [0-9]",
+      "severity": "low",
+      "suggested_fix": "将正则改为 \\A([0-9]{1,16})(?:\\.([0-9]{1,6}))?\\Z（或编译时加 re.ASCII）"
+    }
+  ],
+  "remediation": {
+    "by": "main-agent",
+    "action": "采纳复核建议：invoice.py 的 _PRICE_RE 由 \\d 改为 [0-9]；并在 tests/test_total_exact.py 的 test_illegal_prices 中加入 \"٥\"/\"１２\"/\"123٤\" 三个 Unicode 数字用例。",
+    "verification": "python3 -m unittest discover -s tests → Ran 11 tests, OK；total([{\"price\":\"٥\",\"quantity\":1}])、\"１２\"、\"123٤\" 均抛 ValueError；prec=8 下 1234567890123456.123456×1000 → \"1234567890123456123.46\"、0.1+0.2 → \"0.30\"、0.125+0.125 → \"0.25\"、[] → \"0.00\"，prec 保持 8。",
+    "status": "复核发现的唯一缺陷（低严重度）已修复并回归通过；其余检查均为 pass，无遗留失败。"
+  },
+  "verdict": "pass_with_minor_deviation：契约核心（精确相乘、仅对总和按 HALF_UP 舍入到 2 位、固定 2 位小数字符串、空列表 \"0.00\"、非法/非有限/负数价格与非法数量抛 ValueError、与全局 Decimal 精度无关且不修改全局精度）经 100 组随机差分 + 300 组半值随机用例 + 显式边界用例全部验证通过；唯一缺陷是价格字符串接受 Unicode 十进制数字（应抛 ValueError），属超额接受、低严重度，不影响合法输入结果。",
+  "limitations": [
+    "差分参考实现同为我在本会话内编写，独立于 invoice.py 算法（Fraction 而非整数微元），但非第三方库实现。",
+    "未做性能/极大列表压力测试；未覆盖 lines 元素缺 key、lines 非可迭代等契约未定义的输入。",
+    "工作目录非 git 仓库，被保护文件的历史完整性无法自证，只能确认本复核未写入。"
+  ],
+  "environment": "Python3 + decimal prec=8；全部检查在单次 heredoc 脚本中执行，未修改 invoice.py。"
+}

@@ -1,0 +1,38 @@
+test_adjacent_measurement_qualifiers_are_not_dropped_or_applied_to_other_fields (tests.test_measurement_supplements.MeasurementParserTests) ... ok
+test_only_real_unambiguous_measurements_pass_and_common_simple_reports_keep_zero_model_path (tests.test_measurement_supplements.MeasurementParserTests) ... ok
+test_separate_explicit_reading_from_other_numbers_without_choosing_between_readings (tests.test_measurement_supplements.MeasurementParserTests) ... ok
+test_candidate_after_another_number_keeps_both_sources_and_does_not_drop_the_first_clause (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_demo_preserves_the_supplement_without_claiming_model_processing (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_failed_supplement_retry_does_not_measure_twice_or_reenter_the_consumed_request (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_first_measurement_forwards_full_report_and_does_not_mistake_dose_for_temperature (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_repeat_handles_same_turn_medication_correction_and_preserves_full_source (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_request_with_history_but_no_reading_processes_history_before_offering_repeat (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_supplement_cancels_a_suspended_form_instead_of_trapping_the_next_answer (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_uncertain_repeat_keeps_old_reading_and_still_processes_the_medication (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_urgent_reading_and_raw_emergency_never_wait_for_supplement_planning (tests.test_measurement_supplements.MeasurementSupplementTests) ... ok
+test_completed_calculation_survives_observation_without_duplicate_execution (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_demo_engine_uses_the_same_repeat_controller (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_field_correction_cancels_repeat_and_cannot_restore_an_old_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_history_coverage_keeps_retained_value_visible_after_many_skips (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_hypothetical_input_during_active_repeat_is_not_recorded (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_invalid_retry_and_skip_preserve_old_fact_and_discard_previous_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_literal_repeat_does_not_execute_negated_hypothetical_or_unrelated_requests (tests.test_repeated_observations.RepeatedObservationTests) ... FAIL
+test_model_tool_is_registered_but_requires_actual_request_and_task_eligibility (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_new_reading_supersedes_and_restores_the_unanswered_question_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_actions_require_current_version_before_any_mutation_and_do_not_reopen_closed_cases (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_interrupts_and_restores_calculation_then_summary_rebuilds_current_measurement (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_reported_high_candidate_requires_confirmation_then_existing_triage_runs_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_uncertain_number_does_not_become_a_measurement_or_erase_previous_value (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+
+======================================================================
+FAIL: test_literal_repeat_does_not_execute_negated_hypothetical_or_unrelated_requests (tests.test_repeated_observations.RepeatedObservationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_repeated_observations.py", line 346, in test_literal_repeat_does_not_execute_negated_hypothetical_or_unrelated_requests
+    self.assertIsNotNone(reply)
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.251s
+
+FAILED (failures=1)

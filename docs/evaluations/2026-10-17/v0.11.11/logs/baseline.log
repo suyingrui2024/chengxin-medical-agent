@@ -1,0 +1,47 @@
+
+> medical-agent-dsh-integration@0.11.10 test:ui
+> playwright test tests/ui/self-check-drafts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:1149089) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/self-check-drafts.spec.mjs:7:1 › unconfirmed body location survives a session switch without writing a result (6.4s)
+
+
+  1) tests/ui/self-check-drafts.spec.mjs:7:1 › unconfirmed body location survives a session switch without writing a result 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: getByRole('button', { name: '记录：四肢', exact: true })
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" getByRole('button', { name: '记录：四肢', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '记录：四肢', exact: true })
+
+
+      33 |   await expect(
+      34 |     page.getByRole("button", { name: "记录：四肢", exact: true }),
+    > 35 |   ).toBeEnabled();
+         |     ^
+      36 |   const restored = await degreeSnapshot(page, id);
+      37 |   expect(restored.events).toEqual(before.events);
+      38 |   expect(restored.state.facts).toEqual(before.state.facts);
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/self-check-drafts.spec.mjs:35:5
+
+    Error Context: test-results/ui/self-check-drafts-unconfir-458cc-ch-without-writing-a-result/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/self-check-drafts-unconfir-458cc-ch-without-writing-a-result/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/self-check-drafts-unconfir-458cc-ch-without-writing-a-result/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/self-check-drafts.spec.mjs:7:1 › unconfirmed body location survives a session switch without writing a result 

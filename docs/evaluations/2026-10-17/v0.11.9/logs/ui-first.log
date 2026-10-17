@@ -1,0 +1,48 @@
+
+> medical-agent-dsh-integration@0.11.8 test:ui
+> playwright test tests/ui/consultation-subjects.spec.mjs
+
+
+Running 2 tests using 1 worker
+
+(node:1087795) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/consultation-subjects.spec.mjs:8:3 › consultation subjects stay separate and new-case text remains editable (1.6s)
+  ✘  2 tests/ui/consultation-subjects.spec.mjs:8:3 › consultation subjects stay separate and new-case text remains editable on a narrow screen (1.4s)
+
+
+  1) tests/ui/consultation-subjects.spec.mjs:8:3 › consultation subjects stay separate and new-case text remains editable on a narrow screen 
+
+    Error: locator.click: Error: strict mode violation: locator('#recent-sessions .recent-item').filter({ hasText: '头疼' }) resolved to 2 elements:
+        1) <button title="头疼" type="button" class="recent-item ">头疼</button> aka getByRole('button', { name: '·头疼' }).first()
+        2) <button title="头疼" type="button" class="recent-item ">头疼</button> aka getByRole('button', { name: '·头疼' }).nth(1)
+
+    Call log:
+      - waiting for locator('#recent-sessions .recent-item').filter({ hasText: '头疼' })
+
+
+       at ../fixtures/consultation-subjects.mjs:189
+
+      187 |     .locator("#recent-sessions .recent-item")
+      188 |     .filter({ hasText: "头疼" })
+    > 189 |     .click();
+          |      ^
+      190 |   await expect(card).toBeVisible();
+      191 |   await expect(page.locator("#conversation-subtitle")).toHaveText(
+      192 |     "父亲 · 家属代问",
+        at verifyConsultationSubjects (/home/suyingrui/Desktop/medical-agent/tests/fixtures/consultation-subjects.mjs:189:6)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/consultation-subjects.spec.mjs:27:7
+
+    Error Context: test-results/ui/consultation-subjects-cons-773ce-editable-on-a-narrow-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/consultation-subjects-cons-773ce-editable-on-a-narrow-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/consultation-subjects-cons-773ce-editable-on-a-narrow-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/consultation-subjects.spec.mjs:8:3 › consultation subjects stay separate and new-case text remains editable on a narrow screen 
+  1 passed (7.4s)

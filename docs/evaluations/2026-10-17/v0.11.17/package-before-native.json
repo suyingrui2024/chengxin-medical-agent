@@ -1,0 +1,781 @@
+{
+  "version": "0.11.17",
+  "platform": "linux-x64",
+  "source_files_checked": 119,
+  "source_sha256": {
+    "src/medagent.egg-info/entry_points.txt": "1dd84ee9b7c72570f64946e95cd7cc315a574d59c38918090048489eaec2a18d",
+    "src/medagent.egg-info/PKG-INFO": "fa4611c438270251fe53bbc0399a142c706d43e04d1d36659a9badc390796286",
+    "src/medagent.egg-info/top_level.txt": "bca39d5d6120cb6c6af46e799f80fcf98d733d897e5cc5fd426daadb8b66f0aa",
+    "src/medagent.egg-info/SOURCES.txt": "08c17974f6caf108e4c1b8b6ae8f0da100413c90a17a4a564db0ed3c3ad1b997",
+    "src/medagent.egg-info/dependency_links.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "src/medagent/triage.py": "fb5f9c6117f24baf73a8d5085e99235ea3c15d08fa7da767936b1f76782b0f6a",
+    "src/medagent/execution_changes.py": "9674e445e30cae8b7b5a30d18bc929a3a2b0c6871fb9fcb2542931ff2188f38a",
+    "src/medagent/execution_projects.py": "db146b7ff39f9dbb5407f3928ad1bde3852eaff28ea1730c2e271bdd6fb9d05e",
+    "src/medagent/execution_checkpoints.py": "29eba91d30c9640a5573e1f7c9f3f87f68382bdfd984965a403eb9fcd7150d5e",
+    "src/medagent/measurement_reports.py": "3e284cc7b1134953ce1339a214521cc0268ed5bc9944521191ebe0deff4b16ff",
+    "src/medagent/cli.py": "d553146d21d554b1b3a420b3de49c1cc9a7179bc4ad19c575a7117c33ccb7479",
+    "src/medagent/plugins.py": "6ac11ba78de1939086f2a7a8fb9b8dabeb229996f266ac455a5abc5f8c772705",
+    "src/medagent/backends.py": "f20bf1bc2752f1c3b7608cb2756d85ac32cde4276c53596e8a7960ac37db775f",
+    "src/medagent/decision_wait.py": "4c4f8a2d13edce191c51fb0f50cde958714ce61024b0214c5b8928bc4c7cf995",
+    "src/medagent/calculation_followup.py": "abe7cdd10f6bf89953171ba43d52b78025cae325aba14a91402ad6f0f999898e",
+    "src/medagent/consultation.py": "b43a6ff9cbb76e2a120a97a3f1298b7dbf66e8ab9d7d4520d434be5a020c6fc1",
+    "src/medagent/events.py": "a12c2f3caa238df7930e214c09c747b4f986f56302c132836b59a7b739189456",
+    "src/medagent/execution_limits.py": "8b31560ce1a053f3f89248fc6a4ae47e6324e254f727c7447d6a005db1441d99",
+    "src/medagent/execution_store.py": "f46a5e294dd0d8fcac6dbccd7eab077547ef30bc085cafa3cae51c52b1846c22",
+    "src/medagent/execution.py": "c9ee3b5a1143fac3172c41d53f3c8bde3cde50bc5c026a75356e4c2e31eab95c",
+    "src/medagent/workspace.py": "f9e56d589a67babec0d5aeb135460f4c8943416887dc55729758aa2f7d192fde",
+    "src/medagent/agent_tools.py": "a884c479760fd8fd5ae128dc709aed96aecd7460457ddf1b27bfaaa233f4dc29",
+    "src/medagent/server.py": "d804101542e19c2bd91757ac9e1a01e7c10e3cc68e18ff6a8aab169f56b3d8e8",
+    "src/medagent/patient_calculations.py": "e62f25aaac1180090b8070ed9a8ff6f23f4c137b02325297195678fbbc0ffa5b",
+    "src/medagent/task_interactions.py": "563fff1eca4d567ffed6d1c62caede0bb1d1c904a3988541b09ca158f65e94c4",
+    "src/medagent/execution_files.py": "0d88745992be0b0fc1336018a1ba1f5aeafd3e8ca41249c4cdcb8e62ad994407",
+    "src/medagent/execution_clarifications.py": "6349abcd3c0c2b1116d28abeb684cb6625153463e0ac0c0f8b53100a52c5ea26",
+    "src/medagent/agent.py": "5ac04fff7192396591edc7eb0cc153425e5d4c01d6dff455c6db034af955d191",
+    "src/medagent/interpreter.py": "249c205f2da4978d12de734a07e53419f7e3fb2012e4bfed6490b983d2340b84",
+    "src/medagent/consultation_subject.py": "e38be6fb942297607e56474eaa11d7c28ed11926b52f3ba61e34e960e379f434",
+    "src/medagent/__init__.py": "8387e3763247fb2dca42c85d233fcca283b628d0f9ddaa39d48f8c8af3fedd84",
+    "src/medagent/task_conversation.py": "6b0ae096d42521c75a663ae69638cbd4209dde326871ff9cd47d21363f6255aa",
+    "src/medagent/execution_capabilities.py": "f78438216f9db8599f645ea473d205248958ceb3f81ed3bfb76e955b2d48c32a",
+    "src/medagent/runtime.py": "8b505c55c3af458d0ce48a4a1442beb58a03c796b3468cee745f48b1873944aa",
+    "src/medagent/execution_artifacts.py": "bf4e0f3b386de6a1a73ee1c3c0118a9fe788faf78e0f2a48fec7e57fee307fe5",
+    "src/medagent/knowledge.py": "372656a3038e57c4c98ee71803b26156e30e25ba4c842b312e02d37dd4a746f8",
+    "src/medagent/reasoner.py": "c506a88c074741709c57573ad15d4481c2376e385942eb6b9e5bd6bb2aef2cd0",
+    "src/medagent/env_config.py": "ff669e3ede9f9990e0ac40862beae1f1e8c0a8c74dada47b5213576a3dd1ed01",
+    "src/medagent/task_intents.py": "4e238e07e00adc6591adfc691e1c7b65a9a137b3d00ad44005270c1cbd148b0b",
+    "src/medagent/location_answers.py": "fc411cb06f43b008941d5ba9d4ddd9e5e861dcf35d30942c403dd3024526ea8a",
+    "src/medagent/location_revisions.py": "73e881f4d6a59734659dc4044b01d78495f164bf8af58a96bf19818eaf7ca80f",
+    "src/medagent/execution_observations.py": "ce92993c01017a5adfa8bf565112bd6aa09852d61384a3c5198e9933354338d3",
+    "src/medagent/assertion_evidence.py": "38f6d832fa8247e81adb165a9416ca821cece142e2f58e1f47b6f84d27feb7b5",
+    "src/medagent/presentation.py": "6e3de08736dab2b80223cf510916fc81a35beae34eefa7efa4e2706f1b5ce36e",
+    "src/medagent/self_checks.py": "c6a3a5e65a8e813fe6ea2d3f71d857a34da49cebaeea3a04034f128217ca0fef",
+    "src/medagent/observations.py": "3dfa90c66ed7977bac341204893c09ef6a03bdd4cc34d0e6e3a9aa8a1e86a8fe",
+    "src/medagent/desktop_service.py": "381924705324c2ae4b5ad15a5c9ba5b49c6872e8ea26f98515693f361003bf50",
+    "src/medagent/domain.py": "6e85683c7c7b2ea7574f120c7d36c8146fb5b154c3d83378fd5fe70d6285acdd",
+    "src/medagent/extensions/conversion_forms.py": "9848058e872a1b25f0d0f62306f406eed8f45769bf3bc9c7abccaecbd68378a4",
+    "src/medagent/extensions/__init__.py": "671b1499b6b78c8d7eaff023ef1902f9b59bca86e5a5b0d0f965a3a0ce1d0ce8",
+    "src/medagent/extensions/glucose.py": "c1e8a5c869e006b10c6a2ac4718981f601f436a10065845c51ac55bd090c4ae2",
+    "src/medagent/extensions/input_evidence.py": "c0001e5b4a84e7b317e993f5c2aa883b003ca9fa1bf6ecabaad90952a19beb49",
+    "src/medagent/extensions/registry.py": "a4c4a2a2401b312040442a08caf0e3dcd36406024274210a591797501efccbf9",
+    "src/medagent/extensions/contracts.py": "7e257889ecfb84a3beeaccc7385d13fc2750839204516174042cd4c10026532a",
+    "src/medagent/extensions/builtin.py": "f600f7a159fa8e34874b7e1bdcb8c0135b469b7bd2cc42488c6132d7d7847d65",
+    "src/medagent/extensions/templates/general.json": "952f4c68bd1a6c5cc64bdb05bac035ba4df7abd38dd195c7bf7e195a0e64b4f8",
+    "src/medagent/extensions/templates/history.json": "f80dcc199634cb1040358e67be440e697cd72716a928b4c6821f3d2f4b205731",
+    "src/medagent/extensions/packs/temperature.json": "9d2beed3ced8163789d3df5b4a17d9352514f97e7c9b59c8404bd5d798ee28a4",
+    "src/medagent/extensions/packs/location.json": "67ced0e32e33cabf00e9a49640021f61fb33a6f0bc5dda7314f8b97b3d84f219",
+    "src/medagent/extensions/packs/units.json": "2686961b665dc7683bbadd12474a08bfbf31df5912d94102441aeeab9db13768",
+    "src/medagent/extensions/packs/glucose.json": "b0491bb09d663c1eb60dbaefab11b7163fc41c57bc46f0840fc6076c0926de49",
+    "src/medagent/web/fonts.css": "1f04eea1977cef16becc13104f17519bca6664c535e8475e1370e4cfadf9a893",
+    "src/medagent/web/brand.svg": "6aa5f9c2dc836090b62c2cc4a33cee9689a8b8deba4cc7828ab9404194710090",
+    "src/medagent/web/execution-directory-ui.js": "94751e6526eb1c26f812cd88c1ff83fde1a186446751a52f74570b7c9d9d4b08",
+    "src/medagent/web/execution-artifact-ui.js": "4505027af58d09d4108beb606b9f6c2c4613510e182417fc31aff4f76a2b3fc7",
+    "src/medagent/web/app.js": "512af937c70244018037c24638e65cdba43b7c52b076f9e7425fdff9d1d96520",
+    "src/medagent/web/index.html": "17dc9bc44d95394eb734a931da9d35acb0f98d4143d53a8f608e709642839ff5",
+    "src/medagent/web/location-answer-ui.js": "b5db45d5a4edc86fdfe23c5ae6208bd9236bef67dbad5c285e4f96ee687d3ba9",
+    "src/medagent/web/execution-changes-ui.js": "4f781509e38773c3d889dde857d1e5f960553e8ade689c6207cf4cf0fe8450c8",
+    "src/medagent/web/styles.css": "9788b86396bc67062bc7e5b38c90fdf4203d08d1fa178043a578825eb0eb4193",
+    "src/medagent/web/execution-ui.js": "715be70a85d5fef36b9870b84def1873cb26535230481c7efa1b0cf7e31ec912",
+    "src/medagent/web/fonts-OFL.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+    "src/medagent/web/structured-ui.js": "a56dd560c8845db8c601d891ee512526ce2b266ef9988f2d622d757e882cae29",
+    "src/medagent/web/body-location.svg": "62221848e7bb474c12191d8e56c6fbbd5c6e43a50078efd1819f892cb5396ca6",
+    "src/medagent/web/__init__.py": "110cd4ca5cbad1f99686fa97cb6ee327a45083aa51ca66abb9871cffdfc40d41",
+    "src/medagent/web/temperature.svg": "7ddd919abd5372b2780cf0e33750b5e32291f314f6c2c19b393c722f240972ad",
+    "src/medagent/web/execution-observation-ui.js": "fbf5fa221ce44ae47d694283ef7992be5734dd6d85b67b4073d69b07d63b844e",
+    "src/medagent/web/execution-clarification-ui.js": "a34fdb5eef3179b3bb1a0fe0dd315e01acca5b3a0efee11e7271bab9aa135f06",
+    "src/medagent/web/visual-question.js": "71d06cea363f30741da94b2f74da12e7b46d3d2544bbb5a7b2a5268c8124529a",
+    "src/medagent/web/font-sources.json": "fdf73b2c96946fd5cdee93590c97fc64cb2dcf2b137d168efcd5d9345243c2d7",
+    "src/medagent/web/NotoSansCJKsc-Regular.otf": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+    "src/medagent/web/NotoSerifCJKsc-Regular.otf": "2a2eae2628df83556c54018c41e20fa532c1b862c5256ae8b3f23feb918d12ca",
+    "src/medagent/content/agent_prompt.txt": "d46bb0aef1f1177205f6869e1ae2e6e2fd7fcc2dac9825790ee98bf8f78783d1",
+    "src/medagent/content/questions.json": "e6a67443675079974de9b05738141f6ccc3c6e94322f8b356bc1e4a32e927c0b",
+    "src/medagent/content/__init__.py": "3052aa55b48c259afa9bd3746085628453d39d707d6033a654b5924eee8e2ccf",
+    "desktop/starting.html": "d7291819ddca1d3277811261d91b061b054eb17614d6b6736ad048573c063286",
+    "desktop/starting.css": "6ea9860163501fb7d62963ff60c24396d5787ace9429882f1481e6d1ac1f00b2",
+    "desktop/icon.png": "dc7ac57b8de9795c4661f771002bf95c32f6800f5e727984da3be4b677c4374b",
+    "desktop/preload.cjs": "f6f856524cd74956c7b63d9505593501c94f2213d46fe0add300cc2b4214da55",
+    "desktop/main.cjs": "8151805a37e4b9b9b428ca6635a8fa774443f1c7d0d8a054dcd444aef17bc907",
+    "integrations/dsh/execution.patch.yml": "a9647798d87f00a59a77b08c8a4d3a09adafbd24a87d04d80a8cb63a6c5fc250",
+    "integrations/dsh/isolated-entry.mjs": "ae851ba44813b643de88b6449df4d76c30943df6a7a5a54c49e18d9a167bfc74",
+    "integrations/dsh/execution-checkpoints.mjs": "c009652bee8020b0c8bc617dd8ea1592fdbbab7e32a4322d7f5a653d25b7be1e",
+    "integrations/dsh/medical.patch.yml": "9505563fb050d38502f87941d1eaf316879b22e36dc2805507a40756960ff4cd",
+    "integrations/dsh/README.md": "d7bcc8a9cf6f6d2c4b932c48f0a9a5f1e0574c19e965706309352c68a085ddd6",
+    "integrations/dsh/execution-clarification-tool.mjs": "eeac220137637045ceed5aeb4e3a62285e8e02279f8930be33f535bd323f3215",
+    "integrations/dsh/execution-workspace.mjs": "1e7da5c8022463c697a08603fb36d795ba893b6e7d52581087eb3d4a1030c04a",
+    "integrations/dsh/execution-capabilities.mjs": "e92edb6dfc249c6a1af69f13ab6de0ff9b2237fa8c29996b32f4ebb0db7cf8ed",
+    "integrations/dsh/execution-clarifications.mjs": "5b91775b011247fdbadfccfa4bcee026d6c3e46cf5d19da0d2fabd5d523b7bd6",
+    "integrations/dsh/execution-worker.mjs": "7a594cd2b022109248000b920d9ade0158906e8a5d7e598db18e45a85de74dfe",
+    "integrations/dsh/execution-shell.mjs": "c7be8fcbf2f8c0a24aadbbff2ddc5bff52b67a8099e85dc1085c8b3d001630a7",
+    "integrations/dsh/bridge.mjs": "15a5b008d8df9d993d81c75279f7c27e4615707cb6615a005292b5b8042fb4e6",
+    "integrations/dsh/check-artifacts.mjs": "d1bac924af3e4f52e92f36fc593e2c0787dfa206db273392b51041a4d4291307",
+    "integrations/dsh/execution-delivery-contract.mjs": "86aaba72f73a3aacf4f439ca0f82d76036f5cb116663fea2ed65e4b460829ccb",
+    "integrations/dsh/execution-sdk.mjs": "c75c0c970cdb4b8c41b0f22741d22e1929dc60c526ff50fba629398b845e17b3",
+    "integrations/dsh/check.mjs": "3d79696d9049fd3113b86cb1dcae3afc5d50f132c686510fbd8c45492c6aa363",
+    "integrations/dsh/execution-delivery.mjs": "d99d029e3eec3ebf8a9f6edb6b93cd9ff73efa8979ffba71b0026aa942a7a131",
+    "integrations/dsh/execution-observations.mjs": "6ac6af624b7b8f62e6e9ec26a37d29f2a473b7080b1f1c1203e8937f0e4fa233",
+    "integrations/dsh/execution-control.mjs": "b4e030c942aaac052b9e4f7947d3709deda68d56180ee64452ee0c5d5a4a68d1",
+    "integrations/dsh/tests/runtime-smoke.mjs": "4eebf77e9177dc2304a9e1cd35462a320ee39e281f5b2a22a8a2c7c8b0f974cf",
+    "integrations/dsh/tests/bridge.test.mjs": "e32c09a98aff7c4759a9546bfaec4c1ccf9c2532bcc0ef64d9b220cac40038ca",
+    "integrations/dsh/tests/execution-clarifications.test.mjs": "72ba6ce628cc41d0ba8580116db1a2bfd4fe6d2c4795269f22ae5e5b0316a2c7",
+    "integrations/dsh/tests/execution-checkpoints.test.mjs": "b285b35b8f923b0c0ff30e2666c753feb2da67da1cea757e84b3ed74ee0d76d9",
+    "integrations/dsh/tests/execution-delivery.test.mjs": "1e291b22b26f4933756177f3f3bec1f8725f7d60c645a7f768c8ceff0f3c09ac",
+    "integrations/dsh/tests/execution-workspace.test.mjs": "b5746ab0d724078dac5af2bc43ad3ac574ec4a0ee00e1ed7534da8be96449cea",
+    "integrations/dsh/tests/execution-observations.test.mjs": "09117a08190b5eeb4e489427c2e6ac780f0af2e6e1fba1059c735578549668ab",
+    "pyproject.toml": "d348a23e856370742110c64b3cae6794913fc3af7b61b5050a5a51ccd964a388",
+    "README.md": "f96e541fd47252cdfa2b6c80f748610bf0c45e25651084af6b68fbb1643e1722",
+    "THIRD_PARTY_NOTICES.md": "922d9ad0f3794ca1ef2f23c35b3bcde43984a5d8690c719534f657fd6e3cd84f"
+  },
+  "source_mismatches": [],
+  "production_metadata_matches_expected_packager_reduction": true,
+  "locked_production_packages_checked": 544,
+  "package_version_mismatches": [],
+  "platform_inapplicable_optional_packages": [
+    {
+      "path": "node_modules/@deepseek-ai/libreoffice-kit-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@deepseek-ai/libreoffice-kit-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@deepseek-ai/libreoffice-kit-win32-arm64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@deepseek-ai/libreoffice-kit-win32-x64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@deepseek-ai/node-addon-system-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@deepseek-ai/node-addon-system-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@deepseek-ai/node-addon-system-linux-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-freebsd-wasm32",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "cpu": null
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-arm",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-ppc64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "ppc64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-riscv64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "riscv64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-s390x",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "s390x"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linuxmusl-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-arm",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-ppc64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "ppc64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-riscv64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "riscv64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-s390x",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "s390x"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-linuxmusl-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-webcontainers-wasm32",
+      "optional": true,
+      "os": null,
+      "cpu": [
+        "wasm32"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-win32-arm64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-win32-ia32",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/@img/sharp-win32-x64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-freebsd-arm64",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-freebsd-ia32",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-freebsd-x64",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-linux-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-linux-ia32",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-linux-loong64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "loong64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-linux-riscv64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "riscv64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-openbsd-ia32",
+      "optional": true,
+      "os": [
+        "openbsd"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-openbsd-x64",
+      "optional": true,
+      "os": [
+        "openbsd"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-win32-arm64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-win32-ia32",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/@koromix/koffi-win32-x64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-linux-arm",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-linux-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-linux-ia32",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-linux-ppc64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "ppc64"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-linux-riscv64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "riscv64"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-linux-s390x",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "s390x"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-win32-arm64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-win32-ia32",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/@vscode/ripgrep-win32-x64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-linux-arm64-gnu",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-linux-arm64-musl",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-win32-arm64-msvc",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-win32-ia32-msvc",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/node-addon-require-builtin-win32-x64-msvc",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/sherpa-onnx-darwin-arm64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/sherpa-onnx-darwin-x64",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    },
+    {
+      "path": "node_modules/sherpa-onnx-linux-arm64",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ]
+    },
+    {
+      "path": "node_modules/sherpa-onnx-win-ia32",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "ia32"
+      ]
+    },
+    {
+      "path": "node_modules/sherpa-onnx-win-x64",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    }
+  ],
+  "binary_sha256": "433b343850ed9087fdb6548c48e1bb30011a87210cc3609f7b03061a7ac36c4f",
+  "scope": "Version and own-source verification; not a full transitive dependency integrity audit.",
+  "passed": true
+}

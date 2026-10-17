@@ -1,0 +1,547 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "scope": "Same scripted true partial medication report through actual controller and summary; not a natural-model error estimate.",
+  "raw": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。",
+  "actual_controller_summary": {
+    "message": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+    "phase": "summary",
+    "kind": "summary",
+    "question_id": null,
+    "quick_replies": [
+      {
+        "label": "摘要准确",
+        "value": "confirm_summary"
+      },
+      {
+        "label": "我需要更正",
+        "value": "correct_summary"
+      }
+    ],
+    "task": null,
+    "summary": {
+      "content_versions": {
+        "questions": "2026-10-15.v1",
+        "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+        "self_checks": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3"
+      },
+      "known": [
+        {
+          "key": "consult_for",
+          "label": "咨询对象",
+          "evidence": "我自己",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "本人"
+        },
+        {
+          "key": "age_years",
+          "label": "年龄",
+          "evidence": "32岁",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "32 岁"
+        },
+        {
+          "key": "chief_complaint",
+          "label": "主要问题",
+          "evidence": "手臂不舒服",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "手臂不舒服"
+        },
+        {
+          "key": "onset",
+          "label": "开始与起病方式",
+          "evidence": "从昨天开始",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "昨天"
+        },
+        {
+          "key": "trajectory",
+          "label": "变化趋势",
+          "evidence": "变化不大",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "变化不大"
+        },
+        {
+          "key": "severity",
+          "label": "影响程度",
+          "evidence": "影响程度3分",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": 3
+        },
+        {
+          "key": "associated_symptoms",
+          "label": "伴随不适",
+          "evidence": "没有其他不适",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "否认/没有"
+        },
+        {
+          "key": "emergency_screen",
+          "label": "急症筛查",
+          "evidence": "上述危险信号都没有",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "患者否认上述危险信号"
+        },
+        {
+          "key": "medications_taken",
+          "label": "已做处理/用药",
+          "evidence": "昨晚用过药物甲",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "用过药物甲"
+        },
+        {
+          "key": "allergies",
+          "label": "过敏信息",
+          "evidence": "没有过敏",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "否认/没有"
+        },
+        {
+          "key": "relevant_history",
+          "label": "相关病史",
+          "evidence": "没有相关既往病史",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "否认/没有"
+        },
+        {
+          "key": "patient_goal",
+          "label": "期望与担心",
+          "evidence": "想整理就医记录",
+          "source": "patient",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+            "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+          },
+          "value": "整理就医记录"
+        }
+      ],
+      "unknown": [],
+      "unknown_details": [],
+      "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+      "risk_level": "routine",
+      "risk_triggers": [],
+      "return_now_if": [
+        "意识异常或抽搐",
+        "严重呼吸困难或嘴唇发紫",
+        "持续压榨样胸痛",
+        "大量或无法控制的出血"
+      ]
+    },
+    "developer_trace": {
+      "reason": "必要通用字段与适用的定向字段均已处理"
+    },
+    "action_id": "d69e6623-824a-4811-b475-37879fcd627a:2",
+    "input_error": false,
+    "calculation_input": null,
+    "calculation_result": null,
+    "presentation": {
+      "schema_version": "medical-ui/v1",
+      "blocks": [
+        {
+          "id": "message:d69e6623-824a-4811-b475-37879fcd627a:2",
+          "type": "message",
+          "data": {
+            "text": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+            "kind": "summary"
+          }
+        },
+        {
+          "id": "summary:d69e6623-824a-4811-b475-37879fcd627a:2",
+          "type": "summary",
+          "data": {
+            "content_versions": {
+              "questions": "2026-10-15.v1",
+              "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+              "self_checks": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3"
+            },
+            "known": [
+              {
+                "key": "consult_for",
+                "label": "咨询对象",
+                "evidence": "我自己",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "本人"
+              },
+              {
+                "key": "age_years",
+                "label": "年龄",
+                "evidence": "32岁",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "32 岁"
+              },
+              {
+                "key": "chief_complaint",
+                "label": "主要问题",
+                "evidence": "手臂不舒服",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "手臂不舒服"
+              },
+              {
+                "key": "onset",
+                "label": "开始与起病方式",
+                "evidence": "从昨天开始",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "昨天"
+              },
+              {
+                "key": "trajectory",
+                "label": "变化趋势",
+                "evidence": "变化不大",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "变化不大"
+              },
+              {
+                "key": "severity",
+                "label": "影响程度",
+                "evidence": "影响程度3分",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": 3
+              },
+              {
+                "key": "associated_symptoms",
+                "label": "伴随不适",
+                "evidence": "没有其他不适",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "emergency_screen",
+                "label": "急症筛查",
+                "evidence": "上述危险信号都没有",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "患者否认上述危险信号"
+              },
+              {
+                "key": "medications_taken",
+                "label": "已做处理/用药",
+                "evidence": "昨晚用过药物甲",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "用过药物甲"
+              },
+              {
+                "key": "allergies",
+                "label": "过敏信息",
+                "evidence": "没有过敏",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "relevant_history",
+                "label": "相关病史",
+                "evidence": "没有相关既往病史",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "patient_goal",
+                "label": "期望与担心",
+                "evidence": "想整理就医记录",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+                  "text": "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+                },
+                "value": "整理就医记录"
+              }
+            ],
+            "unknown": [],
+            "unknown_details": [],
+            "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+            "risk_level": "routine",
+            "risk_triggers": [],
+            "return_now_if": [
+              "意识异常或抽搐",
+              "严重呼吸困难或嘴唇发紫",
+              "持续压榨样胸痛",
+              "大量或无法控制的出血"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "facts": {
+    "consult_for": {
+      "key": "consult_for",
+      "value": "self",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.633638+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "507af798-cc03-449b-99a1-d0b826c05051",
+      "evidence": "我自己"
+    },
+    "age_years": {
+      "key": "age_years",
+      "value": 32,
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.633725+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "2fe3c8a0-2c46-4c11-ab87-e0f426e639ad",
+      "evidence": "32岁"
+    },
+    "chief_complaint": {
+      "key": "chief_complaint",
+      "value": "手臂不舒服",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.633789+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "cf45710b-a439-4806-b077-35a12f7c6762",
+      "evidence": "手臂不舒服"
+    },
+    "onset": {
+      "key": "onset",
+      "value": "昨天",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.633848+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "f445268c-0dce-498a-9f1d-3cf3d787ed6c",
+      "evidence": "从昨天开始"
+    },
+    "trajectory": {
+      "key": "trajectory",
+      "value": "stable",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.633907+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "e36e045f-0343-4eb1-a5b7-b12eb763c48d",
+      "evidence": "变化不大"
+    },
+    "severity": {
+      "key": "severity",
+      "value": 3,
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.633963+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "7c5ff888-f454-401c-a9d1-aaabfe619789",
+      "evidence": "影响程度3分"
+    },
+    "associated_symptoms": {
+      "key": "associated_symptoms",
+      "value": null,
+      "assertion": "absent",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.634022+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "a1df5c06-dab3-4ad5-a3c5-051708cbc885",
+      "evidence": "没有其他不适"
+    },
+    "emergency_screen": {
+      "key": "emergency_screen",
+      "value": null,
+      "assertion": "absent",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.634077+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "e03efefa-e1d4-443a-a571-662c635f4d10",
+      "evidence": "上述危险信号都没有"
+    },
+    "medications_taken": {
+      "key": "medications_taken",
+      "value": "用过药物甲",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.634135+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "00941ee5-b5b6-4b12-bb77-d57a30553c37",
+      "evidence": "昨晚用过药物甲"
+    },
+    "allergies": {
+      "key": "allergies",
+      "value": null,
+      "assertion": "absent",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.634198+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "a6cd89c5-5ec0-42af-99ba-d78932fed20c",
+      "evidence": "没有过敏"
+    },
+    "relevant_history": {
+      "key": "relevant_history",
+      "value": null,
+      "assertion": "absent",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.634254+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "f77a105d-4d7e-477f-adbe-12779b23b70b",
+      "evidence": "没有相关既往病史"
+    },
+    "patient_goal": {
+      "key": "patient_goal",
+      "value": "整理就医记录",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "efeddd46-091c-49d3-95fe-c2a1ed69be54",
+      "recorded_at": "2026-10-16T19:21:09.634309+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "be2919b2-8df1-49c0-b66c-7c76315ff825",
+      "evidence": "想整理就医记录"
+    }
+  },
+  "dose_uncertainty_visible_in_summary": true,
+  "medication_value_unchanged": true
+}

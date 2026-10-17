@@ -1,0 +1,40 @@
+--- a/src/marshmallow/schema.py
++++ b/src/marshmallow/schema.py
+@@ -671,20 +671,25 @@
+                 )
+             except ValidationError as error:
+                 result = error.data
+-            self._invoke_field_validators(unmarshal, data=result, many=many)
++            # When the input is not a mapping, ``result`` is ``None`` and there is
++            # nothing to validate. Don't run field or schema-level validators in
++            # that case.
++            if result is not None:
++                self._invoke_field_validators(unmarshal, data=result, many=many)
+             errors = unmarshal.errors
+             field_errors = bool(errors)
+-            # Run schema-level migration
+-            try:
+-                self._invoke_validators(unmarshal, pass_many=True, data=result, original_data=data,
+-                                        many=many, field_errors=field_errors)
+-            except ValidationError as err:
+-                errors.update(err.messages)
+-            try:
+-                self._invoke_validators(unmarshal, pass_many=False, data=result, original_data=data,
+-                                        many=many, field_errors=field_errors)
+-            except ValidationError as err:
+-                errors.update(err.messages)
++            if result is not None:
++                # Run schema-level validation
++                try:
++                    self._invoke_validators(unmarshal, pass_many=True, data=result, original_data=data,
++                                            many=many, field_errors=field_errors)
++                except ValidationError as err:
++                    errors.update(err.messages)
++                try:
++                    self._invoke_validators(unmarshal, pass_many=False, data=result, original_data=data,
++                                            many=many, field_errors=field_errors)
++                except ValidationError as err:
++                    errors.update(err.messages)
+         # Run post processors
+         if not errors and postprocess:
+             try:

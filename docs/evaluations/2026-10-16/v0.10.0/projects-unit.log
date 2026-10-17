@@ -1,0 +1,11 @@
+test_failed_persistence_releases_project_without_deleting_user_files (test_execution_projects.ProjectBindingTests) ... ok
+test_project_diff_uses_private_store_not_project_parent (test_execution_projects.ProjectBindingTests) ... ok
+test_project_is_bound_in_place_without_a_model_request_and_cold_opens_offline (test_execution_projects.ProjectBindingTests) ... ok
+test_protected_missing_and_non_directory_paths_are_rejected (test_execution_projects.ProjectBindingTests) ... ok
+test_replaced_and_tampered_projects_do_not_resume_or_create_a_substitute (test_execution_projects.ProjectBindingTests) ... ok
+test_same_inode_cannot_be_owned_through_other_indices_or_aliases (test_execution_projects.ProjectBindingTests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.109s
+
+OK

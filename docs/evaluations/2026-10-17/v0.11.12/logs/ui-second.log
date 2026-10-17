@@ -1,0 +1,14 @@
+
+> medical-agent-dsh-integration@0.11.11 test:ui
+> playwright test tests/ui/location-layout.spec.mjs
+
+
+Running 3 tests using 1 worker
+
+(node:1181357) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on wide (1.6s)
+  ✓  2 tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on mobile (1.5s)
+  ✓  3 tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on short (1.6s)
+
+  3 passed (8.7s)

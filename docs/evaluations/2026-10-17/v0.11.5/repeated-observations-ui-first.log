@@ -1,0 +1,128 @@
+
+> medical-agent-dsh-integration@0.11.4 test:ui
+> playwright test --grep repeated temperatures|observation rendering
+
+
+Running 3 tests using 1 worker
+
+(node:955036) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk (5.9s)
+(node:955258) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen (5.8s)
+(node:955478) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 tests/ui/repeated-observations.spec.mjs:40:1 › observation rendering rejects malformed histories and treats evidence as inert text (5.4s)
+
+
+  1) tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('.summary-card.current-summary').locator('.observation-card').locator('.observation-value')
+    Expected: "38.25 ℃"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" locator('.summary-card.current-summary').locator('.observation-card').locator('.observation-value') with timeout 5000ms
+      - waiting for locator('.summary-card.current-summary').locator('.observation-card').locator('.observation-value')
+
+
+       at ../fixtures/repeated-observations.mjs:109
+
+      107 |   await expect(page.locator("#active-question")).toBeVisible();
+      108 |   await send(details);
+    > 109 |   await expect(series().locator(".observation-value")).toHaveText("38.25 ℃");
+          |                                                        ^
+      110 |   expect(model.requests).toHaveLength(4);
+      111 |   const oldSnapshot = await page.evaluate(
+      112 |     async (sessionId) =>
+        at verifyRepeatedObservations (/home/suyingrui/Desktop/medical-agent/tests/fixtures/repeated-observations.mjs:109:56)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/repeated-observations.spec.mjs:28:7
+
+    Error Context: test-results/ui/repeated-observations-repe-72a9b--attempts-and-reassess-risk/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/repeated-observations-repe-72a9b--attempts-and-reassess-risk/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/repeated-observations-repe-72a9b--attempts-and-reassess-risk/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('.summary-card.current-summary').locator('.observation-card').locator('.observation-value')
+    Expected: "38.25 ℃"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" locator('.summary-card.current-summary').locator('.observation-card').locator('.observation-value') with timeout 5000ms
+      - waiting for locator('.summary-card.current-summary').locator('.observation-card').locator('.observation-value')
+
+
+       at ../fixtures/repeated-observations.mjs:109
+
+      107 |   await expect(page.locator("#active-question")).toBeVisible();
+      108 |   await send(details);
+    > 109 |   await expect(series().locator(".observation-value")).toHaveText("38.25 ℃");
+          |                                                        ^
+      110 |   expect(model.requests).toHaveLength(4);
+      111 |   const oldSnapshot = await page.evaluate(
+      112 |     async (sessionId) =>
+        at verifyRepeatedObservations (/home/suyingrui/Desktop/medical-agent/tests/fixtures/repeated-observations.mjs:109:56)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/repeated-observations.spec.mjs:28:7
+
+    Error Context: test-results/ui/repeated-observations-repe-561cb-ess-risk-on-a-narrow-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/repeated-observations-repe-561cb-ess-risk-on-a-narrow-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/repeated-observations-repe-561cb-ess-risk-on-a-narrow-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/ui/repeated-observations.spec.mjs:40:1 › observation rendering rejects malformed histories and treats evidence as inert text 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('#wrong-type .unsupported-block')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" locator('#wrong-type .unsupported-block') with timeout 5000ms
+      - waiting for locator('#wrong-type .unsupported-block')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      101 |   ).toBeUndefined();
+      102 |   for (const id of ["wrong-type", "duplicate", "bad-status", "no-current"])
+    > 103 |     await expect(page.locator(`#${id} .structured-fallback`)).toHaveCount(1);
+          |                                                             ^
+      104 | });
+      105 |
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/repeated-observations.spec.mjs:103:61
+
+    Error Context: test-results/ui/repeated-observations-obse-083cf-eats-evidence-as-inert-text/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/repeated-observations-obse-083cf-eats-evidence-as-inert-text/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/repeated-observations-obse-083cf-eats-evidence-as-inert-text/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk 
+    tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen 
+    tests/ui/repeated-observations.spec.mjs:40:1 › observation rendering rejects malformed histories and treats evidence as inert text 

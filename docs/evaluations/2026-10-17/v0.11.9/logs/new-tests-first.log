@@ -1,0 +1,17 @@
+test_aliases_refinements_and_age_category_are_separate (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_calculation_failure_source_is_preserved_through_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_child_refinements_do_not_forget_previous_compatible_constraints (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_explicit_and_unambiguous_implicit_changes_keep_original_facts_without_model (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_generic_role_update_does_not_erase_the_specific_reported_label (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_missing_stale_or_reused_resume_action_has_no_state_or_event_mutation (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_model_has_a_subject_change_tool_and_does_not_write_new_person_facts (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_negative_or_hypothetical_switches_are_not_literal_actions (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_observation_failure_and_emergency_priority_survive_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_ordinary_family_history_stays_in_the_fathers_case (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_repeated_model_boundaries_resume_the_original_question (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_same_enum_model_proposal_is_rejected_atomically (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.088s
+
+OK

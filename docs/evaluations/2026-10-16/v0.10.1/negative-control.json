@@ -1,0 +1,11 @@
+{
+  "model_requests": 0,
+  "mutation": "Restore original warning text; preserve candidate tests.",
+  "verification": {
+    "passed": false,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 4, in <module>\nAssertionError\n",
+    "exit_code": 1
+  },
+  "expected_failure_detected": true
+}

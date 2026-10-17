@@ -1,0 +1,140 @@
+
+> medical-agent-dsh-integration@0.11.8 test:dsh
+> node --test integrations/dsh/tests/*.test.mjs
+
+TAP version 13
+# Subtest: bridge launches shipped profile with isolated home and excludes unrelated credentials
+ok 1 - bridge launches shipped profile with isolated home and excludes unrelated credentials
+  ---
+  duration_ms: 1.89075
+  type: 'test'
+  ...
+# Subtest: medical overlay disables shell, subprocesses and log uploading
+ok 2 - medical overlay disables shell, subprocesses and log uploading
+  ---
+  duration_ms: 14.469472
+  type: 'test'
+  ...
+# Subtest: checkpoint scopes keep prior inputs and reject traversal before any scan
+ok 3 - checkpoint scopes keep prior inputs and reject traversal before any scan
+  ---
+  duration_ms: 3.25998
+  type: 'test'
+  ...
+# Subtest: only complete canonical checkpoint metadata carries a proof digest
+ok 4 - only complete canonical checkpoint metadata carries a proof digest
+  ---
+  duration_ms: 0.696149
+  type: 'test'
+  ...
+# Subtest: a parent or root scope cannot erase an explicitly watched cache input
+ok 5 - a parent or root scope cannot erase an explicitly watched cache input
+  ---
+  duration_ms: 1.348833
+  type: 'test'
+  ...
+# Subtest: scope order uses Unicode scalar order consistently with the Python host
+ok 6 - scope order uses Unicode scalar order consistently with the Python host
+  ---
+  duration_ms: 0.317584
+  type: 'test'
+  ...
+# Subtest: pinned SDK compiles a nonparallel question tool
+ok 7 - pinned SDK compiles a nonparallel question tool
+  ---
+  duration_ms: 4.434702
+  type: 'test'
+  ...
+# Subtest: question waits for host input and does not invent a default
+ok 8 - question waits for host input and does not invent a default
+  ---
+  duration_ms: 5.384826
+  type: 'test'
+  ...
+# Subtest: wrong turns, expired questions and cancellation cannot supply an answer
+ok 9 - wrong turns, expired questions and cancellation cannot supply an answer
+  ---
+  duration_ms: 1.377325
+  type: 'test'
+  ...
+# Subtest: invalid or excessive questions fail without waiting
+ok 10 - invalid or excessive questions fail without waiting
+  ---
+  duration_ms: 6.726272
+  type: 'test'
+  ...
+# Subtest: delivery outcomes use the SDK job producer status, never printed claims
+ok 11 - delivery outcomes use the SDK job producer status, never printed claims
+  ---
+  duration_ms: 1.503533
+  type: 'test'
+  ...
+# Subtest: actual tool registration rejects invalid commands before launching any process
+ok 12 - actual tool registration rejects invalid commands before launching any process
+  ---
+  duration_ms: 3.478908
+  type: 'test'
+  ...
+# Subtest: only typed delivery values acquire command identity and process outcomes
+ok 13 - only typed delivery values acquire command identity and process outcomes
+  ---
+  duration_ms: 0.531096
+  type: 'test'
+  ...
+# Subtest: late optional results cannot downgrade a concurrent required declaration
+ok 14 - late optional results cannot downgrade a concurrent required declaration
+  ---
+  duration_ms: 0.1341
+  type: 'test'
+  ...
+# Subtest: accepted check arguments share explicit bounds and explain rejected proposals
+ok 15 - accepted check arguments share explicit bounds and explain rejected proposals
+  ---
+  duration_ms: 0.42188
+  type: 'test'
+  ...
+# Subtest: a long accepted check reads the same running job again after a bounded wait
+ok 16 - a long accepted check reads the same running job again after a bounded wait
+  ---
+  duration_ms: 15.450542
+  type: 'test'
+  ...
+# Subtest: stdout cannot override a canonical process outcome
+ok 17 - stdout cannot override a canonical process outcome
+  ---
+  duration_ms: 0.914727
+  type: 'test'
+  ...
+# Subtest: background process detail is separate from output and producer kinds
+ok 18 - background process detail is separate from output and producer kinds
+  ---
+  duration_ms: 0.341459
+  type: 'test'
+  ...
+# Subtest: nested calls and missing call coordinates do not acquire invented identity
+ok 19 - nested calls and missing call coordinates do not acquire invented identity
+  ---
+  duration_ms: 0.923609
+  type: 'test'
+  ...
+# Subtest: active preparation and stopping work cannot be treated as quiescent
+ok 20 - active preparation and stopping work cannot be treated as quiescent
+  ---
+  duration_ms: 0.134719
+  type: 'test'
+  ...
+# Subtest: the pinned SDK accepts and registers the real workspace tool definition
+ok 21 - the pinned SDK accepts and registers the real workspace tool definition
+  ---
+  duration_ms: 1.832597
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 112.30009

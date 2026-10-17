@@ -1,0 +1,32 @@
+
+> medical-agent-dsh-integration@0.11.4 test:desktop
+> playwright test --config playwright.desktop.config.mjs
+
+
+Running 21 tests using 1 worker
+
+(node:940522) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (700ms)
+  ✓   2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.5s)
+  ✓   3 tests/desktop/artifacts.spec.mjs:13:1 › native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline (10.3s)
+  ✓   4 tests/desktop/assertion-flow.spec.mjs:15:1 › native controller rejects false denials and keeps unknown history through summary corrections (1.1s)
+  ✓   5 tests/desktop/changes.spec.mjs:45:1 › desktop reviews actual file changes and restores ten-minute history offline (4.6s)
+  ✓   6 tests/desktop/check-inputs.spec.mjs:13:1 › native rejected check inputs remain visible while corrected actual checks complete (2.8s)
+  ✓   7 tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history (6.5s)
+  ✓   8 tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history (5.6s)
+  ✓   9 tests/desktop/directory.spec.mjs:12:1 › native directory pages reach deep files, expose incomplete coverage, reject stale pages and ignore old workspace responses (25.5s)
+  ✓  10 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (5.5s)
+  ✓  11 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (18.2s)
+  ✓  12 tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output (5.2s)
+  ✓  13 tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (10.8s)
+  ✓  14 tests/desktop/freshness.spec.mjs:13:1 › native checks mark changed inputs as needing revalidation and accept the actual new check (4.2s)
+  ✓  15 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.5s)
+  ✓  16 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.1s)
+  ✓  17 tests/desktop/present-provenance.spec.mjs:14:1 › native known reports retain scoped sources and replace them after correction (1.6s)
+  ✓  18 tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline (4.0s)
+  ✓  19 tests/desktop/startup-close.spec.mjs:11:1 › closing the startup window stops a delayed sidecar without a blocking error dialog (2.5s)
+  ✓  20 tests/desktop/uncertain-reports.spec.mjs:12:1 › native patient summary preserves unresolved reports and correction history (1.9s)
+  ✓  21 tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting (1.4s)
+
+  21 passed (2.1m)

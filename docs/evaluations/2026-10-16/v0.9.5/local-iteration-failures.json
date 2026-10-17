@@ -1,0 +1,38 @@
+[
+  {
+    "kind": "product",
+    "issue": "Malformed unit array triggered TypeError in the failed-input echo branch.",
+    "fix": "Require a string before unit membership test.",
+    "evidence": "test_patient_calculations: malformed confirmed parameters; original stack was shown in tool output, no original source snapshot was saved."
+  },
+  {
+    "kind": "product",
+    "issue": "Nested label text included select options and did not give the intended exact accessible name.",
+    "fix": "Explicit accessible names for both unit selectors.",
+    "evidence": "Local Playwright trace retained in .runtime/v095-failures/labels."
+  },
+  {
+    "kind": "harness",
+    "issue": "route.fetch bypassed Electron webRequest token injection and correctly received 401.",
+    "fix": "Simulate losing the usable response only after a normal authenticated browser fetch committed; no auth policy weakened.",
+    "evidence": "native-auth.log; trace retained locally."
+  },
+  {
+    "kind": "migration",
+    "issue": "Two old tests expected immediate model-driven computation and omitted the new evidence field.",
+    "fix": "Exercise proposal, explicit confirmation, result and continuation, retaining original fact and emergency assertions.",
+    "evidence": "legacy-integration.log and updated tests."
+  },
+  {
+    "kind": "product",
+    "issue": "Packaged test could select mode before the event listener was ready, then could not open execution navigation.",
+    "fix": "Mode selector disabled in HTML and enabled after event handlers register; delayed module hydration regression added.",
+    "evidence": "pack-startup.log; first trace lacks page snapshots, so exact intermediate DOM state is not available."
+  },
+  {
+    "kind": "real_provider",
+    "issue": "The initial real native run completed edited-input calculation, but missing parameters led to asking the consultation subject instead of a blank form.",
+    "fix": "Separate optional proposal schema from complete execution schema, normalize unknown fields as missing, and add explicit empty-input instructions.",
+    "evidence": "first/report.json and failed screenshot; first driver did not save the failed step model trace. Subsequent driver captures every response."
+  }
+]

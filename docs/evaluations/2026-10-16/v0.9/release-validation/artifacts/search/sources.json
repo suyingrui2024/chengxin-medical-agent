@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "url": "https://docs.python.org/3/library/decimal.html",
+      "title": "decimal — Decimal fixed-point and floating-point arithmetic — Python documentation",
+      "note": "已用 web_fetch 实际打开，HTTP 200；下列解释的主要依据。"
+    },
+    {
+      "url": "https://docs.python.org/zh-cn/3.14/library/decimal.html",
+      "title": "decimal --- 十进制定点和浮点算术（Python 中文文档）",
+      "note": "由 web_search 返回的搜索结果链接，本轮未实际抓取其正文，仅作参考。"
+    }
+  ]
+}

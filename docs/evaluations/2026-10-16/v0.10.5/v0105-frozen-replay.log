@@ -1,0 +1,1 @@
+{"kind": "saved-freshness-decisions/v1", "checked_runtime_files": 125, "external_model_requests": 0, "local_fixture_requests": 8, "checks": {"same_complete_conformance": true, "same_number_of_model_decisions": true, "same_check_exits": true, "same_freshness_states": true, "actual_final_response_fault_boundary": true}, "passed": true}

@@ -1,0 +1,32 @@
+[
+  {
+    "archive": "docs/evaluations/2026-10-16/v0.10.4",
+    "files": 403,
+    "matched": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-16/v0.10.5",
+    "files": 519,
+    "matched": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-16/v0.10.5-transfer",
+    "files": 690,
+    "matched": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-17/v0.10.6",
+    "files": 443,
+    "matched": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-17/v0.11.0",
+    "files": 548,
+    "matched": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-17/v0.11.1",
+    "files": 282,
+    "matched": true
+  }
+]

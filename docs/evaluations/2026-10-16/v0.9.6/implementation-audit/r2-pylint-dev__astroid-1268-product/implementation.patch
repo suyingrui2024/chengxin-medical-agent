@@ -1,0 +1,13 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -643,6 +643,10 @@
+     def visit_evaluatedobject(self, node):
+         return node.original.accept(self)
+ 
++    def visit_unknown(self, node):
++        """Unknown nodes are not representable in Python space."""
++        return ""
++
+ 
+ def _import_string(names):
+     """return a list of (name, asname) formatted as a string"""

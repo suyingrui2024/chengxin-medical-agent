@@ -1,0 +1,31 @@
+test_action_tokens_change_even_when_the_same_question_is_asked_again (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_age_correction_keeps_reading_and_recomputes_existing_risk (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_chief_correction_invalidates_episode_but_keeps_background_and_history (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_chief_correction_keeps_a_high_reading_and_urgent_route (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_concurrent_editors_cannot_both_commit_the_same_fact_version (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_confirmed_subject_requires_a_new_case (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_editing_age_cannot_retract_an_emergency_route (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_malformed_temperature_is_not_recorded_and_the_task_remains (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_model_batch_rejects_subject_switch_before_any_other_write (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_new_evidence_in_chief_correction_batch_survives_invalidation (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_stale_correction_with_emergency_text_still_routes_without_a_model (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_stale_or_invalidated_fact_cannot_be_overwritten (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_ui_correction_revalidates_inflight_task_without_a_model_or_fake_result (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_unknown_screen_never_offers_a_self_check_in_either_mode (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_aliases_refinements_and_age_category_are_separate (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_calculation_failure_source_is_preserved_through_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_child_refinements_do_not_forget_previous_compatible_constraints (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_explicit_and_unambiguous_implicit_changes_keep_original_facts_without_model (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_generic_role_update_does_not_erase_the_specific_reported_label (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_missing_stale_or_reused_resume_action_has_no_state_or_event_mutation (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_model_has_a_subject_change_tool_and_does_not_write_new_person_facts (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_negative_or_hypothetical_switches_are_not_literal_actions (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_observation_failure_and_emergency_priority_survive_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_ordinary_family_history_stays_in_the_fathers_case (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_repeated_model_boundaries_resume_the_original_question (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_same_enum_model_proposal_is_rejected_atomically (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 0.192s
+
+OK

@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.11.5 test:ui
+> playwright test --grep a narrow-screen repeat
+
+
+Running 1 test using 1 worker
+
+(node:978162) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/repeated-observations.spec.mjs:106:1 › a narrow-screen repeat returns to the same question with its measurement visible (1.2s)
+
+  1 passed (4.7s)

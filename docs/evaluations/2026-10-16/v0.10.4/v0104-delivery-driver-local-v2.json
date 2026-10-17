@@ -1,0 +1,1979 @@
+[
+  {
+    "case": "arithmetic-test",
+    "checks": {
+      "task_completed": true,
+      "actual_check_observed": true,
+      "requested_command_used": true,
+      "initial_failure_observed": true,
+      "same_check_retested_successfully": true,
+      "acceptance_checks_remain_required": true,
+      "protected_files_preserved": true,
+      "independent_artifact_contract": true,
+      "offline_check_history_matches": true,
+      "bounded_requests": true,
+      "all_provider_http200": true
+    },
+    "prompt": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整数加法规范为 add(a,b)=a+b；只修正 test_add 的错误预期，保留对 add(2,2) 的 assertEqual 检查。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；calculator.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+    "files": {
+      "calculator.py": "def add(a, b):\n    return a + b\n",
+      "tests/__init__.py": "",
+      "tests/test_new.py": "import unittest\nfrom calculator import add\nclass NewTests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 2), 5)\n"
+    },
+    "snapshot": {
+      "id": "61e30970-b97d-4245-8802-b65301ccfc89",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/v0104-delivery-local-driver-v2/arithmetic-test/workspaces/61e30970-b97d-4245-8802-b65301ccfc89",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "fixture",
+      "status": "completed",
+      "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+      "final_response": "修正并复验完成",
+      "error": null,
+      "sequence": 28,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792153158.792939,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "files": 3,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792153158.7929418,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整数加法规范为 add(a,b)=a+b；只修正 test_add 的错误预期，保留对 add(2,2) 的 assertEqual 检查。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；calculator.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792153159.477009,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "fixture"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792153159.4780877,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792153159.488643,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792153159.4894137,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792153159488,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "jobs.snapshot",
+          "time": 1792153159.5027041,
+          "jobs": []
+        },
+        {
+          "sequence": 8,
+          "type": "model.request",
+          "time": 1792153159.5759904,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792153159.5824676,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792153159581,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792153159.5835934,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792153159583,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "delivery-1",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"新增测试\",\"command\":\"python3 -m unittest tests.test_new -v\",\"required\":true}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "runtime.event",
+          "time": 1792153159.6403656,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792153159639,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-1"
+                    },
+                    "toolCallId": "delivery-1",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"新增测试\",\"check_key\":\"95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f\",\"owner_turn_id\":\"f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f\",\"required\":true,\"state\":\"completed\",\"exit_code\":1,\"job_id\":\"bash-1\",\"output\":\"[stderr]\\ntest_add (tests.test_new.NewTests) ... FAIL\\n\\n======================================================================\\nFAIL: test_add (tests.test_new.NewTests)\\n----------------------------------------------------------------------\\nTraceback (most recent call last):\\n  File \\\"/workspace/tests/test_new.py\\\", line 5, in test_add\\n    self.assertEqual(add(2, 2), 5)\\nAssertionError: 4 != 5\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nFAILED (failures=1)\\n\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "04d66339-6c00-4edf-9bbf-1747d140870f"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "type": "model.request",
+          "time": 1792153159.6658964,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792153159.6738033,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "assistant/message",
+                "seq": 19,
+                "time": 1792153159671,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "runtime.event",
+          "time": 1792153159.6738324,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "tool/call",
+                "seq": 20,
+                "time": 1792153159672,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "callId": "delivery-2",
+                  "name": "bash",
+                  "arguments": "{\"command\":\"python3 - <<'PY'\\nfrom pathlib import Path\\np=Path('tests/test_new.py')\\np.write_text(p.read_text().replace('add(2, 2), 5','add(2, 2), 4'))\\nPY\",\"description\":\"Correct only the invalid expectation or keyword\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "runtime.event",
+          "time": 1792153159.7177,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "tool/result",
+                "seq": 21,
+                "time": 1792153159717,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-2"
+                    },
+                    "toolCallId": "delivery-2",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "(no output)"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "f45df818-637e-4fcd-aeeb-9c23ebe4b9ae"
+                  }
+                },
+                "sourceEventSeqs": [
+                  20
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 16,
+          "type": "model.request",
+          "time": 1792153159.7423456,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "index": 3,
+          "lifetime_calls": 3,
+          "status": 200
+        },
+        {
+          "sequence": 17,
+          "type": "runtime.event",
+          "time": 1792153159.7495854,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "assistant/message",
+                "seq": 25,
+                "time": 1792153159748,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "type": "runtime.event",
+          "time": 1792153159.7503226,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "tool/call",
+                "seq": 26,
+                "time": 1792153159749,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "callId": "delivery-3",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"新增测试\",\"command\":\"python3 -m unittest tests.test_new -v\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "type": "runtime.event",
+          "time": 1792153159.8111906,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "tool/result",
+                "seq": 27,
+                "time": 1792153159810,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-3"
+                    },
+                    "toolCallId": "delivery-3",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"新增测试\",\"check_key\":\"95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f\",\"owner_turn_id\":\"f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f\",\"required\":true,\"state\":\"completed\",\"exit_code\":0,\"job_id\":\"bash-3\",\"output\":\"[stderr]\\ntest_add (tests.test_new.NewTests) ... ok\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nOK\\n\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "931723f6-6274-4573-969b-7ad25189df7b"
+                  }
+                },
+                "sourceEventSeqs": [
+                  26
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 20,
+          "type": "model.request",
+          "time": 1792153159.8395357,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "index": 4,
+          "lifetime_calls": 4,
+          "status": 200
+        },
+        {
+          "sequence": 21,
+          "type": "runtime.event",
+          "time": 1792153159.8460846,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "assistant/message",
+                "seq": 31,
+                "time": 1792153159844,
+                "data": {
+                  "turn": 1,
+                  "step": 4,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "修正并复验完成"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 22,
+          "type": "runtime.event",
+          "time": 1792153159.846748,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "event": {
+                "type": "turn/end",
+                "seq": 33,
+                "time": 1792153159846,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "type": "runtime.event",
+          "time": 1792153159.849021,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "61e30970-b97d-4245-8802-b65301ccfc89",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 24,
+          "type": "tool.observed",
+          "time": 1792153159.8539233,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "d31c817a-603b-4e43-a667-b363a129d4aa",
+            "sequence": 1,
+            "session_id": "61e30970-b97d-4245-8802-b65301ccfc89",
+            "call_id": "delivery-1",
+            "sdk_turn": 1,
+            "sdk_step": 1,
+            "call_sequence": 14,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 1,
+            "signal": null,
+            "job_id": "bash-1",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+            "check_label": "新增测试",
+            "check_turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+            "check_required": true,
+            "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+            "observation_id": "d31c817a-603b-4e43-a667-b363a129d4aa:1"
+          }
+        },
+        {
+          "sequence": 25,
+          "type": "tool.observed",
+          "time": 1792153159.853927,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "d31c817a-603b-4e43-a667-b363a129d4aa",
+            "sequence": 2,
+            "session_id": "61e30970-b97d-4245-8802-b65301ccfc89",
+            "call_id": "delivery-2",
+            "sdk_turn": 1,
+            "sdk_step": 2,
+            "call_sequence": 20,
+            "tool": "bash",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": null,
+            "job_kind": null,
+            "wait_ms": null,
+            "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+            "observation_id": "d31c817a-603b-4e43-a667-b363a129d4aa:2"
+          }
+        },
+        {
+          "sequence": 26,
+          "type": "tool.observed",
+          "time": 1792153159.8539288,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "d31c817a-603b-4e43-a667-b363a129d4aa",
+            "sequence": 3,
+            "session_id": "61e30970-b97d-4245-8802-b65301ccfc89",
+            "call_id": "delivery-3",
+            "sdk_turn": 1,
+            "sdk_step": 3,
+            "call_sequence": 26,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-3",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+            "check_label": "新增测试",
+            "check_turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+            "check_required": true,
+            "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+            "observation_id": "d31c817a-603b-4e43-a667-b363a129d4aa:3"
+          }
+        },
+        {
+          "sequence": 27,
+          "type": "jobs.snapshot",
+          "time": 1792153159.8620338,
+          "jobs": [
+            {
+              "id": "bash-1",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 1"
+            },
+            {
+              "id": "bash-3",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 0"
+            }
+          ]
+        },
+        {
+          "sequence": 28,
+          "type": "turn.completed",
+          "time": 1792153159.8620536,
+          "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "model_calls": 4,
+          "lifetime_calls": 4,
+          "final_response": "修正并复验完成"
+        }
+      ],
+      "turns": [
+        {
+          "id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整数加法规范为 add(a,b)=a+b；只修正 test_add 的错误预期，保留对 add(2,2) 的 assertEqual 检查。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；calculator.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+          "max_calls": 12,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 4,
+          "final_response": "修正并复验完成"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 1"
+        },
+        {
+          "id": "bash-3",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 0"
+        }
+      ],
+      "artifacts": [
+        {
+          "path": "calculator.py",
+          "size": 32
+        },
+        {
+          "path": "tests/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "tests/test_new.py",
+          "size": 141
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "observations": [
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "d31c817a-603b-4e43-a667-b363a129d4aa",
+        "sequence": 1,
+        "session_id": "61e30970-b97d-4245-8802-b65301ccfc89",
+        "call_id": "delivery-1",
+        "sdk_turn": 1,
+        "sdk_step": 1,
+        "call_sequence": 14,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 1,
+        "signal": null,
+        "job_id": "bash-1",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+        "check_label": "新增测试",
+        "check_turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+        "check_required": true,
+        "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+        "observation_id": "d31c817a-603b-4e43-a667-b363a129d4aa:1"
+      },
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "d31c817a-603b-4e43-a667-b363a129d4aa",
+        "sequence": 3,
+        "session_id": "61e30970-b97d-4245-8802-b65301ccfc89",
+        "call_id": "delivery-3",
+        "sdk_turn": 1,
+        "sdk_step": 3,
+        "call_sequence": 26,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 0,
+        "signal": null,
+        "job_id": "bash-3",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+        "check_label": "新增测试",
+        "check_turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+        "check_required": true,
+        "turn_id": "f4d1d1cc-6410-45ec-bb56-fbc4dbfebe9f",
+        "observation_id": "d31c817a-603b-4e43-a667-b363a129d4aa:3"
+      }
+    ],
+    "gateway": {
+      "attempted_calls": 4,
+      "maximum_calls": 12,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 2,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 3,
+          "status": 200,
+          "duration_ms": 2
+        },
+        {
+          "index": 4,
+          "status": 200,
+          "duration_ms": 5
+        }
+      ]
+    },
+    "independent_verification": {
+      "passed": true,
+      "stdout": "independent delivery conformance check completed\n",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "exit_code": 0
+    },
+    "passed": true
+  },
+  {
+    "case": "versioned-api-test",
+    "checks": {
+      "task_completed": true,
+      "actual_check_observed": true,
+      "requested_command_used": true,
+      "initial_failure_observed": true,
+      "same_check_retested_successfully": true,
+      "acceptance_checks_remain_required": true,
+      "protected_files_preserved": true,
+      "independent_artifact_contract": true,
+      "offline_check_history_matches": true,
+      "bounded_requests": true,
+      "all_provider_http200": true
+    },
+    "prompt": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按当前 project_api.py 的真实函数签名，修正新增测试调用的错误参数名；不要修改实现以迁就测试。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；project_api.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+    "files": {
+      "project_api.py": "def signature(value, *, show_annotations=False):\n    return str(value) + (':int' if show_annotations else '')\n",
+      "tests/__init__.py": "",
+      "tests/test_new.py": "import unittest\nfrom project_api import signature\nclass NewTests(unittest.TestCase):\n    def test_signature(self):\n        self.assertEqual(signature(3, typehints=True), '3:int')\n"
+    },
+    "snapshot": {
+      "id": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/v0104-delivery-local-driver-v2/versioned-api-test/workspaces/0b85cb9b-4158-4978-8b23-669b42d0e744",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "fixture",
+      "status": "completed",
+      "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+      "final_response": "修正并复验完成",
+      "error": null,
+      "sequence": 28,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792153160.4430413,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "files": 3,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792153160.443048,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按当前 project_api.py 的真实函数签名，修正新增测试调用的错误参数名；不要修改实现以迁就测试。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；project_api.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792153161.1371336,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "fixture"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792153161.13805,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792153161.1489012,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792153161.1494744,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792153161149,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "jobs.snapshot",
+          "time": 1792153161.159815,
+          "jobs": []
+        },
+        {
+          "sequence": 8,
+          "type": "model.request",
+          "time": 1792153161.2344346,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792153161.245146,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792153161244,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792153161.2463555,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792153161246,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "delivery-5",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"新增测试\",\"command\":\"python3 -m unittest tests.test_new -v\",\"required\":true}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "runtime.event",
+          "time": 1792153161.3001673,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792153161299,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-5"
+                    },
+                    "toolCallId": "delivery-5",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"新增测试\",\"check_key\":\"95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f\",\"owner_turn_id\":\"b5ae7865-9e2f-42e8-847a-94153aee5790\",\"required\":true,\"state\":\"completed\",\"exit_code\":1,\"job_id\":\"bash-1\",\"output\":\"[stderr]\\ntest_signature (tests.test_new.NewTests) ... ERROR\\n\\n======================================================================\\nERROR: test_signature (tests.test_new.NewTests)\\n----------------------------------------------------------------------\\nTraceback (most recent call last):\\n  File \\\"/workspace/tests/test_new.py\\\", line 5, in test_signature\\n    self.assertEqual(signature(3, typehints=True), '3:int')\\nTypeError: signature() got an unexpected keyword argument 'typehints'\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nFAILED (errors=1)\\n\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "4fa3afcb-dc6e-4dc4-bb8c-52c8eea1765b"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "type": "model.request",
+          "time": 1792153161.3249972,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792153161.332054,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "assistant/message",
+                "seq": 19,
+                "time": 1792153161328,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "runtime.event",
+          "time": 1792153161.3320858,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "tool/call",
+                "seq": 20,
+                "time": 1792153161328,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "callId": "delivery-6",
+                  "name": "bash",
+                  "arguments": "{\"command\":\"python3 - <<'PY'\\nfrom pathlib import Path\\np=Path('tests/test_new.py')\\np.write_text(p.read_text().replace('typehints=True','show_annotations=True'))\\nPY\",\"description\":\"Correct only the invalid expectation or keyword\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "runtime.event",
+          "time": 1792153161.3765192,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "tool/result",
+                "seq": 21,
+                "time": 1792153161375,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-6"
+                    },
+                    "toolCallId": "delivery-6",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "(no output)"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "d650e810-528c-41e9-bfac-ae7688089cdc"
+                  }
+                },
+                "sourceEventSeqs": [
+                  20
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 16,
+          "type": "model.request",
+          "time": 1792153161.4016032,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "index": 3,
+          "lifetime_calls": 3,
+          "status": 200
+        },
+        {
+          "sequence": 17,
+          "type": "runtime.event",
+          "time": 1792153161.408032,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "assistant/message",
+                "seq": 25,
+                "time": 1792153161406,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "type": "runtime.event",
+          "time": 1792153161.4080687,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "tool/call",
+                "seq": 26,
+                "time": 1792153161407,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "callId": "delivery-7",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"新增测试\",\"command\":\"python3 -m unittest tests.test_new -v\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "type": "runtime.event",
+          "time": 1792153161.461727,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "tool/result",
+                "seq": 27,
+                "time": 1792153161461,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-7"
+                    },
+                    "toolCallId": "delivery-7",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"新增测试\",\"check_key\":\"95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f\",\"owner_turn_id\":\"b5ae7865-9e2f-42e8-847a-94153aee5790\",\"required\":true,\"state\":\"completed\",\"exit_code\":0,\"job_id\":\"bash-3\",\"output\":\"[stderr]\\ntest_signature (tests.test_new.NewTests) ... ok\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nOK\\n\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "e6bf396d-452e-41bf-8e36-247daf18ce09"
+                  }
+                },
+                "sourceEventSeqs": [
+                  26
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 20,
+          "type": "model.request",
+          "time": 1792153161.4831324,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "index": 4,
+          "lifetime_calls": 4,
+          "status": 200
+        },
+        {
+          "sequence": 21,
+          "type": "runtime.event",
+          "time": 1792153161.4900317,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "assistant/message",
+                "seq": 31,
+                "time": 1792153161485,
+                "data": {
+                  "turn": 1,
+                  "step": 4,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "修正并复验完成"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 22,
+          "type": "runtime.event",
+          "time": 1792153161.490055,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "event": {
+                "type": "turn/end",
+                "seq": 33,
+                "time": 1792153161486,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "type": "runtime.event",
+          "time": 1792153161.490069,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 24,
+          "type": "tool.observed",
+          "time": 1792153161.4902458,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "9f00af0c-4455-455c-b1c8-534c7512a04d",
+            "sequence": 1,
+            "session_id": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+            "call_id": "delivery-5",
+            "sdk_turn": 1,
+            "sdk_step": 1,
+            "call_sequence": 14,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 1,
+            "signal": null,
+            "job_id": "bash-1",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+            "check_label": "新增测试",
+            "check_turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+            "check_required": true,
+            "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+            "observation_id": "9f00af0c-4455-455c-b1c8-534c7512a04d:1"
+          }
+        },
+        {
+          "sequence": 25,
+          "type": "tool.observed",
+          "time": 1792153161.490249,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "9f00af0c-4455-455c-b1c8-534c7512a04d",
+            "sequence": 2,
+            "session_id": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+            "call_id": "delivery-6",
+            "sdk_turn": 1,
+            "sdk_step": 2,
+            "call_sequence": 20,
+            "tool": "bash",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": null,
+            "job_kind": null,
+            "wait_ms": null,
+            "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+            "observation_id": "9f00af0c-4455-455c-b1c8-534c7512a04d:2"
+          }
+        },
+        {
+          "sequence": 26,
+          "type": "tool.observed",
+          "time": 1792153161.4902508,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "9f00af0c-4455-455c-b1c8-534c7512a04d",
+            "sequence": 3,
+            "session_id": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+            "call_id": "delivery-7",
+            "sdk_turn": 1,
+            "sdk_step": 3,
+            "call_sequence": 26,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-3",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+            "check_label": "新增测试",
+            "check_turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+            "check_required": true,
+            "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+            "observation_id": "9f00af0c-4455-455c-b1c8-534c7512a04d:3"
+          }
+        },
+        {
+          "sequence": 27,
+          "type": "jobs.snapshot",
+          "time": 1792153161.4980106,
+          "jobs": [
+            {
+              "id": "bash-1",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 1"
+            },
+            {
+              "id": "bash-3",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 0"
+            }
+          ]
+        },
+        {
+          "sequence": 28,
+          "type": "turn.completed",
+          "time": 1792153161.4980292,
+          "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "model_calls": 4,
+          "lifetime_calls": 4,
+          "final_response": "修正并复验完成"
+        }
+      ],
+      "turns": [
+        {
+          "id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按当前 project_api.py 的真实函数签名，修正新增测试调用的错误参数名；不要修改实现以迁就测试。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；project_api.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+          "max_calls": 12,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 4,
+          "final_response": "修正并复验完成"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 1"
+        },
+        {
+          "id": "bash-3",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 0"
+        }
+      ],
+      "artifacts": [
+        {
+          "path": "project_api.py",
+          "size": 110
+        },
+        {
+          "path": "tests/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "tests/test_new.py",
+          "size": 186
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "observations": [
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "9f00af0c-4455-455c-b1c8-534c7512a04d",
+        "sequence": 1,
+        "session_id": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+        "call_id": "delivery-5",
+        "sdk_turn": 1,
+        "sdk_step": 1,
+        "call_sequence": 14,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 1,
+        "signal": null,
+        "job_id": "bash-1",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+        "check_label": "新增测试",
+        "check_turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+        "check_required": true,
+        "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+        "observation_id": "9f00af0c-4455-455c-b1c8-534c7512a04d:1"
+      },
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "9f00af0c-4455-455c-b1c8-534c7512a04d",
+        "sequence": 3,
+        "session_id": "0b85cb9b-4158-4978-8b23-669b42d0e744",
+        "call_id": "delivery-7",
+        "sdk_turn": 1,
+        "sdk_step": 3,
+        "call_sequence": 26,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 0,
+        "signal": null,
+        "job_id": "bash-3",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+        "check_label": "新增测试",
+        "check_turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+        "check_required": true,
+        "turn_id": "b5ae7865-9e2f-42e8-847a-94153aee5790",
+        "observation_id": "9f00af0c-4455-455c-b1c8-534c7512a04d:3"
+      }
+    ],
+    "gateway": {
+      "attempted_calls": 4,
+      "maximum_calls": 12,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 2,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 3,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 4,
+          "status": 200,
+          "duration_ms": 2
+        }
+      ]
+    },
+    "independent_verification": {
+      "passed": true,
+      "stdout": "independent delivery conformance check completed\n",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "exit_code": 0
+    },
+    "passed": true
+  },
+  {
+    "case": "inspection-only",
+    "checks": {
+      "task_completed": true,
+      "actual_check_observed": true,
+      "requested_command_used": true,
+      "failure_retained": true,
+      "inspection_not_a_required_gate": true,
+      "no_automatic_repair": true,
+      "protected_files_preserved": true,
+      "independent_artifact_contract": true,
+      "offline_check_history_matches": true,
+      "bounded_requests": true,
+      "all_provider_http200": true
+    },
+    "prompt": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不修复测试。不联网、不安装依赖。请调用 delivery_check，command 为 'python3 -m unittest tests.test_new -v'，label 为 仅检查，required=false。按实际退出和输出报告结果；不要把检查失败说成通过。",
+    "files": {
+      "calculator.py": "def add(a, b):\n    return a + b\n",
+      "tests/__init__.py": "",
+      "tests/test_new.py": "import unittest\nfrom calculator import add\nclass NewTests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 2), 5)\n"
+    },
+    "snapshot": {
+      "id": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/v0104-delivery-local-driver-v2/inspection-only/workspaces/7b77eff1-a309-48a3-a503-fbfebc2a382b",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "fixture",
+      "status": "completed",
+      "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+      "final_response": "只报告失败，没有修改文件。",
+      "error": null,
+      "sequence": 18,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792153162.1081836,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "files": 3,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792153162.1081927,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "text": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不修复测试。不联网、不安装依赖。请调用 delivery_check，command 为 'python3 -m unittest tests.test_new -v'，label 为 仅检查，required=false。按实际退出和输出报告结果；不要把检查失败说成通过。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792153162.8128014,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "fixture"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792153162.8133936,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792153162.8229823,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792153162.8234682,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792153162823,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "model.request",
+          "time": 1792153162.9117,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 8,
+          "type": "runtime.event",
+          "time": 1792153162.9187295,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792153162918,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792153162.9198935,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792153162919,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "delivery-9",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"仅检查\",\"command\":\"python3 -m unittest tests.test_new -v\",\"required\":false}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "jobs.snapshot",
+          "time": 1792153162.922387,
+          "jobs": []
+        },
+        {
+          "sequence": 11,
+          "type": "runtime.event",
+          "time": 1792153162.9759212,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792153162975,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-9"
+                    },
+                    "toolCallId": "delivery-9",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"仅检查\",\"check_key\":\"95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f\",\"owner_turn_id\":\"4ba26f0e-6a8e-4d3c-8a59-43c2759cca24\",\"required\":false,\"state\":\"completed\",\"exit_code\":1,\"job_id\":\"bash-1\",\"output\":\"[stderr]\\ntest_add (tests.test_new.NewTests) ... FAIL\\n\\n======================================================================\\nFAIL: test_add (tests.test_new.NewTests)\\n----------------------------------------------------------------------\\nTraceback (most recent call last):\\n  File \\\"/workspace/tests/test_new.py\\\", line 5, in test_add\\n    self.assertEqual(add(2, 2), 5)\\nAssertionError: 4 != 5\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nFAILED (failures=1)\\n\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "d3dafb10-6137-4aa4-8845-9d3971f91587"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "type": "model.request",
+          "time": 1792153162.9971182,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792153163.0019715,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "event": {
+                "type": "assistant/message",
+                "seq": 19,
+                "time": 1792153162999,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "只报告失败，没有修改文件。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "runtime.event",
+          "time": 1792153163.0019822,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "event": {
+                "type": "turn/end",
+                "seq": 21,
+                "time": 1792153163000,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "runtime.event",
+          "time": 1792153163.0019882,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 16,
+          "type": "tool.observed",
+          "time": 1792153163.004294,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "e70a6b40-072b-473d-801d-74e75aabd9b5",
+            "sequence": 1,
+            "session_id": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+            "call_id": "delivery-9",
+            "sdk_turn": 1,
+            "sdk_step": 1,
+            "call_sequence": 14,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 1,
+            "signal": null,
+            "job_id": "bash-1",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+            "check_label": "仅检查",
+            "check_turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+            "check_required": false,
+            "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+            "observation_id": "e70a6b40-072b-473d-801d-74e75aabd9b5:1"
+          }
+        },
+        {
+          "sequence": 17,
+          "type": "jobs.snapshot",
+          "time": 1792153163.013267,
+          "jobs": [
+            {
+              "id": "bash-1",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 1"
+            }
+          ]
+        },
+        {
+          "sequence": 18,
+          "type": "turn.completed",
+          "time": 1792153163.0132878,
+          "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "model_calls": 2,
+          "lifetime_calls": 2,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+          "text": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不修复测试。不联网、不安装依赖。请调用 delivery_check，command 为 'python3 -m unittest tests.test_new -v'，label 为 仅检查，required=false。按实际退出和输出报告结果；不要把检查失败说成通过。",
+          "max_calls": 12,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 2,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 1"
+        }
+      ],
+      "artifacts": [
+        {
+          "path": "calculator.py",
+          "size": 32
+        },
+        {
+          "path": "tests/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "tests/test_new.py",
+          "size": 141
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "observations": [
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "e70a6b40-072b-473d-801d-74e75aabd9b5",
+        "sequence": 1,
+        "session_id": "7b77eff1-a309-48a3-a503-fbfebc2a382b",
+        "call_id": "delivery-9",
+        "sdk_turn": 1,
+        "sdk_step": 1,
+        "call_sequence": 14,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 1,
+        "signal": null,
+        "job_id": "bash-1",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+        "check_label": "仅检查",
+        "check_turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+        "check_required": false,
+        "turn_id": "4ba26f0e-6a8e-4d3c-8a59-43c2759cca24",
+        "observation_id": "e70a6b40-072b-473d-801d-74e75aabd9b5:1"
+      }
+    ],
+    "gateway": {
+      "attempted_calls": 2,
+      "maximum_calls": 12,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 2
+        },
+        {
+          "index": 2,
+          "status": 200,
+          "duration_ms": 2
+        }
+      ]
+    },
+    "independent_verification": {
+      "passed": true,
+      "stdout": "independent delivery conformance check completed\n",
+      "stderr": "F\n======================================================================\nFAIL: test_add (tests.test_new.NewTests)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/workspace/tests/test_new.py\", line 5, in test_add\n    self.assertEqual(add(2, 2), 5)\nAssertionError: 4 != 5\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (failures=1)\n",
+      "exit_code": 0
+    },
+    "passed": true
+  }
+]

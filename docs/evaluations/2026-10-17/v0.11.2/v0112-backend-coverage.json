@@ -1,0 +1,13 @@
+{
+  "default_discovered": 253,
+  "default_passed": 200,
+  "default_skipped": 53,
+  "skipped_checks_executed_separately": 50,
+  "unique_passed": 250,
+  "remaining_skipped": [
+    "test_execution_long_budget.LongBudgetTests.test_ten_minute_budget_survives_old_rpc_deadline_and_collects_same_job",
+    "test_execution_long_delivery.LongDeliveryTests.test_check_continues_same_job_across_the_600_second_wait_boundary",
+    "test_execution_long_delivery.LongDeliveryTests.test_check_runs_beyond_the_old_tool_cap_and_collects_the_same_job"
+  ],
+  "scope": "Union by actual unittest identity, not the sum of runs. Four final targeted tests are repeats and add no new unique checks."
+}

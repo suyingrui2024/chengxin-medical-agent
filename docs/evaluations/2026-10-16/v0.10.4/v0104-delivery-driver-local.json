@@ -1,0 +1,995 @@
+[
+  {
+    "case": "arithmetic-test",
+    "checks": {
+      "task_completed": true,
+      "actual_check_observed": true,
+      "requested_command_used": true,
+      "initial_failure_observed": true,
+      "same_check_retested_successfully": false,
+      "acceptance_checks_remain_required": false,
+      "protected_files_preserved": true,
+      "independent_artifact_contract": false,
+      "offline_check_history_matches": true,
+      "bounded_requests": true,
+      "all_provider_http200": true
+    },
+    "prompt": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整数加法规范为 add(a,b)=a+b；只修正 test_add 的错误预期，保留对 add(2,2) 的 assertEqual 检查。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；calculator.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+    "files": {
+      "calculator.py": "def add(a, b):\n    return a + b\n",
+      "tests/__init__.py": "",
+      "tests/test_new.py": "import unittest\nfrom calculator import add\nclass NewTests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 2), 5)\n"
+    },
+    "snapshot": {
+      "id": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/v0104-delivery-local-driver/arithmetic-test/workspaces/d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "fixture",
+      "status": "completed",
+      "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+      "final_response": "只报告失败，没有修改文件。",
+      "error": null,
+      "sequence": 18,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792153033.041162,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "files": 3,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792153033.0411723,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整数加法规范为 add(a,b)=a+b；只修正 test_add 的错误预期，保留对 add(2,2) 的 assertEqual 检查。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；calculator.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792153033.736837,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "fixture"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792153033.737473,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792153033.7461863,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792153033.7468698,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792153033746,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "jobs.snapshot",
+          "time": 1792153033.7561457,
+          "jobs": []
+        },
+        {
+          "sequence": 8,
+          "type": "model.request",
+          "time": 1792153033.8284397,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792153033.8353236,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792153033834,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792153033.8365645,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792153033836,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "delivery-1",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"仅检查\",\"command\":\"python3 -m unittest tests.test_new -v\",\"required\":false}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "runtime.event",
+          "time": 1792153033.8942919,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792153033893,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-1"
+                    },
+                    "toolCallId": "delivery-1",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"仅检查\",\"check_key\":\"95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f\",\"owner_turn_id\":\"89b30e8d-eaee-40b9-8a77-ddefbf088692\",\"required\":false,\"state\":\"completed\",\"exit_code\":1,\"job_id\":\"bash-1\",\"output\":\"[stderr]\\ntest_add (tests.test_new.NewTests) ... FAIL\\n\\n======================================================================\\nFAIL: test_add (tests.test_new.NewTests)\\n----------------------------------------------------------------------\\nTraceback (most recent call last):\\n  File \\\"/workspace/tests/test_new.py\\\", line 5, in test_add\\n    self.assertEqual(add(2, 2), 5)\\nAssertionError: 4 != 5\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nFAILED (failures=1)\\n\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "e68150d5-8d40-4e0f-973d-9bb964288dbd"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "type": "model.request",
+          "time": 1792153033.9574344,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792153033.9722474,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "event": {
+                "type": "assistant/message",
+                "seq": 19,
+                "time": 1792153033962,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "只报告失败，没有修改文件。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "runtime.event",
+          "time": 1792153033.9722664,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "event": {
+                "type": "turn/end",
+                "seq": 21,
+                "time": 1792153033964,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "runtime.event",
+          "time": 1792153033.972276,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 16,
+          "type": "tool.observed",
+          "time": 1792153033.972367,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "53d90ddc-b8f6-4930-91b3-23e9327a9eb5",
+            "sequence": 1,
+            "session_id": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+            "call_id": "delivery-1",
+            "sdk_turn": 1,
+            "sdk_step": 1,
+            "call_sequence": 14,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 1,
+            "signal": null,
+            "job_id": "bash-1",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+            "check_label": "仅检查",
+            "check_turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+            "check_required": false,
+            "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+            "observation_id": "53d90ddc-b8f6-4930-91b3-23e9327a9eb5:1"
+          }
+        },
+        {
+          "sequence": 17,
+          "type": "jobs.snapshot",
+          "time": 1792153033.9840336,
+          "jobs": [
+            {
+              "id": "bash-1",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 1"
+            }
+          ]
+        },
+        {
+          "sequence": 18,
+          "type": "turn.completed",
+          "time": 1792153033.9840674,
+          "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "model_calls": 2,
+          "lifetime_calls": 2,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整数加法规范为 add(a,b)=a+b；只修正 test_add 的错误预期，保留对 add(2,2) 的 assertEqual 检查。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；calculator.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+          "max_calls": 12,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 2,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 1"
+        }
+      ],
+      "artifacts": [
+        {
+          "path": "calculator.py",
+          "size": 32
+        },
+        {
+          "path": "tests/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "tests/test_new.py",
+          "size": 141
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。整",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "observations": [
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "53d90ddc-b8f6-4930-91b3-23e9327a9eb5",
+        "sequence": 1,
+        "session_id": "d09f3bd0-5e4a-48a6-a882-fc12c9260aae",
+        "call_id": "delivery-1",
+        "sdk_turn": 1,
+        "sdk_step": 1,
+        "call_sequence": 14,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 1,
+        "signal": null,
+        "job_id": "bash-1",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "95c42adb6fb415159c62fb1520c83f10aeace30c637ecf850744412cbe4d752f",
+        "check_label": "仅检查",
+        "check_turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+        "check_required": false,
+        "turn_id": "89b30e8d-eaee-40b9-8a77-ddefbf088692",
+        "observation_id": "53d90ddc-b8f6-4930-91b3-23e9327a9eb5:1"
+      }
+    ],
+    "gateway": {
+      "attempted_calls": 2,
+      "maximum_calls": 12,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 2,
+          "status": 200,
+          "duration_ms": 5
+        }
+      ]
+    },
+    "independent_verification": {
+      "passed": false,
+      "exit_code": 1,
+      "error": "Verifier did not return JSON",
+      "stderr": "file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/isolated-entry.mjs:21\n      throw new Error(\"Invalid runtime mount\");\n            ^\n\nError: Invalid runtime mount\n    at isolatedLaunch (file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/isolated-entry.mjs:21:13)\n    at file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/check-artifacts.mjs:14:16\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n\nNode.js v22.23.3\n"
+    },
+    "passed": false
+  },
+  {
+    "case": "versioned-api-test",
+    "checks": {
+      "task_completed": true,
+      "actual_check_observed": false,
+      "requested_command_used": false,
+      "initial_failure_observed": false,
+      "same_check_retested_successfully": false,
+      "acceptance_checks_remain_required": false,
+      "protected_files_preserved": true,
+      "independent_artifact_contract": false,
+      "offline_check_history_matches": true,
+      "bounded_requests": true,
+      "all_provider_http200": true
+    },
+    "prompt": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按当前 project_api.py 的真实函数签名，修正新增测试调用的错误参数名；不要修改实现以迁就测试。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；project_api.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+    "files": {
+      "project_api.py": "def signature(value, *, show_annotations=False):\n    return str(value) + (':int' if show_annotations else '')\n",
+      "tests/__init__.py": "",
+      "tests/test_new.py": "import unittest\nfrom project_api import signature\nclass NewTests(unittest.TestCase):\n    def test_signature(self):\n        self.assertEqual(signature(3, typehints=True), '3:int')\n"
+    },
+    "snapshot": {
+      "id": "afc112a6-22d1-46af-b0ec-38828d5cf5ac",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/v0104-delivery-local-driver/versioned-api-test/workspaces/afc112a6-22d1-46af-b0ec-38828d5cf5ac",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "fixture",
+      "status": "completed",
+      "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+      "final_response": "只报告失败，没有修改文件。",
+      "error": null,
+      "sequence": 12,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792153034.5249605,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "files": 3,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792153034.5249665,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按当前 project_api.py 的真实函数签名，修正新增测试调用的错误参数名；不要修改实现以迁就测试。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；project_api.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792153035.2398984,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "fixture"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792153035.2403512,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792153035.2492027,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "afc112a6-22d1-46af-b0ec-38828d5cf5ac",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792153035.2498071,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "afc112a6-22d1-46af-b0ec-38828d5cf5ac",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792153035249,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "jobs.snapshot",
+          "time": 1792153035.3314388,
+          "jobs": []
+        },
+        {
+          "sequence": 8,
+          "type": "model.request",
+          "time": 1792153035.3345654,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792153035.3412967,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "afc112a6-22d1-46af-b0ec-38828d5cf5ac",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792153035340,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "只报告失败，没有修改文件。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792153035.3419185,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "afc112a6-22d1-46af-b0ec-38828d5cf5ac",
+              "event": {
+                "type": "turn/end",
+                "seq": 15,
+                "time": 1792153035341,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "runtime.event",
+          "time": 1792153035.342661,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "afc112a6-22d1-46af-b0ec-38828d5cf5ac",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "type": "turn.completed",
+          "time": 1792153035.3446493,
+          "turn_id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "model_calls": 1,
+          "lifetime_calls": 1,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "589fecb6-8db4-4a21-90d3-e4e70b18d8c4",
+          "text": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按当前 project_api.py 的真实函数签名，修正新增测试调用的错误参数名；不要修改实现以迁就测试。\n必须先用 delivery_check 原样运行 'python3 -m unittest tests.test_new -v'，label 为 新增测试，required=true，取得实际失败后再修正；然后用完全相同的 delivery_check 命令复验。只允许改 tests/test_new.py 中的错误预期或参数名，不增删类、方法、导入、断言，不新增文件；project_api.py 和 tests/__init__.py 必须逐字保留。最终简短报告真实结果；无法完成就明确说明。",
+          "max_calls": 12,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 1,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "jobs": [],
+      "artifacts": [
+        {
+          "path": "project_api.py",
+          "size": 110
+        },
+        {
+          "path": "tests/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "tests/test_new.py",
+          "size": 179
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成工程验收，只操作当前工作区，不联网、不安装依赖。按",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "observations": [],
+    "gateway": {
+      "attempted_calls": 1,
+      "maximum_calls": 12,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 3
+        }
+      ]
+    },
+    "independent_verification": {
+      "passed": false,
+      "exit_code": 1,
+      "error": "Verifier did not return JSON",
+      "stderr": "file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/isolated-entry.mjs:21\n      throw new Error(\"Invalid runtime mount\");\n            ^\n\nError: Invalid runtime mount\n    at isolatedLaunch (file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/isolated-entry.mjs:21:13)\n    at file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/check-artifacts.mjs:14:16\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n\nNode.js v22.23.3\n"
+    },
+    "passed": false
+  },
+  {
+    "case": "inspection-only",
+    "checks": {
+      "task_completed": true,
+      "actual_check_observed": false,
+      "requested_command_used": false,
+      "failure_retained": false,
+      "inspection_not_a_required_gate": false,
+      "no_automatic_repair": true,
+      "protected_files_preserved": true,
+      "independent_artifact_contract": false,
+      "offline_check_history_matches": true,
+      "bounded_requests": true,
+      "all_provider_http200": true
+    },
+    "prompt": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不修复测试。不联网、不安装依赖。请调用 delivery_check，command 为 'python3 -m unittest tests.test_new -v'，label 为 仅检查，required=false。按实际退出和输出报告结果；不要把检查失败说成通过。",
+    "files": {
+      "calculator.py": "def add(a, b):\n    return a + b\n",
+      "tests/__init__.py": "",
+      "tests/test_new.py": "import unittest\nfrom calculator import add\nclass NewTests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 2), 5)\n"
+    },
+    "snapshot": {
+      "id": "d3f8d8c7-eb7c-4f0b-a5bb-296c4fcb2055",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/v0104-delivery-local-driver/inspection-only/workspaces/d3f8d8c7-eb7c-4f0b-a5bb-296c4fcb2055",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "fixture",
+      "status": "completed",
+      "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+      "final_response": "只报告失败，没有修改文件。",
+      "error": null,
+      "sequence": 12,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792153035.8909166,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "files": 3,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792153035.8909192,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "text": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不修复测试。不联网、不安装依赖。请调用 delivery_check，command 为 'python3 -m unittest tests.test_new -v'，label 为 仅检查，required=false。按实际退出和输出报告结果；不要把检查失败说成通过。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792153036.5854425,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "fixture"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792153036.5861838,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792153036.5954847,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "d3f8d8c7-eb7c-4f0b-a5bb-296c4fcb2055",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792153036.5962827,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d3f8d8c7-eb7c-4f0b-a5bb-296c4fcb2055",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792153036595,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "jobs.snapshot",
+          "time": 1792153036.6050339,
+          "jobs": []
+        },
+        {
+          "sequence": 8,
+          "type": "model.request",
+          "time": 1792153036.6748667,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792153036.682886,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d3f8d8c7-eb7c-4f0b-a5bb-296c4fcb2055",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792153036682,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "只报告失败，没有修改文件。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792153036.6834042,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "d3f8d8c7-eb7c-4f0b-a5bb-296c4fcb2055",
+              "event": {
+                "type": "turn/end",
+                "seq": 15,
+                "time": 1792153036683,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "runtime.event",
+          "time": 1792153036.684557,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "d3f8d8c7-eb7c-4f0b-a5bb-296c4fcb2055",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "type": "turn.completed",
+          "time": 1792153036.6869938,
+          "turn_id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "model_calls": 1,
+          "lifetime_calls": 1,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "ffde0c81-c04f-447c-a285-b580022b116f",
+          "text": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不修复测试。不联网、不安装依赖。请调用 delivery_check，command 为 'python3 -m unittest tests.test_new -v'，label 为 仅检查，required=false。按实际退出和输出报告结果；不要把检查失败说成通过。",
+          "max_calls": 12,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 1,
+          "final_response": "只报告失败，没有修改文件。"
+        }
+      ],
+      "jobs": [],
+      "artifacts": [
+        {
+          "path": "calculator.py",
+          "size": 32
+        },
+        {
+          "path": "tests/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "tests/test_new.py",
+          "size": 141
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成工程验收，只检查并报告，不修改或新增任何文件，也不",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "observations": [],
+    "gateway": {
+      "attempted_calls": 1,
+      "maximum_calls": 12,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 2
+        }
+      ]
+    },
+    "independent_verification": {
+      "passed": false,
+      "exit_code": 1,
+      "error": "Verifier did not return JSON",
+      "stderr": "file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/isolated-entry.mjs:21\n      throw new Error(\"Invalid runtime mount\");\n            ^\n\nError: Invalid runtime mount\n    at isolatedLaunch (file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/isolated-entry.mjs:21:13)\n    at file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/check-artifacts.mjs:14:16\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n\nNode.js v22.23.3\n"
+    },
+    "passed": false
+  }
+]

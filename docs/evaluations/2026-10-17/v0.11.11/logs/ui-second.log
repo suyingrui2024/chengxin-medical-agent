@@ -1,0 +1,98 @@
+
+> medical-agent-dsh-integration@0.11.10 test:ui
+> playwright test tests/ui/self-check-drafts.spec.mjs tests/ui/visual-answer-drafts.spec.mjs tests/ui/visual-consultation.spec.mjs
+
+
+Running 14 tests using 1 worker
+
+(node:1150024) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/ui/self-check-drafts.spec.mjs:10:3 › unconfirmed location and steps survive switching sessions (1.7s)
+  ✘   2 tests/ui/self-check-drafts.spec.mjs:10:3 › unconfirmed location and steps survive switching sessions on mobile (30.2s)
+(node:1150963) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 tests/ui/self-check-drafts.spec.mjs:22:1 › invalid temperature feedback keeps the same task progress without recording a reading (6.1s)
+(node:1151207) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 tests/ui/self-check-drafts.spec.mjs:31:1 › new task occurrences reset steps while same occurrences and previews stay separate (1.2s)
+  ✓   5 tests/ui/visual-answer-drafts.spec.mjs:9:3 › visual degree confirms one answer and preserves independent text (1.3s)
+  ✓   6 tests/ui/visual-answer-drafts.spec.mjs:9:3 › visual degree confirms one answer and preserves independent text on a narrow screen (1.2s)
+  ✓   7 tests/ui/visual-answer-drafts.spec.mjs:21:1 › pending visual choices stay with their session and never submit on return (1.0s)
+  ✓   8 tests/ui/visual-answer-drafts.spec.mjs:50:1 › read-only and busy degree cards reject forced programmatic actions (203ms)
+  ✓   9 tests/ui/visual-consultation.spec.mjs:25:1 › visual choices show actual questions, keep history available and send one explicit answer (993ms)
+  ✓  10 tests/ui/visual-consultation.spec.mjs:67:1 › degree scale confirms one selected answer independently of the text draft (1.2s)
+  ✓  11 tests/ui/visual-consultation.spec.mjs:106:1 › body location uses a deliberate selection and confirmation, preserving self-report quality (1.2s)
+  ✓  12 tests/ui/visual-consultation.spec.mjs:135:1 › mobile visual screen and degree scale stay readable without overlapping targets (949ms)
+  ✓  13 tests/ui/visual-consultation.spec.mjs:178:1 › custom and malformed visual components preserve question meaning and isolate unsafe data (263ms)
+  ✓  14 tests/ui/visual-consultation.spec.mjs:225:1 › the smallest desktop window keeps the actual response controls inside the viewport (711ms)
+
+
+  1) tests/ui/self-check-drafts.spec.mjs:10:3 › unconfirmed location and steps survive switching sessions on mobile 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForResponse: Test timeout of 30000ms exceeded.
+
+       at ../fixtures/self-check-drafts.mjs:32
+
+      30 |   const before = await degreeSnapshot(page, id);
+      31 |   expect(before.state.facts.symptom_location).toBeUndefined();
+    > 32 |   const created = page.waitForResponse(
+         |                        ^
+      33 |     (r) => r.request().method() === "POST" && r.url().endsWith("/api/sessions"),
+      34 |   );
+      35 |   await page.locator("#new-session").click();
+        at verifyLocationDraft (/home/suyingrui/Desktop/medical-agent/tests/fixtures/self-check-drafts.mjs:32:24)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/self-check-drafts.spec.mjs:17:5
+
+    Error Context: test-results/ui/self-check-drafts-unconfir-4248e-witching-sessions-on-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/self-check-drafts-unconfir-4248e-witching-sessions-on-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/self-check-drafts-unconfir-4248e-witching-sessions-on-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/self-check-drafts.spec.mjs:22:1 › invalid temperature feedback keeps the same task progress without recording a reading 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#active-task .task-card')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('#active-task .task-card') with timeout 5000ms
+      - waiting for locator('#active-task .task-card')
+
+
+       at ../fixtures/self-check-drafts.mjs:10
+
+       8 |   await page.getByRole("textbox", { name: "输入你的描述" }).fill("没有");
+       9 |   await page.getByRole("button", { name: "发送回答" }).click();
+    > 10 |   await expect(page.locator("#active-task .task-card")).toBeVisible();
+         |                                                         ^
+      11 |   return id;
+      12 | }
+      13 |
+        at reachSelfCheck (/home/suyingrui/Desktop/medical-agent/tests/fixtures/self-check-drafts.mjs:10:57)
+        at verifyTemperatureProgress (/home/suyingrui/Desktop/medical-agent/tests/fixtures/self-check-drafts.mjs:77:14)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/self-check-drafts.spec.mjs:28:3
+
+    Error Context: test-results/ui/self-check-drafts-invalid--674d2-without-recording-a-reading/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/self-check-drafts-invalid--674d2-without-recording-a-reading/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/self-check-drafts-invalid--674d2-without-recording-a-reading/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    tests/ui/self-check-drafts.spec.mjs:10:3 › unconfirmed location and steps survive switching sessions on mobile 
+    tests/ui/self-check-drafts.spec.mjs:22:1 › invalid temperature feedback keeps the same task progress without recording a reading 
+  12 passed (53.3s)

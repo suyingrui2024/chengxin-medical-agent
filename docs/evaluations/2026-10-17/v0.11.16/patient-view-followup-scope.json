@@ -1,0 +1,11 @@
+{
+  "reason": "Completed head case inherited developer view from earlier export workflow; explicitly verify default patient mode on same product sources.",
+  "prior_full_flow_calls": 78,
+  "previous_cumulative_limit": 80,
+  "new_cumulative_limit": 100,
+  "new_run_limit": 20,
+  "selected_cases": [
+    "native_full_location_interview"
+  ],
+  "product_changes": false
+}

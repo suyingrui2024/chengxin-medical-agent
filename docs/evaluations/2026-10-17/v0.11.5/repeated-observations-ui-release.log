@@ -1,0 +1,97 @@
+
+> medical-agent-dsh-integration@0.11.5 test:ui
+> playwright test
+
+
+Running 35 tests using 1 worker
+
+(node:974799) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/ui/assertion-flow.spec.mjs:7:1 › uncertain denials are rejected atomically, repaired and preserved through patient correction (1.0s)
+  ✓   2 tests/ui/capabilities.spec.mjs:9:1 › patient view removes developer navigation while keeping the same conversation (537ms)
+  ✓   3 tests/ui/capabilities.spec.mjs:35:1 › capability workspace calculates without writing cases and pins old session versions (904ms)
+  ✓   4 tests/ui/patient-calculation.spec.mjs:7:1 › patient calculation confirms editable inputs, recovers a lost response and stays readable on mobile (1.6s)
+  ✓   5 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts (1.6s)
+  ✓   6 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts on a narrow screen (1.5s)
+  ✓   7 tests/ui/present-provenance.spec.mjs:40:1 › recorded evidence is inert, malformed sources fall back and old summaries remain readable (411ms)
+  ✓   8 tests/ui/readiness.spec.mjs:3:1 › workspace mode cannot lose an interaction before module hydration (315ms)
+  ✓   9 tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk (2.0s)
+  ✓  10 tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen (1.8s)
+  ✓  11 tests/ui/repeated-observations.spec.mjs:40:1 › observation rendering rejects malformed histories and treats evidence as inert text (266ms)
+  ✘  12 tests/ui/repeated-observations.spec.mjs:106:1 › a narrow-screen repeat returns to the same question with its measurement visible (5.8s)
+(node:976011) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 tests/ui/uncertain-reports.spec.mjs:4:1 › unresolved narratives remain visible and editable through a complete consultation (2.5s)
+  ✓  14 tests/ui/uncertain-reports.spec.mjs:14:1 › a narrow patient window preserves reports and usable correction controls (2.4s)
+  ✓  15 tests/ui/uncertain-reports.spec.mjs:25:1 › unresolved reports render inertly, validate their contract and preserve older summaries (388ms)
+  ✓  16 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late response (967ms)
+  ✓  17 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late error (953ms)
+  ✓  18 tests/ui/urgent-interrupt.spec.mjs:87:1 › priority help preserves a failed request draft and works at a narrow viewport (556ms)
+  ✓  19 tests/ui/visual-consultation.spec.mjs:25:1 › visual choices show actual questions, keep history available and send one explicit answer (1.0s)
+  ✓  20 tests/ui/visual-consultation.spec.mjs:67:1 › degree scale never submits on selection and reflects edits to the actual draft (1.1s)
+  ✓  21 tests/ui/visual-consultation.spec.mjs:105:1 › body location uses a deliberate selection and confirmation, preserving self-report quality (1.2s)
+  ✓  22 tests/ui/visual-consultation.spec.mjs:134:1 › mobile visual screen and degree scale stay readable without overlapping targets (943ms)
+  ✓  23 tests/ui/visual-consultation.spec.mjs:174:1 › custom and malformed visual components preserve question meaning and isolate unsafe data (280ms)
+  ✓  24 tests/ui/visual-consultation.spec.mjs:221:1 › the smallest desktop window keeps the actual response controls inside the viewport (746ms)
+  ✓  25 tests/ui/workspace.spec.mjs:9:1 › patient conversation, self-check, history, evidence and export use actual server state (3.2s)
+  ✓  26 tests/ui/workspace.spec.mjs:125:1 › structured components isolate errors and keep patient text inert (285ms)
+  ✓  27 tests/ui/workspace.spec.mjs:179:1 › unknown result components produce a visible fallback instead of disappearing (360ms)
+  ✓  28 tests/ui/workspace.spec.mjs:197:1 › an emergency notice remains visible through the structured renderer (413ms)
+  ✓  29 tests/ui/workspace.spec.mjs:219:1 › settings are real, keep old sessions, and never return credentials (1.2s)
+  ✓  30 tests/ui/workspace.spec.mjs:249:1 › task library preview cannot write observations and has step navigation (561ms)
+  ✓  31 tests/ui/workspace.spec.mjs:275:1 › mobile layout has no horizontal overflow and exposes records and navigation (886ms)
+  ✓  32 tests/ui/workspace.spec.mjs:324:1 › editing a fact updates the actual case and retains the previous value (639ms)
+  ✓  33 tests/ui/workspace.spec.mjs:352:1 › a stale fact editor preserves the draft and refreshes the current record (946ms)
+  ✓  34 tests/ui/workspace.spec.mjs:399:1 › changing the consultation subject opens a separate case and retains the original (509ms)
+  ✓  35 tests/ui/workspace.spec.mjs:431:1 › a lost response recovers persisted progress and patient markup stays plain text (528ms)
+
+
+  1) tests/ui/repeated-observations.spec.mjs:106:1 › a narrow-screen repeat returns to the same question with its measurement visible 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('#active-question')
+    Timeout: 5000ms
+    - Expected  - 9
+    + Received  + 1
+
+    - 和刚开始比，怎么样了？
+    -
+    - 选择最接近当前情况的一项。
+    -
+    - 在加重
+    - 在减轻
+    - 变化不大
+    - 说不清
+    - 查看完整问题
+    + 和刚开始比，怎么样了？选择最接近当前情况的一项。在加重↗在减轻↗变化不大↗说不清↗查看完整问题从开始到现在，总体是在加重、减轻，还是变化不大？
+
+    Call log:
+      - Expect "toHaveText" locator('#active-question') with timeout 5000ms
+      - waiting for locator('#active-question')
+        14 × locator resolved to <div aria-label="当前问题" aria-busy="false" id="active-question" class="active-question" data-identity="4f4582f9-153f-47bf-9760-9506a3f6d689:question:4f4582f9-153f-47bf-9760-9506a3f6d689:5">…</div>
+           - unexpected value "和刚开始比，怎么样了？选择最接近当前情况的一项。在加重↗在减轻↗变化不大↗说不清↗查看完整问题从开始到现在，总体是在加重、减轻，还是变化不大？"
+
+
+      138 |     ).toContainText("38.25 ℃");
+      139 |     await send("腋温37.6℃");
+    > 140 |     await expect(page.locator("#active-question")).toHaveText(question);
+          |                                                    ^
+      141 |     await expect(
+      142 |       page.locator("#active-observation .observation-value"),
+      143 |     ).toHaveText("37.6 ℃");
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/repeated-observations.spec.mjs:140:52
+
+    Error Context: test-results/ui/repeated-observations-a-na-509b8-ith-its-measurement-visible/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/repeated-observations-a-na-509b8-ith-its-measurement-visible/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/repeated-observations-a-na-509b8-ith-its-measurement-visible/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/repeated-observations.spec.mjs:106:1 › a narrow-screen repeat returns to the same question with its measurement visible 
+  34 passed (44.9s)

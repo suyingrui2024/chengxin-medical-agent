@@ -1,0 +1,10 @@
+{
+  "removed_regenerable_temporary_copies": [
+    ".runtime/v0102-offline-restore",
+    ".runtime/v0102-restore-checkpoint"
+  ],
+  "recovered_bytes": 1176670208,
+  "proof": "docs/evaluations/2026-10-16/v0.10.2/offline-reconstruction.json",
+  "reconstruction_inputs_preserved": "docs/evaluations/2026-10-16/v0.10.2/inputs",
+  "active_cwd_count": 0
+}

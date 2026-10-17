@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "checks": {
+    "evidence_verifier": {
+      "passed": true,
+      "source_stage_counts": {
+        "final": 312,
+        "directed": 117,
+        "before_handoff_documentation": 312,
+        "before_full_driver": 310,
+        "before_selection": 311,
+        "before_patient_mode": 311,
+        "first_full": 311,
+        "selected_full": 311,
+        "patient_full": 311
+      },
+      "real_v01116_attempts": 76,
+      "full_flow_attempts": 72,
+      "full_flow_pass_evidence_cases": 4,
+      "single_clean_four_case_invocation": false,
+      "patient_view_head_retries": 0,
+      "old_archives_unchanged": {
+        "v0.11.15": 430,
+        "v0.11.15-full-flow": 11
+      },
+      "external_model_calls_for_this_verification": 0,
+      "scope": "Evidence hashes and internal consistency; no new model, UI or clinical evaluation."
+    },
+    "current_frozen_source_matches": 312,
+    "reviewed_document_local_link_targets": 114,
+    "binary_present_and_executable": true,
+    "source_stage_count": 9,
+    "source_symlinks": [],
+    "backend_log_counts_confirmed": true,
+    "ui_and_native_log_counts_confirmed": true
+  },
+  "scope": "Recorded evidence, current source bytes, selected document targets and binary presence; no clinical claim or new model calls. Credential scan and archive sealing run separately after this validation."
+}

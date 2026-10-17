@@ -1,0 +1,37 @@
+[
+  {
+    "archive": "docs/evaluations/2026-10-16/v0.10.4",
+    "matched_files": 403,
+    "passed": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-16/v0.10.5",
+    "matched_files": 519,
+    "passed": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-16/v0.10.5-transfer",
+    "matched_files": 690,
+    "passed": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-17/v0.10.6",
+    "matched_files": 443,
+    "passed": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-17/v0.11.0",
+    "matched_files": 548,
+    "passed": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-17/v0.11.1",
+    "matched_files": 282,
+    "passed": true
+  },
+  {
+    "archive": "docs/evaluations/2026-10-17/v0.11.2",
+    "matched_files": 345,
+    "passed": true
+  }
+]

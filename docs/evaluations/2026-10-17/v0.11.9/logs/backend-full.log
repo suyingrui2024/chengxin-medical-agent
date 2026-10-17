@@ -1,0 +1,28 @@
+s..........................................................................................s.....................sss..............ss.ss.s...........s...........ssssssssssssssssssssssss..........sss.sss.............ssssssss...........ss..................................s...s.s.............................F.....................
+======================================================================
+FAIL: test_model_batch_rejects_subject_switch_before_any_other_write (test_state_consistency.StateConsistencyTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_state_consistency.py", line 335, in test_model_batch_rejects_subject_switch_before_any_other_write
+    self.assertEqual(len(backend.calls), 1)
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 327 tests in 6.704s
+
+FAILED (failures=1, skipped=54)
+[17/Oct/2026 06:02:29] "GET /api/sessions/86e62e58-edab-461b-b65b-c4985dd25954/snapshot HTTP/1.1" 200 -
+[17/Oct/2026 06:02:29] "POST /api/sessions/86e62e58-edab-461b-b65b-c4985dd25954/messages HTTP/1.1" 409 -
+[17/Oct/2026 06:02:29] "POST /api/sessions/86e62e58-edab-461b-b65b-c4985dd25954/messages HTTP/1.1" 200 -
+[17/Oct/2026 06:02:29] "POST /api/sessions/86e62e58-edab-461b-b65b-c4985dd25954/messages HTTP/1.1" 200 -
+[17/Oct/2026 06:02:30] "GET /api/execution/6480b128-6a2f-4303-b62b-43c8e58a4461/preview?path=plot.png HTTP/1.1" 200 -
+[17/Oct/2026 06:02:30] "GET /api/execution/6480b128-6a2f-4303-b62b-43c8e58a4461/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 200 -
+[17/Oct/2026 06:02:30] "GET /api/execution/6480b128-6a2f-4303-b62b-43c8e58a4461/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 401 -
+[17/Oct/2026 06:02:30] "GET /api/execution/6480b128-6a2f-4303-b62b-43c8e58a4461/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 403 -
+[17/Oct/2026 06:02:30] "GET /api/execution/6480b128-6a2f-4303-b62b-43c8e58a4461/image?path=plot.png&sha256=0000000000000000000000000000000000000000000000000000000000000000 HTTP/1.1" 400 -
+[17/Oct/2026 06:02:32] "GET /api/execution/c9b37d62-434c-4561-bc33-504f0b09c31c/directory?limit=1 HTTP/1.1" 200 -
+[17/Oct/2026 06:02:32] "GET /api/execution/c9b37d62-434c-4561-bc33-504f0b09c31c/directory HTTP/1.1" 401 -
+[17/Oct/2026 06:02:32] "GET /api/execution/c9b37d62-434c-4561-bc33-504f0b09c31c/directory HTTP/1.1" 403 -
+[17/Oct/2026 06:02:32] "GET /api/execution/c9b37d62-434c-4561-bc33-504f0b09c31c/directory?limit=0 HTTP/1.1" 400 -
+[17/Oct/2026 06:02:32] "GET /api/execution/c9b37d62-434c-4561-bc33-504f0b09c31c/directory?cursor=eyJyZXZpc2lvbiI6ImYzYjI5MzA2ZDQ0ZjA1OTZhOGQ3ZDQzNzc2ZTVhYTJjMDIwYTY2NTk0NGJlMTEwYjdkNzk3NGQ1Yzc3NThlNjkiLCJhZnRlciI6WzEsImEudHh0Il19 HTTP/1.1" 409 -
+[17/Oct/2026 06:02:32] "GET /api/execution/c9b37d62-434c-4561-bc33-504f0b09c31c?include_artifacts=0 HTTP/1.1" 200 -

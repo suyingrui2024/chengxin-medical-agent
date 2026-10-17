@@ -1,0 +1,7 @@
+reformatted src/medagent/execution.py
+reformatted src/medagent/execution_artifacts.py
+reformatted src/medagent/server.py
+reformatted tests/test_execution_artifacts.py
+
+All done! ✨ 🍰 ✨
+4 files reformatted.

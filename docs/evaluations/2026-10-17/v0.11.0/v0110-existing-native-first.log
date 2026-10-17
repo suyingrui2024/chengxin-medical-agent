@@ -1,0 +1,15 @@
+
+> medical-agent-dsh-integration@0.10.6 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/execution.spec.mjs
+
+
+Running 4 tests using 1 worker
+
+(node:817462) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (3.7s)
+  ✓  2 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (10.8s)
+  ✓  3 tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output (5.2s)
+  ✓  4 tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (8.6s)
+
+  4 passed (28.8s)

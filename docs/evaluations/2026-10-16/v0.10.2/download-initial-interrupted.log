@@ -1,0 +1,22 @@
+{"source": "sphinx-doc__sphinx-8627", "bytes": 5995216}
+{"source": "sphinx-doc__sphinx-7975", "bytes": 5958119}
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/scripts/prepare_public_test_sample.py", line 101, in <module>
+    if __name__=='__main__':main()
+  File "/home/suyingrui/Desktop/medical-agent/scripts/prepare_public_test_sample.py", line 85, in main
+    data=fetch(url,target,80000000,plan['cases'].get(identity,{}).get('sha256'))
+  File "/home/suyingrui/Desktop/medical-agent/scripts/prepare_public_test_sample.py", line 42, in fetch
+    data = response.read(maximum+1)
+  File "/home/suyingrui/anaconda3/lib/python3.10/http/client.py", line 459, in read
+    return self._read_chunked(amt)
+  File "/home/suyingrui/anaconda3/lib/python3.10/http/client.py", line 591, in _read_chunked
+    value.append(self._safe_read(chunk_left))
+  File "/home/suyingrui/anaconda3/lib/python3.10/http/client.py", line 630, in _safe_read
+    data = self.fp.read(amt)
+  File "/home/suyingrui/anaconda3/lib/python3.10/socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+  File "/home/suyingrui/anaconda3/lib/python3.10/ssl.py", line 1274, in recv_into
+    return self.read(nbytes, buffer)
+  File "/home/suyingrui/anaconda3/lib/python3.10/ssl.py", line 1130, in read
+    return self._sslobj.read(len, buffer)
+KeyboardInterrupt

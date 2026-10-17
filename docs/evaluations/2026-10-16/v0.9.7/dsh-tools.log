@@ -1,0 +1,50 @@
+
+> medical-agent-dsh-integration@0.9.7 test:dsh
+> node --test integrations/dsh/tests/*.test.mjs
+
+TAP version 13
+# Subtest: bridge launches shipped profile with isolated home and excludes unrelated credentials
+ok 1 - bridge launches shipped profile with isolated home and excludes unrelated credentials
+  ---
+  duration_ms: 0.91757
+  type: 'test'
+  ...
+# Subtest: medical overlay disables shell, subprocesses and log uploading
+ok 2 - medical overlay disables shell, subprocesses and log uploading
+  ---
+  duration_ms: 8.071632
+  type: 'test'
+  ...
+# Subtest: stdout cannot override a canonical process outcome
+ok 3 - stdout cannot override a canonical process outcome
+  ---
+  duration_ms: 0.806487
+  type: 'test'
+  ...
+# Subtest: background process detail is separate from output and producer kinds
+ok 4 - background process detail is separate from output and producer kinds
+  ---
+  duration_ms: 0.231623
+  type: 'test'
+  ...
+# Subtest: nested calls and missing call coordinates do not acquire invented identity
+ok 5 - nested calls and missing call coordinates do not acquire invented identity
+  ---
+  duration_ms: 0.233186
+  type: 'test'
+  ...
+# Subtest: active preparation and stopping work cannot be treated as quiescent
+ok 6 - active preparation and stopping work cannot be treated as quiescent
+  ---
+  duration_ms: 0.701884
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 60.030583

@@ -1,0 +1,32 @@
+test_budget_failures_are_not_reported_as_success_and_auxiliary_search_shares_budget (tests.test_execution.FullDshExecutionTests) ... ok
+test_real_shell_repairs_code_executes_it_delegates_and_keeps_session (tests.test_execution.FullDshExecutionTests) ... ok
+test_unauthed_development_server_cannot_expose_execution (tests.test_execution.FullDshExecutionTests) ... ok
+test_artifact_listing_never_follows_directory_or_file_links (tests.test_execution.WorkspaceFileTests) ... ok
+test_creating_workspace_requires_model_config_but_does_not_call_model (tests.test_execution.WorkspaceFileTests) ... ok
+test_invalid_preview_roots_raise_controlled_errors_and_close_releases_inode (tests.test_execution.WorkspaceFileTests) ... ok
+test_missing_linked_or_replaced_workspace_roots_remain_controllable (tests.test_execution.WorkspaceFileTests) ... ok
+test_text_files_cannot_escape_through_paths_symlinks_or_special_files (tests.test_execution.WorkspaceFileTests) ... ok
+test_deadline_cancels_process_then_long_budget_continues_same_session (tests.test_execution_budget.BudgetRuntimeTests) ... FAIL
+test_deadline_stops_background_after_main_reply_and_persists_cancelled_state (tests.test_execution_budget.BudgetRuntimeTests) ... ok
+test_invalid_budgets_do_not_submit_or_launch_a_model (tests.test_execution_budget.BudgetValidationTests) ... ok
+test_pipeline_failure_is_preserved_and_oversized_wait_hands_off_same_job (tests.test_execution_shell.ExecutionShellTests) ... ok
+
+======================================================================
+FAIL: test_deadline_cancels_process_then_long_budget_continues_same_session (tests.test_execution_budget.BudgetRuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/.runtime/v0103-wait-experiment/tests/test_execution_budget.py", line 45, in test_deadline_cancels_process_then_long_budget_continues_same_session
+    self.exercise(False)
+  File "/home/suyingrui/Desktop/medical-agent/.runtime/v0103-wait-experiment/tests/test_execution_budget.py", line 141, in exercise
+    self.assertEqual(first["status"], "cancelled", first.get("error"))
+AssertionError: 'failed' != 'cancelled'
+- failed
++ cancelled
+ : time_budget_exhausted
+
+----------------------------------------------------------------------
+Ran 12 tests in 47.139s
+
+FAILED (failures=1)
+[16/Oct/2026 17:51:02] "GET /api/execution HTTP/1.1" 403 -
+[16/Oct/2026 17:51:02] "POST /api/execution HTTP/1.1" 403 -

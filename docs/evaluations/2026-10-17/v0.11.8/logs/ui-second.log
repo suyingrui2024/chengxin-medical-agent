@@ -1,0 +1,13 @@
+
+> medical-agent-dsh-integration@0.11.7 test:ui
+> playwright test tests/ui/calculation-supplements.spec.mjs
+
+
+Running 2 tests using 1 worker
+
+(node:1062397) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections (1.7s)
+  ✓  2 tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections on a narrow screen (1.6s)
+
+  2 passed (6.2s)

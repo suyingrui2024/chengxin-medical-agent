@@ -1,0 +1,7 @@
+{
+  "calculator.py": "ba1a531f581d2e6094e978ed6f7aca7a8d92eeb62c6e7ad73ee692f7f18bc772",
+  "tests/test_existing.py": "70f4e59e64f03eeb620b1e8d83e18e155833b522dd29cb7111e7fb5ad45e8b24",
+  "run_checks.py": "f581677b59278e19505a2760a0b15b3933ced1884d4bc405d8a3553a807a9cbb",
+  "review.txt": "87f5bb6f321532e8b460f39c598642bf017c307402283f1a57971acd480622ce",
+  "regressions/test_add_regression.py": "65ecaa2c132e07a9a2b46b525ed3fb3476b537709de6343561e1e411f3764c4d"
+}

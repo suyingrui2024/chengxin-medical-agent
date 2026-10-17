@@ -1,0 +1,93 @@
+
+Running 3 tests using 1 worker
+
+(node:1215886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on wide (1.3s)
+(node:1216087) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on mobile (1.2s)
+(node:1216288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on short (1.2s)
+
+
+  1) tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on wide 
+
+    Error: page.evaluate: TypeError: Cannot read properties of null (reading 'getBoundingClientRect')
+        at eval (eval at evaluate (:370:30), <anonymous>:5:28)
+        at Array.map (<anonymous>)
+        at eval (eval at evaluate (:370:30), <anonymous>:3:117)
+        at UtilityScript.evaluate (<anonymous>:372:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at eval (eval at evaluate (:370:30), <anonymous>:5:28)
+        at eval (eval at evaluate (:370:30), <anonymous>:3:117)
+        at UtilityScript.evaluate (<anonymous>:372:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at verifySelfCheckConversation (/home/suyingrui/Desktop/medical-agent/tests/fixtures/self-check-conversation.mjs:141:33)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/self-check-conversation.spec.mjs:32:7
+
+    Error Context: .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-48b3f-nd-confirms-sources-on-wide/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-48b3f-nd-confirms-sources-on-wide/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-48b3f-nd-confirms-sources-on-wide/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on mobile 
+
+    Error: page.evaluate: TypeError: Cannot read properties of null (reading 'getBoundingClientRect')
+        at eval (eval at evaluate (:370:30), <anonymous>:5:28)
+        at Array.map (<anonymous>)
+        at eval (eval at evaluate (:370:30), <anonymous>:3:117)
+        at UtilityScript.evaluate (<anonymous>:372:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at eval (eval at evaluate (:370:30), <anonymous>:5:28)
+        at eval (eval at evaluate (:370:30), <anonymous>:3:117)
+        at UtilityScript.evaluate (<anonymous>:372:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at verifySelfCheckConversation (/home/suyingrui/Desktop/medical-agent/tests/fixtures/self-check-conversation.mjs:141:33)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/self-check-conversation.spec.mjs:32:7
+
+    Error Context: .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-8cc04--confirms-sources-on-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-8cc04--confirms-sources-on-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-8cc04--confirms-sources-on-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on short 
+
+    Error: page.evaluate: TypeError: Cannot read properties of null (reading 'getBoundingClientRect')
+        at eval (eval at evaluate (:370:30), <anonymous>:5:28)
+        at Array.map (<anonymous>)
+        at eval (eval at evaluate (:370:30), <anonymous>:3:117)
+        at UtilityScript.evaluate (<anonymous>:372:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at eval (eval at evaluate (:370:30), <anonymous>:5:28)
+        at eval (eval at evaluate (:370:30), <anonymous>:3:117)
+        at UtilityScript.evaluate (<anonymous>:372:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at verifySelfCheckConversation (/home/suyingrui/Desktop/medical-agent/tests/fixtures/self-check-conversation.mjs:141:33)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/self-check-conversation.spec.mjs:32:7
+
+    Error Context: .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-cfc3b-d-confirms-sources-on-short/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-cfc3b-d-confirms-sources-on-short/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/self-check-routing-20261017/ui-second-results/self-check-conversation-se-cfc3b-d-confirms-sources-on-short/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on wide 
+    tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on mobile 
+    tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on short 

@@ -1,0 +1,40 @@
+test_age_report_during_temperature_task_updates_age_not_temperature (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_correction_and_emergency_invalidate_suspended_task (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_free_text_location_parser_no_longer_accepts_unclassified_words (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_invalid_quote_or_option_cannot_create_a_candidate_or_fact (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_manual_choice_replaces_suggestion_without_reusing_its_quote (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_medication_supplement_is_not_a_location_and_original_task_can_resume (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_model_location_proposal_requires_confirmation_and_keeps_original_source (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_temperature_history_supplement_routes_to_model_but_invalid_reading_stays_local (tests.test_self_check_conversation.SelfCheckConversationTests) ... ok
+test_completed_calculation_survives_observation_without_duplicate_execution (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_demo_engine_uses_the_same_repeat_controller (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_field_correction_cancels_repeat_and_cannot_restore_an_old_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_history_coverage_keeps_retained_value_visible_after_many_skips (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_hypothetical_input_during_active_repeat_is_not_recorded (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_invalid_retry_and_skip_preserve_old_fact_and_discard_previous_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_literal_repeat_does_not_execute_negated_hypothetical_or_unrelated_requests (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_model_tool_is_registered_but_requires_actual_request_and_task_eligibility (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_new_reading_supersedes_and_restores_the_unanswered_question_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_actions_require_current_version_before_any_mutation_and_do_not_reopen_closed_cases (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_interrupts_and_restores_calculation_then_summary_rebuilds_current_measurement (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_reported_high_candidate_requires_confirmation_then_existing_triage_runs_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_uncertain_number_does_not_become_a_measurement_or_erase_previous_value (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_action_tokens_change_even_when_the_same_question_is_asked_again (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_age_correction_keeps_reading_and_recomputes_existing_risk (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_chief_correction_invalidates_episode_but_keeps_background_and_history (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_chief_correction_keeps_a_high_reading_and_urgent_route (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_concurrent_editors_cannot_both_commit_the_same_fact_version (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_confirmed_subject_requires_a_new_case (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_editing_age_cannot_retract_an_emergency_route (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_malformed_temperature_is_not_recorded_and_the_task_remains (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_model_batch_rejects_subject_switch_before_any_other_write (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_new_evidence_in_chief_correction_batch_survives_invalidation (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_stale_correction_with_emergency_text_still_routes_without_a_model (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_stale_or_invalidated_fact_cannot_be_overwritten (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_ui_correction_revalidates_inflight_task_without_a_model_or_fake_result (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_unknown_screen_never_offers_a_self_check_in_either_mode (tests.test_state_consistency.StateConsistencyTests) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 0.365s
+
+OK

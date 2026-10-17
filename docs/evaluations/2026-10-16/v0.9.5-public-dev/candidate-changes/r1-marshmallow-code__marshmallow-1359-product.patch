@@ -1,0 +1,109 @@
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -1112,11 +1112,15 @@
+ 
+     def _bind_to_schema(self, field_name, schema):
+         super()._bind_to_schema(field_name, schema)
+-        self.format = (
+-            self.format
+-            or getattr(schema.opts, self.SCHEMA_OPTS_VAR_NAME)
+-            or self.DEFAULT_FORMAT
++        # The field may be bound to a container field (e.g. ``List``) rather
++        # than to a ``Schema``. Use the root schema, if any, to look up the
++        # format option.
++        schema_format = (
++            getattr(self.root.opts, self.SCHEMA_OPTS_VAR_NAME, None)
++            if self.root is not None
++            else None
+         )
++        self.format = self.format or schema_format or self.DEFAULT_FORMAT
+ 
+     def _serialize(self, value, attr, obj, **kwargs):
+         if value is None:
+--- a/tests/test_datetime_container_regression.py
++++ b/tests/test_datetime_container_regression.py
+@@ -0,0 +1,84 @@
++"""Regression tests: DateTime/Date fields as inner fields of container fields.
++
++See issue: DateTime fields cannot be used as inner field for List or Tuple
++fields (broken between 3.0.0rc8 and 3.0.0rc9).
++"""
++import datetime as dt
++
++import pytest
++
++from marshmallow import Schema, fields
++
++
++class ListDateTimeSchema(Schema):
++    times = fields.List(fields.DateTime())
++
++
++class TupleDateTimeSchema(Schema):
++    times = fields.Tuple((fields.DateTime(), fields.DateTime()))
++
++
++class MappingDateTimeSchema(Schema):
++    times = fields.Mapping(keys=fields.Str(), values=fields.DateTime())
++
++
++class ListDateSchema(Schema):
++    dates = fields.List(fields.Date())
++
++
++class ListNestedDateTimeSchema(Schema):
++    times = fields.List(fields.List(fields.DateTime()))
++
++
++def test_list_of_datetime_can_be_instantiated():
++    schema = ListDateTimeSchema()
++    assert schema.fields["times"].inner.format == "iso"
++
++
++def test_tuple_of_datetime_can_be_instantiated():
++    schema = TupleDateTimeSchema()
++    assert all(field.format == "iso" for field in schema.fields["times"].tuple_fields)
++
++
++def test_mapping_of_datetime_can_be_instantiated():
++    schema = MappingDateTimeSchema()
++    assert schema.fields["times"].value_field.format == "iso"
++
++
++def test_list_of_date_can_be_instantiated():
++    schema = ListDateSchema()
++    assert schema.fields["dates"].inner.format == "iso"
++
++
++def test_nested_container_of_datetime_can_be_instantiated():
++    schema = ListNestedDateTimeSchema()
++    assert schema.fields["times"].inner.inner.format == "iso"
++
++
++@pytest.mark.parametrize("fmt", ["timestamp", "%Y-%m-%dT%H:%M:%S"])
++def test_container_inner_datetime_picks_up_schema_meta_option(fmt):
++    class SchemaWithMeta(Schema):
++        times = fields.List(fields.DateTime())
++
++        class Meta:
++            datetimeformat = fmt
++
++    schema = SchemaWithMeta()
++    assert schema.fields["times"].inner.format == fmt
++
++
++def test_container_inner_date_picks_up_schema_meta_option():
++    class SchemaWithMeta(Schema):
++        dates = fields.List(fields.Date())
++
++        class Meta:
++            dateformat = "%d/%m/%Y"
++
++    schema = SchemaWithMeta()
++    assert schema.fields["dates"].inner.format == "%d/%m/%Y"
++
++
++def test_list_of_datetime_serialization():
++    schema = ListDateTimeSchema()
++    value = dt.datetime(2018, 1, 2, 3, 4, 5)
++    assert schema.dump({"times": [value]}) == {"times": ["2018-01-02T03:04:05"]}

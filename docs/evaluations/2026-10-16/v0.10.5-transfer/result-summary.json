@@ -1,0 +1,327 @@
+{
+  "kind": "public-transfer-result-summary/v1",
+  "scope": "New to this project's recorded fixtures, public historical data with possible model contamination; stratified subset of supported repositories, not full-population random sampling, official score or proof of general parity.",
+  "actual_requests": 313,
+  "maximum_requests": 320,
+  "all_frozen_source_checks_passed": true,
+  "totals": {
+    "product": {
+      "runs": 8,
+      "implementation_passed": 3,
+      "implementation_unverified": 0,
+      "file_contract_passed": 7,
+      "normal_root_completion": 3,
+      "source_and_contract_passed": 2,
+      "end_to_end_completed": 1,
+      "runs_with_collected_generated_tests": 6,
+      "runs_with_generated_tests_all_passed": 5,
+      "actual_upstream_requests": 153,
+      "execution_duration_ms_sum": 1422766
+    },
+    "official-sdk": {
+      "runs": 8,
+      "implementation_passed": 0,
+      "implementation_unverified": 0,
+      "file_contract_passed": 4,
+      "normal_root_completion": 0,
+      "source_and_contract_passed": 0,
+      "end_to_end_completed": 0,
+      "runs_with_collected_generated_tests": 3,
+      "runs_with_generated_tests_all_passed": 2,
+      "actual_upstream_requests": 160,
+      "execution_duration_ms_sum": 733497
+    }
+  },
+  "by_case": {
+    "matplotlib__matplotlib-25498": {
+      "product": [
+        {
+          "repetition": 1,
+          "implementation_passed": true,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": true,
+          "new_regression_count": 5,
+          "new_regressions_passed": false,
+          "root_error": "model_call_budget_exhausted"
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": true,
+          "runtime_completed": false,
+          "source_and_contract_passed": true,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": true,
+          "new_regression_count": 3,
+          "new_regressions_passed": true,
+          "root_error": "delivery_checks_failed"
+        }
+      ],
+      "official-sdk": [
+        {
+          "repetition": 1,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": false,
+          "new_regression_count": 0,
+          "new_regressions_passed": true,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": true,
+          "new_regression_count": 1,
+          "new_regressions_passed": false,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        }
+      ]
+    },
+    "pallets__flask-4045": {
+      "product": [
+        {
+          "repetition": 1,
+          "implementation_passed": false,
+          "runtime_completed": true,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 19,
+          "file_contract_passed": true,
+          "new_regression_count": 5,
+          "new_regressions_passed": true,
+          "root_error": null
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 17,
+          "file_contract_passed": true,
+          "new_regression_count": 4,
+          "new_regressions_passed": true,
+          "root_error": "delivery_checks_failed"
+        }
+      ],
+      "official-sdk": [
+        {
+          "repetition": 1,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": true,
+          "new_regression_count": 5,
+          "new_regressions_passed": true,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": true,
+          "new_regression_count": 3,
+          "new_regressions_passed": true,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        }
+      ]
+    },
+    "sphinx-doc__sphinx-8474": {
+      "product": [
+        {
+          "repetition": 1,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 19,
+          "file_contract_passed": true,
+          "new_regression_count": 0,
+          "new_regressions_passed": true,
+          "root_error": "max-tokens"
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": false,
+          "new_regression_count": 0,
+          "new_regressions_passed": true,
+          "root_error": "model_call_budget_exhausted"
+        }
+      ],
+      "official-sdk": [
+        {
+          "repetition": 1,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": false,
+          "new_regression_count": 0,
+          "new_regressions_passed": true,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": true,
+          "new_regression_count": 0,
+          "new_regressions_passed": true,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        }
+      ]
+    },
+    "sympy__sympy-20049": {
+      "product": [
+        {
+          "repetition": 1,
+          "implementation_passed": true,
+          "runtime_completed": true,
+          "source_and_contract_passed": true,
+          "end_to_end_completed": true,
+          "calls": 20,
+          "file_contract_passed": true,
+          "new_regression_count": 6,
+          "new_regressions_passed": true,
+          "root_error": null
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": false,
+          "runtime_completed": true,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 18,
+          "file_contract_passed": true,
+          "new_regression_count": 7,
+          "new_regressions_passed": true,
+          "root_error": null
+        }
+      ],
+      "official-sdk": [
+        {
+          "repetition": 1,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": false,
+          "new_regression_count": 0,
+          "new_regressions_passed": true,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        },
+        {
+          "repetition": 2,
+          "implementation_passed": false,
+          "runtime_completed": false,
+          "source_and_contract_passed": false,
+          "end_to_end_completed": false,
+          "calls": 20,
+          "file_contract_passed": false,
+          "new_regression_count": 0,
+          "new_regressions_passed": true,
+          "root_error": {
+            "kind": "error",
+            "error": {
+              "message": "Evaluation gateway unavailable",
+              "code": "RATE_LIMIT",
+              "status": 429
+            }
+          }
+        }
+      ]
+    }
+  },
+  "paired": {
+    "implementation_passed": {
+      "product_only": 3,
+      "sdk_only": 0,
+      "both": 0,
+      "neither": 5,
+      "unassessed": 0
+    },
+    "end_to_end_completed": {
+      "product_only": 1,
+      "sdk_only": 0,
+      "both": 0,
+      "neither": 7,
+      "unassessed": 0
+    }
+  },
+  "statistical_scope": "Four task clusters, two repeats each; repeats are not assumed independent. No general parity, clinical, monetary cost or full-population claim.",
+  "primary_scores_modified": false
+}

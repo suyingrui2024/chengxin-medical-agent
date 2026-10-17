@@ -1,0 +1,98 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "scope": "Same ten pre-change validator inputs replayed after correction; not a clinical language accuracy estimate.",
+  "cases": [
+    {
+      "input": "过敏不知道",
+      "evidence": "过敏不知道",
+      "key": "allergies",
+      "absent_accepted": false,
+      "expected_accepted": false,
+      "passed": true,
+      "error": "不确定的原话不能记为明确否认；请保留完整限定词并使用 unknown/null，或澄清。"
+    },
+    {
+      "input": "是否用过药不确定",
+      "evidence": "是否用过药不确定",
+      "key": "medications_taken",
+      "absent_accepted": false,
+      "expected_accepted": false,
+      "passed": true,
+      "error": "不确定的原话不能记为明确否认；请保留完整限定词并使用 unknown/null，或澄清。"
+    },
+    {
+      "input": "我记不清有没有用药",
+      "evidence": "没有用药",
+      "key": "medications_taken",
+      "absent_accepted": false,
+      "expected_accepted": false,
+      "passed": true,
+      "error": "引文所在分句含不确定限定，不能截取其中的否定作为明确没有；请引用完整范围。"
+    },
+    {
+      "input": "好像没有用药",
+      "evidence": "没有用药",
+      "key": "medications_taken",
+      "absent_accepted": false,
+      "expected_accepted": false,
+      "passed": true,
+      "error": "引文所在分句含不确定限定，不能截取其中的否定作为明确没有；请引用完整范围。"
+    },
+    {
+      "input": "没有用药，具体不确定",
+      "evidence": "没有用药",
+      "key": "medications_taken",
+      "absent_accepted": false,
+      "expected_accepted": false,
+      "passed": true,
+      "error": "原话紧邻不确定限定，不能省略该限定后记为明确否认；请引用完整范围或澄清。"
+    },
+    {
+      "input": "过敏不清楚，没有用药",
+      "evidence": "没有用药",
+      "key": "medications_taken",
+      "absent_accepted": true,
+      "expected_accepted": true,
+      "passed": true,
+      "error": null
+    },
+    {
+      "input": "没有用药，过敏不清楚",
+      "evidence": "没有用药",
+      "key": "medications_taken",
+      "absent_accepted": true,
+      "expected_accepted": true,
+      "passed": true,
+      "error": null
+    },
+    {
+      "input": "有没有用药",
+      "evidence": "有没有用药",
+      "key": "medications_taken",
+      "absent_accepted": false,
+      "expected_accepted": false,
+      "passed": true,
+      "error": "疑问表达不能作为明确否认；请引用实际回答，或继续澄清。"
+    },
+    {
+      "input": "无所谓用药",
+      "evidence": "无所谓用药",
+      "key": "medications_taken",
+      "absent_accepted": false,
+      "expected_accepted": false,
+      "passed": true,
+      "error": "阴性事实缺少明确否定证据；单个“不”或“无所谓”不能表示没有。"
+    },
+    {
+      "input": "没有用药",
+      "evidence": "没有用药",
+      "key": "medications_taken",
+      "absent_accepted": true,
+      "expected_accepted": true,
+      "passed": true,
+      "error": null
+    }
+  ],
+  "passed": true
+}

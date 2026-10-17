@@ -1,0 +1,37 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "version": "0.11.6",
+  "scope": "Same actual controller/registered-parser probe with deterministic decision responses; not a model error-rate or clinical comparison.",
+  "cases": [
+    {
+      "case": "measurement_plus_medication_update",
+      "reply_kind": "summary",
+      "temperature": 37.6,
+      "medication_assertion": "present",
+      "medication_value": "昨晚用过药物甲，用量不清楚",
+      "scripted_decisions_after_measurement": 2
+    },
+    {
+      "case": "full_measurement_report",
+      "text": "腋温38.6℃，读数可能不准",
+      "assertion": "unknown",
+      "quality": "inadequate",
+      "value": null
+    },
+    {
+      "case": "full_measurement_report",
+      "text": "腋温38.6℃，这个读数我不确定",
+      "assertion": "unknown",
+      "quality": "inadequate",
+      "value": null
+    },
+    {
+      "case": "full_measurement_report",
+      "text": "腋温37.6℃，昨晚用药物甲2片",
+      "assertion": "present",
+      "quality": "not_assessed",
+      "value": 37.6
+    }
+  ]
+}

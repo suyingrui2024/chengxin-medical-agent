@@ -1,0 +1,38 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -634,6 +634,9 @@
+     def visit_super(self, node):
+         return node.parent.accept(self)
+ 
++    def visit_unknown(self, node):
++        return "Unknown"
++
+     def visit_uninferable(self, node):
+         return str(node)
+ 
+--- a/tests/unittest_unknown_as_string.py
++++ b/tests/unittest_unknown_as_string.py
+@@ -0,0 +1,23 @@
++# Copyright (c) 2021 Marc Mueller <30130371+cdce8p@users.noreply.github.com>
++
++# Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
++# For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
++
++"""Regression tests for rendering an ``Unknown`` node as a string."""
++
++from astroid import nodes, util
++
++
++def test_unknown_as_string() -> None:
++    """``Unknown.as_string`` should not raise and return a stable name."""
++    unknown = nodes.Unknown()
++    assert unknown.as_string() == "Unknown"
++
++
++def test_unknown_infer_and_name() -> None:
++    """Keep the existing behaviour of ``Unknown`` alongside ``as_string``."""
++    unknown = nodes.Unknown()
++    assert isinstance(next(unknown.infer()), type(util.Uninferable))
++    assert unknown.name == "Unknown"
++    assert unknown.qname() == "Unknown"
++    assert unknown.as_string() == unknown.name

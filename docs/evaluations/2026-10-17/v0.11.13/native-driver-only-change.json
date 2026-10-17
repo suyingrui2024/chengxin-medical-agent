@@ -1,0 +1,11 @@
+{
+  "changes": {
+    "tests/fixtures/self-check-conversation.mjs": {
+      "before": "d892f21b710c6a9828f84996d42014993553cc489edecea1969c34e1d3e7b165",
+      "after": "7d59d21cbebd1681940212ce6ceca88af5147dcefb71d0d18fd129cfe1876ed0"
+    }
+  },
+  "application_sources_changed": false,
+  "provider_calls_needed": 0,
+  "reason": "Use the actual window origin and authenticated fetch in native Electron; no browser-only baseURL assumption."
+}

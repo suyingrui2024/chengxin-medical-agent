@@ -1,0 +1,13 @@
+
+> medical-agent-dsh-integration@0.11.8 test:ui
+> playwright test tests/ui/consultation-subjects.spec.mjs
+
+
+Running 2 tests using 1 worker
+
+(node:1088329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/consultation-subjects.spec.mjs:8:3 › consultation subjects stay separate and new-case text remains editable (1.4s)
+  ✓  2 tests/ui/consultation-subjects.spec.mjs:8:3 › consultation subjects stay separate and new-case text remains editable on a narrow screen (1.3s)
+
+  2 passed (5.9s)

@@ -1,0 +1,20 @@
+{
+  "version": "0.10.0",
+  "backend_tests_passed": 174,
+  "backend_duration_seconds": 288.422,
+  "browser_scenarios_passed": 21,
+  "source_native_scenarios_passed": 10,
+  "package_native_scenarios_passed": 10,
+  "bridge_assertions_passed": 7,
+  "format_check_passed": true,
+  "source_and_document_files_matching_package": 85,
+  "locked_production_packages_verified": 544,
+  "project_native_local_model_requests_per_run": 7,
+  "new_external_provider_requests": 0,
+  "cross_process_owner_checks_passed": true,
+  "actual_185_second_command_check_passed": true,
+  "scope": "Explicit native selection, direct project edits, host-private records, real SDK with local deterministic model, independent process locking, cold restore. No broad model ability comparison.",
+  "full_dsh_parity_proven": false,
+  "clinical_validation_complete": false,
+  "post_test_nonfunctional_change": "Clarified launcher comment: selected project files are accessible; app root credentials and other host folders are not mounted. No executable statements changed; own-source package verification repeated."
+}

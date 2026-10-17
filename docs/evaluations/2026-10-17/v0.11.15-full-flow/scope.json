@@ -1,0 +1,10 @@
+{
+  "version": "0.11.15",
+  "evaluation": "fresh native consultation, emergency and injected service recovery",
+  "synthetic_only": true,
+  "first_run_max_calls": 40,
+  "cumulative_max_calls": 80,
+  "prior_v01115_directed_evaluation_calls": 18,
+  "source_manifest_files": 303,
+  "source_unchanged_before_run": true
+}

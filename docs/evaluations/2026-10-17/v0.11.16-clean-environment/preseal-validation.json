@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "final_assertions": 14,
+  "frozen_supporting_source_files": 3,
+  "original_release_files_unchanged": 415,
+  "original_source_files_still_match_current": 312,
+  "package_project_files_match": 114,
+  "production_dependency_versions_match": 544,
+  "document_targets_checked": 14,
+  "external_model_calls": 0,
+  "same_host_only": true,
+  "new_machine_installation_verified": false,
+  "chromium_process_sandbox_effectiveness_verified": false,
+  "scope": "Final probe source hashes, recorded runtime and case, package metadata and original immutable release. Initial driver is not frozen; no claim of independent clinical validation."
+}

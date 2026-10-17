@@ -1,0 +1,32 @@
+{
+  "model_calls": 475,
+  "all_http200": true,
+  "frozen_source_unchanged": true,
+  "arms": {
+    "product": {
+      "runs": 12,
+      "source_assessments": {
+        "failed": 3,
+        "passed": 9
+      },
+      "source_and_file_checks_passed": 9,
+      "runtime_completed": 8,
+      "end_to_end_completed": 6,
+      "model_calls": 235,
+      "original_unassessed": 1
+    },
+    "official-sdk": {
+      "runs": 12,
+      "source_assessments": {
+        "passed": 5,
+        "failed": 7
+      },
+      "source_and_file_checks_passed": 5,
+      "runtime_completed": 0,
+      "end_to_end_completed": 0,
+      "model_calls": 240,
+      "original_unassessed": 0
+    }
+  },
+  "scope": "Six public historical tasks, two repetitions, local adapted harness and20calls/600s; configuration comparison, not official score, uncontaminated holdout, broad parity or clinical validation."
+}

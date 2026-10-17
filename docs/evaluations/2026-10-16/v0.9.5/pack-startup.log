@@ -1,0 +1,49 @@
+
+> medical-agent-dsh-integration@0.9.5 test:desktop
+> playwright test --config playwright.desktop.config.mjs
+
+
+Running 7 tests using 1 worker
+
+(node:486185) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (672ms)
+  ✓  2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.7s)
+  ✓  3 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (3.6s)
+  ✘  4 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (30.7s)
+(node:486951) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 tests/desktop/execution.spec.mjs:438:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (8.7s)
+  ✓  6 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.6s)
+  ✓  7 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.7s)
+
+
+  1) tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace 
+
+    TimeoutError: locator.click: Timeout 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '执行工作台', exact: true })
+
+
+      349 |     page.on("pageerror", (error) => errors.push(error.message));
+      350 |     await page.getByLabel("界面模式").selectOption("developer");
+    > 351 |     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
+          |                                                                    ^
+      352 |     await expect(
+      353 |       page.getByRole("heading", { name: "把任务，真正做出来。" }),
+      354 |     ).toBeVisible();
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/execution.spec.mjs:351:68
+
+    Error Context: test-results/desktop/execution-native-execution-49d40--resumes-the-same-workspace/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/execution-native-execution-49d40--resumes-the-same-workspace/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/execution-native-execution-49d40--resumes-the-same-workspace/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace 
+  6 passed (57.4s)

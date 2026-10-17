@@ -1,0 +1,22 @@
+test_confirmation_records_typed_choices_without_quality_upgrade (tests.test_location_answers.LocationAnswerTests) ... ok
+test_declared_dimensions_have_registered_inputs_and_no_default_facts (tests.test_location_answers.LocationAnswerTests) ... ok
+test_field_quote_cannot_cut_off_a_same_clause_qualifier (tests.test_location_answers.LocationAnswerTests) ... ok
+test_field_quotes_preserve_clear_location_and_uncertain_extent (tests.test_location_answers.LocationAnswerTests) ... ok
+test_invalid_implicit_draft_cannot_leave_a_new_form_behind (tests.test_location_answers.LocationAnswerTests) ... ok
+test_missing_or_cross_region_answers_are_rejected_before_journaling (tests.test_location_answers.LocationAnswerTests) ... ok
+test_natural_description_prefills_only_reported_dimensions (tests.test_location_answers.LocationAnswerTests) ... ok
+test_old_coarse_button_cannot_bypass_requested_side_and_area (tests.test_location_answers.LocationAnswerTests) ... ok
+test_patient_can_correct_a_model_draft_without_borrowing_the_old_quote (tests.test_location_answers.LocationAnswerTests) ... ok
+test_repeated_confirmation_does_not_duplicate_a_fact_or_user_turn (tests.test_location_answers.LocationAnswerTests) ... ok
+test_service_retry_keeps_the_same_confirmed_structured_fact (tests.test_location_answers.LocationAnswerTests) ... ok
+test_spontaneous_details_can_create_a_reviewable_form_without_an_extra_question (tests.test_location_answers.LocationAnswerTests) ... ok
+test_uncertain_or_unsupported_words_cannot_become_positive_drafts (tests.test_location_answers.LocationAnswerTests) ... ok
+test_uncertain_verbatim_text_remains_uncertain_in_the_confirmed_answer (tests.test_location_answers.LocationAnswerTests) ... ok
+test_unknown_subfields_stay_unknown_under_known_broad_region (tests.test_location_answers.LocationAnswerTests) ... ok
+test_unsupported_registered_contract_fails_before_a_patient_can_use_it (tests.test_location_answers.LocationAnswerTests) ... ok
+test_urgent_note_precedes_old_form_validation_and_does_not_record_location (tests.test_location_answers.LocationAnswerTests) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.192s
+
+OK

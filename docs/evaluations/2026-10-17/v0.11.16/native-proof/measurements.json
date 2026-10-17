@@ -1,0 +1,83 @@
+{
+  "version": "0.11.16",
+  "binary": "/home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.16-linux-x64/Chengxin",
+  "window": [
+    900,
+    680
+  ],
+  "source": {
+    "report": "live-first.json",
+    "report_sha256": "cb727b92446a255a5ffae4497b51b2320c1f5f259bf523ca181be116ca26f66b",
+    "case": "explicit_left",
+    "patient_text": "刚才不适位置选错了，请改为左侧太阳穴附近，范围仍是一片。",
+    "commands": [
+      {
+        "tool": "revise_self_check",
+        "arguments": {
+          "task_id": "body_location",
+          "evidence": "刚才不适位置选错了，请改为左侧太阳穴附近，范围仍是一片。"
+        }
+      },
+      {
+        "tool": "propose_self_check_result",
+        "arguments": {
+          "task_id": "body_location",
+          "option": "head",
+          "evidence": "刚才不适位置选错了，请改为左侧太阳穴附近，范围仍是一片。",
+          "input_evidence": {
+            "area": "请改为左侧太阳穴附近",
+            "side": "请改为左侧太阳穴附近",
+            "extent": "范围仍是一片"
+          },
+          "input": {
+            "area": {
+              "kind": "preset",
+              "value": "temple"
+            },
+            "side": "left",
+            "extent": "area"
+          }
+        }
+      }
+    ],
+    "scope": "Replay the actual two model tool proposals after scripted local setup in the final native binary. Not another real-provider consultation."
+  },
+  "measurements": [
+    {
+      "selector": "#active-task h3",
+      "top": 256,
+      "bottom": 278.390625,
+      "visible": true
+    },
+    {
+      "selector": ".location-answer-review",
+      "top": 301.390625,
+      "bottom": 395.390625,
+      "visible": true
+    },
+    {
+      "selector": ".location-answer-final-actions",
+      "top": 399.390625,
+      "bottom": 443.390625,
+      "visible": true
+    },
+    {
+      "selector": "#message-input",
+      "top": 527,
+      "bottom": 565,
+      "visible": true
+    },
+    {
+      "selector": "#urgent-help",
+      "top": 148.5,
+      "bottom": 192.5,
+      "visible": true
+    }
+  ],
+  "local_fixture_requests": 6,
+  "external_provider_requests": 0,
+  "initial_fact_id": "5eb5161f-2295-4899-ae62-1c86990fff45",
+  "final_fact_id": "fd89aa25-4656-4108-b443-c784a46050e9",
+  "original_question_restored": true,
+  "passed": true
+}

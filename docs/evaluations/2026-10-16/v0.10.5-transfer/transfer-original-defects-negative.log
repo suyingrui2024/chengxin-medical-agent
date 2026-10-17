@@ -1,0 +1,4 @@
+{"case": "matplotlib__matplotlib-25498", "checks": {"original_defect_rejected": true, "oracle_transport_completed": true}, "passed": true}
+{"case": "pallets__flask-4045", "checks": {"original_defect_rejected": true, "oracle_transport_completed": true}, "passed": true}
+{"case": "sphinx-doc__sphinx-8474", "checks": {"original_defect_rejected": true, "oracle_transport_completed": true}, "passed": true}
+{"case": "sympy__sympy-20049", "checks": {"original_defect_rejected": true, "oracle_transport_completed": true}, "passed": true}

@@ -1,0 +1,66 @@
+
+Running 7 tests using 1 worker
+
+(node:1278726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on wide (30.1s)
+(node:1278978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on mobile (28.7s)
+
+
+  1) tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on wide 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: apiRequestContext.post: Target page, context or browser has been closed
+
+      34 |       });
+      35 |     } finally {
+    > 36 |       await request.post("/api/settings", { data: { backend: "demo" } });
+         |                     ^
+      37 |       await model.close();
+      38 |     }
+      39 |   });
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-answers.spec.mjs:36:21
+
+    Error Context: .runtime/location-answers-20261017/ui-first-results/location-answers-location--16aea-rea-side-and-extent-on-wide/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/ui-first-results/location-answers-location--16aea-rea-side-and-extent-on-wide/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/ui-first-results/location-answers-location--16aea-rea-side-and-extent-on-wide/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on mobile 
+
+    Test was interrupted.
+
+    Error: apiRequestContext.post: Target page, context or browser has been closed
+
+      34 |       });
+      35 |     } finally {
+    > 36 |       await request.post("/api/settings", { data: { backend: "demo" } });
+         |                     ^
+      37 |       await model.close();
+      38 |     }
+      39 |   });
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-answers.spec.mjs:36:21
+
+    Error Context: .runtime/location-answers-20261017/ui-first-results/location-answers-location--8d9de-a-side-and-extent-on-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/ui-first-results/location-answers-location--8d9de-a-side-and-extent-on-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/ui-first-results/location-answers-location--8d9de-a-side-and-extent-on-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on wide 
+  1 interrupted
+    tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on mobile 
+  5 did not run

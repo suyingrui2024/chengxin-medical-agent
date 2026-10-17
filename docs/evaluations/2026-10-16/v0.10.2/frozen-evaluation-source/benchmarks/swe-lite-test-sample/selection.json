@@ -1,0 +1,39 @@
+{
+  "kind": "public-test-selection/v1",
+  "dataset": "princeton-nlp/SWE-bench_Lite",
+  "split": "test",
+  "population": 300,
+  "dataset_parquet_sha256": "7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4",
+  "seed": 2026101601,
+  "algorithm": "Python random.Random(seed).shuffle, after sorting by instance_id",
+  "count": 6,
+  "selected_ids": [
+    "sphinx-doc__sphinx-8627",
+    "sphinx-doc__sphinx-7975",
+    "sympy__sympy-21627",
+    "pallets__flask-5063",
+    "matplotlib__matplotlib-25311",
+    "matplotlib__matplotlib-26011"
+  ],
+  "selected_repositories": [
+    "sphinx-doc/sphinx",
+    "sphinx-doc/sphinx",
+    "sympy/sympy",
+    "pallets/flask",
+    "matplotlib/matplotlib",
+    "matplotlib/matplotlib"
+  ],
+  "selection_filters": [],
+  "replacement_policy": "No substitutions. Record environment failures and unsupported cases.",
+  "scope": "Public historical TEST sample; not an uncontaminated holdout or official score.",
+  "instances_sha256": {
+    "sphinx-doc__sphinx-8627": "65f9286625d322410c3cc403430c3d6b98c5cdc3f966358c3b2b743182118695",
+    "sphinx-doc__sphinx-7975": "81616c1c4177e74be2f5a9d877c7249c77726ad8194bbf8bd4fdfb4edf641e6f",
+    "sympy__sympy-21627": "ee38ef8d51b9b833b5760e3e443d8a46d533e231c62ee92344d6e822799f31b7",
+    "pallets__flask-5063": "adb343cf1ffb2f1f00f0fcae5c6dc8070f87606764bde567ced1364882afc3ad",
+    "matplotlib__matplotlib-25311": "85ee90f5ffc88c9508e1df22fc53cda865ed0743422065e3ae58234b7b31c071",
+    "matplotlib__matplotlib-26011": "c69bc2aade9430346b94f21f255a2e20129dd60dcfa1be8965c7ec8b76dc6c1d"
+  },
+  "rows_json_sha256": "c36c705b12c632d4d14ed745401ab77de499cf8f6b3b3c83fb3f79bde84ff373",
+  "created_at": "2026-10-16T08:19:47.809136+00:00"
+}

@@ -1,0 +1,1814 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "scripted_commands": [
+    {
+      "tool": "run_capability",
+      "arguments": {
+        "id": "calculate.units",
+        "input": {
+          "value": "1.25",
+          "from_unit": "kg",
+          "to_unit": "g"
+        },
+        "evidence": "请把1.25kg换算成g"
+      }
+    },
+    {
+      "tool": "record_facts",
+      "arguments": {
+        "facts": [
+          {
+            "key": "consult_for",
+            "value": "self",
+            "assertion": "present",
+            "evidence": "我自己"
+          },
+          {
+            "key": "age_years",
+            "value": 32,
+            "assertion": "present",
+            "evidence": "32岁"
+          },
+          {
+            "key": "chief_complaint",
+            "value": "咳嗽",
+            "assertion": "present",
+            "evidence": "咳嗽"
+          },
+          {
+            "key": "onset",
+            "value": "两天",
+            "assertion": "present",
+            "evidence": "两天"
+          },
+          {
+            "key": "medications_taken",
+            "value": "昨晚用过药物甲",
+            "assertion": "present",
+            "evidence": "昨晚用过药物甲"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "ask_question",
+      "arguments": {
+        "question_id": "emergency_screen"
+      }
+    }
+  ],
+  "scripted_backend_decisions": 3,
+  "unused_commands": 0,
+  "question_id": "emergency_screen",
+  "facts": {
+    "consult_for": {
+      "key": "consult_for",
+      "value": "self",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+      "recorded_at": "2026-10-16T21:32:50.954056+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "35cad255-0c95-48bc-a67e-bf1edbf6c673",
+      "evidence": "我自己"
+    },
+    "age_years": {
+      "key": "age_years",
+      "value": 32,
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+      "recorded_at": "2026-10-16T21:32:50.954163+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "457c78e8-f936-44b0-b67a-27f6489e1ae8",
+      "evidence": "32岁"
+    },
+    "chief_complaint": {
+      "key": "chief_complaint",
+      "value": "咳嗽",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+      "recorded_at": "2026-10-16T21:32:50.954232+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "e8b3a37d-4022-4afd-8024-af5750c66ed6",
+      "evidence": "咳嗽"
+    },
+    "onset": {
+      "key": "onset",
+      "value": "两天",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+      "recorded_at": "2026-10-16T21:32:50.954294+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "af3b6e7e-f3bd-4232-96a2-9bb15ba3f4d3",
+      "evidence": "两天"
+    },
+    "medications_taken": {
+      "key": "medications_taken",
+      "value": "昨晚用过药物甲",
+      "assertion": "present",
+      "source": "patient",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+      "recorded_at": "2026-10-16T21:32:50.954360+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "2c66676d-3361-4977-8ee8-d0e963360aa5",
+      "evidence": "昨晚用过药物甲"
+    }
+  },
+  "calculation_count": 1,
+  "followup": {
+    "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+    "capability_id": "calculate.units",
+    "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+    "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+    "outcome": "completed",
+    "processing": true,
+    "status": "forwarded",
+    "can_process": false
+  },
+  "events": [
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "session.created",
+      "payload": {
+        "content_versions": {
+          "questions": "2026-10-15.v1",
+          "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+          "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+        },
+        "runtime_snapshot": {
+          "engine_version": "0.11.8",
+          "composition": {
+            "api_version": "medical-capability/v1",
+            "template": {
+              "id": "general",
+              "version": "0.2.0",
+              "title": "通用问诊研究模板",
+              "description": "采集必要病史，按适用条件提供图示观察，允许显式计算。未完成临床审核。",
+              "enabled": [
+                "observe.temperature",
+                "observe.location",
+                "calculate.units",
+                "calculate.glucose"
+              ]
+            },
+            "capabilities": [
+              {
+                "id": "calculate.glucose",
+                "name": "血糖单位换算",
+                "version": "0.1.0",
+                "api_version": "medical-capability/v1",
+                "kind": "calculation",
+                "description": "仅换算明确的血糖（葡萄糖）读数：mmol/L与mg/dL；使用常用系数18，显示近似标记、公式、来源和适用范围。",
+                "permissions": [],
+                "review_status": "engineering_verified_not_clinical",
+                "ui": "calculation",
+                "patient_form": "unit_conversion/v2",
+                "input_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "from_unit",
+                    "to_unit"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "title": "输入数值",
+                      "minLength": 1,
+                      "maxLength": 25
+                    },
+                    "from_unit": {
+                      "type": "string",
+                      "title": "原单位",
+                      "enum": [
+                        "mmol/L",
+                        "mg/dL"
+                      ]
+                    },
+                    "to_unit": {
+                      "type": "string",
+                      "title": "目标单位",
+                      "enum": [
+                        "mmol/L",
+                        "mg/dL"
+                      ]
+                    }
+                  }
+                },
+                "output_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "unit",
+                    "formula",
+                    "method",
+                    "limitations",
+                    "approximate",
+                    "precision_policy"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "formula": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "limitations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "approximate": {
+                      "type": "boolean"
+                    },
+                    "precision_policy": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "value": "10",
+                  "from_unit": "mmol/L",
+                  "to_unit": "mg/dL"
+                },
+                "validation": {
+                  "status": "engineering_prototype_requires_review",
+                  "scope": "固定18近似系数、双向换算、出处、输入核对与版本绑定；不评价临床意义"
+                },
+                "patient_input_policy": "blood_glucose",
+                "references": [
+                  {
+                    "title": "American Diabetes Association · Common Terms",
+                    "url": "https://diabetes.org/about-diabetes/common-terms",
+                    "section": "Mg/dL与Mmol/L词条的文字换算规则；采用常用近似系数18。",
+                    "accessed": "2026-10-17"
+                  }
+                ],
+                "enabled": true
+              },
+              {
+                "id": "calculate.units",
+                "name": "可解释单位换算",
+                "version": "0.1.1",
+                "api_version": "medical-capability/v1",
+                "kind": "calculation",
+                "description": "质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。",
+                "permissions": [],
+                "review_status": "engineering_verified_not_clinical",
+                "ui": "calculation",
+                "patient_form": "unit_conversion/v1",
+                "input_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "from_unit",
+                    "to_unit"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "title": "输入数值",
+                      "minLength": 1,
+                      "maxLength": 25
+                    },
+                    "from_unit": {
+                      "type": "string",
+                      "title": "原单位",
+                      "enum": [
+                        "kg",
+                        "g",
+                        "mg",
+                        "L",
+                        "mL"
+                      ]
+                    },
+                    "to_unit": {
+                      "type": "string",
+                      "title": "目标单位",
+                      "enum": [
+                        "kg",
+                        "g",
+                        "mg",
+                        "L",
+                        "mL"
+                      ]
+                    }
+                  }
+                },
+                "output_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "unit",
+                    "formula",
+                    "method",
+                    "limitations"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "formula": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "limitations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "value": "1.25",
+                  "from_unit": "kg",
+                  "to_unit": "g"
+                },
+                "validation": {
+                  "status": "automated_engineering_tests",
+                  "scope": "精确换算、量纲拒绝、契约和版本隔离；不评价临床意义"
+                },
+                "enabled": true
+              },
+              {
+                "id": "observe.location",
+                "name": "指出最明显的不适部位",
+                "version": "0.3.0",
+                "api_version": "medical-capability/v1",
+                "kind": "self_check",
+                "description": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
+                "permissions": [],
+                "review_status": "prototype_requires_clinical_review",
+                "ui": "step_task",
+                "task": {
+                  "id": "body_location",
+                  "result_key": "symptom_location",
+                  "input_kind": "location",
+                  "invalidate_on": [
+                    "chief_complaint"
+                  ],
+                  "request_phrases": [
+                    "想按图指出部位",
+                    "想按图标出位置",
+                    "想标出疼痛部位"
+                  ],
+                  "cancel_phrases": [
+                    "取消定位",
+                    "先不标位置",
+                    "不想标出疼痛部位"
+                  ],
+                  "title": "指出最明显的不适部位",
+                  "purpose": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
+                  "applies_when": {
+                    "chief_complaint_contains_any": [
+                      "痛",
+                      "疼",
+                      "皮疹",
+                      "痒",
+                      "肿"
+                    ]
+                  },
+                  "equipment": [],
+                  "asset": "/body-location.svg",
+                  "steps": [
+                    "看图找到最明显的位置。",
+                    "选择部位；需要时补充左侧、右侧、范围和是否移动。"
+                  ],
+                  "stop_conditions": [
+                    "无法确定位置时可跳过"
+                  ],
+                  "response_prompt": "选一个部位，或用自己的话描述位置。",
+                  "options": [
+                    {
+                      "label": "头/面部",
+                      "value": "head"
+                    },
+                    {
+                      "label": "胸部",
+                      "value": "chest"
+                    },
+                    {
+                      "label": "腹部",
+                      "value": "abdomen"
+                    },
+                    {
+                      "label": "背/腰部",
+                      "value": "back"
+                    },
+                    {
+                      "label": "四肢",
+                      "value": "limbs"
+                    },
+                    {
+                      "label": "其他部位",
+                      "value": "other"
+                    },
+                    {
+                      "label": "说不清/跳过",
+                      "value": "skip"
+                    }
+                  ],
+                  "clinical_limits": [
+                    "这是主观症状定位，不是客观查体或疾病判断。",
+                    "不需要按压、扭转或诱发疼痛。"
+                  ],
+                  "review_status": "prototype_requires_clinical_review"
+                },
+                "validation": {
+                  "status": "prototype_requires_clinical_review",
+                  "scope": "工程流程已测试；图示理解与操作尚未临床审核"
+                },
+                "enabled": true
+              },
+              {
+                "id": "observe.temperature",
+                "name": "测一次腋下体温",
+                "version": "0.7.0",
+                "api_version": "medical-capability/v1",
+                "kind": "self_check",
+                "description": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+                "permissions": [],
+                "review_status": "prototype_requires_clinical_review",
+                "ui": "step_task",
+                "task": {
+                  "id": "axillary_temperature",
+                  "result_key": "temperature_c",
+                  "input_kind": "temperature",
+                  "repeatable": true,
+                  "repeat_phrases": [
+                    "想重新测量",
+                    "想重新测温",
+                    "再测一次腋温",
+                    "想再测腋温",
+                    "重新测腋温",
+                    "重新测体温",
+                    "再量一次体温",
+                    "刚刚又测了一次腋温"
+                  ],
+                  "invalidate_on": [],
+                  "request_phrases": [
+                    "想按图测一下腋温",
+                    "想按图测温",
+                    "想测腋温",
+                    "想测体温",
+                    "想量体温"
+                  ],
+                  "cancel_phrases": [
+                    "取消测温",
+                    "先不测体温",
+                    "不想测体温",
+                    "不测腋温了",
+                    "先不测腋温",
+                    "暂时不测体温",
+                    "不想按图测一下腋温"
+                  ],
+                  "title": "测一次腋下体温",
+                  "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+                  "applies_when": {
+                    "chief_complaint_contains_any": [
+                      "发热",
+                      "发烧",
+                      "低烧",
+                      "高烧",
+                      "体温"
+                    ]
+                  },
+                  "equipment": [
+                    "可正常使用的数字体温计"
+                  ],
+                  "asset": "/temperature.svg",
+                  "step_assets": [
+                    "/temperature.svg#step-1",
+                    "/temperature.svg#step-2",
+                    "/temperature.svg#step-3"
+                  ],
+                  "steps": [
+                    "先阅读体温计说明书；擦干腋窝。",
+                    "将探头放在腋窝中央，手臂贴紧身体。",
+                    "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+                  ],
+                  "stop_conditions": [
+                    "设备破损",
+                    "操作引起明显不适",
+                    "患者无法安全配合"
+                  ],
+                  "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+                  "options": [
+                    {
+                      "label": "没有体温计",
+                      "value": "not_available"
+                    },
+                    {
+                      "label": "做不到/不舒服",
+                      "value": "unable"
+                    },
+                    {
+                      "label": "暂时跳过",
+                      "value": "skip"
+                    }
+                  ],
+                  "clinical_limits": [
+                    "一次体温不能排除病情变化。",
+                    "不同部位和设备的读数不能直接视为完全等价。",
+                    "本任务不负责判断发热原因。"
+                  ],
+                  "review_status": "prototype_requires_clinical_review"
+                },
+                "validation": {
+                  "status": "prototype_requires_clinical_review",
+                  "scope": "工程流程已测试；图示理解与操作尚未临床审核"
+                },
+                "enabled": true
+              }
+            ],
+            "sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+          },
+          "content_versions": {
+            "questions": "2026-10-15.v1",
+            "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+            "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+          },
+          "transport": {}
+        }
+      },
+      "event_id": "fb339b43-d244-44b2-9571-239dd4ae85bf",
+      "occurred_at": "2026-10-16T21:32:50.948465+00:00",
+      "turn_id": null
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+          "phase": "opening",
+          "kind": "question",
+          "question_id": "chief_complaint",
+          "quick_replies": [],
+          "task": null,
+          "summary": null,
+          "developer_trace": {
+            "reason": "先听取主诉，自然叙述后再补关键缺口",
+            "content_version": "2026-10-15.v1"
+          },
+          "action_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:1",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:1",
+                "type": "message",
+                "data": {
+                  "text": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "kind": "question"
+                }
+              },
+              {
+                "id": "question:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:1",
+                "type": "question",
+                "data": {
+                  "question_id": "chief_complaint",
+                  "prompt": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "canonical": false,
+                  "input_kind": "text",
+                  "choices": []
+                }
+              }
+            ]
+          }
+        },
+        "reason": "开放式开场"
+      },
+      "event_id": "a30dfd5f-97bf-48d5-89b0-2a587e95ab00",
+      "occurred_at": "2026-10-16T21:32:50.949140+00:00",
+      "turn_id": "session_start"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "agent.started",
+      "payload": {
+        "backend": "fixture",
+        "reply": {
+          "message": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+          "phase": "opening",
+          "kind": "question",
+          "question_id": "chief_complaint",
+          "quick_replies": [],
+          "task": null,
+          "summary": null,
+          "developer_trace": {
+            "reason": "先听取主诉，自然叙述后再补关键缺口",
+            "content_version": "2026-10-15.v1"
+          },
+          "action_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:1",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:1",
+                "type": "message",
+                "data": {
+                  "text": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "kind": "question"
+                }
+              },
+              {
+                "id": "question:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:1",
+                "type": "question",
+                "data": {
+                  "question_id": "chief_complaint",
+                  "prompt": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "canonical": false,
+                  "input_kind": "text",
+                  "choices": []
+                }
+              }
+            ]
+          }
+        },
+        "policy_version": "medical-tools-v0.11.8",
+        "prompt_sha256": "f89938d02bc3246b0246572ff2e1e8ecaa5268b4b75b8ba784767293e886ec87",
+        "prompt_layout": "static-catalog-prefix/v1"
+      },
+      "event_id": "00703f2c-1c68-4191-8698-c20fac6dbb05",
+      "occurred_at": "2026-10-16T21:32:50.949286+00:00",
+      "turn_id": null
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。"
+      },
+      "event_id": "d297fed3-7555-47ba-800f-9dd025f921dc",
+      "occurred_at": "2026-10-16T21:32:50.949724+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 0,
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.units",
+          "input": {
+            "value": "1.25",
+            "from_unit": "kg",
+            "to_unit": "g"
+          },
+          "evidence": "请把1.25kg换算成g"
+        }
+      },
+      "event_id": "019e9d79-8452-4789-a33b-b72c429e10b1",
+      "occurred_at": "2026-10-16T21:32:50.950212+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "capability.supplement_retained",
+      "payload": {
+        "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+        "capability_id": "calculate.units",
+        "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+        "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "outcome": "awaiting_input",
+        "processing": false
+      },
+      "event_id": "9115cce2-5639-402a-8e77-ef26589b5f28",
+      "occurred_at": "2026-10-16T21:32:50.951493+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "capability.input_requested",
+      "payload": {
+        "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+        "capability_id": "calculate.units",
+        "name": "可解释单位换算",
+        "version": "0.1.1",
+        "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+        "input": {
+          "value": "1.25",
+          "from_unit": "kg",
+          "to_unit": "g"
+        },
+        "original_input": {
+          "value": "1.25",
+          "from_unit": "kg",
+          "to_unit": "g"
+        },
+        "source_quote": "请把1.25kg换算成g",
+        "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "unit_options": [
+          {
+            "value": "kg",
+            "label": "千克 kg"
+          },
+          {
+            "value": "g",
+            "label": "克 g"
+          },
+          {
+            "value": "mg",
+            "label": "毫克 mg"
+          },
+          {
+            "value": "L",
+            "label": "升 L"
+          },
+          {
+            "value": "mL",
+            "label": "毫升 mL"
+          }
+        ],
+        "form_kind": "unit_conversion/v1",
+        "subject_label": "单位换算",
+        "scope_note": "仅同量纲换算，不判断摄入量或用药剂量。",
+        "feedback_hint": "未完成计算。请检查数值、单位；质量与体积不能直接互换。",
+        "feedback": ""
+      },
+      "event_id": "1d45ab4c-4c19-4279-adbd-94640e0eb696",
+      "occurred_at": "2026-10-16T21:32:50.951562+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "run_capability",
+        "terminal": true
+      },
+      "event_id": "4004cacd-dcc8-4002-9173-3197c2e9d11d",
+      "occurred_at": "2026-10-16T21:32:50.951666+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "核对这三个输入，再开始换算。",
+          "phase": "opening",
+          "kind": "calculation_input",
+          "question_id": null,
+          "quick_replies": [],
+          "task": null,
+          "summary": null,
+          "developer_trace": null,
+          "action_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:2",
+          "input_error": false,
+          "calculation_input": {
+            "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+            "capability_id": "calculate.units",
+            "name": "可解释单位换算",
+            "version": "0.1.1",
+            "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+            "input": {
+              "value": "1.25",
+              "from_unit": "kg",
+              "to_unit": "g"
+            },
+            "original_input": {
+              "value": "1.25",
+              "from_unit": "kg",
+              "to_unit": "g"
+            },
+            "source_quote": "请把1.25kg换算成g",
+            "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+            "unit_options": [
+              {
+                "value": "kg",
+                "label": "千克 kg"
+              },
+              {
+                "value": "g",
+                "label": "克 g"
+              },
+              {
+                "value": "mg",
+                "label": "毫克 mg"
+              },
+              {
+                "value": "L",
+                "label": "升 L"
+              },
+              {
+                "value": "mL",
+                "label": "毫升 mL"
+              }
+            ],
+            "form_kind": "unit_conversion/v1",
+            "subject_label": "单位换算",
+            "scope_note": "仅同量纲换算，不判断摄入量或用药剂量。",
+            "feedback_hint": "未完成计算。请检查数值、单位；质量与体积不能直接互换。",
+            "feedback": ""
+          },
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": {
+            "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+            "capability_id": "calculate.units",
+            "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+            "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+            "outcome": "awaiting_input",
+            "processing": false,
+            "status": "pending",
+            "can_process": false
+          },
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:2",
+                "type": "message",
+                "data": {
+                  "text": "核对这三个输入，再开始换算。",
+                  "kind": "calculation_input"
+                }
+              },
+              {
+                "id": "calculation-input:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:2",
+                "type": "calculation_input",
+                "data": {
+                  "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                  "capability_id": "calculate.units",
+                  "name": "可解释单位换算",
+                  "version": "0.1.1",
+                  "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+                  "input": {
+                    "value": "1.25",
+                    "from_unit": "kg",
+                    "to_unit": "g"
+                  },
+                  "original_input": {
+                    "value": "1.25",
+                    "from_unit": "kg",
+                    "to_unit": "g"
+                  },
+                  "source_quote": "请把1.25kg换算成g",
+                  "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                  "unit_options": [
+                    {
+                      "value": "kg",
+                      "label": "千克 kg"
+                    },
+                    {
+                      "value": "g",
+                      "label": "克 g"
+                    },
+                    {
+                      "value": "mg",
+                      "label": "毫克 mg"
+                    },
+                    {
+                      "value": "L",
+                      "label": "升 L"
+                    },
+                    {
+                      "value": "mL",
+                      "label": "毫升 mL"
+                    }
+                  ],
+                  "form_kind": "unit_conversion/v1",
+                  "subject_label": "单位换算",
+                  "scope_note": "仅同量纲换算，不判断摄入量或用药剂量。",
+                  "feedback_hint": "未完成计算。请检查数值、单位；质量与体积不能直接互换。",
+                  "feedback": "",
+                  "followup": {
+                    "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                    "capability_id": "calculate.units",
+                    "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+                    "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                    "outcome": "awaiting_input",
+                    "processing": false,
+                    "status": "pending",
+                    "can_process": false
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "36c34f49-de48-4c29-8b90-cd804ac98005",
+      "occurred_at": "2026-10-16T21:32:50.951760+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "核对换算参数"
+      },
+      "event_id": "dc0566b9-7304-4633-9ebc-37d3e2d7c2ac",
+      "occurred_at": "2026-10-16T21:32:50.952067+00:00",
+      "turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "capability.requested",
+      "payload": {
+        "id": "calculate.units",
+        "input": {
+          "value": "1.25",
+          "from_unit": "kg",
+          "to_unit": "g"
+        }
+      },
+      "event_id": "b295f575-56f9-42b7-8287-a3c6b76db0ee",
+      "occurred_at": "2026-10-16T21:32:50.952229+00:00",
+      "turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "capability.completed",
+      "payload": {
+        "capability_id": "calculate.units",
+        "name": "可解释单位换算",
+        "version": "0.1.1",
+        "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+        "input": {
+          "value": "1.25",
+          "from_unit": "kg",
+          "to_unit": "g"
+        },
+        "data": {
+          "value": "1250",
+          "unit": "g",
+          "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+          "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+          "limitations": [
+            "只换算输入数值，不验证输入对应的实际测量。",
+            "不推导摄入量、药物剂量或医疗建议。"
+          ]
+        },
+        "input_origin": "patient_confirmed_form",
+        "input_status": "confirmed",
+        "quality": "not_assessed",
+        "review_status": "engineering_verified_not_clinical",
+        "renderer": "calculation",
+        "presentation": {
+          "schema_version": "medical-ui/v1",
+          "blocks": [
+            {
+              "id": "calculation:calculate.units:003a1dfb-0c84-4365-890f-e8b8ce236593",
+              "type": "calculation",
+              "data": {
+                "value": "1250",
+                "unit": "g",
+                "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                "limitations": [
+                  "只换算输入数值，不验证输入对应的实际测量。",
+                  "不推导摄入量、药物剂量或医疗建议。"
+                ],
+                "inputs": [
+                  {
+                    "key": "value",
+                    "label": "输入数值",
+                    "value": "1.25"
+                  },
+                  {
+                    "key": "from_unit",
+                    "label": "原单位",
+                    "value": "kg"
+                  },
+                  {
+                    "key": "to_unit",
+                    "label": "目标单位",
+                    "value": "g"
+                  }
+                ],
+                "input_status": "confirmed",
+                "quality": "not_assessed",
+                "review_status": "engineering_verified_not_clinical",
+                "provenance": {
+                  "capability_id": "calculate.units",
+                  "version": "0.1.1",
+                  "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+                  "input_origin": "patient_confirmed_form",
+                  "execution_id": "003a1dfb-0c84-4365-890f-e8b8ce236593",
+                  "confirmation": {
+                    "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                    "source_quote": "请把1.25kg换算成g",
+                    "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                    "confirmation_turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f",
+                    "original_input": {
+                      "value": "1.25",
+                      "from_unit": "kg",
+                      "to_unit": "g"
+                    },
+                    "confirmed_input": {
+                      "value": "1.25",
+                      "from_unit": "kg",
+                      "to_unit": "g"
+                    }
+                  }
+                },
+                "subject_label": "可解释单位换算"
+              }
+            }
+          ]
+        },
+        "execution_id": "003a1dfb-0c84-4365-890f-e8b8ce236593",
+        "confirmation": {
+          "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+          "source_quote": "请把1.25kg换算成g",
+          "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+          "confirmation_turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f",
+          "original_input": {
+            "value": "1.25",
+            "from_unit": "kg",
+            "to_unit": "g"
+          },
+          "confirmed_input": {
+            "value": "1.25",
+            "from_unit": "kg",
+            "to_unit": "g"
+          }
+        }
+      },
+      "event_id": "5f5dceb4-9b6a-443b-8de9-39b3bc9d573a",
+      "occurred_at": "2026-10-16T21:32:50.952387+00:00",
+      "turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "换算已完成，参数已核对。实际测量质量仍未评价。",
+          "phase": "opening",
+          "kind": "calculation_result",
+          "question_id": null,
+          "quick_replies": [],
+          "task": null,
+          "summary": null,
+          "developer_trace": null,
+          "action_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:3",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": {
+            "capability_id": "calculate.units",
+            "name": "可解释单位换算",
+            "version": "0.1.1",
+            "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+            "input": {
+              "value": "1.25",
+              "from_unit": "kg",
+              "to_unit": "g"
+            },
+            "data": {
+              "value": "1250",
+              "unit": "g",
+              "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+              "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+              "limitations": [
+                "只换算输入数值，不验证输入对应的实际测量。",
+                "不推导摄入量、药物剂量或医疗建议。"
+              ]
+            },
+            "input_origin": "patient_confirmed_form",
+            "input_status": "confirmed",
+            "quality": "not_assessed",
+            "review_status": "engineering_verified_not_clinical",
+            "renderer": "calculation",
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "calculation:calculate.units:003a1dfb-0c84-4365-890f-e8b8ce236593",
+                  "type": "calculation",
+                  "data": {
+                    "value": "1250",
+                    "unit": "g",
+                    "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                    "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                    "limitations": [
+                      "只换算输入数值，不验证输入对应的实际测量。",
+                      "不推导摄入量、药物剂量或医疗建议。"
+                    ],
+                    "inputs": [
+                      {
+                        "key": "value",
+                        "label": "输入数值",
+                        "value": "1.25"
+                      },
+                      {
+                        "key": "from_unit",
+                        "label": "原单位",
+                        "value": "kg"
+                      },
+                      {
+                        "key": "to_unit",
+                        "label": "目标单位",
+                        "value": "g"
+                      }
+                    ],
+                    "input_status": "confirmed",
+                    "quality": "not_assessed",
+                    "review_status": "engineering_verified_not_clinical",
+                    "provenance": {
+                      "capability_id": "calculate.units",
+                      "version": "0.1.1",
+                      "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+                      "input_origin": "patient_confirmed_form",
+                      "execution_id": "003a1dfb-0c84-4365-890f-e8b8ce236593",
+                      "confirmation": {
+                        "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                        "source_quote": "请把1.25kg换算成g",
+                        "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                        "confirmation_turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f",
+                        "original_input": {
+                          "value": "1.25",
+                          "from_unit": "kg",
+                          "to_unit": "g"
+                        },
+                        "confirmed_input": {
+                          "value": "1.25",
+                          "from_unit": "kg",
+                          "to_unit": "g"
+                        }
+                      }
+                    },
+                    "subject_label": "可解释单位换算"
+                  }
+                }
+              ]
+            },
+            "execution_id": "003a1dfb-0c84-4365-890f-e8b8ce236593",
+            "confirmation": {
+              "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+              "source_quote": "请把1.25kg换算成g",
+              "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+              "confirmation_turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f",
+              "original_input": {
+                "value": "1.25",
+                "from_unit": "kg",
+                "to_unit": "g"
+              },
+              "confirmed_input": {
+                "value": "1.25",
+                "from_unit": "kg",
+                "to_unit": "g"
+              }
+            }
+          },
+          "observation_result": null,
+          "calculation_followup": {
+            "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+            "capability_id": "calculate.units",
+            "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+            "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+            "outcome": "completed",
+            "processing": false,
+            "status": "pending",
+            "can_process": false
+          },
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:3",
+                "type": "message",
+                "data": {
+                  "text": "换算已完成，参数已核对。实际测量质量仍未评价。",
+                  "kind": "calculation_result"
+                }
+              },
+              {
+                "id": "calculation:calculate.units:003a1dfb-0c84-4365-890f-e8b8ce236593",
+                "type": "calculation",
+                "data": {
+                  "value": "1250",
+                  "unit": "g",
+                  "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                  "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                  "limitations": [
+                    "只换算输入数值，不验证输入对应的实际测量。",
+                    "不推导摄入量、药物剂量或医疗建议。"
+                  ],
+                  "inputs": [
+                    {
+                      "key": "value",
+                      "label": "输入数值",
+                      "value": "1.25"
+                    },
+                    {
+                      "key": "from_unit",
+                      "label": "原单位",
+                      "value": "kg"
+                    },
+                    {
+                      "key": "to_unit",
+                      "label": "目标单位",
+                      "value": "g"
+                    }
+                  ],
+                  "input_status": "confirmed",
+                  "quality": "not_assessed",
+                  "review_status": "engineering_verified_not_clinical",
+                  "provenance": {
+                    "capability_id": "calculate.units",
+                    "version": "0.1.1",
+                    "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+                    "input_origin": "patient_confirmed_form",
+                    "execution_id": "003a1dfb-0c84-4365-890f-e8b8ce236593",
+                    "confirmation": {
+                      "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                      "source_quote": "请把1.25kg换算成g",
+                      "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                      "confirmation_turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f",
+                      "original_input": {
+                        "value": "1.25",
+                        "from_unit": "kg",
+                        "to_unit": "g"
+                      },
+                      "confirmed_input": {
+                        "value": "1.25",
+                        "from_unit": "kg",
+                        "to_unit": "g"
+                      }
+                    }
+                  },
+                  "subject_label": "可解释单位换算",
+                  "followup": {
+                    "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                    "capability_id": "calculate.units",
+                    "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+                    "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                    "outcome": "completed",
+                    "processing": false,
+                    "status": "pending",
+                    "can_process": false
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "014ad613-3990-4d08-9cfe-aed676c3b55d",
+      "occurred_at": "2026-10-16T21:32:50.952640+00:00",
+      "turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "继续问诊"
+      },
+      "event_id": "fdf3b7c2-6cc6-4e71-a1d0-e9a23638fea0",
+      "occurred_at": "2026-10-16T21:32:50.953047+00:00",
+      "turn_id": "35b68641-d2a1-42c2-8c1f-90a787607424"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "capability.supplement_forwarded",
+      "payload": {
+        "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+        "capability_id": "calculate.units",
+        "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+        "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "outcome": "completed",
+        "processing": true
+      },
+      "event_id": "615682cf-8326-4925-a109-729fdf2de6f5",
+      "occurred_at": "2026-10-16T21:32:50.953168+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 0,
+        "tool": "record_facts",
+        "arguments": {
+          "facts": [
+            {
+              "key": "consult_for",
+              "value": "self",
+              "assertion": "present",
+              "evidence": "我自己"
+            },
+            {
+              "key": "age_years",
+              "value": 32,
+              "assertion": "present",
+              "evidence": "32岁"
+            },
+            {
+              "key": "chief_complaint",
+              "value": "咳嗽",
+              "assertion": "present",
+              "evidence": "咳嗽"
+            },
+            {
+              "key": "onset",
+              "value": "两天",
+              "assertion": "present",
+              "evidence": "两天"
+            },
+            {
+              "key": "medications_taken",
+              "value": "昨晚用过药物甲",
+              "assertion": "present",
+              "evidence": "昨晚用过药物甲"
+            }
+          ]
+        }
+      },
+      "event_id": "9dd31ccc-d46a-4fd0-a376-741a1a1068cf",
+      "occurred_at": "2026-10-16T21:32:50.953708+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "consult_for",
+        "value": "self",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "recorded_at": "2026-10-16T21:32:50.954056+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "35cad255-0c95-48bc-a67e-bf1edbf6c673",
+        "evidence": "我自己"
+      },
+      "event_id": "4d8d079a-6bf5-40ab-bc7b-77012d7e02e9",
+      "occurred_at": "2026-10-16T21:32:50.954122+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "age_years",
+        "value": 32,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "recorded_at": "2026-10-16T21:32:50.954163+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "457c78e8-f936-44b0-b67a-27f6489e1ae8",
+        "evidence": "32岁"
+      },
+      "event_id": "0d3a2f3d-2e6c-4d1a-a978-45a3316d11f2",
+      "occurred_at": "2026-10-16T21:32:50.954198+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "chief_complaint",
+        "value": "咳嗽",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "recorded_at": "2026-10-16T21:32:50.954232+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "e8b3a37d-4022-4afd-8024-af5750c66ed6",
+        "evidence": "咳嗽"
+      },
+      "event_id": "a9c53e11-95a8-453c-930e-da6893e0ee55",
+      "occurred_at": "2026-10-16T21:32:50.954263+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "onset",
+        "value": "两天",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "recorded_at": "2026-10-16T21:32:50.954294+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "af3b6e7e-f3bd-4232-96a2-9bb15ba3f4d3",
+        "evidence": "两天"
+      },
+      "event_id": "deb44369-6b38-4d57-a0e6-643cbb1c5b40",
+      "occurred_at": "2026-10-16T21:32:50.954331+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "medications_taken",
+        "value": "昨晚用过药物甲",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "recorded_at": "2026-10-16T21:32:50.954360+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "2c66676d-3361-4977-8ee8-d0e963360aa5",
+        "evidence": "昨晚用过药物甲"
+      },
+      "event_id": "5438938a-3095-44c7-bc40-29eb73120405",
+      "occurred_at": "2026-10-16T21:32:50.954391+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "triage.assessed",
+      "payload": {
+        "level": "undetermined",
+        "triggers": [],
+        "assessed_at": "2026-10-16T21:32:50.954459+00:00"
+      },
+      "event_id": "b3715ee4-1175-46d7-a724-c366422bec9a",
+      "occurred_at": "2026-10-16T21:32:50.954469+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "record_facts",
+        "result": {
+          "ok": true,
+          "case": {
+            "latest_user_text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+            "active_question": null,
+            "active_task": null,
+            "facts": {
+              "consult_for": {
+                "key": "consult_for",
+                "value": "self",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "我自己"
+              },
+              "age_years": {
+                "key": "age_years",
+                "value": 32,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "32岁"
+              },
+              "chief_complaint": {
+                "key": "chief_complaint",
+                "value": "咳嗽",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "咳嗽"
+              },
+              "onset": {
+                "key": "onset",
+                "value": "两天",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "两天"
+              },
+              "medications_taken": {
+                "key": "medications_taken",
+                "value": "昨晚用过药物甲",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "昨晚用过药物甲"
+              }
+            },
+            "missing_required": [
+              "emergency_screen",
+              "trajectory",
+              "severity",
+              "associated_symptoms",
+              "resp_breathing",
+              "resp_cough_details",
+              "resp_intake",
+              "allergies",
+              "relevant_history"
+            ],
+            "questions": [
+              {
+                "id": "emergency_screen",
+                "field": "emergency_screen"
+              },
+              {
+                "id": "trajectory",
+                "field": "trajectory"
+              },
+              {
+                "id": "severity",
+                "field": "severity"
+              },
+              {
+                "id": "associated_symptoms",
+                "field": "associated_symptoms"
+              },
+              {
+                "id": "resp_breathing",
+                "field": "resp_breathing"
+              },
+              {
+                "id": "resp_cough_details",
+                "field": "resp_cough_details"
+              },
+              {
+                "id": "resp_intake",
+                "field": "resp_intake"
+              },
+              {
+                "id": "allergies",
+                "field": "allergies"
+              },
+              {
+                "id": "relevant_history",
+                "field": "relevant_history"
+              },
+              {
+                "id": "patient_goal",
+                "field": "patient_goal"
+              }
+            ],
+            "available_self_checks": [],
+            "self_check_block_reason": "自查之前需要明确急症筛查；未知不能当阴性",
+            "requestable_self_checks": [],
+            "pending_self_checks": [],
+            "repeatable_self_checks": [],
+            "recent_observation_attempts": [],
+            "completed_observation_with_supplement": null,
+            "calculation_request_with_supplement": {
+              "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+              "capability_id": "calculate.units",
+              "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+              "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+              "outcome": "completed",
+              "processing": true
+            },
+            "transcript": [
+              {
+                "role": "assistant",
+                "content": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。"
+              },
+              {
+                "role": "user",
+                "content": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。"
+              },
+              {
+                "role": "assistant",
+                "content": "核对这三个输入，再开始换算。"
+              },
+              {
+                "role": "user",
+                "content": "核对换算参数"
+              },
+              {
+                "role": "assistant",
+                "content": "换算已完成，参数已核对。实际测量质量仍未评价。"
+              },
+              {
+                "role": "user",
+                "content": "继续问诊"
+              }
+            ],
+            "calculation_drafts": [
+              {
+                "capability_id": "calculate.units",
+                "name": "可解释单位换算",
+                "version": "0.1.1",
+                "registry_sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+                "input": {
+                  "value": "1.25",
+                  "from_unit": "kg",
+                  "to_unit": "g"
+                },
+                "data": {
+                  "value": "1250",
+                  "unit": "g",
+                  "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                  "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                  "limitations": [
+                    "只换算输入数值，不验证输入对应的实际测量。",
+                    "不推导摄入量、药物剂量或医疗建议。"
+                  ]
+                },
+                "input_origin": "patient_confirmed_form",
+                "input_status": "confirmed",
+                "quality": "not_assessed",
+                "review_status": "engineering_verified_not_clinical",
+                "renderer": "calculation",
+                "execution_id": "003a1dfb-0c84-4365-890f-e8b8ce236593",
+                "confirmation": {
+                  "proposal_id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                  "source_quote": "请把1.25kg换算成g",
+                  "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                  "confirmation_turn_id": "ce66af9b-7c1e-4d65-be01-82758633d50f",
+                  "original_input": {
+                    "value": "1.25",
+                    "from_unit": "kg",
+                    "to_unit": "g"
+                  },
+                  "confirmed_input": {
+                    "value": "1.25",
+                    "from_unit": "kg",
+                    "to_unit": "g"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "event_id": "6960e170-efa8-4702-b4e9-be6c26be5021",
+      "occurred_at": "2026-10-16T21:32:50.954633+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 1,
+        "tool": "ask_question",
+        "arguments": {
+          "question_id": "emergency_screen"
+        }
+      },
+      "event_id": "30a8b5c7-10eb-46b6-be0f-d67f0fa674a8",
+      "occurred_at": "2026-10-16T21:32:50.955247+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "ask_question",
+        "terminal": true
+      },
+      "event_id": "56e0464c-49e4-435f-acdd-01283c2c5261",
+      "occurred_at": "2026-10-16T21:32:50.955375+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "capability.supplement_released",
+      "payload": {
+        "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+        "capability_id": "calculate.units",
+        "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+        "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+        "outcome": "completed",
+        "processing": true,
+        "status": "forwarded"
+      },
+      "event_id": "3b4c42d4-edb1-4dfc-af16-95232a50f428",
+      "occurred_at": "2026-10-16T21:32:50.955417+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    },
+    {
+      "session_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+          "phase": "emergency_screen",
+          "kind": "question",
+          "question_id": "emergency_screen",
+          "quick_replies": [
+            {
+              "label": "有任一项",
+              "value": "yes"
+            },
+            {
+              "label": "都没有",
+              "value": "no"
+            },
+            {
+              "label": "不确定",
+              "value": "unknown"
+            }
+          ],
+          "task": null,
+          "summary": null,
+          "developer_trace": {
+            "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+            "content_version": "2026-10-15.v1"
+          },
+          "action_id": "d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:4",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": {
+            "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+            "capability_id": "calculate.units",
+            "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+            "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+            "outcome": "completed",
+            "processing": true,
+            "status": "forwarded",
+            "can_process": false
+          },
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:4",
+                "type": "message",
+                "data": {
+                  "text": "此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+                  "kind": "question"
+                }
+              },
+              {
+                "id": "calculation-followup:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:4",
+                "type": "interaction_followup",
+                "data": {
+                  "id": "06b37ad5-afaf-466d-b5ea-7be5fbad2227",
+                  "capability_id": "calculate.units",
+                  "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+                  "source_turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468",
+                  "outcome": "completed",
+                  "processing": true,
+                  "status": "forwarded",
+                  "can_process": false
+                }
+              },
+              {
+                "id": "question:d4bcd070-88fa-47c7-bf7c-d0dc14d78f17:4",
+                "type": "question",
+                "data": {
+                  "question_id": "emergency_screen",
+                  "prompt": "此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+                  "canonical": true,
+                  "input_kind": "yes_no_unknown",
+                  "choices": [
+                    {
+                      "label": "有任一项",
+                      "value": "yes"
+                    },
+                    {
+                      "label": "都没有",
+                      "value": "no"
+                    },
+                    {
+                      "label": "不确定",
+                      "value": "unknown"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "ae4aece8-92b1-4714-a340-f533a8b98279",
+      "occurred_at": "2026-10-16T21:32:50.955497+00:00",
+      "turn_id": "dd61d913-36b8-4ecb-90de-5d332256e468"
+    }
+  ]
+}

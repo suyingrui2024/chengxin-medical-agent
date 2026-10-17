@@ -1,0 +1,6 @@
+
+> medical-agent-dsh-integration@0.9.6 format:check
+> prettier --check src/medagent/web/index.html src/medagent/web/styles.css src/medagent/web/*.js src/medagent/extensions/**/*.json playwright*.mjs tests/fixtures/*.mjs tests/ui/*.mjs tests/desktop/*.mjs tests/live/*.mjs desktop/*.{cjs,html,css} scripts/*desktop*.mjs
+
+Checking formatting...
+All matched files use Prettier code style!

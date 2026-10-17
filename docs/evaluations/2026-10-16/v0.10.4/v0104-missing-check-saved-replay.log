@@ -1,0 +1,3 @@
+{"case": "arithmetic-test", "passed": true, "checks": {"same_declared_task_outcome": true, "all_engineering_checks_passed": true, "same_number_of_model_decisions": true, "same_check_exits": true}}
+{"case": "versioned-api-test", "passed": true, "checks": {"same_declared_task_outcome": true, "all_engineering_checks_passed": true, "same_number_of_model_decisions": true, "same_check_exits": true}}
+{"case": "inspection-only", "passed": true, "checks": {"same_declared_task_outcome": true, "all_engineering_checks_passed": true, "same_number_of_model_decisions": true, "same_check_exits": true}}

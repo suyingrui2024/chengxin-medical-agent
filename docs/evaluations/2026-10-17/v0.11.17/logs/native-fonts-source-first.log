@@ -1,0 +1,12 @@
+First argument must use the object destructuring pattern: _fixtures
+
+   at fonts.spec.mjs:12
+
+  10 | );
+  11 |
+> 12 | test("native startup and patient UI render Chinese with the packaged fonts", async (_fixtures, testInfo) => {
+     | ^
+  13 |   await mkdir(path.join(root, ".runtime"), { recursive: true });
+  14 |   const temporary = await mkdtemp(path.join(root, ".runtime/native-fonts-"));
+  15 |   const python = path.join(temporary, "delayed-python");
+

@@ -1,0 +1,37 @@
+{
+  "report": "live-first.json",
+  "report_sha256": "cb727b92446a255a5ffae4497b51b2320c1f5f259bf523ca181be116ca26f66b",
+  "case": "explicit_left",
+  "patient_text": "刚才不适位置选错了，请改为左侧太阳穴附近，范围仍是一片。",
+  "commands": [
+    {
+      "tool": "revise_self_check",
+      "arguments": {
+        "task_id": "body_location",
+        "evidence": "刚才不适位置选错了，请改为左侧太阳穴附近，范围仍是一片。"
+      }
+    },
+    {
+      "tool": "propose_self_check_result",
+      "arguments": {
+        "task_id": "body_location",
+        "option": "head",
+        "evidence": "刚才不适位置选错了，请改为左侧太阳穴附近，范围仍是一片。",
+        "input_evidence": {
+          "area": "请改为左侧太阳穴附近",
+          "side": "请改为左侧太阳穴附近",
+          "extent": "范围仍是一片"
+        },
+        "input": {
+          "area": {
+            "kind": "preset",
+            "value": "temple"
+          },
+          "side": "left",
+          "extent": "area"
+        }
+      }
+    }
+  ],
+  "scope": "Replay the actual two model tool proposals after scripted local setup in the final native binary. Not another real-provider consultation."
+}

@@ -1,0 +1,50 @@
+test_a_shortened_quote_cannot_remove_its_uncertainty_or_question_scope (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_atomic_batch_can_recover_from_a_rejected_negative_without_losing_age (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_demo_and_direct_correction_parser_preserve_qualified_history_as_unknown (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_interrogatives_and_non_absence_negations_do_not_become_absent (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_invalid_correction_keeps_the_prior_fact_until_a_valid_correction_arrives (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_named_uncertainty_in_another_clause_does_not_erase_a_clear_denial (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_present_text_cannot_disguise_a_false_denial_or_drop_uncertainty (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_repeated_quote_must_be_disambiguated_instead_of_choosing_the_certain_occurrence (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_uncertain_negatives_are_rejected_in_all_four_history_fields (tests.test_assertion_evidence.AssertionEvidenceTests) ... ok
+test_age_must_agree_with_quoted_evidence (tests.test_agent.AdaptiveAgentTests) ... ok
+test_body_location_is_self_report_not_verified_physical_exam (tests.test_agent.AdaptiveAgentTests) ... ok
+test_caregiver_source_does_not_depend_on_order_within_batch (tests.test_agent.AdaptiveAgentTests) ... ok
+test_changing_chief_cancels_old_task_requests (tests.test_agent.AdaptiveAgentTests) ... ok
+test_clarification_is_natural_but_budgeted (tests.test_agent.AdaptiveAgentTests) ... ok
+test_correction_invalidates_dependent_observation_and_keeps_history (tests.test_agent.AdaptiveAgentTests) ... ok
+test_early_summary_cannot_skip_required_fields (tests.test_agent.AdaptiveAgentTests) ... ok
+test_emergency_bypasses_model (tests.test_agent.AdaptiveAgentTests) ... ok
+test_emergency_in_delayed_input_is_not_discarded_as_stale (tests.test_agent.AdaptiveAgentTests) ... ok
+test_entire_batch_rejected_if_one_evidence_is_fabricated (tests.test_agent.AdaptiveAgentTests) ... ok
+test_invalid_batches_do_not_consume_successful_write_budget (tests.test_agent.AdaptiveAgentTests) ... ok
+test_mixed_screen_answer_extracts_new_facts_before_a_pending_task (tests.test_agent.AdaptiveAgentTests) ... ok
+test_model_correction_followed_by_failure_retries_the_correction_text (tests.test_agent.AdaptiveAgentTests) ... ok
+test_model_unavailable_is_explicit_and_does_not_consume_answer_as_other_field (tests.test_agent.AdaptiveAgentTests) ... ok
+test_negative_screen_option_cannot_be_inverted_by_a_model_proposal (tests.test_agent.AdaptiveAgentTests) ... ok
+test_one_turn_can_record_several_fields_and_skip_redundant_questions (tests.test_agent.AdaptiveAgentTests) ... ok
+test_repeated_positive_phrase_after_negation_is_not_missed (tests.test_agent.AdaptiveAgentTests) ... ok
+test_requested_task_is_deferred_then_offered_without_another_model_call (tests.test_agent.AdaptiveAgentTests) ... ok
+test_retry_uses_original_input_as_evidence (tests.test_agent.AdaptiveAgentTests) ... ok
+test_same_question_reasked_still_has_unique_action_revision (tests.test_agent.AdaptiveAgentTests) ... ok
+test_self_check_requires_explicit_negative_emergency_screen (tests.test_agent.AdaptiveAgentTests) ... ok
+test_successful_write_budget_remains_bounded (tests.test_agent.AdaptiveAgentTests) ... ok
+test_summary_requires_patient_confirmation_before_closing (tests.test_agent.AdaptiveAgentTests) ... ok
+test_task_request_requires_current_evidence_and_is_deduplicated (tests.test_agent.AdaptiveAgentTests) ... ok
+test_temperature_cannot_mark_an_unanswered_trajectory_as_unknown (tests.test_agent.AdaptiveAgentTests) ... ok
+test_tool_loop_is_bounded (tests.test_agent.AdaptiveAgentTests) ... ok
+test_ui_edit_keeps_pending_clarification_and_does_not_call_the_model (tests.test_agent.AdaptiveAgentTests) ... ok
+test_uncertain_screen_and_single_negative_cannot_be_written_as_all_negative (tests.test_agent.AdaptiveAgentTests) ... ok
+test_unknown_and_absence_preserved_separately (tests.test_agent.AdaptiveAgentTests) ... ok
+test_unknown_screen_keeps_task_request_pending (tests.test_agent.AdaptiveAgentTests) ... ok
+test_unregistered_tool_is_denied_then_replanned (tests.test_agent.AdaptiveAgentTests) ... ok
+test_urgent_score_interrupts_remaining_questions (tests.test_agent.AdaptiveAgentTests) ... ok
+test_model_proposal_keeps_quoted_report_and_its_uncertainty_in_summary (tests.test_uncertain_reports.AdaptiveUncertainReportTests) ... ok
+test_caregiver_and_skipped_measurement_keep_their_actual_source_and_quality (tests.test_uncertain_reports.UncertainReportTests) ... ok
+test_complete_consultation_keeps_reports_without_inventing_confirmed_values (tests.test_uncertain_reports.UncertainReportTests) ... ok
+test_correction_uses_only_current_evidence_and_keeps_history (tests.test_uncertain_reports.UncertainReportTests) ... ok
+
+----------------------------------------------------------------------
+Ran 45 tests in 0.186s
+
+OK

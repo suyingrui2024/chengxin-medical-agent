@@ -1,0 +1,54 @@
+{
+  "synthetic_only": true,
+  "checks": {
+    "empty_user_environment": true,
+    "only_packaged_python_source": true,
+    "external_network_disconnected": true,
+    "packaged_native_start": true,
+    "private_service_rejects_unauthenticated_access": true,
+    "complete_demo_interview": true,
+    "packaged_image_loaded": true,
+    "invalid_reading_rejected": true,
+    "unknown_and_measurement_provenance_preserved": true,
+    "no_model_requests": true,
+    "no_renderer_errors": true,
+    "private_service_stopped": true
+  },
+  "scope": "Same-host empty HOME, readonly package, system Python, no development source mount or external network. No new-machine or clinical validation.",
+  "runtime": {
+    "executable": "/usr/bin/python3",
+    "version": "3.10.12",
+    "module": "/app/resources/app/src/medagent/__init__.py",
+    "sys_path": [
+      "/app/resources/app/src",
+      "",
+      "/usr/lib/python310.zip",
+      "/usr/lib/python3.10",
+      "/usr/lib/python3.10/lib-dynload",
+      "/usr/local/lib/python3.10/dist-packages",
+      "/usr/lib/python3/dist-packages"
+    ],
+    "external_connect_errno": 101,
+    "interfaces": [
+      "lo"
+    ]
+  },
+  "node": "v22.23.3",
+  "application": {
+    "version": "0.11.16",
+    "path": "/app/resources/app",
+    "profile": "/home/clean/.config/chengxin-medagent-0.11.16",
+    "argv": [
+      "/app/Chengxin",
+      "--no-sandbox",
+      "--inspect=0",
+      "--remote-debugging-port=0"
+    ],
+    "preferences": {
+      "sandbox": true,
+      "nodeIntegration": false,
+      "contextIsolation": true
+    }
+  },
+  "passed": true
+}

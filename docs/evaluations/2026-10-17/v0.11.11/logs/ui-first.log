@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.11.10 test:ui
+> playwright test tests/ui/self-check-drafts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:1149612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/self-check-drafts.spec.mjs:7:1 › unconfirmed body location survives a session switch without writing a result (1.3s)
+
+  1 passed (5.1s)

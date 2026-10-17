@@ -1,0 +1,49 @@
+
+> medical-agent-dsh-integration@0.11.8 test:ui
+> playwright test tests/ui/consultation-subjects.spec.mjs --grep unsubmitted patient text
+
+
+Running 1 test using 1 worker
+
+(node:1090250) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/consultation-subjects.spec.mjs:7:1 › unsubmitted patient text stays with its original session (5.5s)
+
+
+  1) tests/ui/consultation-subjects.spec.mjs:7:1 › unsubmitted patient text stays with its original session 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  getByRole('textbox', { name: '输入你的描述' })
+    Expected: ""
+    Received: "父亲昨晚用过药物甲，尚未发送。"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" getByRole('textbox', { name: '输入你的描述' }) with timeout 5000ms
+      - waiting for getByRole('textbox', { name: '输入你的描述' })
+        14 × locator resolved to <textarea rows="1" maxlength="2000" inputmode="text" id="message-input" placeholder="按自己的话说，也可以补充或更正…"></textarea>
+           - unexpected value "父亲昨晚用过药物甲，尚未发送。"
+
+
+      17 |   await input.fill("父亲昨晚用过药物甲，尚未发送。");
+      18 |   const second = await create(page.locator("#new-session"));
+    > 19 |   await expect(input).toHaveValue("");
+         |                       ^
+      20 |   await input.fill("母亲的另一条未发送描述。");
+      21 |   await page.locator(`#recent-sessions .recent-item[data-session-id="${first.session_id}"]`).click();
+      22 |   await expect(input).toHaveValue("父亲昨晚用过药物甲，尚未发送。");
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/consultation-subjects.spec.mjs:19:23
+
+    Error Context: test-results/ui/consultation-subjects-unsu-7228c-s-with-its-original-session/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/consultation-subjects-unsu-7228c-s-with-its-original-session/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/consultation-subjects-unsu-7228c-s-with-its-original-session/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/consultation-subjects.spec.mjs:7:1 › unsubmitted patient text stays with its original session 

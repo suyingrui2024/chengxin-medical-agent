@@ -1,0 +1,6 @@
+{
+  "static_prefix_sha256": "97fa87ab11c0178873e891d1a36c683ef586c6846ece6ec5afa3f82a672cbbed",
+  "external_model_calls": 0,
+  "tool_count": 11,
+  "scope": "Only static prompt bytes, not clinical correctness or all dynamic model inputs."
+}

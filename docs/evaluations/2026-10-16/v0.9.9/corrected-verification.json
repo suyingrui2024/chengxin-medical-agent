@@ -1,0 +1,16 @@
+{
+  "kind": "execution-change-verifier-correction/v1",
+  "original_report_sha256": "5324f532493f239ca9947d2257310964ca6fa6d30e6ef9894515af4da3aa5c0e",
+  "correction": "Use independent TestLoader and explicit top_level_dir per directory; no change to candidate or required assertions.",
+  "probe": "import sys, unittest\nsys.path.insert(0, '/workspace')\nfrom calculator import add\nfor a,b in [(2,3),(-5,2),(0,0),(10**100,7)]:\n    assert add(a,b) == a+b, (a,b)\nexisting = unittest.TestLoader().discover('/workspace/tests', pattern='test_*.py', top_level_dir='/workspace/tests')\nassert existing.countTestCases() > 0, 'no existing tests'\nassert unittest.TextTestRunner().run(existing).wasSuccessful(), 'existing tests failed'\nsuite = unittest.TestLoader().discover('/workspace/regressions', pattern='test_*.py', top_level_dir='/workspace/regressions')\nassert suite.countTestCases() > 0, 'no regression tests'\nresult = unittest.TextTestRunner().run(suite)\nassert result.wasSuccessful(), 'regressions failed'\nprint('independent addition and regression checks passed')\n",
+  "model_requests": 0,
+  "verification": {
+    "passed": true,
+    "stdout": "independent addition and regression checks passed\n",
+    "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n.....\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n",
+    "exit_code": 0
+  },
+  "runtime_source_unchanged": true,
+  "other_initial_checks_passed": true,
+  "passed": true
+}

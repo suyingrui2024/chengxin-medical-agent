@@ -1,0 +1,27 @@
+{
+  "kind": "local-iteration-summary/v1",
+  "raw_trace_complete": false,
+  "stages": [
+    {
+      "stage": "cold-resume-constructor",
+      "outcome": "one error, one pass",
+      "cause": "Existing directory creation raised FileExistsError; added explicit reopened path."
+    },
+    {
+      "stage": "native-offline-fixture",
+      "outcome": "four pass, one fail",
+      "cause": "The supposed offline test inherited fixture credentials; rerun after clearing all model environment variables."
+    },
+    {
+      "stage": "footer-selector-regression",
+      "ui_groups_failed": 7,
+      "ui_groups_passed": 12,
+      "source_native_failed": 4,
+      "source_native_passed": 1,
+      "packaged_native_failed": 4,
+      "packaged_native_passed": 1,
+      "cause": "The app selector helper requires #; one new footer lookup omitted it, interrupting navigation. Corrected and reran all affected checks."
+    }
+  ],
+  "artifact_limit": "These are tool-observed summaries, not full intermediate snapshots. One trace artifact was unavailable after overlapping runners shared an output directory. Final packaged tests ran separately."
+}

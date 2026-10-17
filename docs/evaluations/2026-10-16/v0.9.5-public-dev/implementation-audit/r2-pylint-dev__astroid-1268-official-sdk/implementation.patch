@@ -1,0 +1,12 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -634,6 +634,9 @@
+     def visit_super(self, node):
+         return node.parent.accept(self)
+ 
++    def visit_unknown(self, node):
++        return "Unknown"
++
+     def visit_uninferable(self, node):
+         return str(node)
+ 

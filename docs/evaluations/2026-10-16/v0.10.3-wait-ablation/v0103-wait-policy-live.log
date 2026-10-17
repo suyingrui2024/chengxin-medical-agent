@@ -1,0 +1,8 @@
+{"case": "sympy__sympy-21627", "repetition": 1, "arm": "wait-30", "calls": 20, "source_correct": true, "runtime_completed": true, "end_to_end_completed": true}
+{"case": "sympy__sympy-21627", "repetition": 1, "arm": "wait-600", "calls": 20, "source_correct": true, "runtime_completed": false, "end_to_end_completed": false}
+{"case": "sphinx-doc__sphinx-8627", "repetition": 1, "arm": "wait-600", "calls": 20, "source_correct": true, "runtime_completed": false, "end_to_end_completed": false}
+{"case": "sphinx-doc__sphinx-8627", "repetition": 1, "arm": "wait-30", "calls": 20, "source_correct": true, "runtime_completed": false, "end_to_end_completed": false}
+{"case": "sympy__sympy-21627", "repetition": 2, "arm": "wait-600", "calls": 20, "source_correct": true, "runtime_completed": false, "end_to_end_completed": false}
+{"case": "sympy__sympy-21627", "repetition": 2, "arm": "wait-30", "calls": 20, "source_correct": true, "runtime_completed": true, "end_to_end_completed": true}
+{"case": "sphinx-doc__sphinx-8627", "repetition": 2, "arm": "wait-30", "calls": 20, "source_correct": true, "runtime_completed": true, "end_to_end_completed": true}
+{"case": "sphinx-doc__sphinx-8627", "repetition": 2, "arm": "wait-600", "calls": 20, "source_correct": true, "runtime_completed": false, "end_to_end_completed": false}

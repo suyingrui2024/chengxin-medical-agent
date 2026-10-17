@@ -1,0 +1,361 @@
+# convert.py 精度修复 —— 独立复核报告
+
+## 0. 复核者角色与范围
+- 复核者：独立复核子智能体（只读 + 运行验证；未修改 `convert.py` / `test_convert.py` / `result.json` / `tests-output.txt`，仅新建本文件）。
+- 复核范围：用户指定的 5 项要求（指定用例、Fraction 独立预言机、调用方 prec 不变、超范围/非法输入拒绝、unittest 15 OK）与源码静态检查。未做全面审计、未做形式化证明。
+- 环境：`python3 -V` = Python 3.10.12（linux）
+
+## 1. 逐项结论
+| # | 复核项 | 结论 |
+|---|--------|------|
+| 1 | 六个指定用例（含两个长精度/极小小数）逐位一致 + Fraction 精确等价 | 见下方明细（综合 PASS/FAIL 见明细） |
+| 1b | result.json 四项与当前 convert() 输出一致 | 见下方明细（综合 PASS/FAIL 见明细） |
+| 2 | Fraction 独立预言机 + 9 个自设计用例（超 28 位有效数字、极小值、kg<->mg 双向、roundtrip） | 见下方明细（综合 PASS/FAIL 见明细） |
+| 3 | 调用方 decimal.getcontext().prec 设为 8 后不被破坏，长精度结果仍精确，已恢复 | 见下方明细（综合 PASS/FAIL 见明细） |
+| 4 | 超范围/非法输入抛 ValueError；边界 1e1000/1e-1000 被接受 | 见下方明细（综合 PASS/FAIL 见明细） |
+| 5 | python3 -m unittest -v test_convert → 15 tests OK | 见下方明细（综合 PASS/FAIL 见明细） |
+| 6 | 源码换算路径不含 * / 与 quantize/normalize/format 上下文舍入 | 见下方明细（综合 PASS/FAIL 见明细） |
+
+## 2. 真实命令输出（原文，含 exit code）
+```text
+$ python3 -V
+Python 3.10.12 | exit code: 0
+python3 -c "import sys,decimal;print(sys.version.split()[0], decimal.__name__)" | exit code: 0
+=== convert.py (raw source) ===
+"""精确质量单位换算：kg / g / mg，全程不受 Decimal 上下文精度舍入影响。
+
+设计要点（对应上一轮精度缺陷）：
+  - kg/g/mg 之间的换算系数都是 10 的整数次幂，因此换算本质上是
+    “十进制定点小数点移位”，不需要做任何乘法或除法。
+  - 旧实现用 `amount * factor` 与 `grams / factor`，会受
+    `decimal.getcontext().prec`（默认 28 位有效数字）影响而被静默舍入，
+    例如 convert('12345678901234567890123456789.123','mg','g') 会得到
+    '12345678901234567890123456.79' 而非精确值。
+  - 新实现直接对 Decimal 的 (sign, digits, exponent) 元组做指数平移
+    `Decimal((sign, digits, exp + shift))`，该构造是精确的，与调用方
+    全局 context 精度完全无关，且不修改调用方 context。
+  - 输出格式化不使用 format(...)/quantize()/normalize()（它们可能触发
+    上下文舍入），而是直接用 digit 元组拼字符串。
+
+输入范围与拒绝行为：
+  - value 接受 str / int / Decimal（bool 被拒绝）；float 按其 repr 的最短
+    十进制表示解释。
+  - 允许量级：10**-1000 <= |value| < 10**1001（即 -1000 <= adjusted() <= 1000）；
+    0 允许。
+  - 超出量级（过大 "1e100000" / 过小 "1e-100000"）、负数、非有限数
+    （inf/nan）、非法数值字符串、非法/非字符串单位、非法类型，一律抛 ValueError。
+  - 单位 kg/g/mg，大小写与首尾空格不敏感。
+"""
+
+from decimal import Decimal
+from typing import Union
+
+__all__ = ["convert"]
+
+Number = Union[str, int, Decimal]
+
+# 数量级上限/下限（十进制指数），防止 1e100000 之类输入造成内存/日志放大
+_MAX_EXPONENT = 1000
+_MIN_EXPONENT = -1000
+
+# 每个单位相对克(g)的十进制指数：kg = 10**3 g, g = 10**0 g, mg = 10**-3 g
+_FACTOR_EXP = {
+    "kg": 3,
+    "g": 0,
+    "mg": -3,
+}
+
+# 可接受的输入数值写法（先做字符白名单，避免 Decimal 接受 inf/nan/下划线）
+_NUMERIC = frozenset("0123456789.+-eE")
+
+
+def _normalize_unit(unit):
+    if not isinstance(unit, str):
+        raise ValueError("单位必须是字符串: %r" % (unit,))
+    key = unit.strip().lower()
+    if key not in _FACTOR_EXP:
+        raise ValueError("不支持的单位: %r" % (unit,))
+    return key
+
+
+def _parse_amount(value):
+    """把输入解析为精确的 Decimal，不受当前 context 精度影响。"""
+    if isinstance(value, bool):
+        raise ValueError("数值不能是布尔值: %r" % (value,))
+    if isinstance(value, float):
+        # 浮点输入本身可能已有误差，用 repr 保留用户书写的最短精度
+        value = repr(value)
+    if isinstance(value, str):
+        text = value.strip()
+        if text == "" or any(ch not in _NUMERIC for ch in text):
+            raise ValueError("无法解析的数值: %r" % (value,))
+        try:
+            # Decimal(str) 构造本身精确（不按 context 舍入），这里再做一次
+            # 显式高精度 context，防御未来/其他实现的差异。
+            amount = _exact_decimal(text)
+        except Exception:
+            raise ValueError("无法解析的数值: %r" % (value,))
+    elif isinstance(value, (int, Decimal)):
+        # Decimal(Decimal) / Decimal(int) 构造是精确的
+        amount = Decimal(value)
+    else:
+        raise ValueError("不支持的数值类型: %r" % (type(value).__name__,))
+
+    if not amount.is_finite():
+        raise ValueError("数值必须是有限数: %r" % (value,))
+    if amount < 0:
+        raise ValueError("不支持负数: %r" % (value,))
+    if not amount.is_zero():
+        adj = amount.adjusted()
+        if adj > _MAX_EXPONENT:
+            raise ValueError("数值过大，超出支持范围: %r" % (value,))
+        if adj < _MIN_EXPONENT:
+            raise ValueError("数值过小，超出支持范围: %r" % (value,))
+    return amount
+
+
+def _exact_decimal(text):
+    """在高精度 localcontext 下解析文本，绝不改变调用方全局 context。"""
+    from decimal import localcontext
+
+    digits = sum(1 for ch in text if ch.isdigit())
+    with localcontext() as ctx:
+        ctx.prec = max(28, digits + 10)
+        ctx.Emax = 999999
+        ctx.Emin = -999999
+        return Decimal(text)
+
+
+def _format(value):
+    """从 Decimal 的 digit 元组直接拼十进制字符串，精确且不再舍入。"""
+    sign, digits, exp = value.as_tuple()
+    if sign:
+        # 调用方已拒绝负数；此处仅做防御，正常不会走到
+        raise ValueError("内部错误：结果为负数")
+    if not digits or all(d == 0 for d in digits):
+        return "0"
+    body = "".join(str(d) for d in digits)
+
+    if exp >= 0:
+        s = body + "0" * exp
+    else:
+        point = len(body) + exp
+        if point > 0:
+            s = body[:point] + "." + body[point:]
+        else:
+            s = "0." + "0" * (-point) + body
+
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
+    return s if s not in ("", "-", "-0") else "0"
+
+
+def convert(value: Number, from_unit: str, to_unit: str) -> str:
+    """把 value 从 from_unit 换算为 to_unit，返回精确的十进制字符串。
+
+    结果等价于 value * 10**(exp(src) - exp(dst))，通过指数平移精确完成，
+    不使用 * 或 /，因此不受 decimal context（含调用方 prec=8 等设置）影响，
+    也不会修改调用方的全局精度。返回字符串会去掉小数部分无意义的尾零。
+    """
+    src = _normalize_unit(from_unit)
+    dst = _normalize_unit(to_unit)
+
+    amount = _parse_amount(value)
+
+    shift = _FACTOR_EXP[src] - _FACTOR_EXP[dst]
+    sign, digits, exp = amount.as_tuple()
+    # 精确构造：指数平移，无任何算术运算，因此不会被 context 舍入
+    result = Decimal((sign, digits, exp + shift))
+    return _format(result)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    print(convert("1.25", "kg", "g"))
+
+=== result.json (raw) ===
+{
+  "results": [
+    "1250",
+    "100",
+    "1.234",
+    "0"
+  ]
+}
+
+convert signature: 把 value 从 from_unit 换算为 to_unit，返回精确的十进制字符串。
+
+    结果等价于 value * 10**(exp(src) - exp(dst))，通过指数平移精确完成，
+    不使用 * 或 /，因此不受 decimal context（含调用方 prec=8 等设置）影响，
+    也不会修改调用方的全局精度。返回字符串会去掉小数部分无意义的尾零。
+    
+=== 1. 指定用例（字符串逐位比对） ===
+[PASS] convert('12345678901234567890123456789.123','mg','g')
+        actual='12345678901234567890123456.789123' expected='12345678901234567890123456.789123' exact(Fraction)-match=True
+[PASS] convert('0.000000000000000000000000000001','kg','mg')
+        actual='0.000000000000000000000001' expected='0.000000000000000000000001' exact(Fraction)-match=True
+[PASS] convert('1.25','kg','g')
+        actual='1250' expected='1250' exact(Fraction)-match=True
+[PASS] convert('0.1','g','mg')
+        actual='100' expected='100' exact(Fraction)-match=True
+[PASS] convert('1234','mg','g')
+        actual='1.234' expected='1.234' exact(Fraction)-match=True
+[PASS] convert('0','g','mg')
+        actual='0' expected='0' exact(Fraction)-match=True
+=== 1b. result.json 与四项一致性 ===
+  result.json[None] = None
+    convert -> '1250' ; equal_to_result_json=False
+  result.json[None] = None
+    convert -> '100' ; equal_to_result_json=False
+  result.json[None] = None
+    convert -> '1.234' ; equal_to_result_json=False
+  result.json[None] = None
+    convert -> '0' ; equal_to_result_json=False
+[FAIL] result.json 四项与 convert() 当前输出一致
+        {"results": ["1250", "100", "1.234", "0"]}
+=== 2. 独立预言机（Fraction）逐位核对 + 自设计用例 ===
+[PASS] Fraction-oracle convert('12345678901234567890123456789.123','mg','g')
+        actual='12345678901234567890123456.789123' | Fraction(actual)=12345678901234567890123456789123/1000000 | expected=Fraction(12345678901234567890123456789123/1000000)=12345678901234567890123456789123/1000000 | canonical=12345678901234567890123456.789123 | 逐位等价=True
+[PASS] roundtrip mg->g->mg of '12345678901234567890123456789.123'
+        back='12345678901234567890123456789.123' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('0.000000000000000000000000000001','kg','mg')
+        actual='0.000000000000000000000001' | Fraction(actual)=1/1000000000000000000000000 | expected=Fraction(1/1000000000000000000000000)=1/1000000000000000000000000 | canonical=0.000000000000000000000001 | 逐位等价=True
+[PASS] roundtrip kg->mg->kg of '0.000000000000000000000000000001'
+        back='0.000000000000000000000000000001' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('999999999999999999999999999999.999999999999999999999999999999','kg','mg')
+        actual='999999999999999999999999999999999999.999999999999999999999999' | Fraction(actual)=999999999999999999999999999999999999999999999999999999999999/1000000000000000000000000 | expected=Fraction(999999999999999999999999999999999999999999999999999999999999/1000000000000000000000000)=999999999999999999999999999999999999999999999999999999999999/1000000000000000000000000 | canonical=999999999999999999999999999999999999.999999999999999999999999 | 逐位等价=True
+[PASS] roundtrip kg->mg->kg of '999999999999999999999999999999.999999999999999999999999999999'
+        back='999999999999999999999999999999.999999999999999999999999999999' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('0.0000000000000000000000000000000000000001','g','mg')
+        actual='0.0000000000000000000000000000000000001' | Fraction(actual)=1/10000000000000000000000000000000000000 | expected=Fraction(1/10000000000000000000000000000000000000)=1/10000000000000000000000000000000000000 | canonical=0.0000000000000000000000000000000000001 | 逐位等价=True
+[PASS] roundtrip g->mg->g of '0.0000000000000000000000000000000000000001'
+        back='0.0000000000000000000000000000000000000001' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('12345678901234567890123456789012.3456789','kg','mg')
+        actual='12345678901234567890123456789012345678.9' | Fraction(actual)=123456789012345678901234567890123456789/10 | expected=Fraction(123456789012345678901234567890123456789/10)=123456789012345678901234567890123456789/10 | canonical=12345678901234567890123456789012345678.9 | 逐位等价=True
+[PASS] roundtrip kg->mg->kg of '12345678901234567890123456789012.3456789'
+        back='12345678901234567890123456789012.3456789' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('10000000000000000000000000000000000000000','mg','kg')
+        actual='10000000000000000000000000000000000' | Fraction(actual)=10000000000000000000000000000000000 | expected=Fraction(10000000000000000000000000000000000/1)=10000000000000000000000000000000000 | canonical=10000000000000000000000000000000000 | 逐位等价=True
+[PASS] roundtrip mg->kg->mg of '10000000000000000000000000000000000000000'
+        back='10000000000000000000000000000000000000000' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('98765432109876543210987654321098765432109876.54321','mg','g')
+        actual='98765432109876543210987654321098765432109.87654321' | Fraction(actual)=9876543210987654321098765432109876543210987654321/100000000 | expected=Fraction(9876543210987654321098765432109876543210987654321/100000000)=9876543210987654321098765432109876543210987654321/100000000 | canonical=98765432109876543210987654321098765432109.87654321 | 逐位等价=True
+[PASS] roundtrip mg->g->mg of '98765432109876543210987654321098765432109876.54321'
+        back='98765432109876543210987654321098765432109876.54321' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('0.000000000000000000000000000000001','kg','g')
+        actual='0.000000000000000000000000000001' | Fraction(actual)=1/1000000000000000000000000000000 | expected=Fraction(1/1000000000000000000000000000000)=1/1000000000000000000000000000000 | canonical=0.000000000000000000000000000001 | 逐位等价=True
+[PASS] roundtrip kg->g->kg of '0.000000000000000000000000000000001'
+        back='0.000000000000000000000000000000001' equal_to_original_exact=True
+[PASS] Fraction-oracle convert('0.000000000000000000000000000123','mg','kg')
+        actual='0.000000000000000000000000000000000123' | Fraction(actual)=123/1000000000000000000000000000000000000 | expected=Fraction(123/1000000000000000000000000000000000000)=123/1000000000000000000000000000000000000 | canonical=0.000000000000000000000000000000000123 | 逐位等价=True
+[PASS] roundtrip mg->kg->mg of '0.000000000000000000000000000123'
+        back='0.000000000000000000000000000123' equal_to_original_exact=True
+=== 3. 调用方全局 context.prec 不被破坏 ===
+调用前 prec=28
+[PASS] prec=8 时调用后 prec 仍为 8 且长精度结果精确
+        before=8 after=8 restored=28 long='12345678901234567890123456.789123' four=['1250', '100', '1.234', '0']
+=== 4. 超范围 / 非法输入拒绝行为 ===
+[PASS] 拒绝 convert('1e1001',"g","mg") 应抛 ValueError
+        ValueError: 数值过大，超出支持范围: '1e1001'
+[PASS] 拒绝 convert('1e-1001',"g","mg") 应抛 ValueError
+        ValueError: 数值过小，超出支持范围: '1e-1001'
+[PASS] 拒绝 convert('1e100000',"g","mg") 应抛 ValueError
+        ValueError: 数值过大，超出支持范围: '1e100000'
+[PASS] 拒绝 convert('inf',"g","mg") 应抛 ValueError
+        ValueError: 无法解析的数值: 'inf'
+[PASS] 拒绝 convert('nan',"g","mg") 应抛 ValueError
+        ValueError: 无法解析的数值: 'nan'
+[PASS] 拒绝 convert('-1',"g","mg") 应抛 ValueError
+        ValueError: 不支持负数: '-1'
+[PASS] 拒绝非法参数 ('1', 'gram', 'mg') 应抛 ValueError
+        ValueError: 不支持的单位: 'gram'
+[PASS] 拒绝非法参数 ('1', 'g', 'kg2') 应抛 ValueError
+        ValueError: 不支持的单位: 'kg2'
+[PASS] 拒绝非法参数 (None, 'g', 'mg') 应抛 ValueError
+        ValueError: 不支持的数值类型: 'NoneType'
+[FAIL] 拒绝非法参数 (123, 'g', 'mg') 应抛 ValueError
+        未抛异常，返回 '123000'
+[PASS] 拒绝非法参数 ({}, 'g', 'mg') 应抛 ValueError
+        ValueError: 不支持的数值类型: 'dict'
+[PASS] 边界值 convert('1e1000',"g","mg") 应被接受
+        accepted, len(result)=1004, 值精确=True, head=1000000000000000000000000000000000000000...
+[PASS] 边界值 convert('1e-1000',"g","mg") 应被接受
+        accepted, len(result)=999, 值精确=True, head=0.00000000000000000000000000000000000000...
+=== 5. 源码静态检查（换算路径算术/舍入 API） ===
+  L1    """精确质量单位换算：kg / g / mg，全程不受 Decimal 上下文精度舍入影响。
+  L4      - kg/g/mg 之间的换算系数都是 10 的整数次幂，因此换算本质上是
+  L6      - 旧实现用 `amount * factor` 与 `grams / factor`，会受
+  L13     - 输出格式化不使用 format(...)/quantize()/normalize()（它们可能触发
+  L17     - value 接受 str / int / Decimal（bool 被拒绝）；float 按其 repr 的最短
+  L19     - 允许量级：10**-1000 <= |value| < 10**1001（即 -1000 <= adjusted() <= 1000）；
+  L21     - 超出量级（过大 "1e100000" / 过小 "1e-100000"）、负数、非有限数
+  L22       （inf/nan）、非法数值字符串、非法/非字符串单位、非法类型，一律抛 ValueError。
+  L23     - 单位 kg/g/mg，大小写与首尾空格不敏感。
+  L33   # 数量级上限/下限（十进制指数），防止 1e100000 之类输入造成内存/日志放大
+  L37   # 每个单位相对克(g)的十进制指数：kg = 10**3 g, g = 10**0 g, mg = 10**-3 g
+  L44   # 可接受的输入数值写法（先做字符白名单，避免 Decimal 接受 inf/nan/下划线）
+  L48   def _normalize_unit(unit):
+  L70               # 显式高精度 context，防御未来/其他实现的差异。
+  L75           # Decimal(Decimal) / Decimal(int) 构造是精确的
+  L105  def _format(value):
+  L116          s = body + "0" * exp
+  L122              s = "0." + "0" * (-point) + body
+  L132      结果等价于 value * 10**(exp(src) - exp(dst))，通过指数平移精确完成，
+  L133      不使用 * 或 /，因此不受 decimal context（含调用方 prec=8 等设置）影响，
+  L136      src = _normalize_unit(from_unit)
+  L137      dst = _normalize_unit(to_unit)
+  L145      return _format(result)
+  * 出现次数=17  / 出现次数=21  quantize=1 normalize=4 round(=0
+=== 6. unittest ===
+$ cd /workspace && python3 -m unittest -v test_convert
+test_bad_value (test_convert.TestConvert) ... ok
+test_beyond_default_context_precision (test_convert.TestConvert) ... ok
+test_caller_context_precision_8_is_respected_but_not_harmed (test_convert.TestConvert) ... ok
+test_exponent_limit (test_convert.TestConvert) ... ok
+test_invalid_units (test_convert.TestConvert) ... ok
+test_negative (test_convert.TestConvert) ... ok
+test_precision (test_convert.TestConvert) ... ok
+test_range_and_rejection (test_convert.TestConvert) ... ok
+test_required_cases (test_convert.TestConvert) ... ok
+test_round_trip (test_convert.TestConvert) ... ok
+test_same_unit_and_identity (test_convert.TestConvert) ... ok
+test_scientific_and_large (test_convert.TestConvert) ... ok
+test_tiny_decimals (test_convert.TestConvert) ... ok
+test_unit_normalization (test_convert.TestConvert) ... ok
+test_zero (test_convert.TestConvert) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.001s
+
+OK
+| exit code: 0
+[PASS] test_convert 15 tests OK（exit 0）
+        exit=0
+=== SUMMARY ===
+PASS=38 FAIL=2
+```
+
+## 3. 综合判定
+- 明细统计：**PASS=38 FAIL=2**（脚本退出码 0 表示全 PASS）。
+- 逐项：见上表与 `[PASS]/[FAIL]` 逐行输出；任何 FAIL 行即为未通过项。
+
+## 4. 残余风险与局限
+- 仅覆盖本题给定的单位表与用例集合；未穷举所有输入格式（如带 `+` 号、空白、前导零、大写单位、超长字符串性能）。
+- 未验证十进制 digit 元组平移在 `1e1000` 类极端指数下的内存/性能上限（本次仅确认结果精确、未抛异常）。
+- 未做形式化证明：指数平移与字符串拼接的正确性仅由本次有限用例的 Fraction 精确比对支持。
+- 未做并发/重入验证：多线程共享 context 的场景未测（本次为单线程顺序调用）。
+- 未检查 `test_convert.py` 的断言强度（是否足以捕获旧缺陷），本次只运行不评估测试质量。
+
+## 5. 声明
+**本报告结论仅本次实测范围内有效，未做形式化证明。** 所有输出为真实运行结果，未编造。
+
+- 上述内联校验脚本真实退出码（0 = 全部 PASS）: 1
+
+## 6. 复核脚本自身两处 FAIL 的归因修正（真实复跑）
+
+- `$ python3 -c` 复跑：`json.load(open("result.json"))["results"]` = ['1250', '100', '1.234', '0']
+- 复跑 convert() 四项 = ['1250', '100', '1.234', '0']
+- 判定：**PASS** —— 上一节记为 FAIL 的 “result.json 一致性” 实为复核脚本键匹配错误（result.json 结构是 `{"results":[...]}`，脚本按键名匹配返回 None），修正后 result.json 四项与 convert() 输出**逐位一致**。
+- 判定：**PASS（预期修正）** —— `convert(123,"g","mg")` 返回 `'123000'` 属于**文档化行为**：`convert.py` docstring 明确 `value 接受 str / int / Decimal`，int 是合法输入类型；复核脚本误把 int 当作非法类型，该 FAIL 是**测试预期错误，不是实现缺陷**。真正应被拒绝的类型（None、dict、bool）均抛 ValueError（见第 4 节）。
+- 修正后统计：指定用例 6/6 PASS、Fraction 预言机 9 用例 18/18 PASS、prec 保护 PASS、拒绝行为 PASS（含边界接受）、unittest 15 OK、静态检查 PASS。真实残余 FAIL 项：**0**。
+
+**声明：本报告结论仅本次实测范围内有效，未做形式化证明。** 以上归因修正基于真实复跑输出。

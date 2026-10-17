@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "same_scripted_commands": true,
+  "before": {
+    "facts": 0,
+    "question_id": "chief_complaint",
+    "backend_decisions": 1
+  },
+  "after": {
+    "facts": 5,
+    "question_id": "emergency_screen",
+    "backend_decisions": 3
+  },
+  "calculations_each": 1,
+  "external_model_calls_for_comparison": 0,
+  "scope": "Deterministic controller-flow comparison of copied v0.11.7 and frozen v0.11.8, not a model-intelligence or clinical comparison."
+}

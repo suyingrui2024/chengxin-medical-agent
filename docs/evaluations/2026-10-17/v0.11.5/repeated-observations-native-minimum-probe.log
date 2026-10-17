@@ -1,0 +1,52 @@
+
+> medical-agent-dsh-integration@0.11.5 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native repeat resumes.*900x680
+
+
+Running 1 test using 1 worker
+
+(node:989456) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 (6.3s)
+
+
+  1) tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 
+
+    Error: expect(locator).toBeInViewport() failed
+
+    Locator:  locator('#active-question').getByRole('button').first()
+    Expected: in viewport
+    Received: viewport ratio 0.5300925970077515
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeInViewport" locator('#active-question').getByRole('button').first() with timeout 5000ms
+      - waiting for locator('#active-question').getByRole('button').first()
+        14 × locator resolved to <button type="button" aria-label="在加重" class="visual-choice choice-worsening">…</button>
+           - unexpected value "viewport ratio 0.5300925970077515"
+
+
+       at ../fixtures/repeated-observations.mjs:258
+
+      256 |   await expect(choices).toHaveCount(4);
+      257 |   for (const choice of await choices.all())
+    > 258 |     await expect(choice).toBeInViewport({ ratio: 1 });
+          |                          ^
+      259 |   if (screenshot) await page.screenshot({ path: screenshot, fullPage: true });
+      260 | }
+      261 |
+        at verifyResumedObservationQuestion (/home/suyingrui/Desktop/medical-agent/tests/fixtures/repeated-observations.mjs:258:26)
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/repeated-observations.spec.mjs:51:11
+
+    Error Context: test-results/desktop/repeated-observations-nati-c6a70--options-visible-at-900x680/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/repeated-observations-nati-c6a70--options-visible-at-900x680/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/repeated-observations-nati-c6a70--options-visible-at-900x680/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 

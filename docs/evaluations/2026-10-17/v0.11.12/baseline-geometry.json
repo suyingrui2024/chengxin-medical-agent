@@ -1,0 +1,100 @@
+[
+  {
+    "trace": "baseline-failure/location-layout-location-c-0a033--readable-targets-on-mobile/trace.zip",
+    "member": "attachments/8aaae4b2a6ac7b42f1ad3e7e8fdb41236fe19c52",
+    "measurement": {
+      "targets": [
+        {
+          "text": "头/面部",
+          "x": 94.640625,
+          "y": 341.09375,
+          "width": 62.71875,
+          "height": 44
+        },
+        {
+          "text": "胸部",
+          "x": 102.9921875,
+          "y": 398.09375,
+          "width": 46.015625,
+          "height": 44
+        },
+        {
+          "text": "腹部",
+          "x": 102.9921875,
+          "y": 438.8125,
+          "width": 46.015625,
+          "height": 44
+        },
+        {
+          "text": "背/腰部",
+          "x": 235.640625,
+          "y": 419.8125,
+          "width": 62.71875,
+          "height": 44
+        },
+        {
+          "text": "四肢",
+          "x": 102.9921875,
+          "y": 503.953125,
+          "width": 46.015625,
+          "height": 44
+        }
+      ],
+      "overlaps": [
+        [
+          "胸部",
+          "腹部"
+        ]
+      ]
+    }
+  },
+  {
+    "trace": "baseline-failure/location-layout-location-c-58351-e-readable-targets-on-short/trace.zip",
+    "member": "attachments/e5759749d6e41e6905f5054c0a20dded7d9d2fc7",
+    "measurement": {
+      "targets": [
+        {
+          "text": "头/面部",
+          "x": 301.109375,
+          "y": 370.90625,
+          "width": 62.71875,
+          "height": 44
+        },
+        {
+          "text": "胸部",
+          "x": 309.4609375,
+          "y": 418.390625,
+          "width": 46.015625,
+          "height": 44
+        },
+        {
+          "text": "腹部",
+          "x": 309.4609375,
+          "y": 452.3125,
+          "width": 46.015625,
+          "height": 44
+        },
+        {
+          "text": "背/腰部",
+          "x": 418.59375,
+          "y": 436.484375,
+          "width": 62.71875,
+          "height": 44
+        },
+        {
+          "text": "四肢",
+          "x": 309.4609375,
+          "y": 506.59375,
+          "width": 46.015625,
+          "height": 44
+        }
+      ],
+      "overlaps": [
+        [
+          "胸部",
+          "腹部"
+        ]
+      ]
+    }
+  }
+]

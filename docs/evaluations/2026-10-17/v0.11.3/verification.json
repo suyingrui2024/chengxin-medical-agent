@@ -1,0 +1,41 @@
+{
+  "version": "0.11.3",
+  "policy_version": "medical-tools-v0.11.3",
+  "backend_discovered": 262,
+  "backend_default_passed": 209,
+  "backend_default_skipped": 53,
+  "skipped_checks_then_passed": 50,
+  "backend_unique_passed": 259,
+  "backend_remaining_skipped": 3,
+  "new_backend_tests": 9,
+  "ui_passed": 28,
+  "new_ui_tests": 1,
+  "native_source_passed": 20,
+  "native_package_passed": 20,
+  "new_native_tests": 1,
+  "real_deepseek_calls": 10,
+  "real_calls_per_phase": [
+    5,
+    5
+  ],
+  "synthetic_injected_proposals": 4,
+  "natural_error_rate_estimated": false,
+  "final_frozen_source_files": 231,
+  "live_source_snapshot_files_per_phase": [
+    86,
+    86
+  ],
+  "frozen_patient_checks_passed": 66,
+  "frozen_patient_check_external_calls": 0,
+  "offline_replay_scenarios": 4,
+  "offline_saved_real_decisions_replayed": 10,
+  "offline_injected_proposals_replayed": 4,
+  "offline_replay_external_calls": 0,
+  "package_own_files_matched": 102,
+  "package_applicable_dependency_versions_matched": 544,
+  "previous_named_archives_unchanged": 7,
+  "clinical_validation": false,
+  "overall_dsh_codex_parity_proven": false,
+  "goal_complete": false,
+  "scope": "Bounded Chinese assertion/evidence checks and synthetic recovery. The final present-text hardening was followed by new real-model, backend, SDK integration, UI, native and frozen checks. Three opt-in long checks retain v0.10.6 historical evidence. Not a clinical or general model accuracy study."
+}

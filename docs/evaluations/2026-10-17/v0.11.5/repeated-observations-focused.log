@@ -1,0 +1,37 @@
+test_demo_engine_uses_the_same_repeat_controller (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_history_coverage_keeps_retained_value_visible_after_many_skips (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_invalid_retry_and_skip_preserve_old_fact_and_discard_previous_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_literal_repeat_does_not_execute_negated_hypothetical_or_unrelated_requests (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_model_tool_is_registered_but_requires_actual_request_and_task_eligibility (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_new_reading_supersedes_and_restores_the_unanswered_question_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_actions_require_current_version_before_any_mutation_and_do_not_reopen_closed_cases (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_interrupts_and_restores_calculation_then_summary_rebuilds_current_measurement (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_reported_high_candidate_requires_confirmation_then_existing_triage_runs_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_uncertain_number_does_not_become_a_measurement_or_erase_previous_value (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_cancel_active_task_and_renew_explicitly (tests.test_task_intents.TaskIntentTests) ... ok
+test_cancel_pending_request_marks_not_done_and_does_not_complete_screening (tests.test_task_intents.TaskIntentTests) ... ok
+test_cancellation_cannot_retract_an_existing_reading (tests.test_task_intents.TaskIntentTests) ... ok
+test_declarative_request_is_retained_when_the_model_omits_the_request_tool (tests.test_task_intents.TaskIntentTests) ... ok
+test_latest_explicit_preference_wins_and_negated_cancellation_is_not_a_decline (tests.test_task_intents.TaskIntentTests) ... ok
+test_negative_request_is_not_queued_from_a_substring (tests.test_task_intents.TaskIntentTests) ... ok
+test_confirmation_executes_once_without_model_or_clinical_fact_and_resumes (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_emergency_text_bypasses_even_stale_card_and_never_computes (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_fabricated_or_unsolicited_inputs_do_not_create_a_form (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_fact_correction_invalidates_the_previous_confirmation (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_invalid_dimension_keeps_edited_inputs_and_original_proposal (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_malformed_confirmed_parameters_cannot_execute_and_form_is_retained (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_missing_or_wrong_card_identifiers_are_refused_before_mutation (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_new_patient_message_cancels_draft_and_reaches_the_planner (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_partial_input_is_blank_and_patient_can_supply_new_values (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_prior_clarification_returns_without_losing_its_wording (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_skip_returns_to_original_question_without_model_call (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_unknown_parameters_are_missing_not_invalid_measurements (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_missing_foreign_or_non_patient_sources_are_not_fabricated_as_patient_context (tests.test_present_provenance.PresentProvenanceTests) ... ok
+test_new_field_correction_replaces_its_quote_and_reference_but_keeps_history (tests.test_present_provenance.PresentProvenanceTests) ... ok
+test_old_sources_are_deduplicated_only_after_the_recent_window_and_do_not_revert_corrections (tests.test_present_provenance.PresentProvenanceTests) ... ok
+test_true_partial_report_keeps_its_quote_and_whole_source_without_inventing_a_dose (tests.test_present_provenance.PresentProvenanceTests) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.218s
+
+OK

@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:1215224) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on wide (1.4s)
+  ✓  2 tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on mobile (1.2s)
+  ✓  3 tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on short (1.4s)
+
+  3 passed (7.7s)

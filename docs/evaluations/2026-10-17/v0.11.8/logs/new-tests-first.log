@@ -1,0 +1,15 @@
+test_confirmation_keeps_history_pending_then_forwards_full_original_with_original_turn (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_failed_followup_retries_original_source_and_rejects_reopening_consumed_calculation (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_later_failed_message_retries_itself_instead_of_the_earlier_calculation_source (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_new_calculation_cannot_replace_an_unprocessed_earlier_supplement (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_new_information_leaves_old_supplement_pending_and_cannot_overwrite_later_correction (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_pending_supplement_blocks_summary_confirmation_and_stale_processing_actions (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_raw_emergency_remains_prior_to_calculation_and_followup_model_work (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_repeat_measurement_can_suspend_a_mixed_request_without_losing_its_supplement (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_simple_requests_have_a_bounded_fast_path_and_unknown_remainders_are_kept (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_skipping_arithmetic_still_processes_the_rest_of_the_original_message (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.076s
+
+OK

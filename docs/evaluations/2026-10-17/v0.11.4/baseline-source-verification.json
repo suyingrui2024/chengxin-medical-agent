@@ -1,0 +1,9 @@
+{
+  "recorded_runtime_and_protocol_files": 66,
+  "post_run_hashes_matched_pre_snapshot": 65,
+  "post_only_files": {
+    "playwright.live.config.mjs": "117d5d950a17a40556447d8c21481e413471d9747bb3e5d32d1c3c81e0856808"
+  },
+  "post_only_bytes_match_recorded_hashes": true,
+  "scope": "The original runner records post-run hashes. The manually frozen pre-run list omitted playwright.live.config.mjs; its matching post-run bytes are preserved separately, not claimed as a pre-run byte snapshot."
+}

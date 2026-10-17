@@ -1,0 +1,34 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "cases": [
+    {
+      "case": "measurement_plus_medication_update",
+      "reply_kind": "summary",
+      "temperature": 37.6,
+      "medication_assertion": "absent",
+      "medication_value": null,
+      "provider_decisions_after_measurement": 0,
+      "scope": "Script backend, real controller transitions; original source is retained as measurement evidence but the explicit medication update is not processed."
+    },
+    {
+      "case": "full_measurement_report",
+      "text": "腋温38.6℃，读数可能不准",
+      "assertion": "present",
+      "quality": "not_assessed",
+      "value": 38.6
+    },
+    {
+      "case": "full_measurement_report",
+      "text": "腋温38.6℃，这个读数我不确定",
+      "assertion": "present",
+      "quality": "not_assessed",
+      "value": 38.6
+    },
+    {
+      "case": "full_measurement_report",
+      "text": "腋温37.6℃，昨晚用药物甲2片",
+      "error_type": "ObservationInputError"
+    }
+  ]
+}

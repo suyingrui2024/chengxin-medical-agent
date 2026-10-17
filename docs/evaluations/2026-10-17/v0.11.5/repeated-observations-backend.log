@@ -1,0 +1,28 @@
+s..............................................................................s.........sss..............ss.ss.s...........s...........ssssssssssssssssssssssss..........sss.sss.............sssssssss......................s...s.s................................F...............
+======================================================================
+FAIL: test_cancel_active_task_and_renew_explicitly (test_task_intents.TaskIntentTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_task_intents.py", line 79, in test_cancel_active_task_and_renew_explicitly
+    self.assertNotIn("temperature_c", self.state.facts)
+AssertionError: 'temperature_c' unexpectedly found in {'chief_complaint': Fact(key='chief_complaint', value='发烧', assertion=<Assertion.PRESENT: 'present'>, source=<Source.PATIENT: 'patient'>, turn_id='7bcfdaea-5eb2-4738-8c58-30d710906625', recorded_at='2026-10-16T19:45:30.566092+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='330ecdba-37d9-458d-a498-461b0149ca8e', evidence='发烧'), 'emergency_screen': Fact(key='emergency_screen', value=None, assertion=<Assertion.ABSENT: 'absent'>, source=<Source.PATIENT: 'patient'>, turn_id='ebd3e1fd-6d82-4717-894b-24dd213cb3f8', recorded_at='2026-10-16T19:45:30.567126+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='1d6fe836-e315-40b3-8d29-e30c0227c0fc', evidence='这些危险情况都没有'), 'temperature_c': Fact(key='temperature_c', value={'reason': 'skip'}, assertion=<Assertion.UNKNOWN: 'unknown'>, source=<Source.PATIENT: 'patient'>, turn_id='5983ab80-eb52-4744-bafc-61395510c71a', recorded_at='2026-10-16T19:45:30.567819+00:00', quality=<ObservationQuality.NOT_DONE: 'not_done'>, supersedes=None, fact_id='a707a603-c701-49db-a525-e609ee1fd5b2', evidence='取消测温')}
+
+----------------------------------------------------------------------
+Ran 276 tests in 6.458s
+
+FAILED (failures=1, skipped=53)
+[17/Oct/2026 03:45:24] "GET /api/sessions/0eef8fea-78b1-42a6-8887-c8ea16302101/snapshot HTTP/1.1" 200 -
+[17/Oct/2026 03:45:24] "POST /api/sessions/0eef8fea-78b1-42a6-8887-c8ea16302101/messages HTTP/1.1" 409 -
+[17/Oct/2026 03:45:24] "POST /api/sessions/0eef8fea-78b1-42a6-8887-c8ea16302101/messages HTTP/1.1" 200 -
+[17/Oct/2026 03:45:24] "POST /api/sessions/0eef8fea-78b1-42a6-8887-c8ea16302101/messages HTTP/1.1" 200 -
+[17/Oct/2026 03:45:25] "GET /api/execution/0e835897-65f9-4034-932d-c479da721cd0/preview?path=plot.png HTTP/1.1" 200 -
+[17/Oct/2026 03:45:25] "GET /api/execution/0e835897-65f9-4034-932d-c479da721cd0/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 200 -
+[17/Oct/2026 03:45:25] "GET /api/execution/0e835897-65f9-4034-932d-c479da721cd0/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 401 -
+[17/Oct/2026 03:45:25] "GET /api/execution/0e835897-65f9-4034-932d-c479da721cd0/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 403 -
+[17/Oct/2026 03:45:25] "GET /api/execution/0e835897-65f9-4034-932d-c479da721cd0/image?path=plot.png&sha256=0000000000000000000000000000000000000000000000000000000000000000 HTTP/1.1" 400 -
+[17/Oct/2026 03:45:27] "GET /api/execution/e3ee2a1a-a343-489e-bf4b-f51624d92119/directory?limit=1 HTTP/1.1" 200 -
+[17/Oct/2026 03:45:27] "GET /api/execution/e3ee2a1a-a343-489e-bf4b-f51624d92119/directory HTTP/1.1" 401 -
+[17/Oct/2026 03:45:27] "GET /api/execution/e3ee2a1a-a343-489e-bf4b-f51624d92119/directory HTTP/1.1" 403 -
+[17/Oct/2026 03:45:27] "GET /api/execution/e3ee2a1a-a343-489e-bf4b-f51624d92119/directory?limit=0 HTTP/1.1" 400 -
+[17/Oct/2026 03:45:27] "GET /api/execution/e3ee2a1a-a343-489e-bf4b-f51624d92119/directory?cursor=eyJyZXZpc2lvbiI6IjQ4NGFkYWUyZTQ5NThkYjhlODg4N2EzYzk5NjUxMjVmNTRkYjc2NTUyM2QwZjA5MGMwM2RjNjMxNjBmZWQ5YWUiLCJhZnRlciI6WzEsImEudHh0Il19 HTTP/1.1" 409 -
+[17/Oct/2026 03:45:27] "GET /api/execution/e3ee2a1a-a343-489e-bf4b-f51624d92119?include_artifacts=0 HTTP/1.1" 200 -

@@ -1,0 +1,13 @@
+{
+  "changes": {
+    "src/medagent/web/styles.css": {
+      "before": "4d0bfc58fa6007a3563def1779e2eddefad6c44fb7841ce437e2bf3b30c92301",
+      "after": "d37046dcbdcb2fed0a01a76d1a29e175491e7e05e3c1d123ee2b8be723c5e525"
+    },
+    "tests/ui/location-layout.spec.mjs": {
+      "before": "cbfb196f13398e94c6d6f093bbf9686e64616d72a2bcbd94a5f76fb02648f961",
+      "after": "7da41c0a925dd9997589784b1ed566eea7e866cb6281668713293e66733ba6df"
+    }
+  },
+  "reason": "Fix required formatting of the new UI test; scope compact task headers and figure rules to active tasks so a pending patient task cannot restyle developer previews. Final UI and native suites run after this snapshot."
+}

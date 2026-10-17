@@ -1,0 +1,7 @@
+{
+  "baseline_binary": "dist/desktop/Chengxin-0.11.3-linux-x64/Chengxin",
+  "baseline_binary_matches_original_release_sha256": true,
+  "expanded_binary": "dist/desktop/Chengxin-0.11.4-linux-x64/Chengxin",
+  "expanded_pre_and_final_audit_binary_sha256_equal": true,
+  "scope": "Binary hashes at recorded audit checkpoints, not continuous filesystem monitoring."
+}

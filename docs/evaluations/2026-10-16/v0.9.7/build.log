@@ -1,0 +1,10 @@
+
+> medical-agent-dsh-integration@0.9.7 desktop:build
+> node scripts/build-desktop.mjs
+
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+
+added 544 packages in 3s
+Packaging app for platform linux x64 using electron v44.7.2
+桌面应用已生成：/home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.9.7-linux-x64/Chengxin
+保留整个应用目录；默认离线模式需要系统 Python 3.10+，DSH 另需系统 Node 22.19+。

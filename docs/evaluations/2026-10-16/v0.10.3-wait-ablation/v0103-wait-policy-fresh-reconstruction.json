@@ -1,0 +1,177 @@
+{
+  "returncode": 0,
+  "restored_frozen_source_files": 128,
+  "all_frozen_files_match_after_materialization": true,
+  "fresh_two_case_environments_reconstructed": true,
+  "archived_candidate_replayed": true,
+  "dependency_policy": "Reused installed locked Node dependencies; source, wheel and historical interpreter inputs copied from the immutable v0.10.2 archive. No model or package download.",
+  "replay": {
+    "model_requests": 0,
+    "negative_control": false,
+    "scope": "Frozen required-node replay only; delivered new regression tests have a separate post-hoc audit.",
+    "runs": [
+      {
+        "run": "r1-sympy__sympy-21627-wait-30",
+        "checks": {
+          "oracle_finished": true,
+          "source_boolean_matches": true,
+          "pytest_exit_matches": true,
+          "all_node_outcomes_match": true
+        },
+        "replay_matches_original": true,
+        "verification": {
+          "pytest_exit_code": 0,
+          "outcomes": {
+            "sympy/functions/elementary/tests/test_complexes.py::test_Abs": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_re": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_im": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_sign": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_as_real_imag": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_Abs_rewrite": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_Abs_real": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_Abs_properties": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_abs": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_arg": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_arg_rewrite": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_adjoint": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_conjugate": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_conjugate_transpose": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_transpose": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_polarify": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_unpolarify": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_issue_4035": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_issue_3206": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_issue_4754_derivative_conjugate": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_derivatives_issue_4757": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_issue_11413": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_periodic_argument": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_principal_branch": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_issue_14216": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_issue_14238": "passed",
+            "sympy/functions/elementary/tests/test_complexes.py::test_zero_assumptions": "passed"
+          },
+          "test_id_map": {
+            "test_Abs": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_Abs"
+            ],
+            "test_re": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_re"
+            ],
+            "test_im": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_im"
+            ],
+            "test_sign": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_sign"
+            ],
+            "test_as_real_imag": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_as_real_imag"
+            ],
+            "test_Abs_rewrite": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_Abs_rewrite"
+            ],
+            "test_Abs_real": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_Abs_real"
+            ],
+            "test_Abs_properties": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_Abs_properties"
+            ],
+            "test_abs": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_abs"
+            ],
+            "test_arg": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_arg"
+            ],
+            "test_arg_rewrite": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_arg_rewrite"
+            ],
+            "test_adjoint": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_adjoint"
+            ],
+            "test_conjugate": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_conjugate"
+            ],
+            "test_conjugate_transpose": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_conjugate_transpose"
+            ],
+            "test_transpose": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_transpose"
+            ],
+            "test_polarify": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_polarify"
+            ],
+            "test_unpolarify": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_unpolarify"
+            ],
+            "test_issue_4035": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_issue_4035"
+            ],
+            "test_issue_3206": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_issue_3206"
+            ],
+            "test_issue_4754_derivative_conjugate": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_issue_4754_derivative_conjugate"
+            ],
+            "test_derivatives_issue_4757": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_derivatives_issue_4757"
+            ],
+            "test_issue_11413": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_issue_11413"
+            ],
+            "test_periodic_argument": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_periodic_argument"
+            ],
+            "test_principal_branch": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_principal_branch"
+            ],
+            "test_issue_14216": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_issue_14216"
+            ],
+            "test_issue_14238": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_issue_14238"
+            ],
+            "test_zero_assumptions": [
+              "sympy/functions/elementary/tests/test_complexes.py::test_zero_assumptions"
+            ]
+          },
+          "fail_to_pass": [
+            "test_Abs"
+          ],
+          "pass_to_pass": [
+            "test_re",
+            "test_im",
+            "test_sign",
+            "test_as_real_imag",
+            "test_Abs_rewrite",
+            "test_Abs_real",
+            "test_Abs_properties",
+            "test_abs",
+            "test_arg",
+            "test_arg_rewrite",
+            "test_adjoint",
+            "test_conjugate",
+            "test_conjugate_transpose",
+            "test_transpose",
+            "test_polarify",
+            "test_unpolarify",
+            "test_issue_4035",
+            "test_issue_3206",
+            "test_issue_4754_derivative_conjugate",
+            "test_derivatives_issue_4757",
+            "test_issue_11413",
+            "test_periodic_argument",
+            "test_principal_branch",
+            "test_issue_14216",
+            "test_issue_14238",
+            "test_zero_assumptions"
+          ],
+          "runtime_completed": true,
+          "stderr": "",
+          "test_output_tail": "...........................                                              [100%]\n=============================== warnings summary ===============================\nsympy/external/importtools.py:4\n  /workspace/sympy/external/importtools.py:4: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives\n    from distutils.version import LooseVersion\n\n.benchmark_dependencies/_pytest/config/__init__.py:1373\n  /workspace/.benchmark_dependencies/_pytest/config/__init__.py:1373: PytestConfigWarning: Unknown config option: doctestplus\n  \n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n27 passed, 2 warnings in 1.15s\n",
+          "passed": true,
+          "original_bug_reproduced": false
+        }
+      }
+    ],
+    "passed": true
+  }
+}

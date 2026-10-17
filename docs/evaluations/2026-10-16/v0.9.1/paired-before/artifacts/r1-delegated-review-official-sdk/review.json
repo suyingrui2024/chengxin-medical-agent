@@ -1,0 +1,123 @@
+{
+  "reviewer": "independent-subagent",
+  "summary": "I adversarially verified invoice.total with an independent harness (/tmp/verify_invoice.py, 93 targeted checks) whose expected values are computed with fractions.Fraction and a hand-written ROUND_HALF_UP, plus a 30,000-case randomized property test over the valid contract domain with randomized caller precision. The core money logic is correct and strong: rounding is applied once to the grand total (not per line), arithmetic is exact decimal (not binary float), exact total halves round half-up, formatting is a fixed two decimals, empty input gives 0.00, all tested ValueError categories fire, and results are exact under caller precision 8 with the global context fully unchanged. All 18 author tests and the frozen existing test pass, but I did not rely on them. Adversarial gaps found are all in price validation: the regex uses \\d, which (under Python's default Unicode matching) accepts non-ASCII decimal digits such as Arabic-Indic or fullwidth digits and computes them, and there is no cap enforcing the contract's 16-integer/6-fractional-digit bounds. Two additional robustness findings, outside the stated contract, are that a caller-set Inexact trap makes a valid rounding call raise decimal.Inexact (localcontext copies caller traps), and a caller-set Emax can cause Overflow. No project file was modified.",
+  "checks": [
+    {
+      "name": "per_line_rounding_discriminator",
+      "method": "check_exact() in /tmp/verify_invoice.py: 3 lines of price '0.005' qty 1; independently expect Fraction-based half-up of exact 0.015",
+      "expected": "0.02",
+      "observed": "0.02",
+      "passed": true,
+      "notes": "Per-line half-up would give 0.01*3 = 0.03. Also 1.005+1.005 -> 2.01 (per-line would be 2.02) and 3x0.004 -> 0.01 (per-line 0.00). Confirms rounding happens only on the grand total."
+    },
+    {
+      "name": "exact_decimal_not_binary_float",
+      "method": "check_exact() on prices '1.005', '2.675', and ['0.1','0.2']",
+      "expected": {"1.005": "1.01", "2.675": "2.68", "0.1+0.2": "0.30"},
+      "observed": {"1.005": "1.01", "2.675": "2.68", "0.1+0.2": "0.30"},
+      "passed": true,
+      "notes": "Binary float 1.005 is 1.00499999... and 2.675 is 2.67499999..., which would misround to 1.00/2.67; 0.1+0.2 is 0.30000000000000004 in float. Implementation uses exact decimal."
+    },
+    {
+      "name": "round_half_up_on_exact_halves_at_total",
+      "method": "check_exact() over exact halves 0.005/0.015/0.025/0.045/0.055/2.675/1.005 and non-halves 0.004/1.004; independent Fraction half-up",
+      "expected": ["0.01", "0.02", "0.03", "0.05", "0.06", "2.68", "1.01", "0.00", "1.00"],
+      "observed": ["0.01", "0.02", "0.03", "0.05", "0.06", "2.68", "1.01", "0.00", "1.00"],
+      "passed": true,
+      "notes": "ROUND_HALF_UP (not banker's rounding): 0.005 -> 0.01 (half-even would give 0.00). Carry cases 0.995 -> 1.00 and 9999999999999999.995 -> 10000000000000000.00 also correct."
+    },
+    {
+      "name": "empty_input_and_fixed_two_decimals",
+      "method": "total([]), total(()), and single lines '2', '2.5', '0', '1.25', qty 0, qty 1000",
+      "expected": ["0.00", "0.00", "2.00", "2.50", "0.00", "1.25", "0.00", "1000.00"],
+      "observed": ["0.00", "0.00", "2.00", "2.50", "0.00", "1.25", "0.00", "1000.00"],
+      "passed": true,
+      "notes": "Fixed two-decimal formatting and empty-input 0.00 confirmed, including tuple and generator inputs."
+    },
+    {
+      "name": "price_valueerror_categories",
+      "method": "raise_to_expected() over 22 malformed strings, 8 non-string values, NaN/Infinity, negatives",
+      "expected": "ValueError for all",
+      "observed": "ValueError for all 30 cases (e.g. 'abc', '', 'NaN', 'Infinity', '-1.00', '1e3', ' 1.00', '1.', '.5', '1,000.00', '1_000.00', None, 1, 1.0, Decimal('1.00'), True)",
+      "passed": true,
+      "notes": "All malformed / non-string / non-finite / negative prices raise ValueError as required."
+    },
+    {
+      "name": "quantity_valueerror_categories",
+      "method": "raise_to_expected() over bool, non-int, and out-of-range quantities; plus valid boundary 0/1/999/1000",
+      "expected": "ValueError for True/False/2.0/'2'/-1/1001/None/Decimal(2)/-0.0/1001.0/1.5/[]/{}; return for 0,1,999,1000",
+      "observed": "ValueError for all 13 invalid; returned for all 4 valid boundaries",
+      "passed": true,
+      "notes": "bool correctly excluded from int; -0.0 (float) rejected; inclusive 0..1000 range enforced."
+    },
+    {
+      "name": "precision_8_exact_and_context_unchanged",
+      "method": "set getcontext().prec=8, total(['1234567890123456.123456' q1, '0.000001' q1]) and a 19-digit product ('9999999999999999.999999' q1000); compare to Fraction expectation; snapshot prec/rounding/Emax/Emin/traps/flags/identity",
+      "expected": {"16_digit": "1234567890123456.12", "big_product": "10000000000000000000.00", "prec_inside": 8, "context_restored": true},
+      "observed": {"16_digit": "1234567890123456.12", "big_product": "10000000000000000000.00", "prec_inside": 8, "context_restored": true},
+      "passed": true,
+      "notes": "localcontext() with prec=MAX_PREC makes arithmetic exact; global prec stayed 8 during the call and the context object, prec, rounding, Emax/Emin, traps and flags were identical afterwards."
+    },
+    {
+      "name": "randomized_property_test_valid_domain",
+      "method": "python3 /tmp/fuzz_invoice.py: 30000 random line-sets within the contract domain (<=16 int digits, <=6 frac digits, qty 0..1000), randomized caller precisions in {1,2,5,8,10,28,50,200}, expected via Fraction half-up",
+      "expected": "0 mismatches",
+      "observed": "0 mismatches; global prec restored",
+      "passed": true,
+      "notes": "Strong evidence there is no hidden arithmetic/rounding bug inside the valid input domain, including heavy bias toward exact half-way sums. Took ~1s."
+    },
+    {
+      "name": "reject_non_ascii_unicode_digit_prices",
+      "method": "total([{'price': '١٢٣.٥'|'१२३.५'|'１２３.５', 'quantity': 1}])",
+      "expected": "ValueError (not an ordinary decimal string)",
+      "observed": "returned '123.50' for all three; no exception",
+      "passed": false,
+      "notes": "The price regex uses \\d, which by default matches Unicode category Nd digits, and decimal.Decimal parses them. 'Ordinary decimal string' and the code's own comment imply ASCII [0-9]. This is a real validation hole."
+    },
+    {
+      "name": "reject_prices_outside_16_int_6_frac_bounds",
+      "method": "total([{'price': '1'*17 + '.0', 'quantity': 1}]) and total([{'price': '1.' + '0'*7, 'quantity': 1}])",
+      "expected": "ValueError per contract bound (16 integer / 6 fractional digits)",
+      "observed": "returned '11111111111111111.00' and '1.00' respectively; no exception",
+      "passed": false,
+      "notes": "The regex has no length cap; only ASCII form is checked. Whether out-of-bound lengths must raise is an interpretation of contract items 1 and 4, but item 1 explicitly bounds the valid price domain."
+    },
+    {
+      "name": "caller_decimal_trap_independence",
+      "method": "set getcontext().traps[decimal.Inexact]=True, then total([{'price':'0.005','quantity':1}])",
+      "expected": "returned '0.01' (robustness; caller context should not break a valid call)",
+      "observed": "raised decimal.Inexact: [<class 'decimal.Inexact'>]",
+      "passed": false,
+      "notes": "localcontext() copies the caller's traps, so an Inexact trap aborts the required final rounding. NOT part of the stated contract (which mentions only precision) and the trap is left unmodified, but it is a caller-context sensitivity worth flagging. A robust fix would clear traps inside localcontext."
+    },
+    {
+      "name": "caller_emax_independence",
+      "method": "set getcontext().prec=8 and getcontext().Emax=5, then total([{'price':'123456789.00','quantity':1}])",
+      "expected": "123456789.00 (robustness only; contract specifies precision 8, not Emax)",
+      "observed": "raised decimal.Overflow: [<class 'decimal.Overflow'>]",
+      "passed": false,
+      "notes": "localcontext() also inherits the caller's exponent limits; Emax/Emin are not reset. Informational/robustness only, outside the stated contract."
+    },
+    {
+      "name": "project_files_unmodified",
+      "method": "sha256sum invoice.py tests/test_total.py tests/test_existing.py fixture_identity.json before and after all checks",
+      "expected": {"invoice.py": "400240afb18b560e2ad1ce4776cb96bf949811f6bc8e0069d761404547f1a013", "tests/test_total.py": "b818b44250b2b86dfec36231b99b3b1a1d0fafa372266e0d0ed3a9c36e58f628", "tests/test_existing.py": "d2170533b2c1b29a3b2d54b2beb68b597540f241dd493b1d33dc2d89446f07df", "fixture_identity.json": "3be40c8ff3e48e3aa35c2584f764fa7fe238881347d8a40517a67fc5aa5e4bc6"},
+      "observed": "all four hashes identical before/after; fixture is 34 bytes, byte-identical",
+      "passed": true,
+      "notes": "Only review.json was created in the repo. The frozen fixture was not touched."
+    }
+  ],
+  "findings": [
+    "Core contract behavior is correct: exact decimal multiply-then-sum, single ROUND_HALF_UP on the grand total (verified with discriminating per-line cases), exact halves, fixed two-decimal output, empty input 0.00, and required ValueErrors.",
+    "Precision independence holds: with caller prec=8 the 16-digit and 19-digit cases match an independent Fraction computation, and the global context (object identity, prec, rounding, Emax/Emin, traps, flags) is unchanged after the call.",
+    "30,000 randomized valid-domain cases produced zero mismatches against an independent Fraction-based ROUND_HALF_UP oracle, giving high confidence in the arithmetic.",
+    "Validation gap: \\d in _PRICE_RE accepts non-ASCII Unicode decimal digits (Arabic-Indic, Devanagari, fullwidth). total([{'price':'١٢٣.٥','quantity':1}]) returns '123.50' instead of raising ValueError.",
+    "Validation gap: no maximum digit-count enforcement; 17-integer-digit and 7-fractional-digit prices are accepted, despite the contract bounding prices to 16 integer and 6 fractional digits.",
+    "Robustness (outside stated contract): localcontext() copies caller traps and exponent limits, so a caller-set Inexact trap raises on the final rounding and a caller-set Emax can Overflow. The global context is not modified, but these settings can break an otherwise valid call.",
+    "Malformed rows: a row missing 'price'/'quantity' raises KeyError and a non-mapping row raises TypeError rather than ValueError; the contract only specifies valid row structure, so this is informational."
+  ],
+  "contract_violations": [
+    "Non-ASCII Unicode decimal digit prices are accepted instead of raising ValueError, violating the 'ORDINARY decimal string' price definition and the requirement that invalid prices raise ValueError. Counterexample: total([{'price':'١٢٣.٥','quantity':1}]) == '123.50' (also fullwidth '１２３.５' and Devanagari '१२३.५').",
+    "Prices outside the stated bounds of 16 integer digits and 6 fractional digits are accepted instead of raising ValueError: total([{'price':'1'*17 + '.0','quantity':1}]) == '11111111111111111.00' and total([{'price':'1.' + '0'*7,'quantity':1}]) == '1.00'. Interpretation of contract item 1 (price domain) together with item 4 (invalid prices must raise)."
+  ]
+}

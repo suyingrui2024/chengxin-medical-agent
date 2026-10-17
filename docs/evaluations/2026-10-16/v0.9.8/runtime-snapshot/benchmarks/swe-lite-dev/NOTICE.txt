@@ -1,0 +1,32 @@
+本目录保存 SWE-bench Lite 公开 DEV 集的四条原始任务与冻结清单，供内部开发对照。
+这不是官方 SWE-bench Docker harness，也不是正式排行榜成绩。
+
+来源与引用：
+https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite
+https://www.swebench.com/lite.html
+Carlos E. Jimenez et al., SWE-bench: Can Language Models Resolve Real-world
+Github Issues?, ICLR 2024. https://openreview.net/forum?id=VTF8yNQM66
+
+选择范围：DEV 23 条中，预先人工选择四条、三个仓库，覆盖迭代协议、序列化异常、
+嵌套字段配置和 AST 节点展示。未使用 TEST 集调优；不代表完整任务分布，存在公开
+历史任务被模型预训练见过的可能。实例、参考补丁和测试补丁只保留在宿主评测目录，
+模型工作区仅获得 base_commit 源码、固定依赖、公开测试助手及 problem_statement。
+不提供 hints_text、目标测试列表或参考补丁；任务提示禁止检索上游答案。
+
+上游源码与依赖在运行时按 manifest.json 中固定 URL/SHA-256 下载；保留各自 LICENSE
+和 wheel 元数据。本目录不将上游不同许可证重新授权为本项目许可证。下载代码仅在
+现有 bubblewrap 文件系统边界内运行，不在持有真实凭据的宿主导入。
+
+适配：/usr/bin/python3 3.10、系统 pytest；三个缺失依赖按官方 PyPI wheel SHA-256
+固定，不修改全局环境。完整源清单包含依赖和测试助手。八个官方历史参数化测试名
+被截断，manifest.json 明确列出一对一完整名称映射；没有删除测试或修改测试断言。
+全部四个任务预检要求：原始实现使 FAIL_TO_PASS 全失败、PASS_TO_PASS 全通过；
+参考补丁使全部指定测试通过。未满足时禁止调用模型。候选运行结束并关闭进程树后，
+在新副本应用上游 test_patch 运行独立检查；篡改已有测试/配置/依赖判失败。
+
+复现（项目根目录）：
+python3 scripts/prepare_public_execution.py
+RUN_DSH_EXECUTION=1 PYTHONPATH=src python3 -m unittest tests.test_public_execution_benchmark -v
+PYTHONPATH=src python3 scripts/benchmark_public_execution.py --output .runtime/evaluations/public-dev-check/report.json
+真实模型：增加 --live --repetitions 2 --max-total-calls 256；需已配置本地 .env。
+输出路径必须全新，同父目录 requests.json 累计计费尝试，不覆盖失败报告。

@@ -1,0 +1,12 @@
+{
+  "core_files_checked": 86,
+  "metadata_only_changes": [
+    "src/medagent/__init__.py",
+    "src/medagent/agent.py"
+  ],
+  "clinical_controller_content_and_dsh_execution_behavior_sources_unchanged": true,
+  "ui_behavior_changed": true,
+  "new_provider_calls": 0,
+  "scope": "Exact source-byte comparison against sealed v0.11.9, allowing only application/policy version text in two Python files. Does not prove clinical correctness or unchanged interaction behavior.",
+  "passed": true
+}

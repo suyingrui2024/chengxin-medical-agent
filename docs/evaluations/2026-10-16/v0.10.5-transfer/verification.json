@@ -1,0 +1,24 @@
+{
+  "runtime_version": "0.10.5",
+  "actual_upstream_requests": 313,
+  "planned_runs": 16,
+  "completed_runs": 16,
+  "frozen_source_unchanged_at_model_finish": true,
+  "frozen_source_files_matched_now": 137,
+  "frozen_environment_files_matched_now": 55,
+  "offline_environment_reconstructed": true,
+  "all_16_candidates_replayed": true,
+  "all_4_original_defects_rejected": true,
+  "replay_external_model_calls": 0,
+  "previous_archives": {
+    "v0.10.4": {
+      "files_unchanged": 403,
+      "unexpected_files": []
+    },
+    "v0.10.5": {
+      "files_unchanged": 519,
+      "unexpected_files": []
+    }
+  },
+  "scope": "Artifact and oracle re-execution does not replay model decisions or replace historical model results. See README for stratification, environment and specification limits."
+}

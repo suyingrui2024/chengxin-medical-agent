@@ -1,0 +1,709 @@
+{
+  "targets": [
+    {
+      "text": "头/面部",
+      "x": 471.71875,
+      "y": 288.890625,
+      "width": 122.421875,
+      "height": 44
+    },
+    {
+      "text": "胸部",
+      "x": 600.140625,
+      "y": 288.890625,
+      "width": 122.421875,
+      "height": 44
+    },
+    {
+      "text": "腹部",
+      "x": 728.5625,
+      "y": 288.890625,
+      "width": 122.4375,
+      "height": 44
+    },
+    {
+      "text": "背/腰部",
+      "x": 471.71875,
+      "y": 338.890625,
+      "width": 122.421875,
+      "height": 44
+    },
+    {
+      "text": "四肢",
+      "x": 600.140625,
+      "y": 338.890625,
+      "width": 122.421875,
+      "height": 44
+    }
+  ],
+  "overlaps": [],
+  "alternatives": [
+    {
+      "width": 72.015625,
+      "height": 44,
+      "bottom": 506.203125
+    },
+    {
+      "width": 88.71875,
+      "height": 44,
+      "bottom": 506.203125
+    }
+  ],
+  "states": [
+    {
+      "value": "head",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 261,
+            "bottom": 283.390625,
+            "left": 243,
+            "right": 403.015625
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 287.390625,
+            "bottom": 436.390625,
+            "left": 243,
+            "right": 459.71875
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 288.890625,
+            "bottom": 382.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 390.890625,
+            "bottom": 434.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 527.203125,
+            "bottom": 565,
+            "left": 253,
+            "right": 798
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 148.5,
+            "bottom": 192.5,
+            "left": 757.15625,
+            "right": 853
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 626,
+            "bottom": 642.1875,
+            "left": 223,
+            "right": 871
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "chest",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 261,
+            "bottom": 283.390625,
+            "left": 243,
+            "right": 403.015625
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 287.390625,
+            "bottom": 436.390625,
+            "left": 243,
+            "right": 459.71875
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 288.890625,
+            "bottom": 382.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 390.890625,
+            "bottom": 434.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 527.203125,
+            "bottom": 565,
+            "left": 253,
+            "right": 798
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 148.5,
+            "bottom": 192.5,
+            "left": 757.15625,
+            "right": 853
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 626,
+            "bottom": 642.1875,
+            "left": 223,
+            "right": 871
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "abdomen",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 261,
+            "bottom": 283.390625,
+            "left": 243,
+            "right": 403.015625
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 287.390625,
+            "bottom": 436.390625,
+            "left": 243,
+            "right": 459.71875
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 288.890625,
+            "bottom": 382.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 390.890625,
+            "bottom": 434.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 527.203125,
+            "bottom": 565,
+            "left": 253,
+            "right": 798
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 148.5,
+            "bottom": 192.5,
+            "left": 757.15625,
+            "right": 853
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 626,
+            "bottom": 642.1875,
+            "left": 223,
+            "right": 871
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "back",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 261,
+            "bottom": 283.390625,
+            "left": 243,
+            "right": 403.015625
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 287.390625,
+            "bottom": 436.390625,
+            "left": 243,
+            "right": 459.71875
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 288.890625,
+            "bottom": 382.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 390.890625,
+            "bottom": 434.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 527.203125,
+            "bottom": 565,
+            "left": 253,
+            "right": 798
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 148.5,
+            "bottom": 192.5,
+            "left": 757.15625,
+            "right": 853
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 626,
+            "bottom": 642.1875,
+            "left": 223,
+            "right": 871
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        }
+      ]
+    },
+    {
+      "value": "limbs",
+      "geometry": [
+        {
+          "selector": "#active-task h3",
+          "bounds": {
+            "top": 261,
+            "bottom": 283.390625,
+            "left": 243,
+            "right": 403.015625
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-canvas",
+          "bounds": {
+            "top": 287.390625,
+            "bottom": 436.390625,
+            "left": 243,
+            "right": 459.71875
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".body-map-options",
+          "bounds": {
+            "top": 288.890625,
+            "bottom": 382.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": ".map-confirm",
+          "bounds": {
+            "top": 390.890625,
+            "bottom": 434.890625,
+            "left": 471.71875,
+            "right": 851
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "bounds": {
+            "top": 527.203125,
+            "bottom": 565,
+            "left": 253,
+            "right": 798
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "bounds": {
+            "top": 148.5,
+            "bottom": 192.5,
+            "left": 757.15625,
+            "right": 853
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        },
+        {
+          "selector": "#view-consultation .page-footnote",
+          "bounds": {
+            "top": 626,
+            "bottom": 642.1875,
+            "left": 223,
+            "right": 871
+          },
+          "viewport": {
+            "width": 900,
+            "height": 648
+          },
+          "pane": {
+            "top": 247,
+            "bottom": 449.203125
+          },
+          "visible": true
+        }
+      ]
+    }
+  ]
+}

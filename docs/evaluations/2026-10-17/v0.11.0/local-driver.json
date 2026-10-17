@@ -1,0 +1,677 @@
+{
+  "checks": {
+    "positive_numeric_rows": true,
+    "all_bad_rows_rejected": true,
+    "full_driver_reference_passed": true
+  },
+  "external_model_calls": 0,
+  "case": {
+    "kind": "artifact-preview-conformance/v1",
+    "prompt": "这是非医疗合成产物验收，只操作当前工作区，不联网、不安装依赖、不启动子任务。输入样本A=1.25kg、B=2.00kg、C=0.75kg。\n编写plot.py，用标准库Decimal按g=kg*1000计算并保存analysis.csv，首行恰为sample,kg,g，后续恰为A/B/C三行；再用Matplotlib将同一计算数据保存为analysis.png柱状图，至少400×240像素，横轴样本、纵轴Mass (g)，图内用英文以免中文字体缺失。不要生成诊疗结论。真正运行脚本，使用delivery_check做必要自检，观察实际结果后简短收尾。最多8次模型请求，不做无关工作。",
+    "checks": {
+      "root_completed": true,
+      "actual_accepted_check_passed": true,
+      "independent_numeric_rows": true,
+      "actual_table_projection": true,
+      "actual_static_png": true,
+      "image_hash_transport_matches": true,
+      "actual_source_saved": true,
+      "offline_projection_matches": true,
+      "bounded_requests": true,
+      "all_http200": true
+    },
+    "snapshot": {
+      "id": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/evaluations/artifacts-v0110/local-reference/workspaces/081b1531-74b1-4c77-8130-c91bf9d20d88",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "fixture",
+      "status": "completed",
+      "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+      "final_response": "Reference complete",
+      "error": null,
+      "sequence": 28,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792168970.1354043,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "files": 0,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792168970.1354074,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "text": "这是非医疗合成产物验收，只操作当前工作区，不联网、不安装依赖、不启动子任务。输入样本A=1.25kg、B=2.00kg、C=0.75kg。\n编写plot.py，用标准库Decimal按g=kg*1000计算并保存analysis.csv，首行恰为sample,kg,g，后续恰为A/B/C三行；再用Matplotlib将同一计算数据保存为analysis.png柱状图，至少400×240像素，横轴样本、纵轴Mass (g)，图内用英文以免中文字体缺失。不要生成诊疗结论。真正运行脚本，使用delivery_check做必要自检，观察实际结果后简短收尾。最多8次模型请求，不做无关工作。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792168970.8396454,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "fixture"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792168970.840409,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792168970.849005,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792168970.8496633,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792168970849,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "model.request_started",
+          "time": 1792168970.9136965,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "index": 1,
+          "lifetime_calls": 1
+        },
+        {
+          "sequence": 8,
+          "type": "model.request",
+          "time": 1792168970.932652,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792168970.943159,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792168970942,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792168970.9441123,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792168970943,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "delivery-1",
+                  "name": "bash",
+                  "arguments": "{\"command\":\"python3 - <<'PY'\\nfrom pathlib import Path\\ncode=\\\"import csv\\\\nfrom decimal import Decimal\\\\nimport matplotlib\\\\nmatplotlib.use('Agg')\\\\nimport matplotlib.pyplot as plt\\\\nsamples=[('A','1.25'),('B','2.00'),('C','0.75')]\\\\nrows=[(n,k,str(Decimal(k)*1000)) for n,k in samples]\\\\nwith open('analysis.csv','w',newline='') as f:\\\\n w=csv.writer(f);w.writerow(['sample','kg','g']);w.writerows(rows)\\\\nfig,ax=plt.subplots(figsize=(5,3));ax.bar([r[0] for r in rows],[float(r[2]) for r in rows]);ax.set_ylabel('Mass (g)');fig.savefig('analysis.png');plt.close(fig)\\\\n\\\"\\nPath('plot.py').write_text(code)\\nexec(compile(code,'plot.py','exec'))\\nPY\",\"description\":\"Create and execute reference synthetic plot\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "jobs.snapshot",
+          "time": 1792168970.9463623,
+          "jobs": []
+        },
+        {
+          "sequence": 12,
+          "type": "jobs.snapshot",
+          "time": 1792168971.5432868,
+          "jobs": [
+            {
+              "id": "bash-1",
+              "status": "running",
+              "kind": "bash"
+            }
+          ]
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792168972.0381706,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792168972037,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-1"
+                    },
+                    "toolCallId": "delivery-1",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "(no output)"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "b06c80b8-3e59-4a21-b818-aeadb68eb570"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "model.request_started",
+          "time": 1792168972.0623572,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "index": 2,
+          "lifetime_calls": 2
+        },
+        {
+          "sequence": 15,
+          "type": "model.request",
+          "time": 1792168972.069207,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 16,
+          "type": "runtime.event",
+          "time": 1792168972.0756757,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "assistant/message",
+                "seq": 19,
+                "time": 1792168972073,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 17,
+          "type": "runtime.event",
+          "time": 1792168972.0767033,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "tool/call",
+                "seq": 20,
+                "time": 1792168972074,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "callId": "delivery-2",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"实际文件检查\",\"command\":\"python3 -c \\\"from pathlib import Path;assert Path('analysis.png').stat().st_size>100;assert Path('analysis.csv').is_file()\\\"\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "type": "runtime.event",
+          "time": 1792168972.1810098,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "tool/result",
+                "seq": 21,
+                "time": 1792168972180,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "delivery-2"
+                    },
+                    "toolCallId": "delivery-2",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"实际文件检查\",\"check_key\":\"1d62572bb68146ecbca5a863a7be770d240cb98b9c27c7ba0eddc37bed01582e\",\"owner_turn_id\":\"80116f67-27fb-4dc9-abae-8f92f14e94d2\",\"required\":true,\"state\":\"completed\",\"exit_code\":0,\"job_id\":\"bash-2\",\"output\":\"\",\"checkpoint\":{\"schema\":\"workspace-checkpoint/v1\",\"paths\":[\".\"],\"sha256\":\"0d176a49396ecff5ef46197cd687eb01142a213ac8d3b1528fd736f1e3369627\",\"complete\":true,\"files\":3,\"ignored_directories\":[\".git\",\".mypy_cache\",\".pytest_cache\",\".ruff_cache\",\"__pycache__\",\"node_modules\"],\"symlink_targets_followed\":false},\"wait_cycles\":1}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "1915b774-7960-4dfc-91b3-c5f905a9b05b"
+                  }
+                },
+                "sourceEventSeqs": [
+                  20
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "type": "model.request_started",
+          "time": 1792168972.2024508,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "index": 3,
+          "lifetime_calls": 3
+        },
+        {
+          "sequence": 20,
+          "type": "model.request",
+          "time": 1792168972.212048,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "index": 3,
+          "lifetime_calls": 3,
+          "status": 200
+        },
+        {
+          "sequence": 21,
+          "type": "runtime.event",
+          "time": 1792168972.2190259,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "assistant/message",
+                "seq": 25,
+                "time": 1792168972218,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Reference complete"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 22,
+          "type": "runtime.event",
+          "time": 1792168972.2202947,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "event": {
+                "type": "turn/end",
+                "seq": 27,
+                "time": 1792168972219,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "type": "runtime.event",
+          "time": 1792168972.2228563,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 24,
+          "type": "tool.observed",
+          "time": 1792168972.243776,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "973a8e7e-2753-4c9f-9aef-ff82b9db4416",
+            "sequence": 1,
+            "session_id": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+            "call_id": "delivery-1",
+            "sdk_turn": 1,
+            "sdk_step": 1,
+            "call_sequence": 14,
+            "tool": "bash",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": null,
+            "job_kind": null,
+            "wait_ms": null,
+            "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+            "observation_id": "973a8e7e-2753-4c9f-9aef-ff82b9db4416:1"
+          }
+        },
+        {
+          "sequence": 25,
+          "type": "tool.observed",
+          "time": 1792168972.2437837,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "973a8e7e-2753-4c9f-9aef-ff82b9db4416",
+            "sequence": 2,
+            "session_id": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+            "call_id": "delivery-2",
+            "sdk_turn": 1,
+            "sdk_step": 2,
+            "call_sequence": 20,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-2",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "1d62572bb68146ecbca5a863a7be770d240cb98b9c27c7ba0eddc37bed01582e",
+            "check_label": "实际文件检查",
+            "check_turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+            "check_required": true,
+            "check_snapshot": {
+              "schema": "workspace-checkpoint/v1",
+              "paths": [
+                "."
+              ],
+              "sha256": "0d176a49396ecff5ef46197cd687eb01142a213ac8d3b1528fd736f1e3369627",
+              "complete": true,
+              "files": 3,
+              "ignored_directories": [
+                ".git",
+                ".mypy_cache",
+                ".pytest_cache",
+                ".ruff_cache",
+                "__pycache__",
+                "node_modules"
+              ],
+              "symlink_targets_followed": false
+            },
+            "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+            "observation_id": "973a8e7e-2753-4c9f-9aef-ff82b9db4416:2"
+          }
+        },
+        {
+          "sequence": 26,
+          "type": "jobs.snapshot",
+          "time": 1792168972.2484796,
+          "jobs": [
+            {
+              "id": "bash-2",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 0"
+            }
+          ]
+        },
+        {
+          "sequence": 27,
+          "type": "delivery.freshness",
+          "time": 1792168972.279355,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "check_key": "1d62572bb68146ecbca5a863a7be770d240cb98b9c27c7ba0eddc37bed01582e",
+          "call_id": "delivery-2",
+          "session_id": "081b1531-74b1-4c77-8130-c91bf9d20d88",
+          "freshness": "current",
+          "watch": [
+            "."
+          ]
+        },
+        {
+          "sequence": 28,
+          "type": "turn.completed",
+          "time": 1792168972.2803466,
+          "turn_id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "model_calls": 3,
+          "lifetime_calls": 3,
+          "final_response": "Reference complete"
+        }
+      ],
+      "turns": [
+        {
+          "id": "80116f67-27fb-4dc9-abae-8f92f14e94d2",
+          "text": "这是非医疗合成产物验收，只操作当前工作区，不联网、不安装依赖、不启动子任务。输入样本A=1.25kg、B=2.00kg、C=0.75kg。\n编写plot.py，用标准库Decimal按g=kg*1000计算并保存analysis.csv，首行恰为sample,kg,g，后续恰为A/B/C三行；再用Matplotlib将同一计算数据保存为analysis.png柱状图，至少400×240像素，横轴样本、纵轴Mass (g)，图内用英文以免中文字体缺失。不要生成诊疗结论。真正运行脚本，使用delivery_check做必要自检，观察实际结果后简短收尾。最多8次模型请求，不做无关工作。",
+          "max_calls": 8,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 3,
+          "final_response": "Reference complete"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "bash-2",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 0"
+        }
+      ],
+      "artifacts": [
+        {
+          "path": "analysis.csv",
+          "size": 60,
+          "revision": "60:1792168971975474540:1792168971975474540"
+        },
+        {
+          "path": "analysis.png",
+          "size": 7669,
+          "revision": "7669:1792168972003475217:1792168972003475217"
+        },
+        {
+          "path": "plot.py",
+          "size": 488,
+          "revision": "488:1792168970974450328:1792168970974450328"
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成产物验收，只操作当前工作区，不联网、不安装依赖、不",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "gateway": {
+      "attempted_calls": 3,
+      "maximum_calls": 8,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 2,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 3,
+          "status": 200,
+          "duration_ms": 4
+        }
+      ]
+    },
+    "table": {
+      "schema_version": "execution-artifact/v1",
+      "path": "analysis.csv",
+      "size": 60,
+      "sha256": "29058d001c7e66083da706979c16cff601c46a95a79a2ee9aa0937ebcd3272f1",
+      "revision": "60:1792168971975474540:1792168971975474540",
+      "kind": "table",
+      "text": "sample,kg,g\r\nA,1.25,1250.00\r\nB,2.00,2000.00\r\nC,0.75,750.00\r\n",
+      "rows": [
+        [
+          "sample",
+          "kg",
+          "g"
+        ],
+        [
+          "A",
+          "1.25",
+          "1250.00"
+        ],
+        [
+          "B",
+          "2.00",
+          "2000.00"
+        ],
+        [
+          "C",
+          "0.75",
+          "750.00"
+        ]
+      ],
+      "total_rows": 4,
+      "columns": 3,
+      "rows_truncated": false,
+      "columns_truncated": false,
+      "ragged": false
+    },
+    "image": {
+      "schema_version": "execution-artifact/v1",
+      "path": "analysis.png",
+      "size": 7669,
+      "sha256": "3f1725d9bc30ebad0340713afd270096a6e0196fa71790d42609ed1b86ec2835",
+      "revision": "7669:1792168972003475217:1792168972003475217",
+      "kind": "image",
+      "mime": "image/png",
+      "width": 500,
+      "height": 300
+    },
+    "passed": true,
+    "image_semantics_automatically_verified": false
+  }
+}

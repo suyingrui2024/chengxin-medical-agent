@@ -1,0 +1,6 @@
+{"case": "sphinx-doc__sphinx-8627", "prepared_files": 8751, "native_extensions_and_libraries": 0}
+{"case": "sphinx-doc__sphinx-7975", "prepared_files": 8717, "native_extensions_and_libraries": 0}
+{"case": "sympy__sympy-21627", "prepared_files": 2148, "native_extensions_and_libraries": 0}
+{"case": "pallets__flask-5063", "prepared_files": 621, "native_extensions_and_libraries": 0}
+{"case": "matplotlib__matplotlib-25311", "prepared_files": 7208, "native_extensions_and_libraries": 9}
+{"case": "matplotlib__matplotlib-26011", "prepared_files": 7332, "native_extensions_and_libraries": 9}

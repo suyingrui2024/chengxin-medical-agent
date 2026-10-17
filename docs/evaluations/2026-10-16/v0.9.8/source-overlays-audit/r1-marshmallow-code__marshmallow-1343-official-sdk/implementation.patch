@@ -1,0 +1,51 @@
+--- a/src/marshmallow/schema.py
++++ b/src/marshmallow/schema.py
+@@ -671,20 +671,25 @@
+                 )
+             except ValidationError as error:
+                 result = error.data
+-            self._invoke_field_validators(unmarshal, data=result, many=many)
++            # Do not run field or schema validators when the input type was
++            # invalid (e.g. a non-mapping value passed to a nested field), as
++            # ``result`` is ``None`` in that case.
++            if result is not None:
++                self._invoke_field_validators(unmarshal, data=result, many=many)
+             errors = unmarshal.errors
+             field_errors = bool(errors)
+-            # Run schema-level migration
+-            try:
+-                self._invoke_validators(unmarshal, pass_many=True, data=result, original_data=data,
+-                                        many=many, field_errors=field_errors)
+-            except ValidationError as err:
+-                errors.update(err.messages)
+-            try:
+-                self._invoke_validators(unmarshal, pass_many=False, data=result, original_data=data,
+-                                        many=many, field_errors=field_errors)
+-            except ValidationError as err:
+-                errors.update(err.messages)
++            if result is not None:
++                # Run schema-level migration
++                try:
++                    self._invoke_validators(unmarshal, pass_many=True, data=result, original_data=data,
++                                            many=many, field_errors=field_errors)
++                except ValidationError as err:
++                    errors.update(err.messages)
++                try:
++                    self._invoke_validators(unmarshal, pass_many=False, data=result, original_data=data,
++                                            many=many, field_errors=field_errors)
++                except ValidationError as err:
++                    errors.update(err.messages)
+         # Run post processors
+         if not errors and postprocess:
+             try:
+@@ -875,6 +880,10 @@
+ 
+             if many:
+                 for idx, item in enumerate(data):
++                    # Items that failed to deserialize (e.g. invalid input
++                    # type) are stored as ``None``.
++                    if item is None:
++                        continue
+                     try:
+                         value = item[field_obj.attribute or field_name]
+                     except KeyError:

@@ -1,0 +1,120 @@
+
+Running 3 tests using 1 worker
+
+(node:1326217) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on wide (6.8s)
+(node:1327012) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on mobile (7.0s)
+(node:1327229) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on short (7.0s)
+
+
+  1) tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on wide 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: locator('#fact-list .location-revision-start')
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" locator('#fact-list .location-revision-start') with timeout 5000ms
+      - waiting for locator('#fact-list .location-revision-start')
+
+
+      38 |         if (!(await control.isVisible()))
+      39 |           await page.locator("#toggle-facts").click();
+    > 40 |         await expect(control).toBeEnabled();
+         |                               ^
+      41 |         const box = await control.boundingBox();
+      42 |         expect(box.height).toBeGreaterThanOrEqual(44);
+      43 |         await control.click();
+        at start (/home/suyingrui/Desktop/medical-agent/tests/ui/location-revisions.spec.mjs:40:31)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-revisions.spec.mjs:60:7
+
+    Error Context: .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-891ee-esumes-the-question-on-wide/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-891ee-esumes-the-question-on-wide/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-891ee-esumes-the-question-on-wide/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on mobile 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: locator('#fact-list .location-revision-start')
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" locator('#fact-list .location-revision-start') with timeout 5000ms
+      - waiting for locator('#fact-list .location-revision-start')
+
+
+      38 |         if (!(await control.isVisible()))
+      39 |           await page.locator("#toggle-facts").click();
+    > 40 |         await expect(control).toBeEnabled();
+         |                               ^
+      41 |         const box = await control.boundingBox();
+      42 |         expect(box.height).toBeGreaterThanOrEqual(44);
+      43 |         await control.click();
+        at start (/home/suyingrui/Desktop/medical-agent/tests/ui/location-revisions.spec.mjs:40:31)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-revisions.spec.mjs:60:7
+
+    Error Context: .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-b0c26-umes-the-question-on-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-b0c26-umes-the-question-on-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-b0c26-umes-the-question-on-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on short 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: locator('#fact-list .location-revision-start')
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" locator('#fact-list .location-revision-start') with timeout 5000ms
+      - waiting for locator('#fact-list .location-revision-start')
+
+
+      38 |         if (!(await control.isVisible()))
+      39 |           await page.locator("#toggle-facts").click();
+    > 40 |         await expect(control).toBeEnabled();
+         |                               ^
+      41 |         const box = await control.boundingBox();
+      42 |         expect(box.height).toBeGreaterThanOrEqual(44);
+      43 |         await control.click();
+        at start (/home/suyingrui/Desktop/medical-agent/tests/ui/location-revisions.spec.mjs:40:31)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-revisions.spec.mjs:60:7
+
+    Error Context: .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-01f3e-sumes-the-question-on-short/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-01f3e-sumes-the-question-on-short/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-revision-20261017/ui-first-results/location-revisions-confirm-01f3e-sumes-the-question-on-short/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on wide 
+    tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on mobile 
+    tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on short 

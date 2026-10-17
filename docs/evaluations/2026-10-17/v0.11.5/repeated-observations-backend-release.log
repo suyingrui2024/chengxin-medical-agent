@@ -1,0 +1,20 @@
+s..............................................................................s.........sss..............ss.ss.s...........s...........ssssssssssssssssssssssss..........sss.sss.............sssssssss......................s...s.s...................................................
+----------------------------------------------------------------------
+Ran 279 tests in 6.610s
+
+OK (skipped=53)
+[17/Oct/2026 03:53:04] "GET /api/sessions/771b2767-edd9-4fe4-b555-4ca7e99bc76a/snapshot HTTP/1.1" 200 -
+[17/Oct/2026 03:53:04] "POST /api/sessions/771b2767-edd9-4fe4-b555-4ca7e99bc76a/messages HTTP/1.1" 409 -
+[17/Oct/2026 03:53:04] "POST /api/sessions/771b2767-edd9-4fe4-b555-4ca7e99bc76a/messages HTTP/1.1" 200 -
+[17/Oct/2026 03:53:04] "POST /api/sessions/771b2767-edd9-4fe4-b555-4ca7e99bc76a/messages HTTP/1.1" 200 -
+[17/Oct/2026 03:53:05] "GET /api/execution/432635fc-54d6-4949-b119-c914a05f5f79/preview?path=plot.png HTTP/1.1" 200 -
+[17/Oct/2026 03:53:05] "GET /api/execution/432635fc-54d6-4949-b119-c914a05f5f79/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 200 -
+[17/Oct/2026 03:53:05] "GET /api/execution/432635fc-54d6-4949-b119-c914a05f5f79/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 401 -
+[17/Oct/2026 03:53:05] "GET /api/execution/432635fc-54d6-4949-b119-c914a05f5f79/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 403 -
+[17/Oct/2026 03:53:05] "GET /api/execution/432635fc-54d6-4949-b119-c914a05f5f79/image?path=plot.png&sha256=0000000000000000000000000000000000000000000000000000000000000000 HTTP/1.1" 400 -
+[17/Oct/2026 03:53:07] "GET /api/execution/01b745f7-4b08-427d-8ba7-6e291f83c20a/directory?limit=1 HTTP/1.1" 200 -
+[17/Oct/2026 03:53:07] "GET /api/execution/01b745f7-4b08-427d-8ba7-6e291f83c20a/directory HTTP/1.1" 401 -
+[17/Oct/2026 03:53:07] "GET /api/execution/01b745f7-4b08-427d-8ba7-6e291f83c20a/directory HTTP/1.1" 403 -
+[17/Oct/2026 03:53:07] "GET /api/execution/01b745f7-4b08-427d-8ba7-6e291f83c20a/directory?limit=0 HTTP/1.1" 400 -
+[17/Oct/2026 03:53:07] "GET /api/execution/01b745f7-4b08-427d-8ba7-6e291f83c20a/directory?cursor=eyJyZXZpc2lvbiI6IjFkZGZjZmEzOGE3NWE0ZmZlMWUxZjgyM2RiNTZhZTRhM2NmNTgyYTQxZmQwN2E0ZmQxNTc1NzdhYjZmYTM2MDkiLCJhZnRlciI6WzEsImEudHh0Il19 HTTP/1.1" 409 -
+[17/Oct/2026 03:53:07] "GET /api/execution/01b745f7-4b08-427d-8ba7-6e291f83c20a?include_artifacts=0 HTTP/1.1" 200 -

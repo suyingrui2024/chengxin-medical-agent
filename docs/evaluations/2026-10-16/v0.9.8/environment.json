@@ -1,0 +1,18 @@
+{
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "driver_python": "3.10.9 (main, Mar  1 2023, 18:23:06) [GCC 11.2.0]",
+  "driver_executable": "/home/suyingrui/anaconda3/bin/python3",
+  "system_verifier_python": {
+    "version": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+    "executable": "/usr/bin/python3",
+    "packages": {
+      "numpy": "1.21.5",
+      "scipy": "1.8.0",
+      "pytest": "6.2.5",
+      "pytz": "2022.1",
+      "packaging": "21.3"
+    }
+  },
+  "node": "v22.23.3",
+  "dsh": "0.2.0-rc.2"
+}

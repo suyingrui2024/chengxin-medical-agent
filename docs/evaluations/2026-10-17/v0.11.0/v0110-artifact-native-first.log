@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.10.6 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/artifacts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:818622) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/artifacts.spec.mjs:13:1 › native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline (6.1s)
+
+  1 passed (6.5s)

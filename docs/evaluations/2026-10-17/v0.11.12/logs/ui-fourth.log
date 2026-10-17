@@ -1,0 +1,54 @@
+
+> medical-agent-dsh-integration@0.11.11 test:ui
+> playwright test tests/ui/location-layout.spec.mjs
+
+
+Running 3 tests using 1 worker
+
+(node:1183680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on wide (1.8s)
+  ✓  2 tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on mobile (1.5s)
+  ✘  3 tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on short (1.3s)
+
+
+  1) tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on short 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 6
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "selector": ".body-map-canvas",
+    +     "visible": false,
+    +   },
+    + ]
+
+       at ../fixtures/location-layout.mjs:104
+
+      102 |       });
+      103 |     });
+    > 104 |     expect(geometry.filter((item) => !item.visible)).toEqual([]);
+          |                                                      ^
+      105 |   }
+      106 |   const after = await degreeSnapshot(page, id);
+      107 |   expect(after.events).toEqual(before.events);
+        at verifyLocationLayout (/home/suyingrui/Desktop/medical-agent/tests/fixtures/location-layout.mjs:104:54)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-layout.spec.mjs:18:20
+
+    Error Context: test-results/ui/location-layout-location-c-58351-e-readable-targets-on-short/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/location-layout-location-c-58351-e-readable-targets-on-short/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/location-layout-location-c-58351-e-readable-targets-on-short/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on short 
+  2 passed (8.4s)

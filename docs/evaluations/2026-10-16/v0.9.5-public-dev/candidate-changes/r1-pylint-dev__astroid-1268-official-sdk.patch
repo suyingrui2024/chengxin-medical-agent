@@ -1,0 +1,43 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -36,6 +36,7 @@
+         MatchSingleton,
+         MatchStar,
+         MatchValue,
++        Unknown,
+     )
+ 
+ # pylint: disable=unused-argument
+@@ -515,6 +516,10 @@
+             operator = node.op
+         return f"{operator}{self._precedence_parens(node, node.operand)}"
+ 
++    def visit_unknown(self, node: "Unknown") -> str:
++        """return an astroid.Unknown node as string"""
++        return node.name
++
+     def visit_while(self, node):
+         """return an astroid.While node as string"""
+         whiles = f"while {node.test.accept(self)}:\n{self._stmt_list(node.body)}"
+--- a/tests/unittest_unknown_as_string.py
++++ b/tests/unittest_unknown_as_string.py
+@@ -0,0 +1,19 @@
++# Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
++# For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
++
++"""Regression tests for rendering the Unknown node with ``as_string``."""
++
++from astroid import nodes
++
++
++def test_unknown_as_string() -> None:
++    """``Unknown`` nodes should render without raising an AttributeError."""
++    assert nodes.Unknown().as_string() == "Unknown"
++
++
++def test_unknown_accept_as_string_visitor() -> None:
++    """The visitor should expose a ``visit_unknown`` method."""
++    from astroid.nodes.as_string import AsStringVisitor
++
++    visitor = AsStringVisitor()
++    assert visitor.visit_unknown(nodes.Unknown()) == "Unknown"

@@ -1,0 +1,656 @@
+{
+  "kind": "check-input-recovery-conformance/v1",
+  "prompt": "这是非医疗合成接口验收，不联网、不安装依赖，不创建其它文件。先实际调用delivery_check负例：label为参数负例，command为'printf SHOULD_NOT_RUN > forbidden.txt'，timeout_ms=1800001，required=true，watch=['.']。该值超过工具上限，应该被拒绝且命令不能执行；需要实际工具回执，不用自然语言代替。观察拒绝后，再调用delivery_check：label为实际检查，command为\"python3 -c 'assert 2+2==4'\"，timeout_ms=240000，required=true，watch=['.']。第二次在本轮原时限内运行，通过后用一句话报告。不要重跑第一个被拒绝的提议，也不要通过更换成会创建forbidden.txt的命令来掩盖它。",
+  "checks": {
+    "completed": true,
+    "actual_negative_call": true,
+    "rejected_proposal_has_no_job": true,
+    "rejected_command_never_executed": true,
+    "actual_valid_long_limit": true,
+    "actual_check_exit_zero": true,
+    "current_file_version": true,
+    "no_extra_repair": true,
+    "offline_history_matches": true,
+    "bounded_requests": true,
+    "all_http200": true
+  },
+  "snapshot": {
+    "id": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+    "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/evaluations/recovery-v0106/local-v2/workspaces/17cb1851-fa54-467c-b403-2c8da42a82d2",
+    "workspace_kind": "managed",
+    "runtime": "dsh-sdk",
+    "dsh_version": "0.2.0-rc.2",
+    "model": "saved-decisions",
+    "status": "completed",
+    "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+    "final_response": "实际检查通过，参数负例未执行。",
+    "error": null,
+    "sequence": 27,
+    "events": [
+      {
+        "sequence": 1,
+        "type": "workspace.baseline",
+        "time": 1792166915.0024867,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "files": 0,
+        "complete": true,
+        "content_complete": true
+      },
+      {
+        "sequence": 2,
+        "type": "task.submitted",
+        "time": 1792166915.002489,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "text": "这是非医疗合成接口验收，不联网、不安装依赖，不创建其它文件。先实际调用delivery_check负例：label为参数负例，command为'printf SHOULD_NOT_RUN > forbidden.txt'，timeout_ms=1800001，required=true，watch=['.']。该值超过工具上限，应该被拒绝且命令不能执行；需要实际工具回执，不用自然语言代替。观察拒绝后，再调用delivery_check：label为实际检查，command为\"python3 -c 'assert 2+2==4'\"，timeout_ms=240000，required=true，watch=['.']。第二次在本轮原时限内运行，通过后用一句话报告。不要重跑第一个被拒绝的提议，也不要通过更换成会创建forbidden.txt的命令来掩盖它。"
+      },
+      {
+        "sequence": 3,
+        "type": "ready",
+        "time": 1792166915.7036395,
+        "runtime": "dsh-sdk",
+        "version": "0.2.0-rc.2",
+        "isolation": "bubblewrap-filesystem",
+        "network": "enabled",
+        "model": "saved-decisions"
+      },
+      {
+        "sequence": 4,
+        "type": "turn.started",
+        "time": 1792166915.7045057,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "time_budget_seconds": 180
+      },
+      {
+        "sequence": 5,
+        "type": "jobs.snapshot",
+        "time": 1792166915.706225,
+        "jobs": []
+      },
+      {
+        "sequence": 6,
+        "type": "runtime.event",
+        "time": 1792166915.7138565,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.status",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "status": "running"
+          }
+        }
+      },
+      {
+        "sequence": 7,
+        "type": "runtime.event",
+        "time": 1792166915.7145362,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "turn/start",
+              "seq": 4,
+              "time": 1792166915714,
+              "data": {
+                "turn": 1
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 8,
+        "type": "model.request_started",
+        "time": 1792166915.7819855,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "index": 1,
+        "lifetime_calls": 1
+      },
+      {
+        "sequence": 9,
+        "type": "model.request",
+        "time": 1792166915.7964954,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "index": 1,
+        "lifetime_calls": 1,
+        "status": 200
+      },
+      {
+        "sequence": 10,
+        "type": "runtime.event",
+        "time": 1792166915.804623,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "assistant/message",
+              "seq": 13,
+              "time": 1792166915803,
+              "data": {
+                "turn": 1,
+                "step": 1,
+                "usage": {
+                  "inputTokens": 10,
+                  "outputTokens": 10,
+                  "totalTokens": 20
+                },
+                "message": {
+                  "role": "assistant",
+                  "content": []
+                }
+              },
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 11,
+        "type": "runtime.event",
+        "time": 1792166915.805678,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "tool/call",
+              "seq": 14,
+              "time": 1792166915805,
+              "data": {
+                "turn": 1,
+                "step": 1,
+                "callId": "local-check-0",
+                "name": "delivery_check",
+                "arguments": "{\"label\":\"参数负例\",\"command\":\"printf SHOULD_NOT_RUN > forbidden.txt\",\"timeout_ms\":1800001,\"required\":true,\"watch\":[\".\"]}"
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 12,
+        "type": "runtime.event",
+        "time": 1792166915.8134923,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "tool/result",
+              "seq": 15,
+              "time": 1792166915812,
+              "data": {
+                "turn": 1,
+                "step": 1,
+                "message": {
+                  "role": "tool",
+                  "source": {
+                    "kind": "tool",
+                    "callId": "local-check-0"
+                  },
+                  "toolCallId": "local-check-0",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Error: 交付检查参数无效：timeout_ms须为100至1800000的整数。命令尚未执行，请修正输入。"
+                    }
+                  ],
+                  "isError": true,
+                  "id": "79afe8cc-b4ab-4995-8517-14cc64ac07da"
+                }
+              },
+              "sourceEventSeqs": [
+                14
+              ],
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 13,
+        "type": "model.request_started",
+        "time": 1792166915.8376238,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "index": 2,
+        "lifetime_calls": 2
+      },
+      {
+        "sequence": 14,
+        "type": "model.request",
+        "time": 1792166915.84415,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "index": 2,
+        "lifetime_calls": 2,
+        "status": 200
+      },
+      {
+        "sequence": 15,
+        "type": "runtime.event",
+        "time": 1792166915.8505037,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "assistant/message",
+              "seq": 19,
+              "time": 1792166915847,
+              "data": {
+                "turn": 1,
+                "step": 2,
+                "usage": {
+                  "inputTokens": 10,
+                  "outputTokens": 10,
+                  "totalTokens": 20
+                },
+                "message": {
+                  "role": "assistant",
+                  "content": []
+                }
+              },
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 16,
+        "type": "runtime.event",
+        "time": 1792166915.8505356,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "tool/call",
+              "seq": 20,
+              "time": 1792166915848,
+              "data": {
+                "turn": 1,
+                "step": 2,
+                "callId": "local-check-1",
+                "name": "delivery_check",
+                "arguments": "{\"label\":\"实际检查\",\"command\":\"python3 -c 'assert 2+2==4'\",\"timeout_ms\":240000,\"required\":true,\"watch\":[\".\"]}"
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 17,
+        "type": "runtime.event",
+        "time": 1792166915.939069,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "tool/result",
+              "seq": 21,
+              "time": 1792166915938,
+              "data": {
+                "turn": 1,
+                "step": 2,
+                "message": {
+                  "role": "tool",
+                  "source": {
+                    "kind": "tool",
+                    "callId": "local-check-1"
+                  },
+                  "toolCallId": "local-check-1",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"实际检查\",\"check_key\":\"92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a\",\"owner_turn_id\":\"6c68c2e4-9411-4b2b-8594-75e478d9699f\",\"required\":true,\"state\":\"completed\",\"exit_code\":0,\"job_id\":\"bash-1\",\"output\":\"\",\"checkpoint\":{\"schema\":\"workspace-checkpoint/v1\",\"paths\":[\".\"],\"sha256\":\"d770c7ba7e48336baeac4b1c5147c78803348a20bb7d72184745320733e6db39\",\"complete\":true,\"files\":0,\"ignored_directories\":[\".git\",\".mypy_cache\",\".pytest_cache\",\".ruff_cache\",\"__pycache__\",\"node_modules\"],\"symlink_targets_followed\":false},\"wait_cycles\":1}"
+                    }
+                  ],
+                  "isError": false,
+                  "id": "80932a3b-1c39-476c-a6eb-393655c06fd6"
+                }
+              },
+              "sourceEventSeqs": [
+                20
+              ],
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 18,
+        "type": "model.request_started",
+        "time": 1792166915.9566312,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "index": 3,
+        "lifetime_calls": 3
+      },
+      {
+        "sequence": 19,
+        "type": "model.request",
+        "time": 1792166915.9645214,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "index": 3,
+        "lifetime_calls": 3,
+        "status": 200
+      },
+      {
+        "sequence": 20,
+        "type": "runtime.event",
+        "time": 1792166915.9709156,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "assistant/message",
+              "seq": 25,
+              "time": 1792166915970,
+              "data": {
+                "turn": 1,
+                "step": 3,
+                "usage": {
+                  "inputTokens": 10,
+                  "outputTokens": 10,
+                  "totalTokens": 20
+                },
+                "message": {
+                  "role": "assistant",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "实际检查通过，参数负例未执行。"
+                    }
+                  ]
+                }
+              },
+              "surfaceOp": "append"
+            }
+          }
+        }
+      },
+      {
+        "sequence": 21,
+        "type": "runtime.event",
+        "time": 1792166915.971537,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.event",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "event": {
+              "type": "turn/end",
+              "seq": 27,
+              "time": 1792166915971,
+              "data": {
+                "turn": 1,
+                "reason": {
+                  "kind": "completed"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "sequence": 22,
+        "type": "runtime.event",
+        "time": 1792166915.9729428,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "notification": {
+          "method": "session.status",
+          "params": {
+            "sessionId": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+            "status": "idle"
+          }
+        }
+      },
+      {
+        "sequence": 23,
+        "type": "delivery.freshness",
+        "time": 1792166916.025729,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "check_key": "92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a",
+        "call_id": "local-check-1",
+        "session_id": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+        "freshness": "current",
+        "watch": [
+          "."
+        ]
+      },
+      {
+        "sequence": 24,
+        "type": "tool.observed",
+        "time": 1792166916.027574,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "observation": {
+          "schema": "execution-observation/v1",
+          "epoch": "5a42f0df-1940-479e-b516-0bf15be2505d",
+          "sequence": 1,
+          "session_id": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+          "call_id": "local-check-0",
+          "sdk_turn": 1,
+          "sdk_step": 1,
+          "call_sequence": 14,
+          "tool": "delivery_check",
+          "state": "failed",
+          "exit_code": null,
+          "signal": null,
+          "job_id": null,
+          "job_kind": null,
+          "wait_ms": null,
+          "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+          "observation_id": "5a42f0df-1940-479e-b516-0bf15be2505d:1"
+        }
+      },
+      {
+        "sequence": 25,
+        "type": "tool.observed",
+        "time": 1792166916.0275779,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "observation": {
+          "schema": "execution-observation/v1",
+          "epoch": "5a42f0df-1940-479e-b516-0bf15be2505d",
+          "sequence": 2,
+          "session_id": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+          "call_id": "local-check-1",
+          "sdk_turn": 1,
+          "sdk_step": 2,
+          "call_sequence": 20,
+          "tool": "delivery_check",
+          "state": "completed",
+          "exit_code": 0,
+          "signal": null,
+          "job_id": "bash-1",
+          "job_kind": "bash",
+          "wait_ms": null,
+          "check_key": "92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a",
+          "check_label": "实际检查",
+          "check_turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+          "check_required": true,
+          "check_snapshot": {
+            "schema": "workspace-checkpoint/v1",
+            "paths": [
+              "."
+            ],
+            "sha256": "d770c7ba7e48336baeac4b1c5147c78803348a20bb7d72184745320733e6db39",
+            "complete": true,
+            "files": 0,
+            "ignored_directories": [
+              ".git",
+              ".mypy_cache",
+              ".pytest_cache",
+              ".ruff_cache",
+              "__pycache__",
+              "node_modules"
+            ],
+            "symlink_targets_followed": false
+          },
+          "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+          "observation_id": "5a42f0df-1940-479e-b516-0bf15be2505d:2"
+        }
+      },
+      {
+        "sequence": 26,
+        "type": "jobs.snapshot",
+        "time": 1792166916.0335286,
+        "jobs": [
+          {
+            "id": "bash-1",
+            "status": "completed",
+            "kind": "bash",
+            "detail": "exit code: 0"
+          }
+        ]
+      },
+      {
+        "sequence": 27,
+        "type": "turn.completed",
+        "time": 1792166916.0335531,
+        "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "model_calls": 3,
+        "lifetime_calls": 3,
+        "final_response": "实际检查通过，参数负例未执行。"
+      }
+    ],
+    "turns": [
+      {
+        "id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+        "text": "这是非医疗合成接口验收，不联网、不安装依赖，不创建其它文件。先实际调用delivery_check负例：label为参数负例，command为'printf SHOULD_NOT_RUN > forbidden.txt'，timeout_ms=1800001，required=true，watch=['.']。该值超过工具上限，应该被拒绝且命令不能执行；需要实际工具回执，不用自然语言代替。观察拒绝后，再调用delivery_check：label为实际检查，command为\"python3 -c 'assert 2+2==4'\"，timeout_ms=240000，required=true，watch=['.']。第二次在本轮原时限内运行，通过后用一句话报告。不要重跑第一个被拒绝的提议，也不要通过更换成会创建forbidden.txt的命令来掩盖它。",
+        "max_calls": 6,
+        "time_budget_seconds": 180,
+        "changes_recorded": true,
+        "status": "completed",
+        "model_calls": 3,
+        "final_response": "实际检查通过，参数负例未执行。"
+      }
+    ],
+    "jobs": [
+      {
+        "id": "bash-1",
+        "status": "completed",
+        "kind": "bash",
+        "detail": "exit code: 0"
+      }
+    ],
+    "artifacts": [],
+    "storage_error": null,
+    "persistence_error": null,
+    "execution_configured": true,
+    "configuration_error": null,
+    "restored": false,
+    "history_trimmed": false,
+    "title": "这是非医疗合成接口验收，不联网、不安装依赖，不创建其它文件。先实",
+    "isolation": "bubblewrap-filesystem",
+    "network": "enabled",
+    "storage": "workspace_files_and_dsh_history_persist",
+    "capability_binding": {
+      "protocol": "execution-capabilities/v1",
+      "template_id": "general",
+      "enabled": [
+        "calculate.units",
+        "observe.location",
+        "observe.temperature"
+      ],
+      "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+      "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+    },
+    "calculations": [],
+    "clarifications": [],
+    "change_baseline_available": true
+  },
+  "observations": [
+    {
+      "schema": "execution-observation/v1",
+      "epoch": "5a42f0df-1940-479e-b516-0bf15be2505d",
+      "sequence": 1,
+      "session_id": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+      "call_id": "local-check-0",
+      "sdk_turn": 1,
+      "sdk_step": 1,
+      "call_sequence": 14,
+      "tool": "delivery_check",
+      "state": "failed",
+      "exit_code": null,
+      "signal": null,
+      "job_id": null,
+      "job_kind": null,
+      "wait_ms": null,
+      "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+      "observation_id": "5a42f0df-1940-479e-b516-0bf15be2505d:1"
+    },
+    {
+      "schema": "execution-observation/v1",
+      "epoch": "5a42f0df-1940-479e-b516-0bf15be2505d",
+      "sequence": 2,
+      "session_id": "17cb1851-fa54-467c-b403-2c8da42a82d2",
+      "call_id": "local-check-1",
+      "sdk_turn": 1,
+      "sdk_step": 2,
+      "call_sequence": 20,
+      "tool": "delivery_check",
+      "state": "completed",
+      "exit_code": 0,
+      "signal": null,
+      "job_id": "bash-1",
+      "job_kind": "bash",
+      "wait_ms": null,
+      "check_key": "92f39d0336aa32a14fdcca0b038bc53db6e8e5da27949ea1aad5d5e6b6ccf68a",
+      "check_label": "实际检查",
+      "check_turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+      "check_required": true,
+      "check_snapshot": {
+        "schema": "workspace-checkpoint/v1",
+        "paths": [
+          "."
+        ],
+        "sha256": "d770c7ba7e48336baeac4b1c5147c78803348a20bb7d72184745320733e6db39",
+        "complete": true,
+        "files": 0,
+        "ignored_directories": [
+          ".git",
+          ".mypy_cache",
+          ".pytest_cache",
+          ".ruff_cache",
+          "__pycache__",
+          "node_modules"
+        ],
+        "symlink_targets_followed": false
+      },
+      "turn_id": "6c68c2e4-9411-4b2b-8594-75e478d9699f",
+      "observation_id": "5a42f0df-1940-479e-b516-0bf15be2505d:2"
+    }
+  ],
+  "gateway": {
+    "attempted_calls": 3,
+    "maximum_calls": 6,
+    "injected_failures": 0,
+    "calls": [
+      {
+        "index": 1,
+        "status": 200,
+        "duration_ms": 3
+      },
+      {
+        "index": 2,
+        "status": 200,
+        "duration_ms": 3
+      },
+      {
+        "index": 3,
+        "status": 200,
+        "duration_ms": 2
+      }
+    ]
+  },
+  "passed": true
+}

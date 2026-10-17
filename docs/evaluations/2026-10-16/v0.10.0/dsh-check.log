@@ -1,0 +1,13 @@
+
+> medical-agent-dsh-integration@0.10.0 dsh:check
+> node integrations/dsh/check.mjs
+
+file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/check.mjs:47
+    throw new Error(
+          ^
+
+Error: Unexpected DSH config output: 
+    at file:///home/suyingrui/Desktop/medical-agent/integrations/dsh/check.mjs:47:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+Node.js v22.23.3

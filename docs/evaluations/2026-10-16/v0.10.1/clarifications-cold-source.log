@@ -1,0 +1,10 @@
+test_answer_persists_before_send_retries_idempotently_and_cannot_cross_turns (test_execution_clarifications.ClarificationRecordTests) ... ok
+test_invalid_records_cannot_enter_the_host_ledger (test_execution_clarifications.ClarificationRecordTests) ... ok
+test_offline_restore_marks_unanswered_questions_interrupted (test_execution_clarifications.ClarificationRecordTests) ... ok
+test_deadline_and_cancel_invalidate_questions_without_extra_model_calls (test_execution_clarifications.ClarificationSdkTests) ... ok
+test_root_child_and_registered_calculation_use_real_answers_in_same_turn (test_execution_clarifications.ClarificationSdkTests) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 10.400s
+
+OK

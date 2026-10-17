@@ -1,0 +1,1 @@
+{"saved_normal_proposals_replayed": 2, "normal_state_and_question_match": true, "controlled_priority_replays": [{"case": "raw-priority", "passed": true}, {"case": "requested-help", "passed": true}], "late_proposal_source": "Saved normal-case proposal deliberately delayed; priority-case cancelled provider bodies were not archived.", "external_requests": 0}

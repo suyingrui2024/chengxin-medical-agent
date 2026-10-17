@@ -1,0 +1,20 @@
+test_answering_history_during_revision_resumes_the_newer_question (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_cancel_keeps_the_original_fact_and_invalidates_the_form (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_closed_confirmed_record_can_be_cancelled_or_reopened_for_reconfirmation (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_model_cannot_open_revision_for_a_hypothetical_or_declined_request (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_model_opens_a_revision_then_only_proposes_the_explicit_changes (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_new_note_service_retry_does_not_duplicate_the_revised_fact (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_offline_caregiver_can_revise_a_legacy_coarse_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_other_field_correction_invalidates_the_old_revision_form (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_pending_calculation_keeps_its_card_and_rejects_a_second_interactive_form (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_skip_cancels_the_revision_instead_of_overwriting_a_known_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_summary_revision_rebuilds_current_values_and_requires_confirmation (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_unchanged_note_is_preserved_without_reprocessing_it (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location (tests.test_location_revisions.LocationRevisionTests) ... ok
+test_wrong_fact_version_is_rejected_before_journaling (tests.test_location_revisions.LocationRevisionTests) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.200s
+
+OK

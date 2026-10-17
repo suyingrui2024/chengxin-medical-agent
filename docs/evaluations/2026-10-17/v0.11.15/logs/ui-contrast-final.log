@@ -1,0 +1,12 @@
+
+Running 5 tests using 1 worker
+
+(node:1321754) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on wide (2.0s)
+  ✓  2 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on mobile (1.6s)
+  ✓  3 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on short (1.7s)
+  ✓  4 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on prefill (1.7s)
+  ✓  5 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on custom (1.6s)
+
+  5 passed (12.1s)

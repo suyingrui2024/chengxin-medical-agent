@@ -1,0 +1,56 @@
+{
+  "version_base": "0.10.3",
+  "kind": "wait-policy-known-task-ablation",
+  "completed_model_runs": 8,
+  "actual_model_requests": 160,
+  "maximum_model_requests": 160,
+  "all_http200": true,
+  "runtime_source_frozen": true,
+  "arms": {
+    "wait-30": {
+      "runs": 4,
+      "requests": 80,
+      "source_passed": 4,
+      "source_failed": 0,
+      "source_unavailable": 0,
+      "file_and_source_passed": 4,
+      "runtime_completed": 3,
+      "end_to_end_completed": 3,
+      "job_output_calls": 6,
+      "explicit_waits_above_30_requested": 3,
+      "waits_above_30_observed": 0
+    },
+    "wait-600": {
+      "runs": 4,
+      "requests": 80,
+      "source_passed": 4,
+      "source_failed": 0,
+      "source_unavailable": 0,
+      "file_and_source_passed": 4,
+      "runtime_completed": 0,
+      "end_to_end_completed": 0,
+      "job_output_calls": 3,
+      "explicit_waits_above_30_requested": 3,
+      "waits_above_30_observed": 0
+    }
+  },
+  "new_regression_groups": {
+    "wait-30": {
+      "passed": 4,
+      "failed": 0
+    },
+    "wait-600": {
+      "passed": 2,
+      "failed": 2
+    }
+  },
+  "all_archived_candidate_node_outcomes_replayed": true,
+  "negative_original_defect_reproduced": true,
+  "fresh_two_case_environments_reconstructed": true,
+  "fresh_restored_source_files_matched": 128,
+  "fresh_candidate_replay_passed": true,
+  "model_requests_for_replay": 0,
+  "real_model_efficiency_improvement_proven": false,
+  "overall_dsh_codex_parity_proven": false,
+  "clinical_validation_complete": false
+}

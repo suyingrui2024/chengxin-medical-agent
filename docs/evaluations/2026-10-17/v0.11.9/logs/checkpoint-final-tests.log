@@ -1,0 +1,59 @@
+test_aliases_refinements_and_age_category_are_separate (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_calculation_failure_source_is_preserved_through_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_child_refinements_do_not_forget_previous_compatible_constraints (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_explicit_and_unambiguous_implicit_changes_keep_original_facts_without_model (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_generic_role_update_does_not_erase_the_specific_reported_label (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_missing_stale_or_reused_resume_action_has_no_state_or_event_mutation (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_model_boundary_restores_the_original_failed_supplement_retry (tests.test_consultation_subjects.ConsultationSubjectTests) ... FAIL
+test_model_has_a_subject_change_tool_and_does_not_write_new_person_facts (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_negative_or_hypothetical_switches_are_not_literal_actions (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_observation_failure_and_emergency_priority_survive_subject_dialog (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_ordinary_family_history_stays_in_the_fathers_case (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_repeated_model_boundaries_resume_the_original_question (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_return_does_not_roll_back_legitimate_new_facts_or_reopen_an_obsolete_card (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_same_enum_model_proposal_is_rejected_atomically (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_semantic_boundary_restores_a_cancelled_but_unexecuted_input_card (tests.test_consultation_subjects.ConsultationSubjectTests) ... ok
+test_action_tokens_change_even_when_the_same_question_is_asked_again (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_age_correction_keeps_reading_and_recomputes_existing_risk (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_chief_correction_invalidates_episode_but_keeps_background_and_history (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_chief_correction_keeps_a_high_reading_and_urgent_route (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_concurrent_editors_cannot_both_commit_the_same_fact_version (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_confirmed_subject_requires_a_new_case (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_editing_age_cannot_retract_an_emergency_route (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_malformed_temperature_is_not_recorded_and_the_task_remains (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_model_batch_rejects_subject_switch_before_any_other_write (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_new_evidence_in_chief_correction_batch_survives_invalidation (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_stale_correction_with_emergency_text_still_routes_without_a_model (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_stale_or_invalidated_fact_cannot_be_overwritten (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_ui_correction_revalidates_inflight_task_without_a_model_or_fake_result (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_unknown_screen_never_offers_a_self_check_in_either_mode (tests.test_state_consistency.StateConsistencyTests) ... ok
+test_confirmation_keeps_history_pending_then_forwards_full_original_with_original_turn (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_earlier_chief_change_cannot_indirectly_invalidate_newer_medication (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_explicit_edit_after_followup_failure_keeps_original_supplement_pending (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_failed_followup_retries_original_source_and_rejects_reopening_consumed_calculation (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_later_failed_message_retries_itself_instead_of_the_earlier_calculation_source (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_new_calculation_cannot_replace_an_unprocessed_earlier_supplement (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_new_information_leaves_old_supplement_pending_and_cannot_overwrite_later_correction (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_pending_supplement_blocks_summary_confirmation_and_stale_processing_actions (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_raw_emergency_remains_prior_to_calculation_and_followup_model_work (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_repeat_measurement_can_suspend_a_mixed_request_without_losing_its_supplement (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_simple_requests_have_a_bounded_fast_path_and_unknown_remainders_are_kept (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+test_skipping_arithmetic_still_processes_the_rest_of_the_original_message (tests.test_calculation_supplements.CalculationSupplementTests) ... ok
+
+======================================================================
+FAIL: test_model_boundary_restores_the_original_failed_supplement_retry (tests.test_consultation_subjects.ConsultationSubjectTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_consultation_subjects.py", line 317, in test_model_boundary_restores_the_original_failed_supplement_retry
+    self._verify_failed_calculation_return(True)
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_consultation_subjects.py", line 354, in _verify_failed_calculation_return
+    self.assertEqual(self.state.pending_input, text)
+AssertionError: '父亲记录保留，这里想咨询母亲的情况。' != '请把1.25kg换算成g；父亲昨晚用过药物甲。'
+- 父亲记录保留，这里想咨询母亲的情况。
++ 请把1.25kg换算成g；父亲昨晚用过药物甲。
+
+
+----------------------------------------------------------------------
+Ran 41 tests in 0.312s
+
+FAILED (failures=1)

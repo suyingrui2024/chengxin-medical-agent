@@ -1,0 +1,32 @@
+{
+  "algorithm": "sha256",
+  "file_count": 26,
+  "files": {
+    "README.md": "d035b9d9d3349c11567eb94d36378df94cb02ef52f992cc5b6226cbdb1e629ea",
+    "credential-scan.json": "715ada84b3d748b96a30e6fd9a11eae5ee2a4956da99c12d1372363a4a2b9784",
+    "final/identity.json": "5de52f138589da8baaf296e42369becc47a30c8c59f0055aca6e629db7c94aa1",
+    "final/launcher-result.json": "6263aaedb4be0412ecb805dd39e4238d39f1323e0174db2cdb1b9730bbf742c6",
+    "final/probe.json": "94822901fd5f86f2c98fd2cc3465f918135c532cf6d89f97363989c5001e9c2d",
+    "final/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final/stdout.log": "46637bd1647708854d3fda98cbcc6011283d121af3e7cd6ac895af0191091c21",
+    "final/summary.png": "041474957fffc2f538fdd1197070bb6399c6345f55bb7f2a48a2502f9d31d4aa",
+    "final/synthetic-case.json": "1e0624dd5cce963f0bb460583a785d35cd9dca8bd6d73904d89173df0929a864",
+    "final/temperature.png": "6a127a694db4a53b9ef845e5976e98fe9970984355a816ae23fd478befa4b512",
+    "final/welcome.png": "f1ba3a28e70c60d85a21d38bdeb5fcd93147bf7c5e191273cf671c1d468547fe",
+    "first/identity.json": "a5ffa8c5f17d83e6cee94f613ea80a1226658f39f322b7e9e2a0d2ff9f48d65c",
+    "first/launcher-result.json": "6263aaedb4be0412ecb805dd39e4238d39f1323e0174db2cdb1b9730bbf742c6",
+    "first/probe.json": "e2a258f364e2a4d2b56a0af45621139f840ca4bc96ed39028d2bea20ec7b95af",
+    "first/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "first/stdout.log": "7c772bf406cf06010b6307b3887ee207f1ebeac8411505cb07a922cff434f255",
+    "first/summary.png": "91863125c1133c32e64567a37ea5070ef4e349cef5bbd03a4b652e114db64c06",
+    "first/synthetic-case.json": "34d017041ed774447ded2ec5f2de399dff1954cbd03a6283271270ceb4802552",
+    "first/temperature.png": "3a35d8ca7557837755df6642cee84024f4a11ad66c2a28aa574b1b9f655cdc6b",
+    "first/welcome.png": "f1ba3a28e70c60d85a21d38bdeb5fcd93147bf7c5e191273cf671c1d468547fe",
+    "package-after-probe.json": "f87f6df6613e1d859d191fdd3926486dbabf0da76da52f6c1ddb2037b56a168a",
+    "preseal-validation.json": "5c0590e453a43fec715879809f272cd32824a402d06f4200f222c59e44135806",
+    "source/docs/当前版本完成审查与后续接续.md": "65e6f276baee19012308310ef25c26ba43fc7d08a24475eb17ae9b627efa7481",
+    "source/scripts/clean-desktop-probe.mjs": "b039af414d53c73bb56abc2cbb56fbcff2012907d0afaa322015fdfafac04912",
+    "source/scripts/verify_clean_desktop.py": "df63aa46c3fe7702989a7f993b1c037051504d2ff891dac55e54ccbf3a736437",
+    "source-files.json": "fb1f9af5c92791bc49835e65f1d525c5c569a2416d0e60d14fe2d52c3092f517"
+  }
+}

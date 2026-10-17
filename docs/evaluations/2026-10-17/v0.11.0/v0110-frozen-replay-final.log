@@ -1,0 +1,2 @@
+{"round": 1, "checks": {"same_decision_count": true, "same_conformance_verdict": true, "same_numeric_and_image_checks": true, "same_root_status": true, "source_unchanged": true}, "local_requests": 7}
+{"round": 2, "checks": {"same_decision_count": true, "same_conformance_verdict": true, "same_numeric_and_image_checks": true, "same_root_status": true, "source_unchanged": true}, "local_requests": 5}

@@ -1,0 +1,14 @@
+
+> medical-agent-dsh-integration@0.11.4 test:ui
+> playwright test --grep repeated temperatures|observation rendering
+
+
+Running 3 tests using 1 worker
+
+(node:955885) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk (2.2s)
+  ✓  2 tests/ui/repeated-observations.spec.mjs:8:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen (1.9s)
+  ✓  3 tests/ui/repeated-observations.spec.mjs:40:1 › observation rendering rejects malformed histories and treats evidence as inert text (264ms)
+
+  3 passed (8.3s)

@@ -1,0 +1,31 @@
+--- a/src/sqlfluff/rules/L031.py
++++ b/src/sqlfluff/rules/L031.py
+@@ -155,6 +155,14 @@
+ 
+         to_check = list(
+             self._filter_table_expressions(base_table, from_expression_elements)
++        )
++
++        # Does the query actually contain any joins? If not, then there is no
++        # join condition to lint and a *used* alias should be left alone.
++        from_clause = segment.get_child("from_clause")
++        has_join = bool(
++            from_clause is not None
++            and list(from_clause.recursive_crawl("join_clause"))
+         )
+ 
+         # How many times does each table appear in the FROM clause?
+@@ -195,6 +203,13 @@
+                 # exp_ref.get_child('dot') ensures that the column reference includes a table reference
+                 if used_alias_ref.raw == alias_name and exp_ref.get_child("dot"):
+                     ids_refs.append(used_alias_ref)
++
++            # If the query contains no join at all (a single table in the FROM
++            # clause, however the tables are separated), then this alias is not
++            # part of a join condition. A *used* alias is therefore left alone
++            # (L031 should not fire when there is no join present).
++            if not has_join and len(from_expression_elements) < 2 and ids_refs:
++                continue
+ 
+             # Fixes for deleting ` as sth` and for editing references to aliased tables
+             fixes = [

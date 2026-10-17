@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "source_files_unchanged": 303,
+  "frozen_source_location": "../v0.11.15/source",
+  "package_own_files_match": 113,
+  "all_three_cases_and_named_checks_passed": true,
+  "real_provider_calls": 21,
+  "injected_local_503": 1,
+  "scope": "Fresh respiratory interview, emergency gate and failed-service retry, not a full detailed-location interview or clinical validation."
+}

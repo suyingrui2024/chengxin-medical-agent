@@ -1,0 +1,10 @@
+{
+  "src/medagent/location_answers.py": {
+    "before": "25e42638a82bca843ef36d688cd4026361259198faca6152fe10738d06ca303d",
+    "after": "6d33b22cfd6a01e73c4c6e06550fc4c4c51e3bbf97019f1401ccb4a21156b552"
+  },
+  "tests/test_location_answers.py": {
+    "before": "37892fd7e2008fe7f4dd06efcb1260c54e9e341d75d7fbae8057d4bbe0e579b0",
+    "after": "4cefd50c1f0d361c1a7ea2d2ddd9f76a73f96e55b9246a9650720e949e43fb1d"
+  }
+}

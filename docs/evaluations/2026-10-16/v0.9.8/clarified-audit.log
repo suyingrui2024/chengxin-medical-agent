@@ -1,0 +1,2 @@
+{"case": "sqlfluff__sqlfluff-1625", "repetition": 1, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": false, "protected_files_changed": []}
+{"case": "sqlfluff__sqlfluff-1625", "repetition": 1, "arm": "product", "strict_original_passed": false, "source_correctness_passed": true, "protected_files_changed": []}

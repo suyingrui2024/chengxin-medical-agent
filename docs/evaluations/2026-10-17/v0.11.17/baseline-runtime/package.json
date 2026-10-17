@@ -1,0 +1,16 @@
+{
+  "name": "medical-agent-dsh-integration",
+  "version": "0.11.16",
+  "type": "module",
+  "main": "desktop/main.cjs",
+  "productName": "澄心问诊",
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sdk-client": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sdk-protocol": "0.2.0-rc.2",
+    "js-yaml": "4.3.2"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  }
+}

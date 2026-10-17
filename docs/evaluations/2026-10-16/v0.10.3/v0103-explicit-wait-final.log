@@ -1,0 +1,11 @@
+test_same_three_requests_collect_a_34_second_job_only_with_explicit_long_wait (tests.test_explicit_job_wait.ExplicitWaitTests) ... {"explicit_wait_comparison": [{"configuration": "old", "model_calls": 3, "wait_seconds": 30.06, "actual_artifact_collected": false}, {"configuration": "candidate", "model_calls": 3, "wait_seconds": 34.06, "actual_artifact_collected": true}]}
+ok
+test_task_deadline_still_cancels_the_long_tool_wait_and_its_command (tests.test_explicit_job_wait.ExplicitWaitTests) ... {"deadline_interrupted_wait": true, "shared_task_seconds": 4, "calls": 2}
+ok
+test_user_cancel_interrupts_one_long_tool_wait_and_preserves_process (tests.test_explicit_job_wait.ExplicitWaitTests) ... {"cancel_wait_seconds": 0.05, "same_process_continued": true}
+ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 73.975s
+
+OK

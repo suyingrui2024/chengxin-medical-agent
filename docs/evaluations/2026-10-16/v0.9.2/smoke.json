@@ -1,0 +1,491 @@
+{
+  "synthetic_only": true,
+  "kind": "full-dsh-execution-evaluation/v1",
+  "cases": [
+    {
+      "id": "smoke",
+      "checks": {
+        "runtime_completed": true,
+        "actual_file": true
+      },
+      "snapshots": [
+        {
+          "id": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+          "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/evaluations/round-execution-v092-20261016/smoke/workspaces/9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+          "runtime": "dsh-sdk",
+          "dsh_version": "0.2.0-rc.2",
+          "model": "deepseek-flash",
+          "status": "completed",
+          "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+          "final_response": "已完成：`/workspace/ready.json` 已创建，内容为 `{\"status\":\"ready\"}`，读取核对一致，无异常。",
+          "error": null,
+          "sequence": 19,
+          "events": [
+            {
+              "sequence": 1,
+              "type": "task.submitted",
+              "time": 1792088216.2456357,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "text": "这是最终协议兼容检查。请实际调用工具创建 ready.json，内容为 {\"status\":\"ready\"}，读取核对后简短结束。不要创建子任务或做无关工作。"
+            },
+            {
+              "sequence": 2,
+              "type": "ready",
+              "time": 1792088216.938417,
+              "runtime": "dsh-sdk",
+              "version": "0.2.0-rc.2",
+              "isolation": "bubblewrap-filesystem",
+              "network": "enabled",
+              "model": "deepseek-flash"
+            },
+            {
+              "sequence": 3,
+              "type": "turn.started",
+              "time": 1792088216.9391286,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536"
+            },
+            {
+              "sequence": 4,
+              "type": "runtime.event",
+              "time": 1792088216.9524264,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.status",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "status": "running"
+                }
+              }
+            },
+            {
+              "sequence": 5,
+              "type": "runtime.event",
+              "time": 1792088216.9529102,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "turn/start",
+                    "seq": 4,
+                    "time": 1792088216952,
+                    "data": {
+                      "turn": 1
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 6,
+              "type": "jobs.snapshot",
+              "time": 1792088217.0519493,
+              "jobs": []
+            },
+            {
+              "sequence": 7,
+              "type": "model.request",
+              "time": 1792088217.273923,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "index": 1,
+              "lifetime_calls": 1,
+              "status": 200
+            },
+            {
+              "sequence": 8,
+              "type": "runtime.event",
+              "time": 1792088218.1727638,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "assistant/message",
+                    "seq": 13,
+                    "time": 1792088218171,
+                    "data": {
+                      "turn": 1,
+                      "step": 1,
+                      "usage": {
+                        "inputTokens": 564,
+                        "outputTokens": 108,
+                        "cacheReadTokens": 5376,
+                        "cacheWriteTokens": 0,
+                        "totalTokens": 6048
+                      },
+                      "message": {
+                        "role": "assistant",
+                        "content": []
+                      }
+                    },
+                    "surfaceOp": "append"
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 9,
+              "type": "runtime.event",
+              "time": 1792088218.173853,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "tool/call",
+                    "seq": 14,
+                    "time": 1792088218173,
+                    "data": {
+                      "turn": 1,
+                      "step": 1,
+                      "callId": "call_00_O4deIkvXTjAsLBnRPPLA6296",
+                      "name": "bash",
+                      "arguments": "{\"command\": \"printf '%s' '{\\\"status\\\":\\\"ready\\\"}' > /workspace/ready.json && echo written\", \"description\": \"Create ready.json in workspace\"}"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 10,
+              "type": "runtime.event",
+              "time": 1792088218.2098227,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "tool/result",
+                    "seq": 15,
+                    "time": 1792088218209,
+                    "data": {
+                      "turn": 1,
+                      "step": 1,
+                      "message": {
+                        "role": "tool",
+                        "source": {
+                          "kind": "tool",
+                          "callId": "call_00_O4deIkvXTjAsLBnRPPLA6296"
+                        },
+                        "toolCallId": "call_00_O4deIkvXTjAsLBnRPPLA6296",
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "written\n"
+                          }
+                        ],
+                        "isError": false,
+                        "id": "07337ee0-f34a-43e9-a701-bca96d0cf20e"
+                      }
+                    },
+                    "sourceEventSeqs": [
+                      14
+                    ],
+                    "surfaceOp": "append"
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 11,
+              "type": "model.request",
+              "time": 1792088218.3613575,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "index": 2,
+              "lifetime_calls": 2,
+              "status": 200
+            },
+            {
+              "sequence": 12,
+              "type": "runtime.event",
+              "time": 1792088218.6848147,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "assistant/message",
+                    "seq": 19,
+                    "time": 1792088218683,
+                    "data": {
+                      "turn": 1,
+                      "step": 2,
+                      "usage": {
+                        "inputTokens": 240,
+                        "outputTokens": 43,
+                        "cacheReadTokens": 6016,
+                        "cacheWriteTokens": 0,
+                        "totalTokens": 6299
+                      },
+                      "message": {
+                        "role": "assistant",
+                        "content": []
+                      }
+                    },
+                    "surfaceOp": "append"
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 13,
+              "type": "runtime.event",
+              "time": 1792088218.6856194,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "tool/call",
+                    "seq": 20,
+                    "time": 1792088218685,
+                    "data": {
+                      "turn": 1,
+                      "step": 2,
+                      "callId": "call_00_ET_2c8Am0Z0qADIOroNszmU2293",
+                      "name": "read",
+                      "arguments": "{\"file_path\": \"/workspace/ready.json\"}"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 14,
+              "type": "runtime.event",
+              "time": 1792088218.7022688,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "tool/result",
+                    "seq": 21,
+                    "time": 1792088218701,
+                    "data": {
+                      "turn": 1,
+                      "step": 2,
+                      "message": {
+                        "role": "tool",
+                        "source": {
+                          "kind": "tool",
+                          "callId": "call_00_ET_2c8Am0Z0qADIOroNszmU2293"
+                        },
+                        "toolCallId": "call_00_ET_2c8Am0Z0qADIOroNszmU2293",
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "<path>/workspace/ready.json</path>\n<type>file</type>\n<content>\n1: {\"status\":\"ready\"}\n\n(End of file - total 1 lines)\n</content>"
+                          }
+                        ],
+                        "isError": false,
+                        "id": "66e1aed1-ed4e-4387-8e20-1f45e015e552"
+                      },
+                      "meta": {
+                        "path": "/workspace/ready.json",
+                        "offset": 1,
+                        "lines": [
+                          {
+                            "number": 1,
+                            "text": "{\"status\":\"ready\"}"
+                          }
+                        ],
+                        "totalLines": 1,
+                        "lang": "json"
+                      }
+                    },
+                    "sourceEventSeqs": [
+                      20
+                    ],
+                    "surfaceOp": "append"
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 15,
+              "type": "model.request",
+              "time": 1792088219.0120485,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "index": 3,
+              "lifetime_calls": 3,
+              "status": 200
+            },
+            {
+              "sequence": 16,
+              "type": "runtime.event",
+              "time": 1792088219.5958076,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "assistant/message",
+                    "seq": 25,
+                    "time": 1792088219594,
+                    "data": {
+                      "turn": 1,
+                      "step": 3,
+                      "usage": {
+                        "inputTokens": 273,
+                        "outputTokens": 32,
+                        "cacheReadTokens": 6272,
+                        "cacheWriteTokens": 0,
+                        "totalTokens": 6577
+                      },
+                      "message": {
+                        "role": "assistant",
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "已完成：`/workspace/ready.json` 已创建，内容为 `{\"status\":\"ready\"}`，读取核对一致，无异常。"
+                          }
+                        ]
+                      }
+                    },
+                    "surfaceOp": "append"
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 17,
+              "type": "runtime.event",
+              "time": 1792088219.5971875,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.event",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "event": {
+                    "type": "turn/end",
+                    "seq": 27,
+                    "time": 1792088219596,
+                    "data": {
+                      "turn": 1,
+                      "reason": {
+                        "kind": "completed"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "sequence": 18,
+              "type": "runtime.event",
+              "time": 1792088219.5986767,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "notification": {
+                "method": "session.status",
+                "params": {
+                  "sessionId": "9b4788f8-2566-4e0a-89cd-80dfc9093d75",
+                  "status": "idle"
+                }
+              }
+            },
+            {
+              "sequence": 19,
+              "type": "turn.completed",
+              "time": 1792088219.6012597,
+              "turn_id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "model_calls": 3,
+              "lifetime_calls": 3,
+              "final_response": "已完成：`/workspace/ready.json` 已创建，内容为 `{\"status\":\"ready\"}`，读取核对一致，无异常。"
+            }
+          ],
+          "turns": [
+            {
+              "id": "a704c8e5-3bff-4c79-8ec4-ad38f5e16536",
+              "text": "这是最终协议兼容检查。请实际调用工具创建 ready.json，内容为 {\"status\":\"ready\"}，读取核对后简短结束。不要创建子任务或做无关工作。",
+              "max_calls": 6,
+              "status": "completed",
+              "model_calls": 3,
+              "final_response": "已完成：`/workspace/ready.json` 已创建，内容为 `{\"status\":\"ready\"}`，读取核对一致，无异常。"
+            }
+          ],
+          "jobs": [],
+          "artifacts": [
+            {
+              "path": "ready.json",
+              "size": 18
+            }
+          ],
+          "storage_error": null,
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "storage": "workspace_files_persist_process_session"
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "maximum_calls": 6,
+  "attempted_calls": 3,
+  "model": "deepseek-flash",
+  "evaluator_sha256": "186ecd6d350d024b64c62fe974f4a088410f41604ddf017835c399d592c2edd1",
+  "passed": true,
+  "source_sha256": {
+    "src/medagent/triage.py": "fb5f9c6117f24baf73a8d5085e99235ea3c15d08fa7da767936b1f76782b0f6a",
+    "src/medagent/cli.py": "d553146d21d554b1b3a420b3de49c1cc9a7179bc4ad19c575a7117c33ccb7479",
+    "src/medagent/plugins.py": "6ac11ba78de1939086f2a7a8fb9b8dabeb229996f266ac455a5abc5f8c772705",
+    "src/medagent/backends.py": "8d56bd088e4e8d4ed688327a77292895b77038e08944883b098adb06333c538a",
+    "src/medagent/consultation.py": "db407dc61d665ed5a0f61bdc1a4d498608831da38614071ae12bb13536155cce",
+    "src/medagent/events.py": "a12c2f3caa238df7930e214c09c747b4f986f56302c132836b59a7b739189456",
+    "src/medagent/execution.py": "3e727775813d3c3b001d5e89e447d7c3946eadf182b30b305f999eb7e58513e1",
+    "src/medagent/workspace.py": "c744943b284ddac1ec932c896e24e8457ed481dc2830d111a0b1f635dd475bf6",
+    "src/medagent/agent_tools.py": "5c2f4ebbd661c9550ded68dd96aa910b4d4678ae854fedd6afa168122e663b0d",
+    "src/medagent/server.py": "e104fbb41841b2bfd549921c399f6f16af773a7eec2b6b77def37bae01f4eebc",
+    "src/medagent/agent.py": "f13191bf889340e7a9dd12c3c0a102527e97ab1ad5b7dc71f266ddf83da51979",
+    "src/medagent/interpreter.py": "558fb7dc036d9a3fd1536c8d0307132bd7e102ba9b368a3a80a0b002ef538e01",
+    "src/medagent/__init__.py": "49fd20f67d449e00001fc0a2604f2032cdb8939dd685287bcc5e04a1c64cebc6",
+    "src/medagent/runtime.py": "8b505c55c3af458d0ce48a4a1442beb58a03c796b3468cee745f48b1873944aa",
+    "src/medagent/knowledge.py": "372656a3038e57c4c98ee71803b26156e30e25ba4c842b312e02d37dd4a746f8",
+    "src/medagent/reasoner.py": "c506a88c074741709c57573ad15d4481c2376e385942eb6b9e5bd6bb2aef2cd0",
+    "src/medagent/env_config.py": "ff669e3ede9f9990e0ac40862beae1f1e8c0a8c74dada47b5213576a3dd1ed01",
+    "src/medagent/task_intents.py": "4e238e07e00adc6591adfc691e1c7b65a9a137b3d00ad44005270c1cbd148b0b",
+    "src/medagent/presentation.py": "70e562e0393b8ca8592009d6af976d6966ecab11a62ab2b30cb070d663b5c7b0",
+    "src/medagent/self_checks.py": "c6a3a5e65a8e813fe6ea2d3f71d857a34da49cebaeea3a04034f128217ca0fef",
+    "src/medagent/desktop_service.py": "e649ece32efb49274062f8ee99babfc9d86eec4cdc09f9ff5084fba624fd118b",
+    "src/medagent/domain.py": "44a93750a5b3fb3463fc3fd4198e06fe25c5fce55fb0aa94ede2b1b7cff43157",
+    "src/medagent/extensions/__init__.py": "671b1499b6b78c8d7eaff023ef1902f9b59bca86e5a5b0d0f965a3a0ce1d0ce8",
+    "src/medagent/extensions/registry.py": "ddc48783b8ab5b0fd8b77ce4751c105abee3bea90d0910c1abb10b3435419e07",
+    "src/medagent/extensions/contracts.py": "91bc2226d6f884b666d8129b86d463d118cc494fcae5f249664f5b122cb6bf7d",
+    "src/medagent/extensions/builtin.py": "0edcf12b1ccc99deb54a41005955ae443a76a62825903ddaedf00e669d510fd5",
+    "src/medagent/extensions/templates/general.json": "d01371107dff6e6c63080d0e4bd998cb7d3827122c729c9b1ef05adcbc6800b7",
+    "src/medagent/extensions/templates/history.json": "f80dcc199634cb1040358e67be440e697cd72716a928b4c6821f3d2f4b205731",
+    "src/medagent/extensions/packs/temperature.json": "3a0e95acc4a38fe8c65ff7e011a9d22a11f707c6ed1454318f789b182160431a",
+    "src/medagent/extensions/packs/location.json": "ed61598f0782bb00093b050f332cd5a719e71444265a31c16bfb6fcb1e0c0dad",
+    "src/medagent/extensions/packs/units.json": "171acbae77448a5ed7071793462a50c9360cb716b73e444dd8da8c14eb882e69",
+    "src/medagent/web/brand.svg": "6aa5f9c2dc836090b62c2cc4a33cee9689a8b8deba4cc7828ab9404194710090",
+    "src/medagent/web/app.js": "eb563aef1200827735bb1a90e374b39f6aadba8714df4e268e332c1b2a902dc4",
+    "src/medagent/web/index.html": "e1438b3c10cd3840ab30f61509ea0615c37a44396bbac020746c08178d00abe6",
+    "src/medagent/web/styles.css": "680076c459f50f21bfcea5094bb4964cbdf9f8ca52591949c9884abdb00c3072",
+    "src/medagent/web/execution-ui.js": "a632edf45de7fe9604447bf3a4f17484d9d4d381a9b40f9bbc1ac8397bb209ec",
+    "src/medagent/web/structured-ui.js": "c37e1d2e9e108bd41d1af1736ffd1e99c0e0f76572e19ff451c56d92eec8bbae",
+    "src/medagent/web/body-location.svg": "62221848e7bb474c12191d8e56c6fbbd5c6e43a50078efd1819f892cb5396ca6",
+    "src/medagent/web/__init__.py": "110cd4ca5cbad1f99686fa97cb6ee327a45083aa51ca66abb9871cffdfc40d41",
+    "src/medagent/web/temperature.svg": "7ddd919abd5372b2780cf0e33750b5e32291f314f6c2c19b393c722f240972ad",
+    "src/medagent/web/visual-question.js": "32c2927461832dd656a1d70c32e49800e0c72b10d7615f8658bc84c044055ca9",
+    "src/medagent/content/questions.json": "e6a67443675079974de9b05738141f6ccc3c6e94322f8b356bc1e4a32e927c0b",
+    "src/medagent/content/__init__.py": "3052aa55b48c259afa9bd3746085628453d39d707d6033a654b5924eee8e2ccf",
+    "integrations/dsh/execution.patch.yml": "cfb146db76a113e341acf0a2d372c2c9e74d02d5dc1f3c51baeabfa53866d527",
+    "integrations/dsh/isolated-entry.mjs": "c2816aa81f60d972b10bfa1e98dc1af2c95a4ce961b580096c58e8b7d73fe6b1",
+    "integrations/dsh/medical.patch.yml": "9505563fb050d38502f87941d1eaf316879b22e36dc2805507a40756960ff4cd",
+    "integrations/dsh/execution-worker.mjs": "77e7ecdb3995d86a3e4b9ab05709748cb0ad209f84a86a25b55cb4221c19eb53",
+    "integrations/dsh/bridge.mjs": "15a5b008d8df9d993d81c75279f7c27e4615707cb6615a005292b5b8042fb4e6",
+    "integrations/dsh/check-artifacts.mjs": "d1bac924af3e4f52e92f36fc593e2c0787dfa206db273392b51041a4d4291307",
+    "integrations/dsh/check.mjs": "9aa132f2ab9b4bc3760938fcc3b0a67ff82dea2047900c73a9462e3ebff7fcee",
+    "integrations/dsh/execution-control.mjs": "ce060025c70e8e0b20eb12643816281c2ecd94e5a78b17bb3f7ed36d47f18fe0",
+    "integrations/dsh/tests/runtime-smoke.mjs": "4eebf77e9177dc2304a9e1cd35462a320ee39e281f5b2a22a8a2c7c8b0f974cf",
+    "integrations/dsh/tests/bridge.test.mjs": "e32c09a98aff7c4759a9546bfaec4c1ccf9c2532bcc0ef64d9b220cac40038ca"
+  }
+}

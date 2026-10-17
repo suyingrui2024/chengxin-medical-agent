@@ -1,0 +1,5 @@
+src/medagent/web/execution-artifact-ui.js 59ms
+src/medagent/web/execution-ui.js 63ms
+src/medagent/web/index.html 81ms
+src/medagent/web/styles.css 228ms
+tests/desktop/execution.spec.mjs 51ms (unchanged)

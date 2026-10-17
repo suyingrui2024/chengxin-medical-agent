@@ -1,0 +1,271 @@
+{
+  "passed": true,
+  "external_model_calls": 0,
+  "saved_decisions_replayed": 3,
+  "scope": "Counterfactual controller replay, not a new model trial.",
+  "reply": {
+    "message": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+    "phase": "summary",
+    "kind": "summary",
+    "question_id": null,
+    "quick_replies": [
+      {
+        "label": "摘要准确",
+        "value": "confirm_summary"
+      },
+      {
+        "label": "我需要更正",
+        "value": "correct_summary"
+      }
+    ],
+    "task": null,
+    "summary": {
+      "content_versions": {
+        "questions": "2026-10-15.v1",
+        "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+        "self_checks": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3"
+      },
+      "known": [
+        {
+          "key": "consult_for",
+          "label": "咨询对象",
+          "value": "其他家人",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "age_years",
+          "label": "年龄",
+          "value": "32 岁",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "chief_complaint",
+          "label": "主要问题",
+          "value": "手臂不舒服",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "emergency_screen",
+          "label": "急症筛查",
+          "value": "患者否认上述危险信号",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "onset",
+          "label": "开始与起病方式",
+          "value": "从昨天开始",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "trajectory",
+          "label": "变化趋势",
+          "value": "变化不大",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "severity",
+          "label": "影响程度",
+          "value": 3,
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "associated_symptoms",
+          "label": "伴随不适",
+          "value": "否认/没有",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "medications_taken",
+          "label": "已做处理/用药",
+          "value": "药物甲，用量不清楚",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "relevant_history",
+          "label": "相关病史",
+          "value": "否认/没有",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        },
+        {
+          "key": "patient_goal",
+          "label": "期望与担心",
+          "value": "想整理就医记录",
+          "source": "caregiver",
+          "quality": "not_assessed"
+        }
+      ],
+      "unknown": [
+        "过敏信息"
+      ],
+      "unknown_details": [
+        {
+          "key": "allergies",
+          "label": "过敏信息",
+          "evidence": "是否药物过敏不确定",
+          "source": "caregiver",
+          "quality": "not_assessed",
+          "context": {
+            "scope": "source_turn",
+            "turn_id": "7b42e05e-bdfc-412f-926d-7fdc045246bc",
+            "text": "给我的成年家人咨询，他，32岁。主要是手臂不舒服，从昨天开始，变化不大，影响程度3分，没有其他不适，没有上述危险信号。昨晚用过药物甲，用量不清楚。以前有过皮疹，是否药物过敏不确定。没有相关既往病史。这次想整理就医记录。"
+          }
+        }
+      ],
+      "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+      "risk_level": "routine",
+      "risk_triggers": [],
+      "return_now_if": [
+        "意识异常或抽搐",
+        "严重呼吸困难或嘴唇发紫",
+        "持续压榨样胸痛",
+        "大量或无法控制的出血"
+      ]
+    },
+    "developer_trace": {
+      "reason": "必要通用字段与适用的定向字段均已处理"
+    },
+    "action_id": "3ddf16de-5e5b-4ae2-be13-9bd5feb6ad4c:2",
+    "input_error": false,
+    "calculation_input": null,
+    "calculation_result": null,
+    "presentation": {
+      "schema_version": "medical-ui/v1",
+      "blocks": [
+        {
+          "id": "message:3ddf16de-5e5b-4ae2-be13-9bd5feb6ad4c:2",
+          "type": "message",
+          "data": {
+            "text": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+            "kind": "summary"
+          }
+        },
+        {
+          "id": "summary:3ddf16de-5e5b-4ae2-be13-9bd5feb6ad4c:2",
+          "type": "summary",
+          "data": {
+            "content_versions": {
+              "questions": "2026-10-15.v1",
+              "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+              "self_checks": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3"
+            },
+            "known": [
+              {
+                "key": "consult_for",
+                "label": "咨询对象",
+                "value": "其他家人",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "age_years",
+                "label": "年龄",
+                "value": "32 岁",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "chief_complaint",
+                "label": "主要问题",
+                "value": "手臂不舒服",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "emergency_screen",
+                "label": "急症筛查",
+                "value": "患者否认上述危险信号",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "onset",
+                "label": "开始与起病方式",
+                "value": "从昨天开始",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "trajectory",
+                "label": "变化趋势",
+                "value": "变化不大",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "severity",
+                "label": "影响程度",
+                "value": 3,
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "associated_symptoms",
+                "label": "伴随不适",
+                "value": "否认/没有",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "medications_taken",
+                "label": "已做处理/用药",
+                "value": "药物甲，用量不清楚",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "relevant_history",
+                "label": "相关病史",
+                "value": "否认/没有",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              },
+              {
+                "key": "patient_goal",
+                "label": "期望与担心",
+                "value": "想整理就医记录",
+                "source": "caregiver",
+                "quality": "not_assessed"
+              }
+            ],
+            "unknown": [
+              "过敏信息"
+            ],
+            "unknown_details": [
+              {
+                "key": "allergies",
+                "label": "过敏信息",
+                "evidence": "是否药物过敏不确定",
+                "source": "caregiver",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "7b42e05e-bdfc-412f-926d-7fdc045246bc",
+                  "text": "给我的成年家人咨询，他，32岁。主要是手臂不舒服，从昨天开始，变化不大，影响程度3分，没有其他不适，没有上述危险信号。昨晚用过药物甲，用量不清楚。以前有过皮疹，是否药物过敏不确定。没有相关既往病史。这次想整理就医记录。"
+                }
+              }
+            ],
+            "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+            "risk_level": "routine",
+            "risk_triggers": [],
+            "return_now_if": [
+              "意识异常或抽搐",
+              "严重呼吸困难或嘴唇发紫",
+              "持续压榨样胸痛",
+              "大量或无法控制的出血"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

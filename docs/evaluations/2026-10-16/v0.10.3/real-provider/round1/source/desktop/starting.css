@@ -1,0 +1,31 @@
+:root {
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #203c33;
+  background: #f5f6f2;
+}
+body {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+main {
+  text-align: center;
+}
+h1 {
+  font-family: "Noto Serif CJK SC", serif;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  font-size: 30px;
+  margin: 24px 0;
+}
+p {
+  font-size: 14px;
+  color: #526e41;
+}
+small {
+  display: block;
+  color: #69785f;
+  margin-top: 40px;
+  font-size: 12px;
+}

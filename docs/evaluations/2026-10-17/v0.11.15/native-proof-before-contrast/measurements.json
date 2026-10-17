@@ -1,0 +1,170 @@
+{
+  "version": "0.11.15",
+  "binary": "/home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin",
+  "native_window": [
+    900,
+    680
+  ],
+  "source": {
+    "report": ".runtime/location-answers-20261017/live-second.json",
+    "report_sha256": "a2863ec3aa5ab9dde606d3bf814339b9a05a596130a48c54d51414b7b541b611",
+    "case": "uncertain_location",
+    "actual_question": "头疼主要在头部哪个部位？左右和范围能大致说清吗？",
+    "actual_fields": [
+      "region",
+      "area",
+      "side",
+      "extent"
+    ],
+    "local_replay": true,
+    "external_provider_calls_in_replay": 0,
+    "scope": "Copy current scripted location fixture, replacing its question with the actual model question; the registered four fields match the actual model declaration. Other setup and follow-up responses remain local scripted fixtures."
+  },
+  "measurements": [
+    {
+      "stage": "area",
+      "measurements": [
+        {
+          "selector": "#active-task h3",
+          "top": 256,
+          "bottom": 278.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-progress",
+          "top": 282.390625,
+          "bottom": 299.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-field",
+          "top": 301.390625,
+          "bottom": 397.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-navigation",
+          "top": 401.390625,
+          "bottom": 445.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "top": 527.203125,
+          "bottom": 565,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "top": 148.5,
+          "bottom": 192.5,
+          "paneBottom": 449.203125,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "stage": "extent",
+      "measurements": [
+        {
+          "selector": "#active-task h3",
+          "top": 256,
+          "bottom": 278.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-progress",
+          "top": 282.390625,
+          "bottom": 299.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-field",
+          "top": 301.390625,
+          "bottom": 388.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-navigation",
+          "top": 392.390625,
+          "bottom": 436.390625,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "top": 527.203125,
+          "bottom": 565,
+          "paneBottom": 449.203125,
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "top": 148.5,
+          "bottom": 192.5,
+          "paneBottom": 449.203125,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "stage": "review",
+      "measurements": [
+        {
+          "selector": "#active-task h3",
+          "top": 256,
+          "bottom": 278.390625,
+          "paneBottom": 449,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-progress",
+          "top": 282.390625,
+          "bottom": 299.390625,
+          "paneBottom": 449,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-review",
+          "top": 301.390625,
+          "bottom": 395.390625,
+          "paneBottom": 449,
+          "visible": true
+        },
+        {
+          "selector": ".location-answer-final-actions",
+          "top": 399.390625,
+          "bottom": 443.390625,
+          "paneBottom": 449,
+          "visible": true
+        },
+        {
+          "selector": "#message-input",
+          "top": 527,
+          "bottom": 565,
+          "paneBottom": 449,
+          "visible": true
+        },
+        {
+          "selector": "#urgent-help",
+          "top": 148.5,
+          "bottom": 192.5,
+          "paneBottom": 449,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "local_fixture_requests": 4,
+  "external_provider_requests": 0,
+  "passed": true,
+  "scope": "Actual final binary with locally replayed real model question and matching declared fields; scripted remaining setup and follow-up. Not a second real-provider consultation."
+}

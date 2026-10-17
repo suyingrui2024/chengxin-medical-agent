@@ -1,0 +1,20 @@
+--- a/pvlib/iam.py
++++ b/pvlib/iam.py
+@@ -214,6 +214,17 @@
+ 
+     # incidence angle modifier
+     iam = (tau_s + tau_p) / 2 / tau_0
++
++    # when the sun is behind the module plane (abs(aoi) >= 90) the direct
++    # beam does not reach the module, so the IAM is zero.  This also avoids
++    # nan results at grazing incidence when n == 1, where the reflectance
++    # terms above are 0/0 (GH #1782).  nan aoi is preserved.
++    aoi_gte_90 = np.full_like(aoi, False, dtype='bool')
++    np.greater_equal(np.abs(aoi), 90, where=~np.isnan(aoi), out=aoi_gte_90)
++    iam = np.where(aoi_gte_90, 0, iam)
++
++    if isinstance(aoi, pd.Series):
++        iam = pd.Series(iam, index=aoi.index)
+ 
+     return iam
+ 

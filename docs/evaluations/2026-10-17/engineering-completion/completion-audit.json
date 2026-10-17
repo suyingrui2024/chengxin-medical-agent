@@ -1,0 +1,204 @@
+{
+  "date": "2026-10-17",
+  "app_version": "0.11.17",
+  "scope_confirmed_by_user": "工程原型设计与工程验收",
+  "engineering_goal_complete": true,
+  "requirements": [
+    {
+      "id": "research_design",
+      "requirement": "研究与架构设计",
+      "engineering_status": "accepted",
+      "evidence_scope": "设计、调研和可行性说明已交付；不把研究材料作为临床有效性证据。",
+      "sources": {
+        "docs/研究与可行性评估.md": "b3f5355bee881b0cbe4e86127ecf48ed9ff2d0339b965d7f777604598cc885d0",
+        "docs/门诊式问诊与图示自查背调.md": "50333cbf223a0cd8a89739b57316cda512dc69457840a882dc96b8bde6863e66",
+        "docs/首版产品与技术设计.md": "9ffdf029e30af636b21b84e6cebe91644350cff0891b722b61e9179621be3dd3",
+        "docs/结构化界面项目调研与接入方案.md": "d9d0c7ccbc0262869e68c2adf81aa79f73c2ee7f48c73ae566628e5e320fa460"
+      },
+      "tests_inspected": {}
+    },
+    {
+      "id": "desktop",
+      "requirement": "独立图形桌面",
+      "engineering_status": "accepted",
+      "evidence_scope": "Linux x64独立窗口、私有服务、启动与关闭；36组源码和36组打包版检查，独立Debian系统文件补验。",
+      "sources": {
+        "desktop/main.cjs": "8151805a37e4b9b9b428ca6635a8fa774443f1c7d0d8a054dcd444aef17bc907",
+        "desktop/preload.cjs": "f6f856524cd74956c7b63d9505593501c94f2213d46fe0add300cc2b4214da55",
+        "scripts/start-desktop.sh": "16bc2e893db3b21093a93c8c96ec97b1b7289263aeed4cab177bbbeafd030770"
+      },
+      "tests_inspected": {
+        "tests/desktop/app.spec.mjs": "7236c21f21680120b423163ee16e119d188959a5d05511b2c6ae299d97f8250d",
+        "tests/desktop/fonts.spec.mjs": "2b559a69d530b078c4d7b474ef2664428e3c87bbfb6f4cd7e29457e52dece4a8"
+      }
+    },
+    {
+      "id": "medical_tool_loop",
+      "requirement": "问诊与显式工具循环",
+      "engineering_status": "accepted",
+      "evidence_scope": "13个受控工具；批量事实、来源校验、工具拒绝后重规划、问诊及预算终止。",
+      "sources": {
+        "src/medagent/agent.py": "5ac04fff7192396591edc7eb0cc153425e5d4c01d6dff455c6db034af955d191",
+        "src/medagent/agent_tools.py": "a884c479760fd8fd5ae128dc709aed96aecd7460457ddf1b27bfaaa233f4dc29",
+        "src/medagent/content/questions.json": "e6a67443675079974de9b05738141f6ccc3c6e94322f8b356bc1e4a32e927c0b"
+      },
+      "tests_inspected": {
+        "tests/test_agent.py": "38d12c3150d9a3f9e296e23d61f20bf5caab3eea75bf4938bd19e64debdf2212",
+        "tests/test_consultation.py": "270c7726926aaa674b0f81e2e0b1163131a76110fdc064d893298e89c1db1e68"
+      }
+    },
+    {
+      "id": "continuation",
+      "requirement": "问诊纠错和任务接续",
+      "engineering_status": "accepted",
+      "evidence_scope": "已确认定位更正、重复测量和同轮补充保留原问诊位置；旧动作失效，失败与未知状态分别处理。",
+      "sources": {
+        "src/medagent/task_conversation.py": "6b0ae096d42521c75a663ae69638cbd4209dde326871ff9cd47d21363f6255aa",
+        "src/medagent/location_revisions.py": "73e881f4d6a59734659dc4044b01d78495f164bf8af58a96bf19818eaf7ca80f",
+        "src/medagent/calculation_followup.py": "abe7cdd10f6bf89953171ba43d52b78025cae325aba14a91402ad6f0f999898e"
+      },
+      "tests_inspected": {
+        "tests/desktop/location-revisions.spec.mjs": "6cd42ed7b96387d25858180c2db3d5fe3803a33c4e6af237bc513251dd295589",
+        "tests/desktop/repeated-observations.spec.mjs": "2777a9bf6e3c28d3a570e292adf8d10631e25408228db8d15fc83eebb9c1643f",
+        "tests/desktop/calculation-supplements.spec.mjs": "1d6ad5ff36f70b1104e5a3328a054773def293144a671758b12e8bb534b96a00"
+      }
+    },
+    {
+      "id": "visual_tasks",
+      "requirement": "图示自查与低文字交互",
+      "engineering_status": "accepted",
+      "evidence_scope": "固定图示、分步操作、明确确认与跳过、程度刻度和原话按需展开；布局检查不代表患者理解改善。",
+      "sources": {
+        "src/medagent/web/visual-question.js": "71d06cea363f30741da94b2f74da12e7b46d3d2544bbb5a7b2a5268c8124529a",
+        "src/medagent/web/location-answer-ui.js": "b5db45d5a4edc86fdfe23c5ae6208bd9236bef67dbad5c285e4f96ee687d3ba9",
+        "src/medagent/extensions/packs/temperature.json": "9d2beed3ced8163789d3df5b4a17d9352514f97e7c9b59c8404bd5d798ee28a4",
+        "src/medagent/extensions/packs/location.json": "67ced0e32e33cabf00e9a49640021f61fb33a6f0bc5dda7314f8b97b3d84f219"
+      },
+      "tests_inspected": {
+        "tests/ui/visual-consultation.spec.mjs": "9b239c0b75014915537f0f06f991f69c06ed2998c48f76b6c66f7017cc199ec9",
+        "tests/desktop/self-check-conversation.spec.mjs": "74019013090ff6b5e3063c59d8c760f7d1c9a93905560d6a98fcbe748b645ff5"
+      }
+    },
+    {
+      "id": "structured_rendering",
+      "requirement": "结构化输出与渲染",
+      "engineering_status": "accepted",
+      "evidence_scope": "注册组件、结构化输入输出、惰性文本及回退；SVG图示17处文字标签保留为矢量。",
+      "sources": {
+        "src/medagent/presentation.py": "6e3de08736dab2b80223cf510916fc81a35beae34eefa7efa4e2706f1b5ce36e",
+        "src/medagent/web/structured-ui.js": "a56dd560c8845db8c601d891ee512526ce2b266ef9988f2d622d757e882cae29"
+      },
+      "tests_inspected": {
+        "tests/test_presentation.py": "b645aa0038678f4282c969eb7d07444bdca86a5e27c954c3edf6d4665d4a23d8",
+        "tests/ui/glucose-calculation.spec.mjs": "4529a84b6cb835647a70d6026e577f5f6adc8fc5889966e89a9153946041c677"
+      }
+    },
+    {
+      "id": "plugins_calculations",
+      "requirement": "插件模板与可解释计算",
+      "engineering_status": "accepted",
+      "evidence_scope": "受信能力契约、模板组合、会谈配置版本固定；单位和血糖换算展示核对输入、公式、出处、结果与限制。",
+      "sources": {
+        "src/medagent/extensions/registry.py": "a4c4a2a2401b312040442a08caf0e3dcd36406024274210a591797501efccbf9",
+        "src/medagent/extensions/builtin.py": "f600f7a159fa8e34874b7e1bdcb8c0135b469b7bd2cc42488c6132d7d7847d65",
+        "src/medagent/extensions/glucose.py": "c1e8a5c869e006b10c6a2ac4718981f601f436a10065845c51ac55bd090c4ae2",
+        "src/medagent/extensions/templates/general.json": "952f4c68bd1a6c5cc64bdb05bac035ba4df7abd38dd195c7bf7e195a0e64b4f8",
+        "src/medagent/extensions/templates/history.json": "f80dcc199634cb1040358e67be440e697cd72716a928b4c6821f3d2f4b205731"
+      },
+      "tests_inspected": {
+        "tests/test_capabilities.py": "f4a4b26b82e8970dbccd1c08b2b5ee57a34f99b93278e292c9d249a748bc9350",
+        "tests/test_runtime.py": "0fd22a76d65a39fd04f7c4ea52ec5e9802821e9103637fc20bb91d7dbbf5020d",
+        "tests/test_glucose_capability.py": "a8cd05bd9f3e81b5dddd2584d975b8f6a3753a73480a65746cb1450e574e9d06",
+        "tests/desktop/patient-calculation.spec.mjs": "61d4c27125c3b3507ffddcef19c5595272bef1286e5d4ef603deffac375701cf"
+      }
+    },
+    {
+      "id": "execution",
+      "requirement": "DSH文件、终端、联网与子任务底座",
+      "engineering_status": "accepted",
+      "evidence_scope": "官方SDK执行工作台可操作项目文件、代码及子任务；搜索和网页工具保留官方配置；依用户安排暂不自动接入患者路径，不声称总体任务准确率等同DSH或Codex。",
+      "sources": {
+        "src/medagent/execution.py": "c9ee3b5a1143fac3172c41d53f3c8bde3cde50bc5c026a75356e4c2e31eab95c",
+        "integrations/dsh/execution-worker.mjs": "7a594cd2b022109248000b920d9ade0158906e8a5d7e598db18e45a85de74dfe",
+        "integrations/dsh/execution.patch.yml": "a9647798d87f00a59a77b08c8a4d3a09adafbd24a87d04d80a8cb63a6c5fc250",
+        "integrations/dsh/execution-control.mjs": "b4e030c942aaac052b9e4f7947d3709deda68d56180ee64452ee0c5d5a4a68d1"
+      },
+      "tests_inspected": {
+        "tests/desktop/execution.spec.mjs": "0d893c358643166cde854bc82d8d96203ba9b99640b618dd44e6466619c25e60",
+        "tests/desktop/projects.spec.mjs": "bf3f820859176308e690f209ea35683ce36c3d3e675e7580d0f7c7aa2bb055f1"
+      }
+    },
+    {
+      "id": "cache_models",
+      "requirement": "DeepSeek接入、缓存与实际迭代",
+      "engineering_status": "accepted",
+      "evidence_scope": "固定共享前缀、患者上下文分离、缓存用量核算；既有真实API原始失败及复验保留，51个运行时Python文件与该医疗验收版本一致。",
+      "sources": {
+        "src/medagent/backends.py": "f20bf1bc2752f1c3b7608cb2756d85ac32cde4276c53596e8a7960ac37db775f",
+        "src/medagent/env_config.py": "ff669e3ede9f9990e0ac40862beae1f1e8c0a8c74dada47b5213576a3dd1ed01",
+        "integrations/dsh/medical.patch.yml": "9505563fb050d38502f87941d1eaf316879b22e36dc2805507a40756960ff4cd"
+      },
+      "tests_inspected": {
+        "tests/test_cache_config.py": "22814e60620b9f64e64f62f67f8b1142dd4ccd9696e7480c813e69dbe55c8bd7",
+        "tests/test_recorded_recovery.py": "eb0886d8b58e13fe13f8ed9381b9985ca276a45b1db80f7097d3e186a57b9fb9"
+      }
+    },
+    {
+      "id": "failure_isolation",
+      "requirement": "错误、过期结果及优先中断",
+      "engineering_status": "accepted",
+      "evidence_scope": "普通等待、明确求助中断、迟到结果隔离、对象与草稿分离、故障重试；仅验证工程处理，不证明危险信号临床覆盖率。",
+      "sources": {
+        "src/medagent/decision_wait.py": "4c4f8a2d13edce191c51fb0f50cde958714ce61024b0214c5b8928bc4c7cf995",
+        "src/medagent/execution_store.py": "f46a5e294dd0d8fcac6dbccd7eab077547ef30bc085cafa3cae51c52b1846c22"
+      },
+      "tests_inspected": {
+        "tests/test_consultation_interrupt.py": "5121d8921c0104725793398dbb3ea4f4b7ac073896e5b0e90e800951fb7e86dc",
+        "tests/ui/urgent-interrupt.spec.mjs": "ebc12e6f44392114a4227fb01fa4667c032f355376d3ba68520eb090b97e99e4",
+        "tests/ui/consultation-subjects.spec.mjs": "85d138805561d39c52adaeeb14d1eab566f77ef985a18e818988bd6fac946153"
+      }
+    },
+    {
+      "id": "delivery",
+      "requirement": "工程验收与可复查交付",
+      "engineering_status": "accepted",
+      "evidence_scope": "默认后端344通过54跳过、浏览器74通过、源码和程序原生各36通过、Node21通过、冻结220通过；程序120文件及544适用生产依赖版本匹配。",
+      "sources": {
+        "scripts/verify_desktop_package.py": "7cc8ffc4d2c8ad99d1a42f93c966c8a4f359baea793f1d76a6e66e2e3b165d4c",
+        "scripts/verify_clean_desktop.py": "f30909dac3fbf016fb2b1a307435d2d51308a05fe83a041cd9a4e49ffde0e9a9",
+        "scripts/check-bundled-fonts.mjs": "ec66f10c648cc49d805f79660cba6b7c74d81cbe74b6422b68fde291f2825598",
+        "docs/实验与验收方案.md": "6dd13200bbd7b0ddd7e45a121919ffcdd504c25dd3a0a0004520e12560fa4f01"
+      },
+      "tests_inspected": {}
+    },
+    {
+      "id": "review_preparation",
+      "requirement": "版本化审阅材料",
+      "engineering_status": "accepted",
+      "evidence_scope": "28项离线内容材料、原始来源摘要和空白审核表已交付；离线显示与导出一致性通过，审核状态保持待审。",
+      "sources": {
+        "scripts/export_review_packet.py": "75b4c9875409241509ea8c11783c0118b3110550ce100e6cc5eaaaaa19bc3da9",
+        "docs/当前版本完成审查与后续接续.md": "9ac4aa640b8eb941dee23a2fc63b24185cc7f139d8c7c5cd9d74348e60fa6f64"
+      },
+      "tests_inspected": {}
+    }
+  ],
+  "mandatory_engineering_items_remaining": [],
+  "medical_python_files_unchanged_since_live_evaluation": 51,
+  "external_model_requests_this_completion_audit": 0,
+  "verification_records": {
+    "package-verification.json": "7f5f85f3257c0c014561bf089cf19b1f11ef5d7c100d55cbe3f05e0f6ffdd7a2",
+    "v01116-evidence.json": "7c71d8178823637030039f9a30006911df52fbcb405f02589ce8e61d50edb73c",
+    "v01117-evidence.json": "4c10283864611593fd3e8694bfb66a8552956afc9d304c128293dc4485ffa1ab",
+    "review-packet-verification.json": "691b35576976f2f3653c6378189e982667601112c920670eaafa37a929ff4d08"
+  },
+  "later_phases": [
+    "具名临床审核和独立临床病例评价",
+    "患者图示理解与操作研究",
+    "生产患者数据与正式产品边界评估",
+    "其他平台／独立机器安装验证",
+    "摄像头、手环、医保、SAM3D及第三方插件安装",
+    "患者路径自动调用通用执行工作台"
+  ],
+  "limits": "Engineering prototype acceptance only. No clinical effectiveness, general diagnosis, prescribing, cross-platform support or DSH/Codex performance equivalence claim."
+}

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">腋下数字体温计测量示意</title>
+  <desc id="desc">三步示意：擦干腋窝，将体温计探头放在腋窝中央，手臂贴紧身体等待测量完成。</desc>
+  <view id="step-1" viewBox="0 0 320 420"/>
+  <view id="step-2" viewBox="320 0 320 420"/>
+  <view id="step-3" viewBox="640 0 320 420"/>
+  <rect width="960" height="420" rx="28" fill="#eaf1ec"/>
+  <g font-family="Arial, 'PingFang SC', sans-serif" fill="#18312d">
+    <g transform="translate(34 36)">
+      <circle cx="32" cy="28" r="28" fill="#d9ed99"/><text x="32" y="36" text-anchor="middle" font-size="24" font-weight="700">1</text>
+      <path d="M124 76c45-31 100-18 122 22 22 40 3 91-41 112l-7 111H92l-5-121c-30-22-37-61-19-91 12-20 31-29 56-33z" fill="#f0c8aa"/>
+      <path d="M94 121c20 16 41 16 64 0" fill="none" stroke="#17685b" stroke-width="7" stroke-linecap="round"/>
+      <path d="M56 75l41 28" stroke="#17685b" stroke-width="9" stroke-linecap="round"/>
+      <path d="M42 55l21 15M45 86l25-5" stroke="#17685b" stroke-width="5" stroke-linecap="round"/>
+      <text x="139" y="360" text-anchor="middle" font-size="23" font-weight="700">擦干腋窝</text>
+    </g>
+    <path d="M320 74v272" stroke="#cad7ce" stroke-width="2" stroke-dasharray="7 9"/>
+    <g transform="translate(350 36)">
+      <circle cx="32" cy="28" r="28" fill="#d9ed99"/><text x="32" y="36" text-anchor="middle" font-size="24" font-weight="700">2</text>
+      <path d="M136 70c47 0 83 38 83 85v160H52V155c0-47 37-85 84-85z" fill="#f0c8aa"/>
+      <circle cx="136" cy="41" r="34" fill="#f0c8aa"/>
+      <path d="M78 119l-45 116" stroke="#f0c8aa" stroke-width="36" stroke-linecap="round"/>
+      <g transform="rotate(-25 78 146)">
+        <rect x="27" y="133" width="117" height="22" rx="11" fill="#fff" stroke="#17685b" stroke-width="4"/>
+        <rect x="44" y="138" width="40" height="12" rx="3" fill="#d9ed99"/>
+        <path d="M144 144h32" stroke="#17685b" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <circle cx="91" cy="131" r="13" fill="none" stroke="#a53a31" stroke-width="4"/>
+      <text x="136" y="360" text-anchor="middle" font-size="23" font-weight="700">探头放在中央</text>
+    </g>
+    <path d="M640 74v272" stroke="#cad7ce" stroke-width="2" stroke-dasharray="7 9"/>
+    <g transform="translate(675 36)">
+      <circle cx="32" cy="28" r="28" fill="#d9ed99"/><text x="32" y="36" text-anchor="middle" font-size="24" font-weight="700">3</text>
+      <path d="M136 70c47 0 83 38 83 85v160H52V155c0-47 37-85 84-85z" fill="#f0c8aa"/>
+      <circle cx="136" cy="41" r="34" fill="#f0c8aa"/>
+      <path d="M70 125l68 106" stroke="#f0c8aa" stroke-width="38" stroke-linecap="round"/>
+      <path d="M202 113v61" stroke="#17685b" stroke-width="6" stroke-linecap="round"/>
+      <path d="M187 160l15 17 15-17" fill="none" stroke="#17685b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M226 72c18 8 27 24 27 45M236 58c28 12 43 35 43 67" fill="none" stroke="#17685b" stroke-width="5" stroke-linecap="round"/>
+      <text x="136" y="360" text-anchor="middle" font-size="23" font-weight="700">手臂贴紧，等提示</text>
+    </g>
+  </g>
+</svg>
+

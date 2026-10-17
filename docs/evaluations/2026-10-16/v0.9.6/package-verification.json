@@ -1,0 +1,12 @@
+{
+  "version": "0.9.6",
+  "matching_runtime_files": 63,
+  "package_metadata_fields_verified": 6,
+  "installed_locked_versions_verified": 544,
+  "expected_packager_metadata_changes": [
+    "private",
+    "scripts",
+    "devDependencies",
+    "package-lock.json"
+  ]
+}

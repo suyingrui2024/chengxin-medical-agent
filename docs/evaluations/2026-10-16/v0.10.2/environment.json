@@ -1,0 +1,40 @@
+{
+  "model_requests": 0,
+  "host_driver_python": "3.10.9 (main, Mar  1 2023, 18:23:06) [GCC 11.2.0]",
+  "isolated_system_runtime": {
+    "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+    "system": "Linux",
+    "machine": "x86_64",
+    "kernel": "6.8.0-138-generic",
+    "numpy": "1.21.5",
+    "scipy": "1.8.0",
+    "matplotlib": "3.5.1",
+    "system_tools": {
+      "node": {
+        "exit": 0,
+        "text": "v22.23.3\n"
+      },
+      "bubblewrap": {
+        "exit": 0,
+        "text": "bubblewrap 0.6.1\n"
+      },
+      "libc": {
+        "exit": 0,
+        "text": "glibc 2.35\n"
+      },
+      "compiler": {
+        "exit": 0,
+        "text": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
+      },
+      "font": {
+        "exit": 0,
+        "text": "DejaVuSans.ttf: \"DejaVu Sans\" \"Book\"\n"
+      }
+    }
+  },
+  "fixed_sdk": "0.2.0-rc.2",
+  "electron": "44.7.2",
+  "evaluation_wheels": "inputs/inputs-v3.json",
+  "historical_python": "inputs/python39.json",
+  "scope": "Current Linux x64 host; no official Docker harness or cross-platform claim."
+}

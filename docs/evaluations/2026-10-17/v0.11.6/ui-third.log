@@ -1,0 +1,13 @@
+
+> medical-agent-dsh-integration@0.11.5 test:ui
+> playwright test --grep full measurement reports
+
+
+Running 2 tests using 1 worker
+
+(node:1009234) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry (1.9s)
+  ✓  2 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen (1.8s)
+
+  2 passed (7.1s)

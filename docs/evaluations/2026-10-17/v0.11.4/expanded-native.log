@@ -1,0 +1,12 @@
+
+Running 1 test using 1 worker
+
+(node:934212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{"case":"native_full_interview","passed":true,"live_calls":22}
+{"case":"native_emergency_gate","passed":true,"live_calls":0}
+{"case":"native_service_failure_recovery","passed":true,"live_calls":2}
+  ✓  1 tests/live/workflow.spec.mjs:11:1 › synthetic patient completes a native live consultation, emergency routing and service recovery (32.8s)
+
+  1 passed (33.3s)
+{"passed": true, "attempted_calls": 24, "injected_failures": 1}

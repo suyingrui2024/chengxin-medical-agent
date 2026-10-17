@@ -1,0 +1,7 @@
+
+> medical-agent-dsh-integration@0.11.12 format:check
+> prettier --check src/medagent/web/index.html src/medagent/web/styles.css src/medagent/web/*.js src/medagent/extensions/**/*.json playwright*.mjs tests/fixtures/*.mjs tests/ui/*.mjs tests/desktop/*.mjs tests/live/*.mjs desktop/*.{cjs,html,css} scripts/*desktop*.mjs
+
+Checking formatting...
+[warn] tests/ui/location-layout.spec.mjs
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.

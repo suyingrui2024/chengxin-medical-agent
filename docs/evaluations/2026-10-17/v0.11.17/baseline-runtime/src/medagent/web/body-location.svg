@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" role="img" aria-labelledby="title desc">
+  <title id="title">主观症状部位示意</title>
+  <desc id="desc">以人体正面和背面示意头面、胸、腹、四肢以及背腰位置。仅用于说明症状位置，不要求触摸或按压。</desc>
+  <rect width="720" height="420" rx="20" fill="#eaf1ec"/>
+  <defs><g id="person" fill="#f0c8aa" stroke="#b99a81" stroke-width="2"><circle cx="0" cy="70" r="32"/><path d="M-17 104h34l12 17h25l29 134-24 7-30-100v95l19 127h-29l-19-112-19 112h-29l19-127v-95l-30 100-24-7 29-134h25z"/></g></defs>
+  <use href="#person" transform="translate(235)"/>
+  <use href="#person" transform="translate(505)"/>
+  <g fill="#d9ed99" stroke="#17685b" stroke-width="2"><ellipse cx="235" cy="70" rx="22" ry="25"/><rect x="212" y="137" width="46" height="45" rx="8"/><rect x="212" y="189" width="46" height="48" rx="8"/><rect x="482" y="140" width="46" height="98" rx="8"/></g>
+  <g fill="none" stroke="#17685b" stroke-width="2"><path d="M100 70h110M100 160h110M100 213h110M303 295h35M530 187h92"/></g>
+  <g font-family="Arial,'PingFang SC',sans-serif" font-size="19" fill="#18312d"><text x="24" y="77">头/面部</text><text x="24" y="167">胸部</text><text x="24" y="220">腹部</text><text x="320" y="289">四肢</text><text x="627" y="194">背/腰</text><text x="215" y="410" font-size="16">正面</text><text x="485" y="410" font-size="16">背面</text></g>
+</svg>

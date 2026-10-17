@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.10.3 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native priority help
+
+
+Running 1 test using 1 worker
+
+(node:691994) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting (1.4s)
+
+  1 passed (1.9s)

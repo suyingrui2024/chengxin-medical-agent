@@ -1,0 +1,18 @@
+
+> medical-agent-dsh-integration@0.9.5 test:desktop
+> playwright test --config playwright.desktop.config.mjs
+
+
+Running 7 tests using 1 worker
+
+(node:494951) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (694ms)
+  ✓  2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.5s)
+  ✓  3 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (3.5s)
+  ✓  4 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (10.8s)
+  ✓  5 tests/desktop/execution.spec.mjs:438:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (8.7s)
+  ✓  6 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.5s)
+  ✓  7 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.4s)
+
+  7 passed (36.5s)

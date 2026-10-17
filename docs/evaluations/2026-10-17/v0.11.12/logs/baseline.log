@@ -1,0 +1,86 @@
+
+> medical-agent-dsh-integration@0.11.11 test:ui
+> playwright test tests/ui/location-layout.spec.mjs
+
+
+Running 3 tests using 1 worker
+
+(node:1178656) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/location-layout.spec.mjs:9:3 › location controls have separate readable targets on wide (1.2s)
+  ✘  2 tests/ui/location-layout.spec.mjs:9:3 › location controls have separate readable targets on mobile (1.2s)
+(node:1178993) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 tests/ui/location-layout.spec.mjs:9:3 › location controls have separate readable targets on short (1.3s)
+
+
+  1) tests/ui/location-layout.spec.mjs:9:3 › location controls have separate readable targets on mobile 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 6
+
+    - Array []
+    + Array [
+    +   Array [
+    +     "胸部",
+    +     "腹部",
+    +   ],
+    + ]
+
+      52 |     expect(targets).toHaveLength(5);
+      53 |     expect(targets.every((t) => t.width >= 44 && t.height >= 44)).toBe(true);
+    > 54 |     expect(overlaps).toEqual([]);
+         |                      ^
+      55 |   });
+      56 |
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-layout.spec.mjs:54:22
+
+    Error Context: test-results/ui/location-layout-location-c-0a033--readable-targets-on-mobile/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/location-layout-location-c-0a033--readable-targets-on-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/location-layout-location-c-0a033--readable-targets-on-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/location-layout.spec.mjs:9:3 › location controls have separate readable targets on short 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 6
+
+    - Array []
+    + Array [
+    +   Array [
+    +     "胸部",
+    +     "腹部",
+    +   ],
+    + ]
+
+      52 |     expect(targets).toHaveLength(5);
+      53 |     expect(targets.every((t) => t.width >= 44 && t.height >= 44)).toBe(true);
+    > 54 |     expect(overlaps).toEqual([]);
+         |                      ^
+      55 |   });
+      56 |
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-layout.spec.mjs:54:22
+
+    Error Context: test-results/ui/location-layout-location-c-58351-e-readable-targets-on-short/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/location-layout-location-c-58351-e-readable-targets-on-short/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/location-layout-location-c-58351-e-readable-targets-on-short/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    tests/ui/location-layout.spec.mjs:9:3 › location controls have separate readable targets on mobile 
+    tests/ui/location-layout.spec.mjs:9:3 › location controls have separate readable targets on short 
+  1 passed (9.0s)

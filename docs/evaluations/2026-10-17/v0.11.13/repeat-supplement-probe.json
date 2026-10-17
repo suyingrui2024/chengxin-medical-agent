@@ -1,0 +1,4469 @@
+{
+  "checks": {
+    "old_reading_preserved": true,
+    "medication_updated": true,
+    "repeat_cancelled_by_case_update": true,
+    "no_stranded_continuation": true,
+    "summary_resumed": true
+  },
+  "passed": true,
+  "external_model_calls": 0,
+  "state": {
+    "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+    "consultation_subject": {
+      "category": "self",
+      "label": "本人",
+      "reference": {
+        "attributes": [
+          "self",
+          "*",
+          "*"
+        ],
+        "label": "本人"
+      },
+      "evidence": "我自己",
+      "source_turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+      "scope": "reported_relationship_only"
+    },
+    "phase": "summary",
+    "facts": {
+      "consult_for": {
+        "key": "consult_for",
+        "value": "self",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640584+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "ca3b7415-1900-4e09-bce6-cf3a336662c4",
+        "evidence": "我自己"
+      },
+      "age_years": {
+        "key": "age_years",
+        "value": 32,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640678+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "ef30444a-9dff-4705-bd58-57d8c10fd41b",
+        "evidence": "32岁"
+      },
+      "chief_complaint": {
+        "key": "chief_complaint",
+        "value": "咳嗽发烧",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640743+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "6e294b16-552e-411d-9f1d-3d40c23ee644",
+        "evidence": "咳嗽发烧"
+      },
+      "onset": {
+        "key": "onset",
+        "value": "两天",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640805+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "e52c21d8-ae1c-47a6-9426-b00bc4e91bab",
+        "evidence": "两天"
+      },
+      "emergency_screen": {
+        "key": "emergency_screen",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640863+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "de8ab09d-f508-402f-967f-e221ea33cda5",
+        "evidence": "上述危险信号都没有"
+      },
+      "temperature_c": {
+        "key": "temperature_c",
+        "value": 38.25,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406",
+        "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+        "evidence": "腋温38.25℃"
+      },
+      "trajectory": {
+        "key": "trajectory",
+        "value": "stable",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647010+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "2ced98c4-5809-45ce-9453-d6abbb3612df",
+        "evidence": "变化不大"
+      },
+      "severity": {
+        "key": "severity",
+        "value": 3,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647100+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "b0ebaf9c-6dfb-4fe8-ba52-11d79e466195",
+        "evidence": "不适程度3分"
+      },
+      "associated_symptoms": {
+        "key": "associated_symptoms",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647162+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "d1cf9fbc-99e4-40a5-a844-df9ececda1fc",
+        "evidence": "没有其他不适"
+      },
+      "resp_breathing": {
+        "key": "resp_breathing",
+        "value": "没有气促，能完整说话",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647226+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "341d4224-92fe-4b64-9d29-590e56c3162c",
+        "evidence": "没有气促，能完整说话"
+      },
+      "resp_cough_details": {
+        "key": "resp_cough_details",
+        "value": "干咳，没有咳血",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647282+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "d3409fe3-ad09-41fb-9697-0029c660922a",
+        "evidence": "干咳，没有咳血"
+      },
+      "resp_intake": {
+        "key": "resp_intake",
+        "value": "能正常喝水吃饭，排尿正常",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647345+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "4188715c-fd38-4260-996a-72c33ee120c7",
+        "evidence": "能正常喝水吃饭，排尿正常"
+      },
+      "medications_taken": {
+        "key": "medications_taken",
+        "value": "昨晚用过药物甲",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826",
+        "recorded_at": "2026-10-17T00:06:20.653118+00:00",
+        "quality": "not_assessed",
+        "supersedes": "aaee3265-0f2c-4893-b032-5bac4ac71514",
+        "fact_id": "4328859f-f48b-4319-b01e-d0317930fb97",
+        "evidence": "昨晚用过药物甲"
+      },
+      "allergies": {
+        "key": "allergies",
+        "value": null,
+        "assertion": "unknown",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647456+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "7ef0e892-5847-4c99-9cf6-5f79a4d4f2d1",
+        "evidence": "过敏不知道"
+      },
+      "relevant_history": {
+        "key": "relevant_history",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647515+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "0397964e-12a2-4133-91e9-0db013b808ae",
+        "evidence": "没有相关既往病史"
+      },
+      "patient_goal": {
+        "key": "patient_goal",
+        "value": "整理信息去就医",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647572+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "e90370ad-baec-475b-83b9-852c74de3e1e",
+        "evidence": "想整理信息去就医"
+      }
+    },
+    "history": [
+      {
+        "key": "consult_for",
+        "value": "self",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640584+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "ca3b7415-1900-4e09-bce6-cf3a336662c4",
+        "evidence": "我自己"
+      },
+      {
+        "key": "age_years",
+        "value": 32,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640678+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "ef30444a-9dff-4705-bd58-57d8c10fd41b",
+        "evidence": "32岁"
+      },
+      {
+        "key": "chief_complaint",
+        "value": "咳嗽发烧",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640743+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "6e294b16-552e-411d-9f1d-3d40c23ee644",
+        "evidence": "咳嗽发烧"
+      },
+      {
+        "key": "onset",
+        "value": "两天",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640805+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "e52c21d8-ae1c-47a6-9426-b00bc4e91bab",
+        "evidence": "两天"
+      },
+      {
+        "key": "emergency_screen",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640863+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "de8ab09d-f508-402f-967f-e221ea33cda5",
+        "evidence": "上述危险信号都没有"
+      },
+      {
+        "key": "temperature_c",
+        "value": 38.25,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406",
+        "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+        "evidence": "腋温38.25℃"
+      },
+      {
+        "key": "trajectory",
+        "value": "stable",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647010+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "2ced98c4-5809-45ce-9453-d6abbb3612df",
+        "evidence": "变化不大"
+      },
+      {
+        "key": "severity",
+        "value": 3,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647100+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "b0ebaf9c-6dfb-4fe8-ba52-11d79e466195",
+        "evidence": "不适程度3分"
+      },
+      {
+        "key": "associated_symptoms",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647162+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "d1cf9fbc-99e4-40a5-a844-df9ececda1fc",
+        "evidence": "没有其他不适"
+      },
+      {
+        "key": "resp_breathing",
+        "value": "没有气促，能完整说话",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647226+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "341d4224-92fe-4b64-9d29-590e56c3162c",
+        "evidence": "没有气促，能完整说话"
+      },
+      {
+        "key": "resp_cough_details",
+        "value": "干咳，没有咳血",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647282+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "d3409fe3-ad09-41fb-9697-0029c660922a",
+        "evidence": "干咳，没有咳血"
+      },
+      {
+        "key": "resp_intake",
+        "value": "能正常喝水吃饭，排尿正常",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647345+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "4188715c-fd38-4260-996a-72c33ee120c7",
+        "evidence": "能正常喝水吃饭，排尿正常"
+      },
+      {
+        "key": "medications_taken",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647400+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "aaee3265-0f2c-4893-b032-5bac4ac71514",
+        "evidence": "没有用药"
+      },
+      {
+        "key": "allergies",
+        "value": null,
+        "assertion": "unknown",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647456+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "7ef0e892-5847-4c99-9cf6-5f79a4d4f2d1",
+        "evidence": "过敏不知道"
+      },
+      {
+        "key": "relevant_history",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647515+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "0397964e-12a2-4133-91e9-0db013b808ae",
+        "evidence": "没有相关既往病史"
+      },
+      {
+        "key": "patient_goal",
+        "value": "整理信息去就医",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647572+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "e90370ad-baec-475b-83b9-852c74de3e1e",
+        "evidence": "想整理信息去就医"
+      },
+      {
+        "key": "medications_taken",
+        "value": "昨晚用过药物甲",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826",
+        "recorded_at": "2026-10-17T00:06:20.653118+00:00",
+        "quality": "not_assessed",
+        "supersedes": "aaee3265-0f2c-4893-b032-5bac4ac71514",
+        "fact_id": "4328859f-f48b-4319-b01e-d0317930fb97",
+        "evidence": "昨晚用过药物甲"
+      }
+    ],
+    "asked_questions": [
+      "chief_complaint",
+      "trajectory"
+    ],
+    "active_question": null,
+    "active_question_is_clarification": false,
+    "active_task": null,
+    "suspended_self_check": null,
+    "risk": {
+      "level": "routine",
+      "triggers": [],
+      "assessed_at": "2026-10-17T00:06:20.654752+00:00"
+    },
+    "closed_reason": null,
+    "created_at": "2026-10-17T00:06:20.638140+00:00",
+    "updated_at": "2026-10-17T00:06:20.653126+00:00",
+    "revision": 6,
+    "runtime_snapshot": {
+      "engine_version": "0.11.13",
+      "composition": {
+        "api_version": "medical-capability/v1",
+        "template": {
+          "id": "general",
+          "version": "0.2.0",
+          "title": "通用问诊研究模板",
+          "description": "采集必要病史，按适用条件提供图示观察，允许显式计算。未完成临床审核。",
+          "enabled": [
+            "observe.temperature",
+            "observe.location",
+            "calculate.units",
+            "calculate.glucose"
+          ]
+        },
+        "capabilities": [
+          {
+            "id": "calculate.glucose",
+            "name": "血糖单位换算",
+            "version": "0.1.0",
+            "api_version": "medical-capability/v1",
+            "kind": "calculation",
+            "description": "仅换算明确的血糖（葡萄糖）读数：mmol/L与mg/dL；使用常用系数18，显示近似标记、公式、来源和适用范围。",
+            "permissions": [],
+            "review_status": "engineering_verified_not_clinical",
+            "ui": "calculation",
+            "patient_form": "unit_conversion/v2",
+            "input_schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "from_unit",
+                "to_unit"
+              ],
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "title": "输入数值",
+                  "minLength": 1,
+                  "maxLength": 25
+                },
+                "from_unit": {
+                  "type": "string",
+                  "title": "原单位",
+                  "enum": [
+                    "mmol/L",
+                    "mg/dL"
+                  ]
+                },
+                "to_unit": {
+                  "type": "string",
+                  "title": "目标单位",
+                  "enum": [
+                    "mmol/L",
+                    "mg/dL"
+                  ]
+                }
+              }
+            },
+            "output_schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "formula",
+                "method",
+                "limitations",
+                "approximate",
+                "precision_policy"
+              ],
+              "properties": {
+                "value": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "formula": {
+                  "type": "string"
+                },
+                "method": {
+                  "type": "string"
+                },
+                "limitations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "approximate": {
+                  "type": "boolean"
+                },
+                "precision_policy": {
+                  "type": "string"
+                }
+              }
+            },
+            "example": {
+              "value": "10",
+              "from_unit": "mmol/L",
+              "to_unit": "mg/dL"
+            },
+            "validation": {
+              "status": "engineering_prototype_requires_review",
+              "scope": "固定18近似系数、双向换算、出处、输入核对与版本绑定；不评价临床意义"
+            },
+            "patient_input_policy": "blood_glucose",
+            "references": [
+              {
+                "title": "American Diabetes Association · Common Terms",
+                "url": "https://diabetes.org/about-diabetes/common-terms",
+                "section": "Mg/dL与Mmol/L词条的文字换算规则；采用常用近似系数18。",
+                "accessed": "2026-10-17"
+              }
+            ],
+            "enabled": true
+          },
+          {
+            "id": "calculate.units",
+            "name": "可解释单位换算",
+            "version": "0.1.1",
+            "api_version": "medical-capability/v1",
+            "kind": "calculation",
+            "description": "质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。",
+            "permissions": [],
+            "review_status": "engineering_verified_not_clinical",
+            "ui": "calculation",
+            "patient_form": "unit_conversion/v1",
+            "input_schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "from_unit",
+                "to_unit"
+              ],
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "title": "输入数值",
+                  "minLength": 1,
+                  "maxLength": 25
+                },
+                "from_unit": {
+                  "type": "string",
+                  "title": "原单位",
+                  "enum": [
+                    "kg",
+                    "g",
+                    "mg",
+                    "L",
+                    "mL"
+                  ]
+                },
+                "to_unit": {
+                  "type": "string",
+                  "title": "目标单位",
+                  "enum": [
+                    "kg",
+                    "g",
+                    "mg",
+                    "L",
+                    "mL"
+                  ]
+                }
+              }
+            },
+            "output_schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "formula",
+                "method",
+                "limitations"
+              ],
+              "properties": {
+                "value": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "formula": {
+                  "type": "string"
+                },
+                "method": {
+                  "type": "string"
+                },
+                "limitations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "example": {
+              "value": "1.25",
+              "from_unit": "kg",
+              "to_unit": "g"
+            },
+            "validation": {
+              "status": "automated_engineering_tests",
+              "scope": "精确换算、量纲拒绝、契约和版本隔离；不评价临床意义"
+            },
+            "enabled": true
+          },
+          {
+            "id": "observe.location",
+            "name": "指出最明显的不适部位",
+            "version": "0.3.0",
+            "api_version": "medical-capability/v1",
+            "kind": "self_check",
+            "description": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
+            "permissions": [],
+            "review_status": "prototype_requires_clinical_review",
+            "ui": "step_task",
+            "task": {
+              "id": "body_location",
+              "result_key": "symptom_location",
+              "input_kind": "location",
+              "invalidate_on": [
+                "chief_complaint"
+              ],
+              "request_phrases": [
+                "想按图指出部位",
+                "想按图标出位置",
+                "想标出疼痛部位"
+              ],
+              "cancel_phrases": [
+                "取消定位",
+                "先不标位置",
+                "不想标出疼痛部位"
+              ],
+              "title": "指出最明显的不适部位",
+              "purpose": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
+              "applies_when": {
+                "chief_complaint_contains_any": [
+                  "痛",
+                  "疼",
+                  "皮疹",
+                  "痒",
+                  "肿"
+                ]
+              },
+              "equipment": [],
+              "asset": "/body-location.svg",
+              "steps": [
+                "看图找到最明显的位置。",
+                "选择部位；需要时补充左侧、右侧、范围和是否移动。"
+              ],
+              "stop_conditions": [
+                "无法确定位置时可跳过"
+              ],
+              "response_prompt": "选一个部位，或用自己的话描述位置。",
+              "options": [
+                {
+                  "label": "头/面部",
+                  "value": "head"
+                },
+                {
+                  "label": "胸部",
+                  "value": "chest"
+                },
+                {
+                  "label": "腹部",
+                  "value": "abdomen"
+                },
+                {
+                  "label": "背/腰部",
+                  "value": "back"
+                },
+                {
+                  "label": "四肢",
+                  "value": "limbs"
+                },
+                {
+                  "label": "其他部位",
+                  "value": "other"
+                },
+                {
+                  "label": "说不清/跳过",
+                  "value": "skip"
+                }
+              ],
+              "clinical_limits": [
+                "这是主观症状定位，不是客观查体或疾病判断。",
+                "不需要按压、扭转或诱发疼痛。"
+              ],
+              "review_status": "prototype_requires_clinical_review"
+            },
+            "validation": {
+              "status": "prototype_requires_clinical_review",
+              "scope": "工程流程已测试；图示理解与操作尚未临床审核"
+            },
+            "enabled": true
+          },
+          {
+            "id": "observe.temperature",
+            "name": "测一次腋下体温",
+            "version": "0.7.0",
+            "api_version": "medical-capability/v1",
+            "kind": "self_check",
+            "description": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+            "permissions": [],
+            "review_status": "prototype_requires_clinical_review",
+            "ui": "step_task",
+            "task": {
+              "id": "axillary_temperature",
+              "result_key": "temperature_c",
+              "input_kind": "temperature",
+              "repeatable": true,
+              "repeat_phrases": [
+                "想重新测量",
+                "想重新测温",
+                "再测一次腋温",
+                "想再测腋温",
+                "重新测腋温",
+                "重新测体温",
+                "再量一次体温",
+                "刚刚又测了一次腋温"
+              ],
+              "invalidate_on": [],
+              "request_phrases": [
+                "想按图测一下腋温",
+                "想按图测温",
+                "想测腋温",
+                "想测体温",
+                "想量体温"
+              ],
+              "cancel_phrases": [
+                "取消测温",
+                "先不测体温",
+                "不想测体温",
+                "不测腋温了",
+                "先不测腋温",
+                "暂时不测体温",
+                "不想按图测一下腋温"
+              ],
+              "title": "测一次腋下体温",
+              "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+              "applies_when": {
+                "chief_complaint_contains_any": [
+                  "发热",
+                  "发烧",
+                  "低烧",
+                  "高烧",
+                  "体温"
+                ]
+              },
+              "equipment": [
+                "可正常使用的数字体温计"
+              ],
+              "asset": "/temperature.svg",
+              "step_assets": [
+                "/temperature.svg#step-1",
+                "/temperature.svg#step-2",
+                "/temperature.svg#step-3"
+              ],
+              "steps": [
+                "先阅读体温计说明书；擦干腋窝。",
+                "将探头放在腋窝中央，手臂贴紧身体。",
+                "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+              ],
+              "stop_conditions": [
+                "设备破损",
+                "操作引起明显不适",
+                "患者无法安全配合"
+              ],
+              "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+              "options": [
+                {
+                  "label": "没有体温计",
+                  "value": "not_available"
+                },
+                {
+                  "label": "做不到/不舒服",
+                  "value": "unable"
+                },
+                {
+                  "label": "暂时跳过",
+                  "value": "skip"
+                }
+              ],
+              "clinical_limits": [
+                "一次体温不能排除病情变化。",
+                "不同部位和设备的读数不能直接视为完全等价。",
+                "本任务不负责判断发热原因。"
+              ],
+              "review_status": "prototype_requires_clinical_review"
+            },
+            "validation": {
+              "status": "prototype_requires_clinical_review",
+              "scope": "工程流程已测试；图示理解与操作尚未临床审核"
+            },
+            "enabled": true
+          }
+        ],
+        "sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+      },
+      "content_versions": {
+        "questions": "2026-10-15.v1",
+        "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+        "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+      },
+      "transport": {}
+    },
+    "calculations": [],
+    "pending_calculation": null,
+    "pending_self_checks": [],
+    "observation_attempts": [
+      {
+        "id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+        "task_id": "axillary_temperature",
+        "previous_fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+        "started_at": "2026-10-17T00:06:20.650526+00:00",
+        "status": "cancelled",
+        "source": "patient",
+        "quality": "not_done",
+        "finished_at": "2026-10-17T00:06:20.652993+00:00",
+        "reason": "case_updated"
+      }
+    ]
+  },
+  "events": [
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "session.created",
+      "payload": {
+        "content_versions": {
+          "questions": "2026-10-15.v1",
+          "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+          "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+        },
+        "runtime_snapshot": {
+          "engine_version": "0.11.13",
+          "composition": {
+            "api_version": "medical-capability/v1",
+            "template": {
+              "id": "general",
+              "version": "0.2.0",
+              "title": "通用问诊研究模板",
+              "description": "采集必要病史，按适用条件提供图示观察，允许显式计算。未完成临床审核。",
+              "enabled": [
+                "observe.temperature",
+                "observe.location",
+                "calculate.units",
+                "calculate.glucose"
+              ]
+            },
+            "capabilities": [
+              {
+                "id": "calculate.glucose",
+                "name": "血糖单位换算",
+                "version": "0.1.0",
+                "api_version": "medical-capability/v1",
+                "kind": "calculation",
+                "description": "仅换算明确的血糖（葡萄糖）读数：mmol/L与mg/dL；使用常用系数18，显示近似标记、公式、来源和适用范围。",
+                "permissions": [],
+                "review_status": "engineering_verified_not_clinical",
+                "ui": "calculation",
+                "patient_form": "unit_conversion/v2",
+                "input_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "from_unit",
+                    "to_unit"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "title": "输入数值",
+                      "minLength": 1,
+                      "maxLength": 25
+                    },
+                    "from_unit": {
+                      "type": "string",
+                      "title": "原单位",
+                      "enum": [
+                        "mmol/L",
+                        "mg/dL"
+                      ]
+                    },
+                    "to_unit": {
+                      "type": "string",
+                      "title": "目标单位",
+                      "enum": [
+                        "mmol/L",
+                        "mg/dL"
+                      ]
+                    }
+                  }
+                },
+                "output_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "unit",
+                    "formula",
+                    "method",
+                    "limitations",
+                    "approximate",
+                    "precision_policy"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "formula": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "limitations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "approximate": {
+                      "type": "boolean"
+                    },
+                    "precision_policy": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "value": "10",
+                  "from_unit": "mmol/L",
+                  "to_unit": "mg/dL"
+                },
+                "validation": {
+                  "status": "engineering_prototype_requires_review",
+                  "scope": "固定18近似系数、双向换算、出处、输入核对与版本绑定；不评价临床意义"
+                },
+                "patient_input_policy": "blood_glucose",
+                "references": [
+                  {
+                    "title": "American Diabetes Association · Common Terms",
+                    "url": "https://diabetes.org/about-diabetes/common-terms",
+                    "section": "Mg/dL与Mmol/L词条的文字换算规则；采用常用近似系数18。",
+                    "accessed": "2026-10-17"
+                  }
+                ],
+                "enabled": true
+              },
+              {
+                "id": "calculate.units",
+                "name": "可解释单位换算",
+                "version": "0.1.1",
+                "api_version": "medical-capability/v1",
+                "kind": "calculation",
+                "description": "质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。",
+                "permissions": [],
+                "review_status": "engineering_verified_not_clinical",
+                "ui": "calculation",
+                "patient_form": "unit_conversion/v1",
+                "input_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "from_unit",
+                    "to_unit"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "title": "输入数值",
+                      "minLength": 1,
+                      "maxLength": 25
+                    },
+                    "from_unit": {
+                      "type": "string",
+                      "title": "原单位",
+                      "enum": [
+                        "kg",
+                        "g",
+                        "mg",
+                        "L",
+                        "mL"
+                      ]
+                    },
+                    "to_unit": {
+                      "type": "string",
+                      "title": "目标单位",
+                      "enum": [
+                        "kg",
+                        "g",
+                        "mg",
+                        "L",
+                        "mL"
+                      ]
+                    }
+                  }
+                },
+                "output_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "unit",
+                    "formula",
+                    "method",
+                    "limitations"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "formula": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "limitations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "value": "1.25",
+                  "from_unit": "kg",
+                  "to_unit": "g"
+                },
+                "validation": {
+                  "status": "automated_engineering_tests",
+                  "scope": "精确换算、量纲拒绝、契约和版本隔离；不评价临床意义"
+                },
+                "enabled": true
+              },
+              {
+                "id": "observe.location",
+                "name": "指出最明显的不适部位",
+                "version": "0.3.0",
+                "api_version": "medical-capability/v1",
+                "kind": "self_check",
+                "description": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
+                "permissions": [],
+                "review_status": "prototype_requires_clinical_review",
+                "ui": "step_task",
+                "task": {
+                  "id": "body_location",
+                  "result_key": "symptom_location",
+                  "input_kind": "location",
+                  "invalidate_on": [
+                    "chief_complaint"
+                  ],
+                  "request_phrases": [
+                    "想按图指出部位",
+                    "想按图标出位置",
+                    "想标出疼痛部位"
+                  ],
+                  "cancel_phrases": [
+                    "取消定位",
+                    "先不标位置",
+                    "不想标出疼痛部位"
+                  ],
+                  "title": "指出最明显的不适部位",
+                  "purpose": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
+                  "applies_when": {
+                    "chief_complaint_contains_any": [
+                      "痛",
+                      "疼",
+                      "皮疹",
+                      "痒",
+                      "肿"
+                    ]
+                  },
+                  "equipment": [],
+                  "asset": "/body-location.svg",
+                  "steps": [
+                    "看图找到最明显的位置。",
+                    "选择部位；需要时补充左侧、右侧、范围和是否移动。"
+                  ],
+                  "stop_conditions": [
+                    "无法确定位置时可跳过"
+                  ],
+                  "response_prompt": "选一个部位，或用自己的话描述位置。",
+                  "options": [
+                    {
+                      "label": "头/面部",
+                      "value": "head"
+                    },
+                    {
+                      "label": "胸部",
+                      "value": "chest"
+                    },
+                    {
+                      "label": "腹部",
+                      "value": "abdomen"
+                    },
+                    {
+                      "label": "背/腰部",
+                      "value": "back"
+                    },
+                    {
+                      "label": "四肢",
+                      "value": "limbs"
+                    },
+                    {
+                      "label": "其他部位",
+                      "value": "other"
+                    },
+                    {
+                      "label": "说不清/跳过",
+                      "value": "skip"
+                    }
+                  ],
+                  "clinical_limits": [
+                    "这是主观症状定位，不是客观查体或疾病判断。",
+                    "不需要按压、扭转或诱发疼痛。"
+                  ],
+                  "review_status": "prototype_requires_clinical_review"
+                },
+                "validation": {
+                  "status": "prototype_requires_clinical_review",
+                  "scope": "工程流程已测试；图示理解与操作尚未临床审核"
+                },
+                "enabled": true
+              },
+              {
+                "id": "observe.temperature",
+                "name": "测一次腋下体温",
+                "version": "0.7.0",
+                "api_version": "medical-capability/v1",
+                "kind": "self_check",
+                "description": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+                "permissions": [],
+                "review_status": "prototype_requires_clinical_review",
+                "ui": "step_task",
+                "task": {
+                  "id": "axillary_temperature",
+                  "result_key": "temperature_c",
+                  "input_kind": "temperature",
+                  "repeatable": true,
+                  "repeat_phrases": [
+                    "想重新测量",
+                    "想重新测温",
+                    "再测一次腋温",
+                    "想再测腋温",
+                    "重新测腋温",
+                    "重新测体温",
+                    "再量一次体温",
+                    "刚刚又测了一次腋温"
+                  ],
+                  "invalidate_on": [],
+                  "request_phrases": [
+                    "想按图测一下腋温",
+                    "想按图测温",
+                    "想测腋温",
+                    "想测体温",
+                    "想量体温"
+                  ],
+                  "cancel_phrases": [
+                    "取消测温",
+                    "先不测体温",
+                    "不想测体温",
+                    "不测腋温了",
+                    "先不测腋温",
+                    "暂时不测体温",
+                    "不想按图测一下腋温"
+                  ],
+                  "title": "测一次腋下体温",
+                  "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+                  "applies_when": {
+                    "chief_complaint_contains_any": [
+                      "发热",
+                      "发烧",
+                      "低烧",
+                      "高烧",
+                      "体温"
+                    ]
+                  },
+                  "equipment": [
+                    "可正常使用的数字体温计"
+                  ],
+                  "asset": "/temperature.svg",
+                  "step_assets": [
+                    "/temperature.svg#step-1",
+                    "/temperature.svg#step-2",
+                    "/temperature.svg#step-3"
+                  ],
+                  "steps": [
+                    "先阅读体温计说明书；擦干腋窝。",
+                    "将探头放在腋窝中央，手臂贴紧身体。",
+                    "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+                  ],
+                  "stop_conditions": [
+                    "设备破损",
+                    "操作引起明显不适",
+                    "患者无法安全配合"
+                  ],
+                  "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+                  "options": [
+                    {
+                      "label": "没有体温计",
+                      "value": "not_available"
+                    },
+                    {
+                      "label": "做不到/不舒服",
+                      "value": "unable"
+                    },
+                    {
+                      "label": "暂时跳过",
+                      "value": "skip"
+                    }
+                  ],
+                  "clinical_limits": [
+                    "一次体温不能排除病情变化。",
+                    "不同部位和设备的读数不能直接视为完全等价。",
+                    "本任务不负责判断发热原因。"
+                  ],
+                  "review_status": "prototype_requires_clinical_review"
+                },
+                "validation": {
+                  "status": "prototype_requires_clinical_review",
+                  "scope": "工程流程已测试；图示理解与操作尚未临床审核"
+                },
+                "enabled": true
+              }
+            ],
+            "sha256": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+          },
+          "content_versions": {
+            "questions": "2026-10-15.v1",
+            "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+            "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+          },
+          "transport": {}
+        }
+      },
+      "event_id": "16bccd99-3aa5-44b4-9609-4e0ccf4fd79c",
+      "occurred_at": "2026-10-17T00:06:20.638488+00:00",
+      "turn_id": null
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+          "phase": "opening",
+          "kind": "question",
+          "question_id": "chief_complaint",
+          "quick_replies": [],
+          "task": null,
+          "summary": null,
+          "developer_trace": {
+            "reason": "先听取主诉，自然叙述后再补关键缺口",
+            "content_version": "2026-10-15.v1"
+          },
+          "action_id": "1470061a-cc91-46f5-824d-26160f72c78f:1",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "subject_change": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:1470061a-cc91-46f5-824d-26160f72c78f:1",
+                "type": "message",
+                "data": {
+                  "text": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "kind": "question"
+                }
+              },
+              {
+                "id": "question:1470061a-cc91-46f5-824d-26160f72c78f:1",
+                "type": "question",
+                "data": {
+                  "question_id": "chief_complaint",
+                  "prompt": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "canonical": false,
+                  "input_kind": "text",
+                  "choices": []
+                }
+              }
+            ]
+          }
+        },
+        "reason": "开放式开场"
+      },
+      "event_id": "15d38ae1-df2c-4566-b62b-239465c43ec1",
+      "occurred_at": "2026-10-17T00:06:20.639151+00:00",
+      "turn_id": "session_start"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "agent.started",
+      "payload": {
+        "backend": "scripted-test-only",
+        "reply": {
+          "message": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+          "phase": "opening",
+          "kind": "question",
+          "question_id": "chief_complaint",
+          "quick_replies": [],
+          "task": null,
+          "summary": null,
+          "developer_trace": {
+            "reason": "先听取主诉，自然叙述后再补关键缺口",
+            "content_version": "2026-10-15.v1"
+          },
+          "action_id": "1470061a-cc91-46f5-824d-26160f72c78f:1",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "subject_change": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:1470061a-cc91-46f5-824d-26160f72c78f:1",
+                "type": "message",
+                "data": {
+                  "text": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "kind": "question"
+                }
+              },
+              {
+                "id": "question:1470061a-cc91-46f5-824d-26160f72c78f:1",
+                "type": "question",
+                "data": {
+                  "question_id": "chief_complaint",
+                  "prompt": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。",
+                  "canonical": false,
+                  "input_kind": "text",
+                  "choices": []
+                }
+              }
+            ]
+          }
+        },
+        "policy_version": "medical-tools-v0.11.13",
+        "prompt_sha256": "677f7e773abe2123e1aff7ea8876e2886b69df4d649cf08700849421081d4568",
+        "prompt_layout": "static-catalog-prefix/v1"
+      },
+      "event_id": "c660a63d-1947-42cc-aca6-b69d26579cf1",
+      "occurred_at": "2026-10-17T00:06:20.639298+00:00",
+      "turn_id": null
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+      },
+      "event_id": "5d2bbc25-92d5-4ec7-986b-e9e53e7c29e0",
+      "occurred_at": "2026-10-17T00:06:20.639747+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 0,
+        "tool": "record_facts",
+        "arguments": {
+          "facts": [
+            {
+              "key": "consult_for",
+              "value": "self",
+              "assertion": "present",
+              "evidence": "我自己",
+              "correction": false
+            },
+            {
+              "key": "age_years",
+              "value": 32,
+              "assertion": "present",
+              "evidence": "32岁",
+              "correction": false
+            },
+            {
+              "key": "chief_complaint",
+              "value": "咳嗽发烧",
+              "assertion": "present",
+              "evidence": "咳嗽发烧",
+              "correction": false
+            },
+            {
+              "key": "onset",
+              "value": "两天",
+              "assertion": "present",
+              "evidence": "两天",
+              "correction": false
+            },
+            {
+              "key": "emergency_screen",
+              "value": null,
+              "assertion": "absent",
+              "evidence": "上述危险信号都没有",
+              "correction": false
+            }
+          ]
+        }
+      },
+      "event_id": "87dd7ea6-383d-4508-b07e-cfd9a7317416",
+      "occurred_at": "2026-10-17T00:06:20.640204+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "consult_for",
+        "value": "self",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640584+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "ca3b7415-1900-4e09-bce6-cf3a336662c4",
+        "evidence": "我自己"
+      },
+      "event_id": "45b8c6f8-da2f-4a69-8a45-18599875d994",
+      "occurred_at": "2026-10-17T00:06:20.640640+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "age_years",
+        "value": 32,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640678+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "ef30444a-9dff-4705-bd58-57d8c10fd41b",
+        "evidence": "32岁"
+      },
+      "event_id": "1c52d042-59aa-4e53-a3ac-cce94298f4ab",
+      "occurred_at": "2026-10-17T00:06:20.640711+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "chief_complaint",
+        "value": "咳嗽发烧",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640743+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "6e294b16-552e-411d-9f1d-3d40c23ee644",
+        "evidence": "咳嗽发烧"
+      },
+      "event_id": "89bab08c-b583-48a6-b153-01284743dea6",
+      "occurred_at": "2026-10-17T00:06:20.640773+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "onset",
+        "value": "两天",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640805+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "e52c21d8-ae1c-47a6-9426-b00bc4e91bab",
+        "evidence": "两天"
+      },
+      "event_id": "2d3d08b0-dfdb-42f0-86c7-c537a8c8c08e",
+      "occurred_at": "2026-10-17T00:06:20.640832+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "emergency_screen",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "recorded_at": "2026-10-17T00:06:20.640863+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "de8ab09d-f508-402f-967f-e221ea33cda5",
+        "evidence": "上述危险信号都没有"
+      },
+      "event_id": "4834a604-2182-4140-8080-c0d9b7eee5d9",
+      "occurred_at": "2026-10-17T00:06:20.640893+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "self_check.requested",
+      "payload": {
+        "task_id": "axillary_temperature",
+        "evidence": "想按图测一下腋温",
+        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+        "origin": "declared_literal_request"
+      },
+      "event_id": "842f2cd3-f045-4cdc-b5b0-df1a26f1d9da",
+      "occurred_at": "2026-10-17T00:06:20.641342+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "triage.assessed",
+      "payload": {
+        "level": "routine",
+        "triggers": [],
+        "assessed_at": "2026-10-17T00:06:20.641406+00:00"
+      },
+      "event_id": "bc70e07b-5978-43df-969a-ec3b9963249d",
+      "occurred_at": "2026-10-17T00:06:20.641417+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "record_facts",
+        "result": {
+          "ok": true,
+          "case": {
+            "latest_user_text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。",
+            "active_question": null,
+            "active_task": null,
+            "self_check_conversation": null,
+            "consultation_subject": {
+              "category": "self",
+              "label": "本人",
+              "reference": {
+                "attributes": [
+                  "self",
+                  "*",
+                  "*"
+                ],
+                "label": "本人"
+              },
+              "evidence": "我自己",
+              "source_turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+              "scope": "reported_relationship_only"
+            },
+            "facts": {
+              "consult_for": {
+                "key": "consult_for",
+                "value": "self",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "我自己"
+              },
+              "age_years": {
+                "key": "age_years",
+                "value": 32,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "32岁"
+              },
+              "chief_complaint": {
+                "key": "chief_complaint",
+                "value": "咳嗽发烧",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "咳嗽发烧"
+              },
+              "onset": {
+                "key": "onset",
+                "value": "两天",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "两天"
+              },
+              "emergency_screen": {
+                "key": "emergency_screen",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "上述危险信号都没有"
+              }
+            },
+            "missing_required": [
+              "trajectory",
+              "severity",
+              "associated_symptoms",
+              "resp_breathing",
+              "resp_cough_details",
+              "resp_intake",
+              "medications_taken",
+              "allergies",
+              "relevant_history"
+            ],
+            "questions": [
+              {
+                "id": "trajectory",
+                "field": "trajectory"
+              },
+              {
+                "id": "severity",
+                "field": "severity"
+              },
+              {
+                "id": "associated_symptoms",
+                "field": "associated_symptoms"
+              },
+              {
+                "id": "resp_breathing",
+                "field": "resp_breathing"
+              },
+              {
+                "id": "resp_cough_details",
+                "field": "resp_cough_details"
+              },
+              {
+                "id": "resp_intake",
+                "field": "resp_intake"
+              },
+              {
+                "id": "medications_taken",
+                "field": "medications_taken"
+              },
+              {
+                "id": "allergies",
+                "field": "allergies"
+              },
+              {
+                "id": "relevant_history",
+                "field": "relevant_history"
+              },
+              {
+                "id": "patient_goal",
+                "field": "patient_goal"
+              }
+            ],
+            "available_self_checks": [
+              {
+                "id": "axillary_temperature",
+                "title": "测一次腋下体温",
+                "result_key": "temperature_c"
+              }
+            ],
+            "self_check_block_reason": null,
+            "requestable_self_checks": [
+              {
+                "id": "axillary_temperature",
+                "title": "测一次腋下体温",
+                "result_key": "temperature_c"
+              }
+            ],
+            "pending_self_checks": [
+              {
+                "task_id": "axillary_temperature",
+                "evidence": "想按图测一下腋温",
+                "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+              }
+            ],
+            "repeatable_self_checks": [],
+            "recent_observation_attempts": [],
+            "completed_observation_with_supplement": null,
+            "calculation_request_with_supplement": null,
+            "transcript": [
+              {
+                "role": "assistant",
+                "content": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。"
+              },
+              {
+                "role": "user",
+                "content": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+              }
+            ],
+            "calculation_drafts": []
+          }
+        }
+      },
+      "event_id": "3c55a4e9-5cbf-4b59-8554-e3d6d372c381",
+      "occurred_at": "2026-10-17T00:06:20.641618+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "self_check.offered",
+      "payload": {
+        "task_id": "axillary_temperature",
+        "content_version": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee",
+        "requested_by_user": true,
+        "requests": [
+          {
+            "task_id": "axillary_temperature",
+            "evidence": "想按图测一下腋温",
+            "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+          }
+        ]
+      },
+      "event_id": "cb585b99-0fc4-4287-97f3-a10a724f14cc",
+      "occurred_at": "2026-10-17T00:06:20.641919+00:00",
+      "turn_id": null
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。",
+          "phase": "observation",
+          "kind": "self_check",
+          "question_id": null,
+          "quick_replies": [
+            {
+              "label": "没有体温计",
+              "value": "not_available"
+            },
+            {
+              "label": "做不到/不舒服",
+              "value": "unable"
+            },
+            {
+              "label": "暂时跳过",
+              "value": "skip"
+            }
+          ],
+          "task": {
+            "id": "axillary_temperature",
+            "result_key": "temperature_c",
+            "input_kind": "temperature",
+            "repeatable": true,
+            "repeat_phrases": [
+              "想重新测量",
+              "想重新测温",
+              "再测一次腋温",
+              "想再测腋温",
+              "重新测腋温",
+              "重新测体温",
+              "再量一次体温",
+              "刚刚又测了一次腋温"
+            ],
+            "invalidate_on": [],
+            "request_phrases": [
+              "想按图测一下腋温",
+              "想按图测温",
+              "想测腋温",
+              "想测体温",
+              "想量体温"
+            ],
+            "cancel_phrases": [
+              "取消测温",
+              "先不测体温",
+              "不想测体温",
+              "不测腋温了",
+              "先不测腋温",
+              "暂时不测体温",
+              "不想按图测一下腋温"
+            ],
+            "title": "测一次腋下体温",
+            "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+            "applies_when": {
+              "chief_complaint_contains_any": [
+                "发热",
+                "发烧",
+                "低烧",
+                "高烧",
+                "体温"
+              ]
+            },
+            "equipment": [
+              "可正常使用的数字体温计"
+            ],
+            "asset": "/temperature.svg",
+            "step_assets": [
+              "/temperature.svg#step-1",
+              "/temperature.svg#step-2",
+              "/temperature.svg#step-3"
+            ],
+            "steps": [
+              "先阅读体温计说明书；擦干腋窝。",
+              "将探头放在腋窝中央，手臂贴紧身体。",
+              "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+            ],
+            "stop_conditions": [
+              "设备破损",
+              "操作引起明显不适",
+              "患者无法安全配合"
+            ],
+            "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+            "options": [
+              {
+                "label": "没有体温计",
+                "value": "not_available"
+              },
+              {
+                "label": "做不到/不舒服",
+                "value": "unable"
+              },
+              {
+                "label": "暂时跳过",
+                "value": "skip"
+              }
+            ],
+            "clinical_limits": [
+              "一次体温不能排除病情变化。",
+              "不同部位和设备的读数不能直接视为完全等价。",
+              "本任务不负责判断发热原因。"
+            ],
+            "review_status": "prototype_requires_clinical_review",
+            "provider": {
+              "id": "observe.temperature",
+              "version": "0.7.0"
+            },
+            "interaction_id": "offer:cb585b99-0fc4-4287-97f3-a10a724f14cc"
+          },
+          "summary": null,
+          "developer_trace": {
+            "reason": "主诉符合固定任务的适用条件；任务结果保留自述来源"
+          },
+          "action_id": "1470061a-cc91-46f5-824d-26160f72c78f:2",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "subject_change": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:1470061a-cc91-46f5-824d-26160f72c78f:2",
+                "type": "message",
+                "data": {
+                  "text": "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。",
+                  "kind": "self_check"
+                }
+              },
+              {
+                "id": "task:1470061a-cc91-46f5-824d-26160f72c78f:2",
+                "type": "self_check",
+                "data": {
+                  "id": "axillary_temperature",
+                  "result_key": "temperature_c",
+                  "input_kind": "temperature",
+                  "repeatable": true,
+                  "repeat_phrases": [
+                    "想重新测量",
+                    "想重新测温",
+                    "再测一次腋温",
+                    "想再测腋温",
+                    "重新测腋温",
+                    "重新测体温",
+                    "再量一次体温",
+                    "刚刚又测了一次腋温"
+                  ],
+                  "invalidate_on": [],
+                  "request_phrases": [
+                    "想按图测一下腋温",
+                    "想按图测温",
+                    "想测腋温",
+                    "想测体温",
+                    "想量体温"
+                  ],
+                  "cancel_phrases": [
+                    "取消测温",
+                    "先不测体温",
+                    "不想测体温",
+                    "不测腋温了",
+                    "先不测腋温",
+                    "暂时不测体温",
+                    "不想按图测一下腋温"
+                  ],
+                  "title": "测一次腋下体温",
+                  "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+                  "applies_when": {
+                    "chief_complaint_contains_any": [
+                      "发热",
+                      "发烧",
+                      "低烧",
+                      "高烧",
+                      "体温"
+                    ]
+                  },
+                  "equipment": [
+                    "可正常使用的数字体温计"
+                  ],
+                  "asset": "/temperature.svg",
+                  "step_assets": [
+                    "/temperature.svg#step-1",
+                    "/temperature.svg#step-2",
+                    "/temperature.svg#step-3"
+                  ],
+                  "steps": [
+                    "先阅读体温计说明书；擦干腋窝。",
+                    "将探头放在腋窝中央，手臂贴紧身体。",
+                    "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+                  ],
+                  "stop_conditions": [
+                    "设备破损",
+                    "操作引起明显不适",
+                    "患者无法安全配合"
+                  ],
+                  "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+                  "options": [
+                    {
+                      "label": "没有体温计",
+                      "value": "not_available"
+                    },
+                    {
+                      "label": "做不到/不舒服",
+                      "value": "unable"
+                    },
+                    {
+                      "label": "暂时跳过",
+                      "value": "skip"
+                    }
+                  ],
+                  "clinical_limits": [
+                    "一次体温不能排除病情变化。",
+                    "不同部位和设备的读数不能直接视为完全等价。",
+                    "本任务不负责判断发热原因。"
+                  ],
+                  "review_status": "prototype_requires_clinical_review",
+                  "provider": {
+                    "id": "observe.temperature",
+                    "version": "0.7.0"
+                  },
+                  "interaction_id": "offer:cb585b99-0fc4-4287-97f3-a10a724f14cc"
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "6237c0fb-4d18-401d-9d42-507c7c9d9f63",
+      "occurred_at": "2026-10-17T00:06:20.642089+00:00",
+      "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "腋温38.25℃"
+      },
+      "event_id": "d3f31ab7-aaf7-4023-80f5-8eddb8817383",
+      "occurred_at": "2026-10-17T00:06:20.642439+00:00",
+      "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "temperature_c",
+        "value": 38.25,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406",
+        "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+        "evidence": "腋温38.25℃"
+      },
+      "event_id": "171b1e6f-8c74-4f35-b352-a2d2ea50d5c3",
+      "occurred_at": "2026-10-17T00:06:20.644564+00:00",
+      "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "self_check.completed",
+      "payload": {
+        "task_id": "axillary_temperature",
+        "quality": "not_assessed",
+        "assertion": "present",
+        "previous_reading_preserved": false
+      },
+      "event_id": "f9589ac7-5800-4410-9a9b-4fdbb785f0b8",
+      "occurred_at": "2026-10-17T00:06:20.644611+00:00",
+      "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 0,
+        "tool": "ask_question",
+        "arguments": {
+          "question_id": "trajectory"
+        }
+      },
+      "event_id": "fdbb947a-3eaa-4e02-9133-68a1eaca9c2f",
+      "occurred_at": "2026-10-17T00:06:20.645130+00:00",
+      "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "ask_question",
+        "terminal": true
+      },
+      "event_id": "4ee3c630-0e6e-4075-a462-bd907a52d460",
+      "occurred_at": "2026-10-17T00:06:20.645221+00:00",
+      "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "从开始到现在，总体是在加重、减轻，还是变化不大？",
+          "phase": "history",
+          "kind": "question",
+          "question_id": "trajectory",
+          "quick_replies": [
+            {
+              "label": "在加重",
+              "value": "worsening"
+            },
+            {
+              "label": "在减轻",
+              "value": "improving"
+            },
+            {
+              "label": "变化不大",
+              "value": "stable"
+            },
+            {
+              "label": "说不清",
+              "value": "unknown"
+            }
+          ],
+          "task": null,
+          "summary": null,
+          "developer_trace": {
+            "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+            "content_version": "2026-10-15.v1"
+          },
+          "action_id": "1470061a-cc91-46f5-824d-26160f72c78f:3",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "subject_change": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:1470061a-cc91-46f5-824d-26160f72c78f:3",
+                "type": "message",
+                "data": {
+                  "text": "从开始到现在，总体是在加重、减轻，还是变化不大？",
+                  "kind": "question"
+                }
+              },
+              {
+                "id": "question:1470061a-cc91-46f5-824d-26160f72c78f:3",
+                "type": "question",
+                "data": {
+                  "question_id": "trajectory",
+                  "prompt": "从开始到现在，总体是在加重、减轻，还是变化不大？",
+                  "canonical": true,
+                  "input_kind": "choice",
+                  "choices": [
+                    {
+                      "label": "在加重",
+                      "value": "worsening"
+                    },
+                    {
+                      "label": "在减轻",
+                      "value": "improving"
+                    },
+                    {
+                      "label": "变化不大",
+                      "value": "stable"
+                    },
+                    {
+                      "label": "说不清",
+                      "value": "unknown"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "f8f9e7df-aab3-4d31-aee2-c96725dc2af0",
+      "occurred_at": "2026-10-17T00:06:20.645287+00:00",
+      "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+      },
+      "event_id": "7fd59e70-5070-478e-8856-11d2b4c27874",
+      "occurred_at": "2026-10-17T00:06:20.645486+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 0,
+        "tool": "record_facts",
+        "arguments": {
+          "facts": [
+            {
+              "key": "trajectory",
+              "value": "stable",
+              "assertion": "present",
+              "evidence": "变化不大",
+              "correction": false
+            },
+            {
+              "key": "severity",
+              "value": 3,
+              "assertion": "present",
+              "evidence": "不适程度3分",
+              "correction": false
+            },
+            {
+              "key": "associated_symptoms",
+              "value": null,
+              "assertion": "absent",
+              "evidence": "没有其他不适",
+              "correction": false
+            },
+            {
+              "key": "resp_breathing",
+              "value": "没有气促，能完整说话",
+              "assertion": "present",
+              "evidence": "没有气促，能完整说话",
+              "correction": false
+            },
+            {
+              "key": "resp_cough_details",
+              "value": "干咳，没有咳血",
+              "assertion": "present",
+              "evidence": "干咳，没有咳血",
+              "correction": false
+            },
+            {
+              "key": "resp_intake",
+              "value": "能正常喝水吃饭，排尿正常",
+              "assertion": "present",
+              "evidence": "能正常喝水吃饭，排尿正常",
+              "correction": false
+            },
+            {
+              "key": "medications_taken",
+              "value": null,
+              "assertion": "absent",
+              "evidence": "没有用药",
+              "correction": false
+            },
+            {
+              "key": "allergies",
+              "value": null,
+              "assertion": "unknown",
+              "evidence": "过敏不知道",
+              "correction": false
+            },
+            {
+              "key": "relevant_history",
+              "value": null,
+              "assertion": "absent",
+              "evidence": "没有相关既往病史",
+              "correction": false
+            },
+            {
+              "key": "patient_goal",
+              "value": "整理信息去就医",
+              "assertion": "present",
+              "evidence": "想整理信息去就医",
+              "correction": false
+            }
+          ]
+        }
+      },
+      "event_id": "c0a5c45a-2d5f-4202-98e2-4925a7f8c1a9",
+      "occurred_at": "2026-10-17T00:06:20.646572+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "trajectory",
+        "value": "stable",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647010+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "2ced98c4-5809-45ce-9453-d6abbb3612df",
+        "evidence": "变化不大"
+      },
+      "event_id": "9fda6ca5-5d2b-4797-a8af-6923bf8cf783",
+      "occurred_at": "2026-10-17T00:06:20.647063+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "severity",
+        "value": 3,
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647100+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "b0ebaf9c-6dfb-4fe8-ba52-11d79e466195",
+        "evidence": "不适程度3分"
+      },
+      "event_id": "539d22dc-7584-4658-acc0-887911b7e6e7",
+      "occurred_at": "2026-10-17T00:06:20.647131+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "associated_symptoms",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647162+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "d1cf9fbc-99e4-40a5-a844-df9ececda1fc",
+        "evidence": "没有其他不适"
+      },
+      "event_id": "5a077021-98a2-4dec-bd91-a39498279d31",
+      "occurred_at": "2026-10-17T00:06:20.647196+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "resp_breathing",
+        "value": "没有气促，能完整说话",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647226+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "341d4224-92fe-4b64-9d29-590e56c3162c",
+        "evidence": "没有气促，能完整说话"
+      },
+      "event_id": "23edfa80-91c5-4e62-af82-a50ebca8cdb7",
+      "occurred_at": "2026-10-17T00:06:20.647254+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "resp_cough_details",
+        "value": "干咳，没有咳血",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647282+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "d3409fe3-ad09-41fb-9697-0029c660922a",
+        "evidence": "干咳，没有咳血"
+      },
+      "event_id": "d323d610-ce88-4e8d-ba82-4f1b71f60583",
+      "occurred_at": "2026-10-17T00:06:20.647310+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "resp_intake",
+        "value": "能正常喝水吃饭，排尿正常",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647345+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "4188715c-fd38-4260-996a-72c33ee120c7",
+        "evidence": "能正常喝水吃饭，排尿正常"
+      },
+      "event_id": "329e35f9-385f-46fc-90d5-0c25c5939d31",
+      "occurred_at": "2026-10-17T00:06:20.647372+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "medications_taken",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647400+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "aaee3265-0f2c-4893-b032-5bac4ac71514",
+        "evidence": "没有用药"
+      },
+      "event_id": "3fbdf3f9-ac98-4e8a-98e1-0aad509e732b",
+      "occurred_at": "2026-10-17T00:06:20.647427+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "allergies",
+        "value": null,
+        "assertion": "unknown",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647456+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "7ef0e892-5847-4c99-9cf6-5f79a4d4f2d1",
+        "evidence": "过敏不知道"
+      },
+      "event_id": "3bc9d034-8a12-47f7-9989-1166cb7cdce4",
+      "occurred_at": "2026-10-17T00:06:20.647484+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "relevant_history",
+        "value": null,
+        "assertion": "absent",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647515+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "0397964e-12a2-4133-91e9-0db013b808ae",
+        "evidence": "没有相关既往病史"
+      },
+      "event_id": "387df5c1-801e-4787-8761-c6e63a8b3c8c",
+      "occurred_at": "2026-10-17T00:06:20.647542+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "patient_goal",
+        "value": "整理信息去就医",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+        "recorded_at": "2026-10-17T00:06:20.647572+00:00",
+        "quality": "not_assessed",
+        "supersedes": null,
+        "fact_id": "e90370ad-baec-475b-83b9-852c74de3e1e",
+        "evidence": "想整理信息去就医"
+      },
+      "event_id": "44fb4575-db42-41b3-a71b-6dae9ad0eb42",
+      "occurred_at": "2026-10-17T00:06:20.647599+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "triage.assessed",
+      "payload": {
+        "level": "routine",
+        "triggers": [],
+        "assessed_at": "2026-10-17T00:06:20.647680+00:00"
+      },
+      "event_id": "ba889907-d5b3-4b77-b583-9dbac1454798",
+      "occurred_at": "2026-10-17T00:06:20.647689+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "record_facts",
+        "result": {
+          "ok": true,
+          "case": {
+            "latest_user_text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。",
+            "active_question": null,
+            "active_task": null,
+            "self_check_conversation": null,
+            "consultation_subject": {
+              "category": "self",
+              "label": "本人",
+              "reference": {
+                "attributes": [
+                  "self",
+                  "*",
+                  "*"
+                ],
+                "label": "本人"
+              },
+              "evidence": "我自己",
+              "source_turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+              "scope": "reported_relationship_only"
+            },
+            "facts": {
+              "consult_for": {
+                "key": "consult_for",
+                "value": "self",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "我自己"
+              },
+              "age_years": {
+                "key": "age_years",
+                "value": 32,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "32岁"
+              },
+              "chief_complaint": {
+                "key": "chief_complaint",
+                "value": "咳嗽发烧",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "咳嗽发烧"
+              },
+              "onset": {
+                "key": "onset",
+                "value": "两天",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "两天"
+              },
+              "emergency_screen": {
+                "key": "emergency_screen",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "上述危险信号都没有"
+              },
+              "temperature_c": {
+                "key": "temperature_c",
+                "value": 38.25,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "腋温38.25℃"
+              },
+              "trajectory": {
+                "key": "trajectory",
+                "value": "stable",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "变化不大"
+              },
+              "severity": {
+                "key": "severity",
+                "value": 3,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "不适程度3分"
+              },
+              "associated_symptoms": {
+                "key": "associated_symptoms",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "没有其他不适"
+              },
+              "resp_breathing": {
+                "key": "resp_breathing",
+                "value": "没有气促，能完整说话",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "没有气促，能完整说话"
+              },
+              "resp_cough_details": {
+                "key": "resp_cough_details",
+                "value": "干咳，没有咳血",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "干咳，没有咳血"
+              },
+              "resp_intake": {
+                "key": "resp_intake",
+                "value": "能正常喝水吃饭，排尿正常",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "能正常喝水吃饭，排尿正常"
+              },
+              "medications_taken": {
+                "key": "medications_taken",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "没有用药"
+              },
+              "allergies": {
+                "key": "allergies",
+                "value": null,
+                "assertion": "unknown",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "过敏不知道"
+              },
+              "relevant_history": {
+                "key": "relevant_history",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "没有相关既往病史"
+              },
+              "patient_goal": {
+                "key": "patient_goal",
+                "value": "整理信息去就医",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "想整理信息去就医"
+              }
+            },
+            "missing_required": [],
+            "questions": [],
+            "available_self_checks": [],
+            "self_check_block_reason": null,
+            "requestable_self_checks": [],
+            "pending_self_checks": [],
+            "repeatable_self_checks": [
+              {
+                "id": "axillary_temperature",
+                "title": "测一次腋下体温",
+                "result_key": "temperature_c"
+              }
+            ],
+            "recent_observation_attempts": [],
+            "completed_observation_with_supplement": null,
+            "calculation_request_with_supplement": null,
+            "transcript": [
+              {
+                "role": "assistant",
+                "content": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。"
+              },
+              {
+                "role": "user",
+                "content": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+              },
+              {
+                "role": "assistant",
+                "content": "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。"
+              },
+              {
+                "role": "user",
+                "content": "腋温38.25℃"
+              },
+              {
+                "role": "assistant",
+                "content": "从开始到现在，总体是在加重、减轻，还是变化不大？"
+              },
+              {
+                "role": "user",
+                "content": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+              }
+            ],
+            "calculation_drafts": []
+          }
+        }
+      },
+      "event_id": "5f417c21-c232-4156-907b-e650e2487926",
+      "occurred_at": "2026-10-17T00:06:20.648042+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 1,
+        "tool": "review_summary",
+        "arguments": {}
+      },
+      "event_id": "1b2b07bc-e91c-4f07-aedb-b7164a09aaa5",
+      "occurred_at": "2026-10-17T00:06:20.648709+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "review_summary",
+        "terminal": true
+      },
+      "event_id": "c8f9e470-692a-41f2-af7a-15fd88fa956f",
+      "occurred_at": "2026-10-17T00:06:20.649301+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+          "phase": "summary",
+          "kind": "summary",
+          "question_id": null,
+          "quick_replies": [
+            {
+              "label": "摘要准确",
+              "value": "confirm_summary"
+            },
+            {
+              "label": "我需要更正",
+              "value": "correct_summary"
+            }
+          ],
+          "task": null,
+          "summary": {
+            "content_versions": {
+              "questions": "2026-10-15.v1",
+              "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+              "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+            },
+            "known": [
+              {
+                "key": "consult_for",
+                "label": "咨询对象",
+                "evidence": "我自己",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "本人"
+              },
+              {
+                "key": "age_years",
+                "label": "年龄",
+                "evidence": "32岁",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "32 岁"
+              },
+              {
+                "key": "chief_complaint",
+                "label": "主要问题",
+                "evidence": "咳嗽发烧",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "咳嗽发烧"
+              },
+              {
+                "key": "onset",
+                "label": "开始与起病方式",
+                "evidence": "两天",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "两天"
+              },
+              {
+                "key": "emergency_screen",
+                "label": "急症筛查",
+                "evidence": "上述危险信号都没有",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "患者否认上述危险信号"
+              },
+              {
+                "key": "temperature_c",
+                "label": "体温",
+                "evidence": "腋温38.25℃",
+                "source": "patient",
+                "quality": "not_assessed",
+                "value": "38.25 ℃（腋温）"
+              },
+              {
+                "key": "trajectory",
+                "label": "变化趋势",
+                "evidence": "变化不大",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "变化不大"
+              },
+              {
+                "key": "severity",
+                "label": "影响程度",
+                "evidence": "不适程度3分",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": 3
+              },
+              {
+                "key": "associated_symptoms",
+                "label": "伴随不适",
+                "evidence": "没有其他不适",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "resp_breathing",
+                "label": "呼吸情况",
+                "evidence": "没有气促，能完整说话",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "没有气促，能完整说话"
+              },
+              {
+                "key": "resp_cough_details",
+                "label": "咳嗽细节",
+                "evidence": "干咳，没有咳血",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "干咳，没有咳血"
+              },
+              {
+                "key": "resp_intake",
+                "label": "饮水进食与排尿",
+                "evidence": "能正常喝水吃饭，排尿正常",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "能正常喝水吃饭，排尿正常"
+              },
+              {
+                "key": "medications_taken",
+                "label": "已做处理/用药",
+                "evidence": "没有用药",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "relevant_history",
+                "label": "相关病史",
+                "evidence": "没有相关既往病史",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "patient_goal",
+                "label": "期望与担心",
+                "evidence": "想整理信息去就医",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "整理信息去就医"
+              }
+            ],
+            "unknown": [
+              "过敏信息"
+            ],
+            "unknown_details": [
+              {
+                "key": "allergies",
+                "label": "过敏信息",
+                "evidence": "过敏不知道",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                }
+              }
+            ],
+            "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+            "risk_level": "routine",
+            "risk_triggers": [],
+            "return_now_if": [
+              "意识异常或抽搐",
+              "严重呼吸困难或嘴唇发紫",
+              "持续压榨样胸痛",
+              "大量或无法控制的出血"
+            ],
+            "observations": [
+              {
+                "task_id": "axillary_temperature",
+                "key": "temperature_c",
+                "title": "腋温记录",
+                "unit": "℃",
+                "entries": [
+                  {
+                    "id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+                    "status": "recorded",
+                    "value": 38.25,
+                    "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+                    "source": "patient",
+                    "quality": "not_assessed",
+                    "evidence": "腋温38.25℃",
+                    "current": true
+                  }
+                ],
+                "total": 1,
+                "can_repeat": true,
+                "latest_status": "recorded"
+              }
+            ]
+          },
+          "developer_trace": {
+            "reason": "必要通用字段与适用的定向字段均已处理"
+          },
+          "action_id": "1470061a-cc91-46f5-824d-26160f72c78f:4",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "subject_change": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:1470061a-cc91-46f5-824d-26160f72c78f:4",
+                "type": "message",
+                "data": {
+                  "text": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+                  "kind": "summary"
+                }
+              },
+              {
+                "id": "summary:1470061a-cc91-46f5-824d-26160f72c78f:4",
+                "type": "summary",
+                "data": {
+                  "content_versions": {
+                    "questions": "2026-10-15.v1",
+                    "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+                    "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+                  },
+                  "known": [
+                    {
+                      "key": "consult_for",
+                      "label": "咨询对象",
+                      "evidence": "我自己",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "本人"
+                    },
+                    {
+                      "key": "age_years",
+                      "label": "年龄",
+                      "evidence": "32岁",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "32 岁"
+                    },
+                    {
+                      "key": "chief_complaint",
+                      "label": "主要问题",
+                      "evidence": "咳嗽发烧",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "咳嗽发烧"
+                    },
+                    {
+                      "key": "onset",
+                      "label": "开始与起病方式",
+                      "evidence": "两天",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "两天"
+                    },
+                    {
+                      "key": "emergency_screen",
+                      "label": "急症筛查",
+                      "evidence": "上述危险信号都没有",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "患者否认上述危险信号"
+                    },
+                    {
+                      "key": "temperature_c",
+                      "label": "体温",
+                      "evidence": "腋温38.25℃",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "value": "38.25 ℃（腋温）"
+                    },
+                    {
+                      "key": "trajectory",
+                      "label": "变化趋势",
+                      "evidence": "变化不大",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "变化不大"
+                    },
+                    {
+                      "key": "severity",
+                      "label": "影响程度",
+                      "evidence": "不适程度3分",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": 3
+                    },
+                    {
+                      "key": "associated_symptoms",
+                      "label": "伴随不适",
+                      "evidence": "没有其他不适",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "否认/没有"
+                    },
+                    {
+                      "key": "resp_breathing",
+                      "label": "呼吸情况",
+                      "evidence": "没有气促，能完整说话",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "没有气促，能完整说话"
+                    },
+                    {
+                      "key": "resp_cough_details",
+                      "label": "咳嗽细节",
+                      "evidence": "干咳，没有咳血",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "干咳，没有咳血"
+                    },
+                    {
+                      "key": "resp_intake",
+                      "label": "饮水进食与排尿",
+                      "evidence": "能正常喝水吃饭，排尿正常",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "能正常喝水吃饭，排尿正常"
+                    },
+                    {
+                      "key": "medications_taken",
+                      "label": "已做处理/用药",
+                      "evidence": "没有用药",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "否认/没有"
+                    },
+                    {
+                      "key": "relevant_history",
+                      "label": "相关病史",
+                      "evidence": "没有相关既往病史",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "否认/没有"
+                    },
+                    {
+                      "key": "patient_goal",
+                      "label": "期望与担心",
+                      "evidence": "想整理信息去就医",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "整理信息去就医"
+                    }
+                  ],
+                  "unknown": [
+                    "过敏信息"
+                  ],
+                  "unknown_details": [
+                    {
+                      "key": "allergies",
+                      "label": "过敏信息",
+                      "evidence": "过敏不知道",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      }
+                    }
+                  ],
+                  "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+                  "risk_level": "routine",
+                  "risk_triggers": [],
+                  "return_now_if": [
+                    "意识异常或抽搐",
+                    "严重呼吸困难或嘴唇发紫",
+                    "持续压榨样胸痛",
+                    "大量或无法控制的出血"
+                  ],
+                  "observations": [
+                    {
+                      "task_id": "axillary_temperature",
+                      "key": "temperature_c",
+                      "title": "腋温记录",
+                      "unit": "℃",
+                      "entries": [
+                        {
+                          "id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+                          "status": "recorded",
+                          "value": 38.25,
+                          "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+                          "source": "patient",
+                          "quality": "not_assessed",
+                          "evidence": "腋温38.25℃",
+                          "current": true
+                        }
+                      ],
+                      "total": 1,
+                      "can_repeat": true,
+                      "latest_status": "recorded"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "e665fc5e-0324-4766-9f55-fa987f7063c9",
+      "occurred_at": "2026-10-17T00:06:20.649460+00:00",
+      "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "再测一次腋温"
+      },
+      "event_id": "10f2d5f6-8af5-4473-8fd7-b7756f3d65b0",
+      "occurred_at": "2026-10-17T00:06:20.650274+00:00",
+      "turn_id": "a0aae807-73a1-4e47-83b5-5a4dc17e5c70"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "self_check.repeat_started",
+      "payload": {
+        "id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+        "task_id": "axillary_temperature",
+        "previous_fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+        "started_at": "2026-10-17T00:06:20.650526+00:00",
+        "status": "awaiting_input",
+        "source": "patient",
+        "quality": "not_done"
+      },
+      "event_id": "d1a3811d-d487-4583-9b0b-547d8a835b9a",
+      "occurred_at": "2026-10-17T00:06:20.650687+00:00",
+      "turn_id": "a0aae807-73a1-4e47-83b5-5a4dc17e5c70"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "再测一次；上次记录会保留。完成或跳过后继续原来的问诊。",
+          "phase": "observation",
+          "kind": "self_check",
+          "question_id": null,
+          "quick_replies": [
+            {
+              "label": "没有体温计",
+              "value": "not_available"
+            },
+            {
+              "label": "做不到/不舒服",
+              "value": "unable"
+            },
+            {
+              "label": "暂时跳过",
+              "value": "skip"
+            }
+          ],
+          "task": {
+            "id": "axillary_temperature",
+            "result_key": "temperature_c",
+            "input_kind": "temperature",
+            "repeatable": true,
+            "repeat_phrases": [
+              "想重新测量",
+              "想重新测温",
+              "再测一次腋温",
+              "想再测腋温",
+              "重新测腋温",
+              "重新测体温",
+              "再量一次体温",
+              "刚刚又测了一次腋温"
+            ],
+            "invalidate_on": [],
+            "request_phrases": [
+              "想按图测一下腋温",
+              "想按图测温",
+              "想测腋温",
+              "想测体温",
+              "想量体温"
+            ],
+            "cancel_phrases": [
+              "取消测温",
+              "先不测体温",
+              "不想测体温",
+              "不测腋温了",
+              "先不测腋温",
+              "暂时不测体温",
+              "不想按图测一下腋温"
+            ],
+            "title": "测一次腋下体温",
+            "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+            "applies_when": {
+              "chief_complaint_contains_any": [
+                "发热",
+                "发烧",
+                "低烧",
+                "高烧",
+                "体温"
+              ]
+            },
+            "equipment": [
+              "可正常使用的数字体温计"
+            ],
+            "asset": "/temperature.svg",
+            "step_assets": [
+              "/temperature.svg#step-1",
+              "/temperature.svg#step-2",
+              "/temperature.svg#step-3"
+            ],
+            "steps": [
+              "先阅读体温计说明书；擦干腋窝。",
+              "将探头放在腋窝中央，手臂贴紧身体。",
+              "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+            ],
+            "stop_conditions": [
+              "设备破损",
+              "操作引起明显不适",
+              "患者无法安全配合"
+            ],
+            "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+            "options": [
+              {
+                "label": "没有体温计",
+                "value": "not_available"
+              },
+              {
+                "label": "做不到/不舒服",
+                "value": "unable"
+              },
+              {
+                "label": "暂时跳过",
+                "value": "skip"
+              }
+            ],
+            "clinical_limits": [
+              "一次体温不能排除病情变化。",
+              "不同部位和设备的读数不能直接视为完全等价。",
+              "本任务不负责判断发热原因。"
+            ],
+            "review_status": "prototype_requires_clinical_review",
+            "provider": {
+              "id": "observe.temperature",
+              "version": "0.7.0"
+            },
+            "repeat": {
+              "attempt_id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+              "previous": {
+                "key": "temperature_c",
+                "value": 38.25,
+                "assertion": "present",
+                "source": "patient",
+                "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406",
+                "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+                "quality": "not_assessed",
+                "supersedes": null,
+                "fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+                "evidence": "腋温38.25℃"
+              }
+            },
+            "interaction_id": "repeat:16545e9f-6223-4a21-9dca-4d79ed6a8405"
+          },
+          "summary": null,
+          "developer_trace": null,
+          "action_id": "1470061a-cc91-46f5-824d-26160f72c78f:5",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "subject_change": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:1470061a-cc91-46f5-824d-26160f72c78f:5",
+                "type": "message",
+                "data": {
+                  "text": "再测一次；上次记录会保留。完成或跳过后继续原来的问诊。",
+                  "kind": "self_check"
+                }
+              },
+              {
+                "id": "task:1470061a-cc91-46f5-824d-26160f72c78f:5",
+                "type": "self_check",
+                "data": {
+                  "id": "axillary_temperature",
+                  "result_key": "temperature_c",
+                  "input_kind": "temperature",
+                  "repeatable": true,
+                  "repeat_phrases": [
+                    "想重新测量",
+                    "想重新测温",
+                    "再测一次腋温",
+                    "想再测腋温",
+                    "重新测腋温",
+                    "重新测体温",
+                    "再量一次体温",
+                    "刚刚又测了一次腋温"
+                  ],
+                  "invalidate_on": [],
+                  "request_phrases": [
+                    "想按图测一下腋温",
+                    "想按图测温",
+                    "想测腋温",
+                    "想测体温",
+                    "想量体温"
+                  ],
+                  "cancel_phrases": [
+                    "取消测温",
+                    "先不测体温",
+                    "不想测体温",
+                    "不测腋温了",
+                    "先不测腋温",
+                    "暂时不测体温",
+                    "不想按图测一下腋温"
+                  ],
+                  "title": "测一次腋下体温",
+                  "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
+                  "applies_when": {
+                    "chief_complaint_contains_any": [
+                      "发热",
+                      "发烧",
+                      "低烧",
+                      "高烧",
+                      "体温"
+                    ]
+                  },
+                  "equipment": [
+                    "可正常使用的数字体温计"
+                  ],
+                  "asset": "/temperature.svg",
+                  "step_assets": [
+                    "/temperature.svg#step-1",
+                    "/temperature.svg#step-2",
+                    "/temperature.svg#step-3"
+                  ],
+                  "steps": [
+                    "先阅读体温计说明书；擦干腋窝。",
+                    "将探头放在腋窝中央，手臂贴紧身体。",
+                    "按设备说明等待测量完成，记录数值、腋温和测量时间。"
+                  ],
+                  "stop_conditions": [
+                    "设备破损",
+                    "操作引起明显不适",
+                    "患者无法安全配合"
+                  ],
+                  "response_prompt": "请填写数值，例如“38.2℃”；也可以选择做不到或暂时跳过。",
+                  "options": [
+                    {
+                      "label": "没有体温计",
+                      "value": "not_available"
+                    },
+                    {
+                      "label": "做不到/不舒服",
+                      "value": "unable"
+                    },
+                    {
+                      "label": "暂时跳过",
+                      "value": "skip"
+                    }
+                  ],
+                  "clinical_limits": [
+                    "一次体温不能排除病情变化。",
+                    "不同部位和设备的读数不能直接视为完全等价。",
+                    "本任务不负责判断发热原因。"
+                  ],
+                  "review_status": "prototype_requires_clinical_review",
+                  "provider": {
+                    "id": "observe.temperature",
+                    "version": "0.7.0"
+                  },
+                  "repeat": {
+                    "attempt_id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+                    "previous": {
+                      "key": "temperature_c",
+                      "value": 38.25,
+                      "assertion": "present",
+                      "source": "patient",
+                      "turn_id": "b8f24d7d-bb96-4c67-b4fb-29e926c26406",
+                      "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+                      "quality": "not_assessed",
+                      "supersedes": null,
+                      "fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+                      "evidence": "腋温38.25℃"
+                    }
+                  },
+                  "interaction_id": "repeat:16545e9f-6223-4a21-9dca-4d79ed6a8405"
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "a000147f-27ae-4a1c-9933-6084daeb8e7b",
+      "occurred_at": "2026-10-17T00:06:20.650922+00:00",
+      "turn_id": "a0aae807-73a1-4e47-83b5-5a4dc17e5c70"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.user_message",
+      "payload": {
+        "text": "更正：昨晚用过药物甲"
+      },
+      "event_id": "56f1f283-23f7-4202-9437-ef76c17760ca",
+      "occurred_at": "2026-10-17T00:06:20.651302+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "self_check.conversation_suspended",
+      "payload": {
+        "task_id": "axillary_temperature",
+        "interaction_id": "repeat:16545e9f-6223-4a21-9dca-4d79ed6a8405"
+      },
+      "event_id": "679151c4-82cf-492a-88c1-5a9e6bc2ec6d",
+      "occurred_at": "2026-10-17T00:06:20.652062+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 0,
+        "tool": "record_facts",
+        "arguments": {
+          "facts": [
+            {
+              "key": "medications_taken",
+              "value": "昨晚用过药物甲",
+              "assertion": "present",
+              "evidence": "昨晚用过药物甲",
+              "correction": true
+            }
+          ]
+        }
+      },
+      "event_id": "207024a3-9938-4927-8a33-26145b34287a",
+      "occurred_at": "2026-10-17T00:06:20.652868+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "self_check.repeat_cancelled",
+      "payload": {
+        "id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+        "task_id": "axillary_temperature",
+        "previous_fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+        "started_at": "2026-10-17T00:06:20.650526+00:00",
+        "status": "cancelled",
+        "source": "patient",
+        "quality": "not_done",
+        "finished_at": "2026-10-17T00:06:20.652993+00:00",
+        "reason": "case_updated"
+      },
+      "event_id": "1b1702b1-ed02-4bbd-bdcb-ab10a5f6029a",
+      "occurred_at": "2026-10-17T00:06:20.653016+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "self_check.conversation_cleared",
+      "payload": {
+        "task_id": "axillary_temperature",
+        "interaction_id": "repeat:16545e9f-6223-4a21-9dca-4d79ed6a8405",
+        "reason": "repeat_case_updated"
+      },
+      "event_id": "47177323-6ce2-437d-a0ae-fab954c9b99f",
+      "occurred_at": "2026-10-17T00:06:20.653077+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "fact.recorded",
+      "payload": {
+        "key": "medications_taken",
+        "value": "昨晚用过药物甲",
+        "assertion": "present",
+        "source": "patient",
+        "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826",
+        "recorded_at": "2026-10-17T00:06:20.653118+00:00",
+        "quality": "not_assessed",
+        "supersedes": "aaee3265-0f2c-4893-b032-5bac4ac71514",
+        "fact_id": "4328859f-f48b-4319-b01e-d0317930fb97",
+        "evidence": "昨晚用过药物甲"
+      },
+      "event_id": "6d37ce04-1521-4faf-a4e1-063b4edb0e06",
+      "occurred_at": "2026-10-17T00:06:20.653158+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "triage.assessed",
+      "payload": {
+        "level": "routine",
+        "triggers": [],
+        "assessed_at": "2026-10-17T00:06:20.653240+00:00"
+      },
+      "event_id": "56bc8cf3-5a22-480f-91b0-28076cf96e23",
+      "occurred_at": "2026-10-17T00:06:20.653248+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "record_facts",
+        "result": {
+          "ok": true,
+          "case": {
+            "latest_user_text": "更正：昨晚用过药物甲",
+            "active_question": null,
+            "active_task": null,
+            "self_check_conversation": null,
+            "consultation_subject": {
+              "category": "self",
+              "label": "本人",
+              "reference": {
+                "attributes": [
+                  "self",
+                  "*",
+                  "*"
+                ],
+                "label": "本人"
+              },
+              "evidence": "我自己",
+              "source_turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+              "scope": "reported_relationship_only"
+            },
+            "facts": {
+              "consult_for": {
+                "key": "consult_for",
+                "value": "self",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "我自己"
+              },
+              "age_years": {
+                "key": "age_years",
+                "value": 32,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "32岁"
+              },
+              "chief_complaint": {
+                "key": "chief_complaint",
+                "value": "咳嗽发烧",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "咳嗽发烧"
+              },
+              "onset": {
+                "key": "onset",
+                "value": "两天",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "两天"
+              },
+              "emergency_screen": {
+                "key": "emergency_screen",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "上述危险信号都没有"
+              },
+              "temperature_c": {
+                "key": "temperature_c",
+                "value": 38.25,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "腋温38.25℃"
+              },
+              "trajectory": {
+                "key": "trajectory",
+                "value": "stable",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "变化不大"
+              },
+              "severity": {
+                "key": "severity",
+                "value": 3,
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "不适程度3分"
+              },
+              "associated_symptoms": {
+                "key": "associated_symptoms",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "没有其他不适"
+              },
+              "resp_breathing": {
+                "key": "resp_breathing",
+                "value": "没有气促，能完整说话",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "没有气促，能完整说话"
+              },
+              "resp_cough_details": {
+                "key": "resp_cough_details",
+                "value": "干咳，没有咳血",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "干咳，没有咳血"
+              },
+              "resp_intake": {
+                "key": "resp_intake",
+                "value": "能正常喝水吃饭，排尿正常",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "能正常喝水吃饭，排尿正常"
+              },
+              "medications_taken": {
+                "key": "medications_taken",
+                "value": "昨晚用过药物甲",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "昨晚用过药物甲"
+              },
+              "allergies": {
+                "key": "allergies",
+                "value": null,
+                "assertion": "unknown",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "过敏不知道"
+              },
+              "relevant_history": {
+                "key": "relevant_history",
+                "value": null,
+                "assertion": "absent",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "没有相关既往病史"
+              },
+              "patient_goal": {
+                "key": "patient_goal",
+                "value": "整理信息去就医",
+                "assertion": "present",
+                "source": "patient",
+                "quality": "not_assessed",
+                "evidence": "想整理信息去就医"
+              }
+            },
+            "missing_required": [],
+            "questions": [],
+            "available_self_checks": [],
+            "self_check_block_reason": null,
+            "requestable_self_checks": [],
+            "pending_self_checks": [],
+            "repeatable_self_checks": [
+              {
+                "id": "axillary_temperature",
+                "title": "测一次腋下体温",
+                "result_key": "temperature_c"
+              }
+            ],
+            "recent_observation_attempts": [
+              {
+                "id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+                "task_id": "axillary_temperature",
+                "previous_fact_id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+                "started_at": "2026-10-17T00:06:20.650526+00:00",
+                "status": "cancelled",
+                "source": "patient",
+                "quality": "not_done",
+                "finished_at": "2026-10-17T00:06:20.652993+00:00",
+                "reason": "case_updated"
+              }
+            ],
+            "completed_observation_with_supplement": null,
+            "calculation_request_with_supplement": null,
+            "transcript": [
+              {
+                "role": "assistant",
+                "content": "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。"
+              },
+              {
+                "role": "user",
+                "content": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+              },
+              {
+                "role": "assistant",
+                "content": "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。"
+              },
+              {
+                "role": "user",
+                "content": "腋温38.25℃"
+              },
+              {
+                "role": "assistant",
+                "content": "从开始到现在，总体是在加重、减轻，还是变化不大？"
+              },
+              {
+                "role": "user",
+                "content": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+              },
+              {
+                "role": "assistant",
+                "content": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。"
+              },
+              {
+                "role": "user",
+                "content": "再测一次腋温"
+              },
+              {
+                "role": "assistant",
+                "content": "再测一次；上次记录会保留。完成或跳过后继续原来的问诊。"
+              },
+              {
+                "role": "user",
+                "content": "更正：昨晚用过药物甲"
+              }
+            ],
+            "calculation_drafts": []
+          }
+        }
+      },
+      "event_id": "f4ff4da2-4536-48f6-8f01-9b22171866d5",
+      "occurred_at": "2026-10-17T00:06:20.653662+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.requested",
+      "payload": {
+        "step": 1,
+        "tool": "review_summary",
+        "arguments": {}
+      },
+      "event_id": "b2ab5217-ec57-43f7-b962-7fad553443b7",
+      "occurred_at": "2026-10-17T00:06:20.654275+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "tool.completed",
+      "payload": {
+        "tool": "review_summary",
+        "terminal": true
+      },
+      "event_id": "2c276fb5-9a78-4abe-bac5-7443bb6c99f8",
+      "occurred_at": "2026-10-17T00:06:20.654962+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    },
+    {
+      "session_id": "1470061a-cc91-46f5-824d-26160f72c78f",
+      "event_type": "turn.agent_reply",
+      "payload": {
+        "reply": {
+          "message": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+          "phase": "summary",
+          "kind": "summary",
+          "question_id": null,
+          "quick_replies": [
+            {
+              "label": "摘要准确",
+              "value": "confirm_summary"
+            },
+            {
+              "label": "我需要更正",
+              "value": "correct_summary"
+            }
+          ],
+          "task": null,
+          "summary": {
+            "content_versions": {
+              "questions": "2026-10-15.v1",
+              "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+              "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+            },
+            "known": [
+              {
+                "key": "consult_for",
+                "label": "咨询对象",
+                "evidence": "我自己",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "本人"
+              },
+              {
+                "key": "age_years",
+                "label": "年龄",
+                "evidence": "32岁",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "32 岁"
+              },
+              {
+                "key": "chief_complaint",
+                "label": "主要问题",
+                "evidence": "咳嗽发烧",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "咳嗽发烧"
+              },
+              {
+                "key": "onset",
+                "label": "开始与起病方式",
+                "evidence": "两天",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "两天"
+              },
+              {
+                "key": "emergency_screen",
+                "label": "急症筛查",
+                "evidence": "上述危险信号都没有",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                  "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                },
+                "value": "患者否认上述危险信号"
+              },
+              {
+                "key": "temperature_c",
+                "label": "体温",
+                "evidence": "腋温38.25℃",
+                "source": "patient",
+                "quality": "not_assessed",
+                "value": "38.25 ℃（腋温）"
+              },
+              {
+                "key": "trajectory",
+                "label": "变化趋势",
+                "evidence": "变化不大",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "变化不大"
+              },
+              {
+                "key": "severity",
+                "label": "影响程度",
+                "evidence": "不适程度3分",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": 3
+              },
+              {
+                "key": "associated_symptoms",
+                "label": "伴随不适",
+                "evidence": "没有其他不适",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "resp_breathing",
+                "label": "呼吸情况",
+                "evidence": "没有气促，能完整说话",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "没有气促，能完整说话"
+              },
+              {
+                "key": "resp_cough_details",
+                "label": "咳嗽细节",
+                "evidence": "干咳，没有咳血",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "干咳，没有咳血"
+              },
+              {
+                "key": "resp_intake",
+                "label": "饮水进食与排尿",
+                "evidence": "能正常喝水吃饭，排尿正常",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "能正常喝水吃饭，排尿正常"
+              },
+              {
+                "key": "medications_taken",
+                "label": "已做处理/用药",
+                "evidence": "昨晚用过药物甲",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826",
+                  "text": "更正：昨晚用过药物甲"
+                },
+                "value": "昨晚用过药物甲"
+              },
+              {
+                "key": "relevant_history",
+                "label": "相关病史",
+                "evidence": "没有相关既往病史",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "否认/没有"
+              },
+              {
+                "key": "patient_goal",
+                "label": "期望与担心",
+                "evidence": "想整理信息去就医",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                },
+                "value": "整理信息去就医"
+              }
+            ],
+            "unknown": [
+              "过敏信息"
+            ],
+            "unknown_details": [
+              {
+                "key": "allergies",
+                "label": "过敏信息",
+                "evidence": "过敏不知道",
+                "source": "patient",
+                "quality": "not_assessed",
+                "context": {
+                  "scope": "source_turn",
+                  "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                  "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                }
+              }
+            ],
+            "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+            "risk_level": "routine",
+            "risk_triggers": [],
+            "return_now_if": [
+              "意识异常或抽搐",
+              "严重呼吸困难或嘴唇发紫",
+              "持续压榨样胸痛",
+              "大量或无法控制的出血"
+            ],
+            "observations": [
+              {
+                "task_id": "axillary_temperature",
+                "key": "temperature_c",
+                "title": "腋温记录",
+                "unit": "℃",
+                "entries": [
+                  {
+                    "id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+                    "status": "recorded",
+                    "value": 38.25,
+                    "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+                    "source": "patient",
+                    "quality": "not_assessed",
+                    "evidence": "腋温38.25℃",
+                    "current": true
+                  },
+                  {
+                    "id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+                    "status": "cancelled",
+                    "value": null,
+                    "recorded_at": "2026-10-17T00:06:20.652993+00:00",
+                    "evidence": "",
+                    "source": "patient",
+                    "quality": "not_done",
+                    "current": false
+                  }
+                ],
+                "total": 2,
+                "can_repeat": true,
+                "latest_status": "cancelled"
+              }
+            ]
+          },
+          "developer_trace": {
+            "reason": "必要通用字段与适用的定向字段均已处理"
+          },
+          "action_id": "1470061a-cc91-46f5-824d-26160f72c78f:6",
+          "input_error": false,
+          "calculation_input": null,
+          "calculation_result": null,
+          "observation_result": null,
+          "calculation_followup": null,
+          "subject_change": null,
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "message:1470061a-cc91-46f5-824d-26160f72c78f:6",
+                "type": "message",
+                "data": {
+                  "text": "我把本次情况整理在下面。请核对是否准确；需要改动的地方可以直接告诉我。",
+                  "kind": "summary"
+                }
+              },
+              {
+                "id": "summary:1470061a-cc91-46f5-824d-26160f72c78f:6",
+                "type": "summary",
+                "data": {
+                  "content_versions": {
+                    "questions": "2026-10-15.v1",
+                    "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
+                    "self_checks": "dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee"
+                  },
+                  "known": [
+                    {
+                      "key": "consult_for",
+                      "label": "咨询对象",
+                      "evidence": "我自己",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "本人"
+                    },
+                    {
+                      "key": "age_years",
+                      "label": "年龄",
+                      "evidence": "32岁",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "32 岁"
+                    },
+                    {
+                      "key": "chief_complaint",
+                      "label": "主要问题",
+                      "evidence": "咳嗽发烧",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "咳嗽发烧"
+                    },
+                    {
+                      "key": "onset",
+                      "label": "开始与起病方式",
+                      "evidence": "两天",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "两天"
+                    },
+                    {
+                      "key": "emergency_screen",
+                      "label": "急症筛查",
+                      "evidence": "上述危险信号都没有",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "c10a082b-4226-41f4-b7ce-47e65b02d7ce",
+                        "text": "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+                      },
+                      "value": "患者否认上述危险信号"
+                    },
+                    {
+                      "key": "temperature_c",
+                      "label": "体温",
+                      "evidence": "腋温38.25℃",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "value": "38.25 ℃（腋温）"
+                    },
+                    {
+                      "key": "trajectory",
+                      "label": "变化趋势",
+                      "evidence": "变化不大",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "变化不大"
+                    },
+                    {
+                      "key": "severity",
+                      "label": "影响程度",
+                      "evidence": "不适程度3分",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": 3
+                    },
+                    {
+                      "key": "associated_symptoms",
+                      "label": "伴随不适",
+                      "evidence": "没有其他不适",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "否认/没有"
+                    },
+                    {
+                      "key": "resp_breathing",
+                      "label": "呼吸情况",
+                      "evidence": "没有气促，能完整说话",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "没有气促，能完整说话"
+                    },
+                    {
+                      "key": "resp_cough_details",
+                      "label": "咳嗽细节",
+                      "evidence": "干咳，没有咳血",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "干咳，没有咳血"
+                    },
+                    {
+                      "key": "resp_intake",
+                      "label": "饮水进食与排尿",
+                      "evidence": "能正常喝水吃饭，排尿正常",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "能正常喝水吃饭，排尿正常"
+                    },
+                    {
+                      "key": "medications_taken",
+                      "label": "已做处理/用药",
+                      "evidence": "昨晚用过药物甲",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826",
+                        "text": "更正：昨晚用过药物甲"
+                      },
+                      "value": "昨晚用过药物甲"
+                    },
+                    {
+                      "key": "relevant_history",
+                      "label": "相关病史",
+                      "evidence": "没有相关既往病史",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "否认/没有"
+                    },
+                    {
+                      "key": "patient_goal",
+                      "label": "期望与担心",
+                      "evidence": "想整理信息去就医",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      },
+                      "value": "整理信息去就医"
+                    }
+                  ],
+                  "unknown": [
+                    "过敏信息"
+                  ],
+                  "unknown_details": [
+                    {
+                      "key": "allergies",
+                      "label": "过敏信息",
+                      "evidence": "过敏不知道",
+                      "source": "patient",
+                      "quality": "not_assessed",
+                      "context": {
+                        "scope": "source_turn",
+                        "turn_id": "5e414f6d-c0bf-4018-ab2f-4dc8918db82e",
+                        "text": "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+                      }
+                    }
+                  ],
+                  "care_route": "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。",
+                  "risk_level": "routine",
+                  "risk_triggers": [],
+                  "return_now_if": [
+                    "意识异常或抽搐",
+                    "严重呼吸困难或嘴唇发紫",
+                    "持续压榨样胸痛",
+                    "大量或无法控制的出血"
+                  ],
+                  "observations": [
+                    {
+                      "task_id": "axillary_temperature",
+                      "key": "temperature_c",
+                      "title": "腋温记录",
+                      "unit": "℃",
+                      "entries": [
+                        {
+                          "id": "3f41be4a-b74f-4217-a3ab-9cfa9497a53d",
+                          "status": "recorded",
+                          "value": 38.25,
+                          "recorded_at": "2026-10-17T00:06:20.644510+00:00",
+                          "source": "patient",
+                          "quality": "not_assessed",
+                          "evidence": "腋温38.25℃",
+                          "current": true
+                        },
+                        {
+                          "id": "16545e9f-6223-4a21-9dca-4d79ed6a8405",
+                          "status": "cancelled",
+                          "value": null,
+                          "recorded_at": "2026-10-17T00:06:20.652993+00:00",
+                          "evidence": "",
+                          "source": "patient",
+                          "quality": "not_done",
+                          "current": false
+                        }
+                      ],
+                      "total": 2,
+                      "can_repeat": true,
+                      "latest_status": "cancelled"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "受约束工具执行后的患者可见动作"
+      },
+      "event_id": "fb29f69c-33a2-45d3-ba51-caa05fa7bc66",
+      "occurred_at": "2026-10-17T00:06:20.655142+00:00",
+      "turn_id": "665ca153-71a9-4b2c-a5d5-f21b02852826"
+    }
+  ]
+}

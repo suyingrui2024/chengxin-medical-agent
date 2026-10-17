@@ -1,0 +1,76 @@
+
+> medical-agent-dsh-integration@0.11.6 test:ui
+> playwright test --grep full measurement reports|supplement evidence
+
+
+Running 2 tests using 1 worker
+
+(node:1022469) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry (2.3s)
+(node:1022741) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen (2.1s)
+
+
+  1) tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry 
+
+    Error: Playwright Test did not expect test() to be called here.
+    Most common reasons include:
+    - You are calling test() in a configuration file.
+    - You are calling test() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+    - You are calling test() from an async test.describe() block. Only sync ones are supported.
+
+      32 |       );
+      33 |
+    > 34 |       test("supplement evidence stays inert and invalid processing status falls back", async ({
+         |       ^
+      35 |         page,
+      36 |       }) => {
+      37 |         await page.goto("/");
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/measurement-supplements.spec.mjs:34:7
+
+    Error Context: test-results/ui/measurement-supplements-fu-56452-s-through-failure-and-retry/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/measurement-supplements-fu-56452-s-through-failure-and-retry/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/measurement-supplements-fu-56452-s-through-failure-and-retry/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen 
+
+    Error: Playwright Test did not expect test() to be called here.
+    Most common reasons include:
+    - You are calling test() in a configuration file.
+    - You are calling test() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+    - You are calling test() from an async test.describe() block. Only sync ones are supported.
+
+      32 |       );
+      33 |
+    > 34 |       test("supplement evidence stays inert and invalid processing status falls back", async ({
+         |       ^
+      35 |         page,
+      36 |       }) => {
+      37 |         await page.goto("/");
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/measurement-supplements.spec.mjs:34:7
+
+    Error Context: test-results/ui/measurement-supplements-fu-1974e-nd-retry-on-a-narrow-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/measurement-supplements-fu-1974e-nd-retry-on-a-narrow-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/measurement-supplements-fu-1974e-nd-retry-on-a-narrow-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry 
+    tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen 

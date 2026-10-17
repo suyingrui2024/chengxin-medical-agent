@@ -1,0 +1,69 @@
+test_patient_api_through_real_dsh_to_validated_multi_fact_update (integration.test_dsh_e2e.DshHttpIntegration) ... ok
+test_real_dsh_http_priority_input_cancels_bridge_and_discards_proposal (test_consultation_interrupt.HttpInterruptTests) ... ok
+test_budget_failures_are_not_reported_as_success_and_auxiliary_search_shares_budget (test_execution.FullDshExecutionTests) ... ok
+test_real_shell_repairs_code_executes_it_delegates_and_keeps_session (test_execution.FullDshExecutionTests) ... ok
+test_unauthed_development_server_cannot_expose_execution (test_execution.FullDshExecutionTests) ... ok
+test_direct_official_sdk_baseline_reuses_process_and_real_files (test_execution_benchmark.BenchmarkCheckerTests) ... ok
+test_hidden_checkers_reject_broken_seeds_accept_references_and_reject_bad_continuation (test_execution_benchmark.BenchmarkCheckerTests) ... ok
+test_deadline_cancels_process_then_long_budget_continues_same_session (test_execution_budget.BudgetRuntimeTests) ... ok
+test_deadline_stops_background_after_main_reply_and_persists_cancelled_state (test_execution_budget.BudgetRuntimeTests) ... ok
+test_sdk_observes_rejection_repairs_calculation_delegates_and_restores_receipts (test_execution_capabilities.CapabilitySdkTests) ... ok
+test_main_and_child_query_actual_changes_cleanup_and_continue_with_new_baseline (test_execution_changes.ChangeSdkTests) ... ok
+test_deadline_and_cancel_invalidate_questions_without_extra_model_calls (test_execution_clarifications.ClarificationSdkTests) ... ok
+test_root_child_and_registered_calculation_use_real_answers_in_same_turn (test_execution_clarifications.ClarificationSdkTests) ... ok
+test_a_different_passing_command_cannot_erase_an_unresolved_check (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_a_missing_retry_cannot_reuse_an_earlier_passing_receipt (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_a_required_command_cannot_be_downgraded_with_the_optional_flag (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_changes_after_a_passing_check_require_actual_revalidation (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_check_timeout_stops_its_job_instead_of_leaving_a_late_write (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_child_check_uses_shared_budget_and_retains_child_lineage (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_failed_check_reaches_model_then_one_repair_retests_same_command_and_restores (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_inspection_only_records_failure_without_authorizing_repair (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_invalid_retry_cannot_erase_an_already_accepted_failing_check (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_large_check_timeout_is_accepted_within_the_original_task_deadline (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_missing_check_result_cannot_silently_pass_the_completion_gate (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_missing_optional_result_stays_a_report_without_authorizing_repair (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_narrower_retry_cannot_drop_previously_watched_test_files (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_no_repair_renews_an_exhausted_model_budget (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_optional_stale_check_reports_without_automatic_repair (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_rejected_parameters_do_not_commit_an_unexecuted_check_obligation (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_retry_of_the_same_command_resolves_a_previously_missing_receipt (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_same_command_revalidation_accepts_the_updated_files (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_unicode_watch_paths_cross_the_host_and_runtime_without_losing_order (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_unrelated_report_does_not_invalidate_explicit_input_scope (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_unresolved_check_is_not_completion_and_repair_does_not_loop (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_user_cancel_interrupts_a_check_and_same_runtime_accepts_next_task (test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_preparing_job_retains_wakeup_budget_and_can_be_cancelled (test_execution_observations.PreparingJobTests) ... ok
+test_cold_sdk_resume_preserves_context_and_files_with_rotated_credential (test_execution_persistence.ColdResumeTests) ... ok
+test_required_missing_history_never_silently_creates_new_session (test_execution_persistence.ColdResumeTests) ... ok
+test_provider_failure_is_not_retried_as_truncation (test_execution_recovery.ExecutionRecoveryTests) ... ok
+test_repeated_truncation_stops_after_one_recovery (test_execution_recovery.ExecutionRecoveryTests) ... ok
+test_truncation_does_not_get_free_calls_after_budget_exhaustion (test_execution_recovery.ExecutionRecoveryTests) ... ok
+test_truncation_recovers_once_with_same_session_and_shared_budget (test_execution_recovery.ExecutionRecoveryTests) ... ok
+test_pipeline_failure_is_preserved_and_oversized_wait_hands_off_same_job (test_execution_shell.ExecutionShellTests) ... ok
+test_same_three_requests_collect_a_34_second_job_only_with_explicit_long_wait (test_explicit_job_wait.ExplicitWaitTests) ... [17/Oct/2026 02:29:26] "POST /api/sessions HTTP/1.1" 201 -
+[17/Oct/2026 02:29:27] "POST /api/sessions/bcf50407-e647-4376-b0a0-ab07d22f206d/messages HTTP/1.1" 200 -
+[17/Oct/2026 02:29:27] "POST /api/sessions/bcf50407-e647-4376-b0a0-ab07d22f206d/messages HTTP/1.1" 200 -
+[17/Oct/2026 02:29:28] "POST /api/sessions/bcf50407-e647-4376-b0a0-ab07d22f206d/messages HTTP/1.1" 200 -
+[17/Oct/2026 02:29:28] "POST /api/sessions/bcf50407-e647-4376-b0a0-ab07d22f206d/messages HTTP/1.1" 200 -
+[17/Oct/2026 02:29:29] "GET /api/sessions/a909390e-3b56-4f20-abfa-ca9b7f09a186/snapshot HTTP/1.1" 200 -
+[17/Oct/2026 02:29:29] "POST /api/sessions/a909390e-3b56-4f20-abfa-ca9b7f09a186/messages HTTP/1.1" 409 -
+[17/Oct/2026 02:29:29] "POST /api/sessions/a909390e-3b56-4f20-abfa-ca9b7f09a186/messages HTTP/1.1" 200 -
+[17/Oct/2026 02:29:29] "POST /api/sessions/a909390e-3b56-4f20-abfa-ca9b7f09a186/messages HTTP/1.1" 200 -
+[17/Oct/2026 02:29:34] "GET /api/execution HTTP/1.1" 403 -
+[17/Oct/2026 02:29:34] "POST /api/execution HTTP/1.1" 403 -
+{"explicit_wait_comparison": [{"configuration": "old", "model_calls": 3, "wait_seconds": 30.05, "actual_artifact_collected": false}, {"configuration": "candidate", "model_calls": 3, "wait_seconds": 34.08, "actual_artifact_collected": true}]}
+ok
+test_task_deadline_still_cancels_the_long_tool_wait_and_its_command (test_explicit_job_wait.ExplicitWaitTests) ... {"deadline_interrupted_wait": true, "shared_task_seconds": 4, "calls": 2}
+ok
+test_user_cancel_interrupts_one_long_tool_wait_and_preserves_process (test_explicit_job_wait.ExplicitWaitTests) ... {"cancel_wait_seconds": 0.05, "same_process_continued": true}
+ok
+test_gateway_auth_budget_failure_injection_and_credential_redaction (test_live_gateway.LiveGatewayTests) ... ok
+test_all_original_defects_fail_and_all_reference_tests_pass (test_public_execution_benchmark.PublicFixtureTests) ... ok
+test_all_additional_original_bugs_fail_and_reference_checks_pass (test_public_execution_contracts.PublicContractTests) ... ok
+test_both_arms_use_independent_original_tests_and_report_tampering (test_public_test_benchmark.PublicTestPairsTests) ... ok
+
+----------------------------------------------------------------------
+Ran 50 tests in 226.623s
+
+OK

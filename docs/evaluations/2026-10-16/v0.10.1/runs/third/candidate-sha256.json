@@ -1,0 +1,6 @@
+{
+  "issue.md": "97254ddfffe3a89ba57dbe50774440aa092fc2986e6cc858fb84eddb91b4ab04",
+  "alias_rule.py": "90ddd9c32621eba95d2a0bbf219478b1a8d96115e541e9690dc374c830a7cb7e",
+  "regressions/test_alias_rule.py": "2a373f01a321a5f310d554eec982eba6fedb9994d94bcdc762aeb802cd8c81ee",
+  "tests/test_existing.py": "390da191997d5a6b3fe96bf9596fb80c7815b37d20f85f7163a0d8ae11c14bd2"
+}

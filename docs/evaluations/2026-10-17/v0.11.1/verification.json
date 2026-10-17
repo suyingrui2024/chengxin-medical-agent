@@ -1,0 +1,46 @@
+{
+  "version": "0.11.1",
+  "full_backend_executed": 249,
+  "full_backend_passed": 246,
+  "full_backend_skipped": 3,
+  "full_backend_duration_seconds": 232.938,
+  "skipped_scope": "185/142/605-second opt-in checks not rerun; historical evidence retains 0.10.6 attribution.",
+  "new_directory_backend_tests": 10,
+  "patient_ui_passed": 24,
+  "source_native_passed": 18,
+  "packaged_native_passed": 18,
+  "node_assertions_passed": 21,
+  "package_own_files_matched": 101,
+  "applicable_locked_production_packages_matched": 544,
+  "final_source_test_metadata_files": 214,
+  "frozen_selected_backend_checks_passed": 24,
+  "frozen_source_unchanged": true,
+  "new_external_model_calls": 0,
+  "native_directory_fixture_requests_before_and_after_browsing_and_offline_restore": 2,
+  "native_project_fixture_requests_preserved": 7,
+  "initial_project_identity_sample_was_empty": true,
+  "project_test_now_waits_for_valid_identity": true,
+  "input_focus_failure_retained": true,
+  "missing_nested_directory_failure_retained": true,
+  "final_delta_after_full_backend": [
+    "src/medagent/web/execution-directory-ui.js",
+    "tests/desktop/directory.spec.mjs",
+    "tests/desktop/projects.spec.mjs"
+  ],
+  "final_backend_source_unchanged": true,
+  "screenshots_manually_reviewed": [
+    "51-directory-pagination.png",
+    "52-directory-coverage.png"
+  ],
+  "previous_archive_files_unchanged": {
+    "v0.10.4": 403,
+    "v0.10.5": 519,
+    "v0.10.5-transfer": 690,
+    "v0.10.6": 443,
+    "v0.11.0": 548
+  },
+  "known_next_audit": "next-audit/demo-partial-uncertainty.json",
+  "clinical_validation_complete": false,
+  "general_dsh_parity_proven": false,
+  "scope": "Final GUI error/focus handling and test synchronization followed the backend suite. Final source/package native suites and frozen-source selected backend checks then passed. No broad model or clinical capability score is inferred."
+}

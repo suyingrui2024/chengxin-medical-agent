@@ -1,0 +1,21 @@
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -1112,9 +1112,17 @@
+ 
+     def _bind_to_schema(self, field_name, schema):
+         super()._bind_to_schema(field_name, schema)
++        # ``schema`` may also be a container field (e.g. ``List(fields.DateTime())``
++        # or ``Tuple((fields.DateTime(),))``), which has no ``opts`` attribute, so
++        # walk up to the root schema before reading the ``Meta`` format option.
++        opts = getattr(schema, "opts", None)
++        parent = schema
++        while opts is None and isinstance(parent, FieldABC):
++            parent = getattr(parent, "parent", None)
++            opts = getattr(parent, "opts", None)
+         self.format = (
+             self.format
+-            or getattr(schema.opts, self.SCHEMA_OPTS_VAR_NAME)
++            or getattr(opts, self.SCHEMA_OPTS_VAR_NAME, None)
+             or self.DEFAULT_FORMAT
+         )
+ 

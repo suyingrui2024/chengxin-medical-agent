@@ -1,0 +1,42 @@
+
+> medical-agent-dsh-integration@0.11.10 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/self-check-drafts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:1154833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/self-check-drafts.spec.mjs:13:1 › native self-check drafts restore selections and keep measurement progress through errors (2.5s)
+
+
+  1) tests/desktop/self-check-drafts.spec.mjs:13:1 › native self-check drafts restore selections and keep measurement progress through errors 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+       at ../fixtures/self-check-drafts.mjs:155
+
+      153 |   });
+      154 |   if (shot) await page.screenshot({ path: shot, fullPage: true });
+    > 155 |   expect(feedbackVisible).toBe(true);
+          |                           ^
+      156 | }
+      157 |
+        at verifyTemperatureProgress (/home/suyingrui/Desktop/medical-agent/tests/fixtures/self-check-drafts.mjs:155:27)
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/self-check-drafts.spec.mjs:39:5
+
+    Error Context: test-results/desktop/self-check-drafts-native-s-56824-ent-progress-through-errors/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/self-check-drafts-native-s-56824-ent-progress-through-errors/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/self-check-drafts-native-s-56824-ent-progress-through-errors/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/self-check-drafts.spec.mjs:13:1 › native self-check drafts restore selections and keep measurement progress through errors 

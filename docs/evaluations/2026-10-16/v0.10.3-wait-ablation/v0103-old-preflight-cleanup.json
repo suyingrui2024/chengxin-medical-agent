@@ -1,0 +1,44 @@
+{
+  "kind": "owned-preflight-workcopy-cleanup/v1",
+  "time_unix": 1792149998.0989707,
+  "scope": "Only first four generated preflight working copies; reports already archived byte-identically. Latest preflight, prepared sources, raw model runs, release packages and all archives retained.",
+  "own_processes_checked": 184,
+  "open_references": [],
+  "archive_manifest_verified_files": 737,
+  "removed": [
+    {
+      "path": ".runtime/public-test-sample/preflight-01",
+      "report_archive": "docs/evaluations/2026-10-16/v0.10.2/preflight-01.json",
+      "report_sha256": "ad778d0e101f607decd89de6667b7e06af3f21e44d624ff15096074768150ba0",
+      "entries_before": 7,
+      "regular_bytes_before": 466040001,
+      "removed": true
+    },
+    {
+      "path": ".runtime/public-test-sample/preflight-02",
+      "report_archive": "docs/evaluations/2026-10-16/v0.10.2/preflight-02.json",
+      "report_sha256": "20f861fdc92e4076a6fb2a388cc99038519c6217abf341dfc3ed1be6c95cf208",
+      "entries_before": 7,
+      "regular_bytes_before": 748560086,
+      "removed": true
+    },
+    {
+      "path": ".runtime/public-test-sample/preflight-03",
+      "report_archive": "docs/evaluations/2026-10-16/v0.10.2/preflight-03.json",
+      "report_sha256": "4e44ae44649447df1c7fbc2ae77afcc320a0985cbb03e94aed846e2072f499ca",
+      "entries_before": 7,
+      "regular_bytes_before": 1400265726,
+      "removed": true
+    },
+    {
+      "path": ".runtime/public-test-sample/preflight-04",
+      "report_archive": "docs/evaluations/2026-10-16/v0.10.2/preflight-04.json",
+      "report_sha256": "66a0e37eaad9e1b41f116db080d02ae07a8728f5364d20349187ddbcc64a18f8",
+      "entries_before": 7,
+      "regular_bytes_before": 2070607248,
+      "removed": true
+    }
+  ],
+  "free_bytes_before": 2720874496,
+  "free_bytes_after": 8227057664
+}

@@ -1,0 +1,10 @@
+{
+  "version": "0.9.2",
+  "archive": "dist/desktop/archives/Chengxin-0.9.2-linux-x64.tar.gz",
+  "entries": 29495,
+  "archive_bytes": 290219684,
+  "sha256": "aa97389372ca896d3936a6e595c55a2aa6196cfc2a10391d23175b4db64a84c4",
+  "file_content_modes_links_verified": true,
+  "restore": "tar -xzf dist/desktop/archives/Chengxin-0.9.2-linux-x64.tar.gz -C dist/desktop",
+  "expanded_copy_removed": true
+}

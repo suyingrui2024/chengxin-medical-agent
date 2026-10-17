@@ -1,0 +1,55 @@
+test_conventional_factor_direction_identity_and_rounding_are_explicit (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_disabled_and_frozen_versions_cannot_gain_a_new_calculation (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_dispatch_keeps_source_formula_references_and_old_receipts_readable (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_missing_sources_or_unregistered_form_policy_are_rejected_at_registration (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_non_numeric_and_foreign_units_never_produce_a_registered_result (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_origin_cannot_be_fabricated_and_another_analyte_in_another_clause_is_not_borrowed (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_source_policy_requires_blood_glucose_and_matches_full_tokens (tests.test_glucose_capability.GlucoseCalculationTests) ... ok
+test_invalid_input_preserves_legal_draft_values_and_cannot_compute_twice (tests.test_glucose_capability.PatientGlucoseTests) ... ok
+test_missing_inputs_stay_blank_and_foreign_lab_is_not_prefilled (tests.test_glucose_capability.PatientGlucoseTests) ... ok
+test_patient_can_check_and_edit_inputs_without_a_new_model_request_or_fact_write (tests.test_glucose_capability.PatientGlucoseTests) ... ok
+test_confirmation_executes_once_without_model_or_clinical_fact_and_resumes (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_emergency_text_bypasses_even_stale_card_and_never_computes (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_fabricated_or_unsolicited_inputs_do_not_create_a_form (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_fact_correction_invalidates_the_previous_confirmation (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_invalid_dimension_keeps_edited_inputs_and_original_proposal (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_malformed_confirmed_parameters_cannot_execute_and_form_is_retained (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_missing_or_wrong_card_identifiers_are_refused_before_mutation (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_new_patient_message_cancels_draft_and_reaches_the_planner (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_partial_input_is_blank_and_patient_can_supply_new_values (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_prior_clarification_returns_without_losing_its_wording (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_skip_returns_to_original_question_without_model_call (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_unknown_parameters_are_missing_not_invalid_measurements (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_sdk_observes_rejection_repairs_calculation_delegates_and_restores_receipts (tests.test_execution_capabilities.CapabilitySdkTests) ... skipped 'Requires real isolated DSH'
+test_cross_dimension_requires_explicit_density_and_is_rejected (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_decimal_result_has_host_provenance_and_unconfirmed_status (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_forged_omitted_and_different_quantity_or_unit_cannot_pass (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_frozen_binding_disabled_capability_and_version_change (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_legacy_workspace_does_not_gain_calculation_permissions (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_old_receipt_stays_readable_when_implementation_unavailable_and_corrupt_presentation_is_rejected (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_trimming_sign_exponent_ranges_or_density_does_not_launder_source (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_content_package_preserves_unknown_and_patient_quality (tests.test_capabilities.CapabilityTests) ... ok
+test_contract_rejects_incompatible_api_and_ungranted_permissions (tests.test_capabilities.CapabilityTests) ... ok
+test_decimal_conversion_is_exact_and_has_provenance (tests.test_capabilities.CapabilityTests) ... ok
+test_dimension_mismatch_and_invalid_input_are_rejected (tests.test_capabilities.CapabilityTests) ... ok
+test_disabled_calculation_and_content_cannot_execute (tests.test_capabilities.CapabilityTests) ... ok
+test_invalid_observation_keeps_task_pending_and_skip_still_works (tests.test_capabilities.CapabilityTests) ... ok
+test_malformed_output_is_rejected_before_a_case_can_use_it (tests.test_capabilities.CapabilityTests) ... ok
+test_manifest_copies_cannot_change_live_registry (tests.test_capabilities.CapabilityTests) ... ok
+test_new_content_pack_uses_existing_flow_and_invalidation (tests.test_capabilities.CapabilityTests) ... ok
+test_new_registered_capability_uses_existing_agent_dispatch (tests.test_capabilities.CapabilityTests) ... ok
+test_observation_dependency_contract_rejects_invalid_fields (tests.test_capabilities.CapabilityTests) ... ok
+test_reconfiguration_keeps_old_session_and_its_active_task (tests.test_capabilities.CompositionTests) ... ok
+test_stale_or_invalid_update_cannot_change_active_composition (tests.test_capabilities.CompositionTests) ... ok
+test_template_switch_and_preview_are_case_independent (tests.test_capabilities.CompositionTests) ... ok
+test_actual_calculation_retains_input_quality_and_execution_identity (tests.test_presentation.PresentationTests) ... ok
+test_emergency_uses_notice_without_requiring_an_ordinary_summary (tests.test_presentation.PresentationTests) ... ok
+test_invalid_observation_has_visible_structured_feedback (tests.test_presentation.PresentationTests) ... ok
+test_patient_projection_omits_developer_trace_and_preserves_plain_text (tests.test_presentation.PresentationTests) ... ok
+test_step_assets_cannot_load_external_content_or_mismatch_steps (tests.test_presentation.PresentationTests) ... ok
+test_visual_question_uses_actual_choices_and_preserves_custom_clarification (tests.test_presentation.PresentationTests) ... ok
+
+----------------------------------------------------------------------
+Ran 50 tests in 0.384s
+
+OK (skipped=1)

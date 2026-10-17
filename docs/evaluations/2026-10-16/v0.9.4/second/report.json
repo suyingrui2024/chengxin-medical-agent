@@ -1,0 +1,2621 @@
+{
+  "kind": "registered-capability-evaluation/v1",
+  "synthetic_only": true,
+  "maximum_calls": 32,
+  "model": "deepseek-flash",
+  "checks": {
+    "initial_completed": true,
+    "actual_rejection_observed": true,
+    "correct_registered_results": true,
+    "child_called_registered_tool": true,
+    "no_adhoc_code_or_search": true,
+    "inputs_remain_unconfirmed": true,
+    "old_process_exited": true,
+    "offline_receipts_preserved": true,
+    "cold_resume_completed": true,
+    "old_user_input_reused_with_original_evidence": true,
+    "missing_inputs_not_invented": true,
+    "credentials_not_persisted": true,
+    "within_bound": true,
+    "no_provider_errors": true
+  },
+  "snapshots": [
+    {
+      "id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/evaluations/round-capabilities-20261016/second/workspaces/9831bfbc-33ea-493b-a404-608fbef9c556",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "deepseek-flash",
+      "status": "completed",
+      "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+      "final_response": "验收完成，证据均为宿主回执（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`）。\n\n1. **错误修正测试（预期失败）**：`1.25 kg → mL` 返回\n   `calculation_rejected: 质量与体积不能直接换算；缺少密度时拒绝计算`\n   —— 跨量纲且无密度时按设计拒绝，未产生数值。\n\n2. **修正后成功**：`1.25 kg → g` 回执 `value=1250`，`unit=g`，`formula=1.25 × 1000 ÷ 1 = 1250 g`，execution_id `363d12e2-…a2c7`，`review_status=engineering_verified_not_clinical`，`input_status=unconfirmed`，`quality=not_assessed`。\n\n3. **子智能体（同一注册工具）**：`0.0005 L → mL` 回执 `value=0.5`，`unit=mL`，`formula=0.0005 × 1000 ÷ 1 = 0.5 mL`，execution_id `39adb97a-…e2ac`，同样为 `unconfirmed / not_assessed`。\n\n限制与状态：仅换算数值、不验证输入对应实际测量，不推导剂量或医疗建议；本次为工具错误恢复测试，不是医疗建议。两个输入值 1.25 kg 与 0.0005 L 及其目标单位仍待核对（回执 evidence scope 仅覆盖数值与原单位），质量与体积之间因缺密度不可互转。",
+      "error": null,
+      "sequence": 42,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "task.submitted",
+          "time": 1792112226.585141,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "text": "合成研发验收，项目代号capability-e56654098e966a28。明确输入是1.25 kg和0.0005 L。先查询注册能力。为验证错误修正，请先实际调用注册工具尝试将1.25 kg换算成mL；缺密度时应拒绝。观察错误后改为把1.25 kg换成g。另外委托一个子智能体通过同一注册工具把0.0005 L换成mL。这只是工具错误恢复测试，不是医疗建议。不要执行脚本、联网或写文件，不要重复复核，计算回执足够，最后简短说明输入仍待核对。"
+        },
+        {
+          "sequence": 2,
+          "type": "ready",
+          "time": 1792112227.2834013,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "deepseek-flash"
+        },
+        {
+          "sequence": 3,
+          "type": "turn.started",
+          "time": 1792112227.2837627,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f"
+        },
+        {
+          "sequence": 4,
+          "type": "runtime.event",
+          "time": 1792112227.2924368,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792112227.293037,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792112227292,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "jobs.snapshot",
+          "time": 1792112227.304077,
+          "jobs": []
+        },
+        {
+          "sequence": 7,
+          "type": "model.request",
+          "time": 1792112228.2628126,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 8,
+          "type": "runtime.event",
+          "time": 1792112228.2721684,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792112228271,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 562,
+                    "outputTokens": 57,
+                    "cacheReadTokens": 5760,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 6379
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792112228.2728589,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792112228272,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "call_00_SyrD9J52hk5qlowhDFo47220",
+                  "name": "medical_capabilities",
+                  "arguments": "{}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792112228.3309195,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792112228330,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_SyrD9J52hk5qlowhDFo47220"
+                    },
+                    "toolCallId": "call_00_SyrD9J52hk5qlowhDFo47220",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"protocol\":\"execution-capabilities/v1\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"capabilities\":[{\"id\":\"calculate.units\",\"name\":\"可解释单位换算\",\"version\":\"0.1.0\",\"api_version\":\"medical-capability/v1\",\"kind\":\"calculation\",\"description\":\"质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。\",\"permissions\":[],\"review_status\":\"engineering_verified_not_clinical\",\"ui\":\"calculation\",\"input_schema\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"value\",\"from_unit\",\"to_unit\"],\"properties\":{\"value\":{\"type\":\"string\",\"title\":\"输入数值\",\"minLength\":1,\"maxLength\":25},\"from_unit\":{\"type\":\"string\",\"title\":\"原单位\",\"enum\":[\"kg\",\"g\",\"mg\",\"L\",\"mL\"]},\"to_unit\":{\"type\":\"string\",\"title\":\"目标单位\",\"enum\":[\"kg\",\"g\",\"mg\",\"L\",\"mL\"]}}},\"output_schema\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"value\",\"unit\",\"formula\",\"method\",\"limitations\"],\"properties\":{\"value\":{\"type\":\"string\"},\"unit\":{\"type\":\"string\"},\"formula\":{\"type\":\"string\"},\"method\":{\"type\":\"string\"},\"limitations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}},\"example\":{\"value\":\"1.25\",\"from_unit\":\"kg\",\"to_unit\":\"g\"},\"validation\":{\"status\":\"automated_engineering_tests\",\"scope\":\"精确换算、量纲拒绝、契约和版本隔离；不评价临床意义\"}}],\"input_policy\":\"引用真实用户原文；只核对数值和原单位。目标单位仍为待核对提议，结果不写入病例。\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "241d7f9e-dd59-49b1-ac05-7bb31318cbbe"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "model.request",
+          "time": 1792112230.5006084,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 12,
+          "type": "runtime.event",
+          "time": 1792112230.513372,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "assistant/message",
+                "seq": 19,
+                "time": 1792112230512,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 740,
+                    "outputTokens": 397,
+                    "cacheReadTokens": 6272,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 7409
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792112230.513469,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/call",
+                "seq": 20,
+                "time": 1792112230513,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "callId": "call_00_cD5sseXlOO0Fs9y1qBcJ8308",
+                  "name": "medical_calculate",
+                  "arguments": "{\"capability_id\": \"calculate.units\", \"input\": {\"value\": \"1.25\", \"from_unit\": \"kg\", \"to_unit\": \"mL\"}, \"evidence\": \"明确输入是1.25 kg和0.0005 L\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "capability.failed",
+          "time": 1792112230.5686886,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "error": {
+            "code": "calculation_rejected",
+            "message": "质量与体积不能直接换算；缺少密度时拒绝计算"
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "runtime.event",
+          "time": 1792112230.5714583,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/result",
+                "seq": 21,
+                "time": 1792112230570,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_cD5sseXlOO0Fs9y1qBcJ8308"
+                    },
+                    "toolCallId": "call_00_cD5sseXlOO0Fs9y1qBcJ8308",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Error: calculation_rejected: 质量与体积不能直接换算；缺少密度时拒绝计算"
+                      }
+                    ],
+                    "isError": true,
+                    "id": "f27768be-3da8-4269-8b2f-4a72eafb2fd7"
+                  }
+                },
+                "sourceEventSeqs": [
+                  20
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 16,
+          "type": "runtime.event",
+          "time": 1792112230.5715938,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/call",
+                "seq": 22,
+                "time": 1792112230571,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "callId": "call_01_Ntqtw7ukk8vcEjnHw09b3931",
+                  "name": "subagent",
+                  "arguments": "{\"description\": \"Subagent unit conversion\", \"prompt\": \"这是一个工具错误恢复测试，不是医疗建议。只做一步：\\n\\n调用 medical_calculate 工具，capability_id 使用 \\\"calculate.units\\\"，将用户明确给出的输入 0.0005 L 换算为 mL：\\n- input: {\\\"value\\\": \\\"0.0005\\\", \\\"from_unit\\\": \\\"L\\\", \\\"to_unit\\\": \\\"mL\\\"}\\n- evidence 必须逐字引用用户原文片段：\\\"明确输入是1.25 kg和0.0005 L\\\"\\n\\n不要执行脚本、不要联网、不要写文件、不要重复调用。把工具返回的原始回执（value/unit/formula/method/limitations 或错误信息）原样报告给我，并注明结果是宿主回执、输入仍待核对。回复保持简短。\", \"run_in_background\": false}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 17,
+          "type": "runtime.event",
+          "time": 1792112230.5930893,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "subagent.started",
+            "params": {
+              "parentSessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "childSessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a"
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "type": "runtime.event",
+          "time": 1792112230.5940845,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "type": "runtime.event",
+          "time": 1792112230.594145,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792112230594,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 20,
+          "type": "model.request",
+          "time": 1792112234.3930745,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "index": 3,
+          "lifetime_calls": 3,
+          "status": 200
+        },
+        {
+          "sequence": 21,
+          "type": "runtime.event",
+          "time": 1792112234.4115665,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "assistant/message",
+                "seq": 14,
+                "time": 1792112234410,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 559,
+                    "outputTokens": 661,
+                    "cacheReadTokens": 5760,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 6980
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 22,
+          "type": "runtime.event",
+          "time": 1792112234.4117532,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "tool/call",
+                "seq": 15,
+                "time": 1792112234411,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "call_00_d05quoCiapvNWmmilvvY1554",
+                  "name": "medical_capabilities",
+                  "arguments": "{}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "type": "runtime.event",
+          "time": 1792112234.4679441,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "tool/result",
+                "seq": 16,
+                "time": 1792112234467,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_d05quoCiapvNWmmilvvY1554"
+                    },
+                    "toolCallId": "call_00_d05quoCiapvNWmmilvvY1554",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"protocol\":\"execution-capabilities/v1\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"capabilities\":[{\"id\":\"calculate.units\",\"name\":\"可解释单位换算\",\"version\":\"0.1.0\",\"api_version\":\"medical-capability/v1\",\"kind\":\"calculation\",\"description\":\"质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。\",\"permissions\":[],\"review_status\":\"engineering_verified_not_clinical\",\"ui\":\"calculation\",\"input_schema\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"value\",\"from_unit\",\"to_unit\"],\"properties\":{\"value\":{\"type\":\"string\",\"title\":\"输入数值\",\"minLength\":1,\"maxLength\":25},\"from_unit\":{\"type\":\"string\",\"title\":\"原单位\",\"enum\":[\"kg\",\"g\",\"mg\",\"L\",\"mL\"]},\"to_unit\":{\"type\":\"string\",\"title\":\"目标单位\",\"enum\":[\"kg\",\"g\",\"mg\",\"L\",\"mL\"]}}},\"output_schema\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"value\",\"unit\",\"formula\",\"method\",\"limitations\"],\"properties\":{\"value\":{\"type\":\"string\"},\"unit\":{\"type\":\"string\"},\"formula\":{\"type\":\"string\"},\"method\":{\"type\":\"string\"},\"limitations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}},\"example\":{\"value\":\"1.25\",\"from_unit\":\"kg\",\"to_unit\":\"g\"},\"validation\":{\"status\":\"automated_engineering_tests\",\"scope\":\"精确换算、量纲拒绝、契约和版本隔离；不评价临床意义\"}}],\"input_policy\":\"引用真实用户原文；只核对数值和原单位。目标单位仍为待核对提议，结果不写入病例。\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "26abb472-26a6-49a3-bea7-d8309f6fc4c2"
+                  }
+                },
+                "sourceEventSeqs": [
+                  15
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 24,
+          "type": "runtime.event",
+          "time": 1792112234.46819,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "tool/call",
+                "seq": 17,
+                "time": 1792112234467,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "call_01_vE1kg0oO0XfpYmiYMnmM7783",
+                  "name": "medical_calculate",
+                  "arguments": "{\"capability_id\": \"calculate.units\", \"input\": {\"value\": \"0.0005\", \"from_unit\": \"L\", \"to_unit\": \"mL\"}, \"evidence\": \"明确输入是1.25 kg和0.0005 L\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 25,
+          "type": "capability.completed",
+          "time": 1792112234.5245538,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "result": {
+            "capability_id": "calculate.units",
+            "version": "0.1.0",
+            "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+            "input": {
+              "value": "0.0005",
+              "from_unit": "L",
+              "to_unit": "mL"
+            },
+            "data": {
+              "value": "0.5",
+              "unit": "mL",
+              "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+              "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+              "limitations": [
+                "只换算输入数值，不验证输入对应的实际测量。",
+                "不推导摄入量、药物剂量或医疗建议。"
+              ]
+            },
+            "input_origin": "execution_model_proposal",
+            "input_status": "unconfirmed",
+            "quality": "not_assessed",
+            "review_status": "engineering_verified_not_clinical",
+            "renderer": "calculation",
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "calculation:calculate.units:39adb97a-d716-4b9a-a039-26e36a12e2ac",
+                  "type": "calculation",
+                  "data": {
+                    "value": "0.5",
+                    "unit": "mL",
+                    "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+                    "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                    "limitations": [
+                      "只换算输入数值，不验证输入对应的实际测量。",
+                      "不推导摄入量、药物剂量或医疗建议。"
+                    ],
+                    "inputs": [
+                      {
+                        "key": "value",
+                        "label": "输入数值",
+                        "value": "0.0005"
+                      },
+                      {
+                        "key": "from_unit",
+                        "label": "原单位",
+                        "value": "L"
+                      },
+                      {
+                        "key": "to_unit",
+                        "label": "目标单位",
+                        "value": "mL"
+                      }
+                    ],
+                    "input_status": "unconfirmed",
+                    "quality": "not_assessed",
+                    "review_status": "engineering_verified_not_clinical",
+                    "provenance": {
+                      "capability_id": "calculate.units",
+                      "version": "0.1.0",
+                      "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                      "input_origin": "execution_model_proposal",
+                      "evidence": {
+                        "quote": "明确输入是1.25 kg和0.0005 L",
+                        "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                        "scope": "quantity_and_source_unit_only"
+                      },
+                      "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                      "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac"
+                    }
+                  }
+                }
+              ]
+            },
+            "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac",
+            "executed_at": 1792112234.5185592,
+            "evidence": {
+              "quote": "明确输入是1.25 kg和0.0005 L",
+              "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+              "scope": "quantity_and_source_unit_only"
+            },
+            "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+            "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+            "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "protocol": "execution-capabilities/v1"
+          }
+        },
+        {
+          "sequence": 26,
+          "type": "runtime.event",
+          "time": 1792112234.530959,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "tool/result",
+                "seq": 18,
+                "time": 1792112234525,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_01_vE1kg0oO0XfpYmiYMnmM7783"
+                    },
+                    "toolCallId": "call_01_vE1kg0oO0XfpYmiYMnmM7783",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"capability_id\":\"calculate.units\",\"version\":\"0.1.0\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"input\":{\"value\":\"0.0005\",\"from_unit\":\"L\",\"to_unit\":\"mL\"},\"data\":{\"value\":\"0.5\",\"unit\":\"mL\",\"formula\":\"0.0005 × 1000 ÷ 1 = 0.5 mL\",\"method\":\"相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\",\"limitations\":[\"只换算输入数值，不验证输入对应的实际测量。\",\"不推导摄入量、药物剂量或医疗建议。\"]},\"input_origin\":\"execution_model_proposal\",\"input_status\":\"unconfirmed\",\"quality\":\"not_assessed\",\"review_status\":\"engineering_verified_not_clinical\",\"renderer\":\"calculation\",\"presentation\":{\"schema_version\":\"medical-ui/v1\",\"blocks\":[{\"id\":\"calculation:calculate.units:39adb97a-d716-4b9a-a039-26e36a12e2ac\",\"type\":\"calculation\",\"data\":{\"value\":\"0.5\",\"unit\":\"mL\",\"formula\":\"0.0005 × 1000 ÷ 1 = 0.5 mL\",\"method\":\"相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\",\"limitations\":[\"只换算输入数值，不验证输入对应的实际测量。\",\"不推导摄入量、药物剂量或医疗建议。\"],\"inputs\":[{\"key\":\"value\",\"label\":\"输入数值\",\"value\":\"0.0005\"},{\"key\":\"from_unit\",\"label\":\"原单位\",\"value\":\"L\"},{\"key\":\"to_unit\",\"label\":\"目标单位\",\"value\":\"mL\"}],\"input_status\":\"unconfirmed\",\"quality\":\"not_assessed\",\"review_status\":\"engineering_verified_not_clinical\",\"provenance\":{\"capability_id\":\"calculate.units\",\"version\":\"0.1.0\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"input_origin\":\"execution_model_proposal\",\"evidence\":{\"quote\":\"明确输入是1.25 kg和0.0005 L\",\"source_turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"scope\":\"quantity_and_source_unit_only\"},\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"execution_id\":\"39adb97a-d716-4b9a-a039-26e36a12e2ac\"}}}]},\"execution_id\":\"39adb97a-d716-4b9a-a039-26e36a12e2ac\",\"executed_at\":1792112234.5185592,\"evidence\":{\"quote\":\"明确输入是1.25 kg和0.0005 L\",\"source_turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"scope\":\"quantity_and_source_unit_only\"},\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"workspace_id\":\"9831bfbc-33ea-493b-a404-608fbef9c556\",\"turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"protocol\":\"execution-capabilities/v1\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "ef9ae811-51a3-4ba9-b8f7-496215b829a2"
+                  }
+                },
+                "sourceEventSeqs": [
+                  17
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 27,
+          "type": "model.request",
+          "time": 1792112236.5864093,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "index": 4,
+          "lifetime_calls": 4,
+          "status": 200
+        },
+        {
+          "sequence": 28,
+          "type": "runtime.event",
+          "time": 1792112236.601539,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "assistant/message",
+                "seq": 22,
+                "time": 1792112236600,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 1570,
+                    "outputTokens": 274,
+                    "cacheReadTokens": 6912,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 8756
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "宿主回执（calculate.units v0.1.0）原始要点：\n\n- **value**: `\"0.5\"`，**unit**: `\"mL\"`\n- **formula**: `0.0005 × 1000 ÷ 1 = 0.5 mL`\n- **method**: 相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\n- **limitations**: [\"只换算输入数值，不验证输入对应的实际测量。\", \"不推导摄入量、药物剂量或医疗建议。\"]\n- **input_status**: `unconfirmed`；**quality**: `not_assessed`；**review_status**: `engineering_verified_not_clinical`\n- **input_origin**: `execution_model_proposal`；evidence quote 已被回执记录，scope 为 `quantity_and_source_unit_only`\n- execution_id: `39adb97a-d716-4b9a-a039-26e36a12e2ac`；registry_sha256: `896c8843…b55451`；implementation_sha256: `0af6adda…e14bc0`\n\n无错误信息，调用成功。以上为宿主计算回执；输入数值与目标单位仍待核对，不构成医疗建议。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 29,
+          "type": "runtime.event",
+          "time": 1792112236.6021183,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "event": {
+                "type": "turn/end",
+                "seq": 24,
+                "time": 1792112236601,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 30,
+          "type": "runtime.event",
+          "time": 1792112236.6037781,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 31,
+          "type": "runtime.event",
+          "time": 1792112236.6052744,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "subagent.finished",
+            "params": {
+              "provider": "spawn",
+              "agentId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "parentSessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "childSessionId": "17c84ecb-4458-4f0e-b088-b537c7aceb3a",
+              "status": "ok",
+              "stopReason": "completed"
+            }
+          }
+        },
+        {
+          "sequence": 32,
+          "type": "runtime.event",
+          "time": 1792112236.6122391,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/result",
+                "seq": 24,
+                "time": 1792112236611,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_01_Ntqtw7ukk8vcEjnHw09b3931"
+                    },
+                    "toolCallId": "call_01_Ntqtw7ukk8vcEjnHw09b3931",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "宿主回执（calculate.units v0.1.0）原始要点：\n\n- **value**: `\"0.5\"`，**unit**: `\"mL\"`\n- **formula**: `0.0005 × 1000 ÷ 1 = 0.5 mL`\n- **method**: 相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\n- **limitations**: [\"只换算输入数值，不验证输入对应的实际测量。\", \"不推导摄入量、药物剂量或医疗建议。\"]\n- **input_status**: `unconfirmed`；**quality**: `not_assessed`；**review_status**: `engineering_verified_not_clinical`\n- **input_origin**: `execution_model_proposal`；evidence quote 已被回执记录，scope 为 `quantity_and_source_unit_only`\n- execution_id: `39adb97a-d716-4b9a-a039-26e36a12e2ac`；registry_sha256: `896c8843…b55451`；implementation_sha256: `0af6adda…e14bc0`\n\n无错误信息，调用成功。以上为宿主计算回执；输入数值与目标单位仍待核对，不构成医疗建议。"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "c171de2d-278b-40a9-b5d4-27643cbb7eb5"
+                  }
+                },
+                "sourceEventSeqs": [
+                  22
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 33,
+          "type": "model.request",
+          "time": 1792112237.6932034,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "index": 5,
+          "lifetime_calls": 5,
+          "status": 200
+        },
+        {
+          "sequence": 34,
+          "type": "runtime.event",
+          "time": 1792112237.7025318,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "assistant/message",
+                "seq": 28,
+                "time": 1792112237701,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "usage": {
+                    "inputTokens": 612,
+                    "outputTokens": 119,
+                    "cacheReadTokens": 7296,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 8027
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 35,
+          "type": "runtime.event",
+          "time": 1792112237.7029896,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/call",
+                "seq": 29,
+                "time": 1792112237702,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "callId": "call_00_qkMI4MEsM6w5y76wVcxE8706",
+                  "name": "medical_calculate",
+                  "arguments": "{\"capability_id\": \"calculate.units\", \"input\": {\"from_unit\": \"kg\", \"to_unit\": \"g\", \"value\": \"1.25\"}, \"evidence\": \"明确输入是1.25 kg和0.0005 L\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 36,
+          "type": "capability.completed",
+          "time": 1792112237.7656024,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "result": {
+            "capability_id": "calculate.units",
+            "version": "0.1.0",
+            "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+            "input": {
+              "from_unit": "kg",
+              "to_unit": "g",
+              "value": "1.25"
+            },
+            "data": {
+              "value": "1250",
+              "unit": "g",
+              "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+              "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+              "limitations": [
+                "只换算输入数值，不验证输入对应的实际测量。",
+                "不推导摄入量、药物剂量或医疗建议。"
+              ]
+            },
+            "input_origin": "execution_model_proposal",
+            "input_status": "unconfirmed",
+            "quality": "not_assessed",
+            "review_status": "engineering_verified_not_clinical",
+            "renderer": "calculation",
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "calculation:calculate.units:363d12e2-93c6-4718-b86b-93fd9106a2c7",
+                  "type": "calculation",
+                  "data": {
+                    "value": "1250",
+                    "unit": "g",
+                    "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                    "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                    "limitations": [
+                      "只换算输入数值，不验证输入对应的实际测量。",
+                      "不推导摄入量、药物剂量或医疗建议。"
+                    ],
+                    "inputs": [
+                      {
+                        "key": "from_unit",
+                        "label": "原单位",
+                        "value": "kg"
+                      },
+                      {
+                        "key": "to_unit",
+                        "label": "目标单位",
+                        "value": "g"
+                      },
+                      {
+                        "key": "value",
+                        "label": "输入数值",
+                        "value": "1.25"
+                      }
+                    ],
+                    "input_status": "unconfirmed",
+                    "quality": "not_assessed",
+                    "review_status": "engineering_verified_not_clinical",
+                    "provenance": {
+                      "capability_id": "calculate.units",
+                      "version": "0.1.0",
+                      "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                      "input_origin": "execution_model_proposal",
+                      "evidence": {
+                        "quote": "明确输入是1.25 kg和0.0005 L",
+                        "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                        "scope": "quantity_and_source_unit_only"
+                      },
+                      "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                      "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7"
+                    }
+                  }
+                }
+              ]
+            },
+            "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7",
+            "executed_at": 1792112237.759614,
+            "evidence": {
+              "quote": "明确输入是1.25 kg和0.0005 L",
+              "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+              "scope": "quantity_and_source_unit_only"
+            },
+            "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+            "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+            "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "protocol": "execution-capabilities/v1"
+          }
+        },
+        {
+          "sequence": 37,
+          "type": "runtime.event",
+          "time": 1792112237.772431,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/result",
+                "seq": 30,
+                "time": 1792112237766,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_qkMI4MEsM6w5y76wVcxE8706"
+                    },
+                    "toolCallId": "call_00_qkMI4MEsM6w5y76wVcxE8706",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"capability_id\":\"calculate.units\",\"version\":\"0.1.0\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"input\":{\"from_unit\":\"kg\",\"to_unit\":\"g\",\"value\":\"1.25\"},\"data\":{\"value\":\"1250\",\"unit\":\"g\",\"formula\":\"1.25 × 1000 ÷ 1 = 1250 g\",\"method\":\"相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\",\"limitations\":[\"只换算输入数值，不验证输入对应的实际测量。\",\"不推导摄入量、药物剂量或医疗建议。\"]},\"input_origin\":\"execution_model_proposal\",\"input_status\":\"unconfirmed\",\"quality\":\"not_assessed\",\"review_status\":\"engineering_verified_not_clinical\",\"renderer\":\"calculation\",\"presentation\":{\"schema_version\":\"medical-ui/v1\",\"blocks\":[{\"id\":\"calculation:calculate.units:363d12e2-93c6-4718-b86b-93fd9106a2c7\",\"type\":\"calculation\",\"data\":{\"value\":\"1250\",\"unit\":\"g\",\"formula\":\"1.25 × 1000 ÷ 1 = 1250 g\",\"method\":\"相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\",\"limitations\":[\"只换算输入数值，不验证输入对应的实际测量。\",\"不推导摄入量、药物剂量或医疗建议。\"],\"inputs\":[{\"key\":\"from_unit\",\"label\":\"原单位\",\"value\":\"kg\"},{\"key\":\"to_unit\",\"label\":\"目标单位\",\"value\":\"g\"},{\"key\":\"value\",\"label\":\"输入数值\",\"value\":\"1.25\"}],\"input_status\":\"unconfirmed\",\"quality\":\"not_assessed\",\"review_status\":\"engineering_verified_not_clinical\",\"provenance\":{\"capability_id\":\"calculate.units\",\"version\":\"0.1.0\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"input_origin\":\"execution_model_proposal\",\"evidence\":{\"quote\":\"明确输入是1.25 kg和0.0005 L\",\"source_turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"scope\":\"quantity_and_source_unit_only\"},\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"execution_id\":\"363d12e2-93c6-4718-b86b-93fd9106a2c7\"}}}]},\"execution_id\":\"363d12e2-93c6-4718-b86b-93fd9106a2c7\",\"executed_at\":1792112237.759614,\"evidence\":{\"quote\":\"明确输入是1.25 kg和0.0005 L\",\"source_turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"scope\":\"quantity_and_source_unit_only\"},\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"workspace_id\":\"9831bfbc-33ea-493b-a404-608fbef9c556\",\"turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"protocol\":\"execution-capabilities/v1\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "c11907f7-882b-4014-8d23-fa0eef41dce4"
+                  }
+                },
+                "sourceEventSeqs": [
+                  29
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 38,
+          "type": "model.request",
+          "time": 1792112240.2604663,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "index": 6,
+          "lifetime_calls": 6,
+          "status": 200
+        },
+        {
+          "sequence": 39,
+          "type": "runtime.event",
+          "time": 1792112240.2702744,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "assistant/message",
+                "seq": 34,
+                "time": 1792112240269,
+                "data": {
+                  "turn": 1,
+                  "step": 4,
+                  "usage": {
+                    "inputTokens": 1090,
+                    "outputTokens": 364,
+                    "cacheReadTokens": 7936,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 9390
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "验收完成，证据均为宿主回执（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`）。\n\n1. **错误修正测试（预期失败）**：`1.25 kg → mL` 返回\n   `calculation_rejected: 质量与体积不能直接换算；缺少密度时拒绝计算`\n   —— 跨量纲且无密度时按设计拒绝，未产生数值。\n\n2. **修正后成功**：`1.25 kg → g` 回执 `value=1250`，`unit=g`，`formula=1.25 × 1000 ÷ 1 = 1250 g`，execution_id `363d12e2-…a2c7`，`review_status=engineering_verified_not_clinical`，`input_status=unconfirmed`，`quality=not_assessed`。\n\n3. **子智能体（同一注册工具）**：`0.0005 L → mL` 回执 `value=0.5`，`unit=mL`，`formula=0.0005 × 1000 ÷ 1 = 0.5 mL`，execution_id `39adb97a-…e2ac`，同样为 `unconfirmed / not_assessed`。\n\n限制与状态：仅换算数值、不验证输入对应实际测量，不推导剂量或医疗建议；本次为工具错误恢复测试，不是医疗建议。两个输入值 1.25 kg 与 0.0005 L 及其目标单位仍待核对（回执 evidence scope 仅覆盖数值与原单位），质量与体积之间因缺密度不可互转。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 40,
+          "type": "runtime.event",
+          "time": 1792112240.27066,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "turn/end",
+                "seq": 36,
+                "time": 1792112240270,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 41,
+          "type": "runtime.event",
+          "time": 1792112240.2716663,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 42,
+          "type": "turn.completed",
+          "time": 1792112240.2724137,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "model_calls": 6,
+          "lifetime_calls": 6,
+          "final_response": "验收完成，证据均为宿主回执（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`）。\n\n1. **错误修正测试（预期失败）**：`1.25 kg → mL` 返回\n   `calculation_rejected: 质量与体积不能直接换算；缺少密度时拒绝计算`\n   —— 跨量纲且无密度时按设计拒绝，未产生数值。\n\n2. **修正后成功**：`1.25 kg → g` 回执 `value=1250`，`unit=g`，`formula=1.25 × 1000 ÷ 1 = 1250 g`，execution_id `363d12e2-…a2c7`，`review_status=engineering_verified_not_clinical`，`input_status=unconfirmed`，`quality=not_assessed`。\n\n3. **子智能体（同一注册工具）**：`0.0005 L → mL` 回执 `value=0.5`，`unit=mL`，`formula=0.0005 × 1000 ÷ 1 = 0.5 mL`，execution_id `39adb97a-…e2ac`，同样为 `unconfirmed / not_assessed`。\n\n限制与状态：仅换算数值、不验证输入对应实际测量，不推导剂量或医疗建议；本次为工具错误恢复测试，不是医疗建议。两个输入值 1.25 kg 与 0.0005 L 及其目标单位仍待核对（回执 evidence scope 仅覆盖数值与原单位），质量与体积之间因缺密度不可互转。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "text": "合成研发验收，项目代号capability-e56654098e966a28。明确输入是1.25 kg和0.0005 L。先查询注册能力。为验证错误修正，请先实际调用注册工具尝试将1.25 kg换算成mL；缺密度时应拒绝。观察错误后改为把1.25 kg换成g。另外委托一个子智能体通过同一注册工具把0.0005 L换成mL。这只是工具错误恢复测试，不是医疗建议。不要执行脚本、联网或写文件，不要重复复核，计算回执足够，最后简短说明输入仍待核对。",
+          "max_calls": 16,
+          "status": "completed",
+          "model_calls": 6,
+          "final_response": "验收完成，证据均为宿主回执（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`）。\n\n1. **错误修正测试（预期失败）**：`1.25 kg → mL` 返回\n   `calculation_rejected: 质量与体积不能直接换算；缺少密度时拒绝计算`\n   —— 跨量纲且无密度时按设计拒绝，未产生数值。\n\n2. **修正后成功**：`1.25 kg → g` 回执 `value=1250`，`unit=g`，`formula=1.25 × 1000 ÷ 1 = 1250 g`，execution_id `363d12e2-…a2c7`，`review_status=engineering_verified_not_clinical`，`input_status=unconfirmed`，`quality=not_assessed`。\n\n3. **子智能体（同一注册工具）**：`0.0005 L → mL` 回执 `value=0.5`，`unit=mL`，`formula=0.0005 × 1000 ÷ 1 = 0.5 mL`，execution_id `39adb97a-…e2ac`，同样为 `unconfirmed / not_assessed`。\n\n限制与状态：仅换算数值、不验证输入对应实际测量，不推导剂量或医疗建议；本次为工具错误恢复测试，不是医疗建议。两个输入值 1.25 kg 与 0.0005 L 及其目标单位仍待核对（回执 evidence scope 仅覆盖数值与原单位），质量与体积之间因缺密度不可互转。"
+        }
+      ],
+      "jobs": [],
+      "artifacts": [],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "合成研发验收，项目代号capability-e56654098e",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+        "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0"
+      },
+      "calculations": [
+        {
+          "capability_id": "calculate.units",
+          "version": "0.1.0",
+          "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+          "input": {
+            "value": "0.0005",
+            "from_unit": "L",
+            "to_unit": "mL"
+          },
+          "data": {
+            "value": "0.5",
+            "unit": "mL",
+            "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+            "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+            "limitations": [
+              "只换算输入数值，不验证输入对应的实际测量。",
+              "不推导摄入量、药物剂量或医疗建议。"
+            ]
+          },
+          "input_origin": "execution_model_proposal",
+          "input_status": "unconfirmed",
+          "quality": "not_assessed",
+          "review_status": "engineering_verified_not_clinical",
+          "renderer": "calculation",
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "calculation:calculate.units:39adb97a-d716-4b9a-a039-26e36a12e2ac",
+                "type": "calculation",
+                "data": {
+                  "value": "0.5",
+                  "unit": "mL",
+                  "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+                  "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                  "limitations": [
+                    "只换算输入数值，不验证输入对应的实际测量。",
+                    "不推导摄入量、药物剂量或医疗建议。"
+                  ],
+                  "inputs": [
+                    {
+                      "key": "value",
+                      "label": "输入数值",
+                      "value": "0.0005"
+                    },
+                    {
+                      "key": "from_unit",
+                      "label": "原单位",
+                      "value": "L"
+                    },
+                    {
+                      "key": "to_unit",
+                      "label": "目标单位",
+                      "value": "mL"
+                    }
+                  ],
+                  "input_status": "unconfirmed",
+                  "quality": "not_assessed",
+                  "review_status": "engineering_verified_not_clinical",
+                  "provenance": {
+                    "capability_id": "calculate.units",
+                    "version": "0.1.0",
+                    "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                    "input_origin": "execution_model_proposal",
+                    "evidence": {
+                      "quote": "明确输入是1.25 kg和0.0005 L",
+                      "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                      "scope": "quantity_and_source_unit_only"
+                    },
+                    "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                    "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac"
+                  }
+                }
+              }
+            ]
+          },
+          "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac",
+          "executed_at": 1792112234.5185592,
+          "evidence": {
+            "quote": "明确输入是1.25 kg和0.0005 L",
+            "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "scope": "quantity_and_source_unit_only"
+          },
+          "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+          "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "protocol": "execution-capabilities/v1"
+        },
+        {
+          "capability_id": "calculate.units",
+          "version": "0.1.0",
+          "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+          "input": {
+            "from_unit": "kg",
+            "to_unit": "g",
+            "value": "1.25"
+          },
+          "data": {
+            "value": "1250",
+            "unit": "g",
+            "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+            "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+            "limitations": [
+              "只换算输入数值，不验证输入对应的实际测量。",
+              "不推导摄入量、药物剂量或医疗建议。"
+            ]
+          },
+          "input_origin": "execution_model_proposal",
+          "input_status": "unconfirmed",
+          "quality": "not_assessed",
+          "review_status": "engineering_verified_not_clinical",
+          "renderer": "calculation",
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "calculation:calculate.units:363d12e2-93c6-4718-b86b-93fd9106a2c7",
+                "type": "calculation",
+                "data": {
+                  "value": "1250",
+                  "unit": "g",
+                  "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                  "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                  "limitations": [
+                    "只换算输入数值，不验证输入对应的实际测量。",
+                    "不推导摄入量、药物剂量或医疗建议。"
+                  ],
+                  "inputs": [
+                    {
+                      "key": "from_unit",
+                      "label": "原单位",
+                      "value": "kg"
+                    },
+                    {
+                      "key": "to_unit",
+                      "label": "目标单位",
+                      "value": "g"
+                    },
+                    {
+                      "key": "value",
+                      "label": "输入数值",
+                      "value": "1.25"
+                    }
+                  ],
+                  "input_status": "unconfirmed",
+                  "quality": "not_assessed",
+                  "review_status": "engineering_verified_not_clinical",
+                  "provenance": {
+                    "capability_id": "calculate.units",
+                    "version": "0.1.0",
+                    "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                    "input_origin": "execution_model_proposal",
+                    "evidence": {
+                      "quote": "明确输入是1.25 kg和0.0005 L",
+                      "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                      "scope": "quantity_and_source_unit_only"
+                    },
+                    "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                    "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7"
+                  }
+                }
+              }
+            ]
+          },
+          "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7",
+          "executed_at": 1792112237.759614,
+          "evidence": {
+            "quote": "明确输入是1.25 kg和0.0005 L",
+            "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "scope": "quantity_and_source_unit_only"
+          },
+          "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+          "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "protocol": "execution-capabilities/v1"
+        }
+      ]
+    },
+    {
+      "id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/evaluations/round-capabilities-20261016/second/workspaces/9831bfbc-33ea-493b-a404-608fbef9c556",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "deepseek-flash",
+      "status": "completed",
+      "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+      "final_response": "项目代号：**capability-e56654098e966a28**。\n\n注册工具换算（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`，execution_id `9f3de904-…2408`）：\n\n- 输入：用户原文明确提供的体积 `0.0005 L`\n- 结果：**0.5 mL**\n- 公式：`0.0005 × 1000 ÷ 1 = 0.5 mL`（同为体积量纲，SI 前缀十进制换算）\n- review_status：`engineering_verified_not_clinical`；input_status：`unconfirmed`；quality：`not_assessed`\n- 限制：只换算数值，不验证输入对应的实际测量，不推导剂量或医疗建议\n\n输入 0.0005 L 及目标单位 mL 仍待核对，非医疗建议。",
+      "error": null,
+      "sequence": 21,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "task.submitted",
+          "time": 1792112240.4019322,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "text": "合成研发验收，项目代号capability-e56654098e966a28。明确输入是1.25 kg和0.0005 L。先查询注册能力。为验证错误修正，请先实际调用注册工具尝试将1.25 kg换算成mL；缺密度时应拒绝。观察错误后改为把1.25 kg换成g。另外委托一个子智能体通过同一注册工具把0.0005 L换成mL。这只是工具错误恢复测试，不是医疗建议。不要执行脚本、联网或写文件，不要重复复核，计算回执足够，最后简短说明输入仍待核对。",
+          "restored": true
+        },
+        {
+          "sequence": 2,
+          "type": "capability.completed",
+          "time": 1792112240.401935,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "result": {
+            "capability_id": "calculate.units",
+            "version": "0.1.0",
+            "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+            "input": {
+              "value": "0.0005",
+              "from_unit": "L",
+              "to_unit": "mL"
+            },
+            "data": {
+              "value": "0.5",
+              "unit": "mL",
+              "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+              "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+              "limitations": [
+                "只换算输入数值，不验证输入对应的实际测量。",
+                "不推导摄入量、药物剂量或医疗建议。"
+              ]
+            },
+            "input_origin": "execution_model_proposal",
+            "input_status": "unconfirmed",
+            "quality": "not_assessed",
+            "review_status": "engineering_verified_not_clinical",
+            "renderer": "calculation",
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "calculation:calculate.units:39adb97a-d716-4b9a-a039-26e36a12e2ac",
+                  "type": "calculation",
+                  "data": {
+                    "value": "0.5",
+                    "unit": "mL",
+                    "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+                    "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                    "limitations": [
+                      "只换算输入数值，不验证输入对应的实际测量。",
+                      "不推导摄入量、药物剂量或医疗建议。"
+                    ],
+                    "inputs": [
+                      {
+                        "key": "value",
+                        "label": "输入数值",
+                        "value": "0.0005"
+                      },
+                      {
+                        "key": "from_unit",
+                        "label": "原单位",
+                        "value": "L"
+                      },
+                      {
+                        "key": "to_unit",
+                        "label": "目标单位",
+                        "value": "mL"
+                      }
+                    ],
+                    "input_status": "unconfirmed",
+                    "quality": "not_assessed",
+                    "review_status": "engineering_verified_not_clinical",
+                    "provenance": {
+                      "capability_id": "calculate.units",
+                      "version": "0.1.0",
+                      "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                      "input_origin": "execution_model_proposal",
+                      "evidence": {
+                        "quote": "明确输入是1.25 kg和0.0005 L",
+                        "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                        "scope": "quantity_and_source_unit_only"
+                      },
+                      "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                      "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac"
+                    }
+                  }
+                }
+              ]
+            },
+            "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac",
+            "executed_at": 1792112234.5185592,
+            "evidence": {
+              "quote": "明确输入是1.25 kg和0.0005 L",
+              "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+              "scope": "quantity_and_source_unit_only"
+            },
+            "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+            "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+            "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "protocol": "execution-capabilities/v1"
+          },
+          "restored": true
+        },
+        {
+          "sequence": 3,
+          "type": "capability.completed",
+          "time": 1792112240.4019363,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "result": {
+            "capability_id": "calculate.units",
+            "version": "0.1.0",
+            "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+            "input": {
+              "from_unit": "kg",
+              "to_unit": "g",
+              "value": "1.25"
+            },
+            "data": {
+              "value": "1250",
+              "unit": "g",
+              "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+              "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+              "limitations": [
+                "只换算输入数值，不验证输入对应的实际测量。",
+                "不推导摄入量、药物剂量或医疗建议。"
+              ]
+            },
+            "input_origin": "execution_model_proposal",
+            "input_status": "unconfirmed",
+            "quality": "not_assessed",
+            "review_status": "engineering_verified_not_clinical",
+            "renderer": "calculation",
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "calculation:calculate.units:363d12e2-93c6-4718-b86b-93fd9106a2c7",
+                  "type": "calculation",
+                  "data": {
+                    "value": "1250",
+                    "unit": "g",
+                    "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                    "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                    "limitations": [
+                      "只换算输入数值，不验证输入对应的实际测量。",
+                      "不推导摄入量、药物剂量或医疗建议。"
+                    ],
+                    "inputs": [
+                      {
+                        "key": "from_unit",
+                        "label": "原单位",
+                        "value": "kg"
+                      },
+                      {
+                        "key": "to_unit",
+                        "label": "目标单位",
+                        "value": "g"
+                      },
+                      {
+                        "key": "value",
+                        "label": "输入数值",
+                        "value": "1.25"
+                      }
+                    ],
+                    "input_status": "unconfirmed",
+                    "quality": "not_assessed",
+                    "review_status": "engineering_verified_not_clinical",
+                    "provenance": {
+                      "capability_id": "calculate.units",
+                      "version": "0.1.0",
+                      "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                      "input_origin": "execution_model_proposal",
+                      "evidence": {
+                        "quote": "明确输入是1.25 kg和0.0005 L",
+                        "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                        "scope": "quantity_and_source_unit_only"
+                      },
+                      "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                      "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7"
+                    }
+                  }
+                }
+              ]
+            },
+            "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7",
+            "executed_at": 1792112237.759614,
+            "evidence": {
+              "quote": "明确输入是1.25 kg和0.0005 L",
+              "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+              "scope": "quantity_and_source_unit_only"
+            },
+            "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+            "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+            "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "protocol": "execution-capabilities/v1"
+          },
+          "restored": true
+        },
+        {
+          "sequence": 4,
+          "type": "turn.completed",
+          "time": 1792112240.4019377,
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "final_response": "验收完成，证据均为宿主回执（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`）。\n\n1. **错误修正测试（预期失败）**：`1.25 kg → mL` 返回\n   `calculation_rejected: 质量与体积不能直接换算；缺少密度时拒绝计算`\n   —— 跨量纲且无密度时按设计拒绝，未产生数值。\n\n2. **修正后成功**：`1.25 kg → g` 回执 `value=1250`，`unit=g`，`formula=1.25 × 1000 ÷ 1 = 1250 g`，execution_id `363d12e2-…a2c7`，`review_status=engineering_verified_not_clinical`，`input_status=unconfirmed`，`quality=not_assessed`。\n\n3. **子智能体（同一注册工具）**：`0.0005 L → mL` 回执 `value=0.5`，`unit=mL`，`formula=0.0005 × 1000 ÷ 1 = 0.5 mL`，execution_id `39adb97a-…e2ac`，同样为 `unconfirmed / not_assessed`。\n\n限制与状态：仅换算数值、不验证输入对应实际测量，不推导剂量或医疗建议；本次为工具错误恢复测试，不是医疗建议。两个输入值 1.25 kg 与 0.0005 L 及其目标单位仍待核对（回执 evidence scope 仅覆盖数值与原单位），质量与体积之间因缺密度不可互转。",
+          "restored": true
+        },
+        {
+          "sequence": 5,
+          "type": "workspace.restored",
+          "time": 1792112240.4019392,
+          "text": "已恢复工作区和已保存的任务记录。尚未执行新任务。"
+        },
+        {
+          "sequence": 6,
+          "type": "task.submitted",
+          "time": 1792112240.412411,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "text": "继续原项目，复述原项目代号，再用注册工具把此前用户明确提供的体积换算成mL，不需要重新提问或写脚本。"
+        },
+        {
+          "sequence": 7,
+          "type": "ready",
+          "time": 1792112241.118569,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "deepseek-flash"
+        },
+        {
+          "sequence": 8,
+          "type": "turn.started",
+          "time": 1792112241.1191926,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991"
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792112241.15577,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792112241.1565354,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "turn/start",
+                "seq": 39,
+                "time": 1792112241156,
+                "data": {
+                  "turn": 2
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "jobs.snapshot",
+          "time": 1792112241.2166586,
+          "jobs": []
+        },
+        {
+          "sequence": 12,
+          "type": "model.request",
+          "time": 1792112242.3068569,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792112242.3239603,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "assistant/message",
+                "seq": 45,
+                "time": 1792112242322,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 370,
+                    "outputTokens": 144,
+                    "cacheReadTokens": 9344,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 9858
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "runtime.event",
+          "time": 1792112242.3254642,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/call",
+                "seq": 46,
+                "time": 1792112242324,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "callId": "call_00_0N2ZR24k5M9fVoPcEAEC5557",
+                  "name": "medical_calculate",
+                  "arguments": "{\"capability_id\": \"calculate.units\", \"evidence\": \"明确输入是1.25 kg和0.0005 L\", \"input\": {\"from_unit\": \"L\", \"to_unit\": \"mL\", \"value\": \"0.0005\"}}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "capability.completed",
+          "time": 1792112242.3811162,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "result": {
+            "capability_id": "calculate.units",
+            "version": "0.1.0",
+            "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+            "input": {
+              "from_unit": "L",
+              "to_unit": "mL",
+              "value": "0.0005"
+            },
+            "data": {
+              "value": "0.5",
+              "unit": "mL",
+              "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+              "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+              "limitations": [
+                "只换算输入数值，不验证输入对应的实际测量。",
+                "不推导摄入量、药物剂量或医疗建议。"
+              ]
+            },
+            "input_origin": "execution_model_proposal",
+            "input_status": "unconfirmed",
+            "quality": "not_assessed",
+            "review_status": "engineering_verified_not_clinical",
+            "renderer": "calculation",
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "calculation:calculate.units:9f3de904-4323-40b2-aa81-b5fa38902408",
+                  "type": "calculation",
+                  "data": {
+                    "value": "0.5",
+                    "unit": "mL",
+                    "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+                    "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                    "limitations": [
+                      "只换算输入数值，不验证输入对应的实际测量。",
+                      "不推导摄入量、药物剂量或医疗建议。"
+                    ],
+                    "inputs": [
+                      {
+                        "key": "from_unit",
+                        "label": "原单位",
+                        "value": "L"
+                      },
+                      {
+                        "key": "to_unit",
+                        "label": "目标单位",
+                        "value": "mL"
+                      },
+                      {
+                        "key": "value",
+                        "label": "输入数值",
+                        "value": "0.0005"
+                      }
+                    ],
+                    "input_status": "unconfirmed",
+                    "quality": "not_assessed",
+                    "review_status": "engineering_verified_not_clinical",
+                    "provenance": {
+                      "capability_id": "calculate.units",
+                      "version": "0.1.0",
+                      "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                      "input_origin": "execution_model_proposal",
+                      "evidence": {
+                        "quote": "明确输入是1.25 kg和0.0005 L",
+                        "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                        "scope": "quantity_and_source_unit_only"
+                      },
+                      "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                      "execution_id": "9f3de904-4323-40b2-aa81-b5fa38902408"
+                    }
+                  }
+                }
+              ]
+            },
+            "execution_id": "9f3de904-4323-40b2-aa81-b5fa38902408",
+            "executed_at": 1792112242.3747008,
+            "evidence": {
+              "quote": "明确输入是1.25 kg和0.0005 L",
+              "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+              "scope": "quantity_and_source_unit_only"
+            },
+            "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+            "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+            "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+            "protocol": "execution-capabilities/v1"
+          }
+        },
+        {
+          "sequence": 16,
+          "type": "runtime.event",
+          "time": 1792112242.3877919,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "tool/result",
+                "seq": 47,
+                "time": 1792112242383,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_0N2ZR24k5M9fVoPcEAEC5557"
+                    },
+                    "toolCallId": "call_00_0N2ZR24k5M9fVoPcEAEC5557",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"capability_id\":\"calculate.units\",\"version\":\"0.1.0\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"input\":{\"from_unit\":\"L\",\"to_unit\":\"mL\",\"value\":\"0.0005\"},\"data\":{\"value\":\"0.5\",\"unit\":\"mL\",\"formula\":\"0.0005 × 1000 ÷ 1 = 0.5 mL\",\"method\":\"相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\",\"limitations\":[\"只换算输入数值，不验证输入对应的实际测量。\",\"不推导摄入量、药物剂量或医疗建议。\"]},\"input_origin\":\"execution_model_proposal\",\"input_status\":\"unconfirmed\",\"quality\":\"not_assessed\",\"review_status\":\"engineering_verified_not_clinical\",\"renderer\":\"calculation\",\"presentation\":{\"schema_version\":\"medical-ui/v1\",\"blocks\":[{\"id\":\"calculation:calculate.units:9f3de904-4323-40b2-aa81-b5fa38902408\",\"type\":\"calculation\",\"data\":{\"value\":\"0.5\",\"unit\":\"mL\",\"formula\":\"0.0005 × 1000 ÷ 1 = 0.5 mL\",\"method\":\"相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算\",\"limitations\":[\"只换算输入数值，不验证输入对应的实际测量。\",\"不推导摄入量、药物剂量或医疗建议。\"],\"inputs\":[{\"key\":\"from_unit\",\"label\":\"原单位\",\"value\":\"L\"},{\"key\":\"to_unit\",\"label\":\"目标单位\",\"value\":\"mL\"},{\"key\":\"value\",\"label\":\"输入数值\",\"value\":\"0.0005\"}],\"input_status\":\"unconfirmed\",\"quality\":\"not_assessed\",\"review_status\":\"engineering_verified_not_clinical\",\"provenance\":{\"capability_id\":\"calculate.units\",\"version\":\"0.1.0\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"input_origin\":\"execution_model_proposal\",\"evidence\":{\"quote\":\"明确输入是1.25 kg和0.0005 L\",\"source_turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"scope\":\"quantity_and_source_unit_only\"},\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"execution_id\":\"9f3de904-4323-40b2-aa81-b5fa38902408\"}}}]},\"execution_id\":\"9f3de904-4323-40b2-aa81-b5fa38902408\",\"executed_at\":1792112242.3747008,\"evidence\":{\"quote\":\"明确输入是1.25 kg和0.0005 L\",\"source_turn_id\":\"16c89eb0-d2b5-42b8-9113-3ad8fd9c871f\",\"scope\":\"quantity_and_source_unit_only\"},\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"workspace_id\":\"9831bfbc-33ea-493b-a404-608fbef9c556\",\"turn_id\":\"90ffec09-ae78-4f42-b462-eaa684bb1991\",\"protocol\":\"execution-capabilities/v1\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "3010af1d-65c6-44a8-8181-729d04f989c1"
+                  }
+                },
+                "sourceEventSeqs": [
+                  46
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 17,
+          "type": "model.request",
+          "time": 1792112243.628402,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 18,
+          "type": "runtime.event",
+          "time": 1792112243.6365857,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "assistant/message",
+                "seq": 51,
+                "time": 1792112243635,
+                "data": {
+                  "turn": 2,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 995,
+                    "outputTokens": 197,
+                    "cacheReadTokens": 9856,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 11048
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "项目代号：**capability-e56654098e966a28**。\n\n注册工具换算（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`，execution_id `9f3de904-…2408`）：\n\n- 输入：用户原文明确提供的体积 `0.0005 L`\n- 结果：**0.5 mL**\n- 公式：`0.0005 × 1000 ÷ 1 = 0.5 mL`（同为体积量纲，SI 前缀十进制换算）\n- review_status：`engineering_verified_not_clinical`；input_status：`unconfirmed`；quality：`not_assessed`\n- 限制：只换算数值，不验证输入对应的实际测量，不推导剂量或医疗建议\n\n输入 0.0005 L 及目标单位 mL 仍待核对，非医疗建议。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "type": "runtime.event",
+          "time": 1792112243.6365983,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "event": {
+                "type": "turn/end",
+                "seq": 53,
+                "time": 1792112243636,
+                "data": {
+                  "turn": 2,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 20,
+          "type": "runtime.event",
+          "time": 1792112243.6373215,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "9831bfbc-33ea-493b-a404-608fbef9c556",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 21,
+          "type": "turn.completed",
+          "time": 1792112243.6387498,
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "model_calls": 2,
+          "lifetime_calls": 2,
+          "final_response": "项目代号：**capability-e56654098e966a28**。\n\n注册工具换算（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`，execution_id `9f3de904-…2408`）：\n\n- 输入：用户原文明确提供的体积 `0.0005 L`\n- 结果：**0.5 mL**\n- 公式：`0.0005 × 1000 ÷ 1 = 0.5 mL`（同为体积量纲，SI 前缀十进制换算）\n- review_status：`engineering_verified_not_clinical`；input_status：`unconfirmed`；quality：`not_assessed`\n- 限制：只换算数值，不验证输入对应的实际测量，不推导剂量或医疗建议\n\n输入 0.0005 L 及目标单位 mL 仍待核对，非医疗建议。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "text": "合成研发验收，项目代号capability-e56654098e966a28。明确输入是1.25 kg和0.0005 L。先查询注册能力。为验证错误修正，请先实际调用注册工具尝试将1.25 kg换算成mL；缺密度时应拒绝。观察错误后改为把1.25 kg换成g。另外委托一个子智能体通过同一注册工具把0.0005 L换成mL。这只是工具错误恢复测试，不是医疗建议。不要执行脚本、联网或写文件，不要重复复核，计算回执足够，最后简短说明输入仍待核对。",
+          "status": "completed",
+          "max_calls": 16,
+          "model_calls": 6,
+          "final_response": "验收完成，证据均为宿主回执（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`）。\n\n1. **错误修正测试（预期失败）**：`1.25 kg → mL` 返回\n   `calculation_rejected: 质量与体积不能直接换算；缺少密度时拒绝计算`\n   —— 跨量纲且无密度时按设计拒绝，未产生数值。\n\n2. **修正后成功**：`1.25 kg → g` 回执 `value=1250`，`unit=g`，`formula=1.25 × 1000 ÷ 1 = 1250 g`，execution_id `363d12e2-…a2c7`，`review_status=engineering_verified_not_clinical`，`input_status=unconfirmed`，`quality=not_assessed`。\n\n3. **子智能体（同一注册工具）**：`0.0005 L → mL` 回执 `value=0.5`，`unit=mL`，`formula=0.0005 × 1000 ÷ 1 = 0.5 mL`，execution_id `39adb97a-…e2ac`，同样为 `unconfirmed / not_assessed`。\n\n限制与状态：仅换算数值、不验证输入对应实际测量，不推导剂量或医疗建议；本次为工具错误恢复测试，不是医疗建议。两个输入值 1.25 kg 与 0.0005 L 及其目标单位仍待核对（回执 evidence scope 仅覆盖数值与原单位），质量与体积之间因缺密度不可互转。"
+        },
+        {
+          "id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "text": "继续原项目，复述原项目代号，再用注册工具把此前用户明确提供的体积换算成mL，不需要重新提问或写脚本。",
+          "max_calls": 8,
+          "status": "completed",
+          "model_calls": 2,
+          "final_response": "项目代号：**capability-e56654098e966a28**。\n\n注册工具换算（capability `calculate.units` v0.1.0，registry_sha256 `896c8843…b55451`，execution_id `9f3de904-…2408`）：\n\n- 输入：用户原文明确提供的体积 `0.0005 L`\n- 结果：**0.5 mL**\n- 公式：`0.0005 × 1000 ÷ 1 = 0.5 mL`（同为体积量纲，SI 前缀十进制换算）\n- review_status：`engineering_verified_not_clinical`；input_status：`unconfirmed`；quality：`not_assessed`\n- 限制：只换算数值，不验证输入对应的实际测量，不推导剂量或医疗建议\n\n输入 0.0005 L 及目标单位 mL 仍待核对，非医疗建议。"
+        }
+      ],
+      "jobs": [],
+      "artifacts": [],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": true,
+      "history_trimmed": false,
+      "title": "合成研发验收，项目代号capability-e56654098e",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+        "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0"
+      },
+      "calculations": [
+        {
+          "capability_id": "calculate.units",
+          "version": "0.1.0",
+          "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+          "input": {
+            "value": "0.0005",
+            "from_unit": "L",
+            "to_unit": "mL"
+          },
+          "data": {
+            "value": "0.5",
+            "unit": "mL",
+            "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+            "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+            "limitations": [
+              "只换算输入数值，不验证输入对应的实际测量。",
+              "不推导摄入量、药物剂量或医疗建议。"
+            ]
+          },
+          "input_origin": "execution_model_proposal",
+          "input_status": "unconfirmed",
+          "quality": "not_assessed",
+          "review_status": "engineering_verified_not_clinical",
+          "renderer": "calculation",
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "calculation:calculate.units:39adb97a-d716-4b9a-a039-26e36a12e2ac",
+                "type": "calculation",
+                "data": {
+                  "value": "0.5",
+                  "unit": "mL",
+                  "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+                  "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                  "limitations": [
+                    "只换算输入数值，不验证输入对应的实际测量。",
+                    "不推导摄入量、药物剂量或医疗建议。"
+                  ],
+                  "inputs": [
+                    {
+                      "key": "value",
+                      "label": "输入数值",
+                      "value": "0.0005"
+                    },
+                    {
+                      "key": "from_unit",
+                      "label": "原单位",
+                      "value": "L"
+                    },
+                    {
+                      "key": "to_unit",
+                      "label": "目标单位",
+                      "value": "mL"
+                    }
+                  ],
+                  "input_status": "unconfirmed",
+                  "quality": "not_assessed",
+                  "review_status": "engineering_verified_not_clinical",
+                  "provenance": {
+                    "capability_id": "calculate.units",
+                    "version": "0.1.0",
+                    "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                    "input_origin": "execution_model_proposal",
+                    "evidence": {
+                      "quote": "明确输入是1.25 kg和0.0005 L",
+                      "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                      "scope": "quantity_and_source_unit_only"
+                    },
+                    "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                    "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac"
+                  }
+                }
+              }
+            ]
+          },
+          "execution_id": "39adb97a-d716-4b9a-a039-26e36a12e2ac",
+          "executed_at": 1792112234.5185592,
+          "evidence": {
+            "quote": "明确输入是1.25 kg和0.0005 L",
+            "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "scope": "quantity_and_source_unit_only"
+          },
+          "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+          "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "protocol": "execution-capabilities/v1"
+        },
+        {
+          "capability_id": "calculate.units",
+          "version": "0.1.0",
+          "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+          "input": {
+            "from_unit": "kg",
+            "to_unit": "g",
+            "value": "1.25"
+          },
+          "data": {
+            "value": "1250",
+            "unit": "g",
+            "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+            "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+            "limitations": [
+              "只换算输入数值，不验证输入对应的实际测量。",
+              "不推导摄入量、药物剂量或医疗建议。"
+            ]
+          },
+          "input_origin": "execution_model_proposal",
+          "input_status": "unconfirmed",
+          "quality": "not_assessed",
+          "review_status": "engineering_verified_not_clinical",
+          "renderer": "calculation",
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "calculation:calculate.units:363d12e2-93c6-4718-b86b-93fd9106a2c7",
+                "type": "calculation",
+                "data": {
+                  "value": "1250",
+                  "unit": "g",
+                  "formula": "1.25 × 1000 ÷ 1 = 1250 g",
+                  "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                  "limitations": [
+                    "只换算输入数值，不验证输入对应的实际测量。",
+                    "不推导摄入量、药物剂量或医疗建议。"
+                  ],
+                  "inputs": [
+                    {
+                      "key": "from_unit",
+                      "label": "原单位",
+                      "value": "kg"
+                    },
+                    {
+                      "key": "to_unit",
+                      "label": "目标单位",
+                      "value": "g"
+                    },
+                    {
+                      "key": "value",
+                      "label": "输入数值",
+                      "value": "1.25"
+                    }
+                  ],
+                  "input_status": "unconfirmed",
+                  "quality": "not_assessed",
+                  "review_status": "engineering_verified_not_clinical",
+                  "provenance": {
+                    "capability_id": "calculate.units",
+                    "version": "0.1.0",
+                    "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                    "input_origin": "execution_model_proposal",
+                    "evidence": {
+                      "quote": "明确输入是1.25 kg和0.0005 L",
+                      "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                      "scope": "quantity_and_source_unit_only"
+                    },
+                    "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                    "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7"
+                  }
+                }
+              }
+            ]
+          },
+          "execution_id": "363d12e2-93c6-4718-b86b-93fd9106a2c7",
+          "executed_at": 1792112237.759614,
+          "evidence": {
+            "quote": "明确输入是1.25 kg和0.0005 L",
+            "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "scope": "quantity_and_source_unit_only"
+          },
+          "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+          "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+          "turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+          "protocol": "execution-capabilities/v1"
+        },
+        {
+          "capability_id": "calculate.units",
+          "version": "0.1.0",
+          "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+          "input": {
+            "from_unit": "L",
+            "to_unit": "mL",
+            "value": "0.0005"
+          },
+          "data": {
+            "value": "0.5",
+            "unit": "mL",
+            "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+            "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+            "limitations": [
+              "只换算输入数值，不验证输入对应的实际测量。",
+              "不推导摄入量、药物剂量或医疗建议。"
+            ]
+          },
+          "input_origin": "execution_model_proposal",
+          "input_status": "unconfirmed",
+          "quality": "not_assessed",
+          "review_status": "engineering_verified_not_clinical",
+          "renderer": "calculation",
+          "presentation": {
+            "schema_version": "medical-ui/v1",
+            "blocks": [
+              {
+                "id": "calculation:calculate.units:9f3de904-4323-40b2-aa81-b5fa38902408",
+                "type": "calculation",
+                "data": {
+                  "value": "0.5",
+                  "unit": "mL",
+                  "formula": "0.0005 × 1000 ÷ 1 = 0.5 mL",
+                  "method": "相同量纲内按固定 SI 前缀比例换算；使用 Decimal 十进制计算",
+                  "limitations": [
+                    "只换算输入数值，不验证输入对应的实际测量。",
+                    "不推导摄入量、药物剂量或医疗建议。"
+                  ],
+                  "inputs": [
+                    {
+                      "key": "from_unit",
+                      "label": "原单位",
+                      "value": "L"
+                    },
+                    {
+                      "key": "to_unit",
+                      "label": "目标单位",
+                      "value": "mL"
+                    },
+                    {
+                      "key": "value",
+                      "label": "输入数值",
+                      "value": "0.0005"
+                    }
+                  ],
+                  "input_status": "unconfirmed",
+                  "quality": "not_assessed",
+                  "review_status": "engineering_verified_not_clinical",
+                  "provenance": {
+                    "capability_id": "calculate.units",
+                    "version": "0.1.0",
+                    "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+                    "input_origin": "execution_model_proposal",
+                    "evidence": {
+                      "quote": "明确输入是1.25 kg和0.0005 L",
+                      "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+                      "scope": "quantity_and_source_unit_only"
+                    },
+                    "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+                    "execution_id": "9f3de904-4323-40b2-aa81-b5fa38902408"
+                  }
+                }
+              }
+            ]
+          },
+          "execution_id": "9f3de904-4323-40b2-aa81-b5fa38902408",
+          "executed_at": 1792112242.3747008,
+          "evidence": {
+            "quote": "明确输入是1.25 kg和0.0005 L",
+            "source_turn_id": "16c89eb0-d2b5-42b8-9113-3ad8fd9c871f",
+            "scope": "quantity_and_source_unit_only"
+          },
+          "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0",
+          "workspace_id": "9831bfbc-33ea-493b-a404-608fbef9c556",
+          "turn_id": "90ffec09-ae78-4f42-b462-eaa684bb1991",
+          "protocol": "execution-capabilities/v1"
+        }
+      ]
+    },
+    {
+      "id": "04469d4a-01db-4337-bf88-5438b14af43c",
+      "directory": "/home/suyingrui/Desktop/medical-agent/.runtime/evaluations/round-capabilities-20261016/second/workspaces/04469d4a-01db-4337-bf88-5438b14af43c",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "deepseek-flash",
+      "status": "completed",
+      "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+      "final_response": "我查了本工作区的受信计算能力目录（`calculate.units`，版本 0.1.0），你要做的换算属于已注册的“可解释单位换算”，但**没有输入我无法执行，也不应替你假设数值或单位**。\n\n**目前缺少的输入（三项都缺）：**\n\n| 缺失项 | 说明 | 契约要求 |\n|---|---|---|\n| 原始数值 | 你要换算的那个数字 | 必填，字符串形式，1–25 字符，如 `\"1.25\"` |\n| 原单位 | 这个数值现在的单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n| 目标单位 | 你想换成什么单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n\n**需要你补充时注意的边界（来自能力目录的登记限制）：**\n\n- 只支持**质量（kg/g/mg）与体积（L/mL）各自的同量纲内十进制换算**；跨量纲（如 mg → mL，相当于把质量当体积）会被拒绝，因为那需要密度等额外信息，本能力不提供。\n- 不支持温度、时间、长度、国际单位（IU）、mEq、mmol 等其他单位，也不做浓度/剂量按体重折算。\n- 若你要换的是药物剂量，请同时说明数值来源（如处方、说明书、称量记录），因为结果仍需人工核对，不写入病例、不授权用药。\n\n**请按这个格式回我一行即可，例如：**「把 ___（原单位）换算成 ___（目标单位）」。\n\n你给出这三项后，我会用 `medical_calculate` 走登记公式并附宿主回执（含公式、比例与限制说明）；我不会自己编示例数值，也不会先用脚本代跑。",
+      "error": null,
+      "sequence": 15,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "task.submitted",
+          "time": 1792112243.8043485,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "text": "我想做单位换算，但尚未提供原始数值、原单位或目标单位。请告诉我缺什么；不要替我设置示例数值，不要执行脚本。"
+        },
+        {
+          "sequence": 2,
+          "type": "ready",
+          "time": 1792112244.4883869,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "deepseek-flash"
+        },
+        {
+          "sequence": 3,
+          "type": "turn.started",
+          "time": 1792112244.4892097,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d"
+        },
+        {
+          "sequence": 4,
+          "type": "runtime.event",
+          "time": 1792112244.4997034,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792112244.5003521,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792112244499,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "jobs.snapshot",
+          "time": 1792112244.514272,
+          "jobs": []
+        },
+        {
+          "sequence": 7,
+          "type": "model.request",
+          "time": 1792112245.8456793,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 8,
+          "type": "runtime.event",
+          "time": 1792112245.8580093,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792112245857,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 209,
+                    "outputTokens": 81,
+                    "cacheReadTokens": 6016,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 6306
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 9,
+          "type": "runtime.event",
+          "time": 1792112245.8587222,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792112245858,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "call_00_KBcals440HzzHC9CvkY33184",
+                  "name": "medical_capabilities",
+                  "arguments": "{}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792112245.917661,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792112245917,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_KBcals440HzzHC9CvkY33184"
+                    },
+                    "toolCallId": "call_00_KBcals440HzzHC9CvkY33184",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"protocol\":\"execution-capabilities/v1\",\"registry_sha256\":\"896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451\",\"implementation_sha256\":\"0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0\",\"capabilities\":[{\"id\":\"calculate.units\",\"name\":\"可解释单位换算\",\"version\":\"0.1.0\",\"api_version\":\"medical-capability/v1\",\"kind\":\"calculation\",\"description\":\"质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。\",\"permissions\":[],\"review_status\":\"engineering_verified_not_clinical\",\"ui\":\"calculation\",\"input_schema\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"value\",\"from_unit\",\"to_unit\"],\"properties\":{\"value\":{\"type\":\"string\",\"title\":\"输入数值\",\"minLength\":1,\"maxLength\":25},\"from_unit\":{\"type\":\"string\",\"title\":\"原单位\",\"enum\":[\"kg\",\"g\",\"mg\",\"L\",\"mL\"]},\"to_unit\":{\"type\":\"string\",\"title\":\"目标单位\",\"enum\":[\"kg\",\"g\",\"mg\",\"L\",\"mL\"]}}},\"output_schema\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"value\",\"unit\",\"formula\",\"method\",\"limitations\"],\"properties\":{\"value\":{\"type\":\"string\"},\"unit\":{\"type\":\"string\"},\"formula\":{\"type\":\"string\"},\"method\":{\"type\":\"string\"},\"limitations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}},\"example\":{\"value\":\"1.25\",\"from_unit\":\"kg\",\"to_unit\":\"g\"},\"validation\":{\"status\":\"automated_engineering_tests\",\"scope\":\"精确换算、量纲拒绝、契约和版本隔离；不评价临床意义\"}}],\"input_policy\":\"引用真实用户原文；只核对数值和原单位。目标单位仍为待核对提议，结果不写入病例。\"}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "4fe9243e-ce25-4f48-a21c-31aaae5cba74"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "model.request",
+          "time": 1792112250.222396,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 12,
+          "type": "runtime.event",
+          "time": 1792112250.2424233,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "event": {
+                "type": "assistant/message",
+                "seq": 19,
+                "time": 1792112250241,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 667,
+                    "outputTokens": 535,
+                    "cacheReadTokens": 6272,
+                    "cacheWriteTokens": 0,
+                    "totalTokens": 7474
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "我查了本工作区的受信计算能力目录（`calculate.units`，版本 0.1.0），你要做的换算属于已注册的“可解释单位换算”，但**没有输入我无法执行，也不应替你假设数值或单位**。\n\n**目前缺少的输入（三项都缺）：**\n\n| 缺失项 | 说明 | 契约要求 |\n|---|---|---|\n| 原始数值 | 你要换算的那个数字 | 必填，字符串形式，1–25 字符，如 `\"1.25\"` |\n| 原单位 | 这个数值现在的单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n| 目标单位 | 你想换成什么单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n\n**需要你补充时注意的边界（来自能力目录的登记限制）：**\n\n- 只支持**质量（kg/g/mg）与体积（L/mL）各自的同量纲内十进制换算**；跨量纲（如 mg → mL，相当于把质量当体积）会被拒绝，因为那需要密度等额外信息，本能力不提供。\n- 不支持温度、时间、长度、国际单位（IU）、mEq、mmol 等其他单位，也不做浓度/剂量按体重折算。\n- 若你要换的是药物剂量，请同时说明数值来源（如处方、说明书、称量记录），因为结果仍需人工核对，不写入病例、不授权用药。\n\n**请按这个格式回我一行即可，例如：**「把 ___（原单位）换算成 ___（目标单位）」。\n\n你给出这三项后，我会用 `medical_calculate` 走登记公式并附宿主回执（含公式、比例与限制说明）；我不会自己编示例数值，也不会先用脚本代跑。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792112250.2428179,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "event": {
+                "type": "turn/end",
+                "seq": 21,
+                "time": 1792112250242,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "runtime.event",
+          "time": 1792112250.2438242,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "04469d4a-01db-4337-bf88-5438b14af43c",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "turn.completed",
+          "time": 1792112250.2451036,
+          "turn_id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "model_calls": 2,
+          "lifetime_calls": 2,
+          "final_response": "我查了本工作区的受信计算能力目录（`calculate.units`，版本 0.1.0），你要做的换算属于已注册的“可解释单位换算”，但**没有输入我无法执行，也不应替你假设数值或单位**。\n\n**目前缺少的输入（三项都缺）：**\n\n| 缺失项 | 说明 | 契约要求 |\n|---|---|---|\n| 原始数值 | 你要换算的那个数字 | 必填，字符串形式，1–25 字符，如 `\"1.25\"` |\n| 原单位 | 这个数值现在的单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n| 目标单位 | 你想换成什么单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n\n**需要你补充时注意的边界（来自能力目录的登记限制）：**\n\n- 只支持**质量（kg/g/mg）与体积（L/mL）各自的同量纲内十进制换算**；跨量纲（如 mg → mL，相当于把质量当体积）会被拒绝，因为那需要密度等额外信息，本能力不提供。\n- 不支持温度、时间、长度、国际单位（IU）、mEq、mmol 等其他单位，也不做浓度/剂量按体重折算。\n- 若你要换的是药物剂量，请同时说明数值来源（如处方、说明书、称量记录），因为结果仍需人工核对，不写入病例、不授权用药。\n\n**请按这个格式回我一行即可，例如：**「把 ___（原单位）换算成 ___（目标单位）」。\n\n你给出这三项后，我会用 `medical_calculate` 走登记公式并附宿主回执（含公式、比例与限制说明）；我不会自己编示例数值，也不会先用脚本代跑。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "b0722ceb-62d2-4118-98ea-954d4382914d",
+          "text": "我想做单位换算，但尚未提供原始数值、原单位或目标单位。请告诉我缺什么；不要替我设置示例数值，不要执行脚本。",
+          "max_calls": 4,
+          "status": "completed",
+          "model_calls": 2,
+          "final_response": "我查了本工作区的受信计算能力目录（`calculate.units`，版本 0.1.0），你要做的换算属于已注册的“可解释单位换算”，但**没有输入我无法执行，也不应替你假设数值或单位**。\n\n**目前缺少的输入（三项都缺）：**\n\n| 缺失项 | 说明 | 契约要求 |\n|---|---|---|\n| 原始数值 | 你要换算的那个数字 | 必填，字符串形式，1–25 字符，如 `\"1.25\"` |\n| 原单位 | 这个数值现在的单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n| 目标单位 | 你想换成什么单位 | 必填，只接受 `kg` `g` `mg` `L` `mL` |\n\n**需要你补充时注意的边界（来自能力目录的登记限制）：**\n\n- 只支持**质量（kg/g/mg）与体积（L/mL）各自的同量纲内十进制换算**；跨量纲（如 mg → mL，相当于把质量当体积）会被拒绝，因为那需要密度等额外信息，本能力不提供。\n- 不支持温度、时间、长度、国际单位（IU）、mEq、mmol 等其他单位，也不做浓度/剂量按体重折算。\n- 若你要换的是药物剂量，请同时说明数值来源（如处方、说明书、称量记录），因为结果仍需人工核对，不写入病例、不授权用药。\n\n**请按这个格式回我一行即可，例如：**「把 ___（原单位）换算成 ___（目标单位）」。\n\n你给出这三项后，我会用 `medical_calculate` 走登记公式并附宿主回执（含公式、比例与限制说明）；我不会自己编示例数值，也不会先用脚本代跑。"
+        }
+      ],
+      "jobs": [],
+      "artifacts": [],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "我想做单位换算，但尚未提供原始数值、原单位或目标单位。请告诉我缺",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "896c88430827813ad4c04770984428f4277dce83ad0138e1407fb505e0b55451",
+        "implementation_sha256": "0af6adda797bbaa46507486f7450a881c08a30ab57867e7bea55e52797e14bc0"
+      },
+      "calculations": []
+    }
+  ],
+  "evaluator_sha256": "c40c81b3490649302ed965f9c7c20894956bdaecc91c3fea28ea65fc0e8d26f4",
+  "source_sha256": {
+    "src/medagent/triage.py": "fb5f9c6117f24baf73a8d5085e99235ea3c15d08fa7da767936b1f76782b0f6a",
+    "src/medagent/cli.py": "d553146d21d554b1b3a420b3de49c1cc9a7179bc4ad19c575a7117c33ccb7479",
+    "src/medagent/plugins.py": "6ac11ba78de1939086f2a7a8fb9b8dabeb229996f266ac455a5abc5f8c772705",
+    "src/medagent/backends.py": "8d56bd088e4e8d4ed688327a77292895b77038e08944883b098adb06333c538a",
+    "src/medagent/consultation.py": "db407dc61d665ed5a0f61bdc1a4d498608831da38614071ae12bb13536155cce",
+    "src/medagent/events.py": "a12c2f3caa238df7930e214c09c747b4f986f56302c132836b59a7b739189456",
+    "src/medagent/execution_store.py": "1d816287d47fc036b74381592fa29d80ba1102a8c29dd12a562f1c7894ccd27a",
+    "src/medagent/execution.py": "8ae905aaeb075038038b2017139037aa4977cc918bbf8f6229c8c9311c57917c",
+    "src/medagent/workspace.py": "c744943b284ddac1ec932c896e24e8457ed481dc2830d111a0b1f635dd475bf6",
+    "src/medagent/agent_tools.py": "5c2f4ebbd661c9550ded68dd96aa910b4d4678ae854fedd6afa168122e663b0d",
+    "src/medagent/server.py": "1dcc21ad96ad424a853e31ce45b176643a76c8b34b23b5fb501b36acc24e957a",
+    "src/medagent/agent.py": "f13191bf889340e7a9dd12c3c0a102527e97ab1ad5b7dc71f266ddf83da51979",
+    "src/medagent/interpreter.py": "558fb7dc036d9a3fd1536c8d0307132bd7e102ba9b368a3a80a0b002ef538e01",
+    "src/medagent/__init__.py": "379e07009a32543b9a6fdf7f4fe0fe6b22280bdcde9120499db9932696d43b39",
+    "src/medagent/execution_capabilities.py": "65e0e63444e7e52d23e18757887bc5c50875d395579b65a8210d5329794e136c",
+    "src/medagent/runtime.py": "8b505c55c3af458d0ce48a4a1442beb58a03c796b3468cee745f48b1873944aa",
+    "src/medagent/knowledge.py": "372656a3038e57c4c98ee71803b26156e30e25ba4c842b312e02d37dd4a746f8",
+    "src/medagent/reasoner.py": "c506a88c074741709c57573ad15d4481c2376e385942eb6b9e5bd6bb2aef2cd0",
+    "src/medagent/env_config.py": "ff669e3ede9f9990e0ac40862beae1f1e8c0a8c74dada47b5213576a3dd1ed01",
+    "src/medagent/task_intents.py": "4e238e07e00adc6591adfc691e1c7b65a9a137b3d00ad44005270c1cbd148b0b",
+    "src/medagent/presentation.py": "ce393a889dedadc6328c345b94392823439ed7511ee4de82a0a2d7a6a2a366e0",
+    "src/medagent/self_checks.py": "c6a3a5e65a8e813fe6ea2d3f71d857a34da49cebaeea3a04034f128217ca0fef",
+    "src/medagent/desktop_service.py": "e649ece32efb49274062f8ee99babfc9d86eec4cdc09f9ff5084fba624fd118b",
+    "src/medagent/domain.py": "44a93750a5b3fb3463fc3fd4198e06fe25c5fce55fb0aa94ede2b1b7cff43157",
+    "src/medagent/extensions/__init__.py": "671b1499b6b78c8d7eaff023ef1902f9b59bca86e5a5b0d0f965a3a0ce1d0ce8",
+    "src/medagent/extensions/registry.py": "ddc48783b8ab5b0fd8b77ce4751c105abee3bea90d0910c1abb10b3435419e07",
+    "src/medagent/extensions/contracts.py": "91bc2226d6f884b666d8129b86d463d118cc494fcae5f249664f5b122cb6bf7d",
+    "src/medagent/extensions/builtin.py": "0edcf12b1ccc99deb54a41005955ae443a76a62825903ddaedf00e669d510fd5",
+    "src/medagent/extensions/templates/general.json": "d01371107dff6e6c63080d0e4bd998cb7d3827122c729c9b1ef05adcbc6800b7",
+    "src/medagent/extensions/templates/history.json": "f80dcc199634cb1040358e67be440e697cd72716a928b4c6821f3d2f4b205731",
+    "src/medagent/extensions/packs/temperature.json": "3a0e95acc4a38fe8c65ff7e011a9d22a11f707c6ed1454318f789b182160431a",
+    "src/medagent/extensions/packs/location.json": "ed61598f0782bb00093b050f332cd5a719e71444265a31c16bfb6fcb1e0c0dad",
+    "src/medagent/extensions/packs/units.json": "171acbae77448a5ed7071793462a50c9360cb716b73e444dd8da8c14eb882e69",
+    "src/medagent/web/brand.svg": "6aa5f9c2dc836090b62c2cc4a33cee9689a8b8deba4cc7828ab9404194710090",
+    "src/medagent/web/app.js": "b8cf644798f127520c71e97bdcaf15f15395373b4a970219ba79d1476967f368",
+    "src/medagent/web/index.html": "639e8a7f387896882596ab64f59352742b90ea8c0fce633fef16a35a67bc573f",
+    "src/medagent/web/styles.css": "82532cbf9aca817afcd307626536f8b065d802b03395c868078e9a57e711cefe",
+    "src/medagent/web/execution-ui.js": "6889ea59db9267161325ea6525aaf3f301ad98040f0e2947bbacbc683b85c982",
+    "src/medagent/web/structured-ui.js": "036ba00c8f70f427144351d09c4f54a306059a45aef8325ba4d04db4a2754cdd",
+    "src/medagent/web/body-location.svg": "62221848e7bb474c12191d8e56c6fbbd5c6e43a50078efd1819f892cb5396ca6",
+    "src/medagent/web/__init__.py": "110cd4ca5cbad1f99686fa97cb6ee327a45083aa51ca66abb9871cffdfc40d41",
+    "src/medagent/web/temperature.svg": "7ddd919abd5372b2780cf0e33750b5e32291f314f6c2c19b393c722f240972ad",
+    "src/medagent/web/visual-question.js": "32c2927461832dd656a1d70c32e49800e0c72b10d7615f8658bc84c044055ca9",
+    "src/medagent/content/questions.json": "e6a67443675079974de9b05738141f6ccc3c6e94322f8b356bc1e4a32e927c0b",
+    "src/medagent/content/__init__.py": "3052aa55b48c259afa9bd3746085628453d39d707d6033a654b5924eee8e2ccf",
+    "integrations/dsh/execution.patch.yml": "059400eef1b850faa97719b0ffe6918e044fd9a75c822b894a89086c860e327b",
+    "integrations/dsh/isolated-entry.mjs": "8078505c33c93c19f0911d8c1c9b4bc3afc2e1caf8c3803815c934dc58c43f90",
+    "integrations/dsh/medical.patch.yml": "9505563fb050d38502f87941d1eaf316879b22e36dc2805507a40756960ff4cd",
+    "integrations/dsh/execution-capabilities.mjs": "e92edb6dfc249c6a1af69f13ab6de0ff9b2237fa8c29996b32f4ebb0db7cf8ed",
+    "integrations/dsh/execution-worker.mjs": "e91adb2dc2eaff50303557a1670bf4420a94f809448719876e9290795a7fdd1d",
+    "integrations/dsh/bridge.mjs": "15a5b008d8df9d993d81c75279f7c27e4615707cb6615a005292b5b8042fb4e6",
+    "integrations/dsh/check-artifacts.mjs": "d1bac924af3e4f52e92f36fc593e2c0787dfa206db273392b51041a4d4291307",
+    "integrations/dsh/execution-sdk.mjs": "c75c0c970cdb4b8c41b0f22741d22e1929dc60c526ff50fba629398b845e17b3",
+    "integrations/dsh/check.mjs": "9aa132f2ab9b4bc3760938fcc3b0a67ff82dea2047900c73a9462e3ebff7fcee",
+    "integrations/dsh/execution-control.mjs": "ce060025c70e8e0b20eb12643816281c2ecd94e5a78b17bb3f7ed36d47f18fe0",
+    "integrations/dsh/tests/runtime-smoke.mjs": "4eebf77e9177dc2304a9e1cd35462a320ee39e281f5b2a22a8a2c7c8b0f974cf",
+    "integrations/dsh/tests/bridge.test.mjs": "e32c09a98aff7c4759a9546bfaec4c1ccf9c2532bcc0ef64d9b220cac40038ca"
+  },
+  "gateway": {
+    "attempted_calls": 10,
+    "maximum_calls": 32,
+    "injected_failures": 0,
+    "calls": [
+      {
+        "index": 1,
+        "status": 200,
+        "duration_ms": 873
+      },
+      {
+        "index": 2,
+        "status": 200,
+        "duration_ms": 2148
+      },
+      {
+        "index": 3,
+        "status": 200,
+        "duration_ms": 3765
+      },
+      {
+        "index": 4,
+        "status": 200,
+        "duration_ms": 2038
+      },
+      {
+        "index": 5,
+        "status": 200,
+        "duration_ms": 1061
+      },
+      {
+        "index": 6,
+        "status": 200,
+        "duration_ms": 2470
+      },
+      {
+        "index": 7,
+        "status": 200,
+        "duration_ms": 1088
+      },
+      {
+        "index": 8,
+        "status": 200,
+        "duration_ms": 1217
+      },
+      {
+        "index": 9,
+        "status": 200,
+        "duration_ms": 1261
+      },
+      {
+        "index": 10,
+        "status": 200,
+        "duration_ms": 4283
+      }
+    ]
+  },
+  "attempted_calls": 10,
+  "passed": true
+}

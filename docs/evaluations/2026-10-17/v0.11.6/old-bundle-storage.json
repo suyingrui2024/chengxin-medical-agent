@@ -1,0 +1,12 @@
+{
+  "bundle": "dist/desktop/Chengxin-0.10.4-linux-x64",
+  "compressed_archive": "dist/desktop/archives/Chengxin-0.10.4-linux-x64.tar.gz",
+  "archive_sha256": "691d74a7034610806867b9fae938074268c5ae025feb4387294d36b21a5a852b",
+  "compressed_bytes": 290376500,
+  "entries_checked": 29541,
+  "file_bytes_modes_links_match": true,
+  "source_rechecked": true,
+  "active_bundle_processes": 0,
+  "restore_command": "tar -xzf dist/desktop/archives/Chengxin-0.10.4-linux-x64.tar.gz -C dist/desktop",
+  "scope": "Lossless storage compaction of one generated old bundle; frozen evaluation archives unchanged."
+}

@@ -1,0 +1,28 @@
+{
+  "scope": "Direct current demo Interpreter only; raw evidence retention and model-backed end-to-end behavior are not evaluated by this probe. No prescribing or medical efficacy claim.",
+  "cases": [
+    {
+      "synthetic_input": "没有",
+      "assertion": "absent",
+      "value": null
+    },
+    {
+      "synthetic_input": "不记得",
+      "assertion": "unknown",
+      "value": null
+    },
+    {
+      "synthetic_input": "昨晚用过药物甲，用量不清楚",
+      "assertion": "unknown",
+      "value": null
+    },
+    {
+      "synthetic_input": "昨晚用过药物甲",
+      "assertion": "present",
+      "value": "昨晚用过药物甲"
+    }
+  ],
+  "partial_known_text_classified_wholly_unknown": true,
+  "next_work": "Inspect the actual consultation/controller behavior for mixed known and uncertain narrative, then preserve supplied information without guessing unknown values.",
+  "external_model_calls": 0
+}

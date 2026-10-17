@@ -1,0 +1,13 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -515,6 +515,10 @@
+             operator = node.op
+         return f"{operator}{self._precedence_parens(node, node.operand)}"
+ 
++    def visit_unknown(self, node):
++        """Return an astroid.Unknown node as string."""
++        return "Unknown"
++
+     def visit_while(self, node):
+         """return an astroid.While node as string"""
+         whiles = f"while {node.test.accept(self)}:\n{self._stmt_list(node.body)}"

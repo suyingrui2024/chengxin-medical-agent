@@ -1,0 +1,14 @@
+
+> medical-agent-dsh-integration@0.11.6 test:ui
+> playwright test --grep full measurement reports|supplement evidence
+
+
+Running 3 tests using 1 worker
+
+(node:1023353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry (1.9s)
+  ✓  2 tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen (1.7s)
+  ✓  3 tests/ui/measurement-supplements.spec.mjs:39:1 › supplement evidence stays inert and invalid processing status falls back (267ms)
+
+  3 passed (7.7s)

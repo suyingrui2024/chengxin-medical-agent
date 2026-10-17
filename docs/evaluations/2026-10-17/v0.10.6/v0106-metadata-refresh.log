@@ -1,0 +1,13 @@
+/home/suyingrui/anaconda3/lib/python3.10/site-packages/setuptools/config/pyprojecttoml.py:108: _BetaConfiguration: Support for `[tool.setuptools]` in `pyproject.toml` is still *beta*.
+  warnings.warn(msg, _BetaConfiguration)
+[Errno 30] Read-only file system: '/home/suyingrui/anaconda3/conda-meta/history'
+[Errno 30] Read-only file system: '/home/suyingrui/anaconda3/conda-meta/history'
+[Errno 30] Read-only file system: '/home/suyingrui/anaconda3/conda-meta/history'
+[Errno 30] Read-only file system: '/home/suyingrui/anaconda3/conda-meta/history'
+running egg_info
+writing src/medagent.egg-info/PKG-INFO
+writing dependency_links to src/medagent.egg-info/dependency_links.txt
+writing entry points to src/medagent.egg-info/entry_points.txt
+writing top-level names to src/medagent.egg-info/top_level.txt
+reading manifest file 'src/medagent.egg-info/SOURCES.txt'
+writing manifest file 'src/medagent.egg-info/SOURCES.txt'

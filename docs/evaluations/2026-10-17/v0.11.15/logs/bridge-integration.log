@@ -1,0 +1,11 @@
+test_patient_api_through_real_dsh_to_validated_multi_fact_update (tests.integration.test_dsh_e2e.DshHttpIntegration) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 2.350s
+
+OK
+[17/Oct/2026 09:15:06] "POST /api/sessions HTTP/1.1" 201 -
+[17/Oct/2026 09:15:07] "POST /api/sessions/8934dbd7-5e43-4296-9bcc-eb68089471ce/messages HTTP/1.1" 200 -
+[17/Oct/2026 09:15:07] "POST /api/sessions/8934dbd7-5e43-4296-9bcc-eb68089471ce/messages HTTP/1.1" 200 -
+[17/Oct/2026 09:15:07] "POST /api/sessions/8934dbd7-5e43-4296-9bcc-eb68089471ce/messages HTTP/1.1" 200 -
+[17/Oct/2026 09:15:07] "POST /api/sessions/8934dbd7-5e43-4296-9bcc-eb68089471ce/messages HTTP/1.1" 200 -

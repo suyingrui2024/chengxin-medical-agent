@@ -1,0 +1,79 @@
+{
+  "startup": [
+    {
+      "family": "Chengxin Sans SC",
+      "sample": "澄心问诊正在准备你的工作台会谈记录仅保留到应用关闭",
+      "loaded": [
+        {
+          "family": "Chengxin Sans SC",
+          "status": "loaded"
+        }
+      ],
+      "platform_fonts": [
+        {
+          "familyName": "Noto Sans CJK SC",
+          "postScriptName": "NotoSansCJKsc-Regular",
+          "isCustomFont": true,
+          "glyphCount": 25
+        }
+      ]
+    },
+    {
+      "family": "Chengxin Serif SC",
+      "sample": "澄心问诊正在准备你的工作台会谈记录仅保留到应用关闭",
+      "loaded": [
+        {
+          "family": "Chengxin Serif SC",
+          "status": "loaded"
+        }
+      ],
+      "platform_fonts": [
+        {
+          "familyName": "Noto Serif CJK SC",
+          "postScriptName": "NotoSerifCJKsc-Regular",
+          "isCustomFont": true,
+          "glyphCount": 25
+        }
+      ]
+    }
+  ],
+  "patient": [
+    {
+      "family": "Chengxin Sans SC",
+      "sample": "跳到主要内容澄心新的问诊界面模式患者视图研发工作空间会谈记录最近出现在这里本机仅保留服务关闭究原型能力协议已连接离线演示先说哪不舒从你描述开始一起把情况理清楚助手倾听核对准备步点用次完整可以按自己话我们逐追必时帮和观察也个题有些症状变化替家人梳信息后随补充或更正输入尚未了解困扰项每渐得晰提供待确认知没动为于采集与流程评审请勿姓名证件号等身份紧急立即拨打",
+      "loaded": [
+        {
+          "family": "Chengxin Sans SC",
+          "status": "loaded"
+        }
+      ],
+      "platform_fonts": [
+        {
+          "familyName": "Noto Sans CJK SC",
+          "postScriptName": "NotoSansCJKsc-Regular",
+          "isCustomFont": true,
+          "glyphCount": 177
+        }
+      ]
+    },
+    {
+      "family": "Chengxin Serif SC",
+      "sample": "跳到主要内容澄心新的问诊界面模式患者视图研发工作空间会谈记录最近出现在这里本机仅保留服务关闭究原型能力协议已连接离线演示先说哪不舒从你描述开始一起把情况理清楚助手倾听核对准备步点用次完整可以按自己话我们逐追必时帮和观察也个题有些症状变化替家人梳信息后随补充或更正输入尚未了解困扰项每渐得晰提供待确认知没动为于采集与流程评审请勿姓名证件号等身份紧急立即拨打",
+      "loaded": [
+        {
+          "family": "Chengxin Serif SC",
+          "status": "loaded"
+        }
+      ],
+      "platform_fonts": [
+        {
+          "familyName": "Noto Serif CJK SC",
+          "postScriptName": "NotoSerifCJKsc-Regular",
+          "isCustomFont": true,
+          "glyphCount": 177
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

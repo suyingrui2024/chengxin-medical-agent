@@ -1,0 +1,134 @@
+TAP version 13
+# Subtest: bridge launches shipped profile with isolated home and excludes unrelated credentials
+ok 1 - bridge launches shipped profile with isolated home and excludes unrelated credentials
+  ---
+  duration_ms: 0.957747
+  type: 'test'
+  ...
+# Subtest: medical overlay disables shell, subprocesses and log uploading
+ok 2 - medical overlay disables shell, subprocesses and log uploading
+  ---
+  duration_ms: 8.091108
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12.276427
+TAP version 13
+# Subtest: pinned SDK compiles a nonparallel question tool
+ok 1 - pinned SDK compiles a nonparallel question tool
+  ---
+  duration_ms: 2.088603
+  type: 'test'
+  ...
+# Subtest: question waits for host input and does not invent a default
+ok 2 - question waits for host input and does not invent a default
+  ---
+  duration_ms: 2.357866
+  type: 'test'
+  ...
+# Subtest: wrong turns, expired questions and cancellation cannot supply an answer
+ok 3 - wrong turns, expired questions and cancellation cannot supply an answer
+  ---
+  duration_ms: 0.573459
+  type: 'test'
+  ...
+# Subtest: invalid or excessive questions fail without waiting
+ok 4 - invalid or excessive questions fail without waiting
+  ---
+  duration_ms: 3.139017
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12.034235
+TAP version 13
+# Subtest: delivery outcomes use the SDK job producer status, never printed claims
+ok 1 - delivery outcomes use the SDK job producer status, never printed claims
+  ---
+  duration_ms: 1.348165
+  type: 'test'
+  ...
+# Subtest: actual tool registration rejects invalid commands before launching any process
+ok 2 - actual tool registration rejects invalid commands before launching any process
+  ---
+  duration_ms: 2.7005
+  type: 'test'
+  ...
+# Subtest: only typed delivery values acquire command identity and process outcomes
+ok 3 - only typed delivery values acquire command identity and process outcomes
+  ---
+  duration_ms: 0.412892
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10.331048
+TAP version 13
+# Subtest: stdout cannot override a canonical process outcome
+ok 1 - stdout cannot override a canonical process outcome
+  ---
+  duration_ms: 1.002824
+  type: 'test'
+  ...
+# Subtest: background process detail is separate from output and producer kinds
+ok 2 - background process detail is separate from output and producer kinds
+  ---
+  duration_ms: 0.26946
+  type: 'test'
+  ...
+# Subtest: nested calls and missing call coordinates do not acquire invented identity
+ok 3 - nested calls and missing call coordinates do not acquire invented identity
+  ---
+  duration_ms: 0.227349
+  type: 'test'
+  ...
+# Subtest: active preparation and stopping work cannot be treated as quiescent
+ok 4 - active preparation and stopping work cannot be treated as quiescent
+  ---
+  duration_ms: 0.788596
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8.160492
+TAP version 13
+# Subtest: the pinned SDK accepts and registers the real workspace tool definition
+ok 1 - the pinned SDK accepts and registers the real workspace tool definition
+  ---
+  duration_ms: 1.801002
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6.680348

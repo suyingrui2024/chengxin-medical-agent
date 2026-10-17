@@ -1,0 +1,55 @@
+{
+  "backend": "compatible",
+  "layout": "legacy",
+  "model": "deepseek-flash",
+  "prompt_sha256": "e875543520b36d1f3544278f27460d3a70ea52782fc2e1f6aa7e476ee64c9dcd",
+  "prefix_sha256": "f003c4716e07a77c2c4aaaac968bedff941ec3440945d5036895e0c949c64636",
+  "synthetic_only": true,
+  "maximum_calls": 3,
+  "cases": [
+    {
+      "id": "adult_multi",
+      "passed": true,
+      "checks": {
+        "decision_envelope_valid": true
+      },
+      "probe_only": true
+    },
+    {
+      "id": "caregiver",
+      "passed": true,
+      "checks": {
+        "decision_envelope_valid": true
+      },
+      "probe_only": true
+    },
+    {
+      "id": "unknown_negative",
+      "passed": true,
+      "checks": {
+        "decision_envelope_valid": true
+      },
+      "probe_only": true
+    }
+  ],
+  "harness_sha256": "2b4ffcc6abb76b3b742c2b558ccd786b25fcbb724f29cdbf13f41306848c51be",
+  "engine_sha256": "6d1ee5b172a0967bb2376a11d3918428535ea39721ed0552d9b37987448d590a",
+  "case_set_sha256": "2bddf838f718ce298cf8ce46567a7b31701f3a090073f5bb16cde21019c8ed56",
+  "metrics": {
+    "completed_model_calls": 3,
+    "usage": {
+      "prompt_tokens": 9967,
+      "completion_tokens": 435,
+      "total_tokens": 10402,
+      "prompt_cache_hit_tokens": 4224,
+      "prompt_cache_miss_tokens": 5743
+    },
+    "reported_models": [
+      "deepseek-flash"
+    ],
+    "cache_hit_ratio": 0.423798535166048,
+    "median_call_ms": 1353
+  },
+  "attempted_calls": 3,
+  "passed_cases": 3
+}

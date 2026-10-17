@@ -1,0 +1,49 @@
+
+> medical-agent-dsh-integration@0.10.0 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native clarification
+
+
+Running 1 test using 1 worker
+
+(node:622919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history (18.1s)
+
+
+  1) tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('.execution-question:not(.execution-question-history)').locator('h3')
+    Expected: "请补充本次复核的备注。"
+    Received: "需求有冲突：要保留现有告警吗？"
+    Timeout:  15000ms
+
+    Call log:
+      - Expect "toHaveText" locator('.execution-question:not(.execution-question-history)').locator('h3') with timeout 15000ms
+      - waiting for locator('.execution-question:not(.execution-question-history)').locator('h3')
+        34 × locator resolved to <h3>需求有冲突：要保留现有告警吗？</h3>
+           - unexpected value "需求有冲突：要保留现有告警吗？"
+
+
+      193 |       .getByRole("button", { name: "保留告警，只改文案", exact: true })
+      194 |       .click();
+    > 195 |     await expect(active.locator("h3")).toHaveText("请补充本次复核的备注。", {
+          |                                        ^
+      196 |       timeout: 15000,
+      197 |     });
+      198 |     await expect(active).toContainText("子任务");
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/clarifications.spec.mjs:195:40
+
+    Error Context: test-results/desktop/clarifications-native-clar-80b7d-sponse-and-restores-history/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/clarifications-native-clar-80b7d-sponse-and-restores-history/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/clarifications-native-clar-80b7d-sponse-and-restores-history/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history 

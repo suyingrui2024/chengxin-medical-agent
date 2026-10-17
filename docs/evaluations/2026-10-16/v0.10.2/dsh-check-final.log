@@ -1,0 +1,39 @@
+
+> medical-agent-dsh-integration@0.10.2 dsh:check
+> node integrations/dsh/check.mjs
+
+{
+  "dsh_version": "0.2.0-rc.2",
+  "active_plugins": [
+    "sdk-app-startup",
+    "sdk-jsonrpc-server",
+    "deepseek-llm-api-extensions",
+    "llm-deepseek",
+    "sandbox",
+    "session-projection",
+    "sandbox-policy",
+    "timer",
+    "llm",
+    "session",
+    "session-title",
+    "system-prompt",
+    "tools",
+    "mcp-resources",
+    "agent",
+    "jobs",
+    "invariants",
+    "session-invariant",
+    "agent-invariant",
+    "scope-invariant",
+    "agent-loop-invariant",
+    "agent-loop",
+    "sessions"
+  ],
+  "model_facing_host_tools": 0,
+  "execution": {
+    "shell_adapter": "file:///opt/medical-agent/integrations/dsh/execution-shell.mjs",
+    "default_wait_ms": 10000,
+    "maximum_wait_ms": 30000,
+    "background_handoff": true
+  }
+}

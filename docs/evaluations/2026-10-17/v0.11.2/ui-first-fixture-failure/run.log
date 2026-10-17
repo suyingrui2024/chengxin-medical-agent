@@ -1,0 +1,45 @@
+
+Running 2 tests using 1 worker
+
+(node:887212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/uncertain-reports.spec.mjs:4:1 › unresolved narratives remain visible and editable through a complete consultation (30.2s)
+(node:887494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/ui/uncertain-reports.spec.mjs:14:1 › unresolved reports render inertly, validate their contract and preserve older summaries (518ms)
+
+
+  1) tests/ui/uncertain-reports.spec.mjs:4:1 › unresolved narratives remain visible and editable through a complete consultation 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '暂时跳过', exact: true })
+
+
+       at ../fixtures/uncertainty-flow.mjs:44
+
+      42 |     if (["summary", "closed"].includes(data.state.phase)) break;
+      43 |     if (data.state.active_task) {
+    > 44 |       await page.getByRole("button", { name: "暂时跳过", exact: true }).click();
+         |                                                                     ^
+      45 |     } else {
+      46 |       const text = answers[data.state.active_question];
+      47 |       if (!text)
+        at exerciseUncertainReports (/home/suyingrui/Desktop/medical-agent/tests/fixtures/uncertainty-flow.mjs:44:69)
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/uncertain-reports.spec.mjs:8:3
+
+    Error Context: test-results/ui/uncertain-reports-unresolv-e1b67-ugh-a-complete-consultation/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/uncertain-reports-unresolv-e1b67-ugh-a-complete-consultation/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/uncertain-reports-unresolv-e1b67-ugh-a-complete-consultation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/uncertain-reports.spec.mjs:4:1 › unresolved narratives remain visible and editable through a complete consultation 
+  1 passed (35.5s)

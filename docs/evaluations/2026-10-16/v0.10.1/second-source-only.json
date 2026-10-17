@@ -1,0 +1,10 @@
+{
+  "model_requests": 0,
+  "scope": "Source behavior and existing tests only; no new regression check. Does not rescore or replace the failed second report.",
+  "verification": {
+    "passed": true,
+    "stdout": "clarified behavior and existing/regression tests passed\n",
+    "stderr": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+    "exit_code": 0
+  }
+}

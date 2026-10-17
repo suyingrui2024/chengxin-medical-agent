@@ -1,0 +1,30 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "scope": "Actual applicable registered fever task -> accepted reading -> history -> summary -> new axillary reading and scripted retest request. Not live-model error-rate or clinical accuracy validation.",
+  "new_user_input": "我刚刚又测了一次腋温40.1℃，想重新测量。",
+  "reply_kind": "summary",
+  "latest_temperature_fact": {
+    "key": "temperature_c",
+    "value": 38.25,
+    "assertion": "present",
+    "source": "patient",
+    "turn_id": "27830f43-1165-4a66-8745-b712a5fe8dd4",
+    "recorded_at": "2026-10-16T19:31:47.272616+00:00",
+    "quality": "not_assessed",
+    "supersedes": null,
+    "fact_id": "12fe1e25-6693-4086-bbe9-4e7bf93973c8",
+    "evidence": "腋温38.25℃"
+  },
+  "previous_reading_unchanged": true,
+  "retest_tool_errors": [
+    {
+      "tool": "show_self_check",
+      "result": {
+        "ok": false,
+        "error": "任务未注册、不适用或已经尝试"
+      }
+    }
+  ],
+  "repeat_measurement_update_available": false
+}

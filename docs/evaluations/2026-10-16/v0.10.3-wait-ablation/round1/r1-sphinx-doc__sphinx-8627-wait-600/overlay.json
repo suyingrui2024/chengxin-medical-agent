@@ -1,0 +1,9 @@
+{
+  "files": {
+    "regressions/test_typing_invalid_builtin_classes.py": "f7ef4cba2f6c919a14df8a094b14a58df5b7c7136e5fa9d38f7ed3dd7896929b",
+    "sphinx/util/typing.py": "b4a1b18a28ffde3b2898c82365c5e5928198a73bef42698faf59e8a0e49a17bf"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

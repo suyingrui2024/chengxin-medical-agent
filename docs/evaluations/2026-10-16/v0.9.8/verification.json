@@ -1,0 +1,64 @@
+{
+  "version": "0.9.8",
+  "backend_tests_passed": 159,
+  "ui_scenarios_passed": 21,
+  "native_source_scenarios_passed": 8,
+  "native_package_scenarios_passed": 8,
+  "bridge_and_status_assertions_passed": 6,
+  "format_check_passed": true,
+  "primary_runs": 16,
+  "primary_provider_requests": 336,
+  "primary_source_correctness": {
+    "product": {
+      "attempts": 8,
+      "source_correctness_passed": 6
+    },
+    "official-sdk": {
+      "attempts": 8,
+      "source_correctness_passed": 5
+    }
+  },
+  "primary_joint_score": {
+    "product": {
+      "attempts": 8,
+      "passed": 6,
+      "requests": 144,
+      "execution_duration_ms": 752889
+    },
+    "official-sdk": {
+      "attempts": 8,
+      "passed": 0,
+      "requests": 192,
+      "execution_duration_ms": 863299
+    },
+    "paired_outcomes": {
+      "both_passed": 0,
+      "product_only": 6,
+      "official_only": 0,
+      "neither_passed": 2
+    }
+  },
+  "clarification_runs": 2,
+  "clarification_provider_requests": 24,
+  "clarification_source_correctness": {
+    "product": {
+      "attempts": 1,
+      "source_correctness_passed": 1
+    },
+    "official-sdk": {
+      "attempts": 1,
+      "source_correctness_passed": 0
+    }
+  },
+  "cumulative_real_provider_requests": 360,
+  "maximum_requests": 384,
+  "all_forwarded_requests_http_200": true,
+  "online_source_files_unchanged": 102,
+  "package_matching_files": 75,
+  "installed_locked_packages_verified": 544,
+  "scope": "Additional manually chosen known DEV tasks with explicit file contracts; SQL issue/upstream acceptance differ. Clarification changes requirements and budgets and is reported separately. Prior scores unchanged.",
+  "full_dsh_parity_proven": false,
+  "clinical_validation_complete": false,
+  "archived_implementation_outcomes_reproduced": 18,
+  "replay_model_calls": 0
+}

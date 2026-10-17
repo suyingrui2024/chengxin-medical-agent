@@ -1,0 +1,1 @@
+{"passed": true, "attempted_calls": 9, "cases": [{"id": "complete_and_corrected", "passed": true, "failure": null}, {"id": "missing_extent", "passed": true, "failure": null}, {"id": "uncertain_extent", "passed": true, "failure": null}, {"id": "uncertain_location", "passed": true, "failure": null}]}

@@ -1,0 +1,42 @@
+{
+  "matplotlib__matplotlib-25498": {
+    "target": "lib/matplotlib/tests/test_colorbar.py::test_colorbar_extension_shape[png]",
+    "result": {
+      "passed": true,
+      "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.10.12, pytest-7.4.4, pluggy-1.3.0\nrootdir: /workspace\nconfigfile: pytest.ini\nplugins: mock-3.11.1\ncollected 1 item\n\nlib/matplotlib/tests/test_colorbar.py .                                  [100%]\n\n============================== 1 passed in 1.23s ===============================\n\n",
+      "stderr": "\n",
+      "exit_code": 0,
+      "signal": null
+    }
+  },
+  "pallets__flask-4045": {
+    "target": "tests/test_basic.py::test_method_route_no_methods",
+    "result": {
+      "passed": true,
+      "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.10.12, pytest-7.4.4, pluggy-1.3.0\nrootdir: /workspace\nconfigfile: setup.cfg\nplugins: mock-3.11.1\ncollected 1 item\n\ntests/test_basic.py .                                                    [100%]\n\n============================== 1 passed in 0.12s ===============================\n\n",
+      "stderr": "\n",
+      "exit_code": 0,
+      "signal": null
+    }
+  },
+  "sphinx-doc__sphinx-8474": {
+    "target": "tests/test_build_html.py::test_html4_output",
+    "result": {
+      "passed": true,
+      "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.9.20, pytest-7.4.4, pluggy-1.3.0\nlibraries: Sphinx-3.4.0+, docutils-0.16\nbase tempdir: /tmp/pytest-of-unknown/pytest-0\nrootdir: /workspace\nconfigfile: setup.cfg\nplugins: mock-3.11.1\ncollected 1 item\n\ntests/test_build_html.py .                                               [100%]\n\n=============================== warnings summary ===============================\nsphinx/util/docutils.py:45\n  /workspace/sphinx/util/docutils.py:45: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.\n    __version_info__ = tuple(LooseVersion(docutils.__version__).version)\n\nsphinx/util/rst.py:56\n  /workspace/sphinx/util/rst.py:56: DeprecationWarning: 'environmentfilter' is renamed to 'pass_environment', the old name will be removed in Jinja 3.1.\n    def heading(env: Environment, text: str, level: int = 1) -> str:\n\ntests/test_build_html.py::test_html4_output\n  /workspace/sphinx/jinja2glue.py:106: DeprecationWarning: 'contextfunction' is renamed to 'pass_context', the old name will be removed in Jinja 3.1.\n    def warning(context: Dict, message: str, *args: Any, **kwargs: Any) -> str:\n\ntests/test_build_html.py::test_html4_output\n  /workspace/sphinx/jinja2glue.py:184: DeprecationWarning: 'contextfunction' is renamed to 'pass_context', the old name will be removed in Jinja 3.1.\n    self.environment.globals['debug'] = contextfunction(pformat)\n\ntests/test_build_html.py::test_html4_output\n  /workspace/sphinx/jinja2glue.py:186: DeprecationWarning: 'contextfunction' is renamed to 'pass_context', the old name will be removed in Jinja 3.1.\n    self.environment.globals['accesskey'] = contextfunction(accesskey)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 1 passed, 5 warnings in 1.76s =========================\n\n",
+      "stderr": "\n",
+      "exit_code": 0,
+      "signal": null
+    }
+  },
+  "sympy__sympy-20049": {
+    "target": "sympy/physics/vector/tests/test_point.py::test_point_v1pt_theorys",
+    "result": {
+      "passed": true,
+      "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.10.12, pytest-7.4.4, pluggy-1.3.0\narchitecture: 64-bit\ncache:        yes\nground types: python \n\nrootdir: /workspace\nconfigfile: pytest.ini\nplugins: mock-3.11.1\ncollected 1 item\n\nsympy/physics/vector/tests/test_point.py .                               [100%]\n\n=============================== warnings summary ===============================\nsympy/external/importtools.py:4\n  /workspace/sympy/external/importtools.py:4: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives\n    from distutils.version import LooseVersion\n\n.benchmark_dependencies/_pytest/config/__init__.py:1373\n  /workspace/.benchmark_dependencies/_pytest/config/__init__.py:1373: PytestConfigWarning: Unknown config option: doctestplus\n  \n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 1 passed, 2 warnings in 0.19s =========================\n\n",
+      "stderr": "\n",
+      "exit_code": 0,
+      "signal": null
+    }
+  }
+}

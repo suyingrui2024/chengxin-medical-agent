@@ -1,0 +1,10 @@
+{
+  "name": "cpython-3.9.20+20241002-x86_64-unknown-linux-gnu-install_only.tar.gz",
+  "version": "3.9.20",
+  "release_tag": "20241002",
+  "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20241002/cpython-3.9.20%2B20241002-x86_64-unknown-linux-gnu-install_only.tar.gz",
+  "sha256_url": "https://github.com/astral-sh/python-build-standalone/releases/download/20241002/cpython-3.9.20%2B20241002-x86_64-unknown-linux-gnu-install_only.tar.gz.sha256",
+  "sha256": "fec849569158e5e46610621d7da91b02dca2cc5f66dd49cc0f85d7469c8f5a84",
+  "bytes": 26326845,
+  "scope": "Historical Sphinx test environment only; not the product interpreter."
+}

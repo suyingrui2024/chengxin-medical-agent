@@ -1,0 +1,92 @@
+{
+  "id": "calculate.glucose",
+  "name": "血糖单位换算",
+  "version": "0.1.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "仅换算明确的血糖（葡萄糖）读数：mmol/L与mg/dL；使用常用系数18，显示近似标记、公式、来源和适用范围。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "patient_form": "unit_conversion/v2",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["value", "from_unit", "to_unit"],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "输入数值",
+        "minLength": 1,
+        "maxLength": 25
+      },
+      "from_unit": {
+        "type": "string",
+        "title": "原单位",
+        "enum": ["mmol/L", "mg/dL"]
+      },
+      "to_unit": {
+        "type": "string",
+        "title": "目标单位",
+        "enum": ["mmol/L", "mg/dL"]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "formula",
+      "method",
+      "limitations",
+      "approximate",
+      "precision_policy"
+    ],
+    "properties": {
+      "value": {
+        "type": "string"
+      },
+      "unit": {
+        "type": "string"
+      },
+      "formula": {
+        "type": "string"
+      },
+      "method": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "approximate": {
+        "type": "boolean"
+      },
+      "precision_policy": {
+        "type": "string"
+      }
+    }
+  },
+  "example": {
+    "value": "10",
+    "from_unit": "mmol/L",
+    "to_unit": "mg/dL"
+  },
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "固定18近似系数、双向换算、出处、输入核对与版本绑定；不评价临床意义"
+  },
+  "patient_input_policy": "blood_glucose",
+  "references": [
+    {
+      "title": "American Diabetes Association · Common Terms",
+      "url": "https://diabetes.org/about-diabetes/common-terms",
+      "section": "Mg/dL与Mmol/L词条的文字换算规则；采用常用近似系数18。",
+      "accessed": "2026-10-17"
+    }
+  ]
+}

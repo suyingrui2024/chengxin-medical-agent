@@ -1,0 +1,23 @@
+--- a/src/marshmallow/schema.py
++++ b/src/marshmallow/schema.py
+@@ -861,6 +861,11 @@
+         return data
+ 
+     def _invoke_field_validators(self, unmarshal, data, many):
++        # If deserialization failed before producing any data (e.g. a nested
++        # field received a value of the wrong type), there is nothing to
++        # validate, so bail out instead of subscripting ``None``.
++        if data is None:
++            return
+         for attr_name in self.__processors__[(VALIDATES, False)]:
+             validator = getattr(self, attr_name)
+             validator_kwargs = validator.__marshmallow_kwargs__[(VALIDATES, False)]
+@@ -918,7 +923,7 @@
+ 
+             if pass_many:
+                 validator = functools.partial(validator, many=many)
+-            if many and not pass_many:
++            if many and not pass_many and data is not None:
+                 for idx, item in enumerate(data):
+                     try:
+                         unmarshal.run_validator(validator,

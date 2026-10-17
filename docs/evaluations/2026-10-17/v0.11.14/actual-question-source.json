@@ -1,0 +1,8 @@
+{
+  "actual_question": "你说的头痛具体在头部哪个区域或哪一侧？包括范围是否清楚？",
+  "source_report": "live-first.json",
+  "source_report_sha256": "af3c5bb471846d06197ac3074b71a16ce53581cd45e441903c2aa453db7815d4",
+  "original_fixture_sha256": "eae61815587d2d3fc8dbd5022e357057c2eb2308fa6d64be0ad21fba6de94d46",
+  "replay_fixture_sha256": "63666962b86f2b92b6c268dec45ad61ef70eb89636361f91cbbd146b1c4b4eaf",
+  "changes": "Replace only the question constant with the recorded actual model question and resolve its existing snapshot helper import absolutely. Local scripted model; no further provider requests."
+}

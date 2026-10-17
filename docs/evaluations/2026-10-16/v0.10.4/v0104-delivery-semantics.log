@@ -1,0 +1,15 @@
+test_a_different_passing_command_cannot_erase_an_unresolved_check (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_a_required_command_cannot_be_downgraded_with_the_optional_flag (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_check_timeout_stops_its_job_instead_of_leaving_a_late_write (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_child_check_uses_shared_budget_and_retains_child_lineage (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_failed_check_reaches_model_then_one_repair_retests_same_command_and_restores (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_inspection_only_records_failure_without_authorizing_repair (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_no_repair_renews_an_exhausted_model_budget (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_unresolved_check_is_not_completion_and_repair_does_not_loop (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_user_cancel_interrupts_a_check_and_same_runtime_accepts_next_task (tests.test_execution_delivery.DeliveryRuntimeTests) ... ok
+test_invalid_status_payloads_cannot_enter_history_as_valid_observations (tests.test_execution_observations.ObservationContractTests) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 17.432s
+
+OK

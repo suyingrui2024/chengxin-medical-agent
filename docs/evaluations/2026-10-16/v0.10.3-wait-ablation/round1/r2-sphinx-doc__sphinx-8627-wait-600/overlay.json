@@ -1,0 +1,9 @@
+{
+  "files": {
+    "regressions/test_struct_annotation.py": "ce43519aa8b8cb3dd04b69115a669c7e6ac3f5374a6df813eca7acadcdfc08cc",
+    "sphinx/util/typing.py": "b8899520aa94b72d17d8a2d2416e11e5aeb54dd7570f2c512f879e3474f27e43"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

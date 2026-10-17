@@ -1,0 +1,43 @@
+{
+  "schema": "illustration-labels/v1",
+  "font": "NotoSansCJKsc-Regular.otf",
+  "font_sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+  "method": "Local glyph outlines, explicit advances and original text anchors; title/desc and label text retained. No external font requests inside SVG images.",
+  "files": [
+    {
+      "file": "temperature.svg",
+      "editable_source": "assets/illustrations/temperature.svg",
+      "source_sha256": "7ddd919abd5372b2780cf0e33750b5e32291f314f6c2c19b393c722f240972ad",
+      "output_sha256": "e30454060707b222912273af89ee6b6e353efee7b558e1e80b37043d0ebe71af",
+      "labels": [
+        "1",
+        "先擦干腋窝",
+        "先阅读体温计说明书",
+        "2",
+        "腋窝中央",
+        "探头贴在腋窝中央",
+        "位置示意，不代表动作已正确",
+        "3",
+        "夹紧手臂，等测量完成",
+        "等待时长以设备说明为准"
+      ],
+      "outlined_glyphs": 52
+    },
+    {
+      "file": "body-location.svg",
+      "editable_source": "assets/illustrations/body-location.svg",
+      "source_sha256": "62221848e7bb474c12191d8e56c6fbbd5c6e43a50078efd1819f892cb5396ca6",
+      "output_sha256": "e8c3cdb9e969c2c8f5d32c31b3e721f73e0d75362bc614a6424b6f2dccd72753",
+      "labels": [
+        "头/面部",
+        "胸部",
+        "腹部",
+        "四肢",
+        "背/腰",
+        "正面",
+        "背面"
+      ],
+      "outlined_glyphs": 11
+    }
+  ]
+}

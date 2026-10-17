@@ -1,0 +1,77 @@
+
+> medical-agent-dsh-integration@0.11.7 test:desktop
+> playwright test --config playwright.desktop.config.mjs
+
+
+Running 26 tests using 1 worker
+
+(node:1042766) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (788ms)
+  ✘   2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (6.0s)
+(node:1043292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   3 tests/desktop/artifacts.spec.mjs:13:1 › native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline (10.7s)
+  ✓   4 tests/desktop/assertion-flow.spec.mjs:15:1 › native controller rejects false denials and keeps unknown history through summary corrections (1.2s)
+  ✓   5 tests/desktop/changes.spec.mjs:45:1 › desktop reviews actual file changes and restores ten-minute history offline (4.7s)
+  ✓   6 tests/desktop/check-inputs.spec.mjs:13:1 › native rejected check inputs remain visible while corrected actual checks complete (2.8s)
+  ✓   7 tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history (6.4s)
+  ✓   8 tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history (6.4s)
+  ✓   9 tests/desktop/directory.spec.mjs:12:1 › native directory pages reach deep files, expose incomplete coverage, reject stale pages and ignore old workspace responses (25.5s)
+  ✓  10 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (4.3s)
+  ✓  11 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (18.3s)
+  ✓  12 tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output (5.3s)
+  ✓  13 tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (10.7s)
+  ✓  14 tests/desktop/freshness.spec.mjs:13:1 › native checks mark changed inputs as needing revalidation and accept the actual new check (3.2s)
+  ✓  15 tests/desktop/glucose-calculation.spec.mjs:14:1 › native glucose conversion keeps sources folded and resumes the medical interview (1.4s)
+  ✓  16 tests/desktop/measurement-supplements.spec.mjs:14:1 › native measurement supplements survive failures and uncertainty without duplicate readings (1.7s)
+  ✓  17 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.5s)
+  ✓  18 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.2s)
+  ✓  19 tests/desktop/present-provenance.spec.mjs:14:1 › native known reports retain scoped sources and replace them after correction (1.4s)
+  ✓  20 tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline (3.8s)
+  ✓  21 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat observations preserve history, resume and reassess risk (1.6s)
+  ✓  22 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x760 (1.2s)
+  ✓  23 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 (1.2s)
+  ✓  24 tests/desktop/startup-close.spec.mjs:11:1 › closing the startup window stops a delayed sidecar without a blocking error dialog (2.4s)
+  ✓  25 tests/desktop/uncertain-reports.spec.mjs:12:1 › native patient summary preserves unresolved reports and correction history (1.8s)
+  ✓  26 tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting (1.5s)
+
+
+  1) tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('#capability-test-result')
+    Expected substring: "1250 g"
+    Received string:    "血糖单位换算已计算 · 输入待核对≈ 180 mg/dL输入数值10原单位mmol/L目标单位mg/dL10 mmol/L × 18 ≈ 180 mg/dL按ADA说明的血糖常用约定系数18换算，使用Decimal十进制运算；该系数为近似约定。输入待核对 · 质量未评价。结果未写为临床事实。执行依据与限制calculate.glucose @ 0.1.0来源：研发独立输入能力组合：dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee仅换算血糖（葡萄糖）读数的单位，不适用于其他化验项目或食物糖分。不核验测量设备、采样条件或读数真实性；不判断高低，不推算饮食、诊断或药物剂量。同单位保留输入值；跨单位显示最多4位小数，ROUND_HALF_UP；非零极小值改保留4位有效数字以免显示为零。显示位数不代表测量精度。公式来源American Diabetes Association · Common TermsMg/dL与Mmol/L词条的文字换算规则；采用常用近似系数18。 · 核对日期 2026-10-17"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" locator('#capability-test-result') with timeout 5000ms
+      - waiting for locator('#capability-test-result')
+        14 × locator resolved to <div aria-live="polite" id="capability-test-result">…</div>
+           - unexpected value "血糖单位换算已计算 · 输入待核对≈ 180 mg/dL输入数值10原单位mmol/L目标单位mg/dL10 mmol/L × 18 ≈ 180 mg/dL按ADA说明的血糖常用约定系数18换算，使用Decimal十进制运算；该系数为近似约定。输入待核对 · 质量未评价。结果未写为临床事实。执行依据与限制calculate.glucose @ 0.1.0来源：研发独立输入能力组合：dfee9fb48ac7a6d946b4ae7a90d85dfb437f596a5105193981729f9ee26a0dee仅换算血糖（葡萄糖）读数的单位，不适用于其他化验项目或食物糖分。不核验测量设备、采样条件或读数真实性；不判断高低，不推算饮食、诊断或药物剂量。同单位保留输入值；跨单位显示最多4位小数，ROUND_HALF_UP；非零极小值改保留4位有效数字以免显示为零。显示位数不代表测量精度。公式来源American Diabetes Association · Common TermsMg/dL与Mmol/L词条的文字换算规则；采用常用近似系数18。 · 核对日期 2026-10-17"
+
+
+      128 |     await window.locator('.nav-item[data-view="capabilities"]').click();
+      129 |     await window.getByRole("button", { name: "执行并查看公式" }).click();
+    > 130 |     await expect(window.locator("#capability-test-result")).toContainText(
+          |                                                             ^
+      131 |       "1250 g",
+      132 |     );
+      133 |     await window.locator('.nav-item[data-view="tasks"]').click();
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/app.spec.mjs:130:61
+
+    Error Context: test-results/desktop/app-desktop-app-owns-its-w-f9390-ecar-and-shutdown-lifecycle/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/app-desktop-app-owns-its-w-f9390-ecar-and-shutdown-lifecycle/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/app-desktop-app-owns-its-w-f9390-ecar-and-shutdown-lifecycle/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle 
+  25 passed (2.3m)

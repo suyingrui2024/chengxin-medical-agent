@@ -1,0 +1,285 @@
+{
+  "model_requests": 0,
+  "reused_completed_oracle_runs": true,
+  "candidate_replays": 24,
+  "negative_controls": 1,
+  "results": [
+    {
+      "run": "r1-sphinx-doc__sphinx-8627-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-sphinx-doc__sphinx-8627-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-sphinx-doc__sphinx-7975-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-sphinx-doc__sphinx-7975-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-sympy__sympy-21627-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-sympy__sympy-21627-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-pallets__flask-5063-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-pallets__flask-5063-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-matplotlib__matplotlib-25311-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-matplotlib__matplotlib-25311-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-matplotlib__matplotlib-26011-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-matplotlib__matplotlib-26011-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-sphinx-doc__sphinx-8627-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-sphinx-doc__sphinx-8627-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-sphinx-doc__sphinx-7975-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-sphinx-doc__sphinx-7975-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-sympy__sympy-21627-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-sympy__sympy-21627-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-pallets__flask-5063-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-pallets__flask-5063-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-matplotlib__matplotlib-25311-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-matplotlib__matplotlib-25311-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-matplotlib__matplotlib-26011-official-sdk",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r2-matplotlib__matplotlib-26011-product",
+      "negative_control": false,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "r1-sphinx-doc__sphinx-8627-official-sdk",
+      "negative_control": true,
+      "checks": {
+        "source_boolean_matches": true,
+        "oracle_completed": true,
+        "pytest_exit_matches": true,
+        "all_node_outcomes_match": true,
+        "original_bug_reproduced": true
+      },
+      "all_passed": true
+    }
+  ],
+  "all_source_exit_and_node_results_match": true
+}

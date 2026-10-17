@@ -1,0 +1,35 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -637,6 +637,9 @@
+     def visit_uninferable(self, node):
+         return str(node)
+ 
++    def visit_unknown(self, node):
++        return "Unknown"
++
+     def visit_property(self, node):
+         return node.function.accept(self)
+ 
+--- a/tests/unittest_unknown_as_string.py
++++ b/tests/unittest_unknown_as_string.py
+@@ -0,0 +1,20 @@
++# Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
++# For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
++
++"""Regression test for as_string() of an astroid Unknown node."""
++
++# pylint: disable=missing-docstring,invalid-name
++
++import pytest
++
++from astroid import nodes
++
++
++@pytest.mark.parametrize("node", [nodes.Unknown()])
++def test_unknown_as_string(node):
++    assert node.as_string() == "Unknown"
++
++
++def test_unknown_as_string_matches_name():
++    node = nodes.Unknown()
++    assert node.as_string() == node.name

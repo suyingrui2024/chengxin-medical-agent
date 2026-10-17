@@ -1,0 +1,8 @@
+reformatted src/medagent/agent.py
+reformatted src/medagent/agent_tools.py
+reformatted src/medagent/consultation.py
+reformatted src/medagent/observations.py
+reformatted tests/test_observation_completion.py
+
+All done! ✨ 🍰 ✨
+5 files reformatted, 1 file left unchanged.

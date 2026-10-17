@@ -1,0 +1,17 @@
+test_invalid_feedback_after_restoring_an_earlier_offer_keeps_the_restored_identity (tests.test_task_interactions.TaskInteractionTests) ... FAIL
+
+======================================================================
+FAIL: test_invalid_feedback_after_restoring_an_earlier_offer_keeps_the_restored_identity (tests.test_task_interactions.TaskInteractionTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_task_interactions.py", line 97, in test_invalid_feedback_after_restoring_an_earlier_offer_keeps_the_restored_identity
+    self.assertEqual(invalid.task["interaction_id"], first.task["interaction_id"])
+AssertionError: 'offer:27104b09-ef53-440b-a35e-b4a7dd842698' != 'offer:72038272-18a3-4648-93db-bcf820c06564'
+- offer:27104b09-ef53-440b-a35e-b4a7dd842698
++ offer:72038272-18a3-4648-93db-bcf820c06564
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.013s
+
+FAILED (failures=1)

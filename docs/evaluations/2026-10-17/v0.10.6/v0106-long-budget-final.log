@@ -1,0 +1,6 @@
+test_ten_minute_budget_survives_old_rpc_deadline_and_collects_same_job (tests.test_execution_long_budget.LongBudgetTests) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 186.414s
+
+OK

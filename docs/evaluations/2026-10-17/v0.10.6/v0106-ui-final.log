@@ -1,0 +1,35 @@
+
+> medical-agent-dsh-integration@0.10.6 test:ui
+> playwright test
+
+
+Running 24 tests using 1 worker
+
+(node:805791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/ui/capabilities.spec.mjs:9:1 › patient view removes developer navigation while keeping the same conversation (553ms)
+  ✓   2 tests/ui/capabilities.spec.mjs:35:1 › capability workspace calculates without writing cases and pins old session versions (977ms)
+  ✓   3 tests/ui/patient-calculation.spec.mjs:7:1 › patient calculation confirms editable inputs, recovers a lost response and stays readable on mobile (1.6s)
+  ✓   4 tests/ui/readiness.spec.mjs:3:1 › workspace mode cannot lose an interaction before module hydration (398ms)
+  ✓   5 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late response (825ms)
+  ✓   6 tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late error (897ms)
+  ✓   7 tests/ui/urgent-interrupt.spec.mjs:87:1 › priority help preserves a failed request draft and works at a narrow viewport (533ms)
+  ✓   8 tests/ui/visual-consultation.spec.mjs:25:1 › visual choices show actual questions, keep history available and send one explicit answer (1.1s)
+  ✓   9 tests/ui/visual-consultation.spec.mjs:67:1 › degree scale never submits on selection and reflects edits to the actual draft (1.1s)
+  ✓  10 tests/ui/visual-consultation.spec.mjs:105:1 › body location uses a deliberate selection and confirmation, preserving self-report quality (1.2s)
+  ✓  11 tests/ui/visual-consultation.spec.mjs:134:1 › mobile visual screen and degree scale stay readable without overlapping targets (965ms)
+  ✓  12 tests/ui/visual-consultation.spec.mjs:174:1 › custom and malformed visual components preserve question meaning and isolate unsafe data (281ms)
+  ✓  13 tests/ui/visual-consultation.spec.mjs:221:1 › the smallest desktop window keeps the actual response controls inside the viewport (769ms)
+  ✓  14 tests/ui/workspace.spec.mjs:9:1 › patient conversation, self-check, history, evidence and export use actual server state (3.3s)
+  ✓  15 tests/ui/workspace.spec.mjs:125:1 › structured components isolate errors and keep patient text inert (249ms)
+  ✓  16 tests/ui/workspace.spec.mjs:179:1 › unknown result components produce a visible fallback instead of disappearing (350ms)
+  ✓  17 tests/ui/workspace.spec.mjs:197:1 › an emergency notice remains visible through the structured renderer (400ms)
+  ✓  18 tests/ui/workspace.spec.mjs:219:1 › settings are real, keep old sessions, and never return credentials (1.2s)
+  ✓  19 tests/ui/workspace.spec.mjs:249:1 › task library preview cannot write observations and has step navigation (621ms)
+  ✓  20 tests/ui/workspace.spec.mjs:275:1 › mobile layout has no horizontal overflow and exposes records and navigation (931ms)
+  ✓  21 tests/ui/workspace.spec.mjs:324:1 › editing a fact updates the actual case and retains the previous value (634ms)
+  ✓  22 tests/ui/workspace.spec.mjs:352:1 › a stale fact editor preserves the draft and refreshes the current record (874ms)
+  ✓  23 tests/ui/workspace.spec.mjs:399:1 › changing the consultation subject opens a separate case and retains the original (517ms)
+  ✓  24 tests/ui/workspace.spec.mjs:431:1 › a lost response recovers persisted progress and patient markup stays plain text (538ms)
+
+  24 passed (25.4s)

@@ -1,0 +1,49 @@
+
+> medical-agent-dsh-integration@0.11.1 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/directory.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:864387) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/directory.spec.mjs:12:1 › native directory pages reach deep files, expose incomplete coverage, reject stale pages and ignore old workspace responses (23.4s)
+
+
+  1) tests/desktop/directory.spec.mjs:12:1 › native directory pages reach deep files, expose incomplete coverage, reject stale pages and ignore old workspace responses 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  getByLabel('文件相对路径')
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" getByLabel('文件相对路径') with timeout 5000ms
+      - waiting for getByLabel('文件相对路径')
+        14 × locator resolved to <input disabled maxlength="4096" spellcheck="false" autocomplete="off" aria-label="文件相对路径" id="execution-file-path" placeholder="例如 outputs/chart.png"/>
+           - unexpected value "disabled"
+
+
+      187 |     await page.getByLabel("文件相对路径").focus();
+      188 |     const old = await requested;
+    > 189 |     await expect(page.getByLabel("文件相对路径")).toBeEnabled();
+          |                                             ^
+      190 |     await expect(page.getByLabel("文件相对路径")).toBeFocused();
+      191 |     await page.keyboard.press("End");await page.keyboard.type("x");
+      192 |     await expect(page.getByLabel("文件相对路径")).toHaveValue(`${deep}/result.csvx`);
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/directory.spec.mjs:189:45
+
+    Error Context: test-results/desktop/directory-native-directory-3533c-ore-old-workspace-responses/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/directory-native-directory-3533c-ore-old-workspace-responses/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/directory-native-directory-3533c-ore-old-workspace-responses/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/directory.spec.mjs:12:1 › native directory pages reach deep files, expose incomplete coverage, reject stale pages and ignore old workspace responses 

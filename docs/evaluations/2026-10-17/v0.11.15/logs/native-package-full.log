@@ -1,0 +1,490 @@
+
+> medical-agent-dsh-integration@0.11.15 test:desktop
+> playwright test --config playwright.desktop.config.mjs --output=.runtime/location-answers-20261017/native-package-full-results
+
+
+Running 34 tests using 1 worker
+
+(node:1304886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (731ms)
+  ✓   2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.6s)
+  ✓   3 tests/desktop/artifacts.spec.mjs:13:1 › native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline (10.2s)
+  ✓   4 tests/desktop/assertion-flow.spec.mjs:15:1 › native controller rejects false denials and keeps unknown history through summary corrections (1.2s)
+  ✓   5 tests/desktop/calculation-supplements.spec.mjs:14:1 › native mixed calculation keeps supplementary history, retries and later corrections (1.8s)
+  ✓   6 tests/desktop/changes.spec.mjs:45:1 › desktop reviews actual file changes and restores ten-minute history offline (4.6s)
+  ✓   7 tests/desktop/check-inputs.spec.mjs:13:1 › native rejected check inputs remain visible while corrected actual checks complete (2.8s)
+  ✓   8 tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history (6.4s)
+  ✓   9 tests/desktop/consultation-subjects.spec.mjs:14:1 › native consultation changes preserve the old case and prepare a separate editable draft (1.6s)
+  ✓  10 tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history (5.6s)
+  ✓  11 tests/desktop/directory.spec.mjs:12:1 › native directory pages reach deep files, expose incomplete coverage, reject stale pages and ignore old workspace responses (25.6s)
+  ✓  12 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (5.4s)
+  ✓  13 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (15.8s)
+  ✓  14 tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output (5.6s)
+  ✓  15 tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (10.8s)
+  ✓  16 tests/desktop/freshness.spec.mjs:13:1 › native checks mark changed inputs as needing revalidation and accept the actual new check (3.1s)
+  ✓  17 tests/desktop/glucose-calculation.spec.mjs:15:3 › native glucose conversion keeps sources folded and resumes the medical interview at 900x760 (1.5s)
+  ✓  18 tests/desktop/glucose-calculation.spec.mjs:15:3 › native glucose conversion keeps sources folded and resumes the medical interview at 900x680 (1.4s)
+  ✓  19 tests/desktop/location-answers.spec.mjs:13:1 › native fine location answers preserve corrected choices and source (1.8s)
+  ✓  20 tests/desktop/measurement-supplements.spec.mjs:14:1 › native measurement supplements survive failures and uncertainty without duplicate readings (1.7s)
+  ✓  21 tests/desktop/observation-completion.spec.mjs:14:1 › native location clarification and completion retry preserve the original task and one fact (1.6s)
+  ✓  22 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.6s)
+  ✘  23 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.7s)
+(node:1310791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  24 tests/desktop/present-provenance.spec.mjs:14:1 › native known reports retain scoped sources and replace them after correction (84ms)
+(node:1310820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  25 tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline (95ms)
+(node:1310857) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  26 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat observations preserve history, resume and reassess risk (99ms)
+(node:1310886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  27 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x760 (89ms)
+(node:1310915) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  28 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 (82ms)
+(node:1310944) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  29 tests/desktop/self-check-conversation.spec.mjs:14:1 › native self-check conversation retains drafts and confirms original location evidence (77ms)
+(node:1310973) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  30 tests/desktop/self-check-drafts.spec.mjs:13:1 › native self-check drafts restore selections and keep measurement progress through errors (75ms)
+(node:1311002) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  31 tests/desktop/startup-close.spec.mjs:11:1 › closing the startup window stops a delayed sidecar without a blocking error dialog (89ms)
+(node:1311031) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  32 tests/desktop/uncertain-reports.spec.mjs:12:1 › native patient summary preserves unresolved reports and correction history (82ms)
+(node:1311060) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  33 tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting (1.6s)
+  ✓  34 tests/desktop/visual-answer-drafts.spec.mjs:11:1 › native degree selection preserves independent patient text and confirms explicitly at 900x680 (1.4s)
+
+
+  1) tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.execution-file').filter({ hasText: 'followup.txt' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.execution-file').filter({ hasText: 'followup.txt' }) with timeout 5000ms
+      - waiting for locator('.execution-file').filter({ hasText: 'followup.txt' })
+
+
+      199 |     await expect(
+      200 |       page.locator(".execution-file").filter({ hasText: "followup.txt" }),
+    > 201 |     ).toBeVisible();
+          |       ^
+      202 |     expect(await readFile(path.join(directory, "followup.txt"), "utf8")).toBe(
+      203 |       "resumed",
+      204 |     );
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/persistence.spec.mjs:201:7
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/persistence-desktop-restor-7e5d0-es-the-original-SDK-session/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/persistence-desktop-restor-7e5d0-es-the-original-SDK-session/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/persistence-desktop-restor-7e5d0-es-the-original-SDK-session/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/desktop/present-provenance.spec.mjs:14:1 › native known reports retain scoped sources and replace them after correction 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1310803
+      - [pid=1310803][err] [1310805:1017/091946.807208:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310803][err] Some features may not be available.
+      - [pid=1310803][err] [1310806:1017/091946.809221:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310803][err] Some features may not be available.
+      - [pid=1310803][err] Debugger listening on ws://127.0.0.1:37703/247c7043-fad4-4664-84cb-240599074718
+      - [pid=1310803][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:37703/247c7043-fad4-4664-84cb-240599074718
+      - <ws connected> ws://127.0.0.1:37703/247c7043-fad4-4664-84cb-240599074718
+      - [pid=1310803][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:37703/247c7043-fad4-4664-84cb-240599074718 code=1006 reason=
+      - [pid=1310803] <kill>
+      - [pid=1310803] <will force kill>
+      - [pid=1310803] exception while trying to kill process: Error: kill ESRCH
+      - [pid=1310803] <process did exit: exitCode=1, signal=null>
+      - [pid=1310803] starting temporary directories cleanup
+      - [pid=1310803] finished temporary directories cleanup
+
+
+      31 |   try {
+      32 |     const executablePath = process.env.MEDAGENT_DESKTOP_BINARY;
+    > 33 |     app = await electron.launch({
+         |           ^
+      34 |       executablePath,
+      35 |       args: executablePath ? [] : [root],
+      36 |       env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/present-provenance.spec.mjs:33:11
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/present-provenance-native--2470e-place-them-after-correction/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/present-provenance-native--2470e-place-them-after-correction/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/present-provenance-native--2470e-place-them-after-correction/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1310840
+      - [pid=1310840][err] [1310843:1017/091947.220498:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310840][err] Some features may not be available.
+      - [pid=1310840][err] [1310842:1017/091947.221232:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310840][err] Some features may not be available.
+      - [pid=1310840][err] Debugger listening on ws://127.0.0.1:40895/81f4fff7-27e0-41e6-9ceb-21b937b59b55
+      - [pid=1310840][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:40895/81f4fff7-27e0-41e6-9ceb-21b937b59b55
+      - <ws connected> ws://127.0.0.1:40895/81f4fff7-27e0-41e6-9ceb-21b937b59b55
+      - [pid=1310840][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:40895/81f4fff7-27e0-41e6-9ceb-21b937b59b55 code=1006 reason=
+      - [pid=1310840] <kill>
+      - [pid=1310840] <will force kill>
+      - [pid=1310840] <process did exit: exitCode=1, signal=null>
+      - [pid=1310840] starting temporary directories cleanup
+      - [pid=1310840] finished temporary directories cleanup
+
+
+      160 |   let app;
+      161 |   try {
+    > 162 |     app = await launch(environment);
+          |           ^
+      163 |     let page = await app.firstWindow();
+      164 |     const errors = [];
+      165 |     page.on("pageerror", (error) => errors.push(error.message));
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/projects.spec.mjs:162:11
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/projects-native-project-pi-34c2a-review-and-restores-offline/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/projects-native-project-pi-34c2a-review-and-restores-offline/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/projects-native-project-pi-34c2a-review-and-restores-offline/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat observations preserve history, resume and reassess risk 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1310869
+      - [pid=1310869][err] [1310871:1017/091947.643162:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310869][err] Some features may not be available.
+      - [pid=1310869][err] [1310872:1017/091947.651993:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310869][err] Some features may not be available.
+      - [pid=1310869][err] Debugger listening on ws://127.0.0.1:38807/9f14254b-f8fd-4af4-ac04-3685c8eb0e8e
+      - [pid=1310869][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:38807/9f14254b-f8fd-4af4-ac04-3685c8eb0e8e
+      - <ws connected> ws://127.0.0.1:38807/9f14254b-f8fd-4af4-ac04-3685c8eb0e8e
+      - [pid=1310869][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:38807/9f14254b-f8fd-4af4-ac04-3685c8eb0e8e code=1006 reason=
+      - [pid=1310869] <kill>
+      - [pid=1310869] <will force kill>
+      - [pid=1310869] <process did exit: exitCode=1, signal=null>
+      - [pid=1310869] starting temporary directories cleanup
+      - [pid=1310869] finished temporary directories cleanup
+
+
+      37 |       try {
+      38 |         const executablePath = process.env.MEDAGENT_DESKTOP_BINARY;
+    > 39 |         app = await electron.launch({
+         |               ^
+      40 |           executablePath,
+      41 |           args: executablePath ? [] : [root],
+      42 |           env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/repeated-observations.spec.mjs:39:15
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-736a7-ry-resume-and-reassess-risk/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-736a7-ry-resume-and-reassess-risk/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-736a7-ry-resume-and-reassess-risk/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x760 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1310898
+      - [pid=1310898][err] [1310900:1017/091948.078831:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310898][err] Some features may not be available.
+      - [pid=1310898][err] [1310901:1017/091948.083384:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310898][err] Some features may not be available.
+      - [pid=1310898][err] Debugger listening on ws://127.0.0.1:38017/4a176298-3ff6-4e2e-baf2-a1e50c7c1e66
+      - [pid=1310898][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:38017/4a176298-3ff6-4e2e-baf2-a1e50c7c1e66
+      - <ws connected> ws://127.0.0.1:38017/4a176298-3ff6-4e2e-baf2-a1e50c7c1e66
+      - [pid=1310898][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:38017/4a176298-3ff6-4e2e-baf2-a1e50c7c1e66 code=1006 reason=
+      - [pid=1310898] <kill>
+      - [pid=1310898] <will force kill>
+      - [pid=1310898] <process did exit: exitCode=1, signal=null>
+      - [pid=1310898] starting temporary directories cleanup
+      - [pid=1310898] finished temporary directories cleanup
+
+
+      37 |       try {
+      38 |         const executablePath = process.env.MEDAGENT_DESKTOP_BINARY;
+    > 39 |         app = await electron.launch({
+         |               ^
+      40 |           executablePath,
+      41 |           args: executablePath ? [] : [root],
+      42 |           env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/repeated-observations.spec.mjs:39:15
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-cb473--options-visible-at-900x760/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-cb473--options-visible-at-900x760/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-cb473--options-visible-at-900x760/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1310927
+      - [pid=1310927][err] [1310929:1017/091948.500807:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310927][err] Some features may not be available.
+      - [pid=1310927][err] [1310930:1017/091948.501898:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310927][err] Some features may not be available.
+      - [pid=1310927][err] Debugger listening on ws://127.0.0.1:43489/c2c13b7c-1cc2-4107-8b5c-4f07b0ef404e
+      - [pid=1310927][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:43489/c2c13b7c-1cc2-4107-8b5c-4f07b0ef404e
+      - <ws connected> ws://127.0.0.1:43489/c2c13b7c-1cc2-4107-8b5c-4f07b0ef404e
+      - [pid=1310927][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:43489/c2c13b7c-1cc2-4107-8b5c-4f07b0ef404e code=1006 reason=
+      - [pid=1310927] <kill>
+      - [pid=1310927] <will force kill>
+      - [pid=1310927] exception while trying to kill process: Error: kill ESRCH
+      - [pid=1310927] <process did exit: exitCode=1, signal=null>
+      - [pid=1310927] starting temporary directories cleanup
+      - [pid=1310927] finished temporary directories cleanup
+
+
+      37 |       try {
+      38 |         const executablePath = process.env.MEDAGENT_DESKTOP_BINARY;
+    > 39 |         app = await electron.launch({
+         |               ^
+      40 |           executablePath,
+      41 |           args: executablePath ? [] : [root],
+      42 |           env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/repeated-observations.spec.mjs:39:15
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-c6a70--options-visible-at-900x680/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-c6a70--options-visible-at-900x680/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/repeated-observations-nati-c6a70--options-visible-at-900x680/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) tests/desktop/self-check-conversation.spec.mjs:14:1 › native self-check conversation retains drafts and confirms original location evidence 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1310956
+      - [pid=1310956][err] [1310958:1017/091948.908700:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310956][err] Some features may not be available.
+      - [pid=1310956][err] [1310959:1017/091948.910877:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310956][err] Some features may not be available.
+      - [pid=1310956][err] Debugger listening on ws://127.0.0.1:38773/a9f46d3f-302a-4d90-a594-177bc600475b
+      - [pid=1310956][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:38773/a9f46d3f-302a-4d90-a594-177bc600475b
+      - <ws connected> ws://127.0.0.1:38773/a9f46d3f-302a-4d90-a594-177bc600475b
+      - [pid=1310956][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:38773/a9f46d3f-302a-4d90-a594-177bc600475b code=1006 reason=
+      - [pid=1310956] <kill>
+      - [pid=1310956] <will force kill>
+      - [pid=1310956] <process did exit: exitCode=1, signal=null>
+      - [pid=1310956] starting temporary directories cleanup
+      - [pid=1310956] finished temporary directories cleanup
+
+
+      31 |   try {
+      32 |     const executablePath = process.env.MEDAGENT_DESKTOP_BINARY;
+    > 33 |     app = await electron.launch({
+         |           ^
+      34 |       executablePath,
+      35 |       args: executablePath ? [] : [root],
+      36 |       env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/self-check-conversation.spec.mjs:33:11
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/self-check-conversation-na-0df3a--original-location-evidence/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/self-check-conversation-na-0df3a--original-location-evidence/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/self-check-conversation-na-0df3a--original-location-evidence/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) tests/desktop/self-check-drafts.spec.mjs:13:1 › native self-check drafts restore selections and keep measurement progress through errors 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1310985
+      - [pid=1310985][err] [1310987:1017/091949.320291:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310985][err] Some features may not be available.
+      - [pid=1310985][err] [1310988:1017/091949.320430:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1310985][err] Some features may not be available.
+      - [pid=1310985][err] Debugger listening on ws://127.0.0.1:42653/8c87536d-3237-423b-b8f2-2efa290c954b
+      - [pid=1310985][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:42653/8c87536d-3237-423b-b8f2-2efa290c954b
+      - <ws connected> ws://127.0.0.1:42653/8c87536d-3237-423b-b8f2-2efa290c954b
+      - [pid=1310985][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:42653/8c87536d-3237-423b-b8f2-2efa290c954b code=1006 reason=
+      - [pid=1310985] <kill>
+      - [pid=1310985] <will force kill>
+      - [pid=1310985] <process did exit: exitCode=1, signal=null>
+      - [pid=1310985] starting temporary directories cleanup
+      - [pid=1310985] finished temporary directories cleanup
+
+
+      24 |   let app;
+      25 |   try {
+    > 26 |     app = await electron.launch({
+         |           ^
+      27 |       executablePath,
+      28 |       args: executablePath ? [] : [root],
+      29 |       env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/self-check-drafts.spec.mjs:26:11
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/self-check-drafts-native-s-56824-ent-progress-through-errors/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/self-check-drafts-native-s-56824-ent-progress-through-errors/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/self-check-drafts-native-s-56824-ent-progress-through-errors/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) tests/desktop/startup-close.spec.mjs:11:1 › closing the startup window stops a delayed sidecar without a blocking error dialog 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1311014
+      - [pid=1311014][err] [1311016:1017/091949.722954:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1311014][err] Some features may not be available.
+      - [pid=1311014][err] [1311017:1017/091949.729934:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1311014][err] Some features may not be available.
+      - [pid=1311014][err] Debugger listening on ws://127.0.0.1:39173/7c0e56a5-e979-47dd-a009-03df6a28ee1d
+      - [pid=1311014][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:39173/7c0e56a5-e979-47dd-a009-03df6a28ee1d
+      - <ws connected> ws://127.0.0.1:39173/7c0e56a5-e979-47dd-a009-03df6a28ee1d
+      - [pid=1311014][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:39173/7c0e56a5-e979-47dd-a009-03df6a28ee1d code=1006 reason=
+      - [pid=1311014] <kill>
+      - [pid=1311014] <will force kill>
+      - [pid=1311014] <process did exit: exitCode=1, signal=null>
+      - [pid=1311014] starting temporary directories cleanup
+      - [pid=1311014] finished temporary directories cleanup
+
+
+      31 |   let desktop;
+      32 |   try {
+    > 33 |     desktop = await electron.launch({
+         |               ^
+      34 |       executablePath,
+      35 |       args: executablePath ? [] : [root],
+      36 |       env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/startup-close.spec.mjs:33:15
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/startup-close-closing-the--b91a6-out-a-blocking-error-dialog/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/startup-close-closing-the--b91a6-out-a-blocking-error-dialog/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/startup-close-closing-the--b91a6-out-a-blocking-error-dialog/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) tests/desktop/uncertain-reports.spec.mjs:12:1 › native patient summary preserves unresolved reports and correction history 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/Chengxin --no-sandbox --inspect=0 --remote-debugging-port=0
+      - <launched> pid=1311043
+      - [pid=1311043][err] [1311045:1017/091950.132339:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1311043][err] Some features may not be available.
+      - [pid=1311043][err] [1311046:1017/091950.135259:ERROR:ui/base/resource/resource_bundle.cc:1105] Failed to load /home/suyingrui/Desktop/medical-agent/dist/desktop/Chengxin-0.11.15-linux-x64/resources.pak
+      - [pid=1311043][err] Some features may not be available.
+      - [pid=1311043][err] Debugger listening on ws://127.0.0.1:35567/d54c8c34-6261-4280-b59d-c4975a8c1f6d
+      - [pid=1311043][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:35567/d54c8c34-6261-4280-b59d-c4975a8c1f6d
+      - <ws connected> ws://127.0.0.1:35567/d54c8c34-6261-4280-b59d-c4975a8c1f6d
+      - [pid=1311043][err] Debugger attached.
+      - <ws disconnected> ws://127.0.0.1:35567/d54c8c34-6261-4280-b59d-c4975a8c1f6d code=1006 reason=
+      - [pid=1311043] <kill>
+      - [pid=1311043] <will force kill>
+      - [pid=1311043] <process did exit: exitCode=1, signal=null>
+      - [pid=1311043] starting temporary directories cleanup
+      - [pid=1311043] finished temporary directories cleanup
+
+
+      23 |   let desktop;
+      24 |   try {
+    > 25 |     desktop = await electron.launch({
+         |               ^
+      26 |       executablePath,
+      27 |       args: executablePath ? [] : [root],
+      28 |       env,
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/uncertain-reports.spec.mjs:25:15
+
+    Error Context: .runtime/location-answers-20261017/native-package-full-results/uncertain-reports-native-p-65ed2-orts-and-correction-history/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/native-package-full-results/uncertain-reports-native-p-65ed2-orts-and-correction-history/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/native-package-full-results/uncertain-reports-native-p-65ed2-orts-and-correction-history/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10 failed
+    tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session 
+    tests/desktop/present-provenance.spec.mjs:14:1 › native known reports retain scoped sources and replace them after correction 
+    tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline 
+    tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat observations preserve history, resume and reassess risk 
+    tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x760 
+    tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 
+    tests/desktop/self-check-conversation.spec.mjs:14:1 › native self-check conversation retains drafts and confirms original location evidence 
+    tests/desktop/self-check-drafts.spec.mjs:13:1 › native self-check drafts restore selections and keep measurement progress through errors 
+    tests/desktop/startup-close.spec.mjs:11:1 › closing the startup window stops a delayed sidecar without a blocking error dialog 
+    tests/desktop/uncertain-reports.spec.mjs:12:1 › native patient summary preserves unresolved reports and correction history 
+  24 passed (2.2m)

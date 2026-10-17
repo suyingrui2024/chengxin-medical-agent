@@ -1,0 +1,1 @@
+{"model_requests": 0, "links_recorded_without_following": 3, "host_external_target_not_exposed": true, "protected_file_restored": true, "isolated_relative_and_workspace_absolute_links_work": true, "oracle": {"passed": true, "stdout": "isolated link replay verified\n", "stderr": "", "exit_code": 0, "signal": null}}

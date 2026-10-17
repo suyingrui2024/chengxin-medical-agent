@@ -1,0 +1,106 @@
+TAP version 13
+# Subtest: bridge launches shipped profile with isolated home and excludes unrelated credentials
+ok 1 - bridge launches shipped profile with isolated home and excludes unrelated credentials
+  ---
+  duration_ms: 0.968443
+  type: 'test'
+  ...
+# Subtest: medical overlay disables shell, subprocesses and log uploading
+ok 2 - medical overlay disables shell, subprocesses and log uploading
+  ---
+  duration_ms: 8.542387
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12.776278
+TAP version 13
+# Subtest: pinned SDK compiles a nonparallel question tool
+ok 1 - pinned SDK compiles a nonparallel question tool
+  ---
+  duration_ms: 2.127596
+  type: 'test'
+  ...
+# Subtest: question waits for host input and does not invent a default
+ok 2 - question waits for host input and does not invent a default
+  ---
+  duration_ms: 2.293595
+  type: 'test'
+  ...
+# Subtest: wrong turns, expired questions and cancellation cannot supply an answer
+ok 3 - wrong turns, expired questions and cancellation cannot supply an answer
+  ---
+  duration_ms: 0.530328
+  type: 'test'
+  ...
+# Subtest: invalid or excessive questions fail without waiting
+ok 4 - invalid or excessive questions fail without waiting
+  ---
+  duration_ms: 3.137788
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12.121676
+TAP version 13
+# Subtest: stdout cannot override a canonical process outcome
+ok 1 - stdout cannot override a canonical process outcome
+  ---
+  duration_ms: 0.812179
+  type: 'test'
+  ...
+# Subtest: background process detail is separate from output and producer kinds
+ok 2 - background process detail is separate from output and producer kinds
+  ---
+  duration_ms: 0.257324
+  type: 'test'
+  ...
+# Subtest: nested calls and missing call coordinates do not acquire invented identity
+ok 3 - nested calls and missing call coordinates do not acquire invented identity
+  ---
+  duration_ms: 0.19397
+  type: 'test'
+  ...
+# Subtest: active preparation and stopping work cannot be treated as quiescent
+ok 4 - active preparation and stopping work cannot be treated as quiescent
+  ---
+  duration_ms: 0.707494
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8.023694
+TAP version 13
+# Subtest: the pinned SDK accepts and registers the real workspace tool definition
+ok 1 - the pinned SDK accepts and registers the real workspace tool definition
+  ---
+  duration_ms: 1.786982
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6.775538

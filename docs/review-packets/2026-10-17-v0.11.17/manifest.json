@@ -1,0 +1,43 @@
+{
+  "schema": "medical-content-review-packet/v1",
+  "app_version": "0.11.17",
+  "clinical_review": "pending",
+  "source_files": 22,
+  "items_by_kind": {
+    "question": 15,
+    "risk": 6,
+    "self_check": 2,
+    "calculation": 2,
+    "context": 3
+  },
+  "files": {
+    "index.html": "b49ab49399a8d389a6506a44a7445b02c7b376967bec2c55df5414d64f7da0e2",
+    "readme.txt": "dd15185c8aa5112369c490a19dfaaca187a2cf51104c0ce695216929fd82ca9f",
+    "records.json": "518630449dacbb923b0badfdd0f1dec5e4e08e6cc5b738a9e53e4e15ee9c5999",
+    "review-form.csv": "16fb41ff872abbfddc8f49feb05324e72460817c56c2dc345595d66970cdf09c",
+    "review.css": "40ad6c269df78363178acfdaf5492b6b4d1c167b1816be8ee74b512fd7c9f0dc",
+    "review.js": "bca37e7893a831b5faa560af97ace2cbef014c6fb209683e4b9826be630f07c3",
+    "sources/assets/illustrations/body-location.svg": "62221848e7bb474c12191d8e56c6fbbd5c6e43a50078efd1819f892cb5396ca6",
+    "sources/assets/illustrations/temperature.svg": "7ddd919abd5372b2780cf0e33750b5e32291f314f6c2c19b393c722f240972ad",
+    "sources/package.json": "752d3f33846b1d1bbca065929f4ddfd6dd29be027f17b4c7204ee4e7216ad78c",
+    "sources/scripts/export_review_packet.py": "75b4c9875409241509ea8c11783c0118b3110550ce100e6cc5eaaaaa19bc3da9",
+    "sources/src/medagent/content/agent_prompt.txt": "d46bb0aef1f1177205f6869e1ae2e6e2fd7fcc2dac9825790ee98bf8f78783d1",
+    "sources/src/medagent/content/questions.json": "e6a67443675079974de9b05738141f6ccc3c6e94322f8b356bc1e4a32e927c0b",
+    "sources/src/medagent/extensions/builtin.py": "f600f7a159fa8e34874b7e1bdcb8c0135b469b7bd2cc42488c6132d7d7847d65",
+    "sources/src/medagent/extensions/glucose.py": "c1e8a5c869e006b10c6a2ac4718981f601f436a10065845c51ac55bd090c4ae2",
+    "sources/src/medagent/extensions/input_evidence.py": "c0001e5b4a84e7b317e993f5c2aa883b003ca9fa1bf6ecabaad90952a19beb49",
+    "sources/src/medagent/extensions/packs/glucose.json": "b0491bb09d663c1eb60dbaefab11b7163fc41c57bc46f0840fc6076c0926de49",
+    "sources/src/medagent/extensions/packs/location.json": "67ced0e32e33cabf00e9a49640021f61fb33a6f0bc5dda7314f8b97b3d84f219",
+    "sources/src/medagent/extensions/packs/temperature.json": "9d2beed3ced8163789d3df5b4a17d9352514f97e7c9b59c8404bd5d798ee28a4",
+    "sources/src/medagent/extensions/packs/units.json": "2686961b665dc7683bbadd12474a08bfbf31df5912d94102441aeeab9db13768",
+    "sources/src/medagent/extensions/templates/general.json": "952f4c68bd1a6c5cc64bdb05bac035ba4df7abd38dd195c7bf7e195a0e64b4f8",
+    "sources/src/medagent/interpreter.py": "249c205f2da4978d12de734a07e53419f7e3fb2012e4bfed6490b983d2340b84",
+    "sources/src/medagent/triage.py": "fb5f9c6117f24baf73a8d5085e99235ea3c15d08fa7da767936b1f76782b0f6a",
+    "sources/src/medagent/web/NotoSansCJKsc-Regular.otf": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+    "sources/src/medagent/web/body-location.svg": "e8c3cdb9e969c2c8f5d32c31b3e721f73e0d75362bc614a6424b6f2dccd72753",
+    "sources/src/medagent/web/font-sources.json": "fdf73b2c96946fd5cdee93590c97fc64cb2dcf2b137d168efcd5d9345243c2d7",
+    "sources/src/medagent/web/fonts-OFL.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+    "sources/src/medagent/web/illustration-labels.json": "3e774288162c234370df6593d3548511dec55989ec5ade71aaed4f63a8139a8a",
+    "sources/src/medagent/web/temperature.svg": "e30454060707b222912273af89ee6b6e353efee7b558e1e80b37043d0ebe71af"
+  }
+}

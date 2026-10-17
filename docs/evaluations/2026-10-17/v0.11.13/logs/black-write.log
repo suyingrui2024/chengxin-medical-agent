@@ -1,0 +1,6 @@
+reformatted src/medagent/agent.py
+reformatted src/medagent/consultation.py
+reformatted tests/test_self_check_conversation.py
+
+All done! ✨ 🍰 ✨
+3 files reformatted, 1 file left unchanged.

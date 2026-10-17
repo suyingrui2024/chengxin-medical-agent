@@ -1,0 +1,33 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "scope": "Scripted model proposals through actual controller, not a real-model frequency estimate or completed consultation.",
+  "facts": {
+    "allergies": {
+      "key": "allergies",
+      "value": null,
+      "assertion": "absent",
+      "source": "patient",
+      "turn_id": "cc258503-ac29-4867-8800-0a1252f8c8da",
+      "recorded_at": "2026-10-16T18:14:19.240729+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "4874433c-fc93-4cb1-94ad-a6d6364069bc",
+      "evidence": "过敏不知道"
+    },
+    "medications_taken": {
+      "key": "medications_taken",
+      "value": null,
+      "assertion": "absent",
+      "source": "patient",
+      "turn_id": "cc258503-ac29-4867-8800-0a1252f8c8da",
+      "recorded_at": "2026-10-16T18:14:19.240809+00:00",
+      "quality": "not_assessed",
+      "supersedes": null,
+      "fact_id": "a49747b1-d019-4b5d-ac59-fab2fd9baa79",
+      "evidence": "是否用过药不确定"
+    }
+  },
+  "next_reply_kind": "question",
+  "uncertain_evidence_was_accepted_as_absent": true
+}

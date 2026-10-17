@@ -1,0 +1,6 @@
+{
+  "parquet_rows": 300,
+  "json_exactly_matches_parquet": true,
+  "reader": "pinned pyarrow19.0.1 without host site-packages",
+  "host_initial_failure": "pandas/numpy ABI mismatch when using read_table with host site-packages; isolated ParquetFile used instead."
+}

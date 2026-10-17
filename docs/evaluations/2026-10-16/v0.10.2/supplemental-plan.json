@@ -1,0 +1,11 @@
+{
+  "kind": "candidate-link-audit-amendment/v1",
+  "reason": "The original inventory rejected Matplotlib-generated result_images/*-expected image symlinks and therefore skipped independent verification; source_correct=false can mean unavailable rather than an implementation failure.",
+  "scope": "Apply the same supplemental procedure to every one of the 24 fixed runs, including both arms and both repetitions. No new model requests, source/task changes, test omissions or candidate fixes.",
+  "original_report_policy": "Keep the original report, booleans, all model failures and request journals unchanged. Report supplemental source assessment as passed, failed or unavailable separately.",
+  "snapshot_policy": "Hash bounded regular files with O_NOFOLLOW; record raw symlink text without following it; preserve special-file metadata as unsupported.",
+  "rebuild_policy": "Restore frozen tests/config/dependencies, overlay regular implementation and ordinary files, then reproduce non-protected links as the last host write phase. Link targets are resolved only by the same isolated oracle. Aliases above protected inputs or unsupported special files remain unavailable.",
+  "test_policy": "Reuse every frozen upstream required test ID and the unchanged oracle; missing/skipped tests cannot pass.",
+  "comparison_policy": "Separate file-contract compliance, implementation assessment and runtime completion. Do not silently merge original failures with corrected assessments.",
+  "freeze_policy": "Freeze the supplemental implementation after local safety tests and before its first candidate oracle run; preserve any subsequent revisions separately."
+}

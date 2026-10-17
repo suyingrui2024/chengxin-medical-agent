@@ -1,0 +1,12 @@
+{
+  "kind": "watch-contract-local-baseline",
+  "merged_scope": [
+    "."
+  ],
+  "root_claims_explicit_dependency_covered": true,
+  "dependency_change_detected": false,
+  "mixed_unicode_checkpoint_accepted": false,
+  "scope_mismatch_observed": true,
+  "unicode_mismatch_observed": true,
+  "external_model_requests": 0
+}

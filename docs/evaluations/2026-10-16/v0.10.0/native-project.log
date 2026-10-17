@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.9.9 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native project picker
+
+
+Running 1 test using 1 worker
+
+(node:606044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline (4.1s)
+
+  1 passed (4.5s)

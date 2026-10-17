@@ -1,0 +1,18 @@
+test_completed_calculation_survives_observation_without_duplicate_execution (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_demo_engine_uses_the_same_repeat_controller (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_field_correction_cancels_repeat_and_cannot_restore_an_old_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_history_coverage_keeps_retained_value_visible_after_many_skips (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_hypothetical_input_during_active_repeat_is_not_recorded (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_invalid_retry_and_skip_preserve_old_fact_and_discard_previous_candidate (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_literal_repeat_does_not_execute_negated_hypothetical_or_unrelated_requests (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_model_tool_is_registered_but_requires_actual_request_and_task_eligibility (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_new_reading_supersedes_and_restores_the_unanswered_question_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_actions_require_current_version_before_any_mutation_and_do_not_reopen_closed_cases (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_repeat_interrupts_and_restores_calculation_then_summary_rebuilds_current_measurement (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_reported_high_candidate_requires_confirmation_then_existing_triage_runs_without_a_model (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+test_uncertain_number_does_not_become_a_measurement_or_erase_previous_value (tests.test_repeated_observations.RepeatedObservationTests) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.144s
+
+OK

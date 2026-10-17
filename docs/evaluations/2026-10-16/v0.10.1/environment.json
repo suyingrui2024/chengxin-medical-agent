@@ -1,0 +1,8 @@
+{
+  "python": "3.10.9 (main, Mar  1 2023, 18:23:06) [GCC 11.2.0]",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "machine": "x86_64",
+  "node": "v22.23.3",
+  "npm": "10.9.9",
+  "bwrap": "bubblewrap 0.6.1"
+}

@@ -1,0 +1,59 @@
+{
+  "kind": "public-test-environment-inputs/v1",
+  "selection_sha256": "5ee8253663f27b59bff61ba47c459d2f5a2f243d73974cbf4f78e5c2a385d178",
+  "wheel_versions": {
+    "pytest-mock": "3.11.1",
+    "mpmath": "1.2.1",
+    "Jinja2": "3.0.3",
+    "MarkupSafe": "2.1.3",
+    "docutils": "0.16",
+    "Pygments": "2.13.0",
+    "snowballstemmer": "2.2.0",
+    "Babel": "2.11.0",
+    "packaging": "21.3",
+    "pyparsing": "3.0.9",
+    "alabaster": "0.7.13",
+    "imagesize": "1.4.1",
+    "sphinxcontrib-applehelp": "1.0.2",
+    "sphinxcontrib-devhelp": "1.0.2",
+    "sphinxcontrib-htmlhelp": "1.0.3",
+    "sphinxcontrib-jsmath": "1.0.1",
+    "sphinxcontrib-qthelp": "1.0.3",
+    "sphinxcontrib-serializinghtml": "1.1.5",
+    "Werkzeug": "2.3.3",
+    "itsdangerous": "2.1.2",
+    "click": "8.1.3",
+    "blinker": "1.6.2",
+    "python-dotenv": "1.0.0",
+    "importlib-metadata": "6.6.0",
+    "zipp": "3.15.0",
+    "matplotlib": "3.7.1",
+    "contourpy": "1.0.7",
+    "cycler": "0.11.0",
+    "fonttools": "4.39.3",
+    "kiwisolver": "1.4.4",
+    "Pillow": "9.5.0",
+    "python-dateutil": "2.8.2",
+    "six": "1.16.0",
+    "pytz": "2022.7.1"
+  },
+  "cases": {
+    "sphinx-doc__sphinx-8627": {
+      "url": "https://codeload.github.com/sphinx-doc/sphinx/tar.gz/332d80ba8433aea41c3709fa52737ede4405072b",
+      "sha256": "adb43119119b9f3cc0b03c04085b50c99f7d380a4a732b364ecb5800c5a4983c",
+      "bytes": 5995216,
+      "source": ".runtime/public-test-sample/sources/sphinx-doc__sphinx-8627"
+    },
+    "sphinx-doc__sphinx-7975": {
+      "url": "https://codeload.github.com/sphinx-doc/sphinx/tar.gz/4ec6cbe341fd84468c448e20082c778043bbea4b",
+      "sha256": "3240540a3637998191f0323ada9944039eae7eee89cf05151a77d41519e4d642",
+      "bytes": 5958119,
+      "source": ".runtime/public-test-sample/sources/sphinx-doc__sphinx-7975"
+    }
+  },
+  "wheels": {},
+  "limits": {
+    "compressed_file_bytes": 80000000,
+    "source_expanded_bytes": 150000000
+  }
+}

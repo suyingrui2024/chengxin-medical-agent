@@ -1,0 +1,8 @@
+{
+  "changed": [
+    "src/medagent/web/app.js",
+    "tests/fixtures/measurement-supplements.mjs",
+    "tests/ui/measurement-supplements.spec.mjs"
+  ],
+  "scope": "After real decisions: added a supplement contract test and corrected its registration, refined pending-feedback heading/composer labels and matching UI assertions. Python controller, parser, prompt, registered pack and real evaluation script unchanged."
+}

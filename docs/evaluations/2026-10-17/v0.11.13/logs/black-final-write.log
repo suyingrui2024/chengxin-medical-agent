@@ -1,0 +1,7 @@
+reformatted scripts/evaluate_self_check_conversation.py
+reformatted src/medagent/agent.py
+reformatted src/medagent/task_conversation.py
+reformatted tests/test_self_check_conversation.py
+
+All done! ✨ 🍰 ✨
+4 files reformatted.

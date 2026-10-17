@@ -1,0 +1,39 @@
+
+Running 4 tests using 1 worker
+
+(node:1285273) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on wide (1.6s)
+  ✓  2 tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on mobile (1.5s)
+  ✓  3 tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on short (1.6s)
+  ✘  4 tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on prefill (30.3s)
+
+
+  1) tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on prefill 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: apiRequestContext.post: Target page, context or browser has been closed
+
+      34 |       });
+      35 |     } finally {
+    > 36 |       await request.post("/api/settings", { data: { backend: "demo" } });
+         |                     ^
+      37 |       await model.close();
+      38 |     }
+      39 |   });
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/location-answers.spec.mjs:36:21
+
+    Error Context: .runtime/location-answers-20261017/ui-sixth-results/location-answers-location--3da93--side-and-extent-on-prefill/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    .runtime/location-answers-20261017/ui-sixth-results/location-answers-location--3da93--side-and-extent-on-prefill/trace.zip
+    Usage:
+
+        npx playwright show-trace .runtime/location-answers-20261017/ui-sixth-results/location-answers-location--3da93--side-and-extent-on-prefill/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/location-answers.spec.mjs:12:3 › location answers match region, area, side and extent on prefill 
+  3 passed (39.5s)

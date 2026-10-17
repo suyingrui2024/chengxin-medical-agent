@@ -1,0 +1,16 @@
+{"case": "marshmallow-code__marshmallow-1343", "repetition": 1, "arm": "product", "strict_original_passed": true, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "marshmallow-code__marshmallow-1343", "repetition": 1, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "pylint-dev__astroid-1196", "repetition": 1, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "pylint-dev__astroid-1196", "repetition": 1, "arm": "product", "strict_original_passed": true, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "pvlib__pvlib-python-1707", "repetition": 1, "arm": "product", "strict_original_passed": true, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "pvlib__pvlib-python-1707", "repetition": 1, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "sqlfluff__sqlfluff-1625", "repetition": 1, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": false, "protected_files_changed": []}
+{"case": "sqlfluff__sqlfluff-1625", "repetition": 1, "arm": "product", "strict_original_passed": false, "source_correctness_passed": false, "protected_files_changed": []}
+{"case": "marshmallow-code__marshmallow-1343", "repetition": 2, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "marshmallow-code__marshmallow-1343", "repetition": 2, "arm": "product", "strict_original_passed": true, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "pylint-dev__astroid-1196", "repetition": 2, "arm": "product", "strict_original_passed": true, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "pylint-dev__astroid-1196", "repetition": 2, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": false, "protected_files_changed": []}
+{"case": "pvlib__pvlib-python-1707", "repetition": 2, "arm": "product", "strict_original_passed": true, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "pvlib__pvlib-python-1707", "repetition": 2, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": true, "protected_files_changed": []}
+{"case": "sqlfluff__sqlfluff-1625", "repetition": 2, "arm": "official-sdk", "strict_original_passed": false, "source_correctness_passed": false, "protected_files_changed": []}
+{"case": "sqlfluff__sqlfluff-1625", "repetition": 2, "arm": "product", "strict_original_passed": false, "source_correctness_passed": false, "protected_files_changed": []}

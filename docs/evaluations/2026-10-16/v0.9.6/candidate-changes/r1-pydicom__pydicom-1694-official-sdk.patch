@@ -1,0 +1,43 @@
+--- a/pydicom/dataset.py
++++ b/pydicom/dataset.py
+@@ -2492,8 +2492,8 @@
+         json_dataset = {}
+         for key in self.keys():
+             json_key = '{:08X}'.format(key)
+-            data_element = self[key]
+             try:
++                data_element = self[key]
+                 json_dataset[json_key] = data_element.to_json_dict(
+                     bulk_data_element_handler=bulk_data_element_handler,
+                     bulk_data_threshold=bulk_data_threshold
+--- a/pydicom/tests/test_json.py
++++ b/pydicom/tests/test_json.py
+@@ -286,6 +286,28 @@
+ 
+         assert ds_json.get("00100010") is None
+ 
++    def test_suppress_invalid_raw_value(self):
++        """Test an invalid value that raises when the raw element is
++        converted is also suppressed by ``suppress_invalid_tags``.
++        """
++        from pydicom import config
++        from pydicom.dataelem import RawDataElement
++
++        ds = Dataset()
++        ds[0x00200013] = RawDataElement(
++            Tag(0x00200013), 'IS', 3, b'2.0', 0, True, True
++        )
++
++        original = config.settings.reading_validation_mode
++        config.settings.reading_validation_mode = config.RAISE
++        try:
++            with pytest.raises(ValueError):
++                ds.to_json_dict()
++
++            assert {} == ds.to_json_dict(suppress_invalid_tags=True)
++        finally:
++            config.settings.reading_validation_mode = original
++
+ 
+ class TestSequence:
+     def test_nested_sequences(self, disable_value_validation):

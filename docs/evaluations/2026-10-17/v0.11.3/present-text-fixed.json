@@ -1,0 +1,6 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "same_proposal_rejected": true,
+  "reason": "文本叙述必须保留引文中的不确定限定，或使用 unknown/null；不能规范化为已确认结论。"
+}

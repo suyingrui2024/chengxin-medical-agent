@@ -1,0 +1,118 @@
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -1112,11 +1112,15 @@
+ 
+     def _bind_to_schema(self, field_name, schema):
+         super()._bind_to_schema(field_name, schema)
+-        self.format = (
+-            self.format
+-            or getattr(schema.opts, self.SCHEMA_OPTS_VAR_NAME)
+-            or self.DEFAULT_FORMAT
+-        )
++        # ``schema`` may be a container field (e.g. ``List`` or ``Tuple``) when
++        # this field is used as an inner field, so fall back to the root schema.
++        schema_opts = getattr(schema, "opts", None) or getattr(self.root, "opts", None)
++        if schema_opts is not None:
++            self.format = (
++                self.format
++                or getattr(schema_opts, self.SCHEMA_OPTS_VAR_NAME)
++                or self.DEFAULT_FORMAT
++            )
+ 
+     def _serialize(self, value, attr, obj, **kwargs):
+         if value is None:
+--- a/tests/test_datetime_inner_field_regression.py
++++ b/tests/test_datetime_inner_field_regression.py
+@@ -0,0 +1,92 @@
++"""Regression tests for DateTime fields used as inner fields of containers.
++
++See: "DateTime fields cannot be used as inner field for List or Tuple fields".
++``DateTime._bind_to_schema`` used to assume its ``schema`` argument was always a
++``Schema`` (accessing ``schema.opts``), which raised ``AttributeError`` when the
++field was bound by a container field such as ``List`` or ``Tuple``.
++"""
++
++import datetime as dt
++
++import pytest
++
++from marshmallow import Schema, fields
++
++
++class DateTimeListSchema(Schema):
++    times = fields.List(fields.DateTime())
++
++
++class DateTimeTupleSchema(Schema):
++    times = fields.Tuple([fields.DateTime(), fields.Integer()])
++
++
++class DateListSchema(Schema):
++    dates = fields.List(fields.Date())
++
++
++class InheritedFormatSchema(Schema):
++    class Meta:
++        datetimeformat = "timestamp"
++
++    times = fields.List(fields.DateTime())
++
++
++def test_datetime_instance_as_inner_field_of_list_does_not_raise():
++    schema = DateTimeListSchema()
++    assert isinstance(schema.fields["times"].inner, fields.DateTime)
++
++
++def test_datetime_instance_as_inner_field_of_tuple_does_not_raise():
++    schema = DateTimeTupleSchema()
++    assert isinstance(schema.fields["times"].tuple_fields[0], fields.DateTime)
++
++
++def test_date_instance_as_inner_field_of_list_does_not_raise():
++    schema = DateListSchema()
++    assert isinstance(schema.fields["dates"].inner, fields.Date)
++
++
++def test_datetime_inner_field_dump_load_roundtrip():
++    schema = DateTimeListSchema()
++    value = dt.datetime(2018, 1, 2, 3, 4, 5)
++    dumped = schema.dump({"times": [value]})
++    assert dumped == {"times": ["2018-01-02T03:04:05"]}
++    assert schema.load(dumped) == {"times": [value]}
++
++
++def test_datetime_inner_field_of_tuple_dump_load_roundtrip():
++    schema = DateTimeTupleSchema()
++    value = dt.datetime(2018, 1, 2, 3, 4, 5)
++    dumped = schema.dump({"times": (value, 42)})
++    assert dumped == {"times": ("2018-01-02T03:04:05", 42)}
++    assert schema.load(dumped) == {"times": (value, 42)}
++
++
++def test_datetime_inner_field_inherits_root_schema_format():
++    schema = InheritedFormatSchema()
++    assert schema.fields["times"].inner.format == "timestamp"
++
++
++def test_unbound_datetime_inner_field_still_serializes():
++    field = fields.List(fields.DateTime())
++    value = dt.datetime(2018, 1, 2, 3, 4, 5)
++    result = field.serialize("times", {"times": [value]})
++    assert result == ["2018-01-02T03:04:05"]
++
++
++def test_datetime_inner_field_with_explicit_format_wins():
++    class ExplicitFormatSchema(Schema):
++        times = fields.List(fields.DateTime(format="%d-%m-%Y"))
++
++    schema = ExplicitFormatSchema()
++    assert schema.fields["times"].inner.format == "%d-%m-%Y"
++    dumped = schema.dump({"times": [dt.datetime(2018, 1, 2)]})
++    assert dumped == {"times": ["02-01-2018"]}
++
++
++def test_invalid_inner_datetime_raises_validation_error():
++    schema = DateTimeListSchema()
++    with pytest.raises(Exception) as excinfo:
++        schema.load({"times": ["not-a-datetime"]})
++    assert "Not a valid datetime." in str(excinfo.value)

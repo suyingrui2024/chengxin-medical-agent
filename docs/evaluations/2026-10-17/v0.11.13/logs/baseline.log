@@ -1,0 +1,80 @@
+test_correction_and_emergency_invalidate_suspended_task (tests.test_self_check_conversation.SelfCheckConversationTests) ... test_free_text_location_parser_no_longer_accepts_unclassified_words (tests.test_self_check_conversation.SelfCheckConversationTests) ... FAIL
+test_invalid_quote_or_option_cannot_create_a_candidate_or_fact (tests.test_self_check_conversation.SelfCheckConversationTests) ... ERROR
+test_manual_choice_replaces_suggestion_without_reusing_its_quote (tests.test_self_check_conversation.SelfCheckConversationTests) ... FAIL
+test_medication_supplement_is_not_a_location_and_original_task_can_resume (tests.test_self_check_conversation.SelfCheckConversationTests) ... FAIL
+test_model_location_proposal_requires_confirmation_and_keeps_original_source (tests.test_self_check_conversation.SelfCheckConversationTests) ... ERROR
+test_temperature_history_supplement_routes_to_model_but_invalid_reading_stays_local (tests.test_self_check_conversation.SelfCheckConversationTests) ... FAIL
+
+======================================================================
+ERROR: test_correction_and_emergency_invalidate_suspended_task (tests.test_self_check_conversation.SelfCheckConversationTests) (emergency=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 136, in test_correction_and_emergency_invalidate_suspended_task
+    self.assertIsNone(self.state.self_check_conversation)
+AttributeError: 'CaseState' object has no attribute 'self_check_conversation'
+
+======================================================================
+ERROR: test_correction_and_emergency_invalidate_suspended_task (tests.test_self_check_conversation.SelfCheckConversationTests) (emergency=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 136, in test_correction_and_emergency_invalidate_suspended_task
+    self.assertIsNone(self.state.self_check_conversation)
+AttributeError: 'CaseState' object has no attribute 'self_check_conversation'
+
+======================================================================
+ERROR: test_invalid_quote_or_option_cannot_create_a_candidate_or_fact (tests.test_self_check_conversation.SelfCheckConversationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 104, in test_invalid_quote_or_option_cannot_create_a_candidate_or_fact
+    self.assertNotIn("result_proposal", reply.task)
+  File "/home/suyingrui/anaconda3/lib/python3.10/unittest/case.py", line 1116, in assertNotIn
+    if member in container:
+TypeError: argument of type 'NoneType' is not iterable
+
+======================================================================
+ERROR: test_model_location_proposal_requires_confirmation_and_keeps_original_source (tests.test_self_check_conversation.SelfCheckConversationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 68, in test_model_location_proposal_requires_confirmation_and_keeps_original_source
+    candidate = proposed.task["result_proposal"]
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+FAIL: test_free_text_location_parser_no_longer_accepts_unclassified_words (tests.test_self_check_conversation.SelfCheckConversationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 140, in test_free_text_location_parser_no_longer_accepts_unclassified_words
+    with self.assertRaises(ObservationInputError):
+AssertionError: ObservationInputError not raised
+
+======================================================================
+FAIL: test_manual_choice_replaces_suggestion_without_reusing_its_quote (tests.test_self_check_conversation.SelfCheckConversationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 93, in test_manual_choice_replaces_suggestion_without_reusing_its_quote
+    self.assertEqual(self.state.get("symptom_location"), "胸部")
+AssertionError: '太阳穴附近' != '胸部'
+- 太阳穴附近
++ 胸部
+
+
+======================================================================
+FAIL: test_medication_supplement_is_not_a_location_and_original_task_can_resume (tests.test_self_check_conversation.SelfCheckConversationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 47, in test_medication_supplement_is_not_a_location_and_original_task_can_resume
+    self.assertNotIn("symptom_location", self.state.facts)
+AssertionError: 'symptom_location' unexpectedly found in {'consult_for': Fact(key='consult_for', value='self', assertion=<Assertion.PRESENT: 'present'>, source=<Source.PATIENT: 'patient'>, turn_id='44953095-9654-4d6e-92c4-48a14168b8d7', recorded_at='2026-10-16T23:51:30.152186+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='e42bc932-9d25-47a9-957a-b0eaf82b9cec', evidence='我自己'), 'age_years': Fact(key='age_years', value=32, assertion=<Assertion.PRESENT: 'present'>, source=<Source.PATIENT: 'patient'>, turn_id='44953095-9654-4d6e-92c4-48a14168b8d7', recorded_at='2026-10-16T23:51:30.152280+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='5e4d6b62-7510-49e3-a8e4-6c19ff777360', evidence='32岁'), 'chief_complaint': Fact(key='chief_complaint', value='头疼', assertion=<Assertion.PRESENT: 'present'>, source=<Source.PATIENT: 'patient'>, turn_id='44953095-9654-4d6e-92c4-48a14168b8d7', recorded_at='2026-10-16T23:51:30.152348+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='a6951c15-ca78-43f5-88a1-9afb90f34e98', evidence='头疼'), 'emergency_screen': Fact(key='emergency_screen', value=None, assertion=<Assertion.ABSENT: 'absent'>, source=<Source.PATIENT: 'patient'>, turn_id='44953095-9654-4d6e-92c4-48a14168b8d7', recorded_at='2026-10-16T23:51:30.152404+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='06d632ae-d3b2-4def-971c-3b2ebc86088b', evidence='上述危险信号都没有'), 'symptom_location': Fact(key='symptom_location', value='昨晚用过药物甲。', assertion=<Assertion.PRESENT: 'present'>, source=<Source.PATIENT: 'patient'>, turn_id='5c355868-67b9-40c8-82f1-ef8be2152222', recorded_at='2026-10-16T23:51:30.154054+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='72e4b4f6-6bc9-4c6a-9a6f-9264990ca973', evidence='昨晚用过药物甲。'), 'medications_taken': Fact(key='medications_taken', value='昨晚用过药物甲', assertion=<Assertion.PRESENT: 'present'>, source=<Source.PATIENT: 'patient'>, turn_id='5c355868-67b9-40c8-82f1-ef8be2152222', recorded_at='2026-10-16T23:51:30.154763+00:00', quality=<ObservationQuality.NOT_ASSESSED: 'not_assessed'>, supersedes=None, fact_id='69f981e0-d75e-4cf0-b8f2-58bdd5b9d5c5', evidence='昨晚用过药物甲')}
+
+======================================================================
+FAIL: test_temperature_history_supplement_routes_to_model_but_invalid_reading_stays_local (tests.test_self_check_conversation.SelfCheckConversationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_self_check_conversation.py", line 116, in test_temperature_history_supplement_routes_to_model_but_invalid_reading_stays_local
+    self.assertFalse(resumed.input_error)
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.067s
+
+FAILED (failures=4, errors=4)

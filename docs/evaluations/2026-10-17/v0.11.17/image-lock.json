@@ -1,0 +1,14 @@
+{
+  "image": "docker.io/library/debian:bookworm-20261005-slim",
+  "index_digest": "sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587",
+  "manifest_digest": "sha256:a4672c0cb26fbdde88e38fa2dfb6c681942306680e41e4378b28770b6e79ee91",
+  "layers": [
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:7fd1ebe418b5079d4aa36f416af9b143d127bc75b0155d71cb5fd559b5e04d39",
+      "size": 28249323
+    }
+  ],
+  "config_digest": "sha256:d4c45f66efc59f89b0597d343a9bd72808493c0eacecde5285961743252cee23",
+  "official_source": "https://raw.githubusercontent.com/docker-library/official-images/master/library/debian"
+}

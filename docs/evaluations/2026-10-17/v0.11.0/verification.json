@@ -1,0 +1,59 @@
+{
+  "version": "0.11.0",
+  "full_backend_executed": 239,
+  "full_backend_passed": 236,
+  "full_backend_skipped": 3,
+  "full_backend_duration_seconds": 239.078,
+  "skipped_scope": "185/142/605-second opt-in checks not rerun in this version; prior evidence remains attributed to 0.10.6.",
+  "patient_ui_passed": 24,
+  "source_native_passed": 17,
+  "packaged_native_passed": 17,
+  "node_assertions_passed": 21,
+  "new_backend_artifact_checks": 9,
+  "package_own_files_matched": 99,
+  "applicable_locked_production_packages_matched": 544,
+  "final_source_test_metadata_files": 210,
+  "real_frozen_files_per_round": [
+    134,
+    134
+  ],
+  "actual_real_requests_per_round": [
+    7,
+    5
+  ],
+  "actual_real_requests_total": 12,
+  "round1_conformance_passed": false,
+  "round2_conformance_passed": true,
+  "same_task_and_scoring": true,
+  "live_round_source_delta": [
+    "integrations/dsh/execution.patch.yml"
+  ],
+  "source_unchanged_during_real_calls": true,
+  "post_api_ui_only_delta": [
+    "src/medagent/web/execution-artifact-ui.js"
+  ],
+  "final_frozen_replay_passed": true,
+  "saved_decisions_replayed": [
+    7,
+    5
+  ],
+  "replay_external_model_calls": 0,
+  "stable_preview_metadata_native_mutations_expected": 0,
+  "initial_stable_metadata_native_mutations_observed": 1,
+  "screenshots_manually_reviewed": [
+    "48-artifact-plot.png",
+    "49-artifact-table.png",
+    "50-artifact-narrow.png"
+  ],
+  "actual_round2_plot_manually_reviewed": true,
+  "image_semantics_automatically_verified": false,
+  "previous_archive_files_unchanged": {
+    "v0.10.4": 403,
+    "v0.10.5": 519,
+    "v0.10.5-transfer": 690,
+    "v0.10.6": 443
+  },
+  "clinical_validation_complete": false,
+  "general_dsh_parity_proven": false,
+  "phase_scope": "Final backend map unchanged after full regression. Only preview metadata DOM deduplication followed real calls, with final source and packaged native checks and final frozen replays; call-time source maps remain preserved."
+}

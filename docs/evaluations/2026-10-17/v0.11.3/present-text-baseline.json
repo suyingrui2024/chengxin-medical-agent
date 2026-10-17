@@ -1,0 +1,13 @@
+{
+  "synthetic_only": true,
+  "external_model_calls": 0,
+  "source_phase": "Frozen live-round1-source, before present-text hardening; imported with -B",
+  "raw_input": "过敏不清楚",
+  "proposal": {
+    "key": "allergies",
+    "value": "没有过敏",
+    "assertion": "present",
+    "evidence": "过敏不清楚"
+  },
+  "present_false_denial_accepted": true
+}

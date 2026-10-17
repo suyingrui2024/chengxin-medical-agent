@@ -1,0 +1,9 @@
+{
+  "files": {
+    "sympy/functions/elementary/complexes.py": "d2c6dec748ee21bead56501526d88af2107f452d38290b64672cad57ed16d4a2",
+    "regressions/test_abs_real_conjugate_recursion.py": "ff5658552a48b2a85a4054da2c970dd52070db9fda380554e273e441d5aa5417"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

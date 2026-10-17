@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+dist/
+build/
+*.egg-info/
+.env*
+!.env.example
+data/sessions/
+node_modules/
+.runtime/
+workspaces/
+vendor/deepseek-harness/
+test-results/
+playwright-report/
+
+
+# Preserve metadata that is part of frozen evaluation evidence.
+!docs/evaluations/**/*.egg-info/
+!docs/evaluations/**/*.egg-info/**
+
+# Two legacy bytecode files are explicitly hashed by a sealed archive.
+!docs/evaluations/2026-10-16/v0.10.2/__pycache__/
+!docs/evaluations/2026-10-16/v0.10.2/__pycache__/candidate_tree.cpython-310.pyc
+!docs/evaluations/2026-10-16/v0.10.2/__pycache__/replay.cpython-310.pyc

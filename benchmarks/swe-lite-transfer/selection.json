@@ -1,0 +1,87 @@
+{
+  "kind": "public-transfer-selection/v1",
+  "created_at": "2026-10-16T13:27:31.697070+00:00",
+  "dataset": "princeton-nlp/SWE-bench_Lite",
+  "split": "test",
+  "population": 300,
+  "dataset_parquet_sha256": "7a21f37b8bc179c7db5beeb14e88ac538ba283455c776e6b2535bbfb6e3551b4",
+  "rows_json_sha256": "c36c705b12c632d4d14ed745401ab77de499cf8f6b3b3c83fb3f79bde84ff373",
+  "seed": 2026101605,
+  "strata": [
+    "matplotlib/matplotlib",
+    "pallets/flask",
+    "sphinx-doc/sphinx",
+    "sympy/sympy"
+  ],
+  "eligible_counts_after_exclusions": {
+    "matplotlib/matplotlib": 21,
+    "pallets/flask": 2,
+    "sphinx-doc/sphinx": 14,
+    "sympy/sympy": 76
+  },
+  "algorithm": "One per repository, sorted IDs then one shared Python Random(seed).shuffle; fixed repository order.",
+  "eligibility_reason": "Existing four repository environment adapters, fixed before inspecting selected issues or outcomes.",
+  "excluded_previous_instance_ids": [
+    "marshmallow-code__marshmallow-1343",
+    "marshmallow-code__marshmallow-1359",
+    "matplotlib__matplotlib-25311",
+    "matplotlib__matplotlib-26011",
+    "pallets__flask-5063",
+    "pvlib__pvlib-python-1707",
+    "pydicom__pydicom-1139",
+    "pydicom__pydicom-1694",
+    "pylint-dev__astroid-1196",
+    "pylint-dev__astroid-1268",
+    "sphinx-doc__sphinx-7975",
+    "sphinx-doc__sphinx-8627",
+    "sqlfluff__sqlfluff-1625",
+    "sympy__sympy-21627"
+  ],
+  "exposure_manifest_sha256": {
+    "benchmarks/swe-lite-dev/marshmallow-code__marshmallow-1359/instance.json": "76259f3892bba140fb8a99273b8f764bf8dd6b508d9d80ca6f962fd264012e1d",
+    "benchmarks/swe-lite-dev/pydicom__pydicom-1139/instance.json": "f2e3d725cb4e3729c15b92d6d7e85b64aa6f4ec27ef6c3f1bb393391cf03223a",
+    "benchmarks/swe-lite-dev/pydicom__pydicom-1694/instance.json": "d24952ef11a5ae98ea5be9d1a8d5681cc34356b0525bf400c599be6f394ae022",
+    "benchmarks/swe-lite-dev/pylint-dev__astroid-1268/instance.json": "16bcd43c0586cb80930c7bc9f1b7b39bc5fbfe5f7c0c7685cf8ff2df7743085f",
+    "benchmarks/swe-lite-dev-expanded/marshmallow-code__marshmallow-1343/instance.json": "5d6414979b704d91a57614fc71ac7b16c9e13cad8b69645e2c41242002294709",
+    "benchmarks/swe-lite-dev-expanded/pvlib__pvlib-python-1707/instance.json": "61133b89469946d57f7b8867acce29f9bf4166d96e4640c307e323484d63104c",
+    "benchmarks/swe-lite-dev-expanded/pylint-dev__astroid-1196/instance.json": "d3af4eb20ae7a40df45982aa00ab45bccfef4aa91516fa903b4dff4a1bb35fae",
+    "benchmarks/swe-lite-dev-expanded/sqlfluff__sqlfluff-1625/instance.json": "ef71d593f29d27619dc06bb9017ebe62b83bf5fd512abb131b30971a0c2de320",
+    "benchmarks/swe-lite-test-sample/matplotlib__matplotlib-25311/instance.json": "84f3bda8ff97400e506732391e92dc17dc291c2535559c00a63acb50b0ce6c00",
+    "benchmarks/swe-lite-test-sample/matplotlib__matplotlib-26011/instance.json": "6d37cf3eb6a72c9b31e32e375e59b495439eb6366c82e3f0c5a51f9a195b15c8",
+    "benchmarks/swe-lite-test-sample/pallets__flask-5063/instance.json": "5260d0921fb2a77bcce1c264dbb1741d651a9cc7063b7d556f7147d83d8d3f08",
+    "benchmarks/swe-lite-test-sample/sphinx-doc__sphinx-7975/instance.json": "914d091e60d14226482a7d180af6f287babfa943e5dfb03af376734233bdfa94",
+    "benchmarks/swe-lite-test-sample/sphinx-doc__sphinx-8627/instance.json": "12aebe4605e4918412117e7e9360bead42425cb0a0ec302581ea078ab5b06c3e",
+    "benchmarks/swe-lite-test-sample/sympy__sympy-21627/instance.json": "fb44933a92204970c8421342777224dbd9f7a097b85c36ffcccdc7c030626ec0"
+  },
+  "selected_ids": [
+    "matplotlib__matplotlib-25498",
+    "pallets__flask-4045",
+    "sphinx-doc__sphinx-8474",
+    "sympy__sympy-20049"
+  ],
+  "selected_repositories": [
+    "matplotlib/matplotlib",
+    "pallets/flask",
+    "sphinx-doc/sphinx",
+    "sympy/sympy"
+  ],
+  "replacement_policy": "No substitutions; retain unsupported environments and failed preflights. No paid runs until every selected oracle qualifies.",
+  "instances_sha256": {
+    "matplotlib__matplotlib-25498": "bab1417d4171a62a548bbfbcf337a5caeb9d8a42198906d44df828664c9c8ea4",
+    "pallets__flask-4045": "bc86dc6c147c275137fd860a9f0cc30d0254611f4f4e65215783b1ed72b23a35",
+    "sphinx-doc__sphinx-8474": "da1fce016b9256e6b199c05945985d1a01cedeeca80fccddefd9bf6e8d1e7a1c",
+    "sympy__sympy-20049": "763d004b6c23185318ba232b0844f33f8d88438666c26e59191d1d5ea59760d0"
+  },
+  "scope": "New to this project's recorded fixtures, public historical data with possible model contamination; stratified subset of supported repositories, not full-population random sampling, official score or proof of general parity.",
+  "planned_comparison": {
+    "arms": [
+      "product",
+      "official-sdk"
+    ],
+    "repetitions": 2,
+    "calls_per_arm": 20,
+    "seconds_per_arm": 600,
+    "maximum_upstream_requests": 320,
+    "order_seed": 2026101606
+  }
+}

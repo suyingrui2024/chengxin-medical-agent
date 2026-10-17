@@ -1,0 +1,52 @@
+{
+  "state": "engineering_release_and_bounded_model_evaluation_verified",
+  "release_version": "0.10.2",
+  "backend_final": {
+    "tests": 185,
+    "passed": 184,
+    "skipped": 1,
+    "reason": "185-second test already passed in earlier full 184-test run"
+  },
+  "earlier_full_backend": {
+    "tests": 184,
+    "passed": 184,
+    "skipped": 0
+  },
+  "ui": 21,
+  "native_source": 11,
+  "native_packaged": 11,
+  "node_direct_assertions": 11,
+  "format_check_passed": true,
+  "all_six_preflight_qualified": true,
+  "required_reference_nodes": 1111,
+  "full_dsh_parity_proven": false,
+  "clinical_validation_complete": false,
+  "checkpoint_replay": {
+    "runs": 4,
+    "all_match": true,
+    "negative_control_rejected": true,
+    "model_requests": 0
+  },
+  "offline_reconstruction": {
+    "frozen_files": 124,
+    "all_files_match": true,
+    "candidate_replays": 4,
+    "all_results_match": true,
+    "model_requests": 0,
+    "reused_locked_node_dependencies": true
+  },
+  "model_runs": 24,
+  "model_provider_calls": 475,
+  "all_model_provider_responses_http200": true,
+  "frozen_source_unchanged": true,
+  "uniform_supplement_runs": 24,
+  "original_source_unassessed": 1,
+  "original_unassessed_corrected_to_passed": 1,
+  "all_archive_replays_complete": true,
+  "previously_assessed_result_disagreements": [],
+  "archive_replay_runs": 24,
+  "strict_per_node_outcome_matches": 24,
+  "strict_negative_controls_passed": 1,
+  "all_supplemental_cases_assessed": true,
+  "known_patient_concurrency_gap_reproduced": true
+}

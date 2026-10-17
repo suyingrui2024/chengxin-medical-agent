@@ -1,0 +1,51 @@
+{
+  "version": "0.11.8",
+  "backend": {
+    "collected": 315,
+    "default_passed": 261,
+    "default_skipped": 54,
+    "separately_passed_sdk": 51,
+    "unique_passed": 312,
+    "three_long_opt_in_checks_not_rerun": true
+  },
+  "ui": {
+    "full_passed": 44,
+    "final_affected_passed": 5,
+    "first_added_test_failures": 2,
+    "failure_reason": "Fixture incorrectly expected snapshot.reply; actual API supplies state and events. Corrected fixture reads the last reply event."
+  },
+  "native": {
+    "source_full_passed": 28,
+    "package_full_passed": 28
+  },
+  "bridge_passed": 21,
+  "frozen": {
+    "source_files": 264,
+    "selected_tests": 137,
+    "changes_after_provider": []
+  },
+  "provider": {
+    "requests": 6,
+    "statuses": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "injected_local_503": 1,
+    "synthetic_cases": 2
+  },
+  "package": {
+    "own_files": 108,
+    "dependency_versions": 544,
+    "passed": true
+  },
+  "format": {
+    "prettier_passed": true,
+    "changed_python_files_black_passed": 8
+  },
+  "clinical_validation": false,
+  "general_dsh_or_codex_parity_proven": false
+}

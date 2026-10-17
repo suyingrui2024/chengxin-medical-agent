@@ -1,0 +1,58 @@
+{
+  "version": "0.11.10",
+  "backend": {
+    "collected": 331,
+    "current_run_passed": 277,
+    "explicitly_skipped": 54,
+    "separate_51_sdk_tests_not_rerun": true,
+    "three_long_opt_in_tests_not_rerun": true,
+    "previous_sdk_evidence_version": "0.11.9"
+  },
+  "ui": {
+    "full_passed": 52,
+    "new_tests": 4
+  },
+  "native": {
+    "source_full_passed": 30,
+    "package_full_passed": 30,
+    "new_tests": 1
+  },
+  "bridge_passed": 21,
+  "format_prettier_passed": true,
+  "frozen": {
+    "source_files": 276,
+    "selected_tests": 153,
+    "source_unchanged": true
+  },
+  "provider": {
+    "new_requests": 0,
+    "previous_real_request_evidence_version": "0.11.9",
+    "previous_requests_not_counted_as_current": 17
+  },
+  "core_sources": {
+    "core_files_checked": 86,
+    "metadata_only_changes": [
+      "src/medagent/__init__.py",
+      "src/medagent/agent.py"
+    ],
+    "clinical_controller_content_and_dsh_execution_behavior_sources_unchanged": true,
+    "ui_behavior_changed": true,
+    "new_provider_calls": 0,
+    "scope": "Exact source-byte comparison against sealed v0.11.9, allowing only application/policy version text in two Python files. Does not prove clinical correctness or unchanged interaction behavior.",
+    "passed": true
+  },
+  "package": {
+    "own_files": 109,
+    "dependency_versions": 544,
+    "passed": true
+  },
+  "early_failures": {
+    "draft_overwrite_reproduced": true,
+    "native_heading_clipped": true,
+    "native_heading_assertion_retained_after_fix": true
+  },
+  "draft_persistence": "Current-page memory only, bound to session and action; no refresh or close guarantee",
+  "clinical_validation": false,
+  "human_usability_validation": false,
+  "general_dsh_or_codex_parity_proven": false
+}

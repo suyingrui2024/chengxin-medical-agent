@@ -1,0 +1,17 @@
+{
+  "kind": "benchmark-interruption-audit/v1",
+  "initial_report": "initial.json",
+  "stopped_reason": "Baseline received relative mount paths; stopped invalid comparison. In-flight reserved requests counted conservatively, not all confirmed billable.",
+  "request_journals": [
+    {
+      "path": "initial/r1-precision-repair-official-sdk/requests.json",
+      "attempted_calls": 0
+    },
+    {
+      "path": "initial/r1-precision-repair-product/requests.json",
+      "attempted_calls": 16
+    }
+  ],
+  "reserved_calls": 16,
+  "comparison_valid": false
+}

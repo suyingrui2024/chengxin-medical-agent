@@ -1,0 +1,51 @@
+
+> medical-agent-dsh-integration@0.11.9 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/visual-answer-drafts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:1127412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/visual-answer-drafts.spec.mjs:11:1 › native degree selection preserves independent patient text and confirms explicitly at 900x680 (1.1s)
+
+
+  1) tests/desktop/visual-answer-drafts.spec.mjs:11:1 › native degree selection preserves independent patient text and confirms explicitly at 900x680 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 6
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "selector": "#active-question h2",
+    +     "visible": false,
+    +   },
+    + ]
+
+       at ../fixtures/visual-answer-drafts.mjs:83
+
+      81 |     });
+      82 |   });
+    > 83 |   expect(geometry.filter((item) => !item.visible)).toEqual([]);
+         |                                                    ^
+      84 |   await page.locator(".severity-confirm").evaluate((node) => {
+      85 |     window.oldDegreeConfirm = node;
+      86 |   });
+        at verifyDegreeDraft (/home/suyingrui/Desktop/medical-agent/tests/fixtures/visual-answer-drafts.mjs:83:52)
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/visual-answer-drafts.spec.mjs:30:5
+
+    Error Context: test-results/desktop/visual-answer-drafts-nativ-0dfee-firms-explicitly-at-900x680/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/visual-answer-drafts-nativ-0dfee-firms-explicitly-at-900x680/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/visual-answer-drafts-nativ-0dfee-firms-explicitly-at-900x680/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/visual-answer-drafts.spec.mjs:11:1 › native degree selection preserves independent patient text and confirms explicitly at 900x680 

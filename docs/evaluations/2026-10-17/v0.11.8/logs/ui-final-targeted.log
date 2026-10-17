@@ -1,0 +1,16 @@
+
+> medical-agent-dsh-integration@0.11.8 test:ui
+> playwright test tests/ui/calculation-supplements.spec.mjs tests/ui/patient-calculation.spec.mjs tests/ui/glucose-calculation.spec.mjs
+
+
+Running 5 tests using 1 worker
+
+(node:1078086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections (1.8s)
+  ✓  2 tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections on a narrow screen (1.6s)
+  ✓  3 tests/ui/glucose-calculation.spec.mjs:7:1 › glucose renderer rejects missing basis and unsafe links while preserving legacy results (307ms)
+  ✓  4 tests/ui/glucose-calculation.spec.mjs:100:1 › sourced glucose conversion uses a scoped form, approximate result and original consultation (1.6s)
+  ✓  5 tests/ui/patient-calculation.spec.mjs:7:1 › patient calculation confirms editable inputs, recovers a lost response and stays readable on mobile (1.7s)
+
+  5 passed (9.6s)

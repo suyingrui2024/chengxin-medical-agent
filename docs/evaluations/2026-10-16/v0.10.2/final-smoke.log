@@ -1,0 +1,11 @@
+test_identifier_resolution_never_substitutes_an_unrelated_test (tests.test_public_test_sample.PublicTestOracleTests) ... ok
+test_long_oracle_program_uses_stdin_and_does_not_hit_argv_limit (tests.test_public_test_sample.PublicTestOracleTests) ... ok
+test_real_collection_original_failure_and_reference_pass_use_separate_copies (tests.test_public_test_sample.PublicTestOracleTests) ... ok
+test_reference_needs_every_pass_and_original_needs_every_designated_failure (tests.test_public_test_sample.PublicTestOracleTests) ... ok
+test_selection_uses_the_entire_population_and_is_order_independent (tests.test_public_test_sample.PublicTestOracleTests) ... ok
+test_both_arms_use_independent_original_tests_and_report_tampering (tests.test_public_test_benchmark.PublicTestPairsTests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 4.117s
+
+OK

@@ -1,0 +1,49 @@
+
+> medical-agent-dsh-integration@0.11.9 test:ui
+> playwright test tests/ui/visual-answer-drafts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:1125025) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/visual-answer-drafts.spec.mjs:3:1 › selecting a visual degree preserves an independently written patient draft (5.9s)
+
+
+  1) tests/ui/visual-answer-drafts.spec.mjs:3:1 › selecting a visual degree preserves an independently written patient draft 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  getByRole('textbox', { name: '输入你的描述' })
+    Expected: "昨晚用过药物甲，这段还没有发送。"
+    Received: "5分"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" getByRole('textbox', { name: '输入你的描述' }) with timeout 5000ms
+      - waiting for getByRole('textbox', { name: '输入你的描述' })
+        14 × locator resolved to <textarea rows="1" maxlength="2000" inputmode="text" id="message-input" placeholder="选一个分数，或描述生活受到的影响"></textarea>
+           - unexpected value "5分"
+
+
+      21 |   await page.getByRole("textbox", { name: "输入你的描述" }).fill(draft);
+      22 |   await page.getByRole("button", { name: "5 分", exact: true }).click();
+    > 23 |   await expect(page.getByRole("textbox", { name: "输入你的描述" })).toHaveValue(draft);
+         |                                                               ^
+      24 |   const selected = await (await request.get(`/api/sessions/${id}/snapshot`)).json();
+      25 |   expect(selected.state.facts).toEqual(before.state.facts);
+      26 |   expect(selected.events).toEqual(before.events);
+        at /home/suyingrui/Desktop/medical-agent/tests/ui/visual-answer-drafts.spec.mjs:23:63
+
+    Error Context: test-results/ui/visual-answer-drafts-selec-667c2-ently-written-patient-draft/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/visual-answer-drafts-selec-667c2-ently-written-patient-draft/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/visual-answer-drafts-selec-667c2-ently-written-patient-draft/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/visual-answer-drafts.spec.mjs:3:1 › selecting a visual degree preserves an independently written patient draft 

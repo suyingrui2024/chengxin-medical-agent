@@ -1,0 +1,11 @@
+{
+  "source_files": 281,
+  "sources_match_running_worktree_and_frozen_snapshot": true,
+  "local_links_scope": "Archive README and adapted design excerpt; frozen partial repository documentation is not a complete documentation site.",
+  "local_links_checked": 51,
+  "missing_links": [],
+  "previous_v01110_manifest_files_unchanged": 317,
+  "declared_results_verified": true,
+  "validation_complete_before_seal": true,
+  "passed": true
+}

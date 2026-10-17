@@ -1,0 +1,61 @@
+--- a/pydicom/dataset.py
++++ b/pydicom/dataset.py
+@@ -2492,8 +2492,8 @@
+         json_dataset = {}
+         for key in self.keys():
+             json_key = '{:08X}'.format(key)
+-            data_element = self[key]
+             try:
++                data_element = self[key]
+                 json_dataset[json_key] = data_element.to_json_dict(
+                     bulk_data_element_handler=bulk_data_element_handler,
+                     bulk_data_threshold=bulk_data_threshold
+--- a/pydicom/tests/test_regression_suppress_invalid_tags.py
++++ b/pydicom/tests/test_regression_suppress_invalid_tags.py
+@@ -0,0 +1,46 @@
++# -*- coding: utf-8 -*-
++# Copyright 2008-2022 pydicom authors. See LICENSE file for details.
++"""Regression tests for ``Dataset.to_json_dict(suppress_invalid_tags=True)``.
++
++The raw element access ``Dataset.__getitem__`` may itself raise while
++converting a raw value (for example an invalid ``IS`` value that cannot be
++converted to an integer without loss).  Such errors must also be suppressed
++when ``suppress_invalid_tags=True``.
++"""
++import pytest
++
++from pydicom.dataelem import RawDataElement
++from pydicom.dataset import Dataset
++from pydicom.tag import Tag
++
++
++class TestSuppressInvalidTagsAccess:
++    def _dataset_with_raw_is(self, raw_value: bytes) -> Dataset:
++        tag = Tag(0x00101030)  # Patient Weight, VR IS
++        ds = Dataset()
++        ds[tag] = RawDataElement(
++            tag, 'IS', len(raw_value), raw_value, 0, True, True
++        )
++        return ds
++
++    def test_raw_invalid_value_suppressed(self):
++        """An invalid raw value that raises on access is dropped."""
++        ds = self._dataset_with_raw_is(b'2.5')
++
++        # Without suppression the conversion error is raised
++        with pytest.raises(TypeError):
++            ds.to_json_dict()
++
++        # With suppression the invalid tag is dropped and no error escapes
++        ds_json = ds.to_json_dict(suppress_invalid_tags=True)
++        assert ds_json == {}
++
++    def test_raw_invalid_value_suppressed_for_to_json(self):
++        """``to_json`` also honours ``suppress_invalid_tags``."""
++        ds = self._dataset_with_raw_is(b'2.5')
++
++        with pytest.raises(TypeError):
++            ds.to_json()
++
++        ds_json = ds.to_json(suppress_invalid_tags=True)
++        assert '00101030' not in ds_json

@@ -1,0 +1,10 @@
+{
+  "text": "我自己32岁，咳嗽两天；请把1.25kg换算成g；昨晚用过药物甲。",
+  "reply_question_id": "chief_complaint",
+  "model_calls": 1,
+  "facts": {},
+  "calculation_count": 1,
+  "original_text_still_in_transcript": true,
+  "unprocessed_supplement_indicator": false,
+  "finding": "Calculator-first model output returns directly to original opening; the same-turn clinical supplement is not forwarded for planning or marked pending."
+}

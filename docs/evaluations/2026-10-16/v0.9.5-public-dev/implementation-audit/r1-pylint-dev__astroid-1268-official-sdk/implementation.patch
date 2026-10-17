@@ -1,0 +1,21 @@
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -36,6 +36,7 @@
+         MatchSingleton,
+         MatchStar,
+         MatchValue,
++        Unknown,
+     )
+ 
+ # pylint: disable=unused-argument
+@@ -515,6 +516,10 @@
+             operator = node.op
+         return f"{operator}{self._precedence_parens(node, node.operand)}"
+ 
++    def visit_unknown(self, node: "Unknown") -> str:
++        """return an astroid.Unknown node as string"""
++        return node.name
++
+     def visit_while(self, node):
+         """return an astroid.While node as string"""
+         whiles = f"while {node.test.accept(self)}:\n{self._stmt_list(node.body)}"

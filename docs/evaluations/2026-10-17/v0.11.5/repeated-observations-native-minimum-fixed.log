@@ -1,0 +1,85 @@
+
+> medical-agent-dsh-integration@0.11.5 test:desktop
+> playwright test --config playwright.desktop.config.mjs --grep native repeat resumes
+
+
+Running 2 tests using 1 worker
+
+(node:989711) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x760 (1.0s)
+  ✘  2 tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 (6.0s)
+
+
+  1) tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('#active-question')
+    Timeout: 5000ms
+    - Expected  - 3
+    + Received  + 0
+
+    @@ -1,9 +1,6 @@
+      和刚开始比，怎么样了？
+    -
+    - 选择最接近当前情况的一项。
+    -
+      在加重
+      ↗
+      在减轻
+      ↗
+      变化不大
+
+    Call log:
+      - Expect "toHaveText" locator('#active-question') with timeout 5000ms
+      - waiting for locator('#active-question')
+        - locator resolved to <div aria-busy="true" aria-label="当前问题" id="active-question" class="active-question" data-identity="146401a9-88b4-479a-937c-7ca6c0f0ff16:question:146401a9-88b4-479a-937c-7ca6c0f0ff16:5">…</div>
+        13 × unexpected value "和刚开始比，怎么样了？
+    在加重
+    ↗
+    在减轻
+    ↗
+    变化不大
+    ↗
+    说不清
+    ↗
+    查看完整问题"
+           - locator resolved to <div aria-label="当前问题" aria-busy="false" id="active-question" class="active-question" data-identity="146401a9-88b4-479a-937c-7ca6c0f0ff16:question:146401a9-88b4-479a-937c-7ca6c0f0ff16:5">…</div>
+        - unexpected value "和刚开始比，怎么样了？
+    在加重
+    ↗
+    在减轻
+    ↗
+    变化不大
+    ↗
+    说不清
+    ↗
+    查看完整问题"
+
+
+       at ../fixtures/repeated-observations.mjs:228
+
+      226 |   ).toContainText("38.25 ℃");
+      227 |   await send("腋温37.6℃");
+    > 228 |   await expect(page.locator("#active-question")).toHaveText(question, {
+          |                                                  ^
+      229 |     useInnerText: true,
+      230 |   });
+      231 |   await expect(
+        at verifyResumedObservationQuestion (/home/suyingrui/Desktop/medical-agent/tests/fixtures/repeated-observations.mjs:228:50)
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/repeated-observations.spec.mjs:51:11
+
+    Error Context: test-results/desktop/repeated-observations-nati-c6a70--options-visible-at-900x680/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/repeated-observations-nati-c6a70--options-visible-at-900x680/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/repeated-observations-nati-c6a70--options-visible-at-900x680/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/repeated-observations.spec.mjs:16:3 › native repeat resumes the original question with all options visible at 900x680 
+  1 passed (7.4s)

@@ -1,0 +1,1 @@
+{"kind": "frozen-check-inputs-replay/v1", "external_model_calls": 0, "source_files_checked": 204, "checks": {"same_three_saved_decisions": true, "same_complete_conformance": true, "same_check_exit_states": true, "source_unchanged": true}, "passed": true}

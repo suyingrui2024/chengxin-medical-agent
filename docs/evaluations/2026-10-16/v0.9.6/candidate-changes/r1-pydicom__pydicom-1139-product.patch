@@ -1,0 +1,65 @@
+--- a/pydicom/tests/test_personname_iterable.py
++++ b/pydicom/tests/test_personname_iterable.py
+@@ -0,0 +1,47 @@
++# Regression tests: PersonName should behave like its string value for
++# membership tests / iteration (issue: "Make PersonName3 iterable").
++import pytest
++
++from pydicom import Dataset
++from pydicom.valuerep import PersonName
++
++
++class TestPersonNameIterable:
++
++    def test_membership_in(self):
++        name = PersonName('SomeName')
++        assert 'S' in name
++        assert 'ome' in name
++        assert 'Z' not in name
++
++    def test_membership_via_dataset(self):
++        ds = Dataset()
++        ds.PatientName = 'SomeName'
++        assert 'S' in ds.PatientName
++        assert str(ds.PatientName) == 'SomeName'
++
++    def test_iter_yields_characters(self):
++        name = PersonName('SomeName')
++        assert list(name) == list('SomeName')
++        assert ''.join(name) == str(name)
++
++    def test_iter_multi_component(self):
++        name = PersonName('Family^Given=Ideo^Graphic')
++        assert ''.join(name) == 'Family^Given=Ideo^Graphic'
++        assert '^' in name
++
++    def test_iter_empty(self):
++        assert list(PersonName('')) == []
++        # same as `'' in ''`
++        assert '' in PersonName('')
++
++    def test_iter_bytes_decoded_on_demand(self):
++        name = PersonName(b'SomeName')
++        assert list(name) == list('SomeName')
++        assert 'S' in name
++
++    def test_bytes_membership_in_bytes_raises(self):
++        # `in` with bytes should still behave like str (TypeError), not
++        # silently pretend to work.
++        with pytest.raises(TypeError):
++            b'S' in PersonName('SomeName')
+--- a/pydicom/valuerep.py
++++ b/pydicom/valuerep.py
+@@ -750,6 +750,12 @@
+     def __str__(self):
+         return '='.join(self.components).__str__()
+ 
++    def __iter__(self):
++        yield from str(self)
++
++    def __contains__(self, item):
++        return item in str(self)
++
+     def __repr__(self):
+         return '='.join(self.components).__repr__()
+ 

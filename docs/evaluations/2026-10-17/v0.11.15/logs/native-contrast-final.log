@@ -1,0 +1,12 @@
+
+> medical-agent-dsh-integration@0.11.15 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/location-answers.spec.mjs --output=.runtime/location-answers-20261017/native-contrast-final-results
+
+
+Running 1 test using 1 worker
+
+(node:1322417) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/location-answers.spec.mjs:13:1 › native fine location answers preserve corrected choices and source (1.8s)
+
+  1 passed (2.1s)

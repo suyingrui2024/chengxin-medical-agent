@@ -1,0 +1,19 @@
+{
+  "counterexamples_before_fix": [
+    {
+      "source": "1 000kg",
+      "accepted": true,
+      "result": "0"
+    },
+    {
+      "source": "1e 3kg",
+      "accepted": true,
+      "result": "3000"
+    }
+  ],
+  "expected": "Reject numeric fragments in grouped or spaced scientific notation.",
+  "repair": "The full-source prefix check rejects preceding digits, decimal/group separators and exponent prefixes. Added four cases to the existing evidence-rejection regression.",
+  "first_real_evaluation_passed": true,
+  "second_real_evaluation_passed": true,
+  "provider_error_count": 0
+}

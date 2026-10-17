@@ -1,0 +1,70 @@
+{
+  "version": "0.10.6",
+  "full_backend_executed": 230,
+  "full_backend_passed": 227,
+  "full_backend_skipped": 3,
+  "full_backend_duration_seconds": 231.595,
+  "skipped_methods_all_run_separately_on_final_runtime": true,
+  "long_tests": {
+    "test_ten_minute_budget_survives_old_rpc_deadline_and_collects_same_job": {
+      "log": "v0106-long-budget-final.log",
+      "unittest_duration_seconds": 186.414,
+      "passed": true,
+      "proof": {
+        "same_job_and_three_local_requests_asserted_by_test": true
+      }
+    },
+    "test_check_runs_beyond_the_old_tool_cap_and_collects_the_same_job": {
+      "log": "v0106-long-delivery-final.log",
+      "unittest_duration_seconds": 143.588,
+      "passed": true,
+      "proof": {
+        "elapsed_seconds": 143.227,
+        "model_fixture_requests": 2,
+        "actual_exit": 0,
+        "same_job": "bash-1",
+        "status": "completed"
+      }
+    },
+    "test_check_continues_same_job_across_the_600_second_wait_boundary": {
+      "log": "v0106-chunked-delivery.log",
+      "unittest_duration_seconds": 607.073,
+      "passed": true,
+      "proof": {
+        "elapsed_seconds": 606.548,
+        "model_fixture_requests": 2,
+        "wait_cycles": 2,
+        "actual_exit": 0,
+        "same_job": "bash-1",
+        "status": "completed"
+      }
+    }
+  },
+  "distinct_backend_tests_verified_across_final_runs": 230,
+  "patient_ui_passed": 24,
+  "source_native_passed": 16,
+  "packaged_native_passed": 16,
+  "node_assertions_passed": 21,
+  "package_own_files_matched": 97,
+  "applicable_locked_production_packages_matched": 544,
+  "real_upstream_requests": 3,
+  "real_conformance_passed": true,
+  "live_frozen_files": 131,
+  "final_source_test_metadata_files": 204,
+  "final_fingerprint_matches_live_frozen_map": true,
+  "frozen_three_decision_replay_passed": true,
+  "frozen_twenty_decision_counterfactual_passed": true,
+  "replay_external_model_calls": 0,
+  "old_public_scores_unchanged": true,
+  "previous_archive_files_unchanged": {
+    "v0.10.4": 403,
+    "v0.10.5": 519,
+    "v0.10.5-transfer": 690
+  },
+  "screenshots_manually_reviewed": [
+    "47-rejected-input-recovery.png"
+  ],
+  "general_dsh_parity_proven": false,
+  "clinical_validation_complete": false,
+  "scope": "Final backend coverage is a 227-pass regular run plus three separately executed opt-in long tests, not one all-enabled run. Real model checks are explicit synthetic conformance; saved decisions are local re-execution, not fresh model reasoning."
+}

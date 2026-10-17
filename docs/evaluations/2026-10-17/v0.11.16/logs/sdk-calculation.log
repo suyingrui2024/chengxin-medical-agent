@@ -1,0 +1,6 @@
+test_sdk_observes_rejection_repairs_calculation_delegates_and_restores_receipts (tests.test_execution_capabilities.CapabilitySdkTests) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 2.146s
+
+OK

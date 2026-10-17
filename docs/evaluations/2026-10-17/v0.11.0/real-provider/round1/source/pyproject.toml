@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=65"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medagent"
+version = "0.11.0"
+description = "Auditable outpatient-style consultation agent prototype"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "medical-agent contributors" }]
+
+[project.scripts]
+medagent = "medagent.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+medagent = ["web/*", "content/*.json", "content/*.txt"]
+"medagent.extensions" = ["packs/*.json", "templates/*.json"]
+

@@ -1,0 +1,51 @@
+{
+  "id": "calculate.units",
+  "name": "可解释单位换算",
+  "version": "0.1.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["value", "from_unit", "to_unit"],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "输入数值",
+        "minLength": 1,
+        "maxLength": 25
+      },
+      "from_unit": {
+        "type": "string",
+        "title": "原单位",
+        "enum": ["kg", "g", "mg", "L", "mL"]
+      },
+      "to_unit": {
+        "type": "string",
+        "title": "目标单位",
+        "enum": ["kg", "g", "mg", "L", "mL"]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["value", "unit", "formula", "method", "limitations"],
+    "properties": {
+      "value": { "type": "string" },
+      "unit": { "type": "string" },
+      "formula": { "type": "string" },
+      "method": { "type": "string" },
+      "limitations": { "type": "array", "items": { "type": "string" } }
+    }
+  },
+  "example": { "value": "1.25", "from_unit": "kg", "to_unit": "g" },
+  "validation": {
+    "status": "automated_engineering_tests",
+    "scope": "精确换算、量纲拒绝、契约和版本隔离；不评价临床意义"
+  }
+}

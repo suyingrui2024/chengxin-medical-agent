@@ -1,0 +1,61 @@
+[
+  {
+    "run": "first",
+    "kind": "execution-clarification-evaluation/v1",
+    "requests": 12,
+    "original_report_passed": true,
+    "clarification_tool_attempts": 3,
+    "clarification_tool_failures": 2,
+    "actual_questions_answered": 1,
+    "source_unchanged_when_question_arrived": true,
+    "answer_sequence": 34,
+    "edit_and_write_call_sequences": [
+      38,
+      40
+    ],
+    "all_edit_and_write_calls_follow_answer": true,
+    "before_answer_bash_commands": [
+      "ls -la /workspace && echo \"---\" && cat /workspace/issue.md 2>/dev/null"
+    ],
+    "online_snapshot_hashes_verified": true
+  },
+  {
+    "run": "second",
+    "kind": "execution-clarification-evaluation/v1",
+    "requests": 7,
+    "original_report_passed": false,
+    "clarification_tool_attempts": 1,
+    "clarification_tool_failures": 0,
+    "actual_questions_answered": 1,
+    "source_unchanged_when_question_arrived": true,
+    "answer_sequence": 26,
+    "edit_and_write_call_sequences": [
+      30
+    ],
+    "all_edit_and_write_calls_follow_answer": true,
+    "before_answer_bash_commands": [
+      "ls -la /workspace && echo \"---\" && ls -R /workspace --ignore=.git | head -50"
+    ],
+    "online_snapshot_hashes_verified": true
+  },
+  {
+    "run": "third",
+    "kind": "execution-clarification-evaluation/v2",
+    "requests": 7,
+    "original_report_passed": true,
+    "clarification_tool_attempts": 1,
+    "clarification_tool_failures": 0,
+    "actual_questions_answered": 1,
+    "source_unchanged_when_question_arrived": true,
+    "answer_sequence": 26,
+    "edit_and_write_call_sequences": [
+      30,
+      32
+    ],
+    "all_edit_and_write_calls_follow_answer": true,
+    "before_answer_bash_commands": [
+      "ls -la /workspace && echo \"---\" && cat /workspace/issue.md 2>/dev/null"
+    ],
+    "online_snapshot_hashes_verified": true
+  }
+]

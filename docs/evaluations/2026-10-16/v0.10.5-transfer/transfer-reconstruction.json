@@ -1,0 +1,18 @@
+{
+  "kind": "frozen-transfer-reconstruction/v1",
+  "returncode": 0,
+  "external_model_calls": 0,
+  "network_downloads": 0,
+  "frozen_environment_files_checked": 55,
+  "frozen_source_files_checked": 137,
+  "node_dependency_policy": "Reuse existing installed dependencies; no package installation.",
+  "stdout": "{\"source\": \"matplotlib__matplotlib-25498\", \"archive_bytes\": 37691777}\n{\"source\": \"pallets__flask-4045\", \"archive_bytes\": 621624}\n{\"source\": \"sphinx-doc__sphinx-8474\", \"archive_bytes\": 5983933}\n{\"source\": \"sympy__sympy-20049\", \"archive_bytes\": 6950659}\n{\"case\": \"matplotlib__matplotlib-25498\", \"prepared_files\": 7221, \"native_extensions_and_libraries\": 9}\n{\"case\": \"pallets__flask-4045\", \"prepared_files\": 603, \"native_extensions_and_libraries\": 0}\n{\"case\": \"sphinx-doc__sphinx-8474\", \"prepared_files\": 8742, \"native_extensions_and_libraries\": 0}\n{\"case\": \"sympy__sympy-20049\", \"prepared_files\": 2070, \"native_extensions_and_libraries\": 0}\n",
+  "stderr": "",
+  "all_prepared_sources_match": true,
+  "prepared_cases": {
+    "matplotlib__matplotlib-25498": true,
+    "pallets__flask-4045": true,
+    "sphinx-doc__sphinx-8474": true,
+    "sympy__sympy-20049": true
+  }
+}

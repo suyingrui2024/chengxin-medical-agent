@@ -1,0 +1,7 @@
+test_check_runs_beyond_the_old_tool_cap_and_collects_the_same_job (tests.test_execution_long_delivery.LongDeliveryTests) ... LONG_DELIVERY_PROOF={"elapsed_seconds": 143.227, "model_fixture_requests": 2, "actual_exit": 0, "same_job": "bash-1", "status": "completed"}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 143.588s
+
+OK

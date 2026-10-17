@@ -1,0 +1,17 @@
+{
+  "package_version": "0.11.17",
+  "binary_sha256": "433b343850ed9087fdb6548c48e1bb30011a87210cc3609f7b03061a7ac36c4f",
+  "driver_sha256": "53c4c2af1e57d1b56e4b560c1e083f3cd4af85d193117a8f5acf8d83b1094f92",
+  "launcher_sha256": "f30909dac3fbf016fb2b1a307435d2d51308a05fe83a041cd9a4e49ffde0e9a9",
+  "display_shared_with_host": true,
+  "host_system_libraries_mounted": false,
+  "system_files_source": "separate-rootfs",
+  "system_os_release_sha256": "59a77b5f2666d9c85c489bd1911a6eebbd91ef22fe48b90a3b75f1b21f3844d4",
+  "chinese_font_coverage_required": false,
+  "bundled_chinese_font_coverage_required": true,
+  "bundled_font_probe_sha256": "ec66f10c648cc49d805f79660cba6b7c74d81cbe74b6422b68fde291f2825598",
+  "external_network_namespace_shared": false,
+  "development_checkout_mounted": false,
+  "model_requests": 0,
+  "scope": "Same-kernel isolated desktop check, optionally using separately prepared OS libraries. Not a new physical machine or clinical validation."
+}

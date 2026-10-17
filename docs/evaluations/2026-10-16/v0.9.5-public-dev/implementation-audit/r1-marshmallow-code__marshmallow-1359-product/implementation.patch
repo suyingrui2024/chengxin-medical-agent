@@ -1,0 +1,22 @@
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -1112,11 +1112,15 @@
+ 
+     def _bind_to_schema(self, field_name, schema):
+         super()._bind_to_schema(field_name, schema)
+-        self.format = (
+-            self.format
+-            or getattr(schema.opts, self.SCHEMA_OPTS_VAR_NAME)
+-            or self.DEFAULT_FORMAT
++        # The field may be bound to a container field (e.g. ``List``) rather
++        # than to a ``Schema``. Use the root schema, if any, to look up the
++        # format option.
++        schema_format = (
++            getattr(self.root.opts, self.SCHEMA_OPTS_VAR_NAME, None)
++            if self.root is not None
++            else None
+         )
++        self.format = self.format or schema_format or self.DEFAULT_FORMAT
+ 
+     def _serialize(self, value, attr, obj, **kwargs):
+         if value is None:

@@ -1,0 +1,33 @@
+test_compatible_http_snapshot_and_priority_input_preempt_socket_wait (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_real_dsh_http_priority_input_cancels_bridge_and_discards_proposal (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_explicit_help_records_request_origin_without_inventing_symptoms (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_facts_committed_before_the_wait_survive_but_late_corrections_do_not (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_late_failure_cannot_replace_emergency_with_retry (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_new_information_in_another_help_request_is_retained (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_priority_correction_precedes_field_and_version_checks (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_raw_emergency_preempts_and_late_valid_facts_are_discarded (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_repeated_help_request_is_idempotent (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_worker_capacity_is_bounded_without_blocking_priority_or_other_sessions (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_compatible_transport_logs_actual_request_and_response (tests.test_backends.BackendTests) ... ok
+test_decision_requires_exact_top_level_envelope (tests.test_backends.BackendTests) ... ok
+test_missing_config_is_not_silently_demo_mode (tests.test_backends.BackendTests) ... ok
+test_official_deepseek_records_cache_usage_without_reasoning_or_keys (tests.test_backends.BackendTests) ... ok
+test_patient_api_through_real_dsh_to_validated_multi_fact_update (tests.integration.test_dsh_e2e.DshHttpIntegration) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 4.492s
+
+OK
+[16/Oct/2026 19:00:55] "GET /api/sessions/bc9ed223-ec4d-4163-b524-a9bd32ef7b3b/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 19:00:55] "POST /api/sessions/bc9ed223-ec4d-4163-b524-a9bd32ef7b3b/messages HTTP/1.1" 409 -
+[16/Oct/2026 19:00:55] "POST /api/sessions/bc9ed223-ec4d-4163-b524-a9bd32ef7b3b/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:00:55] "POST /api/sessions/bc9ed223-ec4d-4163-b524-a9bd32ef7b3b/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:00:56] "GET /api/sessions/f1310ace-0023-42b6-a5f7-17eb8aa254f0/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 19:00:56] "POST /api/sessions/f1310ace-0023-42b6-a5f7-17eb8aa254f0/messages HTTP/1.1" 409 -
+[16/Oct/2026 19:00:56] "POST /api/sessions/f1310ace-0023-42b6-a5f7-17eb8aa254f0/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:00:56] "POST /api/sessions/f1310ace-0023-42b6-a5f7-17eb8aa254f0/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:00:58] "POST /api/sessions HTTP/1.1" 201 -
+[16/Oct/2026 19:00:58] "POST /api/sessions/936507bc-b312-4026-894f-846404ef8219/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:00:58] "POST /api/sessions/936507bc-b312-4026-894f-846404ef8219/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:00:59] "POST /api/sessions/936507bc-b312-4026-894f-846404ef8219/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:00:59] "POST /api/sessions/936507bc-b312-4026-894f-846404ef8219/messages HTTP/1.1" 200 -

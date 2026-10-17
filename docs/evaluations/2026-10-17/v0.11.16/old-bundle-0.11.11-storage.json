@@ -1,0 +1,10 @@
+{
+  "version": "0.11.11",
+  "archive": "dist/desktop/archives/Chengxin-0.11.11-linux-x64.tar.gz",
+  "entries": 29565,
+  "archive_bytes": 290475243,
+  "sha256": "9a7b1b14c8ba8ff0424336bf1f83beab9befffbd825eebf0e2f76470f094b385",
+  "file_content_modes_links_verified": true,
+  "restore": "tar -xzf dist/desktop/archives/Chengxin-0.11.11-linux-x64.tar.gz -C dist/desktop",
+  "expanded_copy_removed": true
+}

@@ -1,0 +1,20 @@
+test_bad_value (test_convert.TestConvert) ... ok
+test_beyond_default_context_precision (test_convert.TestConvert) ... ok
+test_caller_context_precision_8_is_respected_but_not_harmed (test_convert.TestConvert) ... ok
+test_exponent_limit (test_convert.TestConvert) ... ok
+test_invalid_units (test_convert.TestConvert) ... ok
+test_negative (test_convert.TestConvert) ... ok
+test_precision (test_convert.TestConvert) ... ok
+test_range_and_rejection (test_convert.TestConvert) ... ok
+test_required_cases (test_convert.TestConvert) ... ok
+test_round_trip (test_convert.TestConvert) ... ok
+test_same_unit_and_identity (test_convert.TestConvert) ... ok
+test_scientific_and_large (test_convert.TestConvert) ... ok
+test_tiny_decimals (test_convert.TestConvert) ... ok
+test_unit_normalization (test_convert.TestConvert) ... ok
+test_zero (test_convert.TestConvert) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.001s
+
+OK

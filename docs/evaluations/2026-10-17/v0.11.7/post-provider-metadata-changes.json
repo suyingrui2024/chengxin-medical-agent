@@ -1,0 +1,15 @@
+{
+  "changes": [
+    {
+      "path": "src/medagent.egg-info/PKG-INFO",
+      "before": "0953def88756a9e10664b240f0948a4452ca5823d736b29cab399c1ca6426389",
+      "after": "ddd9b0b3667c1e8af239e78a5f3873f145f67b60e68cd4443ee5b4054322b4ea"
+    },
+    {
+      "path": "src/medagent.egg-info/SOURCES.txt",
+      "before": "cb732cd6d487a4c41ca94184c9259cd87be6f90efbd1d2f0add278fd327ed225",
+      "after": "d81bad694e8b595c8c43375a3b0969e6f419f2f1ea6b3505d2cac6c8ec6cdb27"
+    }
+  ],
+  "reason": "Regenerated distribution metadata after release version and file additions. Source logic unchanged after provider evaluation."
+}

@@ -1,0 +1,38 @@
+{
+  "verdict": "pass",
+  "target": "/workspace/invoice.py: total(lines)",
+  "method": "python3 实际执行（invoice.py 未改动，md5 e868b8909ce1421331e2a0f9aac5985a；fixture_identity.json md5 f7e568f90f646ef9aebb8da25daf2d56，未修改）",
+  "checks": [
+    {
+      "name": "prec=8 下 16位整数+6位小数 巨额价格，且调用前后全局精度不变",
+      "command": "python3 -c \"from decimal import getcontext; from invoice import total; getcontext().prec=8; print(total([{'price':'1234567890123456.999999','quantity':1000}]), getcontext().prec)\"",
+      "result": "输出 \"1234567890123457000.00 8\"，与期望一致；调用前后 getcontext().prec 均为 8（未修改全局精度）",
+      "finding": "通过：total 内部使用 localcontext 并抬高 prec，结果不受调用方 prec=8 影响；使用整数 1e-6 单位累加，无逐行舍入"
+    },
+    {
+      "name": "逐行舍入会出错的用例：两个 0.005 之和",
+      "command": "python3 -c \"from invoice import total; print(total([{'price':'0.005','quantity':1},{'price':'0.005','quantity':1}]))\"",
+      "result": "输出 \"0.01\"（若逐行 ROUND_HALF_UP 会得到 0.01+0.01=\"0.02\"，故实现确为仅对总和舍入）",
+      "finding": "通过：先精确求和再统一 ROUND_HALF_UP 两位"
+    },
+    {
+      "name": "非法价格/数量抛 ValueError 与边界值",
+      "command": "python3 -c \"from invoice import total; bad=['-1.00','nan','inf','-inf','1e3','1.2345678','12345678901234567','','1.','.5',5,None,True]; print([p for p in bad if not _raises(p)])\"（实际以 try/except ValueError 循环断言）",
+      "result": "bad 价格全部抛 ValueError，无漏网、无其它异常类型；quantity ∈ {True,'2',1001,-1,2.0,None} 全部抛 ValueError；total([])==\"0.00\"；[{'price':'0','quantity':0}]==\"0.00\"；调用后 getcontext().prec 仍为 8",
+      "finding": "通过：bool 被显式排除（isinstance(value,bool) 前置判断），范围 0..1000 校验生效，空列表返回 \"0.00\""
+    },
+    {
+      "name": "独立整数实现随机对拍 300 例（prec=8）",
+      "command": "python3 - <<'PY' ... 参考实现：u=Σ(int(整数部分)*1e6+小数位补零)*qty；cents,rem=divmod(u,10000); rem*2>=10000 则进位 ... PY",
+      "result": "300 例（0~6 行，价格 16 位整数 + 6 位小数随机，数量 0..1000）零不一致；对拍后 getcontext().prec 仍为 8",
+      "finding": "通过：与完全独立的纯整数/半进位参考实现逐步一致"
+    },
+    {
+      "name": "既有测试回归",
+      "command": "python3 -m pytest -q tests",
+      "result": "16 passed in 0.02s（tests/test_existing.py 与 tests/test_total.py 均通过）",
+      "finding": "通过：未修改 tests/test_existing.py 与 fixture_identity.json"
+    }
+  ],
+  "issues": []
+}

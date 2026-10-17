@@ -1,0 +1,66 @@
+
+> medical-agent-dsh-integration@0.10.5 test:desktop
+> playwright test --config playwright.desktop.config.mjs
+
+
+Running 15 tests using 1 worker
+
+(node:760349) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/desktop/app.spec.mjs:11:1 › explicit live mode configures a model without making an automatic model call (741ms)
+  ✓   2 tests/desktop/app.spec.mjs:59:1 › desktop app owns its window, private sidecar and shutdown lifecycle (1.5s)
+  ✓   3 tests/desktop/changes.spec.mjs:45:1 › desktop reviews actual file changes and restores ten-minute history offline (4.5s)
+  ✓   4 tests/desktop/clarifications.spec.mjs:48:1 › native clarification waits for real answers, recovers a lost response and restores history (6.3s)
+  ✘   5 tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history (11.2s)
+(node:761559) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   6 tests/desktop/execution.spec.mjs:72:1 › native registered calculation renders only host receipts and restores them offline (3.6s)
+  ✓   7 tests/desktop/execution.spec.mjs:219:1 › native execution creates files, shows real subagents, cancels a process and resumes the same workspace (10.6s)
+  ✓   8 tests/desktop/execution.spec.mjs:438:1 › native execution uses structured outcomes despite misleading command output (5.1s)
+  ✓   9 tests/desktop/execution.spec.mjs:651:1 › native execution shows bounded recovery, handles moved directories and ignores stale preview errors (8.9s)
+  ✓  10 tests/desktop/freshness.spec.mjs:13:1 › native checks mark changed inputs as needing revalidation and accept the actual new check (3.1s)
+  ✓  11 tests/desktop/patient-calculation.spec.mjs:14:1 › native patient calculation uses real controller confirmation and resumes the interview (1.4s)
+  ✓  12 tests/desktop/persistence.spec.mjs:44:1 › desktop restores offline history, rotates credentials and resumes the original SDK session (9.0s)
+  ✓  13 tests/desktop/projects.spec.mjs:57:1 › native project picker edits the chosen directory, delegates review and restores offline (3.8s)
+  ✓  14 tests/desktop/startup-close.spec.mjs:11:1 › closing the startup window stops a delayed sidecar without a blocking error dialog (2.4s)
+  ✓  15 tests/desktop/urgent-interrupt.spec.mjs:12:1 › native priority help interrupts real DSH while the provider is still waiting (1.4s)
+
+
+  1) tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('#execution-check-summary .execution-check-chip')
+    Expected substring: "退出 0"
+    Received string:    "!新增测试版本未核对"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" locator('#execution-check-summary .execution-check-chip') with timeout 5000ms
+      - waiting for locator('#execution-check-summary .execution-check-chip')
+        14 × locator resolved to <button type="button" class="execution-check-chip check-unresolved" title="本轮必需检查最近一次运行的状态。检查范围：整个工作区。文件变化后需复验；退出0不代表需求覆盖充分。" data-check-key="fb8c8aef0c6e7ef474d88fdad30b85a2bacce56dba17216e767e8dee9981f356">…</button>
+           - unexpected value "!新增测试版本未核对"
+
+
+      205 |     await page.getByLabel("选择执行工作区").selectOption(identity);
+      206 |     chip = page.locator("#execution-check-summary .execution-check-chip");
+    > 207 |     await expect(chip).toContainText("退出 0");
+          |                        ^
+      208 |     await chip.click();
+      209 |     await expect(
+      210 |       page.locator(".execution-delivery details[open]").last(),
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/delivery.spec.mjs:207:24
+
+    Error Context: test-results/desktop/delivery-native-delivery-c-18db2-tore-the-real-check-history/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/delivery-native-delivery-c-18db2-tore-the-real-check-history/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/delivery-native-delivery-c-18db2-tore-the-real-check-history/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/delivery.spec.mjs:13:1 › native delivery checks show failure, repair within budget and restore the real check history 
+  14 passed (1.2m)

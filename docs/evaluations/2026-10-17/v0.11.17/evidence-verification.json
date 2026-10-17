@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "frozen_source_files": 327,
+  "baseline_runtime_files": 115,
+  "final_debian_assertions": 17,
+  "actual_han_glyphs_per_role": 246,
+  "font_roles": [
+    "body",
+    "serif",
+    "mono"
+  ],
+  "outlined_image_labels": 17,
+  "external_model_requests": 0,
+  "previous_archives_unchanged": {
+    "v0.11.16": 415,
+    "v0.11.16-clean-environment": 26
+  },
+  "scope": "Recorded bytes and rendering evidence; no new-machine, clinical or process-sandbox effectiveness claim."
+}

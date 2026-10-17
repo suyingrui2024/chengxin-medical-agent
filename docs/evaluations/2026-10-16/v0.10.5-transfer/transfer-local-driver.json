@@ -1,0 +1,34 @@
+{
+  "kind": "local-driver-conformance",
+  "external_model_calls": 0,
+  "results": [
+    {
+      "arm": "product",
+      "reference": true,
+      "implementation_passed": true,
+      "runtime_completed": true,
+      "end_to_end_completed": true,
+      "calls": 2,
+      "error": null
+    },
+    {
+      "arm": "official-sdk",
+      "reference": true,
+      "implementation_passed": true,
+      "runtime_completed": true,
+      "end_to_end_completed": true,
+      "calls": 2,
+      "error": null
+    },
+    {
+      "arm": "product",
+      "reference": false,
+      "implementation_passed": false,
+      "runtime_completed": true,
+      "end_to_end_completed": false,
+      "calls": 1,
+      "error": null
+    }
+  ],
+  "passed": true
+}

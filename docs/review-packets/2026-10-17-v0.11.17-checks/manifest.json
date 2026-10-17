@@ -1,0 +1,14 @@
+{
+  "files": {
+    "browser.log": "881980e5c0e4dbd8aa6b346a0b45d3ac184b8f22e39b73f3cb39fca4f7c9afa2",
+    "exporter-verification.json": "ca8942ada8a5b29ebe0e8d6151bb7088926d3326fb9b9a2fbd4a287b55160f80",
+    "illustrations.png": "45725e8e655397e1b1daa2fdb2d90d55694ff6ecfecf86848946e3addfa28b5e",
+    "inspect.mjs": "4c77c03cb88c7d029f1699d5f5a3f80ce990d03fd1e725f1e60685ac1fa2f353",
+    "mobile.png": "7e6a02164c81903c0bfd5cfd7610f1f1ef2ceac19ac2fd5c36b88ad9a93a9b9b",
+    "overview.png": "1337e3d1ab1b1fd38f21dd09cbf58e2e4862f9b6c484728eea129c58d9697aef",
+    "readme.txt": "4c19630fffb6e5a11c2826a11400a57c02c0dcda5328ada1db742203f579cb94",
+    "ui-verification.json": "8c3494eb49f20ce163a95cde7a5a0beabf2fde6fe0fcc45acbf6df23eeeb0d9f",
+    "unchanged-runtime-package.json": "7f5f85f3257c0c014561bf089cf19b1f11ef5d7c100d55cbe3f05e0f6ffdd7a2"
+  },
+  "clinical_review": "pending"
+}

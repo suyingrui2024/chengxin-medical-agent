@@ -1,0 +1,14 @@
+{
+  "changes": {
+    "docs/首版产品与技术设计.md": {
+      "before": "1443b5257b7d720c130fe8f1b83c397e4ce23ffd68e40d850e967d4c8a3377ea",
+      "after": "c39c591011a8aa18d4d7498da723469f4f79f40a4b861cffd114962d90f7459a"
+    },
+    "src/medagent.egg-info/PKG-INFO": {
+      "before": "4ae60e0545958c0216cefdeee894148f14ad10d083d3b8b2036bc600f272a1c1",
+      "after": "3a64b2e3cbd518aec41a83662df7fe1affc2393bf15a2efdf98eb707218a7a4e"
+    }
+  },
+  "application_behavior_changed": false,
+  "reason": "Correct the primary tool table and regenerate distribution metadata for version 0.11.14 during packaging. No controller, prompt or renderer changes after the provider evaluation."
+}

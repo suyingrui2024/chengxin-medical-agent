@@ -1,0 +1,9 @@
+{
+  "files": {
+    "regressions/test_blueprint_name_dot.py": "3111a6a05580462e180441411709ff1c7a7c51dbf6e2e2c8c8321660fd0d39eb",
+    "src/flask/blueprints.py": "daffade3857d07bb4623f61728be9976644794707a4e7c6a0f67c1be089683a2"
+  },
+  "deleted": [],
+  "links": {},
+  "special": {}
+}

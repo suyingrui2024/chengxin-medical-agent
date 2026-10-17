@@ -1,0 +1,36 @@
+{
+  "repository": "https://github.com/notofonts/noto-cjk",
+  "commit": "f8d157532fbfaeda587e826d4cd5b21a49186f7c",
+  "license": "SIL Open Font License 1.1",
+  "license_file": "fonts-OFL.txt",
+  "license_sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+  "license_sources": [
+    "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/LICENSE",
+    "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Serif/LICENSE"
+  ],
+  "files": [
+    {
+      "file": "NotoSansCJKsc-Regular.otf",
+      "upstream_path": "Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+      "source": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+      "bytes": 16437364,
+      "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+      "git_blob_sha1": "dc15562470b4f842321894787a0d066879ccff8b",
+      "copyright": "© 2014-2021 Adobe (http://www.adobe.com/).",
+      "font_version": "Version 2.004;hotconv 1.0.118;makeotfexe 2.5.65603",
+      "modified": false
+    },
+    {
+      "file": "NotoSerifCJKsc-Regular.otf",
+      "upstream_path": "Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Regular.otf",
+      "source": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Regular.otf",
+      "bytes": 24543080,
+      "sha256": "2a2eae2628df83556c54018c41e20fa532c1b862c5256ae8b3f23feb918d12ca",
+      "git_blob_sha1": "cba8a4783cc38574ac7cda52cae7d9b4241c07a5",
+      "copyright": "© 2017-2024 Adobe (http://www.adobe.com/).",
+      "font_version": "Version 2.003;hotconv 1.1.1;makeotfexe 2.6.0",
+      "modified": false
+    }
+  ],
+  "scope": "Unmodified original font bytes, locally served without third-party requests; CSS aliases do not alter font metadata."
+}

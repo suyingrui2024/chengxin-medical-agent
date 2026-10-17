@@ -1,0 +1,7 @@
+{
+  "id": "general",
+  "version": "0.1.0",
+  "title": "通用问诊研究模板",
+  "description": "采集必要病史，按适用条件提供图示观察，允许显式计算。未完成临床审核。",
+  "enabled": ["observe.temperature", "observe.location", "calculate.units"]
+}

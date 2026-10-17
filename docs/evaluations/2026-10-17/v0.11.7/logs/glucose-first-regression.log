@@ -1,0 +1,53 @@
+test_confirmation_executes_once_without_model_or_clinical_fact_and_resumes (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_emergency_text_bypasses_even_stale_card_and_never_computes (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_fabricated_or_unsolicited_inputs_do_not_create_a_form (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_fact_correction_invalidates_the_previous_confirmation (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_invalid_dimension_keeps_edited_inputs_and_original_proposal (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_malformed_confirmed_parameters_cannot_execute_and_form_is_retained (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_missing_or_wrong_card_identifiers_are_refused_before_mutation (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_new_patient_message_cancels_draft_and_reaches_the_planner (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_partial_input_is_blank_and_patient_can_supply_new_values (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_prior_clarification_returns_without_losing_its_wording (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_skip_returns_to_original_question_without_model_call (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_unknown_parameters_are_missing_not_invalid_measurements (tests.test_patient_calculations.PatientCalculationTests) ... ok
+test_content_package_preserves_unknown_and_patient_quality (tests.test_capabilities.CapabilityTests) ... ok
+test_contract_rejects_incompatible_api_and_ungranted_permissions (tests.test_capabilities.CapabilityTests) ... ok
+test_decimal_conversion_is_exact_and_has_provenance (tests.test_capabilities.CapabilityTests) ... ok
+test_dimension_mismatch_and_invalid_input_are_rejected (tests.test_capabilities.CapabilityTests) ... ok
+test_disabled_calculation_and_content_cannot_execute (tests.test_capabilities.CapabilityTests) ... ok
+test_invalid_observation_keeps_task_pending_and_skip_still_works (tests.test_capabilities.CapabilityTests) ... ok
+test_malformed_output_is_rejected_before_a_case_can_use_it (tests.test_capabilities.CapabilityTests) ... ok
+test_manifest_copies_cannot_change_live_registry (tests.test_capabilities.CapabilityTests) ... ok
+test_new_content_pack_uses_existing_flow_and_invalidation (tests.test_capabilities.CapabilityTests) ... ok
+test_new_registered_capability_uses_existing_agent_dispatch (tests.test_capabilities.CapabilityTests) ... ok
+test_observation_dependency_contract_rejects_invalid_fields (tests.test_capabilities.CapabilityTests) ... ok
+test_reconfiguration_keeps_old_session_and_its_active_task (tests.test_capabilities.CompositionTests) ... ok
+test_stale_or_invalid_update_cannot_change_active_composition (tests.test_capabilities.CompositionTests) ... ok
+test_template_switch_and_preview_are_case_independent (tests.test_capabilities.CompositionTests) ... ok
+test_sdk_observes_rejection_repairs_calculation_delegates_and_restores_receipts (tests.test_execution_capabilities.CapabilitySdkTests) ... skipped 'Requires real isolated DSH'
+test_cross_dimension_requires_explicit_density_and_is_rejected (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_decimal_result_has_host_provenance_and_unconfirmed_status (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_forged_omitted_and_different_quantity_or_unit_cannot_pass (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_frozen_binding_disabled_capability_and_version_change (tests.test_execution_capabilities.RegisteredCalculationTests) ... FAIL
+test_legacy_workspace_does_not_gain_calculation_permissions (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_old_receipt_stays_readable_when_implementation_unavailable_and_corrupt_presentation_is_rejected (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+test_trimming_sign_exponent_ranges_or_density_does_not_launder_source (tests.test_execution_capabilities.RegisteredCalculationTests) ... ok
+
+======================================================================
+FAIL: test_frozen_binding_disabled_capability_and_version_change (tests.test_execution_capabilities.RegisteredCalculationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/suyingrui/Desktop/medical-agent/tests/test_execution_capabilities.py", line 194, in test_frozen_binding_disabled_capability_and_version_change
+    self.assertEqual(
+AssertionError: Lists differ: [{'id': 'calculate.glucose', 'name': '血糖单位[1545 chars]'}]}] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+{'id': 'calculate.glucose', 'name': '血糖单位换算', 'version': '0.1.0', 'api_version': 'medical-capability/v1', 'kind': 'calculation', 'description': '仅换算明确的血糖（葡萄糖）读数：mmol/L与mg/dL；使用常用系数18，显示近似标记、公式、来源和适用范围。', 'permissions': [], 'review_status': 'engineering_verified_not_clinical', 'ui': 'calculation', 'patient_form': 'unit_conversion/v2', 'input_schema': {'type': 'object', 'additionalProperties': False, 'required': ['value', 'from_unit', 'to_unit'], 'properties': {'value': {'type': 'string', 'title': '输入数值', 'minLength': 1, 'maxLength': 25}, 'from_unit': {'type': 'string', 'title': '原单位', 'enum': ['mmol/L', 'mg/dL']}, 'to_unit': {'type': 'string', 'title': '目标单位', 'enum': ['mmol/L', 'mg/dL']}}}, 'output_schema': {'type': 'object', 'additionalProperties': False, 'required': ['value', 'unit', 'formula', 'method', 'limitations', 'approximate', 'precision_policy'], 'properties': {'value': {'type': 'string'}, 'unit': {'type': 'string'}, 'formula': {'type': 'string'}, 'method': {'type': 'string'}, 'limitations': {'type': 'array', 'items': {'type': 'string'}}, 'approximate': {'type': 'boolean'}, 'precision_policy': {'type': 'string'}}}, 'example': {'value': '10', 'from_unit': 'mmol/L', 'to_unit': 'mg/dL'}, 'validation': {'status': 'engineering_prototype_requires_review', 'scope': '固定18近似系数、双向换算、出处、输入核对与版本绑定；不评价临床意义'}, 'patient_input_policy': 'blood_glucose', 'references': [{'title': 'American Diabetes Association · Common Terms', 'url': 'https://diabetes.org/about-diabetes/common-terms', 'section': 'Mg/dL与Mmol/L的文字说明：乘18／除18；该页面反向示例含乘号笔误，不直接复制示例。', 'accessed': '2026-10-17'}]}
+
+Diff is 2759 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 34 tests in 0.327s
+
+FAILED (failures=1, skipped=1)

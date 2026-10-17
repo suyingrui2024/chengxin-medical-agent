@@ -1,0 +1,61 @@
+--- a/pvlib/iam.py
++++ b/pvlib/iam.py
+@@ -130,7 +130,9 @@
+     Returns
+     -------
+     iam : numeric
+-        The incident angle modifier
++        The incident angle modifier. Returns zero for all angles of incidence
++        with ``cos(aoi) <= 0`` (i.e. at or beyond 90 degrees from the module
++        normal).  Angles of nan result in nan.
+ 
+     Notes
+     -----
+@@ -175,8 +177,22 @@
+     n2costheta2 = n2 * costheta
+ 
+     # reflectance of s-, p-polarized, and normal light by the first interface
+-    rho12_s = ((n1costheta1 - n2costheta2) / (n1costheta1 + n2costheta2)) ** 2
+-    rho12_p = ((n1costheta2 - n2costheta1) / (n1costheta2 + n2costheta1)) ** 2
++    # When the two media are index-matched (n1 == n2, e.g. n=1 without an AR
++    # coating) both the numerator and the denominator of the Fresnel
++    # quotients vanish at AOI >= 90 deg.  The reflectance is zero in that
++    # case, so it is set explicitly to avoid an indeterminate 0/0 result.
++    # Multiplying by 0 also preserves nan for nan AOI and the input type
++    # (scalar, array or Series).
++    if np.allclose(n1, n2):
++        rho12_s = costheta * 0.
++        rho12_p = costheta * 0.
++    else:
++        rho12_s = (
++            (n1costheta1 - n2costheta2) / (n1costheta1 + n2costheta2)
++        ) ** 2
++        rho12_p = (
++            (n1costheta2 - n2costheta1) / (n1costheta2 + n2costheta1)
++        ) ** 2
+     rho12_0 = ((n1 - n2) / (n1 + n2)) ** 2
+ 
+     # transmittance through the first interface
+@@ -208,9 +224,19 @@
+         tau_0 *= (1 - rho23_0) / (1 - rho23_0 * rho12_0)
+ 
+     # transmittance after absorption in the glass
+-    tau_s *= np.exp(-K * L / costheta)
+-    tau_p *= np.exp(-K * L / costheta)
+-    tau_0 *= np.exp(-K * L)
++    # costheta is zero at AOI >= 90 deg when the media are index-matched
++    # (n1 == n2), in which case no light is transmitted through the glass and
++    # the exponent -K*L/costheta is undefined; use zero transmittance there.
++    # nan AOI is propagated as nan.
++    costheta = np.asarray(costheta, dtype=float)
++    with np.errstate(divide='ignore', invalid='ignore'):
++        absorption = np.exp(-K * L / costheta)
++    absorption = np.where(
++        np.isnan(costheta), np.nan,
++        np.where(costheta > 0, absorption, 0.))
++    tau_s = tau_s * absorption
++    tau_p = tau_p * absorption
++    tau_0 = tau_0 * np.exp(-K * L)
+ 
+     # incidence angle modifier
+     iam = (tau_s + tau_p) / 2 / tau_0

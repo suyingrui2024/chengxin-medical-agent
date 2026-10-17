@@ -1,0 +1,13 @@
+{
+  "schema": "public-transfer-scoring/v1",
+  "registered_before_external_model_calls": true,
+  "implementation_passed": "Rebuild from frozen source, restore all protected tests/config/dependencies, overlay candidate implementation, apply exact upstream test patch, run every mapped FAIL_TO_PASS and PASS_TO_PASS node. Require pytest exit 0 and every node passed; skips/errors/missing outcomes fail.",
+  "file_contract_passed": "Use the same explicit byte-preservation contract in both prompts and the existing no-follow candidate snapshot checker. Ordinary implementation links are retained as link text for isolated reconstruction; protected links or special files cannot silently count as compliant.",
+  "added_regressions_passed": "Run all allowed newly added regressions/test_*.py in the rebuilt environment; require actual nonzero collection for every added file and every collected node passed. If none exist, mark not applicable without claiming generated-test coverage.",
+  "runtime_completed": "Only the actual SDK completion reason with a nonempty final response; independent of source correctness.",
+  "end_to_end_completed": "Implementation, file contract, added regressions, request bound, provider HTTP responses, independent verification and actual root completion all pass.",
+  "primary_reporting": ["implementation_passed", "file_contract_passed", "added_regressions_passed", "runtime_completed", "end_to_end_completed", "actual_requests", "execution_duration"],
+  "model_conditions": "Same configured model, pinned DSH 0.2.0-rc.2, shared 8192-token output bound, identical prepared files and user task, 20 actual upstream requests and 600 seconds per arm. Product persona, dynamic budget context, first-party tools, waits and completion checks remain product behavior; independent SDK keeps its own default persona and official tool behavior. Full system prompts and tools are not identical.",
+  "development_policy": "Freeze runtime, tasks, scoring and evaluator source before first paid request. Complete the predeclared plan without tuning on intermediate outcomes. Keep all failed and incomplete runs. Do not replace selected tasks.",
+  "scope": "Four public historical tasks, one per existing repository adapter, each repeated twice. Public-model training contamination is possible. Results do not establish full-population performance, general DSH/Codex parity, clinical validity, or network isolation. The no-upstream-answer rule is an instruction, not a network hard block."
+}

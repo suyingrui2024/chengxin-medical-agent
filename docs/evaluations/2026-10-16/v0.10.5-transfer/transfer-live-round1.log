@@ -1,0 +1,16 @@
+{"case": "matplotlib__matplotlib-25498", "repetition": 1, "arm": "product", "implementation_passed": true, "runtime_completed": false, "added_regressions_passed": false, "end_to_end_completed": false, "calls": 20}
+{"case": "matplotlib__matplotlib-25498", "repetition": 1, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "pallets__flask-4045", "repetition": 1, "arm": "product", "implementation_passed": false, "runtime_completed": true, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 19}
+{"case": "pallets__flask-4045", "repetition": 1, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "sphinx-doc__sphinx-8474", "repetition": 1, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "sphinx-doc__sphinx-8474", "repetition": 1, "arm": "product", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 19}
+{"case": "sympy__sympy-20049", "repetition": 1, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "sympy__sympy-20049", "repetition": 1, "arm": "product", "implementation_passed": true, "runtime_completed": true, "added_regressions_passed": true, "end_to_end_completed": true, "calls": 20}
+{"case": "matplotlib__matplotlib-25498", "repetition": 2, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": false, "end_to_end_completed": false, "calls": 20}
+{"case": "matplotlib__matplotlib-25498", "repetition": 2, "arm": "product", "implementation_passed": true, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "pallets__flask-4045", "repetition": 2, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "pallets__flask-4045", "repetition": 2, "arm": "product", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 17}
+{"case": "sphinx-doc__sphinx-8474", "repetition": 2, "arm": "product", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "sphinx-doc__sphinx-8474", "repetition": 2, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}
+{"case": "sympy__sympy-20049", "repetition": 2, "arm": "product", "implementation_passed": false, "runtime_completed": true, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 18}
+{"case": "sympy__sympy-20049", "repetition": 2, "arm": "official-sdk", "implementation_passed": false, "runtime_completed": false, "added_regressions_passed": true, "end_to_end_completed": false, "calls": 20}

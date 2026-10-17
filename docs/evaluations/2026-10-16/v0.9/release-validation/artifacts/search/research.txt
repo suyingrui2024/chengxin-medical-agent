@@ -1,0 +1,38 @@
+Python Decimal 如何避免二进制浮点的部分误差
+（依据：实际抓取的官方文档 https://docs.python.org/3/library/decimal.html ，HTTP 200；
+ 抓取时该页面标注为 Python 3.15.0 文档，属开发版文档，非稳定版）
+
+1. 表示方式不同
+   二进制 float 用 2 的幂之和表示数值，像 1.1、2.2 这类十进制小数在二进制中是无限循环
+   小数，只能存成最接近的可表示值，因此本身就不是精确值。
+   （“无限循环小数、只能近似”是页面论断的数学解释，页面只直接写了它们没有精确表示。）
+   Decimal 采用“符号 + 系数数字 + 十进制指数”的十进制浮点模型，可以精确表示十进制小数
+   （文档原文：Decimal numbers can be represented exactly）。
+
+2. 误差因此被避免的部分
+   官方文档给出的例子：十进制下 0.1 + 0.1 + 0.1 - 0.3 恰好等于 0；
+   而二进制浮点结果是 5.5511151231257827e-017，接近 0 但不等于 0，会破坏相等性判断并累积偏差。
+   文档因此指出 Decimal 更适合有严格相等不变量要求的记账类应用。
+   本地实测（Python 3.10.12）：Decimal('0.1')+Decimal('0.2') == Decimal('0.3') 为 True。
+
+3. 精度与舍入可控
+   Decimal 的精度可由用户设置（默认 28 位，可放大），并可在运算时指定舍入模式
+   （ROUND_HALF_EVEN、ROUND_DOWN、ROUND_CEILING 等），还保留了有效位概念：
+   1.30 + 1.20 得到 2.50，1.30 * 1.20 得到 1.5600，符合货币等场景的表示习惯。
+   运算超出精度时会产生 Inexact/Rounded 信号，可选择忽略、记录或直接抛异常。
+
+4. 必须注意的边界（不是“无条件消除误差”）
+   - Decimal(0.1) 或 Decimal.from_float(0.1) 是精确转换该 float 的二进制值，结果是
+     0.1000000000000000055511151231257827021181583404541015625，仍带着原 float 的误差；
+     应改用字符串构造 Decimal('0.1')（此为文档示例的用法归纳，页面未逐字给出“正确做法”一句）。
+   - 乘除、开方、对数等仍可能不精确，只是在十进制模型下按指定精度与舍入规则得到
+     “正确舍入”的结果，而非数学上的绝对精确。
+   - Decimal 一般不能与 float 直接做算术运算（会抛 TypeError），比较运算可以。
+
+实际查阅的官方链接：
+- https://docs.python.org/3/library/decimal.html （本轮 web_fetch 成功，HTTP 200）
+- 另见规范：General Decimal Arithmetic Specification https://speleotrove.com/decimal/decarith.html
+  （该链接出现在上述官方文档的 See also 小节中，本轮未单独抓取）
+
+工具与网络状态：本轮 web_search 调用返回了结果，web_fetch 调用成功（HTTP 200），无失败记录；
+web_search 只用于检索链接，其返回页面的正文未逐字抓取，故不对搜索结果内容作引文级断言。

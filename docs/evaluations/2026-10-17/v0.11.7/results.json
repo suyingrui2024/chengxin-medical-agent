@@ -1,0 +1,49 @@
+{
+  "version": "0.11.7",
+  "backend": {
+    "default_collected": 303,
+    "default_passed": 249,
+    "default_skipped": 54,
+    "separately_passed_original_sdk_tests": 50,
+    "separately_passed_new_glucose_sdk_test": 1,
+    "unique_passed": 300,
+    "three_long_opt_in_tests_not_rerun": true
+  },
+  "ui": {
+    "full_suite_passed": 42,
+    "final_affected_tests_passed": 5
+  },
+  "native": {
+    "source_first_full_passed": 25,
+    "source_first_full_failed": 1,
+    "source_fixed_affected_passed": 4,
+    "final_packaged_full_passed": 27
+  },
+  "bridge_passed": 21,
+  "frozen": {
+    "files": 258,
+    "selected_tests": 125
+  },
+  "real_provider": {
+    "requests": 2,
+    "statuses": [
+      200,
+      200
+    ],
+    "cases": 2,
+    "synthetic_only": true
+  },
+  "package": {
+    "own_source_files": 107,
+    "locked_production_versions": 544,
+    "passed": true
+  },
+  "format": {
+    "prettier_script_passed": true,
+    "black_changed_files_passed": 16,
+    "whole_tree_exploratory_black_failed_on_14_files_before_one_changed_init_was_formatted": true,
+    "whole_tree_black_pass_not_claimed": true
+  },
+  "clinical_validation": false,
+  "general_dsh_or_codex_parity_proven": false
+}

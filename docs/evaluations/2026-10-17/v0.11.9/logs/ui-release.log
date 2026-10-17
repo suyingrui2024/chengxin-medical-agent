@@ -1,0 +1,15 @@
+
+> medical-agent-dsh-integration@0.11.9 test:ui
+> playwright test tests/ui/consultation-subjects.spec.mjs
+
+
+Running 4 tests using 1 worker
+
+(node:1109668) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/consultation-subjects.spec.mjs:7:1 › unsubmitted patient text stays with its original session (648ms)
+  ✓  2 tests/ui/consultation-subjects.spec.mjs:54:1 › choosing an answer does not silently submit or erase a different composer draft (404ms)
+  ✓  3 tests/ui/consultation-subjects.spec.mjs:84:3 › consultation subjects stay separate and new-case text remains editable (1.6s)
+  ✓  4 tests/ui/consultation-subjects.spec.mjs:84:3 › consultation subjects stay separate and new-case text remains editable on a narrow screen (1.6s)
+
+  4 passed (8.1s)

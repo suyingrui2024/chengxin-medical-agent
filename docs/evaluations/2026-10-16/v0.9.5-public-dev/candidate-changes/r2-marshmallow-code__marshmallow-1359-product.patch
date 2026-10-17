@@ -1,0 +1,102 @@
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -1114,7 +1114,7 @@
+         super()._bind_to_schema(field_name, schema)
+         self.format = (
+             self.format
+-            or getattr(schema.opts, self.SCHEMA_OPTS_VAR_NAME)
++            or getattr(getattr(schema, "opts", None), self.SCHEMA_OPTS_VAR_NAME, None)
+             or self.DEFAULT_FORMAT
+         )
+ 
+--- a/tests/test_regression_container_datetime.py
++++ b/tests/test_regression_container_datetime.py
+@@ -0,0 +1,88 @@
++"""Regression tests for DateTime/Date fields nested in container fields.
++
++Binding a ``DateTime`` (or ``Date``) field as the inner field of ``List``,
++``Tuple`` or ``Mapping`` used to raise ``AttributeError: 'List' object has no
++attribute 'opts'`` because the parent field was assumed to be a Schema.
++"""
++import datetime as dt
++
++import pytest
++
++from marshmallow import Schema, fields
++
++
++class ListSchema(Schema):
++    times = fields.List(fields.DateTime())
++
++
++class TupleSchema(Schema):
++    times = fields.Tuple((fields.DateTime(), fields.DateTime()))
++
++
++class MappingSchema(Schema):
++    mapping = fields.Mapping(keys=fields.Date(), values=fields.DateTime())
++
++
++class DictKeySchema(Schema):
++    mapping = fields.Dict(keys=fields.Date(), values=fields.DateTime())
++
++
++def test_datetime_in_list_binds_to_default_format():
++    schema = ListSchema()
++    assert schema.fields["times"].inner.format == "iso"
++    result = schema.dump({"times": [dt.datetime(2019, 1, 2, 3, 4, 5)]})
++    assert result == {"times": ["2019-01-02T03:04:05"]}
++
++
++def test_datetime_in_list_roundtrip_load():
++    schema = ListSchema()
++    data = schema.load({"times": ["2019-01-02T03:04:05"]})
++    assert data == {"times": [dt.datetime(2019, 1, 2, 3, 4, 5)]}
++
++
++def test_datetime_in_tuple_binds_to_default_format():
++    schema = TupleSchema()
++    assert [f.format for f in schema.fields["times"].tuple_fields] == ["iso", "iso"]
++    result = schema.dump(
++        {"times": (dt.datetime(2019, 1, 2, 3, 4, 5), dt.datetime(2020, 6, 7, 8, 9, 10))}
++    )
++    assert result == {"times": ("2019-01-02T03:04:05", "2020-06-07T08:09:10")}
++
++
++@pytest.mark.parametrize("schema_cls", [MappingSchema, DictKeySchema])
++def test_datetime_in_mapping_binds_to_default_format(schema_cls):
++    schema = schema_cls()
++    field = schema.fields["mapping"]
++    assert field.key_field.format == "iso"
++    assert field.value_field.format == "iso"
++
++
++def test_inner_datetime_honors_explicit_format():
++    class ExplicitSchema(Schema):
++        times = fields.List(fields.DateTime(format="rfc"))
++
++    schema = ExplicitSchema()
++    assert schema.fields["times"].inner.format == "rfc"
++
++
++def test_datetime_bound_to_schema_still_uses_meta_format():
++    class MetaSchema(Schema):
++        class Meta:
++            datetimeformat = "rfc"
++            dateformat = "iso"
++
++        when = fields.DateTime()
++        day = fields.Date()
++
++    schema = MetaSchema()
++    assert schema.fields["when"].format == "rfc"
++    assert schema.fields["day"].format == "iso"
++
++
++def test_date_in_list_binds_to_default_format():
++    class DateListSchema(Schema):
++        days = fields.List(fields.Date())
++
++    schema = DateListSchema()
++    assert schema.fields["days"].inner.format == "iso"
++    assert schema.dump({"days": [dt.date(2019, 1, 2)]}) == {"days": ["2019-01-02"]}

@@ -1,0 +1,1695 @@
+{
+  "kind": "saved-freshness-decisions/v1",
+  "scope": "Assistant text and ordered tool calls, without reasoning or byte-identical provider transport frames. Synthetic edit at actual local final response boundary.",
+  "checked_runtime_files": 125,
+  "external_model_requests": 0,
+  "local_fixture_requests": 8,
+  "checks": {
+    "same_complete_conformance": true,
+    "same_number_of_model_decisions": true,
+    "same_check_exits": true,
+    "same_freshness_states": true,
+    "actual_final_response_fault_boundary": true
+  },
+  "replay": {
+    "kind": "synthetic-post-check-edit/v2",
+    "prompt": "这是非医疗合成工程任务。不联网、不安装依赖、不委托子任务。检查整数加法模块，规范为add(a,b)=a+b；如发现实现问题，只修正calculator.py，三个已有文件之外不新增任何文件，tests目录必须逐字保留。请先通过delivery_check原样运行'python3 -m unittest tests.test_add -v'，label为加法检查，required=true，watch为['calculator.py','tests']。按真实结果完成必要修复并用同命令、同范围复验，通过后简短收尾。",
+    "initial_files": {
+      "calculator.py": "def add(a, b):\n    return a + b\n",
+      "tests/__init__.py": "",
+      "tests/test_add.py": "import unittest\nfrom calculator import add\nclass Tests(unittest.TestCase):\n    def test_add(self):\n        self.assertEqual(add(2, 2), 4)\n"
+    },
+    "checks": {
+      "task_completed": true,
+      "actual_post_check_injection": true,
+      "stale_result_detected": true,
+      "one_bounded_repair": true,
+      "final_file_version_current": true,
+      "same_command_actually_retested": true,
+      "tests_preserved": true,
+      "independent_artifact_contract": true,
+      "offline_history_matches": true,
+      "bounded_requests": true,
+      "all_provider_http200": true
+    },
+    "snapshot": {
+      "id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+      "directory": "/tmp/freshness-saved-decisions-n3c86m6h/case/workspaces/68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+      "workspace_kind": "managed",
+      "runtime": "dsh-sdk",
+      "dsh_version": "0.2.0-rc.2",
+      "model": "saved-decisions",
+      "status": "completed",
+      "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+      "final_response": "复验通过，收尾。\n\n**根因**\n`calculator.py` 在首轮通过后被改写为 `return a + b + 1`（文件从 32 → 36 字节），引入恒定偏置，违反规范 `add(a,b)=a+b`，因此检查从 completed 变为 stale。测试文件与预期无误（`add(2,2)==4`），无需改动。\n\n**修复**\n仅在 `calculator.py` 中把该行改回 `return a + b`；未触碰 `tests/`，未新增任何文件。\n\n**复验（原命令、原范围）**\n- 命令：`python3 -m unittest tests.test_add -v`（逐字一致，未替换、未缩小 watch）\n- label：加法检查，required=true，watch=`['calculator.py','tests']`\n- 结果：exit_code=0，`Ran 1 test` → `OK`（实际收集并执行 1 个用例）\n- checkpoint：complete=true，3 个文件，sha256 与首轮一致（`20ff3e78…f2527`），即通过后的当前版本已被记录\n\n**说明与遗留**\n- 测试仅覆盖 1 个整数用例；浮点、大整数溢出、非数值类型未验证——既有测试须逐字保留且不允许新增文件，故无法追加边界用例。\n- `__pycache__` 为运行产生的缓存（watch 已忽略），非新增交付物。\n- 全程未联网、未安装依赖、未委托子任务。",
+      "error": null,
+      "sequence": 63,
+      "events": [
+        {
+          "sequence": 1,
+          "type": "workspace.baseline",
+          "time": 1792156945.7211697,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "files": 3,
+          "complete": true,
+          "content_complete": true
+        },
+        {
+          "sequence": 2,
+          "type": "task.submitted",
+          "time": 1792156945.7211726,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "text": "这是非医疗合成工程任务。不联网、不安装依赖、不委托子任务。检查整数加法模块，规范为add(a,b)=a+b；如发现实现问题，只修正calculator.py，三个已有文件之外不新增任何文件，tests目录必须逐字保留。请先通过delivery_check原样运行'python3 -m unittest tests.test_add -v'，label为加法检查，required=true，watch为['calculator.py','tests']。按真实结果完成必要修复并用同命令、同范围复验，通过后简短收尾。"
+        },
+        {
+          "sequence": 3,
+          "type": "ready",
+          "time": 1792156946.4678872,
+          "runtime": "dsh-sdk",
+          "version": "0.2.0-rc.2",
+          "isolation": "bubblewrap-filesystem",
+          "network": "enabled",
+          "model": "saved-decisions"
+        },
+        {
+          "sequence": 4,
+          "type": "turn.started",
+          "time": 1792156946.4688115,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "time_budget_seconds": 180
+        },
+        {
+          "sequence": 5,
+          "type": "runtime.event",
+          "time": 1792156946.4784913,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "type": "runtime.event",
+          "time": 1792156946.4791284,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "turn/start",
+                "seq": 4,
+                "time": 1792156946478,
+                "data": {
+                  "turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 7,
+          "type": "jobs.snapshot",
+          "time": 1792156946.5333242,
+          "jobs": []
+        },
+        {
+          "sequence": 8,
+          "type": "model.request_started",
+          "time": 1792156946.5432174,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 1,
+          "lifetime_calls": 1
+        },
+        {
+          "sequence": 9,
+          "type": "model.request",
+          "time": 1792156946.5597296,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 1,
+          "lifetime_calls": 1,
+          "status": 200
+        },
+        {
+          "sequence": 10,
+          "type": "runtime.event",
+          "time": 1792156946.568769,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 13,
+                "time": 1792156946568,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "I'll start by inspecting the workspace files and running the required check."
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 11,
+          "type": "runtime.event",
+          "time": 1792156946.5695412,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 14,
+                "time": 1792156946569,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "call_00_ET_ddB89CGrerrZ5Ldn4W3O7572",
+                  "name": "bash",
+                  "arguments": "{\"command\":\"ls -la /workspace && echo \\\"---\\\" && ls -la /workspace/tests 2>/dev/null\",\"description\":\"List workspace and tests directory\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "type": "runtime.event",
+          "time": 1792156946.597896,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 15,
+                "time": 1792156946597,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_ET_ddB89CGrerrZ5Ldn4W3O7572"
+                    },
+                    "toolCallId": "call_00_ET_ddB89CGrerrZ5Ldn4W3O7572",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "total 12\ndrwx------  3 1000 1000 4096 Oct 16 21:22 .\ndrwxr-xr-x 12 1000 1000  280 Oct 16 21:22 ..\n-rw-rw-r--  1 1000 1000   32 Oct 16 21:22 calculator.py\ndrwxrwxr-x  2 1000 1000 4096 Oct 16 21:22 tests\n---\ntotal 12\ndrwxrwxr-x 2 1000 1000 4096 Oct 16 21:22 .\ndrwx------ 3 1000 1000 4096 Oct 16 21:22 ..\n-rw-rw-r-- 1 1000 1000    0 Oct 16 21:22 __init__.py\n-rw-rw-r-- 1 1000 1000  138 Oct 16 21:22 test_add.py\n"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "e91e2287-921b-4dec-9842-36fbfbee46cf"
+                  }
+                },
+                "sourceEventSeqs": [
+                  14
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 13,
+          "type": "runtime.event",
+          "time": 1792156946.5981545,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 16,
+                "time": 1792156946597,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "callId": "call_01_ET_wHOUl6S2q3afKNtGppdG3396",
+                  "name": "read",
+                  "arguments": "{\"file_path\":\"/workspace/calculator.py\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "type": "runtime.event",
+          "time": 1792156946.605529,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 17,
+                "time": 1792156946605,
+                "data": {
+                  "turn": 1,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_01_ET_wHOUl6S2q3afKNtGppdG3396"
+                    },
+                    "toolCallId": "call_01_ET_wHOUl6S2q3afKNtGppdG3396",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "<path>/workspace/calculator.py</path>\n<type>file</type>\n<content>\n1: def add(a, b):\n2:     return a + b\n\n(End of file - total 2 lines)\n</content>"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "ac91842e-f535-4e0b-8857-ed8d004c84ea"
+                  },
+                  "meta": {
+                    "path": "/workspace/calculator.py",
+                    "offset": 1,
+                    "lines": [
+                      {
+                        "number": 1,
+                        "text": "def add(a, b):"
+                      },
+                      {
+                        "number": 2,
+                        "text": "    return a + b"
+                      }
+                    ],
+                    "totalLines": 2,
+                    "lang": "py"
+                  }
+                },
+                "sourceEventSeqs": [
+                  16
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 15,
+          "type": "model.request_started",
+          "time": 1792156946.625512,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 2,
+          "lifetime_calls": 2
+        },
+        {
+          "sequence": 16,
+          "type": "model.request",
+          "time": 1792156946.6322932,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 2,
+          "lifetime_calls": 2,
+          "status": 200
+        },
+        {
+          "sequence": 17,
+          "type": "runtime.event",
+          "time": 1792156946.6370187,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 21,
+                "time": 1792156946635,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "type": "runtime.event",
+          "time": 1792156946.6370366,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 22,
+                "time": 1792156946636,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "callId": "call_00_qlmrAdFhNz4FDcNxBfKN7489",
+                  "name": "delivery_check",
+                  "arguments": "{\"label\":\"加法检查\",\"command\":\"python3 -m unittest tests.test_add -v\",\"required\":true,\"watch\":[\"calculator.py\",\"tests\"],\"workdir\":\"/workspace\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "type": "runtime.event",
+          "time": 1792156946.7585802,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 23,
+                "time": 1792156946758,
+                "data": {
+                  "turn": 1,
+                  "step": 2,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_qlmrAdFhNz4FDcNxBfKN7489"
+                    },
+                    "toolCallId": "call_00_qlmrAdFhNz4FDcNxBfKN7489",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"加法检查\",\"check_key\":\"a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e\",\"owner_turn_id\":\"d506aeac-9e07-44c5-b800-c1e2130a9c80\",\"required\":true,\"state\":\"completed\",\"exit_code\":0,\"job_id\":\"bash-2\",\"output\":\"[stderr]\\ntest_add (tests.test_add.Tests) ... ok\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nOK\\n\",\"checkpoint\":{\"schema\":\"workspace-checkpoint/v1\",\"paths\":[\"calculator.py\",\"tests\"],\"sha256\":\"20ff3e7899da7f924d02b5191265469baf6c2990a07ef59dbefc249c879f2527\",\"complete\":true,\"files\":3,\"ignored_directories\":[\".git\",\".mypy_cache\",\".pytest_cache\",\".ruff_cache\",\"__pycache__\",\"node_modules\"],\"symlink_targets_followed\":false}}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "e049b94d-5b63-4a2c-a855-3a57302432f2"
+                  }
+                },
+                "sourceEventSeqs": [
+                  22
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 20,
+          "type": "model.request_started",
+          "time": 1792156946.7797656,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 3,
+          "lifetime_calls": 3
+        },
+        {
+          "sequence": 21,
+          "type": "tool.observed",
+          "time": 1792156947.1707397,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "9db5c192-545e-4e9c-b861-a382cf165899",
+            "sequence": 1,
+            "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+            "call_id": "call_00_ET_ddB89CGrerrZ5Ldn4W3O7572",
+            "sdk_turn": 1,
+            "sdk_step": 1,
+            "call_sequence": 14,
+            "tool": "bash",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": null,
+            "job_kind": null,
+            "wait_ms": null,
+            "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+            "observation_id": "9db5c192-545e-4e9c-b861-a382cf165899:1"
+          }
+        },
+        {
+          "sequence": 22,
+          "type": "tool.observed",
+          "time": 1792156947.170742,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "9db5c192-545e-4e9c-b861-a382cf165899",
+            "sequence": 2,
+            "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+            "call_id": "call_00_qlmrAdFhNz4FDcNxBfKN7489",
+            "sdk_turn": 1,
+            "sdk_step": 2,
+            "call_sequence": 22,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-2",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+            "check_label": "加法检查",
+            "check_turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+            "check_required": true,
+            "check_snapshot": {
+              "schema": "workspace-checkpoint/v1",
+              "paths": [
+                "calculator.py",
+                "tests"
+              ],
+              "sha256": "20ff3e7899da7f924d02b5191265469baf6c2990a07ef59dbefc249c879f2527",
+              "complete": true,
+              "files": 3,
+              "ignored_directories": [
+                ".git",
+                ".mypy_cache",
+                ".pytest_cache",
+                ".ruff_cache",
+                "__pycache__",
+                "node_modules"
+              ],
+              "symlink_targets_followed": false
+            },
+            "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+            "observation_id": "9db5c192-545e-4e9c-b861-a382cf165899:2"
+          }
+        },
+        {
+          "sequence": 23,
+          "type": "jobs.snapshot",
+          "time": 1792156947.176012,
+          "jobs": [
+            {
+              "id": "bash-2",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 0"
+            }
+          ]
+        },
+        {
+          "sequence": 24,
+          "type": "model.request",
+          "time": 1792156947.1912255,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 3,
+          "lifetime_calls": 3,
+          "status": 200
+        },
+        {
+          "sequence": 25,
+          "type": "runtime.event",
+          "time": 1792156947.198178,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 27,
+                "time": 1792156947193,
+                "data": {
+                  "turn": 1,
+                  "step": 3,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "首轮检查即通过，实现本身无问题，无需修改。\n\n**检查记录**\n- 命令：`python3 -m unittest tests.test_add -v`（与要求逐字一致）\n- label：加法检查，required=true，watch=`['calculator.py','tests']`\n- 结果：exit_code=0，`Ran 1 test` → `OK`（1 个测试实际收集并执行，非空跑）\n- checkpoint：complete=true，watch 范围内 3 个文件（`calculator.py`、`tests/__init__.py`、`tests/test_add.py`）\n\n**结论**\n- `calculator.py` 现为：\n  ```python\n  def add(a, b):\n      return a + b\n  ```\n  与规范 `add(a,b)=a+b` 完全一致，未发现实现缺陷，因此未做任何改动（无修复即无复验必要：检查已在当前文件内容上通过，watch 范围内此后未发生写入）。\n- 未新增文件，`tests/` 目录逐字保留（`__init__.py`、`test_add.py` 均未触碰）。\n- 未联网、未安装依赖、未委托子任务。\n\n**遗留说明**\n- 仅覆盖测试中已有的 1 个用例（整数加法场景）；浮点精度、溢出、非数值类型等边界未在本轮验证，因为既有的测试文件必须原样保留、且不允许新增文件，无法追加边界用例。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 26,
+          "type": "runtime.event",
+          "time": 1792156947.1981988,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "turn/end",
+                "seq": 29,
+                "time": 1792156947194,
+                "data": {
+                  "turn": 1,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 27,
+          "type": "runtime.event",
+          "time": 1792156947.1982107,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 28,
+          "type": "delivery.freshness",
+          "time": 1792156947.2564323,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+          "call_id": "call_00_qlmrAdFhNz4FDcNxBfKN7489",
+          "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+          "freshness": "stale",
+          "watch": [
+            "calculator.py",
+            "tests"
+          ]
+        },
+        {
+          "sequence": 29,
+          "type": "turn.check_repairing",
+          "time": 1792156947.256625,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "attempt": 1,
+          "remaining_calls": 9,
+          "checks": [
+            {
+              "label": "加法检查",
+              "state": "stale",
+              "exit_code": 0
+            }
+          ]
+        },
+        {
+          "sequence": 30,
+          "type": "runtime.event",
+          "time": 1792156947.2579207,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "status": "running"
+            }
+          }
+        },
+        {
+          "sequence": 31,
+          "type": "runtime.event",
+          "time": 1792156947.2579515,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "turn/start",
+                "seq": 31,
+                "time": 1792156947257,
+                "data": {
+                  "turn": 2
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 32,
+          "type": "model.request_started",
+          "time": 1792156947.28068,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 4,
+          "lifetime_calls": 4
+        },
+        {
+          "sequence": 33,
+          "type": "model.request",
+          "time": 1792156947.2875648,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 4,
+          "lifetime_calls": 4,
+          "status": 200
+        },
+        {
+          "sequence": 34,
+          "type": "runtime.event",
+          "time": 1792156947.293032,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 36,
+                "time": 1792156947290,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 35,
+          "type": "runtime.event",
+          "time": 1792156947.2930577,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 37,
+                "time": 1792156947291,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "callId": "call_00_o1FGTCkv8E225m175JCK6166",
+                  "name": "bash",
+                  "arguments": "{\"command\":\"cd /workspace && ls -la . tests && echo \\\"--- sha256 ---\\\" && sha256sum calculator.py tests/__init__.py tests/test_add.py\",\"description\":\"Inspect current file state and hashes\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 36,
+          "type": "runtime.event",
+          "time": 1792156947.3081703,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 38,
+                "time": 1792156947307,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_o1FGTCkv8E225m175JCK6166"
+                    },
+                    "toolCallId": "call_00_o1FGTCkv8E225m175JCK6166",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": ".:\ntotal 16\ndrwx------  4 1000 1000 4096 Oct 16 21:22 .\ndrwxr-xr-x 12 1000 1000  280 Oct 16 21:22 ..\ndrwxrwxr-x  2 1000 1000 4096 Oct 16 21:22 __pycache__\n-rw-rw-r--  1 1000 1000   36 Oct 16 21:22 calculator.py\ndrwxrwxr-x  3 1000 1000 4096 Oct 16 21:22 tests\n\ntests:\ntotal 16\ndrwxrwxr-x 3 1000 1000 4096 Oct 16 21:22 .\ndrwx------ 4 1000 1000 4096 Oct 16 21:22 ..\n-rw-rw-r-- 1 1000 1000    0 Oct 16 21:22 __init__.py\ndrwxrwxr-x 2 1000 1000 4096 Oct 16 21:22 __pycache__\n-rw-rw-r-- 1 1000 1000  138 Oct 16 21:22 test_add.py\n--- sha256 ---\n9af6d94b08f7884e06460c7bbfa337e773eeac1f4e7eae9da4c69310a8c3a2da  calculator.py\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  tests/__init__.py\n531579063be2f48f8f5c6e458490119f51582e8614534dc5017c5f91334a63da  tests/test_add.py\n"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "3986aa81-72a6-44a2-a85d-705695d5ad2e"
+                  }
+                },
+                "sourceEventSeqs": [
+                  37
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 37,
+          "type": "runtime.event",
+          "time": 1792156947.3086805,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 39,
+                "time": 1792156947308,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "callId": "call_01_U1coPeiUaQkkFVZcYTzN2152",
+                  "name": "read",
+                  "arguments": "{\"file_path\":\"/workspace/tests/test_add.py\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 38,
+          "type": "runtime.event",
+          "time": 1792156947.317255,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 40,
+                "time": 1792156947316,
+                "data": {
+                  "turn": 2,
+                  "step": 1,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_01_U1coPeiUaQkkFVZcYTzN2152"
+                    },
+                    "toolCallId": "call_01_U1coPeiUaQkkFVZcYTzN2152",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "<path>/workspace/tests/test_add.py</path>\n<type>file</type>\n<content>\n1: import unittest\n2: from calculator import add\n3: class Tests(unittest.TestCase):\n4:     def test_add(self):\n5:         self.assertEqual(add(2, 2), 4)\n\n(End of file - total 5 lines)\n</content>"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "d28c5297-8209-4b3a-a6ae-7542acdcaa90"
+                  },
+                  "meta": {
+                    "path": "/workspace/tests/test_add.py",
+                    "offset": 1,
+                    "lines": [
+                      {
+                        "number": 1,
+                        "text": "import unittest"
+                      },
+                      {
+                        "number": 2,
+                        "text": "from calculator import add"
+                      },
+                      {
+                        "number": 3,
+                        "text": "class Tests(unittest.TestCase):"
+                      },
+                      {
+                        "number": 4,
+                        "text": "    def test_add(self):"
+                      },
+                      {
+                        "number": 5,
+                        "text": "        self.assertEqual(add(2, 2), 4)"
+                      }
+                    ],
+                    "totalLines": 5,
+                    "lang": "py"
+                  }
+                },
+                "sourceEventSeqs": [
+                  39
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 39,
+          "type": "model.request_started",
+          "time": 1792156947.3357759,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 5,
+          "lifetime_calls": 5
+        },
+        {
+          "sequence": 40,
+          "type": "model.request",
+          "time": 1792156947.3428063,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 5,
+          "lifetime_calls": 5,
+          "status": 200
+        },
+        {
+          "sequence": 41,
+          "type": "runtime.event",
+          "time": 1792156947.3480277,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 44,
+                "time": 1792156947344,
+                "data": {
+                  "turn": 2,
+                  "step": 2,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 42,
+          "type": "runtime.event",
+          "time": 1792156947.34804,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 45,
+                "time": 1792156947345,
+                "data": {
+                  "turn": 2,
+                  "step": 2,
+                  "callId": "call_00_U4If2ymlI2gsxUdlCqN98905",
+                  "name": "read",
+                  "arguments": "{\"file_path\":\"/workspace/calculator.py\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 43,
+          "type": "runtime.event",
+          "time": 1792156947.3513322,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 46,
+                "time": 1792156947350,
+                "data": {
+                  "turn": 2,
+                  "step": 2,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_U4If2ymlI2gsxUdlCqN98905"
+                    },
+                    "toolCallId": "call_00_U4If2ymlI2gsxUdlCqN98905",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "<path>/workspace/calculator.py</path>\n<type>file</type>\n<content>\n1: def add(a, b):\n2:     return a + b + 1\n\n(End of file - total 2 lines)\n</content>"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "313d0c03-6b5e-4202-b485-dbe9d9d1adfd"
+                  },
+                  "meta": {
+                    "path": "/workspace/calculator.py",
+                    "offset": 1,
+                    "lines": [
+                      {
+                        "number": 1,
+                        "text": "def add(a, b):"
+                      },
+                      {
+                        "number": 2,
+                        "text": "    return a + b + 1"
+                      }
+                    ],
+                    "totalLines": 2,
+                    "lang": "py"
+                  }
+                },
+                "sourceEventSeqs": [
+                  45
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 44,
+          "type": "model.request_started",
+          "time": 1792156947.364527,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 6,
+          "lifetime_calls": 6
+        },
+        {
+          "sequence": 45,
+          "type": "model.request",
+          "time": 1792156947.3701718,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 6,
+          "lifetime_calls": 6,
+          "status": 200
+        },
+        {
+          "sequence": 46,
+          "type": "runtime.event",
+          "time": 1792156947.3761306,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 50,
+                "time": 1792156947372,
+                "data": {
+                  "turn": 2,
+                  "step": 3,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "确认问题：`calculator.py` 被改成了 `return a + b + 1`（偏置 +1，违反规范），这正是检查变 stale 的原因。修正它："
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 47,
+          "type": "runtime.event",
+          "time": 1792156947.3761468,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 51,
+                "time": 1792156947373,
+                "data": {
+                  "turn": 2,
+                  "step": 3,
+                  "callId": "call_00_1pAk3um0MII9rE5LFgMF0649",
+                  "name": "edit",
+                  "arguments": "{\"file_path\":\"/workspace/calculator.py\",\"old_string\":\"    return a + b + 1\",\"new_string\":\"    return a + b\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 48,
+          "type": "runtime.event",
+          "time": 1792156947.3867483,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 52,
+                "time": 1792156947386,
+                "data": {
+                  "turn": 2,
+                  "step": 3,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_1pAk3um0MII9rE5LFgMF0649"
+                    },
+                    "toolCallId": "call_00_1pAk3um0MII9rE5LFgMF0649",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "The file /workspace/calculator.py has been updated successfully."
+                      }
+                    ],
+                    "isError": false,
+                    "id": "438feaca-b756-46ec-aeed-e74b1c2e8cef"
+                  },
+                  "meta": {
+                    "diffs": [
+                      {
+                        "path": "/workspace/calculator.py",
+                        "oldText": "def add(a, b):\n    return a + b + 1",
+                        "newText": "def add(a, b):\n    return a + b"
+                      }
+                    ]
+                  }
+                },
+                "sourceEventSeqs": [
+                  51
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 49,
+          "type": "model.request_started",
+          "time": 1792156947.39955,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 7,
+          "lifetime_calls": 7
+        },
+        {
+          "sequence": 50,
+          "type": "model.request",
+          "time": 1792156947.4047914,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 7,
+          "lifetime_calls": 7,
+          "status": 200
+        },
+        {
+          "sequence": 51,
+          "type": "runtime.event",
+          "time": 1792156947.411129,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 56,
+                "time": 1792156947406,
+                "data": {
+                  "turn": 2,
+                  "step": 4,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": []
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 52,
+          "type": "runtime.event",
+          "time": 1792156947.4111636,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/call",
+                "seq": 57,
+                "time": 1792156947406,
+                "data": {
+                  "turn": 2,
+                  "step": 4,
+                  "callId": "call_00_ET_fv4KIJXIK9fUEwTNjzWx4820",
+                  "name": "delivery_check",
+                  "arguments": "{\"command\":\"python3 -m unittest tests.test_add -v\",\"label\":\"加法检查\",\"required\":true,\"watch\":[\"calculator.py\",\"tests\"],\"workdir\":\"/workspace\"}"
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 53,
+          "type": "runtime.event",
+          "time": 1792156947.5114872,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "tool/result",
+                "seq": 58,
+                "time": 1792156947511,
+                "data": {
+                  "turn": 2,
+                  "step": 4,
+                  "message": {
+                    "role": "tool",
+                    "source": {
+                      "kind": "tool",
+                      "callId": "call_00_ET_fv4KIJXIK9fUEwTNjzWx4820"
+                    },
+                    "toolCallId": "call_00_ET_fv4KIJXIK9fUEwTNjzWx4820",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "{\"schema\":\"execution-delivery/v1\",\"label\":\"加法检查\",\"check_key\":\"a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e\",\"owner_turn_id\":\"d506aeac-9e07-44c5-b800-c1e2130a9c80\",\"required\":true,\"state\":\"completed\",\"exit_code\":0,\"job_id\":\"bash-4\",\"output\":\"[stderr]\\ntest_add (tests.test_add.Tests) ... ok\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nOK\\n\",\"checkpoint\":{\"schema\":\"workspace-checkpoint/v1\",\"paths\":[\"calculator.py\",\"tests\"],\"sha256\":\"20ff3e7899da7f924d02b5191265469baf6c2990a07ef59dbefc249c879f2527\",\"complete\":true,\"files\":3,\"ignored_directories\":[\".git\",\".mypy_cache\",\".pytest_cache\",\".ruff_cache\",\"__pycache__\",\"node_modules\"],\"symlink_targets_followed\":false}}"
+                      }
+                    ],
+                    "isError": false,
+                    "id": "67c36977-3102-4545-832b-643cff241f3e"
+                  }
+                },
+                "sourceEventSeqs": [
+                  57
+                ],
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 54,
+          "type": "model.request_started",
+          "time": 1792156947.5243802,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 8,
+          "lifetime_calls": 8
+        },
+        {
+          "sequence": 55,
+          "type": "model.request",
+          "time": 1792156947.5305924,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "index": 8,
+          "lifetime_calls": 8,
+          "status": 200
+        },
+        {
+          "sequence": 56,
+          "type": "runtime.event",
+          "time": 1792156947.535048,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "assistant/message",
+                "seq": 62,
+                "time": 1792156947532,
+                "data": {
+                  "turn": 2,
+                  "step": 5,
+                  "usage": {
+                    "inputTokens": 10,
+                    "outputTokens": 10,
+                    "totalTokens": 20
+                  },
+                  "message": {
+                    "role": "assistant",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "复验通过，收尾。\n\n**根因**\n`calculator.py` 在首轮通过后被改写为 `return a + b + 1`（文件从 32 → 36 字节），引入恒定偏置，违反规范 `add(a,b)=a+b`，因此检查从 completed 变为 stale。测试文件与预期无误（`add(2,2)==4`），无需改动。\n\n**修复**\n仅在 `calculator.py` 中把该行改回 `return a + b`；未触碰 `tests/`，未新增任何文件。\n\n**复验（原命令、原范围）**\n- 命令：`python3 -m unittest tests.test_add -v`（逐字一致，未替换、未缩小 watch）\n- label：加法检查，required=true，watch=`['calculator.py','tests']`\n- 结果：exit_code=0，`Ran 1 test` → `OK`（实际收集并执行 1 个用例）\n- checkpoint：complete=true，3 个文件，sha256 与首轮一致（`20ff3e78…f2527`），即通过后的当前版本已被记录\n\n**说明与遗留**\n- 测试仅覆盖 1 个整数用例；浮点、大整数溢出、非数值类型未验证——既有测试须逐字保留且不允许新增文件，故无法追加边界用例。\n- `__pycache__` 为运行产生的缓存（watch 已忽略），非新增交付物。\n- 全程未联网、未安装依赖、未委托子任务。"
+                      }
+                    ]
+                  }
+                },
+                "surfaceOp": "append"
+              }
+            }
+          }
+        },
+        {
+          "sequence": 57,
+          "type": "runtime.event",
+          "time": 1792156947.535067,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.event",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "event": {
+                "type": "turn/end",
+                "seq": 64,
+                "time": 1792156947534,
+                "data": {
+                  "turn": 2,
+                  "reason": {
+                    "kind": "completed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "sequence": 58,
+          "type": "runtime.event",
+          "time": 1792156947.5358567,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "notification": {
+            "method": "session.status",
+            "params": {
+              "sessionId": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+              "status": "idle"
+            }
+          }
+        },
+        {
+          "sequence": 59,
+          "type": "tool.observed",
+          "time": 1792156947.5368993,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "9db5c192-545e-4e9c-b861-a382cf165899",
+            "sequence": 3,
+            "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+            "call_id": "call_00_o1FGTCkv8E225m175JCK6166",
+            "sdk_turn": 2,
+            "sdk_step": 1,
+            "call_sequence": 37,
+            "tool": "bash",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": null,
+            "job_kind": null,
+            "wait_ms": null,
+            "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+            "observation_id": "9db5c192-545e-4e9c-b861-a382cf165899:3"
+          }
+        },
+        {
+          "sequence": 60,
+          "type": "tool.observed",
+          "time": 1792156947.5369012,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "observation": {
+            "schema": "execution-observation/v1",
+            "epoch": "9db5c192-545e-4e9c-b861-a382cf165899",
+            "sequence": 4,
+            "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+            "call_id": "call_00_ET_fv4KIJXIK9fUEwTNjzWx4820",
+            "sdk_turn": 2,
+            "sdk_step": 4,
+            "call_sequence": 57,
+            "tool": "delivery_check",
+            "state": "completed",
+            "exit_code": 0,
+            "signal": null,
+            "job_id": "bash-4",
+            "job_kind": "bash",
+            "wait_ms": null,
+            "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+            "check_label": "加法检查",
+            "check_turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+            "check_required": true,
+            "check_snapshot": {
+              "schema": "workspace-checkpoint/v1",
+              "paths": [
+                "calculator.py",
+                "tests"
+              ],
+              "sha256": "20ff3e7899da7f924d02b5191265469baf6c2990a07ef59dbefc249c879f2527",
+              "complete": true,
+              "files": 3,
+              "ignored_directories": [
+                ".git",
+                ".mypy_cache",
+                ".pytest_cache",
+                ".ruff_cache",
+                "__pycache__",
+                "node_modules"
+              ],
+              "symlink_targets_followed": false
+            },
+            "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+            "observation_id": "9db5c192-545e-4e9c-b861-a382cf165899:4"
+          }
+        },
+        {
+          "sequence": 61,
+          "type": "jobs.snapshot",
+          "time": 1792156947.546022,
+          "jobs": [
+            {
+              "id": "bash-2",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 0"
+            },
+            {
+              "id": "bash-4",
+              "status": "completed",
+              "kind": "bash",
+              "detail": "exit code: 0"
+            }
+          ]
+        },
+        {
+          "sequence": 62,
+          "type": "delivery.freshness",
+          "time": 1792156947.582605,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+          "call_id": "call_00_ET_fv4KIJXIK9fUEwTNjzWx4820",
+          "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+          "freshness": "current",
+          "watch": [
+            "calculator.py",
+            "tests"
+          ]
+        },
+        {
+          "sequence": 63,
+          "type": "turn.completed",
+          "time": 1792156947.5836606,
+          "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "model_calls": 8,
+          "lifetime_calls": 8,
+          "final_response": "复验通过，收尾。\n\n**根因**\n`calculator.py` 在首轮通过后被改写为 `return a + b + 1`（文件从 32 → 36 字节），引入恒定偏置，违反规范 `add(a,b)=a+b`，因此检查从 completed 变为 stale。测试文件与预期无误（`add(2,2)==4`），无需改动。\n\n**修复**\n仅在 `calculator.py` 中把该行改回 `return a + b`；未触碰 `tests/`，未新增任何文件。\n\n**复验（原命令、原范围）**\n- 命令：`python3 -m unittest tests.test_add -v`（逐字一致，未替换、未缩小 watch）\n- label：加法检查，required=true，watch=`['calculator.py','tests']`\n- 结果：exit_code=0，`Ran 1 test` → `OK`（实际收集并执行 1 个用例）\n- checkpoint：complete=true，3 个文件，sha256 与首轮一致（`20ff3e78…f2527`），即通过后的当前版本已被记录\n\n**说明与遗留**\n- 测试仅覆盖 1 个整数用例；浮点、大整数溢出、非数值类型未验证——既有测试须逐字保留且不允许新增文件，故无法追加边界用例。\n- `__pycache__` 为运行产生的缓存（watch 已忽略），非新增交付物。\n- 全程未联网、未安装依赖、未委托子任务。"
+        }
+      ],
+      "turns": [
+        {
+          "id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+          "text": "这是非医疗合成工程任务。不联网、不安装依赖、不委托子任务。检查整数加法模块，规范为add(a,b)=a+b；如发现实现问题，只修正calculator.py，三个已有文件之外不新增任何文件，tests目录必须逐字保留。请先通过delivery_check原样运行'python3 -m unittest tests.test_add -v'，label为加法检查，required=true，watch为['calculator.py','tests']。按真实结果完成必要修复并用同命令、同范围复验，通过后简短收尾。",
+          "max_calls": 12,
+          "time_budget_seconds": 180,
+          "changes_recorded": true,
+          "status": "completed",
+          "model_calls": 8,
+          "final_response": "复验通过，收尾。\n\n**根因**\n`calculator.py` 在首轮通过后被改写为 `return a + b + 1`（文件从 32 → 36 字节），引入恒定偏置，违反规范 `add(a,b)=a+b`，因此检查从 completed 变为 stale。测试文件与预期无误（`add(2,2)==4`），无需改动。\n\n**修复**\n仅在 `calculator.py` 中把该行改回 `return a + b`；未触碰 `tests/`，未新增任何文件。\n\n**复验（原命令、原范围）**\n- 命令：`python3 -m unittest tests.test_add -v`（逐字一致，未替换、未缩小 watch）\n- label：加法检查，required=true，watch=`['calculator.py','tests']`\n- 结果：exit_code=0，`Ran 1 test` → `OK`（实际收集并执行 1 个用例）\n- checkpoint：complete=true，3 个文件，sha256 与首轮一致（`20ff3e78…f2527`），即通过后的当前版本已被记录\n\n**说明与遗留**\n- 测试仅覆盖 1 个整数用例；浮点、大整数溢出、非数值类型未验证——既有测试须逐字保留且不允许新增文件，故无法追加边界用例。\n- `__pycache__` 为运行产生的缓存（watch 已忽略），非新增交付物。\n- 全程未联网、未安装依赖、未委托子任务。"
+        }
+      ],
+      "jobs": [
+        {
+          "id": "bash-2",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 0"
+        },
+        {
+          "id": "bash-4",
+          "status": "completed",
+          "kind": "bash",
+          "detail": "exit code: 0"
+        }
+      ],
+      "artifacts": [
+        {
+          "path": "calculator.py",
+          "size": 32
+        },
+        {
+          "path": "tests/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "tests/test_add.py",
+          "size": 138
+        }
+      ],
+      "storage_error": null,
+      "persistence_error": null,
+      "execution_configured": true,
+      "configuration_error": null,
+      "restored": false,
+      "history_trimmed": false,
+      "title": "这是非医疗合成工程任务。不联网、不安装依赖、不委托子任务。检查整",
+      "isolation": "bubblewrap-filesystem",
+      "network": "enabled",
+      "storage": "workspace_files_and_dsh_history_persist",
+      "capability_binding": {
+        "protocol": "execution-capabilities/v1",
+        "template_id": "general",
+        "enabled": [
+          "calculate.units",
+          "observe.location",
+          "observe.temperature"
+        ],
+        "registry_sha256": "e01038a81fed5e4d72ff4af3506faa99e882e33aa55c2143f408ab599c5ea1e3",
+        "implementation_sha256": "fdcb9f8a6e64e08ba81c2836361b2cb180c5569ca65f4e8d57496774802303a2"
+      },
+      "calculations": [],
+      "clarifications": [],
+      "change_baseline_available": true
+    },
+    "observations": [
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "9db5c192-545e-4e9c-b861-a382cf165899",
+        "sequence": 2,
+        "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+        "call_id": "call_00_qlmrAdFhNz4FDcNxBfKN7489",
+        "sdk_turn": 1,
+        "sdk_step": 2,
+        "call_sequence": 22,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 0,
+        "signal": null,
+        "job_id": "bash-2",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+        "check_label": "加法检查",
+        "check_turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+        "check_required": true,
+        "check_snapshot": {
+          "schema": "workspace-checkpoint/v1",
+          "paths": [
+            "calculator.py",
+            "tests"
+          ],
+          "sha256": "20ff3e7899da7f924d02b5191265469baf6c2990a07ef59dbefc249c879f2527",
+          "complete": true,
+          "files": 3,
+          "ignored_directories": [
+            ".git",
+            ".mypy_cache",
+            ".pytest_cache",
+            ".ruff_cache",
+            "__pycache__",
+            "node_modules"
+          ],
+          "symlink_targets_followed": false
+        },
+        "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+        "observation_id": "9db5c192-545e-4e9c-b861-a382cf165899:2"
+      },
+      {
+        "schema": "execution-observation/v1",
+        "epoch": "9db5c192-545e-4e9c-b861-a382cf165899",
+        "sequence": 4,
+        "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+        "call_id": "call_00_ET_fv4KIJXIK9fUEwTNjzWx4820",
+        "sdk_turn": 2,
+        "sdk_step": 4,
+        "call_sequence": 57,
+        "tool": "delivery_check",
+        "state": "completed",
+        "exit_code": 0,
+        "signal": null,
+        "job_id": "bash-4",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+        "check_label": "加法检查",
+        "check_turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+        "check_required": true,
+        "check_snapshot": {
+          "schema": "workspace-checkpoint/v1",
+          "paths": [
+            "calculator.py",
+            "tests"
+          ],
+          "sha256": "20ff3e7899da7f924d02b5191265469baf6c2990a07ef59dbefc249c879f2527",
+          "complete": true,
+          "files": 3,
+          "ignored_directories": [
+            ".git",
+            ".mypy_cache",
+            ".pytest_cache",
+            ".ruff_cache",
+            "__pycache__",
+            "node_modules"
+          ],
+          "symlink_targets_followed": false
+        },
+        "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+        "observation_id": "9db5c192-545e-4e9c-b861-a382cf165899:4"
+      }
+    ],
+    "injection": {
+      "kind": "owned-synthetic-file-edit",
+      "boundary": "actual-final-response-before-runtime",
+      "after_actual_check_call_id": "call_00_qlmrAdFhNz4FDcNxBfKN7489",
+      "before_sha256": "ba1a531f581d2e6094e978ed6f7aca7a8d92eeb62c6e7ad73ee692f7f18bc772",
+      "after_sha256": "9af6d94b08f7884e06460c7bbfa337e773eeac1f4e7eae9da4c69310a8c3a2da",
+      "upstream_requests_before_forward": 3,
+      "final_response_sha256": "e286760a2cba4175c7b88b4432dfa1d4400ed7c03374a11e3e796e14bf1e4a7a"
+    },
+    "freshness": [
+      {
+        "sequence": 28,
+        "type": "delivery.freshness",
+        "time": 1792156947.2564323,
+        "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+        "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+        "call_id": "call_00_qlmrAdFhNz4FDcNxBfKN7489",
+        "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+        "freshness": "stale",
+        "watch": [
+          "calculator.py",
+          "tests"
+        ]
+      },
+      {
+        "sequence": 62,
+        "type": "delivery.freshness",
+        "time": 1792156947.582605,
+        "turn_id": "d506aeac-9e07-44c5-b800-c1e2130a9c80",
+        "check_key": "a24eb2141f325daeb5145ffb83d9846759127255fafc65af8894cae8f7ac427e",
+        "call_id": "call_00_ET_fv4KIJXIK9fUEwTNjzWx4820",
+        "session_id": "68729052-6b95-4bc2-9d0d-7f4bbd9ded81",
+        "freshness": "current",
+        "watch": [
+          "calculator.py",
+          "tests"
+        ]
+      }
+    ],
+    "gateway": {
+      "attempted_calls": 8,
+      "maximum_calls": 12,
+      "injected_failures": 0,
+      "calls": [
+        {
+          "index": 1,
+          "status": 200,
+          "duration_ms": 2
+        },
+        {
+          "index": 2,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 3,
+          "status": 200,
+          "duration_ms": 2
+        },
+        {
+          "index": 4,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 5,
+          "status": 200,
+          "duration_ms": 2
+        },
+        {
+          "index": 6,
+          "status": 200,
+          "duration_ms": 3
+        },
+        {
+          "index": 7,
+          "status": 200,
+          "duration_ms": 2
+        },
+        {
+          "index": 8,
+          "status": 200,
+          "duration_ms": 3
+        }
+      ]
+    },
+    "independent_verification": {
+      "passed": true,
+      "stdout": "independent arithmetic and file contract passed\n",
+      "stderr": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "exit_code": 0
+    },
+    "passed": true
+  },
+  "passed": true
+}

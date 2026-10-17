@@ -1,0 +1,39 @@
+test_actual_calculation_retains_input_quality_and_execution_identity (tests.test_presentation.PresentationTests) ... ok
+test_emergency_uses_notice_without_requiring_an_ordinary_summary (tests.test_presentation.PresentationTests) ... ok
+test_invalid_observation_has_visible_structured_feedback (tests.test_presentation.PresentationTests) ... ok
+test_patient_projection_omits_developer_trace_and_preserves_plain_text (tests.test_presentation.PresentationTests) ... ok
+test_step_assets_cannot_load_external_content_or_mismatch_steps (tests.test_presentation.PresentationTests) ... ok
+test_visual_question_uses_actual_choices_and_preserves_custom_clarification (tests.test_presentation.PresentationTests) ... ok
+test_compatible_http_snapshot_and_priority_input_preempt_socket_wait (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_real_dsh_http_priority_input_cancels_bridge_and_discards_proposal (tests.test_consultation_interrupt.HttpInterruptTests) ... ok
+test_explicit_help_records_request_origin_without_inventing_symptoms (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_facts_committed_before_the_wait_survive_but_late_corrections_do_not (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_late_failure_cannot_replace_emergency_with_retry (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_new_information_in_another_help_request_is_retained (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_priority_correction_precedes_field_and_version_checks (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_raw_emergency_preempts_and_late_valid_facts_are_discarded (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_repeated_help_request_is_idempotent (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_worker_capacity_is_bounded_without_blocking_priority_or_other_sessions (tests.test_consultation_interrupt.InterruptTests) ... ok
+test_compatible_transport_logs_actual_request_and_response (tests.test_backends.BackendTests) ... ok
+test_decision_requires_exact_top_level_envelope (tests.test_backends.BackendTests) ... ok
+test_missing_config_is_not_silently_demo_mode (tests.test_backends.BackendTests) ... ok
+test_official_deepseek_records_cache_usage_without_reasoning_or_keys (tests.test_backends.BackendTests) ... ok
+test_patient_api_through_real_dsh_to_validated_multi_fact_update (tests.integration.test_dsh_e2e.DshHttpIntegration) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 4.427s
+
+OK
+[16/Oct/2026 19:06:25] "GET /api/sessions/d3ebb452-520f-4e55-af2c-2932d3273195/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 19:06:25] "POST /api/sessions/d3ebb452-520f-4e55-af2c-2932d3273195/messages HTTP/1.1" 409 -
+[16/Oct/2026 19:06:25] "POST /api/sessions/d3ebb452-520f-4e55-af2c-2932d3273195/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:06:25] "POST /api/sessions/d3ebb452-520f-4e55-af2c-2932d3273195/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:06:26] "GET /api/sessions/f762abf3-75e2-403e-9159-1054da5368af/snapshot HTTP/1.1" 200 -
+[16/Oct/2026 19:06:26] "POST /api/sessions/f762abf3-75e2-403e-9159-1054da5368af/messages HTTP/1.1" 409 -
+[16/Oct/2026 19:06:26] "POST /api/sessions/f762abf3-75e2-403e-9159-1054da5368af/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:06:26] "POST /api/sessions/f762abf3-75e2-403e-9159-1054da5368af/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:06:27] "POST /api/sessions HTTP/1.1" 201 -
+[16/Oct/2026 19:06:28] "POST /api/sessions/efaf8f4e-44ea-4e1d-be77-6d94d4df2762/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:06:28] "POST /api/sessions/efaf8f4e-44ea-4e1d-be77-6d94d4df2762/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:06:28] "POST /api/sessions/efaf8f4e-44ea-4e1d-be77-6d94d4df2762/messages HTTP/1.1" 200 -
+[16/Oct/2026 19:06:28] "POST /api/sessions/efaf8f4e-44ea-4e1d-be77-6d94d4df2762/messages HTTP/1.1" 200 -

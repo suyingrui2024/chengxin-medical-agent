@@ -1,0 +1,40 @@
+
+> medical-agent-dsh-integration@0.11.0 test:desktop
+> playwright test --config playwright.desktop.config.mjs tests/desktop/artifacts.spec.mjs
+
+
+Running 1 test using 1 worker
+
+(node:842113) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/desktop/artifacts.spec.mjs:13:1 › native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline (7.2s)
+
+
+  1) tests/desktop/artifacts.spec.mjs:13:1 › native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+      151 |     await checked;
+      152 |     await page.evaluate(() => new Promise(requestAnimationFrame));
+    > 153 |     expect(await page.evaluate(() => window.artifactMetaChanges)).toBe(0);
+          |                                                                   ^
+      154 |     await page.evaluate(() => window.artifactMetaObserver.disconnect());
+      155 |     const originalSrc = await page
+      156 |       .locator("#execution-preview img")
+        at /home/suyingrui/Desktop/medical-agent/tests/desktop/artifacts.spec.mjs:153:67
+
+    Error Context: test-results/desktop/artifacts-native-generated-80e1b-esponses-and-reopen-offline/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/desktop/artifacts-native-generated-80e1b-esponses-and-reopen-offline/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/desktop/artifacts-native-generated-80e1b-esponses-and-reopen-offline/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/desktop/artifacts.spec.mjs:13:1 › native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline 

@@ -1,0 +1,49 @@
+{
+  "version": "0.11.15",
+  "scope": "Structured location answers and patient confirmation; research prototype, not clinical validation.",
+  "source_files": 303,
+  "frozen_checks": 205,
+  "backend": {
+    "collected": 383,
+    "passed": 329,
+    "skipped": 54,
+    "separate_registered_calculation_sdk_passed": 1,
+    "separate_patient_bridge_integration_passed": 1,
+    "not_separately_rerun": "Remaining optional SDK and long-duration tests."
+  },
+  "ui": {
+    "full_before_final_visual_adjustments": 70,
+    "final_targeted_with_geometry_hit_targets_and_contrast": 5
+  },
+  "native": {
+    "source_before_final_visual_adjustments": 34,
+    "package_before_final_contrast_adjustment": 34,
+    "final_package_targeted": 1,
+    "final_actual_question_replay_passed": true,
+    "discarded_overlapping_build_run": {
+      "passed": 24,
+      "failed": 10,
+      "accepted_as_gate": false,
+      "cause": "Agent mistakenly rebuilt the package during tests; launch failures included missing resources.pak. Replaced by a completed stable 34-test run, followed by final targeted checks."
+    }
+  },
+  "actual_provider_requests": 18,
+  "directed_cases_per_run": 4,
+  "provider_runs_passed": [
+    true,
+    true
+  ],
+  "proposal_errors_preserved": true,
+  "final_package_audit": {
+    "own_files": 113,
+    "locked_dependency_versions": 544,
+    "passed": true
+  },
+  "semantic_visual_answer_alignment_verified_for_tested_location_fields": true,
+  "limitations": [
+    "Four directed synthetic model cases, not a new complete real-provider consultation.",
+    "Clinical content and patient understanding require separate review.",
+    "No dedicated post-confirmation location editing, camera action verification, patient database or arbitrary third-party plugin installer added."
+  ],
+  "goal_complete": false
+}

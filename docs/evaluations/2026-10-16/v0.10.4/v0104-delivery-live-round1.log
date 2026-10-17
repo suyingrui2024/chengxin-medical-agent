@@ -1,0 +1,3 @@
+{"case": "arithmetic-test", "passed": true, "calls": 6}
+{"case": "versioned-api-test", "passed": true, "calls": 6}
+{"case": "inspection-only", "passed": true, "calls": 2}

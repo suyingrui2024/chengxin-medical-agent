@@ -1,0 +1,18 @@
+{
+  "files": {
+    "README.md": "8ad38671918c27a5e0aa6a69bd7b476e47c0bec9893920ba76437a6dc7e1102a",
+    "candidate/integrations/dsh/check.mjs": "5f039cc758adbe6be508f5d32567bfb6a953ce86b66f1b918161f84b071b3ed2",
+    "candidate/integrations/dsh/execution.patch.yml": "d77f682eb69bcb337a3728097210afb4ae866659fea783a618081edc5e928e1f",
+    "candidate/tests/test_explicit_job_wait.py": "2efdc85ed2f4b69056003a952263a17719683b1bcd1b60f8ca5d56e364e5e2ef",
+    "credential-scan.json": "180207ec81136a31a1a0e8ed62616ec019125614db7eecec5a731d7ed8b951ee",
+    "deadline-old-control.json": "749f8c2f41fe828af79ea102e119c99f0c9355479c6138ba1ad894a4bc029552",
+    "dsh-check.log": "62c169ee0d3d42e2396d5b1cef4b5b12fc457fb745e4143ffcf5b8884fe72c85",
+    "existing-runtime-checks.log": "5af8b18a857c73e100c9fe70f64e59a68a8a78aeb7b80c9238612cfa2f9e203b",
+    "explicit-wait-initial.log": "56b64c6b47b68625ac92ed7937338bd32d477035357e0c3b3d960ddcc24e8b5d",
+    "explicit-wait-status-revision.log": "425ffe54761b86fe707eb61add70e76acbf953b622e9d69d786156da8d00d1e6",
+    "portable-wait-control.log": "62df367203b51036c3d3ed41d1d2f0a0b94553f0b59bb6255cf081638b073eeb",
+    "runtime-and-wait-final.log": "6395f015febf862cb64fa33a23ff5545e1a9aaee35cf3c226503808f0509e50d",
+    "verification.json": "e537aeb968a390d546719c08a5de4359577b67e94686a6271bcd760f534557fe"
+  },
+  "file_count": 13
+}

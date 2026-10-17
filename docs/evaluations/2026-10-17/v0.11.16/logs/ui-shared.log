@@ -1,0 +1,15 @@
+
+Running 8 tests using 1 worker
+
+(node:1330418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on wide (1.9s)
+  ✓  2 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on mobile (1.7s)
+  ✓  3 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on short (1.7s)
+  ✓  4 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on prefill (1.5s)
+  ✓  5 tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on custom (1.7s)
+  ✓  6 tests/ui/location-revisions.spec.mjs:10:3 › confirmed location revision cancels safely and resumes the question on wide (2.7s)
+  ✓  7 tests/ui/location-revisions.spec.mjs:10:3 › confirmed location revision cancels safely and resumes the question on mobile (4.4s)
+  ✓  8 tests/ui/location-revisions.spec.mjs:10:3 › confirmed location revision cancels safely and resumes the question on short (4.1s)
+
+  8 passed (23.7s)

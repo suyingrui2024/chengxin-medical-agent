@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:1327579) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on wide (2.8s)
+  ✓  2 tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on mobile (3.6s)
+  ✓  3 tests/ui/location-revisions.spec.mjs:13:3 › confirmed location revision cancels safely and resumes the question on short (3.5s)
+
+  3 passed (13.8s)

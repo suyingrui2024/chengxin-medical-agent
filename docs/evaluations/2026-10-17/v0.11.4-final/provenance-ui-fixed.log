@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:931726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts (1.7s)
+  ✓  2 tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts on a narrow screen (1.4s)
+  ✓  3 tests/ui/present-provenance.spec.mjs:40:1 › recorded evidence is inert, malformed sources fall back and old summaries remain readable (376ms)
+
+  3 passed (7.4s)
