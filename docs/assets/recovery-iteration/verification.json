@@ -106,6 +106,13 @@
     "directory-small.png": "8424cf7745f1e60e7354ff795f8272109677044814a79a02db75f312f4bd4b1c"
   },
   "windows": {
-    "status": "pending"
+    "status": "passed",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39079554015",
+    "tested_code_commit": "1953dab02aa0c43795e31ff26c3ee568c21c78df",
+    "gui_receipts": {
+      "arm": 2,
+      "server": 3
+    },
+    "receipt": "windows-native.json"
   }
 }
