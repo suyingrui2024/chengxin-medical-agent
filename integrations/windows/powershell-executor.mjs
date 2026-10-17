@@ -9,7 +9,12 @@ export default class NativePowerShellExecutor extends LocalBashExecutor {
       "System32/WindowsPowerShell/v1.0/powershell.exe",
     );
     const source =
-      "$ErrorActionPreference='Stop'; [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $OutputEncoding=[Console]::OutputEncoding; $global:LASTEXITCODE=0; & {\n" +
+      "$ErrorActionPreference='Stop'; [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $OutputEncoding=[Console]::OutputEncoding; $global:LASTEXITCODE=0; " +
+      // PowerShell's provider location can differ from the Win32 process cwd
+      // under ProcessContainer. Set the exact requested directory explicitly.
+      "Microsoft.PowerShell.Management\\Set-Location -LiteralPath '" +
+      spec.workdir.replaceAll("'", "''") +
+      "'; & {\n" +
       spec.command +
       "\n}; exit $global:LASTEXITCODE";
     return this.executeArgv(spec, [
