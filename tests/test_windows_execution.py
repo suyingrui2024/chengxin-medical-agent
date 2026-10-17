@@ -40,7 +40,7 @@ class WindowsExecutionTests(unittest.TestCase):
                 )
                 return tool(
                     "bash",
-                    command="'print(1250)' | Set-Content -Encoding UTF8 calc.py; python.exe calc.py | Set-Content -Encoding UTF8 result.txt",
+                    command="'print(1250)' | Set-Content -Encoding UTF8 calc.py; python.exe calc.py | Set-Content -Encoding UTF8 result.txt; npm --version | Set-Content -Encoding UTF8 npm-version.txt",
                     description="Write and run Python on Windows",
                 )
             if step == 1:
@@ -106,6 +106,12 @@ class WindowsExecutionTests(unittest.TestCase):
                 finish()
                 self.assertEqual(
                     (session.directory / "review.txt").read_text(), "verified"
+                )
+                self.assertRegex(
+                    (session.directory / "npm-version.txt")
+                    .read_text(encoding="utf-8-sig")
+                    .strip(),
+                    r"^\d+\.\d+\.\d+$",
                 )
                 self.assertTrue(
                     any(

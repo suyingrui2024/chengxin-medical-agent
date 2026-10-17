@@ -16,6 +16,8 @@ export default class NativePowerShellExecutor extends LocalBashExecutor {
       shell,
       "-NoLogo",
       "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
       "-NonInteractive",
       "-EncodedCommand",
       Buffer.from(source, "utf16le").toString("base64"),
