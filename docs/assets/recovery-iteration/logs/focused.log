@@ -1,0 +1,15 @@
+
+Running 8 tests using 1 worker
+
+(node:67662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/execution-recovery.spec.mjs:18:1 › an idle workspace recovers its status automatically after a transient read failure (5.2s)
+  ✓  2 tests/ui/execution-recovery.spec.mjs:41:1 › manual reconnect preserves file, task draft and execution errors, rejects duplicate reads and restores keyboard focus (3.4s)
+  ✓  3 tests/ui/execution-recovery.spec.mjs:97:1 › a stalled request times out, permits reconnection and keeps the user's active input focus (19.3s)
+  ✓  4 tests/ui/execution-recovery.spec.mjs:128:1 › late older poll responses cannot revert a newer submitted answer (2.3s)
+  ✓  5 tests/ui/execution-recovery.spec.mjs:192:1 › invalid status data and delayed requests cannot replace the selected workspace (3.7s)
+  ✓  6 tests/ui/execution-recovery.spec.mjs:224:1 › failed reads back off and do not continue while another view is open (11.7s)
+  ✓  7 tests/ui/execution-recovery.spec.mjs:254:3 › recovery and preview actions have comfortable touch targets and contrast at 320px in six themes (4.5s)
+  ✓  8 tests/ui/execution-recovery.spec.mjs:254:3 › recovery and preview actions have comfortable touch targets and contrast at 390px in six themes (4.0s)
+
+  8 passed (54.7s)

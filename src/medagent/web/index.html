@@ -533,6 +533,23 @@
                     回答问题 ↗
                   </button>
                 </section>
+                <section
+                  id="execution-connection"
+                  class="execution-connection"
+                  aria-label="任务状态连接"
+                  hidden
+                >
+                  <div class="execution-connection-row">
+                    <span id="execution-connection-label" role="status"></span>
+                    <button id="execution-connection-retry" type="button">
+                      立即重试
+                    </button>
+                  </div>
+                  <details>
+                    <summary>连接详情</summary>
+                    <p id="execution-connection-error"></p>
+                  </details>
+                </section>
                 <button
                   id="execution-outcome"
                   class="execution-outcome"

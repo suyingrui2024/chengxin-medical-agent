@@ -184,3 +184,38 @@ export async function verifyEditableAnswer(page, fixture) {
   });
   return { passed: true, host_snapshot_fixture: true, edited_answer: true };
 }
+
+export async function verifyExecutionRecovery(page, fixture) {
+  fixture.first.status = "completed";
+  await expect(page.locator("#execution-focus-label")).toHaveText("本轮已完成");
+  const input = page.getByLabel("描述执行任务");
+  await input.fill("保留这份尚未发送的接续任务");
+  let reads = 0;
+  const pattern = "**/api/execution/focus-a?**";
+  const failure = async (route) => {
+    if (!reads++)
+      await route.fulfill({
+        status: 503,
+        json: { error: { message: "临时读取失败：恢复检查" } },
+      });
+    else await route.fallback();
+  };
+  await page.route(pattern, failure);
+  try {
+    await expect(page.locator("#execution-connection")).toBeVisible();
+    await page.locator("#execution-connection-retry").click();
+    await expect(page.locator("#execution-connection")).toBeHidden();
+    await expect(input).toHaveValue("保留这份尚未发送的接续任务");
+    await expect(page.locator("#execution-preview table")).toContainText(
+      "1250",
+    );
+    return {
+      passed: true,
+      host_snapshot_fixture: true,
+      read_failure_and_manual_retry: true,
+      draft_preserved: true,
+    };
+  } finally {
+    await page.unroute(pattern, failure);
+  }
+}

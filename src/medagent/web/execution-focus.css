@@ -173,3 +173,68 @@
   cursor: pointer;
   padding-block: 6px;
 }
+.execution-connection {
+  flex: none;
+  margin: 0 20px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--warning-line);
+  border-radius: 10px;
+  background: var(--warning-bg);
+  color: var(--orange);
+  font-size: 12px;
+}
+.execution-connection-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.execution-connection-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.execution-connection button {
+  flex: none;
+  min-height: 36px;
+  background: var(--surface);
+  color: var(--primary);
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  padding: 6px 10px;
+}
+.execution-connection details {
+  margin-top: 6px;
+}
+.execution-connection button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: progress;
+}
+.execution-connection summary {
+  cursor: pointer;
+  width: fit-content;
+  padding-block: 5px;
+}
+.execution-connection p {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px), (pointer: coarse) {
+  .artifact-controls button,
+  .execution-focus button,
+  .execution-connection button,
+  .execution-question-custom,
+  .directory-toolbar button,
+  .directory-pages button,
+  .directory-direct button {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 13px;
+  }
+  .execution-connection {
+    margin-inline: 12px;
+  }
+  .execution-connection summary {
+    min-height: 44px;
+    padding-block: 13px;
+  }
+}

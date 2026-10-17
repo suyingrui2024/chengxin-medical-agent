@@ -17,6 +17,28 @@ export function createExecutionUI(api) {
     pollingFor = null,
     submitting = false;
   let needsReview = false;
+  let pollFailures = 0,
+    pollController = null;
+  function connected() {
+    pollFailures = 0;
+    const panel = $("execution-connection");
+    const focused = !panel.hidden && panel.contains(document.activeElement);
+    panel.hidden = true;
+    $("execution-connection-label").textContent = "";
+    panel.setAttribute("aria-busy", "false");
+    $("execution-connection-error").textContent = "";
+    $("execution-connection-retry").setAttribute("aria-disabled", "false");
+    if (focused) {
+      $("execution-focus-label").tabIndex = -1;
+      $("execution-focus-label").focus({ preventScroll: true });
+    }
+  }
+  function resetConnection() {
+    pollController?.abort();
+    pollController = null;
+    connected();
+    $("execution-connection").querySelector("details").open = false;
+  }
   const events = new Map();
   const rendered = new Set();
   const renderedReceipts = new Set();
@@ -616,6 +638,7 @@ export function createExecutionUI(api) {
     $("execution-events").textContent = [...events.values()]
       .map((event) => JSON.stringify(event))
       .join("\n");
+    connected();
     controls();
     clarificationUI.update(current);
     needsReview = Boolean(issues.size && !rechecked);
@@ -639,11 +662,14 @@ export function createExecutionUI(api) {
     }
     if (!$("view-execution").hidden) schedule();
   }
-  function schedule() {
+  function schedule(delay = busy() || hasJobs() ? 700 : 2000) {
     clearTimeout(timer);
-    timer = setTimeout(refresh, busy() || hasJobs() ? 700 : 2000);
+    if (current && !$("view-execution").hidden)
+      timer = setTimeout(refresh, delay);
   }
   async function refresh() {
+    clearTimeout(timer);
+    if ($("view-execution").hidden) return;
     if (!current) {
       await reloadWorkspaces();
       return;
@@ -653,24 +679,62 @@ export function createExecutionUI(api) {
     const ticket = `${id}:${epoch}`;
     if (pollingFor === ticket) return;
     pollingFor = ticket;
+    const controller = new AbortController();
+    pollController = controller;
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    $("execution-connection-retry").setAttribute("aria-disabled", "true");
+    $("execution-connection").setAttribute("aria-busy", "true");
     try {
       const snapshot = await api(
         `/api/execution/${id}?after=${Math.max(0, ...events.keys())}&include_artifacts=0`,
+        { signal: controller.signal },
       );
-      if (current?.id === id && activation === epoch) render(snapshot);
+      if (current?.id !== id || activation !== epoch) return;
+      if (
+        snapshot?.id !== id ||
+        !Array.isArray(snapshot.events) ||
+        !Number.isInteger(snapshot.sequence) ||
+        snapshot.sequence < 0 ||
+        typeof snapshot.status !== "string"
+      )
+        throw new Error("返回的任务状态无效，请重新读取。");
+      if (snapshot.sequence >= (current.sequence ?? 0)) render(snapshot);
+      else {
+        connected();
+        schedule();
+      }
     } catch (error) {
       if (current?.id !== id || activation !== epoch) return;
-      $("execution-feedback").textContent =
-        `读取状态失败：${error.message}；可稍后重试或检查工作目录。`;
-      if (busy() || hasJobs()) schedule();
+      pollFailures++;
+      $("execution-connection").hidden = false;
+      if (
+        $("execution-connection-label").textContent !==
+        "状态暂未更新 · 正在重连"
+      )
+        $("execution-connection-label").textContent = "状态暂未更新 · 正在重连";
+      $("execution-connection-error").textContent = controller.signal.aborted
+        ? "连接等待超时，已保留当前结果与未发送内容。"
+        : error.message || "暂时无法读取任务状态。";
+      schedule(Math.min(30000, 1000 * 2 ** Math.min(pollFailures - 1, 5)));
     } finally {
+      clearTimeout(timeout);
+      if (pollController === controller) pollController = null;
       if (pollingFor === ticket) pollingFor = null;
+      if (current?.id === id && activation === epoch) {
+        $("execution-connection-retry").setAttribute("aria-disabled", "false");
+        $("execution-connection").setAttribute("aria-busy", "false");
+      }
     }
   }
+  $("execution-connection-retry").addEventListener(
+    "click",
+    () => void refresh(),
+  );
   function activate(snapshot) {
     changeReview.reset();
     clarificationUI.reset();
     activation++;
+    resetConnection();
     if (current) drafts.set(current.id, $("execution-input").value);
     current = snapshot;
     $("execution-input").value = drafts.get(current.id) || "";
@@ -725,6 +789,7 @@ export function createExecutionUI(api) {
       changeReview.reset();
       clarificationUI.reset();
       activation++;
+      resetConnection();
       events.clear();
       rendered.clear();
       renderedReceipts.clear();

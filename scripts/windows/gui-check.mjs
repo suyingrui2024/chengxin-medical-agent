@@ -13,6 +13,7 @@ import {
   installExecutionFocusFixture,
   openFocusWorkspace,
   verifyEditableAnswer,
+  verifyExecutionRecovery,
 } from "../../tests/fixtures/execution-focus.mjs";
 import { verifyNativeArtifactChart } from "../../tests/fixtures/native-artifact-chart.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -131,6 +132,7 @@ try {
     "1250",
   );
   const draftReceipt = await verifyEditableAnswer(reopened, focusFixture);
+  const recoveryReceipt = await verifyExecutionRecovery(reopened, focusFixture);
   assert.equal(model.requests.length, beforeChart);
   focusFixture.first.status = "completed";
   await expect(reopened.locator("#execution-focus-label")).toHaveText(
@@ -157,6 +159,7 @@ try {
       clipboard_line_endings: "OS-native; CRLF normalized only for comparison",
       artifact_save: "passed (actual CSV snapshot on disk)",
       clarification_draft: draftReceipt,
+      execution_recovery: recoveryReceipt,
       profile_path_with_spaces_and_chinese: "passed",
       local_fixture_requests: model.requests.length,
       external_model_calls: 0,

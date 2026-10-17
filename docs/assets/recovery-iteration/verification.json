@@ -1,0 +1,111 @@
+{
+  "schema": "execution-recovery-iteration/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "10759a6bbc038c9488533d067c4128ca93b7bd1f",
+  "baseline_reproduction": {
+    "expected": "failure",
+    "observed": "Only one idle status GET after a transient 503; no retry in the eight-second observation period.",
+    "log": "logs/reproduce.log"
+  },
+  "checks": {
+    "browser": {
+      "passed": 133,
+      "log": "logs/ui.log"
+    },
+    "native_desktop": {
+      "passed": 6,
+      "log": "logs/desktop.log"
+    },
+    "recovery_focused": {
+      "passed": 8,
+      "log": "logs/focused.log"
+    },
+    "directory_touch": {
+      "passed": true,
+      "receipt": "directory-touch.json"
+    },
+    "native_gui": {
+      "passed": true,
+      "log": "logs/native-gui.log",
+      "receipt": {
+        "gui": "passed",
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": [
+          "body",
+          "serif",
+          "mono"
+        ],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "artifact_copy": "passed (actual CSV and system clipboard)",
+        "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+        "artifact_save": "passed (actual CSV snapshot on disk)",
+        "clarification_draft": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "edited_answer": true
+        },
+        "execution_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "draft_preserved": true
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      }
+    },
+    "format": "passed"
+  },
+  "scope": [
+    "Idle GET retry, 15-second request timeout, progressive retry spacing, no polling while away from the execution view.",
+    "Manual retry deduplication, preserved task draft, preview and existing execution error; keyboard focus restoration without stealing input focus.",
+    "Old sequence responses cannot revert a newer submitted answer; invalid responses and old-workspace requests cannot replace the current workspace.",
+    "Preview and recovery touch targets at 320/390px, six-theme scoped contrast and ARIA checks.",
+    "Separate mobile directory button geometry audit at 320/390px."
+  ],
+  "boundaries": [
+    "HTTP failure injection and question handling use synthetic host snapshots, including in real Electron windows.",
+    "No automatic task, answer or tool resubmission.",
+    "This is not a full accessibility certification or a real-model quality benchmark."
+  ],
+  "next_audits": [
+    "Evaluate actual task quality against current, comparable execution evidence; do not infer reasoning quality from UI fixtures.",
+    "Review adaptive execution layouts and other mobile controls beyond the action-button scope."
+  ],
+  "source_files_sha256": {
+    "scripts/windows/gui-check.mjs": "5425e36b73f07c9471d79fb49bcef72aa1c6d1905aa21d70437a821349773fef",
+    "src/medagent/web/execution-focus.css": "7dd01a086244ad37a536a133e599a25f28a0c1d3050eb977d4c39772b49dd7a3",
+    "src/medagent/web/execution-ui.js": "560084a9c56d6159bc2de551ae0a3b950163881b6dbd1df136ac2f27125904c5",
+    "src/medagent/web/index.html": "00f4aaea4bf10bf760f9cadacba43f36597e610b9d7732e0f4f7e34b1fcff333",
+    "tests/desktop/execution-focus.spec.mjs": "cad7b3dc093a6143d003db7e802a537f7ed5eeef58fae8884c5773028689d57d",
+    "tests/fixtures/execution-focus.mjs": "155dffdabaaf8d36ff020e5d9ba18f85be934347edc0412a08d9d92f05ef315f",
+    "tests/ui/execution-recovery.spec.mjs": "80ae7c0a29ab08b3088bbaadbb7d89510650e466b847125289c2f593e757faad"
+  },
+  "screenshots": {
+    "connection-small.png": "10a3ea031cc8a4d912ac097175f4abd473815b01988d079d4110be98967439c0",
+    "workspace-small.png": "9fbd7b361560e4b76a0b1d0abac8e9b55541d79f282ddb33cafbc5b683d693f6",
+    "directory-small.png": "8424cf7745f1e60e7354ff795f8272109677044814a79a02db75f312f4bd4b1c"
+  },
+  "windows": {
+    "status": "pending"
+  }
+}

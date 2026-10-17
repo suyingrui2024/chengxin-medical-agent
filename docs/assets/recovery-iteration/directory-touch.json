@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "host_snapshot_fixture": true,
+  "receipts": [
+    {
+      "viewport": 320,
+      "controls": [
+        {
+          "name": "工作区",
+          "width": 59,
+          "height": 44,
+          "left": 31,
+          "right": 90
+        },
+        {
+          "name": "打开文件",
+          "width": 72,
+          "height": 44,
+          "left": 217,
+          "right": 289
+        }
+      ]
+    },
+    {
+      "viewport": 390,
+      "controls": [
+        {
+          "name": "工作区",
+          "width": 59,
+          "height": 44,
+          "left": 31,
+          "right": 90
+        },
+        {
+          "name": "打开文件",
+          "width": 72,
+          "height": 44,
+          "left": 287,
+          "right": 359
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+
+Running 1 test using 1 worker
+
+(node:67388) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/execution-recovery.spec.mjs:4:1 › an idle workspace recovers its status automatically after a transient read failure (9.5s)
+
+
+  1) tests/ui/execution-recovery.spec.mjs:4:1 › an idle workspace recovers its status automatically after a transient read failure 
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 2
+    Received:    1
+
+    Call Log:
+    - Timeout 8000ms exceeded while waiting on the predicate
+
+      13 |     else await route.fallback();
+      14 |   });
+    > 15 |   await expect.poll(() => failures, {timeout:8000}).toBeGreaterThanOrEqual(2);
+         |                                                     ^
+      16 |   await expect(page.locator("#execution-connection")).toBeHidden();
+      17 | });
+      18 |
+        at /Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/ui/execution-recovery.spec.mjs:15:53
+
+    Error Context: test-results/ui/execution-recovery-an-idle-4935b-er-a-transient-read-failure/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/execution-recovery-an-idle-4935b-er-a-transient-read-failure/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/execution-recovery-an-idle-4935b-er-a-transient-read-failure/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/execution-recovery.spec.mjs:4:1 › an idle workspace recovers its status automatically after a transient read failure 

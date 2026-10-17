@@ -6,6 +6,7 @@ import {
   installExecutionFocusFixture,
   openFocusWorkspace,
   verifyEditableAnswer,
+  verifyExecutionRecovery,
 } from "../fixtures/execution-focus.mjs";
 const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -36,6 +37,7 @@ test("native focused work area renders host snapshots and opens an inert preview
       "1250",
     );
     await verifyEditableAnswer(page, fixture);
+    await verifyExecutionRecovery(page, fixture);
     fixture.first.status = "completed";
     await expect(page.locator("#execution-focus-label")).toHaveText(
       "本轮已完成",
