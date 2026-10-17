@@ -26,8 +26,8 @@
     {
       "file": "body-location.svg",
       "editable_source": "assets/illustrations/body-location.svg",
-      "source_sha256": "62221848e7bb474c12191d8e56c6fbbd5c6e43a50078efd1819f892cb5396ca6",
-      "output_sha256": "e8c3cdb9e969c2c8f5d32c31b3e721f73e0d75362bc614a6424b6f2dccd72753",
+      "source_sha256": "11b7cb1e43a60f050eb319da3d9cf18f33976d6a37db17488e14fda4fb658fa4",
+      "output_sha256": "946ba068fa7acf4809f8b3722548e588cf6e21da85f05cf99ff80a0d73c8c080",
       "labels": [
         "头/面部",
         "胸部",
@@ -35,9 +35,13 @@
         "四肢",
         "背/腰",
         "正面",
-        "背面"
+        "背面",
+        "右",
+        "左",
+        "左",
+        "右"
       ],
-      "outlined_glyphs": 11
+      "outlined_glyphs": 13
     }
   ]
 }

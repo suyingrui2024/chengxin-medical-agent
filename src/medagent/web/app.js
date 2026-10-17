@@ -346,8 +346,13 @@ function navigate(view) {
     refreshSessions().catch((error) => toast(error.message));
   if (view === "tasks") renderLibrary();
   if (view === "execution") executionUI.refresh();
-  if (view === "capabilities")
-    refreshCapabilities().catch((error) => toast(error.message));
+  if (view === "capabilities" && !state.capabilityBusy) {
+    // A late catalog refresh must not replace a template the user just chose.
+    setCapabilityBusy(true);
+    refreshCapabilities()
+      .catch((error) => toast(error.message))
+      .finally(() => setCapabilityBusy(false));
+  }
   if (view === "inspect") {
     renderInspection();
     loadEvents().catch((error) => toast(error.message));

@@ -11,6 +11,7 @@ import {
   renderLocationChips,
 } from "./location-answer-ui.js";
 export const UI_VERSION = "medical-ui/v1";
+let illustrationSequence = 0;
 
 const sourceNames = {
   patient: "患者自述",
@@ -965,6 +966,48 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       const image = el("img", "task-image");
       const caption = el("figcaption");
       figure.append(image, caption);
+      if (data.id !== "body_location" || context.preview) {
+        const viewer = el("dialog", "illustration-dialog");
+        const viewerId = `illustration-title-${++illustrationSequence}`;
+        const heading = el("h2");
+        heading.id = viewerId;
+        viewer.setAttribute("aria-labelledby", viewerId);
+        const close = button(
+          "关闭大图",
+          () => viewer.close(),
+          "secondary-button",
+        );
+        const large = el("img", "illustration-large");
+        const description = el("p", "illustration-instruction");
+        const zoom = button(
+          "放大图示",
+          () => {
+            heading.textContent = `${data.title} · 步骤 ${step + 1}`;
+            large.src = image.src;
+            large.alt = image.alt;
+            description.textContent = data.steps[step];
+            viewer.showModal();
+            close.focus();
+          },
+          "illustration-zoom",
+        );
+        zoom.setAttribute("aria-haspopup", "dialog");
+        viewer.append(heading, description, large, close);
+        figure.append(zoom, viewer);
+        image.addEventListener("error", () => {
+          image.hidden = true;
+          zoom.hidden = true;
+          caption.textContent =
+            "图示暂时无法加载，请阅读右侧或下方的分步说明。";
+          caption.setAttribute("role", "alert");
+        });
+        image.addEventListener("load", () => {
+          image.hidden = false;
+          zoom.hidden = false;
+          caption.removeAttribute("role");
+          caption.textContent = `步骤 ${step + 1} · ${data.step_assets ? "当前步骤示意" : "请结合图示阅读当前步骤"}`;
+        });
+      }
       const view = el("div", "step-view");
       const progress = el("div", "step-progress");
       const instruction = el("p", "step-text");

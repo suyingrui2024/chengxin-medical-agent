@@ -78,9 +78,9 @@ export async function verifyLocationLayout(page, id, { shot } = {}) {
           ? "手臂／腿示意"
           : "正面示意",
     );
-    await expect(page.locator(".body-selection-marker circle")).toHaveCount(
-      value === "limbs" ? 4 : 1,
-    );
+    await expect(
+      page.locator(".body-selection-marker .body-region"),
+    ).toHaveCount(value === "limbs" ? 4 : 1);
     const geometry = await page.evaluate(() => {
       const pane = document
         .querySelector("#active-task")

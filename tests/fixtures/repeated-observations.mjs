@@ -180,7 +180,9 @@ export async function verifyRepeatedObservations(
   );
   await expect(series().locator(".observation-value")).toHaveCSS(
     "color",
-    "rgb(154, 77, 32)",
+    await current()
+      .locator(".summary-route")
+      .evaluate((node) => getComputedStyle(node).color),
   );
   if (screenshotPrefix)
     await page.screenshot({

@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" role="img" aria-labelledby="title desc">
-  <title id="title">主观症状部位示意</title>
-  <desc id="desc">以人体正面和背面示意头面、胸、腹、四肢以及背腰位置。仅用于说明症状位置，不要求触摸或按压。</desc>
-  <rect width="720" height="420" rx="20" fill="#eaf1ec" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
+  <title id="title">主观症状部位：正面与背面</title>
+  <desc id="desc">正面与背面分别显示头面、胸部、腹部、四肢及背腰的大范围。左右按患者自身标注。虚线仅作区域示意，不代表精确位置、测量或疾病，不需要按压身体。</desc>
   <defs>
-    <g id="person" fill="#f0c8aa" stroke="#b99a81" stroke-width="2">
-      <circle cx="0" cy="70" r="32" />
-      <path d="M-17 104h34l12 17h25l29 134-24 7-30-100v95l19 127h-29l-19-112-19 112h-29l19-127v-95l-30 100-24-7 29-134h25z" />
+    <g id="person" fill="#e0e8e3" stroke="#718a7d" stroke-width="1.8" stroke-linejoin="round">
+      <ellipse cx="114" cy="45" rx="22" ry="28" />
+      <path d="M103 72v12l-26 9q-13 4-17 23L41 195q-2 8 5 11l5 2q7 1 10-7l20-63-1 66-7 114q-1 9 8 9h10q7 0 8-8l15-93 15 93q1 8 8 8h10q9 0 8-9l-7-114-1-66 20 63q3 8 10 7l5-2q7-3 5-11l-19-79q-4-19-17-23l-26-9V72" />
     </g>
     <path id="label-glyph-5934" d="M537 165C673 99 812 10 893 -66L943 -8C860 65 716 154 577 219ZM192 741C273 711 372 659 420 618L464 679C414 719 313 767 233 795ZM102 559C183 527 281 472 329 431L377 490C327 531 227 582 147 612ZM57 382V311H483C429 158 313 49 56 -13C72 -30 92 -58 100 -76C384 -4 508 128 563 311H946V382H580C605 511 605 661 606 830H529C528 656 530 507 502 382Z" />
     <path id="label-glyph-2f" d="M11 -179H78L377 794H311Z" />
@@ -18,56 +17,92 @@
     <path id="label-glyph-80cc" d="M735 378V293H273V378ZM198 436V-80H273V93H735V4C735 -10 729 -15 713 -16C697 -16 638 -16 580 -14C590 -33 601 -61 605 -81C685 -81 737 -80 769 -69C800 -58 811 -38 811 3V436ZM273 238H735V148H273ZM330 841V753H79V692H330V602C225 584 125 568 54 558L66 493L330 543V469H404V841ZM550 840V576C550 499 574 478 670 478C689 478 819 478 840 478C914 478 936 504 945 602C924 606 894 617 878 628C874 555 867 543 833 543C805 543 698 543 678 543C633 543 625 548 625 576V654C721 676 828 708 905 741L852 795C798 768 709 738 625 714V840Z" />
     <path id="label-glyph-8170" d="M91 803V444C91 297 86 96 22 -46C38 -51 66 -67 79 -78C121 17 140 141 148 259H273V16C273 3 269 -1 257 -2C245 -2 206 -3 162 -1C171 -19 179 -50 182 -67C245 -68 282 -66 306 -55C329 -43 337 -21 337 15V803ZM154 735H273V569H154ZM154 500H273V329H152C154 370 154 409 154 444ZM399 640V378H901V640H762V722H932V789H373V722H548V640ZM610 722H698V640H610ZM775 229C754 171 723 125 678 88C626 106 572 123 518 139C536 165 556 196 575 229ZM417 107C484 89 550 68 613 46C550 14 470 -8 367 -21C379 -35 391 -62 397 -81C523 -60 619 -30 691 16C770 -14 839 -46 891 -76L943 -25C892 4 825 33 750 62C796 106 828 161 849 229H940V294H611C622 315 632 337 641 357L569 370C559 346 547 320 534 294H375V229H498C471 184 443 140 417 107ZM460 576H552V442H460ZM609 576H698V442H609ZM757 576H838V442H757Z" />
     <path id="label-glyph-6b63" d="M188 510V38H52V-35H950V38H565V353H878V426H565V693H917V767H90V693H486V38H265V510Z" />
+    <path id="label-glyph-53f3" d="M412 840C399 778 382 715 361 653H65V580H334C270 420 174 274 31 177C47 162 70 135 82 117C155 169 216 232 268 303V-81H343V-25H788V-76H866V386H323C359 447 390 512 416 580H939V653H442C460 710 476 767 490 825ZM343 48V313H788V48Z" />
+    <path id="label-glyph-5de6" d="M370 840C361 781 350 720 336 659H67V587H319C265 377 177 174 28 39C44 25 67 -3 79 -20C196 89 277 233 336 390V323H560V22H232V-51H949V22H636V323H904V395H338C361 457 380 522 397 587H930V659H414C427 716 438 773 448 829Z" />
   </defs>
-  <use href="#person" transform="translate(235)" />
-  <use href="#person" transform="translate(505)" />
-  <g fill="#d9ed99" stroke="#17685b" stroke-width="2">
-    <ellipse cx="235" cy="70" rx="22" ry="25" />
-    <rect x="212" y="137" width="46" height="45" rx="8" />
-    <rect x="212" y="189" width="46" height="48" rx="8" />
-    <rect x="482" y="140" width="46" height="98" rx="8" />
+  <rect width="720" height="440" rx="20" fill="#f4f7f3" />
+  <rect x="16" y="16" width="334" height="408" rx="16" fill="#fff" stroke="#dce5da" />
+  <rect x="370" y="16" width="334" height="408" rx="16" fill="#fff" stroke="#dce5da" />
+  <g transform="translate(70 42)">
+    <use href="#person" />
+    <g fill="none" stroke="#718a7d" stroke-width="1.5" stroke-linecap="round">
+      <path d="M106 43h1m14 0h1m-11 14q3 2 6 0M96 96q18 8 36 0M94 151q20 5 40 0" />
+      <circle cx="114" cy="183" r="1.5" />
+    </g>
+    <g fill="#dcebdc" fill-opacity=".75" stroke="#235f4e" stroke-width="1.8" stroke-dasharray="4 3">
+      <ellipse cx="114" cy="45" rx="25" ry="31" />
+      <ellipse cx="114" cy="123" rx="29" ry="26" />
+      <ellipse cx="114" cy="179" rx="27" ry="26" />
+      <ellipse cx="60" cy="162" rx="13" ry="43" transform="rotate(15 60 162)" />
+      <ellipse cx="168" cy="162" rx="13" ry="43" transform="rotate(-15 168 162)" />
+      <ellipse cx="91" cy="272" rx="13" ry="46" transform="rotate(6 91 272)" />
+      <ellipse cx="137" cy="272" rx="13" ry="46" transform="rotate(-6 137 272)" />
+    </g>
   </g>
-  <g fill="none" stroke="#17685b" stroke-width="2">
-    <path d="M100 70h110M100 160h110M100 213h110M303 295h35M530 187h92" />
+  <g transform="translate(424 42)">
+    <use href="#person" />
+    <g fill="none" stroke="#718a7d" stroke-width="1.5" stroke-linecap="round">
+      <path d="M103 32q11-5 22 0M97 108q-9 12 0 23m34-23q9 12 0 23M114 100v99M96 203q18-8 36 0" />
+    </g>
+    <ellipse cx="114" cy="155" rx="28" ry="52" fill="#dcebdc" fill-opacity=".75" stroke="#235f4e" stroke-width="1.8" stroke-dasharray="4 3" />
   </g>
-  <g font-family="Arial,'PingFang SC',sans-serif" font-size="19" fill="#18312d">
-    <g aria-label="头/面部" transform="translate(24 77) scale(0.019 -0.019)">
+  <g fill="none" stroke="#718a7d" stroke-width="1.4">
+    <path d="M210 87h44M214 165h40M212 221h42M138 310H99M567 197h45" />
+  </g>
+  <g font-family="Arial,'PingFang SC',sans-serif" font-size="18" fill="#203c33">
+    <g aria-label="头/面部" transform="translate(260 94) scale(0.018 -0.018)">
       <title>头/面部</title>
       <use href="#label-glyph-5934" x="0" />
       <use href="#label-glyph-2f" x="1000" />
       <use href="#label-glyph-9762" x="1392" />
       <use href="#label-glyph-90e8" x="2392" />
     </g>
-    <g aria-label="胸部" transform="translate(24 167) scale(0.019 -0.019)">
+    <g aria-label="胸部" transform="translate(260 172) scale(0.018 -0.018)">
       <title>胸部</title>
       <use href="#label-glyph-80f8" x="0" />
       <use href="#label-glyph-90e8" x="1000" />
     </g>
-    <g aria-label="腹部" transform="translate(24 220) scale(0.019 -0.019)">
+    <g aria-label="腹部" transform="translate(260 228) scale(0.018 -0.018)">
       <title>腹部</title>
       <use href="#label-glyph-8179" x="0" />
       <use href="#label-glyph-90e8" x="1000" />
     </g>
-    <g aria-label="四肢" transform="translate(320 289) scale(0.019 -0.019)">
+    <g aria-label="四肢" transform="translate(43 317) scale(0.018 -0.018)">
       <title>四肢</title>
       <use href="#label-glyph-56db" x="0" />
       <use href="#label-glyph-80a2" x="1000" />
     </g>
-    <g aria-label="背/腰" transform="translate(627 194) scale(0.019 -0.019)">
+    <g aria-label="背/腰" transform="translate(618 204) scale(0.018 -0.018)">
       <title>背/腰</title>
       <use href="#label-glyph-80cc" x="0" />
       <use href="#label-glyph-2f" x="1000" />
       <use href="#label-glyph-8170" x="1392" />
     </g>
-    <g aria-label="正面" transform="translate(215 410) scale(0.016 -0.016)">
+    <g aria-label="正面" transform="translate(162 398) scale(0.017 -0.017)">
       <title>正面</title>
       <use href="#label-glyph-6b63" x="0" />
       <use href="#label-glyph-9762" x="1000" />
     </g>
-    <g aria-label="背面" transform="translate(485 410) scale(0.016 -0.016)">
+    <g aria-label="背面" transform="translate(516 398) scale(0.017 -0.017)">
       <title>背面</title>
       <use href="#label-glyph-80cc" x="0" />
       <use href="#label-glyph-9762" x="1000" />
+    </g>
+    <g fill="#586b60" aria-label="右" transform="translate(91 155) scale(0.013 -0.013)">
+      <title>右</title>
+      <use href="#label-glyph-53f3" x="0" />
+    </g>
+    <g fill="#586b60" aria-label="左" transform="translate(270 155) scale(0.013 -0.013)">
+      <title>左</title>
+      <use href="#label-glyph-5de6" x="0" />
+    </g>
+    <g fill="#586b60" aria-label="左" transform="translate(445 155) scale(0.013 -0.013)">
+      <title>左</title>
+      <use href="#label-glyph-5de6" x="0" />
+    </g>
+    <g fill="#586b60" aria-label="右" transform="translate(624 155) scale(0.013 -0.013)">
+      <title>右</title>
+      <use href="#label-glyph-53f3" x="0" />
     </g>
   </g>
 </svg>

@@ -312,11 +312,11 @@ export function renderLocationAnswer(data, context) {
           '<ellipse cx="42" cy="75" rx="8" ry="14"/><ellipse cx="118" cy="75" rx="8" ry="14"/>',
       };
       svg.innerHTML =
-        '<path d="M41 63C36 25 59 17 80 17S124 25 119 63C134 56 133 87 120 89C118 121 98 138 80 138S42 121 40 89C27 87 26 56 41 63Z" fill="#e3e9e2" stroke="#a2baa6" stroke-width="2"/>' +
+        '<path d="M41 63C36 25 59 17 80 17S124 25 119 63C134 56 133 87 120 89C118 121 98 138 80 138S42 121 40 89C27 87 26 56 41 63Z" class="body-anatomy"/>' +
         (!back
-          ? '<g fill="none" stroke="#8ca18e" stroke-width="2"><path d="M53 70h17m20 0h17M80 74v17h7M66 110q14 8 28 0"/></g>'
+          ? '<g class="body-landmarks"><path d="M53 70h17m20 0h17M80 74v17h7M66 110q14 8 28 0"/></g>'
           : "") +
-        `<g fill="#80a88b" opacity="0.65">${marks[area] || ""}</g>`;
+        `<g class="body-region">${marks[area] || ""}</g>`;
       picture.append(
         svg,
         node("figcaption", "", back ? "后面 · 区域示意" : "前面 · 区域示意"),

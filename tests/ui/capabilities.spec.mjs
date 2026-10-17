@@ -122,3 +122,35 @@ test("capability workspace calculates without writing cases and pins old session
     expect(response.ok()).toBe(true);
   }
 });
+
+test("a catalog loading in the background cannot replace a template selection", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.getByText("本机服务已连接")).toBeVisible();
+  await page.getByLabel("界面模式").selectOption("developer");
+  let release;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/api/capabilities", async (route) => {
+    await gate;
+    await route.continue();
+  });
+  try {
+    await page.locator('.nav-item[data-view="capabilities"]').click();
+    await expect(page.getByLabel("新问诊模板")).toBeDisabled();
+    release();
+    await expect(page.getByLabel("新问诊模板")).toBeEnabled();
+    await page.getByLabel("新问诊模板").selectOption("history");
+    await page.getByRole("button", { name: "应用模板", exact: true }).click();
+    await expect(page.getByText("0 / 4 已启用", { exact: true })).toBeVisible();
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+    const catalog = await (await page.request.get("/api/capabilities")).json();
+    await page.request.post("/api/capabilities/configure", {
+      data: { template_id: "general", expected_revision: catalog.revision },
+    });
+  }
+});

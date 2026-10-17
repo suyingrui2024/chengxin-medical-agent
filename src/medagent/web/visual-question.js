@@ -365,14 +365,20 @@ export function renderBodyMap(data, context) {
   const figure = document.createElementNS(ns, "svg");
   figure.setAttribute("viewBox", "14 0 200 348");
   figure.setAttribute("aria-hidden", "true");
+  // Repository-owned anatomy only. Broad regions never imply a measured point.
   figure.innerHTML =
-    '<defs><g id="location-person"><circle cx="0" cy="50" r="25"/><path d="M-15 80h30l12 12h22l25 112-20 5-27-84v91l16 116H17L0 232l-17 100h-26l16-116v-91l-27 84-20-5 25-112h22z"/></g></defs><g fill="#e3e9e2" stroke="#b8cabc" stroke-width="2"><use class="body-silhouette" href="#location-person" transform="translate(114 8)"/></g>';
+    '<g class="body-anatomy"><ellipse cx="114" cy="45" rx="22" ry="28"/><path class="body-silhouette" d="M103 72v12l-26 9q-13 4-17 23L41 195q-2 8 5 11l5 2q7 1 10-7l20-63-1 66-7 114q-1 9 8 9h10q7 0 8-8l15-93 15 93q1 8 8 8h10q9 0 8-9l-7-114-1-66 20 63q3 8 10 7l5-2q7-3 5-11l-19-79q-4-19-17-23l-26-9V72"/></g><g class="body-landmarks body-front"><path d="M106 43h1m14 0h1m-11 14q3 2 6 0M96 96q18 8 36 0M94 151q20 5 40 0"/><circle cx="114" cy="183" r="1.5"/></g><g class="body-landmarks body-back" hidden><path d="M103 32q11-5 22 0M97 108q-9 12 0 23m34-23q9 12 0 23M114 100v99M96 203q18-8 36 0"/></g><g class="body-landmarks body-side-labels" font-size="13" fill="currentColor" stroke="none"><text x="24" y="112" class="body-right-label">右</text><text x="192" y="112" class="body-left-label">左</text></g>';
   const marker = document.createElementNS(ns, "g");
   marker.setAttribute("class", "body-selection-marker");
   figure.append(marker);
   const orientations = node("div", "body-map-orientations", "正面示意");
   canvas.append(figure, orientations);
   const controls = node("div", "body-map-controls");
+  const scope = node(
+    "p",
+    "body-map-scope",
+    "虚线范围仅表示所选大部位；左右以患者自己为准。",
+  );
   const choices = node("div", "body-map-options");
   let expanded = !useProposal;
   const edit = proposal
@@ -386,12 +392,17 @@ export function renderBodyMap(data, context) {
       update();
     });
   }
-  const points = {
-    head: [27, 15],
-    chest: [27, 36],
-    abdomen: [27, 51],
-    back: [74, 44],
-    limbs: [27, 75],
+  const regions = {
+    head: [[114, 45, 25, 31]],
+    chest: [[114, 123, 29, 26]],
+    abdomen: [[114, 179, 27, 26]],
+    back: [[114, 155, 28, 52]],
+    limbs: [
+      [60, 162, 13, 43, 15],
+      [168, 162, 13, 43, -15],
+      [91, 272, 13, 46, 6],
+      [137, 272, 13, 46, -6],
+    ],
   };
   const result = node("p", "map-selection sr-only", "点击部位，再确认记录");
   result.setAttribute("aria-live", "polite");
@@ -400,7 +411,7 @@ export function renderBodyMap(data, context) {
   confirm.disabled = true;
   const options = (data.options || []).filter(
     (choice) =>
-      Object.hasOwn(points, choice.value) ||
+      Object.hasOwn(regions, choice.value) ||
       (context.includeOtherRegion && choice.value === "other"),
   );
   const actionable =
@@ -429,53 +440,33 @@ export function renderBodyMap(data, context) {
       button.disabled = !actionable || Boolean(context.isBusy?.());
     });
     marker.style.display =
-      selected && Object.hasOwn(points, selected.value) ? "" : "none";
+      selected && Object.hasOwn(regions, selected.value) ? "" : "none";
     marker.dataset.location = selected?.value || "";
-    figure.setAttribute(
-      "viewBox",
-      selected?.value === "back" ? "210 0 200 348" : "14 0 200 348",
-    );
     orientations.textContent =
       selected?.value === "back"
         ? "背面示意"
         : selected?.value === "limbs"
           ? "手臂／腿示意"
           : "正面示意";
-    figure
-      .querySelector(".body-silhouette")
-      .setAttribute(
-        "transform",
-        selected?.value === "back" ? "translate(310 8)" : "translate(114 8)",
-      );
+    const back = selected?.value === "back";
+    figure.querySelector(".body-front").toggleAttribute("hidden", back);
+    figure.querySelector(".body-back").toggleAttribute("hidden", !back);
+    figure.querySelector(".body-right-label").textContent = back ? "左" : "右";
+    figure.querySelector(".body-left-label").textContent = back ? "右" : "左";
     marker.replaceChildren();
-    if (selected && Object.hasOwn(points, selected.value)) {
-      // Broad, existing categories only. “四肢” does not identify one leg or side.
-      const centers =
-        selected.value === "limbs"
-          ? [
-              [60, 180],
-              [168, 180],
-              [85, 285],
-              [143, 285],
-            ]
-          : [
-              [
-                points[selected.value][0] * 4.2,
-                points[selected.value][1] * 3.8,
-              ],
-            ];
-      centers.forEach(([x, y]) => {
-        const dot = document.createElementNS(ns, "circle");
+    if (selected && Object.hasOwn(regions, selected.value)) {
+      regions[selected.value].forEach(([x, y, rx, ry, rotation = 0]) => {
+        const area = document.createElementNS(ns, "ellipse");
         for (const [key, value] of Object.entries({
+          class: "body-region",
           cx: x,
           cy: y,
-          r: selected.value === "limbs" ? 9 : 13,
-          fill: "#235f4e",
-          stroke: "#fff",
-          "stroke-width": 4,
+          rx,
+          ry,
+          transform: `rotate(${rotation} ${x} ${y})`,
         }))
-          dot.setAttribute(key, String(value));
-        marker.append(dot);
+          area.setAttribute(key, String(value));
+        marker.append(area);
       });
     }
     result.textContent = selected
@@ -517,7 +508,7 @@ export function renderBodyMap(data, context) {
       );
   });
   if (quote) controls.append(quote, edit);
-  controls.append(choices, confirm);
+  controls.append(choices, confirm, scope);
   map.append(canvas, controls, result);
   return map;
 }

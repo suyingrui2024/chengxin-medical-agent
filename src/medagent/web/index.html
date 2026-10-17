@@ -20,7 +20,10 @@
       type="font/otf"
       crossorigin="anonymous"
     />
+    <script src="themes.js"></script>
+    <link rel="stylesheet" href="themes.css" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="appearance.css" />
   </head>
   <body data-mode="patient">
     <svg
@@ -79,6 +82,10 @@
         </symbol>
         <symbol id="i-edit" viewBox="0 0 24 24">
           <path d="m5 15 11-11 4 4L9 19l-5 1 1-5ZM13 7l4 4" />
+        </symbol>
+        <symbol id="i-appearance" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 3a9 9 0 0 1 0 18V3Z" fill="currentColor" stroke="none" />
         </symbol>
       </defs>
     </svg>
@@ -189,6 +196,17 @@
             ><strong id="page-title">问诊</strong>
           </div>
           <div class="top-actions">
+            <button
+              id="open-appearance"
+              class="appearance-trigger"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="appearance-dialog"
+              aria-label="外观与皮肤"
+            >
+              <svg class="icon"><use href="#i-appearance" /></svg>
+              <span>外观</span>
+            </button>
             <span id="connection-status" class="connection"
               ><span class="status-dot"></span>正在连接</span
             ><span id="patient-mode-label" class="subtle-pill patient-only"
@@ -1125,6 +1143,108 @@
           <pre id="execution-change-diff" tabindex="0"></pre>
         </section>
       </div>
+    </dialog>
+    <dialog
+      id="appearance-dialog"
+      class="appearance-dialog"
+      aria-labelledby="appearance-title"
+      aria-describedby="appearance-description"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">MAKE YOURSELF COMFORTABLE</p>
+          <h2 id="appearance-title">选一种，让你自在的颜色。</h2>
+        </div>
+        <button
+          class="icon-button appearance-close"
+          type="button"
+          aria-label="关闭外观设置"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <p id="appearance-description" class="appearance-description">
+        从清晨的明亮，到夜间的安静。选择后立即应用。
+      </p>
+      <fieldset class="appearance-options">
+        <legend class="sr-only">选择界面皮肤</legend>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="forest" checked />
+          <span class="theme-swatch" data-palette="forest" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>澄心绿</strong><small>熟悉的自然与安心</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="ocean" />
+          <span class="theme-swatch" data-palette="ocean" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>海盐蓝</strong><small>清透、利落、有条理</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="iris" />
+          <span class="theme-swatch" data-palette="iris" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>鸢尾紫</strong><small>柔和、轻盈、舒展</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="sand" />
+          <span class="theme-swatch" data-palette="sand" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>暖砂金</strong><small>纸张般温润的陪伴</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="slate" />
+          <span class="theme-swatch" data-palette="slate" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>雾石灰</strong><small>克制简洁，专注当下</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="night" />
+          <span class="theme-swatch" data-palette="night" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>夜航</strong><small>深色界面，安静相伴</small></span
+          >
+        </label>
+        <label class="appearance-system"
+          ><input type="radio" name="appearance" value="system" /><span
+            ><strong>跟随系统</strong
+            ><small>随设备自动切换澄心绿与夜航</small></span
+          ><svg class="icon" aria-hidden="true">
+            <use href="#i-appearance" /></svg
+        ></label>
+      </fieldset>
+      <p id="appearance-status" class="appearance-status" role="status">
+        外观偏好保存在当前浏览器中。
+      </p>
     </dialog>
     <div id="toast" class="toast" role="status" hidden></div>
     <script src="app.js" type="module"></script>

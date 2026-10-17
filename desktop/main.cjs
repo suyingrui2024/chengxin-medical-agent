@@ -5,12 +5,19 @@ const {
   dialog,
   session,
   ipcMain,
+  nativeTheme,
 } = require("electron");
 const { spawn } = require("node:child_process");
 const { randomBytes } = require("node:crypto");
 const path = require("node:path");
 const fs = require("node:fs");
 const readline = require("node:readline");
+const { pathToFileURL } = require("node:url");
+const {
+  readAppearance,
+  saveAppearance,
+  valid: validAppearance,
+} = require("./appearance.cjs");
 
 const projectRoot = path.resolve(__dirname, "..");
 const { version } = require("../package.json");
@@ -33,6 +40,49 @@ let readyOrigin;
 let quitting = false;
 let choosingProject = false;
 const projectRequests = new Map();
+
+function nativeAppearance(value) {
+  nativeTheme.themeSource =
+    value === "system" ? "system" : value === "night" ? "dark" : "light";
+  const resolved =
+    value === "system"
+      ? nativeTheme.shouldUseDarkColors
+        ? "night"
+        : "forest"
+      : value;
+  return {
+    forest: "#f5f6f2",
+    ocean: "#f2f6fa",
+    iris: "#f6f4fa",
+    sand: "#f8f4ed",
+    slate: "#f3f4f5",
+    night: "#111722",
+  }[resolved];
+}
+
+function trustedAppearanceSender(event) {
+  return (
+    !stopping &&
+    event.sender === window?.webContents &&
+    event.senderFrame === window.webContents.mainFrame &&
+    (event.senderFrame.url ===
+      pathToFileURL(path.join(__dirname, "starting.html")).href ||
+      (readyOrigin && new URL(event.senderFrame.url).origin === readyOrigin))
+  );
+}
+
+ipcMain.on("appearance:read", (event) => {
+  event.returnValue = trustedAppearanceSender(event)
+    ? readAppearance(app.getPath("userData"))
+    : null;
+});
+ipcMain.handle("appearance:save", (event, value, ...args) => {
+  if (!trustedAppearanceSender(event) || args.length || !validAppearance(value))
+    throw new Error("只能保存当前应用的外观选项");
+  saveAppearance(app.getPath("userData"), value);
+  window.setBackgroundColor(nativeAppearance(value));
+  return { saved: true };
+});
 
 function pythonCommand() {
   if (process.env.MEDAGENT_PYTHON) return process.env.MEDAGENT_PYTHON;
@@ -155,7 +205,7 @@ async function createWindow() {
     height: 980,
     minWidth: 900,
     minHeight: 680,
-    backgroundColor: "#f5f6f2",
+    backgroundColor: nativeAppearance(readAppearance(app.getPath("userData"))),
     icon: path.join(__dirname, "icon.png"),
     show: false,
     webPreferences: {
