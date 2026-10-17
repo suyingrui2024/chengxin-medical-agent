@@ -1,7 +1,5 @@
 // First-party Cordis adapter: cancel activity without discarding SDK sessions.
-// The socket is in this runtime's private state mount; it grants no host access.
-import { createServer } from "node:http";
-import { lstat, unlink } from "node:fs/promises";
+// Requests arrive on the existing SDK pipe; no additional listener is opened.
 import { randomUUID } from "node:crypto";
 import { observeTool } from "./execution-observations.mjs";
 import { mergeCheckRequirement } from "./execution-delivery.mjs";
@@ -93,16 +91,6 @@ export async function apply(ctx) {
     },
     { prepend: true },
   );
-  const native = process.platform === "win32";
-  const socket = "/state/control.sock";
-  if (!native)
-    try {
-      const info = await lstat(socket);
-      if (!info.isSocket()) throw new Error("Invalid control socket");
-      await unlink(socket);
-    } catch (error) {
-      if (error.code !== "ENOENT") throw error;
-    }
   const handle = async (method, path) => {
     const url = new URL(path, "http://runtime.local");
     if (method === "GET" && url.pathname === "/status") {
@@ -164,18 +152,4 @@ export async function apply(ctx) {
   };
   const unregister = registerControl(ctx.root, handle);
   ctx.effect(() => unregister);
-  if (native) return;
-  const server = createServer(async (request, response) => {
-    const result = await handle(request.method, request.url);
-    response.writeHead(result.status, { "Content-Type": "application/json" });
-    response.end(result.body);
-  });
-  await new Promise((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(socket, resolve);
-  });
-  ctx.effect(() => () => {
-    server.closeAllConnections();
-    return new Promise((resolve) => server.close(resolve));
-  });
 }

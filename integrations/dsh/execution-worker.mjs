@@ -1,11 +1,10 @@
 // Host-side owner. The provider credential arrives over stdin and never enters
 // the sandbox. A revocable loopback gateway shares one budget across descendants.
 import { DeepSeekHarness } from "@deepseek-ai/dsh-sdk-client";
-import { createServer, request as httpRequest } from "node:http";
+import { createServer } from "node:http";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { createInterface } from "node:readline";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { openSync, closeSync, constants } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFile } from "node:child_process";
@@ -299,61 +298,19 @@ function errorResponse(response, code) {
   );
 }
 function control(method, path) {
-  if (process.platform === "win32")
-    return harness.client
-      .request("chengxin/control", { method, path }, 7000)
-      .then((result) => {
-        if (
-          result?.status !== 200 ||
-          typeof result.body !== "string" ||
-          result.body.length > 512000
-        )
-          throw new Error("Runtime control failed");
-        return result.body;
-      });
-  return new Promise((resolve, reject) => {
-    const directory = openSync(
-      config.state,
-      constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW,
-    );
-    let closed = false;
-    const release = () => {
-      if (!closed) {
-        if (directory !== null) closeSync(directory);
-        closed = true;
-      }
-    };
-    const request = httpRequest(
-      {
-        socketPath: `/proc/self/fd/${directory}/control.sock`,
-        method,
-        path,
-      },
-      (response) => {
-        let body = "";
-        response.setEncoding("utf8");
-        response.on("data", (chunk) => {
-          body += chunk;
-          if (body.length > 512000)
-            request.destroy(new Error("Runtime control response too large"));
-        });
-        response.on("end", () => {
-          release();
-          response.statusCode === 200
-            ? resolve(body)
-            : reject(new Error("Runtime control failed"));
-        });
-      },
-    );
-    request.setTimeout(7000, () =>
-      request.destroy(new Error("Runtime control timed out")),
-    );
-    request.on("error", (error) => {
-      release();
-      reject(error);
+  // Both platforms reuse the already-owned SDK pipe; no extra listener or
+  // host-to-container loopback capability is required for lifecycle control.
+  return harness.client
+    .request("chengxin/control", { method, path }, 7000)
+    .then((result) => {
+      if (
+        result?.status !== 200 ||
+        typeof result.body !== "string" ||
+        result.body.length > 512000
+      )
+        throw new Error("Runtime control failed");
+      return result.body;
     });
-    request.end();
-  });
 }
 async function capabilityRequest(request, response) {
   const owned = active || lease;
