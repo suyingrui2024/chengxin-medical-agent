@@ -39,6 +39,23 @@ test("native chart preview reads actual workspace CSV bytes without a model call
       timeout: 15000,
     });
     const receipt = await verifyNativeArtifactChart(page, executionRoot);
+    await page.locator("#execution-preview-copy").click();
+    await expect(page.locator("#execution-preview-action-status")).toHaveText(
+      "已复制读取时的原文",
+    );
+    expect(
+      await desktop.evaluate(({ clipboard }) => clipboard.readText()),
+    ).toBe("样本,质量 (g)\nA,1250\nB,2000\nC,750\n");
+    expect(
+      await page.evaluate(async () => {
+        try {
+          await navigator.clipboard.readText();
+          return "unexpectedly allowed";
+        } catch {
+          return "denied";
+        }
+      }),
+    ).toBe("denied");
     expect(receipt.agent_turns).toBe(0);
     expect(calls).toBe(0);
     await page

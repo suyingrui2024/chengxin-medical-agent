@@ -747,6 +747,17 @@
                   <button id="execution-preview-reload" type="button">
                     重新读取
                   </button>
+                  <button id="execution-preview-copy" type="button" hidden>
+                    复制原文
+                  </button>
+                  <button
+                    id="execution-preview-save"
+                    type="button"
+                    disabled
+                    title="保存读取时的快照；文字按纯文本保存，不执行文件内容"
+                  >
+                    保存快照
+                  </button>
                 </div>
                 <div
                   id="execution-preview"
@@ -757,6 +768,11 @@
                 </div>
                 <p
                   id="execution-preview-meta"
+                  class="artifact-meta"
+                  role="status"
+                ></p>
+                <p
+                  id="execution-preview-action-status"
                   class="artifact-meta"
                   role="status"
                 ></p>

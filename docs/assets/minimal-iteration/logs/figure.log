@@ -1,0 +1,11 @@
+
+Running 4 tests using 1 worker
+
+(node:65890) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on wide (1.7s)
+  ✓  2 tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on short (1.6s)
+  ✓  3 tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on mobile (1.6s)
+  ✓  4 tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on small (1.6s)
+
+  4 passed (7.1s)

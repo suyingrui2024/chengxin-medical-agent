@@ -1,0 +1,127 @@
+{
+  "schema": "minimal-agent-usability/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "b8732f1f78947e2fd5b23eee86a388f988dc7b95",
+  "checks": {
+    "browser": {
+      "passed": 125,
+      "log": "logs/ui.log"
+    },
+    "native_desktop": {
+      "passed": 6,
+      "log": "logs/desktop.log"
+    },
+    "final_figure_viewports": {
+      "passed": 4,
+      "log": "logs/figure.log"
+    },
+    "permission_boundaries": {
+      "passed": 1,
+      "log": "logs/permission.log"
+    },
+    "native_gui": {
+      "passed": true,
+      "receipt": {
+        "gui": "passed",
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": [
+          "body",
+          "serif",
+          "mono"
+        ],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "artifact_copy": "passed (actual CSV and system clipboard)",
+        "artifact_save": "passed (actual CSV snapshot on disk)",
+        "clarification_draft": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "edited_answer": true
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      },
+      "log": "logs/native-gui.log"
+    },
+    "format": "passed",
+    "outlined_labels": "passed"
+  },
+  "research": [
+    {
+      "url": "https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them",
+      "applied": "Copy and save inert source snapshots alongside existing previews."
+    },
+    {
+      "url": "https://docs.langchain.com/oss/javascript/langgraph/interrupts",
+      "applied": "Select, revise or edit an answer draft before explicit submission."
+    },
+    {
+      "url": "https://cursor.com/learn/reviewing-testing",
+      "applied": "Retain separate change review and verify original bytes and actual native behavior."
+    }
+  ],
+  "scope": [
+    "Faceless monochrome pictograms; three temperature actions and four viewports.",
+    "Actual local CSV to OS clipboard and snapshot file, with zero additional model requests.",
+    "Image export content hash, failed copy/retry, stale workspace async results.",
+    "Editable answer drafts, polling retention, no implicit submission, changed/removed questions and retry.",
+    "Six themes and 320/390px editable answer layouts.",
+    "Desktop write permission limited to the current app main document; clipboard reads and other permissions remain denied."
+  ],
+  "boundaries": [
+    "Browser answer checks and the native question check use synthetic host snapshots, not a reasoning benchmark.",
+    "Text snapshots preserve decoded UTF-8 source and save as plain text; image snapshots are PNG/JPEG only.",
+    "No clinical evaluation or comparative product ranking is claimed."
+  ],
+  "source_files_sha256": {
+    ".github/workflows/windows-native.yml": "e64a7cf315c77b43908b4d4e228f14dd55744d09164e7125cb868bfe0d2c6ddd",
+    "assets/illustrations/temperature.svg": "eaa9b81d13ad4488f2306a088c085e4ccd0fde7f982f9c2fed395a29dba2c10e",
+    "desktop/main.cjs": "999d2a6ee67d331f024b5092ad3523d05eb902038675f01defc77cf2d5d8185c",
+    "scripts/windows/gui-check.mjs": "1b7d7a853a412cfc8933c1d97612106822ac7c107558199d50d5532875b28206",
+    "src/medagent/web/execution-artifact-ui.js": "262e05d0bfa638e38b063155dd9d9159a66e116166e2757750e1da2f06702223",
+    "src/medagent/web/execution-clarification-ui.js": "c50d5b3526a16d6de26af83cae284213cebcdcf3b70eb4ddee28c289a243c196",
+    "src/medagent/web/illustration-labels.json": "ae6dc4933e68b2a6a64e86fbcfbb0c216c2631bb4054941a24aa6afedf9fbff2",
+    "src/medagent/web/index.html": "a469bd0412aa1552c121aada78932afe355c4673576f12f31b75b33c163f76c7",
+    "src/medagent/web/styles.css": "b9342e709129e75bb4145ed2ffda057150a6a31417f6be9561bcee3ae9d60acb",
+    "src/medagent/web/temperature.svg": "69bc4ee9953b323aaba91eda27b2195e4ca5f6843ea255fd6be382b93a3db0bd",
+    "tests/desktop/artifact-chart.spec.mjs": "b2ff96cbe34e2d746ae5d7bfdc2e314cabcdb1f843d1c9c063adf5293ebb821a",
+    "tests/desktop/clarifications.spec.mjs": "905a7e1d940435229c5143973dade6298278dd5f8bb946e002224ca6f38e3d24",
+    "tests/desktop/execution-focus.spec.mjs": "56e3469dff266159fb0786a2bf381ba97742a1131ac0c879b5b037e303c6dcc2",
+    "tests/fixtures/execution-focus.mjs": "a8b3e377b101a7b7580627cd118b60eb1e36d32f668f6e8d35759550e9f1e5bb",
+    "tests/ui/execution-focus.spec.mjs": "887dd943918ca844a525290384612a232b57261e7f945a1955caea4cde98116b",
+    "desktop/clipboard-permission.cjs": "176f85ab027f72206112803c41de817b2bd6440eb6b3e69ffe25b4e95f1d2230",
+    "tests/ui/artifact-actions.spec.mjs": "0efc3427dfdcda3550e9522cb716ea62cfa46fb8cedce947ecf18146688de91a",
+    "tests/ui/clarification-drafts.spec.mjs": "6b3565b2cb9aa30db354a6ec15422ce80f0e1bc6b3e9b829d90eb1c3be31c8f7",
+    "tests/unit/clipboard-permission.test.mjs": "c179fe71b8d6770b4659e2e3967a948656d3ccc8aaae7eb06fa8d1d880eb554f"
+  },
+  "screenshots": {
+    "temperature-mobile.png": "90bb78071c541d0e765fa03febe20858d02e46b728ee0afab4b3aa552e6409dc",
+    "editable-answer.png": "89289d983be49dd9732caad1966f477fdef937fdcb260493cabeac35732f521d",
+    "answer-small.png": "2a60033e7cce3321f8fed524e54e2a616851b1fc9758c836abd0dafc2db5af2d",
+    "answer-mobile.png": "70c66360e0ec73d2afca950473eaa8f07f6a1c302f1b9d5a68f4e616bae18655",
+    "temperature-three-steps.png": "f5658781fd19e6b0d7bc35848f07d2c8259df7f3812f48370225e1ef64385f1b",
+    "temperature-wide.png": "73e863268d005eaf9794d5e86a61df3709b280cd89af05572f4c259c5f798a92",
+    "temperature-small.png": "f3d3930c950ad1dca0c81ff39c4b383e731934b36e2dd68c96257c4c07ffd74f"
+  },
+  "windows": {
+    "status": "pending"
+  }
+}

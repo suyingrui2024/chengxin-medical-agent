@@ -50,6 +50,7 @@ export function createArtifactPreview(api, getCurrent) {
     $("execution-preview").className = "artifact-preview-empty";
     $("execution-preview").textContent = message;
     setMeta("");
+    $("execution-preview-action-status").textContent = "";
     $("execution-preview-controls").hidden = true;
     markSelection();
   }
@@ -196,7 +197,11 @@ export function createArtifactPreview(api, getCurrent) {
     $("execution-preview").className = "artifact-preview-empty";
     $("execution-preview").textContent = "正在读取文件…";
     setMeta("");
+    $("execution-preview-action-status").textContent = "";
     $("execution-preview-controls").hidden = false;
+    $("execution-preview-copy").hidden = true;
+    $("execution-preview-copy").disabled = false;
+    $("execution-preview-save").disabled = true;
     $("execution-preview-reload").disabled = true;
     $("execution-preview-expand").disabled = true;
     $("execution-preview-source").hidden = true;
@@ -218,6 +223,8 @@ export function createArtifactPreview(api, getCurrent) {
       content = value;
       renderInto($("execution-preview"), value, request);
       metadata(value);
+      $("execution-preview-copy").hidden = value.kind === "image";
+      $("execution-preview-save").disabled = false;
       $("execution-preview-expand").disabled = false;
       $("execution-preview-source").hidden = value.kind !== "table";
       $("execution-preview-chart").hidden = !numericColumns(value).length;
@@ -329,5 +336,88 @@ export function createArtifactPreview(api, getCurrent) {
     $("execution-preview-chart").setAttribute("aria-pressed", String(chart));
     renderInto($("execution-preview"), content, ticket);
   });
+  async function exportSnapshot(copy) {
+    if (
+      !content ||
+      !selected ||
+      getCurrent()?.id !== selected.id ||
+      getCurrent()?.storage_error
+    )
+      return;
+    const value = content,
+      request = ticket,
+      workspace = selected.id;
+    const button = $(
+      copy ? "execution-preview-copy" : "execution-preview-save",
+    );
+    if (button.disabled || (copy && value.kind === "image")) return;
+    const active = () =>
+      request === ticket &&
+      getCurrent()?.id === workspace &&
+      !getCurrent()?.storage_error;
+    button.disabled = true;
+    const status = $("execution-preview-action-status");
+    status.textContent = "";
+    try {
+      if (copy) {
+        if (!navigator.clipboard?.writeText)
+          throw new Error("剪贴板不可用，请保存快照或手动复制。");
+        try {
+          await navigator.clipboard.writeText(value.text);
+        } catch {
+          throw new Error("未能复制，请重试、保存快照或手动复制。");
+        }
+        if (active()) status.textContent = "已复制读取时的原文";
+      } else {
+        let blob,
+          extension = "txt";
+        if (value.kind === "image") {
+          const response = await fetch(
+            `/api/execution/${encodeURIComponent(workspace)}/image?path=${encodeURIComponent(value.path)}&sha256=${value.sha256}`,
+          );
+          if (!response.ok)
+            throw new Error("图像已变化或暂不可用，请重新读取后保存。");
+          const bytes = await response.arrayBuffer();
+          const digest = [
+            ...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
+          ]
+            .map((byte) => byte.toString(16).padStart(2, "0"))
+            .join("");
+          if (digest !== value.sha256)
+            throw new Error("图像与读取快照不一致，请重新读取。");
+          blob = new Blob([bytes], { type: value.mime });
+          extension = value.mime === "image/png" ? "png" : "jpg";
+        } else
+          blob = new Blob([value.text], { type: "text/plain;charset=utf-8" });
+        if (!active()) return;
+        const name = value.path
+          .split(/[\\/]/)
+          .at(-1)
+          .replace(/[\x00-\x1f\x7f]/g, "_");
+        const url = URL.createObjectURL(blob);
+        const link = element("a");
+        link.href = url;
+        link.download = `${name}.snapshot.${extension}`;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        status.textContent = "已发起快照下载";
+      }
+    } catch (error) {
+      if (active())
+        status.textContent = error.message || "操作未完成，请重试。";
+    } finally {
+      if (active()) button.disabled = false;
+    }
+  }
+  $("execution-preview-copy").addEventListener(
+    "click",
+    () => void exportSnapshot(true),
+  );
+  $("execution-preview-save").addEventListener(
+    "click",
+    () => void exportSnapshot(false),
+  );
   return { open, reset, update };
 }

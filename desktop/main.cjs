@@ -228,10 +228,18 @@ async function stopBackend() {
 
 async function createWindow() {
   const privateSession = session.fromPartition("chengxin-desktop");
-  privateSession.setPermissionRequestHandler(
-    (_contents, _permission, callback) => callback(false),
+  const { createClipboardPermission } = require("./clipboard-permission.cjs");
+  const allowClipboard = createClipboardPermission(
+    () => window?.webContents,
+    () => readyOrigin,
   );
-  privateSession.setPermissionCheckHandler(() => false);
+  privateSession.setPermissionRequestHandler(
+    (contents, permission, callback, details) =>
+      callback(
+        allowClipboard(contents, permission, details.requestingUrl, details),
+      ),
+  );
+  privateSession.setPermissionCheckHandler(allowClipboard);
   window = new BrowserWindow({
     title: "澄心问诊",
     width: 1440,

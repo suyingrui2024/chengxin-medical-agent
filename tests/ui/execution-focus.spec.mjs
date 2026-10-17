@@ -28,6 +28,10 @@ test("host state shows a waiting action and preserves answers and background wor
   ).toBeFocused();
   await page.getByRole("button", { name: "生成图表", exact: true }).click();
   await expect(page.locator("#execution-focus-label")).toHaveText(
+    "等待你的回答",
+  );
+  await page.getByRole("button", { name: "发送回答 ↗", exact: true }).click();
+  await expect(page.locator("#execution-focus-label")).toHaveText(
     "正在处理任务",
   );
   await expect(page.locator("#execution-focus-respond")).toBeHidden();

@@ -12,6 +12,7 @@ import {
 import {
   installExecutionFocusFixture,
   openFocusWorkspace,
+  verifyEditableAnswer,
 } from "../../tests/fixtures/execution-focus.mjs";
 import { verifyNativeArtifactChart } from "../../tests/fixtures/native-artifact-chart.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -93,6 +94,31 @@ try {
     env.MEDAGENT_EXECUTION_ROOT,
   );
   assert.equal(model.requests.length, beforeChart);
+  await reopened.locator("#execution-preview-copy").click();
+  await expect(reopened.locator("#execution-preview-action-status")).toHaveText(
+    "已复制读取时的原文",
+  );
+  assert.equal(
+    await app.evaluate(({ clipboard }) => clipboard.readText()),
+    "样本,质量 (g)\nA,1250\nB,2000\nC,750\n",
+  );
+  const savedSnapshot = join(scratch, "actual-csv.snapshot.txt");
+  await app.evaluate(({ BrowserWindow }, filename) => {
+    BrowserWindow.getAllWindows()[0].webContents.session.once(
+      "will-download",
+      (_event, item) => item.setSavePath(filename),
+    );
+  }, savedSnapshot);
+  await reopened.locator("#execution-preview-save").click();
+  await expect
+    .poll(async () => {
+      try {
+        return await readFile(savedSnapshot, "utf8");
+      } catch {
+        return null;
+      }
+    })
+    .toBe("样本,质量 (g)\nA,1250\nB,2000\nC,750\n");
   const focusFixture = await installExecutionFocusFixture(reopened);
   await openFocusWorkspace(reopened);
   await reopened
@@ -101,6 +127,8 @@ try {
   await expect(reopened.locator("#execution-preview table")).toContainText(
     "1250",
   );
+  const draftReceipt = await verifyEditableAnswer(reopened, focusFixture);
+  assert.equal(model.requests.length, beforeChart);
   focusFixture.first.status = "completed";
   await expect(reopened.locator("#execution-focus-label")).toHaveText(
     "本轮已完成",
@@ -122,6 +150,9 @@ try {
       appearance_restart: "passed",
       execution_focus_ui: "passed (host snapshot fixture)",
       artifact_chart: chartReceipt,
+      artifact_copy: "passed (actual CSV and system clipboard)",
+      artifact_save: "passed (actual CSV snapshot on disk)",
+      clarification_draft: draftReceipt,
       profile_path_with_spaces_and_chinese: "passed",
       local_fixture_requests: model.requests.length,
       external_model_calls: 0,

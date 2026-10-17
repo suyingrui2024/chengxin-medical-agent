@@ -20,12 +20,22 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
       (q) => q.turn_id === snapshot.turn_id,
     );
     container.hidden = !questions.length;
+    const activeIds = new Set(questions.map((question) => question.id));
+    for (const [id, card] of cards) {
+      if (activeIds.has(id)) continue;
+      card.element.remove();
+      cards.delete(id);
+    }
     for (const value of questions) {
       let card = cards.get(value.id);
       const signature = JSON.stringify([
         value.status,
         value.answer,
         value.reason,
+        value.question,
+        value.context,
+        value.options,
+        value.session_id,
       ]);
       if (card?.signature === signature) continue;
       const previous = card;
@@ -82,7 +92,13 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
       error.hidden = true;
       const controls = [];
       const submit = async (answer) => {
-        if (card.busy || !answer.trim() || context !== key) return;
+        if (
+          card.busy ||
+          !answer.trim() ||
+          context !== key ||
+          cards.get(value.id) !== card
+        )
+          return;
         card.busy = true;
         controls.forEach((control) => (control.disabled = true));
         error.hidden = true;
@@ -108,14 +124,6 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
           card.busy = false;
         }
       };
-      for (const option of value.options) {
-        const button = node("button", "execution-question-choice", option);
-        button.type = "button";
-        button.addEventListener("click", () => void submit(option));
-        choices.append(button);
-        controls.push(button);
-      }
-      element.append(choices);
       const form = node("form", "execution-question-form");
       const input = node("textarea");
       input.rows = 2;
@@ -124,6 +132,29 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
       input.setAttribute("aria-label", "补充回答");
       const send = node("button", "secondary-button", "发送回答 ↗");
       send.type = "submit";
+      send.disabled = true;
+      input.addEventListener("input", () => {
+        send.disabled = !input.value.trim();
+        for (const button of choices.children)
+          button.setAttribute(
+            "aria-pressed",
+            String(button.textContent === input.value),
+          );
+      });
+      for (const option of value.options) {
+        const button = node("button", "execution-question-choice", option);
+        button.type = "button";
+        button.setAttribute("aria-pressed", "false");
+        button.addEventListener("click", () => {
+          input.value = option;
+          send.disabled = false;
+          for (const choice of choices.children)
+            choice.setAttribute("aria-pressed", String(choice === button));
+        });
+        choices.append(button);
+        controls.push(button);
+      }
+      element.append(choices);
       form.append(input, send);
       controls.push(input, send);
       form.addEventListener("submit", (event) => {
@@ -131,7 +162,7 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
         if (input.value.trim()) void submit(input.value.trim());
       });
       if (value.options.length) {
-        form.hidden = true;
+        input.hidden = true;
         const custom = node(
           "button",
           "text-button execution-question-custom",
@@ -139,7 +170,7 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
         );
         custom.type = "button";
         custom.addEventListener("click", () => {
-          form.hidden = false;
+          input.hidden = false;
           custom.hidden = true;
           input.focus();
         });

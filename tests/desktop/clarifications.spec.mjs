@@ -198,6 +198,9 @@ test("native clarification waits for real answers, recovers a lost response and 
     await active
       .getByRole("button", { name: "保留告警，只改文案", exact: true })
       .click();
+    await active
+      .getByRole("button", { name: "发送回答 ↗", exact: true })
+      .click();
     await expect(active.locator("h3")).toHaveText("请补充本次复核的备注。", {
       timeout: 15000,
     });

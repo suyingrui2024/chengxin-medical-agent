@@ -37,6 +37,7 @@ export async function installExecutionFocusFixture(page) {
     [second.id, second],
   ]);
   let previews = 0;
+  const answers = [];
   await page.route("**/api/health", async (route) => {
     const response = await route.fetch();
     await route.fulfill({
@@ -121,17 +122,20 @@ export async function installExecutionFocusFixture(page) {
         entries: [],
       };
     else if (operation === "answer") {
+      const answer = route.request().postDataJSON();
+      answers.push(answer);
       state.clarifications = state.clarifications.map((q) => ({
         ...q,
-        status: "answered",
-        answer: "生成图表",
+        ...(q.id === answer.request_id
+          ? { status: "answered", answer: answer.answer }
+          : {}),
       }));
       state.sequence++;
       data = state;
     } else data = state;
     await route.fulfill({ json: data });
   });
-  return { first, second, previews: () => previews };
+  return { first, second, previews: () => previews, answers };
 }
 export async function openFocusWorkspace(page) {
   if (await page.locator("#mobile-menu").isVisible())
@@ -150,4 +154,33 @@ export async function openFocusWorkspace(page) {
   );
   await expect(page.locator("#execution-quick-files button")).toHaveCount(3);
   await page.locator("#execution-quick-look > summary").click();
+}
+
+export async function verifyEditableAnswer(page, fixture) {
+  fixture.first.clarifications = [
+    {
+      id: "native-draft",
+      turn_id: "turn-1",
+      status: "pending",
+      question: "希望如何查看结果？",
+      options: ["图表", "数据表"],
+    },
+  ];
+  const card = page.locator(
+    ".execution-question:not(.execution-question-history)",
+  );
+  await card.getByRole("button", { name: "图表", exact: true }).click();
+  await card.getByRole("button", { name: "数据表", exact: true }).click();
+  expect(fixture.answers).toEqual([]);
+  await card.getByRole("button", { name: "自行说明", exact: true }).click();
+  await expect(card.getByLabel("补充回答")).toHaveValue("数据表");
+  await card.getByLabel("补充回答").fill("数据表，保留原始顺序");
+  await card.getByRole("button", { name: "发送回答 ↗", exact: true }).click();
+  await expect.poll(() => fixture.answers.length).toBe(1);
+  expect(fixture.answers[0]).toEqual({
+    request_id: "native-draft",
+    turn_id: "turn-1",
+    answer: "数据表，保留原始顺序",
+  });
+  return { passed: true, host_snapshot_fixture: true, edited_answer: true };
 }
