@@ -44,6 +44,14 @@ test("path metadata rejects siblings, escaping links and undeclared files", asyn
     const aliased = createPathResolver([alias]);
     assert.equal(aliased(join(workspace, "中文.txt")).ok, true);
     assert.equal(aliased(join(alias, "escape")).code, "EACCES");
+    const manifestOnly = createPathResolver([
+      { path: root, recursive: false },
+      selected,
+    ]);
+    assert.equal(manifestOnly(root).ok, true);
+    assert.equal(manifestOnly(selected).ok, true);
+    assert.equal(manifestOnly(outside).code, "EACCES");
+    assert.equal(manifestOnly(join(workspace, "中文.txt")).code, "EACCES");
   } finally {
     await rm(root, { recursive: true, force: true });
   }

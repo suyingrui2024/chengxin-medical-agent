@@ -80,6 +80,7 @@ export function requestFor({
     LOCALAPPDATA: join(home, "AppData/Local"),
     TEMP: temporary,
     TMP: temporary,
+    CHENGXIN_TEMP: temporary,
     DSH_HOME: home,
     NO_COLOR: "1",
     // Node's realpath walk lstats drive-root metadata before loading a file.
@@ -110,7 +111,13 @@ export function requestFor({
     },
     filesystem: {
       readwritePaths: [workspace, state],
-      readonlyPaths: [modules, integration, realpathAdapter, ...readonly],
+      readonlyPaths: [
+        modules,
+        integration,
+        realpathAdapter,
+        join(root, "package.json"),
+        ...readonly,
+      ],
       deniedPaths: [],
     },
     network: {

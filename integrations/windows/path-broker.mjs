@@ -13,13 +13,15 @@ function within(path, root) {
 
 export function createPathResolver(roots) {
   const allowed = roots.map((path) => {
+    const recursive = typeof path === "string" || path.recursive !== false;
+    path = typeof path === "string" ? path : path.path;
     const canonical = realpathSync.native(path);
     return {
       input: resolve(path),
       canonical,
       inputParent: dirname(resolve(path)),
       canonicalParent: realpathSync.native(dirname(resolve(path))),
-      directory: statSync(canonical).isDirectory(),
+      directory: recursive && statSync(canonical).isDirectory(),
     };
   });
   return (path) => {

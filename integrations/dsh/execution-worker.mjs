@@ -926,6 +926,8 @@ async function setup(payload) {
       dirname(process.execPath),
       dirname(config.python),
       config.native_patch,
+      join(integration, "../../package.json"),
+      { path: join(integration, "../.."), recursive: false },
       join(process.env.SystemRoot, "System32/WindowsPowerShell/v1.0"),
     ]);
   }

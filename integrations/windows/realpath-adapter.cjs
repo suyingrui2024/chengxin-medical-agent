@@ -7,6 +7,12 @@ const { fileURLToPath } = require("node:url");
 const { Worker } = require("node:worker_threads");
 const { syncBuiltinESMExports } = require("node:module");
 const endpoint = process.env.CHENGXIN_PATH_BROKER;
+// AppContainer launch may replace TEMP with an uncreated profile directory.
+// Restore the already-created, explicitly writable per-task temp directory.
+if (process.env.CHENGXIN_TEMP) {
+  process.env.TEMP = process.env.CHENGXIN_TEMP;
+  process.env.TMP = process.env.CHENGXIN_TEMP;
+}
 
 if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
   const url = new URL(endpoint);
