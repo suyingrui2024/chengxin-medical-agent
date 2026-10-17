@@ -1,6 +1,7 @@
 // Native boundary probe with a loopback fixture, never a provider API.
 import assert from "node:assert/strict";
 import { nativeLaunch } from "../../integrations/windows/isolation.mjs";
+import { nativePowerShellSource } from "../../integrations/windows/powershell-command.mjs";
 import {
   mkdtemp,
   mkdir,
@@ -39,10 +40,14 @@ try {
   await new Promise((resolve) => gateway.listen(0, "127.0.0.1", resolve));
   const python = process.env.MEDAGENT_PYTHON;
   assert(python, "The installation must select the dedicated Windows Python");
-  const nativePipeline =
-    "$ErrorActionPreference='Stop'; & '" +
-    python.replaceAll("'", "''") +
-    "' -I -c 'print(42)' | ForEach-Object { $_ }; exit $LASTEXITCODE";
+  const nativePipeline = nativePowerShellSource({
+    workdir: workspace,
+    command: "python.exe -I -c 'print(42)' | ForEach-Object { $_ }",
+  });
+  const nativeFailure = nativePowerShellSource({
+    workdir: workspace,
+    command: "python.exe -I -c 'raise SystemExit(23)'",
+  });
   const pathProbe = `import ctypes as c,json,sys
 from ctypes import wintypes as w
 k=c.WinDLL('kernel32',use_last_error=True)
@@ -73,6 +78,8 @@ print(json.dumps(rows))`;
     fs.writeFileSync('artifact.txt','native-isolated');
     assert.equal(cp.execFileSync(${JSON.stringify(python)},['-I','-c','print(6*7)'],{encoding:'utf8'}).trim(),'42');
     assert.equal(cp.execFileSync(require('node:path').join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoLogo','-NoProfile','-NonInteractive','-EncodedCommand',${JSON.stringify(Buffer.from(nativePipeline, "utf16le").toString("base64"))}],{encoding:'utf8'}).trim(),'42');
+    const failedNative=cp.spawnSync(require('node:path').join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoLogo','-NoProfile','-NonInteractive','-EncodedCommand',${JSON.stringify(Buffer.from(nativeFailure, "utf16le").toString("base64"))}],{encoding:'utf8'});
+    assert.equal(failedNative.status,23,failedNative.stderr);
     cp.execFileSync(${JSON.stringify(python)},['-I','-m','venv','.venv'],{encoding:'utf8'});
     const projectPython=require('node:path').resolve('.venv/Scripts/python.exe');
     assert.equal(cp.execFileSync(projectPython,['-c','import sys; assert sys.prefix != sys.base_prefix; print(42)'],{encoding:'utf8'}).trim(),'42');
@@ -116,6 +123,7 @@ print(json.dumps(rows))`;
       ...result,
       model_calls: 0,
       powershell_native_pipeline: "passed",
+      powershell_native_exit_status: "passed",
     }),
   );
 } catch (error) {
