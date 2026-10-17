@@ -82,7 +82,6 @@ export function requestFor({
     DSH_HOME: home,
     NO_COLOR: "1",
     PYTHONUTF8: "1",
-    PYTHONHOME: env.CHENGXIN_PYTHON ? dirname(env.CHENGXIN_PYTHON) : "",
     PYTHONNOUSERSITE: "1",
   };
   for (const [name, value] of Object.entries(env))

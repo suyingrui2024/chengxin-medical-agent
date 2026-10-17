@@ -41,6 +41,10 @@ try {
     assert.throws(()=>fs.writeFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'must-not-write'));
     fs.writeFileSync('artifact.txt','native-isolated');
     assert.equal(cp.execFileSync(${JSON.stringify(python)},['-I','-c','print(6*7)'],{encoding:'utf8'}).trim(),'42');
+    cp.execFileSync(${JSON.stringify(python)},['-I','-m','venv','.venv'],{encoding:'utf8'});
+    const projectPython=require('node:path').resolve('.venv/Scripts/python.exe');
+    assert.equal(cp.execFileSync(projectPython,['-c','import sys; assert sys.prefix != sys.base_prefix; print(42)'],{encoding:'utf8'}).trim(),'42');
+    assert.match(cp.execFileSync(projectPython,['-m','pip','--version'],{encoding:'utf8'}),/^pip /);
     fetch(${JSON.stringify(`http://127.0.0.1:${gateway.address().port}`)}).then(r=>r.text()).then(text=>{assert.equal(text,'fixture-gateway');console.log(JSON.stringify({passed:true,host_file_denied:true,host_env_hidden:true,code_executed:true,host_gateway_reachable:true}));}).catch(()=>process.exit(1));`;
   launch = nativeLaunch({
     workspace,
