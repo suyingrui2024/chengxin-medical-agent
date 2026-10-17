@@ -10,11 +10,12 @@ export default class NativePowerShellExecutor extends LocalBashExecutor {
     );
     const source =
       "$ErrorActionPreference='Stop'; [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $OutputEncoding=[Console]::OutputEncoding; $global:LASTEXITCODE=0; " +
-      // PowerShell's provider location can differ from the Win32 process cwd
-      // under ProcessContainer. Set the exact requested directory explicitly.
-      "Microsoft.PowerShell.Management\\Set-Location -LiteralPath '" +
+      // A workspace-rooted PSDrive avoids PowerShell normalizing every parent
+      // from C:\, which would require access outside the selected directory.
+      // This changes only the shell's provider view, never the OS policy.
+      "$null=Microsoft.PowerShell.Management\\New-PSDrive -Name ChengxinWorkspace -PSProvider FileSystem -Scope Global -Root '" +
       spec.workdir.replaceAll("'", "''") +
-      "'; & {\n" +
+      "'; Microsoft.PowerShell.Management\\Set-Location -LiteralPath 'ChengxinWorkspace:\\'; & {\n" +
       spec.command +
       "\n}; exit $global:LASTEXITCODE";
     return this.executeArgv(spec, [
