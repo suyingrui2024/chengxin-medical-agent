@@ -89,20 +89,21 @@
   "boundaries": [
     "Browser answer checks and the native question check use synthetic host snapshots, not a reasoning benchmark.",
     "Text snapshots preserve decoded UTF-8 source and save as plain text; image snapshots are PNG/JPEG only.",
-    "No clinical evaluation or comparative product ranking is claimed."
+    "No clinical evaluation or comparative product ranking is claimed.",
+    "System clipboard text follows OS-native line endings; saved UTF-8 snapshot bytes are checked without normalization."
   ],
   "source_files_sha256": {
     ".github/workflows/windows-native.yml": "e64a7cf315c77b43908b4d4e228f14dd55744d09164e7125cb868bfe0d2c6ddd",
     "assets/illustrations/temperature.svg": "eaa9b81d13ad4488f2306a088c085e4ccd0fde7f982f9c2fed395a29dba2c10e",
     "desktop/main.cjs": "999d2a6ee67d331f024b5092ad3523d05eb902038675f01defc77cf2d5d8185c",
-    "scripts/windows/gui-check.mjs": "1b7d7a853a412cfc8933c1d97612106822ac7c107558199d50d5532875b28206",
+    "scripts/windows/gui-check.mjs": "d32755b55f8a076eb0d9aaf1e52a250e30a353c1eb61afe8b1b955a977c37602",
     "src/medagent/web/execution-artifact-ui.js": "262e05d0bfa638e38b063155dd9d9159a66e116166e2757750e1da2f06702223",
     "src/medagent/web/execution-clarification-ui.js": "c50d5b3526a16d6de26af83cae284213cebcdcf3b70eb4ddee28c289a243c196",
     "src/medagent/web/illustration-labels.json": "ae6dc4933e68b2a6a64e86fbcfbb0c216c2631bb4054941a24aa6afedf9fbff2",
     "src/medagent/web/index.html": "a469bd0412aa1552c121aada78932afe355c4673576f12f31b75b33c163f76c7",
     "src/medagent/web/styles.css": "b9342e709129e75bb4145ed2ffda057150a6a31417f6be9561bcee3ae9d60acb",
     "src/medagent/web/temperature.svg": "69bc4ee9953b323aaba91eda27b2195e4ca5f6843ea255fd6be382b93a3db0bd",
-    "tests/desktop/artifact-chart.spec.mjs": "b2ff96cbe34e2d746ae5d7bfdc2e314cabcdb1f843d1c9c063adf5293ebb821a",
+    "tests/desktop/artifact-chart.spec.mjs": "4ce0a658ff86c9a9289d2eef0583f5b84c63fc1a2773015bb72d2c39aba5209b",
     "tests/desktop/clarifications.spec.mjs": "905a7e1d940435229c5143973dade6298278dd5f8bb946e002224ca6f38e3d24",
     "tests/desktop/execution-focus.spec.mjs": "56e3469dff266159fb0786a2bf381ba97742a1131ac0c879b5b037e303c6dcc2",
     "tests/fixtures/execution-focus.mjs": "a8b3e377b101a7b7580627cd118b60eb1e36d32f668f6e8d35759550e9f1e5bb",
@@ -122,6 +123,8 @@
     "temperature-small.png": "f3d3930c950ad1dca0c81ff39c4b383e731934b36e2dd68c96257c4c07ffd74f"
   },
   "windows": {
-    "status": "pending"
+    "status": "pending",
+    "previous_run": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39077267662",
+    "previous_failure": "Windows system clipboard returns OS-native CRLF line endings. Only clipboard comparisons now normalize CRLF to LF; saved UTF-8 snapshots still compare exactly."
   }
 }

@@ -44,7 +44,10 @@ test("native chart preview reads actual workspace CSV bytes without a model call
       "已复制读取时的原文",
     );
     expect(
-      await desktop.evaluate(({ clipboard }) => clipboard.readText()),
+      (await desktop.evaluate(({ clipboard }) => clipboard.readText())).replace(
+        /\r\n/g,
+        "\n",
+      ),
     ).toBe("样本,质量 (g)\nA,1250\nB,2000\nC,750\n");
     expect(
       await page.evaluate(async () => {

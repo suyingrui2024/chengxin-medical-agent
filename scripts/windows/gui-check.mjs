@@ -99,7 +99,10 @@ try {
     "已复制读取时的原文",
   );
   assert.equal(
-    await app.evaluate(({ clipboard }) => clipboard.readText()),
+    (await app.evaluate(({ clipboard }) => clipboard.readText())).replace(
+      /\r\n/g,
+      "\n",
+    ),
     "样本,质量 (g)\nA,1250\nB,2000\nC,750\n",
   );
   const savedSnapshot = join(scratch, "actual-csv.snapshot.txt");
@@ -151,6 +154,7 @@ try {
       execution_focus_ui: "passed (host snapshot fixture)",
       artifact_chart: chartReceipt,
       artifact_copy: "passed (actual CSV and system clipboard)",
+      clipboard_line_endings: "OS-native; CRLF normalized only for comparison",
       artifact_save: "passed (actual CSV snapshot on disk)",
       clarification_draft: draftReceipt,
       profile_path_with_spaces_and_chinese: "passed",
