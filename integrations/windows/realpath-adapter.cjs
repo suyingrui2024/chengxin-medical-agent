@@ -23,6 +23,32 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
     url.password
   )
     throw new Error("Invalid native path metadata gateway");
+  // Preserve the caller when the SDK serializes an access error's message but
+  // drops its stack; this does not change any filesystem decision.
+  for (const name of ["stat", "lstat"]) {
+    const original = fs.promises[name].bind(fs.promises);
+    fs.promises[name] = async (...args) => {
+      const caller = new Error(`Native ${name} caller`).stack;
+      try {
+        return await original(...args);
+      } catch (error) {
+        if (["EPERM", "EACCES"].includes(error.code))
+          error.message += "\n" + caller;
+        throw error;
+      }
+    };
+    const synchronous = name + "Sync",
+      originalSync = fs[synchronous].bind(fs);
+    fs[synchronous] = (...args) => {
+      try {
+        return originalSync(...args);
+      } catch (error) {
+        if (["EPERM", "EACCES"].includes(error.code))
+          error.message += "\n" + error.stack;
+        throw error;
+      }
+    };
+  }
   const workerSource = `
     const { parentPort, workerData } = require('node:worker_threads');
     const http = require('node:http');
