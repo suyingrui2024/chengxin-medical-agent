@@ -1,0 +1,41 @@
+{
+  "schema": "illustration-redraw-review/v1",
+  "review_date": "2026-10-18",
+  "verified_at": "2026-10-18T05:02:26.664755+08:00",
+  "base_commit": "01977f952bf7696f47386d5e7206d61ad4efbdcc",
+  "changes": [
+    "Redraw the same character in all three existing axillary temperature illustrations.",
+    "Reframe each step without adding text or changing the patient confirmation flow."
+  ],
+  "checks": {
+    "browser": {
+      "startTime": "2026-10-17T21:01:18.305Z",
+      "duration": 13388.159000000001,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "macos_desktop": {
+      "startTime": "2026-10-17T21:01:46.052Z",
+      "duration": 4022.257,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "svg_generation_consistency": "passed",
+  "source_sha256": {
+    "assets/illustrations/temperature.svg": "d67306594c9e9436d68e5eaceacac88f7333a819968b1ed4708d87eedb9c5ee6",
+    "src/medagent/web/temperature.svg": "d864a4782fae8d2f48a5682695d126edc9f5ff821f667fdd5b1d3e98e882d3a6",
+    "src/medagent/web/illustration-labels.json": "be1b7f2a74ac04c74a6a059d5eab129058406db30b571396fafb96a600920f7c"
+  },
+  "screenshots_sha256": {
+    "temperature-desktop.png": "12cb06d8cdb9167ae8c8a91731615276b9e2412da5bd6c077ed722897f4ca29b",
+    "temperature-detail.png": "ec18898f05debab118dd7de0c12dd5811a92e6cb27367789c7c86ee7dc4c1e03",
+    "temperature-mobile.png": "d4360276548dab183b615e0a657768dab83e9f990f249eafb260bbb722850570",
+    "temperature-steps.png": "ad47108815854d9f2216dd1424139dbba53876536f17312140f9509379fa6190"
+  },
+  "scope": "Rendering and interaction regression on macOS, including four viewport sizes and image fallback; no new Windows or clinical validation."
+}
