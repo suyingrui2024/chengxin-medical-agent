@@ -49,6 +49,7 @@
           "agent_turns": 0
         },
         "artifact_copy": "passed (actual CSV and system clipboard)",
+        "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
         "artifact_save": "passed (actual CSV snapshot on disk)",
         "clarification_draft": {
           "passed": true,
@@ -123,8 +124,15 @@
     "temperature-small.png": "f3d3930c950ad1dca0c81ff39c4b383e731934b36e2dd68c96257c4c07ffd74f"
   },
   "windows": {
-    "status": "pending",
+    "status": "passed",
     "previous_run": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39077267662",
-    "previous_failure": "Windows system clipboard returns OS-native CRLF line endings. Only clipboard comparisons now normalize CRLF to LF; saved UTF-8 snapshots still compare exactly."
+    "previous_failure": "Windows system clipboard returns OS-native CRLF line endings. Only clipboard comparisons now normalize CRLF to LF; saved UTF-8 snapshots still compare exactly.",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39077907437",
+    "tested_code_commit": "c1542d1764607c589935997953b5d16b4dd36130",
+    "native_gui_receipts": {
+      "arm": 2,
+      "server": 3
+    },
+    "receipt": "windows-native.json"
   }
 }

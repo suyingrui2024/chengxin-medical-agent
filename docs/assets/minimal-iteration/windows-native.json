@@ -1,0 +1,182 @@
+{
+  "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39077907437",
+  "tested_code_commit": "c1542d1764607c589935997953b5d16b4dd36130",
+  "status": "passed",
+  "native_gui_receipts": {
+    "arm": 2,
+    "server": 3
+  },
+  "clipboard_comparison": "Only OS-native CRLF is normalized to LF; saved UTF-8 snapshot content is compared exactly.",
+  "question_scope": "Synthetic host snapshots exercised in real Electron windows; not a reasoning benchmark.",
+  "platforms": [
+    "Windows 11 Arm running the x64 application: source and portable GUI, native isolation, source and packaged full SDK and continuation.",
+    "Windows Server x64: source, portable and installed GUI, shortcuts and uninstall."
+  ],
+  "not_verified": [
+    "Windows 10",
+    "physical Windows 11 x64"
+  ],
+  "jobs": [
+    {
+      "name": "Windows Server x64 desktop",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, Node compatibility, chart data and clipboard permissions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Windows 11 on Arm running x64 application",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, Node compatibility, chart data and clipboard permissions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "local_installer": {
+    "path": "dist/windows-validated/39077907437/installer/Chengxin-Setup-0.11.17-Windows-x64.exe",
+    "bytes": 365222474,
+    "sha256": "2ce15ce00feab0d13dd8fe63a89960d477b4998849da786dc495ca4883f3d912"
+  }
+}
