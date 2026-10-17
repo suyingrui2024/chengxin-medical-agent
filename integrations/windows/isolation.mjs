@@ -96,6 +96,7 @@ export function requestFor({
     version: "1.0.0",
     containerId: "Chengxin-" + randomBytes(16).toString("hex"),
     containment: "processcontainer",
+    fallback: { allowDaclMutation: false },
     lifecycle: { destroyOnExit: true, preservePolicy: false },
     process: {
       commandLine: command.map(windowsArgument).join(" "),
