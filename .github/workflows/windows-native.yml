@@ -31,9 +31,30 @@ jobs:
             integrations
             scripts
             tests
+      - name: Restore verified native dependencies
+        id: runtime-cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            .runtime/windows
+            node_modules
+          key: native-windows-v1-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'scripts/windows/runtime-lock.json', 'scripts/windows.ps1') }}
       - name: Install native runtimes and exercise real desktop
         shell: powershell
-        run: ./scripts/windows.ps1 -Mode Setup -NoShortcut
+        run: |
+          if ('${{ steps.runtime-cache.outputs.cache-hit }}' -eq 'true') {
+            ./scripts/windows.ps1 -Mode Check
+          } else {
+            ./scripts/windows.ps1 -Mode Setup -NoShortcut
+          }
+      - name: Save verified native dependencies
+        if: steps.runtime-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            .runtime/windows
+            node_modules
+          key: ${{ steps.runtime-cache.outputs.cache-primary-key }}
       - name: Win32 filesystem, locks and process trees
         shell: powershell
         run: ./scripts/windows.ps1 -Mode Test

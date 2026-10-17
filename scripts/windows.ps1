@@ -23,6 +23,7 @@ $previousNpm = $env:MEDAGENT_NPM_CLI
 $previousElectronMode = $env:ELECTRON_RUN_AS_NODE
 $previousSecurityProtocol = [Net.ServicePointManager]::SecurityProtocol
 $previousProgress = $ProgressPreference
+$previousNpmCache = $env:npm_config_cache
 
 function ConvertTo-ChengxinArgument {
     param([AllowEmptyString()][string]$Value)
@@ -153,6 +154,7 @@ try {
         $env:PATH = (Split-Path -Parent $node) + [IO.Path]::PathSeparator + $previousPath
         $env:MEDAGENT_PYTHON = $python
         $env:MEDAGENT_NPM_CLI = $npmCli
+        $env:npm_config_cache = Join-Path $runtimeRoot 'npm-cache'
         Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
         if ($Mode -eq 'Setup') {
             Invoke-ChengxinCommand $node @($npmCli, 'ci', '--ignore-scripts', '--no-audit', '--no-fund')
@@ -189,6 +191,7 @@ try {
     $env:ELECTRON_RUN_AS_NODE = $previousElectronMode
     [Net.ServicePointManager]::SecurityProtocol = $previousSecurityProtocol
     $ProgressPreference = $previousProgress
+    $env:npm_config_cache = $previousNpmCache
     [Console]::OutputEncoding = $previousEncoding
     $OutputEncoding = $previousPipelineEncoding
 }

@@ -34,7 +34,26 @@ try {
   await new Promise((resolve) => gateway.listen(0, "127.0.0.1", resolve));
   const python = process.env.MEDAGENT_PYTHON;
   assert(python, "The installation must select the dedicated Windows Python");
+  const pathProbe = `import ctypes as c,json,sys
+from ctypes import wintypes as w
+k=c.WinDLL('kernel32',use_last_error=True)
+k.CreateFileW.argtypes=[w.LPCWSTR,w.DWORD,w.DWORD,w.LPVOID,w.DWORD,w.DWORD,w.HANDLE];k.CreateFileW.restype=w.HANDLE
+k.GetFinalPathNameByHandleW.argtypes=[w.HANDLE,w.LPWSTR,w.DWORD,w.DWORD];k.GetFinalPathNameByHandleW.restype=w.DWORD
+k.CloseHandle.argtypes=[w.HANDLE]
+rows=[]
+for path in sys.argv[1:]:
+ for access in [0,128,2147483648]:
+  h=k.CreateFileW(path,access,7,None,3,0x02000000,None)
+  row={'path':path,'access':access,'open_error':c.get_last_error() if h==c.c_void_p(-1).value else 0}
+  if not row['open_error']:
+   for flags in [0,8,2,10]:
+    b=c.create_unicode_buffer(32768);n=k.GetFinalPathNameByHandleW(h,b,len(b),flags)
+    row[str(flags)]={'value':b.value if n else '', 'error':0 if n else c.get_last_error()}
+   k.CloseHandle(h)
+  rows.append(row)
+print(json.dumps(rows))`;
   const code = `const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
+    console.error(cp.execFileSync(${JSON.stringify(python)},['-I','-c',${JSON.stringify(pathProbe)},${JSON.stringify(join(root, "node_modules/@deepseek-ai/dsh"))},${JSON.stringify(workspace)}],{encoding:'utf8'}).trim());
     assert.throws(()=>fs.readFileSync(${JSON.stringify(marker)}));
     assert.equal(process.env.CHENGXIN_HOST_ONLY_SECRET,undefined);
     assert.equal(fs.readFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'utf8'),'immutable-reference');
@@ -55,17 +74,22 @@ try {
     command: [process.execPath, "-e", code],
     readonly: [dirname(process.execPath), dirname(python), readOnly],
   });
-  const { stdout } = await promisify(execFile)(launch.command, launch.args, {
-    encoding: "utf8",
-    timeout: 45000,
-    maxBuffer: 128000,
-    env: {
-      SystemRoot: process.env.SystemRoot,
-      PATH: process.env.PATH,
-      TEMP: process.env.TEMP,
-      CHENGXIN_HOST_ONLY_SECRET: "must-not-leak",
+  const { stdout, stderr } = await promisify(execFile)(
+    launch.command,
+    launch.args,
+    {
+      encoding: "utf8",
+      timeout: 45000,
+      maxBuffer: 128000,
+      env: {
+        SystemRoot: process.env.SystemRoot,
+        PATH: process.env.PATH,
+        TEMP: process.env.TEMP,
+        CHENGXIN_HOST_ONLY_SECRET: "must-not-leak",
+      },
     },
-  });
+  );
+  if (stderr.trim()) console.log("Native path diagnostics:", stderr.trim());
   const result = JSON.parse(stdout.trim());
   assert.equal(result.passed, true);
   assert.equal(
