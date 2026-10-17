@@ -378,6 +378,8 @@ async function capabilityRequest(request, response) {
         config.python,
         [
           "-I",
+          "-X",
+          "utf8",
           "-c",
           "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution_capabilities import main;main()",
           join(integration, "../../src"),
@@ -493,6 +495,8 @@ async function workspaceRequest(request, response) {
         config.python,
         [
           "-I",
+          "-X",
+          "utf8",
           "-c",
           "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution_changes import main;main()",
           join(integration, "../../src"),
@@ -568,6 +572,8 @@ async function workspaceCheckpoint(paths, owned) {
         config.python,
         [
           "-I",
+          "-X",
+          "utf8",
           "-c",
           "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution_checkpoints import main;main()",
           join(integration, "../../src"),
