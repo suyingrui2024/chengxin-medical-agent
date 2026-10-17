@@ -82,7 +82,10 @@ class WindowsExecutionTests(unittest.TestCase):
                     self.assertEqual(
                         session.status,
                         "completed",
-                        json.dumps(session.snapshot(), ensure_ascii=False),
+                        json.dumps(
+                            {"error": session.error, "events": list(session.events)},
+                            ensure_ascii=False,
+                        ),
                     )
 
                 session.start_turn(

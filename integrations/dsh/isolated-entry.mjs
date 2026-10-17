@@ -144,8 +144,6 @@ if (
           ? {
               CHENGXIN_PYTHON: process.env.CHENGXIN_PYTHON,
               CHENGXIN_NATIVE_PATCH: process.env.CHENGXIN_NATIVE_PATCH,
-              CHENGXIN_CONTROL_PORT: process.env.CHENGXIN_CONTROL_PORT,
-              CHENGXIN_CONTROL_TOKEN: process.env.CHENGXIN_CONTROL_TOKEN,
             }
           : {}),
         ...Object.fromEntries(

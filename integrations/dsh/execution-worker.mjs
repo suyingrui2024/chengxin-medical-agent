@@ -7,7 +7,7 @@ import { createInterface } from "node:readline";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { openSync, closeSync, constants } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFile } from "node:child_process";
 import { hasActiveJobs, observationKey } from "./execution-observations.mjs";
 import { ClarificationBroker } from "./execution-clarifications.mjs";
@@ -299,14 +299,23 @@ function errorResponse(response, code) {
   );
 }
 function control(method, path) {
+  if (process.platform === "win32")
+    return harness.client
+      .request("chengxin/control", { method, path }, 7000)
+      .then((result) => {
+        if (
+          result?.status !== 200 ||
+          typeof result.body !== "string" ||
+          result.body.length > 512000
+        )
+          throw new Error("Runtime control failed");
+        return result.body;
+      });
   return new Promise((resolve, reject) => {
-    const native = process.platform === "win32";
-    const directory = native
-      ? null
-      : openSync(
-          config.state,
-          constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW,
-        );
+    const directory = openSync(
+      config.state,
+      constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW,
+    );
     let closed = false;
     const release = () => {
       if (!closed) {
@@ -315,19 +324,11 @@ function control(method, path) {
       }
     };
     const request = httpRequest(
-      native
-        ? {
-            hostname: "127.0.0.1",
-            port: config.native_control_port,
-            headers: { "x-chengxin-control": config.native_control_token },
-            method,
-            path,
-          }
-        : {
-            socketPath: `/proc/self/fd/${directory}/control.sock`,
-            method,
-            path,
-          },
+      {
+        socketPath: `/proc/self/fd/${directory}/control.sock`,
+        method,
+        path,
+      },
       (response) => {
         let body = "";
         response.setEncoding("utf8");
@@ -853,8 +854,6 @@ async function makeHarness() {
             TMP: process.env.TMP,
             CHENGXIN_PYTHON: config.python,
             CHENGXIN_NATIVE_PATCH: config.native_patch,
-            CHENGXIN_CONTROL_PORT: String(config.native_control_port),
-            CHENGXIN_CONTROL_TOKEN: config.native_control_token,
           }
         : {}),
       ...Object.fromEntries(
@@ -893,14 +892,6 @@ async function setup(payload) {
     : [];
   await mkdir(join(config.state, "home"), { recursive: true });
   if (process.platform === "win32") {
-    const portProbe = createServer();
-    await new Promise((resolve, reject) => {
-      portProbe.once("error", reject);
-      portProbe.listen(0, "127.0.0.1", resolve);
-    });
-    config.native_control_port = portProbe.address().port;
-    await new Promise((resolve) => portProbe.close(resolve));
-    config.native_control_token = randomBytes(32).toString("hex");
     const patches = join(config.state, "..", ".native-patches");
     await mkdir(patches, { recursive: true });
     config.native_patch = join(patches, config.id + ".yml");
@@ -916,7 +907,7 @@ async function setup(payload) {
             name === "execution-shell.mjs"
               ? join(integration, "../windows/powershell-executor.mjs")
               : join(integration, name);
-          return "name: " + JSON.stringify(file.replaceAll("\\", "/"));
+          return "name: " + JSON.stringify(pathToFileURL(file).href);
         },
       )
       .replace(

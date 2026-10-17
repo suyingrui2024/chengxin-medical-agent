@@ -537,8 +537,13 @@ class ExecutionSession:
         with self.send_lock:
             if not self.process or self.process.poll() is not None:
                 raise ExecutionError("执行进程未运行")
-            self.process.stdin.write(json.dumps(payload, ensure_ascii=False) + "\n")
-            self.process.stdin.flush()
+            try:
+                self.process.stdin.write(json.dumps(payload, ensure_ascii=False) + "\n")
+                self.process.stdin.flush()
+            except (OSError, ValueError):
+                # Shutdown can close stdin after poll() but before this write.
+                # Keep inspection available so it can report the original failure.
+                raise ExecutionError("执行进程通信已关闭") from None
 
     def has_pending_clarification(self):
         return any(

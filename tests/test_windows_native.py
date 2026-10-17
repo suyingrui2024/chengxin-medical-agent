@@ -20,28 +20,65 @@ class NativeWindowsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="chengxin ") as raw:
             root = Path(raw) / "中文 project's workspace"
             root.mkdir()
-            fd = workspace_os.open(root, workspace_os.O_RDONLY | workspace_os.O_DIRECTORY | workspace_os.O_NOFOLLOW)
+            fd = workspace_os.open(
+                root,
+                workspace_os.O_RDONLY
+                | workspace_os.O_DIRECTORY
+                | workspace_os.O_NOFOLLOW,
+            )
             try:
                 workspace_os.mkdir("资料", dir_fd=fd)
-                directory = workspace_os.open("资料", workspace_os.O_RDONLY | workspace_os.O_DIRECTORY | workspace_os.O_NOFOLLOW, dir_fd=fd)
+                directory = workspace_os.open(
+                    "资料",
+                    workspace_os.O_RDONLY
+                    | workspace_os.O_DIRECTORY
+                    | workspace_os.O_NOFOLLOW,
+                    dir_fd=fd,
+                )
                 try:
-                    file = workspace_os.open("结果.txt", workspace_os.O_CREAT | workspace_os.O_EXCL | workspace_os.O_WRONLY | workspace_os.O_NOFOLLOW, 0o600, dir_fd=directory)
+                    file = workspace_os.open(
+                        "结果.txt",
+                        workspace_os.O_CREAT
+                        | workspace_os.O_EXCL
+                        | workspace_os.O_WRONLY
+                        | workspace_os.O_NOFOLLOW,
+                        0o600,
+                        dir_fd=directory,
+                    )
                     workspace_os.write(file, "原生 Windows".encode())
                     workspace_os.close(file)
                 finally:
                     workspace_os.close(directory)
                 self.assertEqual(safe_file(root, "资料/结果.txt")["text"], "原生 Windows")
-                self.assertEqual([entry.name for entry in workspace_os.scandir(fd)], ["资料"])
+                self.assertEqual(
+                    [entry.name for entry in workspace_os.scandir(fd)], ["资料"]
+                )
                 outside = Path(raw) / "outside"
                 outside.mkdir()
                 (outside / "secret.txt").write_text("host-only")
                 junction = root / "junction"
-                subprocess.run(["cmd.exe", "/d", "/c", "mklink", "/J", str(junction), str(outside)], check=True, capture_output=True)
+                subprocess.run(
+                    [
+                        "cmd.exe",
+                        "/d",
+                        "/c",
+                        "mklink",
+                        "/J",
+                        str(junction),
+                        str(outside),
+                    ],
+                    check=True,
+                    capture_output=True,
+                )
                 try:
                     with self.assertRaises((ValueError, OSError)):
                         safe_file(root, "junction/secret.txt")
                     with self.assertRaises(OSError):
-                        workspace_os.open("资料:stream", workspace_os.O_RDONLY | workspace_os.O_NOFOLLOW, dir_fd=fd)
+                        workspace_os.open(
+                            "资料:stream",
+                            workspace_os.O_RDONLY | workspace_os.O_NOFOLLOW,
+                            dir_fd=fd,
+                        )
                 finally:
                     junction.rmdir()
             finally:
@@ -50,7 +87,11 @@ class NativeWindowsTests(unittest.TestCase):
     def test_workspace_store_create_lock_restart_and_unicode_project(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
-            config = {"MEDAGENT_LLM_BASE_URL": "https://fixture.invalid/anthropic", "MEDAGENT_LLM_MODEL": "fixture", "MEDAGENT_LLM_API_KEY": "fixture-only"}
+            config = {
+                "MEDAGENT_LLM_BASE_URL": "https://fixture.invalid/anthropic",
+                "MEDAGENT_LLM_MODEL": "fixture",
+                "MEDAGENT_LLM_API_KEY": "fixture-only",
+            }
             first = ExecutionManager(root=root / "storage")
             second = ExecutionManager(root=root / "storage")
             identity = None
@@ -73,7 +114,12 @@ class NativeWindowsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             marker = Path(raw) / "pids.json"
             code = "import json,subprocess,sys,time;from pathlib import Path;c=subprocess.Popen([sys.executable,'-c','import time;time.sleep(120)']);Path(sys.argv[1]).write_text(json.dumps({'pid':c.pid}));time.sleep(120)"
-            process = popen([sys.executable, "-I", "-c", code, str(marker)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            process = popen(
+                [sys.executable, "-I", "-c", code, str(marker)],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
             try:
                 deadline = time.monotonic() + 15
                 while not marker.is_file() and time.monotonic() < deadline:
@@ -82,6 +128,7 @@ class NativeWindowsTests(unittest.TestCase):
                 pid = json.loads(marker.read_text())["pid"]
                 kernel = ctypes.WinDLL("kernel32", use_last_error=True)
                 from ctypes import wintypes as W
+
                 kernel.OpenProcess.argtypes = [W.DWORD, W.BOOL, W.DWORD]
                 kernel.OpenProcess.restype = W.HANDLE
                 kernel.WaitForSingleObject.argtypes = [W.HANDLE, W.DWORD]
@@ -91,7 +138,11 @@ class NativeWindowsTests(unittest.TestCase):
                 try:
                     terminate(process)
                     process.wait(timeout=10)
-                    self.assertEqual(kernel.WaitForSingleObject(child_handle, 10000), 0, "grandchild survived the job")
+                    self.assertEqual(
+                        kernel.WaitForSingleObject(child_handle, 10000),
+                        0,
+                        "grandchild survived the job",
+                    )
                 finally:
                     kernel.CloseHandle(child_handle)
             finally:

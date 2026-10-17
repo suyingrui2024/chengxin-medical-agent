@@ -5,6 +5,7 @@ import { lstat, unlink } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { observeTool } from "./execution-observations.mjs";
 import { mergeCheckRequirement } from "./execution-delivery.mjs";
+import { registerControl } from "./execution-control-channel.mjs";
 export const name = "chengxin-execution-control";
 export const inject = ["agents", "jobs", "systemPrompt", "tools"];
 export async function apply(ctx) {
@@ -102,24 +103,12 @@ export async function apply(ctx) {
     } catch (error) {
       if (error.code !== "ENOENT") throw error;
     }
-  const server = createServer(async (request, response) => {
-    if (
-      native &&
-      (!process.env.CHENGXIN_CONTROL_TOKEN ||
-        request.headers["x-chengxin-control"] !==
-          process.env.CHENGXIN_CONTROL_TOKEN)
-    ) {
-      response.writeHead(401);
-      response.end();
-      return;
-    }
-    const url = new URL(request.url, "http://runtime.local");
-    if (request.method === "GET" && url.pathname === "/status") {
+  const handle = async (method, path) => {
+    const url = new URL(path, "http://runtime.local");
+    if (method === "GET" && url.pathname === "/status") {
       const requested = Number(url.searchParams.get("after") || 0);
       if (!Number.isSafeInteger(requested) || requested < 0) {
-        response.writeHead(400);
-        response.end();
-        return;
+        return { status: 400, body: "" };
       }
       const after = url.searchParams.get("epoch") === epoch ? requested : 0;
       const jobs = new Map();
@@ -131,9 +120,9 @@ export async function apply(ctx) {
             kind: job.kind,
             detail: job.detail,
           });
-      response.setHeader("Content-Type", "application/json");
-      response.end(
-        JSON.stringify({
+      return {
+        status: 200,
+        body: JSON.stringify({
           jobs: [...jobs.values()],
           delivery_checks: [...deliveryChecks.values()],
           incomplete_delivery_turns: [...incompleteDeliveryTurns],
@@ -147,17 +136,13 @@ export async function apply(ctx) {
               .slice(0, 64),
           },
         }),
-      );
-      return;
+      };
     }
-    if (request.method === "GET" && request.url === "/health") {
-      response.end("ready");
-      return;
+    if (method === "GET" && path === "/health") {
+      return { status: 200, body: "ready" };
     }
-    if (request.method !== "POST" || request.url !== "/cancel") {
-      response.writeHead(404);
-      response.end();
-      return;
+    if (method !== "POST" || path !== "/cancel") {
+      return { status: 404, body: "" };
     }
     try {
       const agents = ctx.agents.list();
@@ -172,21 +157,22 @@ export async function apply(ctx) {
         }
       }
       await Promise.all([...agents.map((agent) => agent.whenIdle()), ...jobs]);
-      response.end("cancelled");
+      return { status: 200, body: "cancelled" };
     } catch {
-      response.writeHead(500);
-      response.end("Cancellation failed");
+      return { status: 500, body: "Cancellation failed" };
     }
+  };
+  const unregister = registerControl(ctx.root, handle);
+  ctx.effect(() => unregister);
+  if (native) return;
+  const server = createServer(async (request, response) => {
+    const result = await handle(request.method, request.url);
+    response.writeHead(result.status, { "Content-Type": "application/json" });
+    response.end(result.body);
   });
   await new Promise((resolve, reject) => {
     server.once("error", reject);
-    if (native)
-      server.listen(
-        Number(process.env.CHENGXIN_CONTROL_PORT),
-        "127.0.0.1",
-        resolve,
-      );
-    else server.listen(socket, resolve);
+    server.listen(socket, resolve);
   });
   ctx.effect(() => () => {
     server.closeAllConnections();

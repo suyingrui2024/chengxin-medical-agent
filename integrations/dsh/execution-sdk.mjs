@@ -3,6 +3,7 @@
 import { HarnessSdkJsonRpcServer } from "@deepseek-ai/dsh-sdk-jsonrpc-server";
 import { JsonRpcLineTransport } from "@deepseek-ai/dsh-sdk-protocol";
 import { brandString } from "@deepseek-ai/dsh-brand";
+import { dispatchControl } from "./execution-control-channel.mjs";
 
 export const name = "chengxin-execution-sdk";
 export const inject = ["agents", "sessionPersistence"];
@@ -60,6 +61,7 @@ export function apply(ctx) {
     })());
   transport.onRequest(async (method, params) => {
     if (method === "initialize") await ctx.get("loader")?.await();
+    if (method === "chengxin/control") return dispatchControl(ctx.root, params);
     const result = await server.handleRequest(method, params);
     if (method === "shutdown") setImmediate(() => shutdown());
     return result;
