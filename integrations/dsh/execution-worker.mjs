@@ -46,6 +46,20 @@ let capabilityLifetimeCalls = 0;
 let workspaceLifetimeCalls = 0;
 let checkpointLifetimeCalls = 0;
 const integration = dirname(fileURLToPath(import.meta.url));
+function trustedHelperEnvironment() {
+  return {
+    PATH: process.env.PATH || "/usr/bin:/bin",
+    LANG: "C.UTF-8",
+    ...(process.platform === "win32"
+      ? {
+          SystemRoot: process.env.SystemRoot,
+          WINDIR: process.env.WINDIR,
+          TEMP: process.env.TEMP,
+          TMP: process.env.TMP,
+        }
+      : {}),
+  };
+}
 const clarifications = new ClarificationBroker({
   owner: () => active || lease,
   emit: (type, value) => emit(type, value),
@@ -409,7 +423,8 @@ async function capabilityRequest(request, response) {
         ],
         {
           cwd: integration,
-          env: { PATH: process.env.PATH || "/usr/bin:/bin", LANG: "C.UTF-8" },
+          env: trustedHelperEnvironment(),
+          windowsHide: true,
           signal: abort.signal,
           timeout: 5000,
           maxBuffer: 128000,
@@ -523,7 +538,8 @@ async function workspaceRequest(request, response) {
         ],
         {
           cwd: integration,
-          env: { PATH: process.env.PATH || "/usr/bin:/bin", LANG: "C.UTF-8" },
+          env: trustedHelperEnvironment(),
+          windowsHide: true,
           signal: abort.signal,
           timeout: 10000,
           maxBuffer: 512000,
@@ -597,7 +613,8 @@ async function workspaceCheckpoint(paths, owned) {
         ],
         {
           cwd: integration,
-          env: { PATH: process.env.PATH || "/usr/bin:/bin", LANG: "C.UTF-8" },
+          env: trustedHelperEnvironment(),
+          windowsHide: true,
           signal: abort.signal,
           timeout: 5000,
           maxBuffer: 16000,

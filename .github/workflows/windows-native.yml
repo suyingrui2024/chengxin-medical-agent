@@ -7,7 +7,20 @@ permissions:
   contents: read
 jobs:
   windows:
-    runs-on: windows-2025
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            name: Windows Server x64 desktop
+            execution: false
+            artifact: Windows-x64
+          - runner: windows-11-arm
+            name: Windows 11 on Arm running x64 application
+            execution: true
+            artifact: Windows11-x64-compat
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -24,6 +37,10 @@ jobs:
       - name: Win32 filesystem, locks and process trees
         shell: powershell
         run: ./scripts/windows.ps1 -Mode Test
+      - name: Native Windows isolation and full SDK execution
+        if: matrix.execution
+        shell: powershell
+        run: ./scripts/windows.ps1 -Mode ExecutionTest
       - name: Native isolation host diagnostics
         if: always()
         shell: powershell
@@ -51,6 +68,6 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: Chengxin-Windows-x64
+          name: Chengxin-${{ matrix.artifact }}
           path: dist/Chengxin-Windows-x64.zip
           retention-days: 3

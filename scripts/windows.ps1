@@ -2,7 +2,7 @@
 <#! Native Windows setup. No WSL, global PATH changes or administrator install. !#>
 [CmdletBinding()]
 param(
-    [ValidateSet('Setup', 'Check', 'Start', 'Build', 'Test')]
+    [ValidateSet('Setup', 'Check', 'Start', 'Build', 'Test', 'ExecutionTest')]
     [string]$Mode = 'Setup',
     [switch]$Live,
     [switch]$NoShortcut
@@ -133,7 +133,8 @@ function New-ChengxinShortcut {
 
 try {
     if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT -or [Environment]::OSVersion.Version.Build -lt 19044) { throw 'Windows 10 19044+ or Windows 11 is required.' }
-    if ($env:PROCESSOR_ARCHITECTURE -ne 'AMD64') { throw 'This installation targets Windows x64. Use 64-bit PowerShell on an x64 PC.' }
+    if ($env:PROCESSOR_ARCHITECTURE -notin @('AMD64', 'ARM64')) { throw 'Use 64-bit Windows PowerShell. This package uses Windows x64 runtimes.' }
+    if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64' -and [Environment]::OSVersion.Version.Build -lt 22000) { throw 'Windows 11 is required to run the x64 package on Arm through Windows compatibility support.' }
     if ($Live -and $Mode -ne 'Start') { throw '-Live is only valid with -Mode Start.' }
     $OutputEncoding = New-Object Text.UTF8Encoding($false)
     [Console]::OutputEncoding = $OutputEncoding
@@ -166,6 +167,7 @@ try {
         } elseif ($Mode -eq 'Test') {
             & (Join-Path $projectRoot 'tests\windows-installer.ps1')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_native.py')
+        } elseif ($Mode -eq 'ExecutionTest') {
             Invoke-ChengxinCommand $node @('scripts/windows/isolation-check.mjs')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_execution.py')
         } elseif ($Live) {

@@ -28,12 +28,17 @@ try {
   await mkdir(state);
   const marker = join(scratch, "host-only-secret.txt");
   await writeFile(marker, "host-only-secret-marker");
+  const readOnly = join(scratch, "readonly");
+  await mkdir(readOnly);
+  await writeFile(join(readOnly, "reference.txt"), "immutable-reference");
   await new Promise((resolve) => gateway.listen(0, "127.0.0.1", resolve));
   const python = process.env.MEDAGENT_PYTHON;
   assert(python, "The installation must select the dedicated Windows Python");
   const code = `const fs=require('node:fs'),cp=require('node:child_process'),assert=require('node:assert/strict');
     assert.throws(()=>fs.readFileSync(${JSON.stringify(marker)}));
     assert.equal(process.env.CHENGXIN_HOST_ONLY_SECRET,undefined);
+    assert.equal(fs.readFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'utf8'),'immutable-reference');
+    assert.throws(()=>fs.writeFileSync(${JSON.stringify(join(readOnly, "reference.txt"))},'must-not-write'));
     fs.writeFileSync('artifact.txt','native-isolated');
     assert.equal(cp.execFileSync(${JSON.stringify(python)},['-I','-c','print(6*7)'],{encoding:'utf8'}).trim(),'42');
     fetch(${JSON.stringify(`http://127.0.0.1:${gateway.address().port}`)}).then(r=>r.text()).then(text=>{assert.equal(text,'fixture-gateway');console.log(JSON.stringify({passed:true,host_file_denied:true,host_env_hidden:true,code_executed:true,host_gateway_reachable:true}));}).catch(()=>process.exit(1));`;
@@ -44,7 +49,7 @@ try {
     integration: join(root, "integrations/dsh"),
     env: { CHENGXIN_PYTHON: python },
     command: [process.execPath, "-e", code],
-    readonly: [dirname(process.execPath), dirname(python)],
+    readonly: [dirname(process.execPath), dirname(python), readOnly],
   });
   const { stdout } = await promisify(execFile)(launch.command, launch.args, {
     encoding: "utf8",
@@ -79,7 +84,8 @@ try {
       error.cause.stdout || "",
       error.cause.stderr || "",
     );
-  if (error.cause?.probe) console.error("Native host facts:", JSON.stringify(error.cause.probe));
+  if (error.cause?.probe)
+    console.error("Native host facts:", JSON.stringify(error.cause.probe));
   throw error;
 } finally {
   if (launch?.policyFile) await unlink(launch.policyFile).catch(() => {});

@@ -158,6 +158,7 @@ if (
     });
     const child = spawn(launch.command, launch.args, {
       stdio: "inherit",
+      windowsHide: true,
       env:
         process.platform === "win32"
           ? {
