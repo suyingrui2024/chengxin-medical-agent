@@ -110,7 +110,10 @@ export function requestFor({
       egress: { default: "allow" },
       ingress: { default: "allow", hostLoopback: "allow" },
     },
-    ui: { disable: true, clipboard: "none", injection: false },
+    // PowerShell and Windows' x64 compatibility loader need Win32k during
+    // initialization. Retain MXC's default container-scoped UI handles/atoms,
+    // clipboard denial, input denial and system-setting restrictions.
+    ui: { disable: false, clipboard: "none", injection: false },
     processContainer: { leastPrivilege: false, capabilities: [] },
     telemetry: { enabled: false },
   };
