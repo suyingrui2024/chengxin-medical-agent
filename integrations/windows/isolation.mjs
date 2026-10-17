@@ -81,6 +81,10 @@ export function requestFor({
     TMP: temporary,
     DSH_HOME: home,
     NO_COLOR: "1",
+    // Node's realpath walk lstats drive-root metadata before loading a file.
+    // Keep the host-canonicalized, read-only bundle paths rather than granting
+    // recursive read access to C:\ merely to satisfy module resolution.
+    NODE_OPTIONS: "--preserve-symlinks --preserve-symlinks-main",
     PYTHONUTF8: "1",
     PYTHONNOUSERSITE: "1",
   };

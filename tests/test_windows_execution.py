@@ -34,6 +34,10 @@ class WindowsExecutionTests(unittest.TestCase):
             step = root_calls[0]
             root_calls[0] += 1
             if step == 0:
+                self.assertTrue(
+                    {"bash", "subagent", "web_search", "web_fetch", "medical_calculate"}
+                    <= {item.get("name") for item in body.get("tools", [])}
+                )
                 return tool(
                     "bash",
                     command="'print(1250)' | Set-Content -Encoding UTF8 calc.py; python.exe calc.py | Set-Content -Encoding UTF8 result.txt",
@@ -52,7 +56,14 @@ class WindowsExecutionTests(unittest.TestCase):
                     label="Verify actual Windows artifacts",
                     command="python.exe -c \"from pathlib import Path; assert Path('result.txt').read_text(encoding='utf-8-sig').strip()=='1250'; assert Path('review.txt').read_text()=='verified'\"",
                 )
-            if step == 4:
+            if step == 3:
+                return tool(
+                    "medical_calculate",
+                    capability_id="calculate.units",
+                    input={"value": "1.25", "from_unit": "kg", "to_unit": "g"},
+                    evidence="1.25 kg",
+                )
+            if step == 5:
                 return tool(
                     "bash",
                     command="if (-not (Test-Path review.txt)) { throw 'missing previous result' }; 'continued' | Set-Content -Encoding UTF8 notes.txt",
@@ -89,7 +100,7 @@ class WindowsExecutionTests(unittest.TestCase):
                     )
 
                 session.start_turn(
-                    "WINDOWS_ROOT_FIXTURE: create and run calc.py, delegate verification, and run a delivery check",
+                    "WINDOWS_ROOT_FIXTURE: create and run calc.py, delegate verification, and run a delivery check. 请把1.25 kg换算成g。",
                     12,
                 )
                 finish()
@@ -102,6 +113,9 @@ class WindowsExecutionTests(unittest.TestCase):
                         for item in session.observations
                     )
                 )
+                self.assertEqual(len(session.calculations), 1)
+                self.assertEqual(session.calculations[0]["data"]["value"], "1250")
+                self.assertEqual(session.calculations[0]["input_status"], "unconfirmed")
                 session.start_turn(
                     "WINDOWS_ROOT_FIXTURE FOLLOW_UP: retain the original artifacts and write notes.txt",
                     4,

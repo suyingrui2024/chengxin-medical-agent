@@ -169,6 +169,7 @@ try {
         } elseif ($Mode -eq 'Test') {
             & (Join-Path $projectRoot 'tests\windows-installer.ps1')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_native.py')
+            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_execution_closed_pipe.py')
         } elseif ($Mode -eq 'ExecutionTest') {
             Invoke-ChengxinCommand $node @('scripts/windows/isolation-check.mjs')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_execution.py')

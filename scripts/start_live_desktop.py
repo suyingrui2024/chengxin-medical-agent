@@ -14,7 +14,7 @@ def main():
     parser.add_argument(
         "--env-file",
         type=Path,
-        help="Explicit configuration file, including a Windows-mounted file under WSL",
+        help="Explicit local configuration file for the native desktop application",
     )
     parser.add_argument(
         "--check",

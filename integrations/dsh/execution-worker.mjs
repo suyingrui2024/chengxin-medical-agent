@@ -877,7 +877,7 @@ async function setup(payload) {
       )
       .replace(
         "The validated Linux environment provides python3; do not assume python or pip is installed.",
-        "This is native Windows. The bash-named tool runs Windows PowerShell, not bash or WSL. Use PowerShell syntax. Python is available as python.exe; pip and third-party scientific packages are not assumed. Native command failures preserve their exit code.",
+        "This is native Windows. The bash-named tool runs Windows PowerShell. Use PowerShell syntax. Python and pip are bundled; use python.exe -m venv .venv for project dependencies, then .venv/Scripts/python.exe -m pip. The bundled runtime is read-only; scientific packages are not preinstalled. Native command failures preserve their exit code.",
       )
       .replace(
         "Bash pipelines use pipefail by default.",

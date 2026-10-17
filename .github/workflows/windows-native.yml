@@ -74,6 +74,12 @@ jobs:
           $env:MEDAGENT_ISCC = Join-Path $compilerRoot 'ISCC.exe'
           ./scripts/windows.ps1 -Mode Installer
           ./tests/windows-installer-e2e.ps1
+      - name: Execute full SDK with packaged Python and Node
+        if: matrix.execution
+        shell: powershell
+        run: |
+          $metadata = Get-Content package.json -Raw | ConvertFrom-Json
+          ./scripts/windows/packaged-execution-check.ps1 -ApplicationDirectory "dist/desktop/Chengxin-$($metadata.version)-win32-x64"
       - name: Archive portable native Windows application
         shell: powershell
         run: |

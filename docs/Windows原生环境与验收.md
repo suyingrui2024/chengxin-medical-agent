@@ -55,15 +55,22 @@ Windows 使用原生 PowerShell 执行命令。上游工具名称仍为 `bash`�
 | `d87df0d`／[39032717413](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39032717413) | Server 2025 build 26100.33438 缺少 BaseContainer API；拒绝执行并保留诊断，没有降低隔离要求 |
 | `7c1f77d`／[39033094864](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39033094864) | Windows 11 Arm、x64 应用：安装、实际窗口和 3 项 Win32 检查通过；原生执行因界面初始化限制失败，随后调整策略 |
 | `0abccea`／[39033319060](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39033319060) | Server 完整 Python 便携包启动通过；Inno Setup 6 编译深层依赖路径失败，随后改为固定校验的 Inno Setup 7.1 |
+| `7f87892`／[39033962848](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39033962848) | Server x64 整个任务通过，包括 Inno Setup 7.1 编译、安装到带空格路径、随包运行时启动、桌面快捷方式及卸载；Windows 11 隔离边界和 venv／pip 通过，完整 DSH 仍因启动失败和管道关闭竞态未通过 |
 
-后续隔离修复、患者计算交互、venv／pip 与安装／卸载的最终结果仍待相应 Windows 工作流完成后记录。当前不能宣称 Windows 完整执行工作台或安装器已经验收。
+安装器已有上述 Server x64 实测；后续 SDK 控制通道、快捷方式清理与打包版完整执行仍需验证，当前不能宣称 Windows 完整执行工作台已验收。
 
-## 本次分支交接
+## 前次分支交接
 
-按用户要求，当前更改保存到 `windows-native` 分支，未合并 `main`，后续由用户继续修改。本次提交使用 `[skip ci]`，不再自动启动新一轮验证。
+前次按用户要求，将当时更改保存到 `windows-native` 分支，未合并 `main`。交接提交 `d8e0dff` 使用 `[skip ci]`，未自动启动新一轮验证。现已按用户后续要求继续适配。
 
 `844984c` 的 Windows 11 实测已通过患者计算交互与原生隔离边界检查：工作区外文件拒绝、宿主环境变量不可见、Python 执行和宿主模型网关访问通过。完整 DSH 测试随后失败，快照读取中的已关闭 stdin 异常遮住了启动诊断。
 
-交接提交包含已关闭管道的异常处理和独立回归检查（本机 1 项通过），以及尚待验证的 Windows 适配：插件路径使用 `file:` URL，状态／停止复用 SDK JSON-RPC 通道，安装器检查开始菜单快捷方式和卸载后的快捷方式清理。新增 SDK 控制通道尚未完成集成回归，也未在真实 Windows 上复验；早先通过的检查不覆盖这些后续更改。Inno Setup 7.1、venv／pip 和安装／卸载的最新 Windows 工作流结果需后续查看。
+交接提交包含已关闭管道的异常处理和独立回归检查（本机 1 项通过），以及当时尚待验证的 Windows 适配：插件路径使用 `file:` URL，状态／停止复用 SDK JSON-RPC 通道，安装器检查开始菜单快捷方式和卸载后的快捷方式清理。早先通过的检查不覆盖这些后续更改。
+
+## 接续验证
+
+`b504a61` 将两套系统的状态与停止统一到 SDK 管道，移除额外控制监听器。本机真实完整 DSH／交付检查与已关闭管道回归共 31 项通过，目录保护及生命周期另外 7 项通过。真实桌面计算、返回问诊、历史恢复和字体检查通过（本地图形会话 `DISPLAY=:1`）。Windows 正在重新验证，后续结果需据实际工作流补充。
+
+新增 `scripts/windows/packaged-execution-check.ps1` 使用打包目录中的解释器、Node 和 Python 源码运行完整 Windows 执行场景，避免只测试源码环境。检查包括写代码、实际执行、子智能体验证、交付检查及原会话接续。
 
 Linux 回归：完整 DSH 执行与交付检查 30 项通过；项目目录保护与桌面生命周期 7 项通过；真实桌面计算、继续问诊、历史恢复及三类实际字体检查通过。Linux 结果不替代 Windows 验证。
