@@ -11,7 +11,7 @@ def project_path(value, storage_root, source_root):
         raise ValueError("请选择一个已有的项目文件夹")
     raw = str(value)
     if (
-        not raw.startswith("/")
+        not Path(raw).is_absolute()
         or len(raw.encode("utf-8")) > 4096
         or any(ord(char) < 32 for char in raw)
     ):
@@ -49,9 +49,13 @@ def project_path(value, storage_root, source_root):
             "/boot",
             "/run",
         ]
+    ] if os.name != "nt" else [
+        Path(os.environ[name]).resolve()
+        for name in ("SystemRoot", "ProgramFiles", "ProgramFiles(x86)", "APPDATA", "LOCALAPPDATA")
+        if os.environ.get(name)
     ]
     if candidate in {
-        Path("/"),
+        Path(candidate.anchor),
         Path("/home"),
         home,
         Path("/tmp"),

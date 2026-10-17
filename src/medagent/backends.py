@@ -191,14 +191,14 @@ class DshBackend:
                 raise RuntimeError("DSH backend is closed")
             if cancelled is not None and cancelled.is_set():
                 raise DecisionInterrupted()
-            child = subprocess.Popen(
+            from .processes import popen
+            child = popen(
                 ["node", str(self.bridge)],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
                 cwd=self.root,
-                start_new_session=(os.name == "posix"),
                 env={
                     **os.environ,
                     **self.config,
@@ -234,6 +234,8 @@ class DshBackend:
             child.communicate()
             raise
         finally:
+            from .processes import release
+            release(child)
             with self._process_lock:
                 self._children.discard(child)
         if cancelled is not None and cancelled.is_set():
@@ -263,10 +265,8 @@ class DshBackend:
     @staticmethod
     def _terminate(child):
         try:
-            if os.name == "posix":
-                os.killpg(child.pid, signal.SIGKILL)
-            else:
-                child.kill()
+            from .processes import terminate
+            terminate(child)
         except ProcessLookupError:
             pass
 

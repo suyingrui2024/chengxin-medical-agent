@@ -1,0 +1,48 @@
+name: Native Windows desktop
+on:
+  workflow_dispatch:
+  push:
+    branches: [windows-native]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          sparse-checkout: |
+            src
+            desktop
+            integrations
+            scripts
+            tests
+      - name: Install native runtimes and exercise real desktop
+        shell: powershell
+        run: ./scripts/windows.ps1 -Mode Setup -NoShortcut
+      - name: Win32 filesystem, locks and process trees
+        shell: powershell
+        run: ./scripts/windows.ps1 -Mode Test
+      - name: Build Windows desktop with bundled Python and Node
+        shell: powershell
+        run: ./scripts/windows.ps1 -Mode Build
+      - name: Run packaged Windows executable
+        shell: powershell
+        run: |
+          $metadata = Get-Content package.json -Raw | ConvertFrom-Json
+          $env:MEDAGENT_DESKTOP_BINARY = Join-Path $PWD "dist/desktop/Chengxin-$($metadata.version)-win32-x64/Chengxin.exe"
+          $env:MEDAGENT_PYTHON = $null
+          & ./.runtime/windows/node/node.exe scripts/windows/gui-check.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Archive portable native Windows application
+        shell: powershell
+        run: |
+          $metadata = Get-Content package.json -Raw | ConvertFrom-Json
+          tar.exe -a -c -f dist/Chengxin-Windows-x64.zip -C "dist/desktop/Chengxin-$($metadata.version)-win32-x64" .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Chengxin-Windows-x64
+          path: dist/Chengxin-Windows-x64.zip
+          retention-days: 3

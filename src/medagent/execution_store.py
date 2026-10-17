@@ -1,12 +1,11 @@
 """Host-owned workspace index, outside all model-runtime mounts. No credentials."""
 
-import fcntl
 import json
 from .execution_observations import validate_observation
 from .execution_limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
 from .execution_clarifications import validate_clarification
 import math
-import os
+from .platform_fs import os, fcntl
 from pathlib import Path
 import stat
 from uuid import UUID, uuid4
@@ -161,8 +160,8 @@ class WorkspaceStore:
             path = record["project_path"]
             if (
                 not isinstance(path, str)
-                or not path.startswith("/")
-                or path == "/"
+                or not os.path.isabs(path)
+                or Path(path) == Path(Path(path).anchor)
                 or len(path.encode("utf-8")) > 4096
                 or os.path.normpath(path) != path
                 or any(ord(char) < 32 for char in path)

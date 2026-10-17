@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 from collections import deque
-import fcntl
 import hashlib
 import json
-import os
+from .platform_fs import os, fcntl
 from pathlib import Path, PurePosixPath
 import select
 import shutil

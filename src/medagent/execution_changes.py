@@ -6,7 +6,7 @@ import difflib
 import hashlib
 import json
 import math
-import os
+from .platform_fs import os
 from pathlib import Path, PurePosixPath
 import stat
 import sys

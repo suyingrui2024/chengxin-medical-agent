@@ -36,6 +36,15 @@ const projectRequests = new Map();
 
 function pythonCommand() {
   if (process.env.MEDAGENT_PYTHON) return process.env.MEDAGENT_PYTHON;
+  if (process.platform === "win32") {
+    for (const relative of [
+      "runtime/python/python.exe",
+      ".runtime/windows/python/python.exe",
+    ]) {
+      const bundled = path.join(projectRoot, relative);
+      if (fs.existsSync(bundled)) return bundled;
+    }
+  }
   const candidate = path.join(
     projectRoot,
     ".venv",
@@ -50,20 +59,44 @@ function pythonCommand() {
 
 function startBackend(token) {
   return new Promise((resolve, reject) => {
-    backend = spawn(pythonCommand(), ["-u", "-m", "medagent.desktop_service"], {
-      cwd: projectRoot,
-      detached: process.platform !== "win32",
-      windowsHide: true,
-      stdio: ["pipe", "pipe", "pipe"],
-      env: {
-        ...process.env,
-        PYTHONPATH: path.join(projectRoot, "src"),
-        PYTHONDONTWRITEBYTECODE: "1",
-        MEDAGENT_EXECUTION_ROOT:
-          process.env.MEDAGENT_EXECUTION_ROOT ||
-          path.join(app.getPath("desktop"), "澄心工作区"),
+    const runtimeEnv = { ...process.env };
+    if (process.platform === "win32") {
+      for (const relative of ["runtime/node", ".runtime/windows/node"]) {
+        const directory = path.join(projectRoot, relative);
+        if (fs.existsSync(path.join(directory, "node.exe"))) {
+          runtimeEnv.PATH =
+            directory + path.delimiter + (runtimeEnv.PATH || "");
+          break;
+        }
+      }
+      runtimeEnv.PYTHONUTF8 = "1";
+    }
+    backend = spawn(
+      pythonCommand(),
+      [
+        "-I",
+        "-u",
+        "-X",
+        "utf8",
+        "-c",
+        "import sys;sys.path.insert(0,sys.argv[1]);from medagent.desktop_service import main;main()",
+        path.join(projectRoot, "src"),
+      ],
+      {
+        cwd: projectRoot,
+        detached: process.platform !== "win32",
+        windowsHide: true,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: {
+          ...runtimeEnv,
+          PYTHONPATH: path.join(projectRoot, "src"),
+          PYTHONDONTWRITEBYTECODE: "1",
+          MEDAGENT_EXECUTION_ROOT:
+            process.env.MEDAGENT_EXECUTION_ROOT ||
+            path.join(app.getPath("desktop"), "澄心工作区"),
+        },
       },
-    });
+    );
     const timer = setTimeout(() => reject(new Error("启动超时")), 15000);
     const lines = readline.createInterface({ input: backend.stdout });
     let ready = false;
@@ -303,7 +336,9 @@ if (!app.requestSingleInstanceLock()) {
       if (quitting || stopping) return;
       dialog.showErrorBox(
         "无法打开澄心问诊",
-        "请确认已安装 Python 3.10+，并保留完整的应用目录。可设置 MEDAGENT_PYTHON 指向 Python 可执行文件。模型依赖安装方法请查看项目说明。",
+        process.platform === "win32"
+          ? "请运行 scripts/windows.ps1 -Mode Check 检查 Windows 运行环境；使用发行包时请先解压整个目录，保留随包 Python 和 Node。"
+          : "请确认已安装 Python 3.10+，并保留完整的应用目录。可设置 MEDAGENT_PYTHON 指向 Python 可执行文件。模型依赖安装方法请查看项目说明。",
       );
       app.quit();
     }

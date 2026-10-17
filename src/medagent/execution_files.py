@@ -2,7 +2,7 @@
 import base64
 import hashlib
 import json
-import os
+from .platform_fs import os
 from pathlib import PurePosixPath
 import stat
 import time

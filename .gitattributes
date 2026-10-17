@@ -1,3 +1,5 @@
 # Preserve frozen evidence bytes, including CSV line endings, on every platform.
 docs/evaluations/** -text
 docs/review-packets/** -text
+*.sh text eol=lf
+*.ps1 text eol=crlf

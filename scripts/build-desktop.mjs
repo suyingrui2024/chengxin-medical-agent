@@ -8,10 +8,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const metadata = JSON.parse(
   await readFile(path.join(root, "package.json"), "utf8"),
 );
-if (process.platform !== "linux" || process.arch !== "x64") {
-  throw new Error(
-    "当前打包配置已针对 Linux x64 编写；其他平台需单独验证后增加。 ",
-  );
+if (!["linux", "win32"].includes(process.platform) || process.arch !== "x64") {
+  throw new Error("当前打包目标为 Linux x64 或 Windows x64。");
 }
 
 // Packager's pruning drops transitive peer dependencies in this DSH graph.
@@ -35,16 +33,39 @@ try {
       filter: (source) =>
         !source.includes("__pycache__") && !source.endsWith(".pyc"),
     });
+  const npmArguments = [
+    "ci",
+    "--omit=dev",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund",
+  ];
+  const windows = process.platform === "win32";
+  const npmCli = process.env.MEDAGENT_NPM_CLI;
+  if (windows && !npmCli)
+    throw new Error(
+      "请使用 scripts/windows.ps1 -Mode Build，确保采用项目专用运行时。",
+    );
   execFileSync(
-    "npm",
-    ["ci", "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"],
+    windows ? process.execPath : "npm",
+    windows ? [npmCli, ...npmArguments] : npmArguments,
     { cwd: staging, stdio: "inherit" },
   );
+  if (windows) {
+    // A Windows distribution carries its own interpreter and Node runtime.
+    for (const name of ["python", "node"]) {
+      await cp(
+        path.join(root, ".runtime/windows", name),
+        path.join(staging, "runtime", name),
+        { recursive: true },
+      );
+    }
+  }
   const outputs = await packager({
     dir: staging,
     name: `Chengxin-${metadata.version}`,
     executableName: "Chengxin",
-    platform: "linux",
+    platform: process.platform,
     arch: "x64",
     out: path.join(root, "dist", "desktop"),
     overwrite: true,
@@ -58,9 +79,13 @@ try {
       /\.py[co]$/,
     ],
   });
-  console.log(`桌面应用已生成：${path.join(outputs[0], "Chengxin")}`);
   console.log(
-    "保留整个应用目录；默认离线模式需要系统 Python 3.10+，DSH 另需系统 Node 22.19+。",
+    `桌面应用已生成：${path.join(outputs[0], windows ? "Chengxin.exe" : "Chengxin")}`,
+  );
+  console.log(
+    windows
+      ? "保留整个目录；Windows Python 和 Node 已随包附带，无需 WSL。"
+      : "保留整个应用目录；默认离线模式需要系统 Python 3.10+，DSH 另需系统 Node 22.19+。",
   );
 } finally {
   await rm(staging, { recursive: true, force: true });
