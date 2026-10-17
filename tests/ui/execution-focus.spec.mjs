@@ -124,9 +124,8 @@ test("a completed turn with a failed tool remains visibly unresolved", async ({
     },
   ];
   fixture.first.sequence = 1;
-  await expect(page.locator("#execution-focus-label")).toHaveText(
-    "有未完成项，请核对",
-  );
+  await expect(page.locator("#execution-focus-label")).toHaveText("结果待核对");
+  await expect(page.locator("#execution-status")).toHaveText("本轮已结束");
   await expect(page.locator("#execution-outcome")).toBeVisible();
   await expect(page.locator(".execution-failure")).toContainText("7");
   fixture.first.storage_error = "工作目录暂不可读";
@@ -134,6 +133,75 @@ test("a completed turn with a failed tool remains visibly unresolved", async ({
     "工作目录不可用",
   );
   await expect(page.locator("#execution-quick-look")).toBeHidden();
+});
+
+test("long results use a short excerpt, keep the full text and leave failures visible", async ({
+  page,
+}, info) => {
+  const fixture = await installExecutionFocusFixture(page);
+  await page.goto("/");
+  await openFocusWorkspace(page);
+  const text =
+    "已经保存结果，请查看文件。\n\n" +
+    "这是需要时才展开的详细过程与记录。".repeat(45) +
+    '<img src=x onerror="window.RESULT_INJECTED=1">';
+  fixture.first.status = "completed";
+  fixture.first.events = [
+    {
+      sequence: 1,
+      type: "turn.completed",
+      turn_id: "turn-1",
+      final_response: text,
+    },
+    {
+      sequence: 2,
+      type: "tool.observed",
+      turn_id: "turn-1",
+      observation: {
+        schema: "execution-observation/v1",
+        session_id: "root",
+        sdk_turn: 1,
+        sdk_step: 1,
+        call_id: "failed-long-result",
+        observation_id: "failed-long-observation",
+        turn_id: "turn-1",
+        tool: "bash",
+        state: "completed",
+        exit_code: 7,
+      },
+    },
+  ];
+  fixture.first.sequence = 2;
+  const card = page.locator(".execution-final");
+  await expect(card.locator(".execution-response-preview")).toBeVisible();
+  expect(
+    (await card.locator(".execution-response-preview").textContent()).length,
+  ).toBeLessThan(150);
+  await expect(card.locator(".execution-response-preview")).not.toContainText(
+    "详细过程",
+  );
+  await expect(card.locator(".execution-response-full")).toBeHidden();
+  await expect(page.locator("#execution-outcome")).toBeVisible();
+  await card.locator(".execution-response-preview").scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({
+    path: info.outputPath("condensed-results.png"),
+    fullPage: true,
+  });
+  await card.locator("summary").click();
+  await expect(card.locator(".execution-response-full")).toHaveText(text);
+  await expect(card.locator(".execution-response-preview")).toBeHidden();
+  await page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      url.pathname === "/api/execution/focus-a" && url.searchParams.has("after")
+    );
+  });
+  await expect(card.locator("summary")).toHaveText("收起结果");
+  await card.locator("summary").click();
+  await expect(card.locator(".execution-response-full")).toBeHidden();
+  await expect(page.locator("#execution-outcome")).toBeVisible();
+  expect(await page.evaluate(() => window.RESULT_INJECTED)).toBeUndefined();
 });
 
 for (const [name, width, height] of [

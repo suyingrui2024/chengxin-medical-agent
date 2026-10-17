@@ -1,0 +1,158 @@
+{
+  "schema": "artifact-chart-iteration/v1",
+  "date": "2026-10-18",
+  "platform": "macOS arm64",
+  "source_parent_commit": "a5d55772f03fc961d2ffeed2213e9f823aa518b7",
+  "checks": {
+    "browser": {
+      "passed": 117,
+      "log": "logs/ui.log"
+    },
+    "native_desktop": {
+      "passed": 6,
+      "log": "logs/desktop.log"
+    },
+    "numeric_chart_units": {
+      "passed": 5,
+      "log": "logs/unit.log"
+    },
+    "host_and_preview_python": {
+      "passed": 10,
+      "log": "logs/python.log"
+    },
+    "gui_script": {
+      "passed": true,
+      "receipt": {
+        "gui": "passed",
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": [
+          "body",
+          "serif",
+          "mono"
+        ],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      },
+      "log": "logs/native-gui.log"
+    },
+    "format": "passed",
+    "svg_labels": "passed"
+  },
+  "requirements": [
+    {
+      "requirement": "Keep attention on visuals and current actions",
+      "evidence": [
+        "chart-mobile.png",
+        "condensed-results.png",
+        "temperature-mobile.png",
+        "tests/ui/execution-focus.spec.mjs"
+      ]
+    },
+    {
+      "requirement": "Simple comfortable figures without facial features",
+      "evidence": [
+        "location-mobile.png",
+        "temperature-mobile.png",
+        "assets/illustrations/body-location.svg",
+        "assets/illustrations/temperature.svg",
+        "src/medagent/web/visual-question.js"
+      ],
+      "review": "Source inspected and actual mobile rendering visually reviewed; head outlines retained without eyes or mouth."
+    },
+    {
+      "requirement": "Apply relevant leading-agent design ideas",
+      "evidence": [
+        "https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them",
+        "https://docs.langchain.com/oss/javascript/langgraph/interrupts",
+        "src/medagent/web/execution-focus-ui.js",
+        "src/medagent/web/execution-artifact-ui.js"
+      ]
+    },
+    {
+      "requirement": "Add useful agent functionality and verify it",
+      "evidence": [
+        "native-chart.png",
+        "tests/fixtures/native-artifact-chart.mjs",
+        "tests/unit/artifact-chart.test.mjs",
+        "tests/ui/artifact-chart.spec.mjs"
+      ],
+      "scope": "Actual SHA-bound workspace CSV previews with zero agent turns; selectable numeric columns; no filling missing values, evaluating formulas or reordering rows."
+    },
+    {
+      "requirement": "Check visual and functional regressions",
+      "evidence": [
+        "logs/ui.log",
+        "logs/desktop.log",
+        "logs/unit.log",
+        "logs/python.log"
+      ],
+      "windows": "Current chart and full faceless body revision pending Windows CI; a5d5577 foundation passed run 39072806249."
+    }
+  ],
+  "scope": [
+    "six themes, three chart viewports and four patient viewports",
+    "shared chart axis and row scroll area including a classic-scrollbar simulation",
+    "zero baseline, signed data, exact raw values, ragged/missing/unsafe inputs",
+    "truncated snapshots, changed-file notices, source/table/chart/expanded modes",
+    "first-paragraph previews with complete inert text, polling state and visible failures",
+    "both static and interactive body figures are faceless"
+  ],
+  "boundaries": [
+    "Rendering fixtures are not an agent reasoning benchmark.",
+    "The real-file native check does not start an execution turn.",
+    "No clinical review or patient comprehension study is claimed.",
+    "This record establishes tested behavior and visual review, not a comparative market ranking."
+  ],
+  "source_files_sha256": {
+    ".github/workflows/windows-native.yml": "fa8cb6088f94d6f15fee1c522291e7b6b9720540e8f2c52dfa59270524f92958",
+    "assets/illustrations/body-location.svg": "b2b6b5e44fc1c390991db592defbba19b8c3534fb969b4809962c6adbc7a7c2a",
+    "assets/illustrations/temperature.svg": "d3c199187fa60c9e1aeb10c1b669df364ce38ecb27571d2302ddc773dcb7beba",
+    "src/medagent/web/body-location.svg": "3bfb62227824d89b8f37bab9970858484c7f4e08dda95fd0cd6c4cfe7842c2bc",
+    "src/medagent/web/temperature.svg": "b964129a465ff7087b11a61551f561c787c69092b72b24be6d3fd39ebc91cea0",
+    "src/medagent/web/visual-question.js": "3b8c3ef3aa21ccf6997e85b1c6ff5598b8dce30595723445a84184d9fbb3d0bc",
+    "src/medagent/web/illustration-labels.json": "d1022f309b3ae55886f111782d6773e6910dba2ee48ee176461e36f30097e4ab",
+    "src/medagent/web/artifact-chart-ui.js": "66f62eb904cbdcb6eb78aad4f4bb49feea3de1ff781e9de7ec95e3c479ac2da0",
+    "src/medagent/web/artifact-chart.css": "676103119aa41cea4f511390bbbc0deec3d0168c55e1824414359a0f17dcc03b",
+    "src/medagent/web/execution-artifact-ui.js": "adcef190b0a898bf3c2ede86587fbbec555b1b9f53820c338f9296beeca17423",
+    "src/medagent/web/execution-ui.js": "3cbc5e4f3a6393da82dadd4588c0c2cfea347ab04e86c14b6c94f1f8c740468b",
+    "src/medagent/web/execution-focus-ui.js": "53b3d21b1638e548801d26bff93e22a1fdf597a95a3614563866258343b6d055",
+    "src/medagent/web/execution-focus.css": "9444df01e37e5cfe794f2281da93bb7a17bfa8266bbdff147a0f26541eedc825",
+    "src/medagent/web/index.html": "2551e7ed4510c82717815709ae10c15d8fb14920112af6fb1f2e68c23c07223c",
+    "scripts/windows/gui-check.mjs": "cef7ac0f1fa5d5ce28bfaef98c071526ddfe730320c4fa21cc8edf7fb1698515",
+    "tests/fixtures/native-artifact-chart.mjs": "0f4c83d4c84a8d2328b7d5e6d645b9c41dd067068b92f67a2cd048532b8d36dc",
+    "tests/fixtures/execution-focus.mjs": "059cbef61a3ae58ed1f8d861d8a3e88b40967f0a51a4e14dd53a6c6e83364cbd",
+    "tests/ui/artifact-chart.spec.mjs": "308e280cb85b84d6138086d9da48efa9a6a476ff8141d7a382dbf43b1ebda10b",
+    "tests/ui/execution-focus.spec.mjs": "659b1b28665f1f3cc42ac1c05d93f298d34f5b40d8bf35597f3fcf8248d3a97b",
+    "tests/unit/artifact-chart.test.mjs": "4ce53639fd805a1c9c00661e24c82805d32123a24b8d88d2169736a682db9639",
+    "tests/desktop/artifact-chart.spec.mjs": "8824e40e7e6b9bd02f02799565ebb71028a3d1af471219735aebcf5a04762860"
+  },
+  "screenshots": {
+    "chart-wide.png": "802c7cf23c6cc490c2c79341358763b28e7b25a7c07488f249a6b22378dfd151",
+    "chart-mobile.png": "e973c4218a905b306f73399539744e0028d9f28571c0dd57c155436c8cfe7870",
+    "chart-small-night.png": "a81ad573d12ff76f4cfa995f4a471f10f9e97e9d1433cf230ed39a5a1820b26d",
+    "native-chart.png": "f3286e4514bf49f250a6d1ec0449002ba1c804142c7f65f3634eeb942a636a51",
+    "condensed-results.png": "52a8622ea1e01d57f205e3fddef5c9d79fa4156d23c874127a3ca4c3f608b405",
+    "location-mobile.png": "4159f0726835a020b6cdab63b5159daa656090cd00e37b151618d9922fe08018",
+    "temperature-mobile.png": "da06e586cdc667c671d36fbf359ec07a53cf8018799cc45f126f28ebae4857e0"
+  }
+}

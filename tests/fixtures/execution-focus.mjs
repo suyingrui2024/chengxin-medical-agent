@@ -47,6 +47,10 @@ export async function installExecutionFocusFixture(page) {
   await page.route("**/api/execution**", async (route) => {
     const url = new URL(route.request().url());
     const parts = url.pathname.split("/").filter(Boolean);
+    if (parts.length > 2 && !states.has(parts[2])) {
+      await route.fallback();
+      return;
+    }
     const state = states.get(parts[2]) || first;
     const operation = parts[3];
     let data;
@@ -136,6 +140,7 @@ export async function openFocusWorkspace(page) {
   if (await page.locator("#mobile-menu").isVisible())
     await page.locator("#mobile-menu").click();
   await page.getByRole("button", { name: "执行工作台", exact: true }).click();
+  await page.locator("#execution-refresh").click();
   await expect(
     page.locator('#execution-workspace option[value="focus-a"]'),
   ).toHaveCount(1);

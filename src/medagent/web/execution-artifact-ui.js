@@ -1,4 +1,5 @@
 // Workspace files are inert snapshots. Neither file text nor model HTML is executed.
+import { numericColumns, renderArtifactChart } from "./artifact-chart-ui.js";
 export function createArtifactPreview(api, getCurrent) {
   const $ = (id) => document.getElementById(id);
   let ticket = 0,
@@ -6,6 +7,8 @@ export function createArtifactPreview(api, getCurrent) {
     content = null,
     unavailable = false,
     source = false,
+    chart = false,
+    chartColumn = null,
     checking = 0,
     lastChecked = 0;
   const empty = "选择文件查看图像、表格或代码。";
@@ -39,6 +42,8 @@ export function createArtifactPreview(api, getCurrent) {
     checking = 0;
     selected = content = null;
     source = false;
+    chart = false;
+    chartColumn = null;
     unavailable = title === "文件暂不可用";
     close();
     $("execution-preview-title").textContent = title;
@@ -66,6 +71,18 @@ export function createArtifactPreview(api, getCurrent) {
         );
       });
       target.append(image);
+    } else if (value.kind === "table" && chart && !source) {
+      target.className = "artifact-preview-chart";
+      const figure = renderArtifactChart(value, chartColumn, (index) => {
+        if (request !== ticket || content !== value || !target.isConnected)
+          return;
+        chartColumn = index;
+        renderInto($("execution-preview"), value, request);
+        if ($("execution-artifact-dialog").open)
+          renderInto($("execution-artifact-large"), value, request);
+        target.querySelector("select")?.focus({ preventScroll: true });
+      });
+      if (figure) target.append(figure);
     } else if (value.kind === "table" && !source) {
       const table = element("table", "artifact-table");
       table.setAttribute("aria-label", value.path);
@@ -173,6 +190,8 @@ export function createArtifactPreview(api, getCurrent) {
     };
     content = null;
     source = false;
+    chart = false;
+    chartColumn = null;
     $("execution-preview-title").textContent = artifact.path;
     $("execution-preview").className = "artifact-preview-empty";
     $("execution-preview").textContent = "正在读取文件…";
@@ -181,6 +200,9 @@ export function createArtifactPreview(api, getCurrent) {
     $("execution-preview-reload").disabled = true;
     $("execution-preview-expand").disabled = true;
     $("execution-preview-source").hidden = true;
+    $("execution-preview-chart").hidden = true;
+    $("execution-preview-chart").textContent = "查看图表";
+    $("execution-preview-chart").setAttribute("aria-pressed", "false");
     markSelection();
     const active = () =>
       ticket === request &&
@@ -198,6 +220,7 @@ export function createArtifactPreview(api, getCurrent) {
       metadata(value);
       $("execution-preview-expand").disabled = false;
       $("execution-preview-source").hidden = value.kind !== "table";
+      $("execution-preview-chart").hidden = !numericColumns(value).length;
       $("execution-preview-source").textContent = "查看原文";
       selected.seenRevision = getCurrent().artifacts.find(
         (a) => a.path === selected.path,
@@ -289,10 +312,22 @@ export function createArtifactPreview(api, getCurrent) {
   $("execution-preview-source").addEventListener("click", () => {
     if (!content) return;
     source = !source;
+    chart = false;
+    $("execution-preview-chart").textContent = "查看图表";
+    $("execution-preview-chart").setAttribute("aria-pressed", "false");
     renderInto($("execution-preview"), content, ticket);
     $("execution-preview-source").textContent = source
       ? "查看表格"
       : "查看原文";
+  });
+  $("execution-preview-chart").addEventListener("click", () => {
+    if (!content || !numericColumns(content).length) return;
+    chart = !chart;
+    source = false;
+    $("execution-preview-source").textContent = "查看原文";
+    $("execution-preview-chart").textContent = chart ? "查看表格" : "查看图表";
+    $("execution-preview-chart").setAttribute("aria-pressed", String(chart));
+    renderInto($("execution-preview"), content, ticket);
   });
   return { open, reset, update };
 }

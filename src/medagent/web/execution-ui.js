@@ -320,14 +320,6 @@ export function createExecutionUI(api) {
   function render(snapshot) {
     current = snapshot;
     for (const event of snapshot.events) events.set(event.sequence, event);
-    $("execution-status").textContent = current.storage_error
-      ? "工作目录不可用"
-      : current.status !== "cancelling" &&
-          current.clarifications?.some((value) => value.status === "pending")
-        ? "需要你核对"
-        : !busy() && hasJobs()
-          ? "后台任务仍在运行"
-          : labels[current.status] || current.status;
     $("execution-directory").textContent =
       current.workspace_kind === "project"
         ? `本地项目 · 文件直接保存到原目录：${current.directory}`
@@ -445,7 +437,30 @@ export function createExecutionUI(api) {
       }
       if (item.kind === "final") {
         const final = node("article", "execution-final");
-        final.append(node("strong", "", item.title), node("p", "", item.text));
+        final.append(node("strong", "", item.title));
+        const characters = Array.from(item.text);
+        if (characters.length > 360 || item.text.split("\n").length > 8) {
+          const excerpt = Array.from(
+            item.text.trimStart().split(/\n\s*\n/, 1)[0],
+          )
+            .slice(0, 120)
+            .join("")
+            .split("\n")
+            .slice(0, 4)
+            .join("\n")
+            .trimEnd();
+          final.append(node("p", "execution-response-preview", `${excerpt}…`));
+          const details = node("details", "execution-response-details");
+          const summary = node("summary", "", "查看完整结果");
+          details.append(
+            summary,
+            node("p", "execution-response-full", item.text),
+          );
+          details.addEventListener("toggle", () => {
+            summary.textContent = details.open ? "收起结果" : "查看完整结果";
+          });
+          final.append(details);
+        } else final.append(node("p", "", item.text));
         result.append(final);
         continue;
       }
@@ -604,6 +619,16 @@ export function createExecutionUI(api) {
     controls();
     clarificationUI.update(current);
     needsReview = Boolean(issues.size && !rechecked);
+    $("execution-status").textContent = current.storage_error
+      ? "工作目录不可用"
+      : current.status !== "cancelling" &&
+          current.clarifications?.some((value) => value.status === "pending")
+        ? "需要你核对"
+        : !busy() && hasJobs()
+          ? "后台任务仍在运行"
+          : current.status === "completed" && needsReview
+            ? "本轮已结束"
+            : labels[current.status] || current.status;
     focusUI.update({ ...current, artifacts: directoryUI.files() }, needsReview);
     artifactPreview.update({ ...current, artifacts: directoryUI.files() });
     changeReview.update(current);

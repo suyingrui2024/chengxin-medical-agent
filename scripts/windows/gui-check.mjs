@@ -13,6 +13,7 @@ import {
   installExecutionFocusFixture,
   openFocusWorkspace,
 } from "../../tests/fixtures/execution-focus.mjs";
+import { verifyNativeArtifactChart } from "../../tests/fixtures/native-artifact-chart.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const scratch = await mkdtemp(join(tmpdir(), "chengxin native gui 中文-"));
 const model = await createGlucoseModel();
@@ -86,6 +87,12 @@ try {
     reopened.locator('input[name="appearance"][value="night"]'),
   ).toBeChecked();
   await reopened.keyboard.press("Escape");
+  const beforeChart = model.requests.length;
+  const chartReceipt = await verifyNativeArtifactChart(
+    reopened,
+    env.MEDAGENT_EXECUTION_ROOT,
+  );
+  assert.equal(model.requests.length, beforeChart);
   const focusFixture = await installExecutionFocusFixture(reopened);
   await openFocusWorkspace(reopened);
   await reopened
@@ -114,6 +121,7 @@ try {
       appearance_themes: themes,
       appearance_restart: "passed",
       execution_focus_ui: "passed (host snapshot fixture)",
+      artifact_chart: chartReceipt,
       profile_path_with_spaces_and_chinese: "passed",
       local_fixture_requests: model.requests.length,
       external_model_calls: 0,

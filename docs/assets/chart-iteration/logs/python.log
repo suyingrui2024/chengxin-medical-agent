@@ -1,0 +1,45 @@
+test_queued_asset_burst_is_served_with_desktop_auth (test_server_asset_burst.AssetBurstTests.test_queued_asset_burst_is_served_with_desktop_auth) ... ok
+test_http_preview_and_image_keep_desktop_auth_and_origin_checks (test_execution_artifacts.ArtifactTests.test_http_preview_and_image_keep_desktop_auth_and_origin_checks) ... ok
+test_link_fifo_traversal_changed_reads_and_replaced_roots_are_rejected (test_execution_artifacts.ArtifactTests.test_link_fifo_traversal_changed_reads_and_replaced_roots_are_rejected) ... ok
+test_png_crc_dimensions_animation_and_payload_limits (test_execution_artifacts.ArtifactTests.test_png_crc_dimensions_animation_and_payload_limits) ... ok
+test_preview_is_offline_and_revisions_detect_same_size_restored_timestamp (test_execution_artifacts.ArtifactTests.test_preview_is_offline_and_revisions_detect_same_size_restored_timestamp) ... ok
+test_static_image_metadata_and_hash_bound_bytes (test_execution_artifacts.ArtifactTests.test_static_image_metadata_and_hash_bound_bytes) ... ok
+test_svg_html_and_fake_image_extensions_never_become_image_payloads (test_execution_artifacts.ArtifactTests.test_svg_html_and_fake_image_extensions_never_become_image_payloads) ... ok
+test_table_truncation_and_bad_csv_are_explicit (test_execution_artifacts.ArtifactTests.test_table_truncation_and_bad_csv_are_explicit) ... ok
+test_tables_preserve_quotes_newlines_and_literal_formula_strings (test_execution_artifacts.ArtifactTests.test_tables_preserve_quotes_newlines_and_literal_formula_strings) ... ok
+test_valid_jpeg_uses_real_fixture_dimensions (test_execution_artifacts.ArtifactTests.test_valid_jpeg_uses_real_fixture_dimensions) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.097s
+
+OK
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /app.js HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus.css HTTP/1.0" 200 -
+[18/Oct/2026 06:03:42] "GET /execution-focus-ui.js HTTP/1.1" 401 -
+[18/Oct/2026 06:03:43] "GET /api/execution/80378ed5-2c31-467b-976b-518c735fbd78/preview?path=plot.png HTTP/1.1" 200 -
+[18/Oct/2026 06:03:43] "GET /api/execution/80378ed5-2c31-467b-976b-518c735fbd78/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 200 -
+[18/Oct/2026 06:03:43] "GET /api/execution/80378ed5-2c31-467b-976b-518c735fbd78/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 401 -
+[18/Oct/2026 06:03:43] "GET /api/execution/80378ed5-2c31-467b-976b-518c735fbd78/image?path=plot.png&sha256=9cffbd57cb593068bb5d85c248f6e1c0aac4df3d5fa8d2e5236c784f4e851904 HTTP/1.1" 403 -
+[18/Oct/2026 06:03:43] "GET /api/execution/80378ed5-2c31-467b-976b-518c735fbd78/image?path=plot.png&sha256=0000000000000000000000000000000000000000000000000000000000000000 HTTP/1.1" 400 -

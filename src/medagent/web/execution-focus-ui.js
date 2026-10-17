@@ -83,7 +83,7 @@ export function createExecutionFocus(getCurrent, openFile) {
         snapshot.status === "starting" ? "正在准备工作区" : "正在处理任务";
     } else if (needsReview || snapshot.status === "failed") {
       kind = "attention";
-      label = "有未完成项，请核对";
+      label = snapshot.status === "failed" ? "本轮尚未完成" : "结果待核对";
     } else if (["cancelled", "interrupted"].includes(snapshot.status)) {
       kind = "stopped";
       label = snapshot.status === "cancelled" ? "任务已停止" : "上次任务已中断";

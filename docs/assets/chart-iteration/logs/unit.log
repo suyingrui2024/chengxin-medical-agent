@@ -1,0 +1,13 @@
+✔ chart cells accept finite decimal numbers without coercing missing, formatted or unsafe values (0.405917ms)
+✔ bars retain original row order, exact labels and values and include the zero baseline (0.36875ms)
+✔ negative, positive and zero bars share one scale without magnitude distortion (0.0895ms)
+✔ missing and ragged numeric columns stay unavailable and are never filled with zero (0.330333ms)
+✔ zero-only and very small signed series remain finite and preserve the source snapshot (0.135542ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32.136834

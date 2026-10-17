@@ -82,6 +82,7 @@ Windows 使用原生 PowerShell 执行命令。上游工具名称仍为 `bash`�
 | `29cea2a`／[39067170248](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39067170248) | Server x64 全部通过，包括源码、便携包、安装后的六套皮肤和重启恢复，以及中文／空格配置目录。Windows 11 日志确认工作目录正确，但根命令退出码为 1：缺少 PATHEXT，PowerShell 将 python.exe 作为文档处理；SDK 上报完成没有产生预期产物 |
 | `96b35f2`／[39069386187](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39069386187) | Server x64 全部通过，构建包含新自检卡片与重绘的体温人物。补上隔离环境固定的原生命令扩展名；新管道探针因未初始化 PowerShell 工作目录而先行失败，没有完整 SDK 通过证据 |
 | `9d5d49c`／[39070074396](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39070074396) | 本轮最终代码：Server 2025 build 26100.33438 x64 的源码、便携包、安装器、快捷方式和卸载检查通过；Windows 11 25H2 build 26200.9457 Arm 运行 x64 应用的原生隔离、源码完整 SDK、随包完整 SDK 及会话接续均通过，便携目录含空格 |
+| `a5d5577`／[39072806249](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39072806249) | 两套任务全部通过：无五官测温图、任务聚焦和文件速览；新增 24 个排队请求的实际静态资源读取检查；Windows 11 源码与打包版完整 SDK 验证真实隔离标签、文件落盘和接续，Server x64 安装卸载通过 |
 
 本轮以宿主实际读取产物为验收依据：根任务运行 Python 将结果写入 `result.txt`，调用随包 npm；子智能体独立核对结果并生成 `review.txt`；交付检查必须退出成功。继续原会话后，旧文件仍可读并生成 `notes.txt`。源码与便携包分别执行这一场景，使用回环合成模型服务，不消耗外部模型 API。
 

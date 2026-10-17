@@ -1,0 +1,129 @@
+.artifact-chart {
+  margin: 0;
+  padding: 16px;
+  color: var(--ink);
+}
+.artifact-chart-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.artifact-chart-column {
+  min-height: 36px;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  padding: 5px 8px;
+}
+.artifact-chart-axis,
+.artifact-chart-row {
+  display: grid;
+  grid-template-columns: minmax(48px, 0.8fr) minmax(64px, 1.8fr) minmax(
+      44px,
+      0.8fr
+    );
+  gap: 8px;
+  align-items: center;
+}
+.artifact-chart-axis {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--light);
+  padding-block: 4px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.artifact-chart-range {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.artifact-chart-range span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.artifact-chart-label-heading {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.artifact-chart-points {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.artifact-chart-scroll {
+  max-height: 380px;
+  overflow: auto;
+}
+.artifact-chart-row {
+  min-height: 34px;
+  font-size: 12px;
+}
+.artifact-chart-label,
+.artifact-chart-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.artifact-chart-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.artifact-chart-track {
+  position: relative;
+  min-width: 0;
+  height: 24px;
+  background: var(--light);
+  border-radius: 3px;
+}
+.artifact-chart-zero {
+  position: absolute;
+  width: 1px;
+  top: -5px;
+  bottom: -5px;
+  background: var(--line-strong);
+}
+.artifact-chart-bar {
+  position: absolute;
+  top: 4px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+.artifact-chart-bar.is-negative {
+  background: var(--info);
+}
+.artifact-chart-caption {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 14px;
+  line-height: 1.6;
+}
+#execution-preview.artifact-preview-chart {
+  padding: 0;
+  max-height: none;
+}
+.artifact-controls button[aria-pressed="true"] {
+  color: var(--primary);
+  background: var(--light);
+  border-color: var(--primary);
+}
+.artifact-chart-scroll:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}

@@ -163,3 +163,13 @@
   top: 0;
   left: 0;
 }
+.execution-final:has(.execution-response-details[open])
+  > .execution-response-preview {
+  display: none;
+}
+.execution-response-details > summary {
+  color: var(--primary);
+  font-size: 12px;
+  cursor: pointer;
+  padding-block: 6px;
+}
