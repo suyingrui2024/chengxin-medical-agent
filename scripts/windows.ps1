@@ -147,6 +147,7 @@ try {
         } elseif ($Mode -eq 'Build') {
             Invoke-ChengxinCommand $node @('scripts/build-desktop.mjs')
         } elseif ($Mode -eq 'Test') {
+            & (Join-Path $projectRoot 'tests\windows-installer.ps1')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_native.py')
         } elseif ($Live) {
             Invoke-ChengxinPython (Join-Path $PSScriptRoot 'start_live_desktop.py')

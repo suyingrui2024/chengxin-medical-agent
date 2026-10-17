@@ -8,6 +8,32 @@
 
 Python 3.10+；DSH 模式另需 Node 22.19+。以下命令从项目根目录运行。
 
+### Windows 原生环境（适配验证中）
+
+Windows 使用独立的 Python、Node 和 Electron，直接显示原生 Windows 桌面窗口，无需 WSL。当前目标 Windows 10 19044+／Windows 11 x64。首次配置在项目根目录的普通 PowerShell 中运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Setup
+# 启动离线演示
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start
+# 重新检查原生运行时、DSH、后端鉴权与实际窗口
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Check
+# Win32 文件／进程回归
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Test
+```
+
+安装脚本下载 SHA256 固定的 Windows Python 3.14.8 与 Node 22.23.3 到 `.runtime/windows`，安装锁定依赖和 Electron，检查成功后创建桌面快捷方式。不修改系统 PATH，不要求预装 Windows Python、Node、Conda 或 pip。首次下载需要网络。
+
+真实问诊可在界面配置模型；也可在原项目根目录自行填写 `.env` 后显式启动：
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+notepad .env
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start -Live
+```
+
+Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。当前仍在进行 Windows 实际验证，通用执行工作台的原生隔离也在接续中；不能把 Linux 通过的结果当成 Windows 已验收。进展以 `windows-native` 分支及 Windows 验收记录为准。
+
 ### 独立桌面应用（推荐）
 
 当前电脑直接双击桌面的 **“澄心问诊”** 图标；会自动打开独立应用窗口，无需浏览器或手动启动服务。也可运行：
