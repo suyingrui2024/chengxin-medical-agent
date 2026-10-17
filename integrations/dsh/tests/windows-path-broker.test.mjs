@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { createPathResolver } from "../../windows/path-broker.mjs";
+import runnerAdapter from "../../windows/runner-adapter.cjs";
 
 test("path metadata rejects siblings, escaping links and undeclared files", async () => {
   const root = await mkdtemp(join(tmpdir(), "chengxin-path-"));
@@ -127,7 +128,7 @@ test("native realpath adapter preserves sync, callback, promise and error result
       env: {
         ...process.env,
         CHENGXIN_PATH_BROKER: `http://127.0.0.1:${server.address().port}/metadata`,
-        DEEPSEEK_API_KEY: "path-fixture",
+        CHENGXIN_PATH_BROKER_AUTH: "path-fixture",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -152,6 +153,79 @@ test("native realpath adapter preserves sync, callback, promise and error result
     child?.kill();
     server.closeAllConnections();
     await new Promise((resolve) => server.close(resolve));
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("only the trusted Job runner receives the preload after NODE_OPTIONS is scrubbed", async () => {
+  const root = await mkdtemp(join(tmpdir(), "chengxin-runner with spaces-"));
+  const runner = join(root, "runner.cjs"),
+    preload = join(root, "preload.cjs");
+  let child;
+  try {
+    await writeFile(preload, "global.chengxinRuntimeReady = true;");
+    await writeFile(
+      runner,
+      `process.send({ready:global.chengxinRuntimeReady, argv:process.argv.slice(2), hasProviderKey:Boolean(process.env.DEEPSEEK_API_KEY), nodeOptions:process.env.NODE_OPTIONS || ''}); process.disconnect();`,
+    );
+    const options = {
+      env: {
+        SystemRoot: process.env.SystemRoot,
+        CHENGXIN_PATH_BROKER_AUTH: "metadata-only-fixture",
+      },
+      stdio: ["ignore", "pipe", "pipe", "ipc"],
+      windowsHide: true,
+    };
+    let seen;
+    const inspect = runnerAdapter.adaptRunnerSpawn(
+      (...args) => {
+        seen = args;
+      },
+      { node: process.execPath, runner, preload },
+    );
+    const ordinary = ["-e", "console.log(42)"];
+    inspect(process.execPath, ordinary, options);
+    assert.equal(seen[1], ordinary);
+    assert.equal(seen[2], options);
+    const prefixSibling = [runner + ".untrusted", "--"];
+    inspect(process.execPath, prefixSibling, options);
+    assert.equal(seen[1], prefixSibling);
+    const arguments_ = [runner, "--", "command with spaces", "中文"];
+    inspect(process.execPath, arguments_, options);
+    assert.equal(seen[2], options);
+    assert.deepEqual(arguments_, [runner, "--", "command with spaces", "中文"]);
+    const adapted = runnerAdapter.adaptRunnerSpawn(spawn, {
+      node: process.execPath,
+      runner,
+      preload,
+    });
+    child = adapted(process.execPath, arguments_, options);
+    let stderr = "";
+    child.stderr.on("data", (value) => {
+      stderr += value;
+    });
+    const message = new Promise((resolve, reject) => {
+      child.once("message", resolve);
+      child.once("error", reject);
+      child.once("exit", () =>
+        reject(new Error("Runner exited without IPC: " + stderr)),
+      );
+    });
+    const exit = new Promise((resolve) => child.once("exit", resolve));
+    const timer = setTimeout(() => child.kill(), 15000);
+    try {
+      assert.deepEqual(await message, {
+        ready: true,
+        argv: arguments_.slice(1),
+        hasProviderKey: false,
+        nodeOptions: "",
+      });
+      assert.equal(await exit, 0, stderr);
+    } finally {
+      clearTimeout(timer);
+    }
+  } finally {
+    child?.kill();
     await rm(root, { recursive: true, force: true });
   }
 });

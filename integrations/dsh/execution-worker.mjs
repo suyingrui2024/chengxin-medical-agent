@@ -28,6 +28,9 @@ let config,
 let resolveNativePath,
   metadataCalls = 0;
 const token = randomBytes(32).toString("hex");
+// This grant can only query approved path/directory metadata. It cannot call a
+// model or another host tool, and survives the SDK's child credential scrub.
+const metadataAuth = randomBytes(32).toString("hex");
 let sequence = 0,
   calls = 0,
   lifetimeCalls = 0;
@@ -71,7 +74,7 @@ const clarifications = new ClarificationBroker({
 });
 function redact(value) {
   let serialized = JSON.stringify(value);
-  for (const secret of [config?.api_key, token])
+  for (const secret of [config?.api_key, token, metadataAuth])
     if (secret) serialized = serialized.replaceAll(secret, "[REDACTED]");
   return serialized;
 }
@@ -650,12 +653,15 @@ async function proxy(request, response) {
     request.headers["x-api-key"] ||
     request.headers.authorization?.replace(/^Bearer /, "") ||
     "";
+  const metadataRequest =
+    request.method === "POST" && request.url === "/model/runtime/realpath";
+  const expected = metadataRequest ? metadataAuth : token;
   if (
-    Buffer.byteLength(supplied) !== token.length ||
-    !timingSafeEqual(Buffer.from(supplied), Buffer.from(token))
+    Buffer.byteLength(supplied) !== expected.length ||
+    !timingSafeEqual(Buffer.from(supplied), Buffer.from(expected))
   )
     return errorResponse(response, 401);
-  if (request.method === "POST" && request.url === "/model/runtime/realpath") {
+  if (metadataRequest) {
     if (!resolveNativePath) return errorResponse(response, 404);
     if (++metadataCalls > 65536) return errorResponse(response, 429);
     const chunks = [];
@@ -850,6 +856,7 @@ async function makeHarness() {
             CHENGXIN_PYTHON: config.python,
             CHENGXIN_NATIVE_PATCH: config.native_patch,
             CHENGXIN_PATH_BROKER: `http://127.0.0.1:${gateway.address().port}/model/runtime/realpath`,
+            CHENGXIN_PATH_BROKER_AUTH: metadataAuth,
           }
         : {}),
       ...Object.fromEntries(

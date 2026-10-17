@@ -2,7 +2,7 @@
 // gateway when the Windows containment API cannot query a volume's path name.
 // This returns metadata only; opening/reading/writing still uses the OS sandbox.
 const fs = require("node:fs");
-const { resolve } = require("node:path");
+const { resolve, join } = require("node:path");
 const { fileURLToPath } = require("node:url");
 const { Worker } = require("node:worker_threads");
 const { syncBuiltinESMExports } = require("node:module");
@@ -23,6 +23,8 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
     url.password
   )
     throw new Error("Invalid native path metadata gateway");
+  const runnerAdapter =
+    process.platform === "win32" ? require("./runner-adapter.cjs") : null;
   const statPrototypes = {
     number: fs.Stats.prototype,
     bigint: Object.getPrototypeOf(fs.statSync(__filename, { bigint: true })),
@@ -101,7 +103,11 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
       eval: true,
       execArgv: [],
       env: { ...process.env, CHENGXIN_PATH_BROKER_WORKER: "1" },
-      workerData: { shared, endpoint, token: process.env.DEEPSEEK_API_KEY },
+      workerData: {
+        shared,
+        endpoint,
+        token: process.env.CHENGXIN_PATH_BROKER_AUTH,
+      },
     });
     worker.on("error", () => {});
     worker.unref();
@@ -207,5 +213,16 @@ if (endpoint && !process.env.CHENGXIN_PATH_BROKER_WORKER) {
   fs.realpathSync = canonical;
   fs.realpath = asynchronous;
   fs.promises.realpath = async (path, options) => canonical(path, options);
+  if (process.platform === "win32") {
+    const subprocess = require("node:child_process");
+    subprocess.spawn = runnerAdapter.adaptRunnerSpawn(subprocess.spawn, {
+      node: process.execPath,
+      runner: join(
+        __dirname,
+        "../../node_modules/@deepseek-ai/dsh-subprocess-local/lib/runner.js",
+      ),
+      preload: __filename,
+    });
+  }
   syncBuiltinESMExports();
 }

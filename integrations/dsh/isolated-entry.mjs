@@ -145,6 +145,7 @@ if (
               CHENGXIN_PYTHON: process.env.CHENGXIN_PYTHON,
               CHENGXIN_NATIVE_PATCH: process.env.CHENGXIN_NATIVE_PATCH,
               CHENGXIN_PATH_BROKER: process.env.CHENGXIN_PATH_BROKER,
+              CHENGXIN_PATH_BROKER_AUTH: process.env.CHENGXIN_PATH_BROKER_AUTH,
             }
           : {}),
         ...Object.fromEntries(
