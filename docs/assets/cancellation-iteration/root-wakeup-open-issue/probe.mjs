@@ -22,7 +22,7 @@ const server=createServer(async(req,res)=>{
  if(res.destroyed)return;res.writeHead(200,{'Content-Type':'text/event-stream'});res.end(events.map(e=>'event: '+e.type+'\ndata: '+JSON.stringify(e)+'\n\n').join(''));
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const child=spawn(process.execPath,['--no-warnings','--loader',new URL('./sdk-loader.mjs',import.meta.url).href,new URL('../../integrations/dsh/execution-worker.mjs',import.meta.url).pathname],{stdio:['pipe','pipe','pipe'],env:{...process.env,NODE_OPTIONS:''}});
+const child=spawn(process.execPath,['--no-warnings','--loader',new URL('./sdk-loader.mjs',import.meta.url).href,new URL('../../../../integrations/dsh/execution-worker.mjs',import.meta.url).pathname],{stdio:['pipe','pipe','pipe'],env:{...process.env,NODE_OPTIONS:''}});
 const exited=new Promise(r=>child.once('exit',r));const lines=createInterface({input:child.stdout});const events=[];const waiters=new Set();let diagnostic='';
 child.stderr.on('data',b=>diagnostic+=b.toString());lines.on('line',l=>{const v=JSON.parse(l);events.push(v);for(const f of waiters)f(v);});
 const waitFor=(match,timeout=15000)=>new Promise((resolve,reject)=>{const prior=events.find(match);if(prior)return resolve(prior);const timer=setTimeout(()=>{waiters.delete(check);reject(new Error('Missing expected event'));},timeout);const check=e=>{if(!match(e)&&e.type!=='worker.error')return;clearTimeout(timer);waiters.delete(check);if(match(e))resolve(e);else reject(new Error(JSON.stringify(e)));};waiters.add(check);});

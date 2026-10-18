@@ -11,6 +11,7 @@ import { execFile } from "node:child_process";
 import { createPathResolver } from "../windows/path-broker.mjs";
 import { hasActiveJobs, observationKey } from "./execution-observations.mjs";
 import { ClarificationBroker } from "./execution-clarifications.mjs";
+import { runOwnedPrompt } from "./execution-prompt.mjs";
 import { checkArguments } from "./execution-delivery-contract.mjs";
 import {
   ExecutionOwnership,
@@ -337,13 +338,18 @@ function errorResponse(response, code) {
     }),
   );
 }
-function control(method, path, scope) {
+function control(method, path, options = {}) {
   // Both platforms reuse the already-owned SDK pipe; no extra listener or
   // host-to-container loopback capability is required for lifecycle control.
   return harness.client
     .request(
       "chengxin/control",
-      { method, path, ...(scope ? { scope } : {}) },
+      {
+        method,
+        path,
+        ...(options.scope ? { scope: options.scope } : {}),
+        ...(options.admission ? { admission: options.admission } : {}),
+      },
       7000,
     )
     .then((result) => {
@@ -738,6 +744,51 @@ async function proxy(request, response) {
     response.end(JSON.stringify(result));
     return;
   }
+  if (request.method === "POST" && request.url === "/model/admission") {
+    const sessionId = request.headers["x-chengxin-session-id"];
+    if (sessionId !== config.id) return errorResponse(response, 400);
+    const chunks = [];
+    let size = 0;
+    for await (const chunk of request) {
+      size += chunk.length;
+      if (size > 1024) return errorResponse(response, 413);
+      chunks.push(chunk);
+    }
+    try {
+      const value = JSON.parse(Buffer.concat(chunks));
+      const owner = ownership.forTurn(value?.task_id);
+      const admitted =
+        owner &&
+        !owner.cancelled &&
+        Date.now() < owner.deadline &&
+        Number.isSafeInteger(value?.turn) &&
+        value.turn > 0 &&
+        ownership.admitRootTurn(config.id, value.turn, owner);
+      response.writeHead(admitted ? 200 : 409, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ ok: Boolean(admitted) }));
+    } catch {
+      errorResponse(response, 400);
+    }
+    return;
+  }
+  if (
+    request.method === "GET" &&
+    request.url.startsWith("/model/admission/owner?")
+  ) {
+    const requester = request.headers["x-chengxin-session-id"];
+    const url = new URL(request.url, "http://runtime.local");
+    const sessionId = url.searchParams.get("session_id") || "";
+    if (
+      requester !== config.id ||
+      sessionId.length > 256 ||
+      /[\x00-\x20\x7f]/.test(sessionId)
+    )
+      return errorResponse(response, 400);
+    const owner = ownership.forSession(sessionId);
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ task_id: owner?.id || null }));
+    return;
+  }
   const scoped = scopedModelRequest(request.url);
   if (scoped) {
     if (
@@ -1101,6 +1152,7 @@ async function cancelGrant(owned) {
       (pending) => pending.owned === owned,
     );
   owned.cancelled = true;
+  owned.abort?.abort();
   clearTimeout(owned.timer);
   clarifications.cancel(
     owned.id,
@@ -1143,7 +1195,7 @@ async function cancelGrant(owned) {
         turn_id: owned.id,
         time_budget_seconds: owned.timeBudgetSeconds,
       });
-    await control("POST", "/cancel", scope);
+    await control("POST", "/cancel", { scope });
     if (!wasActive && owned.timedOut && work)
       emit("turn.work_stopped", {
         turn_id: owned.id,
@@ -1170,7 +1222,10 @@ async function cancel() {
     null,
     ownedBudget?.timedOut ? "time_budget_exhausted" : "user_cancelled",
   );
-  if (active || lease) (active || lease).cancelled = true;
+  if (active || lease) {
+    (active || lease).cancelled = true;
+    (active || lease).abort?.abort();
+  }
   ownership.cancelAll();
   for (const abort of upstreamRequests.keys()) abort.abort();
   stopping = control("POST", "/cancel").catch(async () => {
@@ -1311,6 +1366,7 @@ async function run(payload) {
   active = {
     id: payload.id,
     cancelled: false,
+    abort: new AbortController(),
     maxCalls: payload.max_calls,
     timeBudgetSeconds: seconds,
     modelCalls: 0,
@@ -1344,10 +1400,19 @@ async function run(payload) {
       await harness.start();
       observeRuntime();
     }
+    const promptOwned = (text) =>
+      runOwnedPrompt({
+        client: harness.client,
+        sessionId: config.id,
+        text,
+        taskId: owned.id,
+        register: (taskId) =>
+          control("POST", "/admission", { admission: { task_id: taskId } }),
+        ownerForTurn: (turn) => ownership.forSdkTurn(config.id, turn)?.id,
+        signal: owned.abort.signal,
+      });
     const guidance = `\n\n[执行上下文] 本轮主任务、子智能体和辅助搜索合计最多 ${owned.maxCalls} 次模型请求；为实际运行、保存要求的产物和最终回复留出调用。批量读取相关文件，执行有针对性的检查；通过后及时收尾。简单任务无需额外委托。用户要求委托或任务需要分工时，提前安排范围明确的子任务；下一步依赖其结果时设置 run_in_background=false，避免父子重复检查与 sleep 轮询。`;
-    let result = await harness.run(payload.text + guidance, {
-      sessionId: config.id,
-    });
+    let result = await promptOwned(payload.text + guidance);
     const collectDeclarations = (value) => {
       // The tree subscription can lag behind run(); canonical returned events
       // provide a second, idempotent source for root declarations.
@@ -1376,9 +1441,8 @@ async function run(payload) {
         attempt: 1,
         remaining_calls: Math.min(owned.maxCalls - calls, 200 - lifetimeCalls),
       });
-      result = await harness.run(
+      result = await promptOwned(
         "[执行恢复] 上一次模型输出达到单次上限，原任务尚未完成。继续本轮最初的用户任务，已有文件和工具结果仍在当前会话。不要重做已完成的工作；按较小步骤调用工具、写入或修改必要文件并实际验证。不要长篇推演或增加任务外审计。共享调用预算与截止时间未重置；只允许这一次自动恢复，完成后简短报告真实结果。",
-        { sessionId: config.id },
       );
       collectDeclarations(result);
     }
@@ -1487,7 +1551,7 @@ async function run(payload) {
           exit_code,
         })),
       });
-      result = await harness.run(
+      result = await promptOwned(
         "[交付检查纠错] 本轮已声明的检查尚未解决：" +
           JSON.stringify(
             unresolved.map(
@@ -1509,7 +1573,6 @@ async function run(payload) {
             ),
           ) +
           "。检查命令与实际输出保留在当前会话。stale表示检查通过后依赖文件已改变，需用原命令和至少原watch范围复验；inputs是检查开始和结束都须保持不变的输入范围，必须保留并复验，不包含生成的输出。退出0或缺失inputs版本证明不能沿用旧通过。遵守原用户的文件保护、授权与任务范围；只要求检查报告时不得扩展为修改。先判断实现、测试预期或当前版本API是否有误，在授权范围内修正后用原delivery_check命令复验。不得用无关命令或缩小watch替代，也不能隐藏失败。若范围、预算或时间不足，请如实说明未完成。调用额度和截止时间未重置，只允许本次自动纠错。",
-        { sessionId: config.id },
       );
       collectDeclarations(result);
       unresolved = await failedChecks();

@@ -175,6 +175,7 @@ try {
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_server_asset_burst.py')
         } elseif ($Mode -eq 'ExecutionTest') {
             Invoke-ChengxinCommand $node @('scripts/windows/isolation-check.mjs')
+            Invoke-ChengxinCommand $node @('integrations/dsh/tests/root-wakeup-runtime.mjs')
             Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_execution.py')
         } elseif ($Live) {
             Invoke-ChengxinPython (Join-Path $PSScriptRoot 'start_live_desktop.py')

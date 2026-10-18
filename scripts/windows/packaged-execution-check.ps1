@@ -15,6 +15,8 @@ $originalApplication = (Resolve-Path -LiteralPath $ApplicationDirectory).Path
 $application = $originalApplication
 $moved = $false
 $oldPath = $env:PATH
+$oldPython = $env:MEDAGENT_PYTHON
+$oldExecutionRoot = $env:CHENGXIN_EXECUTION_ROOT
 try {
     if ($PathWithSpaces) {
         $application = Join-Path (Split-Path -Parent $originalApplication) ('Chengxin app with spaces ' + [Guid]::NewGuid().ToString('N'))
@@ -28,10 +30,15 @@ try {
         if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Missing packaged runtime: $file" }
     }
     $env:PATH = $nodeRoot + ';' + (Split-Path -Parent $python) + ';' + $oldPath
+    $env:MEDAGENT_PYTHON = $python
+    $env:CHENGXIN_EXECUTION_ROOT = $packageRoot
     $bootstrap = 'import runpy,sys;sys.path.insert(0,sys.argv.pop(1));p=sys.argv.pop(1);sys.argv[0]=p;runpy.run_path(p,run_name="__main__")'
     Invoke-ChengxinCommand $python @('-I', '-X', 'utf8', '-c', $bootstrap, (Join-Path $packageRoot 'src'), (Join-Path $projectRoot 'tests/test_windows_execution.py'))
+    Invoke-ChengxinCommand (Join-Path $nodeRoot 'node.exe') @((Join-Path $projectRoot 'integrations/dsh/tests/root-wakeup-runtime.mjs'))
     @{passed=$true; packaged_execution=$true; python=$python; node=(Join-Path $nodeRoot 'node.exe'); source=$packageRoot} | ConvertTo-Json -Compress
 } finally {
     $env:PATH = $oldPath
+    $env:MEDAGENT_PYTHON = $oldPython
+    $env:CHENGXIN_EXECUTION_ROOT = $oldExecutionRoot
     if ($moved) { Move-Item -LiteralPath $application -Destination $originalApplication }
 }

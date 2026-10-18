@@ -4,11 +4,13 @@ import { randomUUID } from "node:crypto";
 import { observeTool } from "./execution-observations.mjs";
 import { mergeCheckRequirement } from "./execution-delivery.mjs";
 import { registerControl } from "./execution-control-channel.mjs";
+import { createRootAdmission } from "./execution-admission.mjs";
 import { sessionHeaders } from "./execution-ownership.mjs";
 import { cancelRuntime } from "./execution-cancellation.mjs";
 export const name = "chengxin-execution-control";
 export const inject = ["agents", "jobs", "systemPrompt", "tools"];
 export async function apply(ctx) {
+  const admission = createRootAdmission(ctx);
   const epoch = randomUUID(),
     calls = new Map(),
     observations = [];
@@ -98,7 +100,8 @@ export async function apply(ctx) {
     },
     { prepend: true },
   );
-  const handle = async (method, path, scope) => {
+  const handle = async (method, path, control = {}) => {
+    const { scope, admission: requestAdmission } = control;
     const url = new URL(path, "http://runtime.local");
     if (method === "GET" && url.pathname === "/status") {
       const requested = Number(url.searchParams.get("after") || 0);
@@ -136,6 +139,14 @@ export async function apply(ctx) {
     }
     if (method === "GET" && path === "/health") {
       return { status: 200, body: "ready" };
+    }
+    if (method === "POST" && path === "/admission") {
+      try {
+        admission.register(requestAdmission?.task_id);
+        return { status: 200, body: "admitted" };
+      } catch {
+        return { status: 400, body: "Invalid prompt admission" };
+      }
     }
     if (method !== "POST" || path !== "/cancel") {
       return { status: 404, body: "" };

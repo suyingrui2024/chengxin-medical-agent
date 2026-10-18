@@ -24,5 +24,15 @@ export async function dispatchControl(root, parameters) {
     (parameters.method !== "POST" || parameters.path !== "/cancel")
   )
     throw new Error("Cancellation scope requires the stop endpoint");
-  return handler(parameters.method, parameters.path, parameters.scope);
+  if (
+    parameters.admission !== undefined &&
+    (parameters.method !== "POST" || parameters.path !== "/admission")
+  )
+    throw new Error("Prompt admission requires the admission endpoint");
+  if (parameters.scope !== undefined && parameters.admission !== undefined)
+    throw new Error("Control request has conflicting payloads");
+  return handler(parameters.method, parameters.path, {
+    scope: parameters.scope,
+    admission: parameters.admission,
+  });
 }

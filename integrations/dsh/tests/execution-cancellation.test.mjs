@@ -115,7 +115,20 @@ test("the private control channel transports scope and rejects scope on other en
     assert.deepEqual(
       (await dispatchControl(root, { method: "POST", path: "/cancel", scope }))
         .received,
-      scope,
+      { scope, admission: undefined },
+    );
+    assert.deepEqual(
+      (
+        await dispatchControl(root, {
+          method: "POST",
+          path: "/admission",
+          admission: { task_id: "11111111-1111-4111-8111-111111111111" },
+        })
+      ).received,
+      {
+        scope: undefined,
+        admission: { task_id: "11111111-1111-4111-8111-111111111111" },
+      },
     );
     await assert.rejects(
       dispatchControl(root, { method: "GET", path: "/status", scope }),

@@ -9,6 +9,7 @@ export class ExecutionOwnership {
     this.waiters = new Map();
     this.canonicalTurns = new Map();
     this.parentOwners = new Map();
+    this.rootRequestOwners = new Map();
   }
   remember(owner) {
     this.turns.set(owner.id, owner);
@@ -39,6 +40,14 @@ export class ExecutionOwnership {
     this.canonicalTurns.set(JSON.stringify([session, turn]), owner.id);
     if (this.canonicalTurns.size > 4096)
       this.canonicalTurns.delete(this.canonicalTurns.keys().next().value);
+  }
+  admitRootTurn(session, turn, owner) {
+    if (session !== this.root() || !owner) return false;
+    this.recordTurn(session, turn, owner);
+    this.rootRequestOwners.set(session, owner.id);
+    if (this.rootRequestOwners.size > 64)
+      this.rootRequestOwners.delete(this.rootRequestOwners.keys().next().value);
+    return true;
   }
   eventOwner(session, event) {
     const key = JSON.stringify([session, event?.data?.turn]);
@@ -86,6 +95,10 @@ export class ExecutionOwnership {
         waiting.add(finish);
         this.waiters.set(id, waiting);
       });
+    }
+    if (id === this.root()) {
+      const admitted = this.forTurn(this.rootRequestOwners.get(id));
+      return admitted || this.forSession(id);
     }
     return this.forSession(id);
   }

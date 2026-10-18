@@ -1,27 +1,26 @@
 {
-  "schema": "root-wakeup-ownership-open-issue/v1",
-  "status": "reproduced_unfixed",
-  "tested_code_commit": "ec39f44b1a43143036b82e788cb1df0630341ba0",
+  "schema": "root-wakeup-ownership-resolution/v1",
+  "status": "resolved_locally_pending_windows",
+  "tested_code_commit": "working-tree-root-wakeup-admission",
   "scope": "Actual SDK with deterministic loopback provider replies, macOS investigation launcher without outer filesystem isolation. No external model calls.",
-  "finding": "The original three-call grant is exhausted by two root requests plus one child request. With no follow-up, the completion wakeup causes no additional provider request. After an independent eight-call follow-up acknowledgement, the original child completes normally, but its root wakeup takes a second request from the new grant and is labelled with the new turn ID.",
+  "finding": "The root inbox now binds a foreground prompt or child settlement to its original task before prompt assembly and before a provider request. The original three-call task remains limited to its two root requests and one child request. After a separate follow-up completes, the old child settlement cannot take a second provider request from that newer task.",
   "asserted_pair": {
-    "control_root_provider_requests": 2,
-    "control_child_provider_requests": 1,
-    "followup_root_provider_requests": 4,
-    "followup_child_provider_requests": 1,
-    "new_grant_requests": 2,
-    "new_grant_direct_acknowledgements": 1
+    "control_original_task_requests": 3,
+    "control_child_requests": 1,
+    "followup_original_task_requests": 3,
+    "followup_child_requests": 1,
+    "followup_new_task_requests": 1,
+    "followup_new_task_direct_acknowledgements": 1,
+    "followup_old_completion_requests_charged_to_new_task": 0
   },
-  "distinction": "Selective timeout cancellation is fixed by this iteration; shared-root completion wakeup causal ownership remains unfixed. This probe contains no file-writing tool and lets the original child finish in its already-reserved third call.",
-  "next_work": "Bind wakeup admission to canonical SDK message source and original task, covering queued notices and mixed active-root steering without borrowing another grant.",
-  "replay": "Copy the three mjs files together to a fresh directory two levels below the repository root; run probe.mjs and probe.mjs --followup. The original task has three calls; the independent follow-up has eight calls and 30 seconds.",
+  "distinction": "Selective timeout cancellation remains separately covered by the surrounding cancellation record. This probe contains no file-writing tool and isolates shared-root task attribution; the deterministic provider is local and no external model is called.",
+  "next_work": "Run the full native Windows matrix for this source revision. Tool-job completion notices remain fail-closed unless their source can be canonically attributed; no unlabelled notice may borrow the current task budget.",
+  "replay": "Run probe.mjs and probe.mjs --followup from this repository. The original task has three calls; the independent follow-up has eight calls and 30 seconds. The scripts resolve the repository root from their own directory.",
   "artifacts_sha256": {
-    "child-control-events.json": "d1e2c3ded913184bcb2d7bb074f7c6d1bd1bd30e264f9b5198c78dd102d6c3cc",
-    "child-followup-events.json": "c56e2e9fcaa09a9515041d8af0d369aa2cf899f8e4136531d79328674c27ccf0",
-    "control.log": "c3a6f6dc564ccd4995be974a549581c87ab6512c8ee961bd5a40f940133ed676",
-    "followup.log": "2b892dff3404330c1c82210b904e8b7d3a5fc4fb3072adaf6a581a298dfcb560",
-    "native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
-    "probe.mjs": "83558ae3465f69055a16a4b1fb8b8ad84550de05edcd898f5e5be2c70617383f",
+    "child-control-events.json": "1d4a5de9d92360c99ee4124da0a98b71ed42a6fadd8142a12a707c026ed4c50d",
+    "child-followup-events.json": "3c8b8871e484bbbee4cc22816fe934842ba7f69a3fae9335f0f01507c27f7e9a",
+    "native-sdk.mjs": "11b8a914bbfd94192b139e2238158b3da0f8c07e00fd6a5382a56341f2d280e8",
+    "probe.mjs": "b6c23848a343889112331db479a3e40e1d30c51baa985b3265b44bbea07859f8",
     "sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4"
   }
 }
