@@ -1,12 +1,50 @@
 name: Native Windows desktop
 on:
   workflow_dispatch:
+    inputs:
+      deadline_diagnostic:
+        description: Run only the source deadline investigation; not full Windows acceptance
+        type: boolean
+        default: false
   push:
     branches: [windows-native]
 permissions:
   contents: read
 jobs:
+  deadline-diagnostic:
+    if: ${{ inputs.deadline_diagnostic }}
+    name: Windows 11 command deadline investigation (source only)
+    runs-on: windows-11-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Restore verified native dependencies
+        id: runtime-cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            .runtime/windows
+            node_modules
+          key: native-windows-v1-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'scripts/windows/runtime-lock.json', 'scripts/windows.ps1') }}
+      - name: Verify native runtimes and real desktop
+        shell: powershell
+        run: |
+          if ('${{ steps.runtime-cache.outputs.cache-hit }}' -eq 'true') {
+            ./scripts/windows.ps1 -Mode Check
+          } else {
+            ./scripts/windows.ps1 -Mode Setup -NoShortcut
+          }
+      - name: Investigate original and independent command deadlines
+        shell: powershell
+        run: |
+          $env:PATH = (Join-Path $PWD '.runtime/windows/node') + ';' + $env:PATH
+          $env:PYTHONPATH = Join-Path $PWD 'src'
+          & ./.runtime/windows/node/node.exe scripts/windows/isolation-check.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ./.runtime/windows/python/python.exe -m unittest tests.test_windows_execution.WindowsExecutionTests.test_original_command_deadline_survives_an_independent_followup -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
   windows:
+    if: ${{ !inputs.deadline_diagnostic }}
     name: ${{ matrix.name }}
     strategy:
       fail-fast: false

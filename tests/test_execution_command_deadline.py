@@ -18,6 +18,7 @@ def exercise_command_deadline(owner):
     def command(seconds, path):
         if native:
             return (
+                f"[IO.File]::WriteAllText((Join-Path $PWD.Path '{path}.started'), 'started'); "
                 f"Start-Sleep -Seconds {seconds}; "
                 f"'finished' | Set-Content -Encoding UTF8 {path}"
             )
@@ -48,7 +49,10 @@ def exercise_command_deadline(owner):
                 owner.assertEqual(
                     session.status, "completed",
                     json.dumps({"status": session.status, "error": session.error,
-                                "events": list(session.events)[-60:], "jobs": session.jobs}, ensure_ascii=False),
+                                "events": list(session.events)[-60:], "jobs": session.jobs,
+                                "artifacts": {name: (session.directory / name).read_text(encoding="utf-8-sig")
+                                              for name in ["old-late.txt", "old-late.txt.started", "followup.txt", "followup.txt.started"]
+                                              if (session.directory / name).is_file()}}, ensure_ascii=False),
                 )
 
             try:
@@ -69,7 +73,10 @@ def exercise_command_deadline(owner):
                     owner.assertIs(session.process, process)
                     owner.assertTrue(
                         (session.directory / "followup.txt").exists(),
-                        json.dumps({"events": list(session.events)[-60:], "jobs": session.jobs}, ensure_ascii=False),
+                        json.dumps({"events": list(session.events)[-60:], "jobs": session.jobs,
+                                "artifacts": {name: (session.directory / name).read_text(encoding="utf-8-sig")
+                                              for name in ["old-late.txt", "old-late.txt.started", "followup.txt", "followup.txt.started"]
+                                              if (session.directory / name).is_file()}}, ensure_ascii=False),
                     )
                     owner.assertEqual(
                         (session.directory / "followup.txt").read_text(encoding="utf-8-sig").strip(),
@@ -84,7 +91,10 @@ def exercise_command_deadline(owner):
                     owner.assertEqual(
                     session.status, "completed",
                     json.dumps({"status": session.status, "error": session.error,
-                                "events": list(session.events)[-60:], "jobs": session.jobs}, ensure_ascii=False),
+                                "events": list(session.events)[-60:], "jobs": session.jobs,
+                                "artifacts": {name: (session.directory / name).read_text(encoding="utf-8-sig")
+                                              for name in ["old-late.txt", "old-late.txt.started", "followup.txt", "followup.txt.started"]
+                                              if (session.directory / name).is_file()}}, ensure_ascii=False),
                 )
                     owner.assertEqual(session.turns[-1]["time_budget_seconds"], 20)
             finally:
