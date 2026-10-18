@@ -82,6 +82,19 @@ test("an unattributed root notice is rejected before a provider request", async 
   assert.deepEqual(admitted, []);
 });
 
+test("a revoked child settlement is discarded before it can block a newer root turn", () => {
+  const { admission, agent } = fixture();
+  admission.root = agent.id;
+  admission.revoke(
+    { task_id: oldTask, sessions: ["old-child"] },
+    [{ ...agent, inbox: { nextTurn: [], nextStep: [] } }],
+  );
+  const settled = message("old-settled", "subagent-settled", { senderSessionId: "old-child" });
+  let removed;
+  admission.inserted({ ...agent, inbox: { remove: (id) => (removed = id) } }, settled);
+  assert.equal(removed, "old-settled");
+});
+
 test("a later tool-only step keeps the root turn admitted by its first message", async () => {
   const { admission, admitted, agent } = fixture();
   admission.root = agent.id;

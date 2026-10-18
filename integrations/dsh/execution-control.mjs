@@ -148,6 +148,8 @@ export async function apply(ctx) {
         return { status: 400, body: "Invalid prompt admission" };
       }
     }
+    if (method === "POST" && path === "/cancel")
+      admission.revoke(scope, ctx.agents.list());
     if (method !== "POST" || path !== "/cancel") {
       return { status: 404, body: "" };
     }

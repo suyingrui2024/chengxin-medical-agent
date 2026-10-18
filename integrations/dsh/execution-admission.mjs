@@ -25,6 +25,8 @@ export class RootAdmission {
     this.pending = null;
     this.root = null;
     this.references = new Map();
+    this.revokedTasks = new Set();
+    this.revokedSessions = new Set();
   }
 
   register(id) {
@@ -42,6 +44,13 @@ export class RootAdmission {
       return;
     }
     if (agent.id !== this.root) return;
+    if (
+      typeof source.senderSessionId === "string" &&
+      this.revokedSessions.has(source.senderSessionId)
+    ) {
+      agent.inbox.remove(message.id);
+      return;
+    }
     this.remember(message, noticeReference(message));
   }
 
@@ -67,7 +76,7 @@ export class RootAdmission {
       ({ message, owner }) => message.source?.kind === "user" && taskId(owner),
     );
     const owner = direct?.owner || entries.find(({ owner: value }) => taskId(value))?.owner;
-    if (!taskId(owner)) return { kind: "reject" };
+    if (!taskId(owner) || this.revokedTasks.has(owner)) return { kind: "reject" };
 
     const keep = new Set(
       entries
@@ -113,6 +122,25 @@ export class RootAdmission {
       return owner;
     }
     return null;
+  }
+
+  revoke(scope, agents) {
+    if (!scope) {
+      this.pending = null;
+      return;
+    }
+    this.revokedTasks.add(scope.task_id);
+    for (const session of scope.sessions || []) this.revokedSessions.add(session);
+    if (this.pending === scope.task_id) this.pending = null;
+    for (const agent of agents)
+      for (const message of [...agent.inbox.nextTurn, ...agent.inbox.nextStep]) {
+        const reference = this.references.get(message.id) || noticeReference(message);
+        if (
+          reference.task_id === scope.task_id ||
+          this.revokedSessions.has(reference.sender_session_id)
+        )
+          agent.inbox.remove(message.id);
+      }
   }
 }
 
