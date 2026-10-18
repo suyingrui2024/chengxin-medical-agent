@@ -67,10 +67,27 @@
     "input-unverified.png": "8c84cc9a4e6c42c38e14d50a90b7b2bd8822d111ed3af63ef948581ab0a9d083",
     "actual-tool-receipts.json": "9e327ac3ffcd73fcd41f1d19220d126cd02641ee5a7fc35ebc9ccc793c39e413",
     "baseline-race-proof.json": "46ae41abdd06d0bf3eac96222354751b1c029598764902ff074ca16cc62fee3c",
-    "native-alias-proof.json": "754567ca2913c6fd67abc09cf8d55d254f2186dfa49f89121461aeceeb11cd8e"
+    "native-alias-proof.json": "754567ca2913c6fd67abc09cf8d55d254f2186dfa49f89121461aeceeb11cd8e",
+    "windows-native.json": "dd9c003862640641a766ace5ea8087ca51ee0cac4571fb3869ac25ad97e19682"
   },
   "windows": {
-    "status": "pending",
-    "required": "Source and packaged full SDK rejection of changed declared inputs, allowance of generated outputs, ASCII alias tracking and cold restoration; pure checkpoint contracts on both Windows matrices."
+    "status": "passed",
+    "required": "Source and packaged full SDK rejection of changed declared inputs, allowance of generated outputs, ASCII alias tracking and cold restoration; pure checkpoint contracts on both Windows matrices.",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39081442480",
+    "tested_code_commit": "2e949f6bf3bbe669e242aaeab326507c8eee706c",
+    "receipt": "windows-native.json",
+    "gui_receipts": {
+      "arm": 2,
+      "server": 3
+    },
+    "full_sdk_runs": 2,
+    "python_per_matrix": {
+      "passed": 11,
+      "skipped": 1
+    },
+    "node_per_matrix": {
+      "passed": 31,
+      "failed": 0
+    }
   }
 }

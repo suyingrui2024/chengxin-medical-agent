@@ -1,0 +1,436 @@
+{
+  "schema": "delivery-explicit-inputs-windows/v1",
+  "status": "passed",
+  "tested_code_commit": "2e949f6bf3bbe669e242aaeab326507c8eee706c",
+  "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39081442480",
+  "platforms": {
+    "arm": {
+      "job_id": 117539017181,
+      "log_sha256": "f2aaed3f9ebacd69ada9abd40dcc603fc01f325d577213ace284927cf522e171",
+      "node": {
+        "passed": 31,
+        "failed": 0
+      },
+      "python": {
+        "run": 12,
+        "passed": 11,
+        "skipped": 1,
+        "skip_reason": "Filesystem does not provide the tested combined Unicode/case alias; ASCII case-alias tracking passed."
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "full_sdk_summaries": ["Ran 2 tests in 47.041s", "Ran 2 tests in 58.643s"]
+    },
+    "server": {
+      "job_id": 117539017284,
+      "log_sha256": "e29b38872d3906a7e3656ebd82cfe9b5575679242a0336285bee8b533cc93ab2",
+      "node": {
+        "passed": 31,
+        "failed": 0
+      },
+      "python": {
+        "run": 12,
+        "passed": 11,
+        "skipped": 1,
+        "skip_reason": "Filesystem does not provide the tested combined Unicode/case alias; ASCII case-alias tracking passed."
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "full_sdk_summaries": []
+    }
+  },
+  "sdk_evidence": {
+    "module": "tests/test_windows_execution.py",
+    "module_sha256": "c7589a2327e4fb3a4ad2e3346c0255b3584d561618c941b4c90efcbe93535539",
+    "tests_per_sdk_run": 2,
+    "runs": [
+      "Windows 11 source runtimes",
+      "Windows 11 bundled runtimes, application directory with spaces"
+    ],
+    "input_test_subcases": [
+      "Stable SOURCE.TXT native alias, generated report allowed, completion and cold restoration.",
+      "SOURCE.TXT native alias modified during successful command, actual exit zero retained, delivery completion rejected after one repair, cold restoration."
+    ],
+    "evidence_basis": "Both complete module runs pass with no skips; subcases and assertions are defined in the tested commit, rather than separately named in the non-verbose unittest output.",
+    "external_model_calls": 0,
+    "provider": "Loopback synthetic SDK tool plans; not a reasoning benchmark."
+  },
+  "installer": {
+    "schema": "downloaded-windows-installer/v1",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39081442480",
+    "tested_code_commit": "2e949f6bf3bbe669e242aaeab326507c8eee706c",
+    "installer": "installer/Chengxin-Setup-0.11.17-Windows-x64.exe",
+    "bytes": 365225500,
+    "sha256": "cd6b421e49a8f75bb056f1d5e3fe3c19a1bde3d1e5f5138b96aaf885bba9b8f2",
+    "pe_machine": "0x14c",
+    "native_server_job": "success",
+    "native_windows11_job": "success",
+    "local_verification": "Downloaded GitHub artifact and checked PE signature and SHA256; execution and installation are verified by the Windows job, not this Mac.",
+    "workflow_conclusion": "success"
+  },
+  "jobs": [
+    {
+      "id": 117539017181,
+      "name": "Windows 11 on Arm running x64 application",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 117539017284,
+      "name": "Windows Server x64 desktop",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

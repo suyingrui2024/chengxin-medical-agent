@@ -34,7 +34,7 @@ notepad .env
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start -Live
 ```
 
-Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。[Windows CI 验收](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39079554015)已通过：Server 2025 x64 覆盖桌面、安装器、快捷方式与卸载；Windows 11 Arm 运行 x64 应用覆盖原生隔离、源码与便携包的完整 SDK 执行、产物落盘、子智能体验证及会话接续。六套皮肤及重启恢复、真实 CSV 数值图表也已实测。完整执行要求支持 ProcessContainer 的已更新 Windows 11，启动时实际探测；Windows 10 和实体 Windows 11 x64 尚未实际验证。更改已合并到 `main`，详见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)。
+Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。[Windows CI 验收](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39081442480)已通过：Server 2025 x64 覆盖桌面、安装器、快捷方式与卸载；Windows 11 Arm 运行 x64 应用覆盖原生隔离、源码与便携包的完整 SDK 执行、产物落盘、子智能体验证及会话接续。六套皮肤及重启恢复、真实 CSV 数值图表也已实测。完整执行要求支持 ProcessContainer 的已更新 Windows 11，启动时实际探测；Windows 10 和实体 Windows 11 x64 尚未实际验证。更改已合并到 `main`，详见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)。
 
 ### 独立桌面应用（推荐）
 
