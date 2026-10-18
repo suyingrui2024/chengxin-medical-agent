@@ -1,0 +1,40 @@
+✔ bridge launches shipped profile with isolated home and excludes unrelated credentials (1.100958ms)
+✔ medical overlay disables shell, subprocesses and log uploading (10.251875ms)
+✔ checkpoint scopes keep prior inputs and reject traversal before any scan (1.93475ms)
+✔ only complete canonical checkpoint metadata carries a proof digest (0.42175ms)
+✔ a parent or root scope cannot erase an explicitly watched cache input (0.182917ms)
+✔ scope order uses Unicode scalar order consistently with the Python host (1.199042ms)
+✔ pinned SDK compiles a nonparallel question tool (1.118958ms)
+✔ question waits for host input and does not invent a default (1.416375ms)
+✔ wrong turns, expired questions and cancellation cannot supply an answer (0.300458ms)
+✔ invalid or excessive questions fail without waiting (1.23625ms)
+✔ delivery outcomes use the SDK job producer status, never printed claims (0.796166ms)
+✔ actual tool registration rejects invalid commands before launching any process (1.482833ms)
+✔ only typed delivery values acquire command identity and process outcomes (0.212958ms)
+✔ late optional results cannot downgrade a concurrent required declaration (0.060708ms)
+✔ accepted check arguments share explicit bounds and explain rejected proposals (0.177542ms)
+✔ a long accepted check reads the same running job again after a bounded wait (9.088042ms)
+✔ actual exit zero and matching final snapshot do not verify input modified during checking (259.98425ms)
+✔ stable explicit inputs permit generated outputs and keep the post-run file binding (240.087459ms)
+✔ post-run-only checks retain their documented scope and cannot satisfy a later input requirement (171.198916ms)
+✔ input proof scopes must be canonical, explicit and cover the declared dependencies (0.376208ms)
+✔ only the typed delivery producer can attach verified input scope (0.204541ms)
+✔ input requirements survive later omission and expansion; missing start proof=false (1.159125ms)
+✔ input requirements survive later omission and expansion; missing start proof=true (0.548584ms)
+✔ stdout cannot override a canonical process outcome (2.38825ms)
+✔ background process detail is separate from output and producer kinds (0.156125ms)
+✔ nested calls and missing call coordinates do not acquire invented identity (0.088541ms)
+✔ active preparation and stopping work cannot be treated as quiescent (0.06075ms)
+✔ the pinned SDK accepts and registers the real workspace tool definition (0.9425ms)
+✔ path metadata rejects siblings, escaping links and undeclared files (6.857458ms)
+✔ native realpath adapter preserves sync, callback, promise and error results (52.726084ms)
+✔ only the trusted Job runner receives the preload after NODE_OPTIONS is scrubbed (21.734916ms)
+✔ input proof and command exit status remain distinct in presentation (0.890084ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 748.72775

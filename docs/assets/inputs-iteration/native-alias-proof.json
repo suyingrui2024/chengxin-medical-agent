@@ -1,0 +1,12 @@
+{
+  "schema": "native-alias-checkpoint-proof/v1",
+  "baseline_commit": "1953dab",
+  "baseline_source_sha256": "60bfa9305c2e4c787676e076770b9121f00e765fcf011bfcdb17aeba89a84395",
+  "alias_exists": true,
+  "baseline_files": 0,
+  "baseline_same_after_change": true,
+  "fixed_files": 1,
+  "fixed_complete": true,
+  "fixed_same_after_change": false,
+  "external_model_calls": 0
+}

@@ -37,6 +37,31 @@ class ObservationContractTests(unittest.TestCase):
         }
         validated = validate_observation(value)
         self.assertEqual(validate_observation(validated), validated)
+        delivery = {
+            **value,
+            "tool": "delivery_check",
+            "check_key": "b" * 64,
+            "check_label": "稳定输入检查",
+            "check_turn_id": value["turn_id"],
+            "check_inputs": ["src"],
+        }
+        normalized = validate_observation(delivery)
+        self.assertEqual(normalized["check_inputs"], ["src"])
+        self.assertEqual(validate_observation(normalized), normalized)
+        self.assertEqual(
+            validate_observation(json.loads(json.dumps(delivery))), normalized
+        )
+        for inputs in [
+            None, {}, "src", ["../host"], ["src", "src"], ["src/a.py", "src"]
+        ]:
+            with self.subTest(inputs=inputs):
+                with self.assertRaises(ValueError):
+                    validate_observation({**delivery, "check_inputs": inputs})
+        self.assertEqual(
+            validate_observation({**delivery, "check_inputs": []})["check_inputs"], []
+        )
+        with self.assertRaises(ValueError):
+            validate_observation({**value, "check_inputs": []})
         for changes in [
             {"exit_code": True},
             {"state": []},

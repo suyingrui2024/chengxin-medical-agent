@@ -1,0 +1,76 @@
+{
+  "schema": "delivery-explicit-inputs/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "d631b8b3f05b73513bfe288d89c4a294f11cf381",
+  "checks": {
+    "browser": {
+      "passed": 134,
+      "log": "logs/ui.log"
+    },
+    "native_desktop": {
+      "passed": 6,
+      "log": "logs/desktop.log"
+    },
+    "node": {
+      "passed": 32,
+      "log": "logs/node-all.log"
+    },
+    "python": {
+      "passed": 12,
+      "skipped": 0,
+      "log": "logs/python.log"
+    },
+    "format": "passed",
+    "python_syntax": "passed"
+  },
+  "evidence": {
+    "post_run_only_counterexample": "baseline-race-proof.json",
+    "real_tool_input_and_output_cases": "actual-tool-receipts.json",
+    "native_alias_before_after": "native-alias-proof.json",
+    "unverified_input_ui": "input-unverified.png"
+  },
+  "scope": [
+    "Explicit delivery_check inputs are compared before and after the command, separately from the post-run watch snapshot.",
+    "Stable inputs allow generated report files; input mutation or unavailable start evidence does not satisfy declared input requirements.",
+    "Input scope requirements expand monotonically within the turn; missing proof cannot downgrade a prior declared requirement.",
+    "Actual child-process file mutation and Python host checkpoints, with no external model calls.",
+    "Native case and Unicode aliases are resolved through pinned directory handles and file identities; missing and empty scope states differ.",
+    "Command exit zero is retained in the UI while missing input evidence stays unresolved."
+  ],
+  "boundaries": [
+    "Local tool fixtures are not the complete SDK or a real-model task-quality benchmark.",
+    "Without inputs the existing post-run-only snapshot semantics remain; no continuous input stability is claimed.",
+    "Matching boundary snapshots cannot detect transient edits restored between observations, or prove test coverage and expected values.",
+    "Checkpoint scans and request quotas remain bounded; unavailable evidence is not passing evidence.",
+    "Native Unicode alias support depends on the filesystem; Windows has an explicit ASCII case-alias full SDK test."
+  ],
+  "source_files_sha256": {
+    ".github/workflows/windows-native.yml": "c42dc2669e9a0f85a231aa1a301606451672d48cdec30a3dbb3316d6bc6c2a96",
+    "integrations/dsh/execution-checkpoints.mjs": "ae24816191bf6637b11de70ffda05b3ea2904777804789fa1f1b3b663627f7ec",
+    "integrations/dsh/execution-delivery-contract.mjs": "fe5d0ae9e9ba45c6a621cd82f964c8fe635d7cae0fe0744aab8ecb0023a50f35",
+    "integrations/dsh/execution-delivery.mjs": "31f5328e8e139e614eb43b814d459a518cd8a7f262f0c8fc87c2aebc01e05c52",
+    "integrations/dsh/execution-observations.mjs": "35f001215431575ffe20b6ebadd2663149e2c6d0219933d967f5c03f58757c64",
+    "integrations/dsh/execution-worker.mjs": "aafd3d3fc24ce006d78b3cf0f0d61fa61bece4c0a935fcc4a64f757febeed94c",
+    "src/medagent/execution_checkpoints.py": "bede208543c4bb1f99e8e6511e264469e8c213be3c97356db7180113137c4fed",
+    "src/medagent/execution_observations.py": "092c0b1786aa55455b1065ebc206eb32b00319a5db24847db4a1f65ef8564119",
+    "src/medagent/web/execution-observation-ui.js": "a445c0bab7ee61586222440cffbdddfcd8fb42733e1714254adc498085ca8eba",
+    "src/medagent/web/execution-ui.js": "d24c5995aaabfb31749ecd83c65c030b0345aca99441bc3dd2b2ec933e81cd64",
+    "tests/test_execution_checkpoints.py": "b574d1eb698f0769194870b23e5628710cbf5e2f27fcf62261081a8c73a22512",
+    "tests/test_execution_observations.py": "63acf5678ea83406cb9c66a13ed2ad92fe6f38650e3e4c7311aea7a68ca2bf85",
+    "tests/test_windows_execution.py": "c7589a2327e4fb3a4ad2e3346c0255b3584d561618c941b4c90efcbe93535539",
+    "integrations/dsh/tests/execution-inputs.test.mjs": "2f229d9df158adaa44151032eef05050cecfec08a0e518bf14223db0512f88b2",
+    "tests/fixtures/delivery-inputs.mjs": "8291ccd02f203e71f17d77f8a55993d65f1c239c402358fd501f44695f0bd86a",
+    "tests/ui/execution-inputs.spec.mjs": "8ac39b84c00852b5b53b7781cfe43116029efd1913cdb571159501d56eca3c18",
+    "tests/unit/execution-inputs-ui.test.mjs": "88ee600a29df9b43f43feb14e5cf35bded13df3d4c9a0930a230fc7275b5250e"
+  },
+  "artifacts_sha256": {
+    "input-unverified.png": "8c84cc9a4e6c42c38e14d50a90b7b2bd8822d111ed3af63ef948581ab0a9d083",
+    "actual-tool-receipts.json": "9e327ac3ffcd73fcd41f1d19220d126cd02641ee5a7fc35ebc9ccc793c39e413",
+    "baseline-race-proof.json": "46ae41abdd06d0bf3eac96222354751b1c029598764902ff074ca16cc62fee3c",
+    "native-alias-proof.json": "754567ca2913c6fd67abc09cf8d55d254f2186dfa49f89121461aeceeb11cd8e"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Source and packaged full SDK rejection of changed declared inputs, allowance of generated outputs, ASCII alias tracking and cold restoration; pure checkpoint contracts on both Windows matrices."
+  }
+}

@@ -14,6 +14,110 @@ from medagent.execution import ExecutionManager
 
 @unittest.skipUnless(os.name == "nt", "requires native Windows ProcessContainer")
 class WindowsExecutionTests(unittest.TestCase):
+    def test_explicit_inputs_reject_mutation_and_allow_generated_outputs(self):
+        for mutation in [False, True]:
+            with (
+                self.subTest(input_mutation=mutation),
+                tempfile.TemporaryDirectory(prefix="chengxin-inputs-") as raw,
+            ):
+                update = (
+                    "p.write_text('bad');"
+                    if mutation
+                    else "Path('report.txt').write_text('generated');"
+                )
+                command = (
+                    "python.exe -c \"from pathlib import Path;"
+                    "p=Path('source.txt');tested=p.read_text();"
+                    + update
+                    + "assert tested=='good'\""
+                )
+                provider = Provider(
+                    [
+                        tool(
+                            "bash",
+                            command=(
+                                "python.exe -c \"from pathlib import Path;"
+                                "Path('source.txt').write_text('good')\""
+                            ),
+                            description="Prepare synthetic source input",
+                        ),
+                        tool(
+                            "delivery_check",
+                            label="核对不变输入",
+                            command=command,
+                            inputs=["SOURCE.TXT"],
+                        ),
+                        final("检查命令已结束，保留真实文件版本状态。"),
+                        final("输入变化尚未复验，不能报告完成。"),
+                    ]
+                )
+                manager = ExecutionManager(root=Path(raw))
+                settings = {
+                    "MEDAGENT_LLM_BASE_URL": (
+                        f"http://127.0.0.1:{provider.server_port}/anthropic"
+                    ),
+                    "MEDAGENT_LLM_API_KEY": "native-inputs-loopback-only",
+                    "MEDAGENT_LLM_MODEL": "fixture",
+                }
+                try:
+                    session = manager.create(settings)
+                    session.start_turn(
+                        "合成输入版本检查：按工具计划声明inputs，生成输出不属于检查输入。",
+                        6,
+                        60,
+                    )
+                    deadline = time.monotonic() + 65
+                    while (
+                        session.status not in {"completed", "failed", "cancelled"}
+                        and time.monotonic() < deadline
+                    ):
+                        time.sleep(0.05)
+                    self.assertEqual(
+                        session.status,
+                        "failed" if mutation else "completed",
+                        session.error,
+                    )
+                    checks = [
+                        entry
+                        for entry in session.observations
+                        if entry["tool"] == "delivery_check"
+                    ]
+                    self.assertEqual(len(checks), 1)
+                    self.assertEqual(checks[0]["exit_code"], 0)
+                    self.assertEqual(
+                        checks[0].get("check_inputs"),
+                        [] if mutation else ["SOURCE.TXT"],
+                    )
+                    self.assertEqual(
+                        (session.directory / "source.txt").read_text(),
+                        "bad" if mutation else "good",
+                    )
+                    if mutation:
+                        self.assertEqual(session.error, "delivery_checks_failed")
+                    else:
+                        self.assertEqual(
+                            (session.directory / "report.txt").read_text(),
+                            "generated",
+                        )
+                    self.assertEqual(len(provider.requests), 4 if mutation else 3)
+                    identity = session.id
+                    manager.close()
+                    manager = ExecutionManager(root=Path(raw))
+                    restored = manager.open(identity, {})
+                    self.assertEqual(
+                        [
+                            item.get("check_inputs")
+                            for item in restored.observations
+                            if item["tool"] == "delivery_check"
+                        ],
+                        [[] if mutation else ["SOURCE.TXT"]],
+                    )
+                    self.assertIsNone(restored.process)
+                finally:
+                    manager.close()
+                    provider.shutdown()
+                    provider.server_close()
+
     def test_native_code_delegation_delivery_and_same_session_continuation(self):
         root_calls, child_calls = [0], [0]
 

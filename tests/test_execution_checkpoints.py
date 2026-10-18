@@ -33,6 +33,47 @@ class CheckpointTests(unittest.TestCase):
         source.write_text("answer=1")
         self.assertEqual(first["sha256"], self.observe()["sha256"])
 
+    def test_native_case_alias_tracks_actual_file_bytes(self):
+        source = self.root / "source.txt"
+        source.write_text("before")
+        if not (self.root / "SOURCE.TXT").exists():
+            self.skipTest("This filesystem treats these names as different paths")
+        before = self.observe(["SOURCE.TXT"])
+        self.assertTrue(before["complete"])
+        self.assertEqual(before["files"], 1)
+        source.write_text("after!")
+        after = self.observe(["SOURCE.TXT"])
+        self.assertTrue(after["complete"])
+        self.assertNotEqual(before["sha256"], after["sha256"])
+
+    def test_native_case_and_unicode_aliases_track_the_actual_input(self):
+        import unicodedata
+
+        folder = self.root / "Source"
+        folder.mkdir()
+        source = folder / "Étude.py"
+        source.write_text("before")
+        alias = unicodedata.normalize("NFD", "sOURCE/éTUDE.PY")
+        if not (self.root / alias).exists():
+            self.skipTest("This filesystem does not provide these native aliases")
+        before = self.observe([alias])
+        self.assertTrue(before["complete"])
+        self.assertEqual(before["files"], 1)
+        source.write_text("after!")
+        after = self.observe([alias])
+        self.assertTrue(after["complete"])
+        self.assertNotEqual(before["sha256"], after["sha256"])
+        self.assertNotIn("after!", json.dumps(after))
+
+    def test_explicit_empty_and_missing_scope_states_are_observed(self):
+        path = self.root / "inputs"
+        missing = self.observe(["inputs"])
+        path.mkdir()
+        empty = self.observe(["inputs"])
+        self.assertTrue(missing["complete"])
+        self.assertTrue(empty["complete"])
+        self.assertNotEqual(missing["sha256"], empty["sha256"])
+
     def test_scoped_inputs_ignore_reports_but_track_new_and_deleted_code(self):
         (self.root / "src").mkdir()
         source = self.root / "src/main.py"

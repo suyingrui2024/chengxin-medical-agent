@@ -1,5 +1,5 @@
 // Research UI observations from canonical SDK values, never stdout interpretation.
-import { validCheckpoint } from "./execution-checkpoints.mjs";
+import { validCheckpoint, validInputScope } from "./execution-checkpoints.mjs";
 export const ACTIVE_JOB_STATES = new Set(["starting", "running", "stopping"]);
 export const hasActiveJobs = (jobs) =>
   jobs.some((job) => ACTIVE_JOB_STATES.has(job.status));
@@ -65,6 +65,10 @@ export function observeTool(exec, result, call, epoch, sequence) {
     observation.check_label = value.label;
     observation.check_turn_id = value.owner_turn_id;
     observation.check_required = value.required !== false;
+    if (Object.hasOwn(value, "inputs_verified"))
+      observation.check_inputs = validInputScope(value.inputs_verified)
+        ? value.inputs_verified
+        : [];
     if (Object.hasOwn(value, "checkpoint"))
       observation.check_snapshot = validCheckpoint(value.checkpoint)
         ? value.checkpoint

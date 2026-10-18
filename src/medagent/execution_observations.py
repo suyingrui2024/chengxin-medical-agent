@@ -49,6 +49,7 @@ def validate_observation(value):
             "check_turn_id",
             "check_required",
             "check_snapshot",
+            "check_inputs",
         }
         or FIELDS - set(value)
     ):
@@ -119,6 +120,17 @@ def validate_observation(value):
         value["tool"] != "delivery_check" or not check_fields <= set(value)
     ):
         raise ValueError("Check snapshot requires delivery identity")
+    if "check_inputs" in value:
+        from .execution_checkpoints import normalize_paths
+        paths = value["check_inputs"]
+        if (
+            value["tool"] != "delivery_check"
+            or not check_fields <= set(value)
+            or not isinstance(paths, list)
+            or len(paths) > 16
+            or (paths and normalize_paths(paths) != paths)
+        ):
+            raise ValueError("Invalid verified check inputs")
     for name in ["epoch", "turn_id"]:
         if (
             not isinstance(value[name], str)

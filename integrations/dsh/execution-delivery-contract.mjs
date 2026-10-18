@@ -11,10 +11,17 @@ export function checkArguments(args) {
   if (
     Object.keys(args).some(
       (name) =>
-        !["label", "command", "required", "timeout_ms", "watch"].includes(name),
+        ![
+          "label",
+          "command",
+          "required",
+          "timeout_ms",
+          "watch",
+          "inputs",
+        ].includes(name),
     )
   )
-    invalid("字段须为label、command、required、timeout_ms、watch");
+    invalid("字段须为label、command、required、timeout_ms、watch、inputs");
   if (
     typeof args.label !== "string" ||
     !args.label.isWellFormed() ||
@@ -40,9 +47,10 @@ export function checkArguments(args) {
       args.timeout_ms > MAX_CHECK_TIMEOUT_MS)
   )
     invalid(`timeout_ms须为100至${MAX_CHECK_TIMEOUT_MS}的整数`);
-  let watch;
+  let watch, inputs;
   try {
     watch = checkpointPaths(args.watch);
+    if (args.inputs !== undefined) inputs = checkpointPaths(args.inputs);
   } catch (error) {
     invalid(error.message);
   }
@@ -52,5 +60,6 @@ export function checkArguments(args) {
     required: args.required !== false,
     timeout_ms: args.timeout_ms ?? 60000,
     watch,
+    inputs,
   };
 }

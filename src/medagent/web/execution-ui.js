@@ -7,6 +7,7 @@ import { createDirectoryUI } from "./execution-directory-ui.js";
 import { createExecutionFocus } from "./execution-focus-ui.js";
 import {
   observationPresentation,
+  inputProofMissing,
   toolObservationKey,
 } from "./execution-observation-ui.js";
 export function createExecutionUI(api) {
@@ -543,8 +544,11 @@ export function createExecutionUI(api) {
       value?.state === "completed" &&
       value.exit_code === 0 &&
       !value.check_historical &&
-      (!Object.hasOwn(value, "check_snapshot") ||
-        value.check_freshness === "current");
+      !inputProofMissing(value) &&
+      ((!Object.hasOwn(value, "check_snapshot") &&
+        !Object.hasOwn(value, "check_inputs")) ||
+        (value.check_snapshot?.complete === true &&
+          value.check_freshness === "current"));
     const nextCheckSignature = JSON.stringify([
       current.id,
       latestTurn,
@@ -575,7 +579,7 @@ export function createExecutionUI(api) {
           node(
             "small",
             "",
-            `${value.check_required === false ? "参考 · " : ""}${value.check_historical ? `历史 · ${value.exit_code === null ? "未完成" : `退出 ${value.exit_code}`}` : value.check_freshness === "stale" ? "需复验" : value.exit_code === 0 && !passed ? "版本未核对" : value.exit_code === null ? "未完成" : `退出 ${value.exit_code}`}`,
+            `${value.check_required === false ? "参考 · " : ""}${value.check_historical ? `历史 · ${value.exit_code === null ? "未完成" : `退出 ${value.exit_code}`}` : inputProofMissing(value) ? "输入待复验" : value.check_freshness === "stale" ? "需复验" : value.exit_code === 0 && !passed ? "版本未核对" : value.exit_code === null ? "未完成" : `退出 ${value.exit_code}`}`,
           ),
         );
         chip.title = `${value.check_historical ? "已保存的历史退出状态；当前文件版本未重新核对。" : `${value.check_required === false ? "参考检查" : "本轮必需检查"}最近一次运行的状态。`}${value.check_snapshot?.paths ? `检查范围：${value.check_snapshot.paths.map((path) => (path === "." ? "整个工作区" : path)).join("、")}。` : ""}文件变化后需复验；退出0不代表需求覆盖充分。`;

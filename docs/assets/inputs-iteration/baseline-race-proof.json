@@ -1,0 +1,11 @@
+{
+  "schema": "delivery-input-race-proof/v1",
+  "external_model_calls": 0,
+  "actual_child_exit": 0,
+  "source_changed_during_check": true,
+  "final_source": "bad",
+  "tool_state": "completed",
+  "tool_exit": 0,
+  "checkpoint_requests": 1,
+  "receipt_matches_unchecked_final_source": true
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "explicit-input-checks/v1",
+  "external_model_calls": 0,
+  "scope": "Registered tool with actual child process and host checkpoints, not the full SDK",
+  "cases": [
+    {
+      "input_changed": false,
+      "actual_child_exit": 0,
+      "final_source": "good",
+      "generated_report": "generated output",
+      "inputs_verified": [
+        "source.txt"
+      ],
+      "input_gate": true,
+      "post_snapshot_current": true,
+      "checkpoint_requests": [
+        [
+          "source.txt"
+        ],
+        [
+          "."
+        ],
+        [
+          "source.txt"
+        ]
+      ],
+      "output": "actual checker exited after the concurrent writer"
+    },
+    {
+      "input_changed": true,
+      "actual_child_exit": 0,
+      "final_source": "bad",
+      "generated_report": "generated output",
+      "inputs_verified": [],
+      "input_gate": false,
+      "post_snapshot_current": true,
+      "checkpoint_requests": [
+        [
+          "source.txt"
+        ],
+        [
+          "."
+        ],
+        [
+          "source.txt"
+        ]
+      ],
+      "output": "actual checker exited after the concurrent writer\n检查输入在运行期间变化或未能完整核对；退出0仍保留，当前结果不能证明最终输入已通过。请稳定输入后用同一命令及至少原inputs范围复验。"
+    }
+  ]
+}

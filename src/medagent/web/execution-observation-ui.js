@@ -1,6 +1,10 @@
 // Display only typed research observations; text printed by commands is not status.
 export const toolObservationKey = (session, turn, step, call) =>
   `${session}:${turn}:${step}:${call}`;
+export const inputProofMissing = (value) =>
+  value?.tool === "delivery_check" &&
+  Object.hasOwn(value, "check_inputs") &&
+  (!Array.isArray(value.check_inputs) || !value.check_inputs.length);
 export function observationPresentation(value) {
   let kind = "model",
     title = "运行状态未提供";
@@ -8,6 +12,12 @@ export function observationPresentation(value) {
     return { kind: "model", title };
   if (value.tool === "delivery_check") {
     const label = value.check_label || "交付检查";
+    if (
+      value.state === "completed" &&
+      value.exit_code === 0 &&
+      inputProofMissing(value)
+    )
+      return { kind: "failure", title: `${label} · 输入待复验（命令退出 0）` };
     if (value.state === "completed" && value.exit_code === 0)
       return { kind: "result", title: `${label} · 命令退出 0`, symbol: "✓" };
     return {

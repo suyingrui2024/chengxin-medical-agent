@@ -56,6 +56,21 @@ export function coversCheckpointPaths(actual, required) {
     actual.some((parent) => checkpointPathCovers(parent, path)),
   );
 }
+export function validInputScope(value) {
+  if (!Array.isArray(value) || value.length > 16) return false;
+  if (!value.length) return true;
+  try {
+    return JSON.stringify(checkpointPaths(value)) === JSON.stringify(value);
+  } catch {
+    return false;
+  }
+}
+export function coversVerifiedInputs(verified, required = []) {
+  return (
+    !required.length ||
+    (validInputScope(verified) && coversCheckpointPaths(verified, required))
+  );
+}
 export function validCheckpoint(value) {
   if (
     !value ||

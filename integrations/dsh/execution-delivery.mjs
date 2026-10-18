@@ -3,6 +3,7 @@ import { defineTool } from "@deepseek-ai/dsh-tools";
 import { createHash } from "node:crypto";
 import {
   mergeCheckpointPaths,
+  coversCheckpointPaths,
   validCheckpoint,
 } from "./execution-checkpoints.mjs";
 import {
@@ -52,6 +53,7 @@ export function mergeCheckRequirement(previous, current) {
 export function apply(ctx) {
   const requiredChecks = new Map();
   const watchedChecks = new Map();
+  const inputChecks = new Map();
   ctx.tools.register(
     defineTool({
       name: "delivery_check",
@@ -84,6 +86,12 @@ export function apply(ctx) {
           items: { type: "string" },
           description:
             '检查依赖的1至16项工作区相对文件或目录，默认["."]覆盖工作区（常见缓存目录除外）。检查结束记录文件版本，交付前变更会要求复验。同命令范围只能扩展。报告等输出不属于检查输入时可显式指定代码、测试和配置范围。',
+        },
+        inputs: {
+          type: "array",
+          items: { type: "string" },
+          description:
+            "检查必须保持不变的1至16项输入文件／目录。代码测试应声明代码、测试及配置；开始前和结束后核对输入版本，变化或核对失败不能沿用通过。不要包含生成的报告／结果文件，它们由watch绑定结束版本。同命令的inputs范围只能扩展，省略也不会取消此前声明。不设置inputs时只核对结束快照，不能证明执行期间输入稳定。",
         },
       },
       timeoutMs: MAX_CHECK_TIMEOUT_MS + 15000,
@@ -147,10 +155,12 @@ export function apply(ctx) {
           if (!requiredChecks.has(budget.turn_id)) {
             requiredChecks.set(budget.turn_id, new Set());
             watchedChecks.set(budget.turn_id, new Map());
+            inputChecks.set(budget.turn_id, new Map());
             if (requiredChecks.size > 64) {
               const oldest = requiredChecks.keys().next().value;
               requiredChecks.delete(oldest);
               watchedChecks.delete(oldest);
+              inputChecks.delete(oldest);
             }
           }
           const declared = requiredChecks.get(budget.turn_id);
@@ -161,10 +171,57 @@ export function apply(ctx) {
           }
           result.required = declared.has(result.check_key);
           const watched = watchedChecks.get(budget.turn_id);
+          const inputs = inputChecks.get(budget.turn_id);
+          if (args.inputs)
+            inputs.set(
+              result.check_key,
+              mergeCheckpointPaths(inputs.get(result.check_key), args.inputs),
+            );
+          const stableInputs = inputs.get(result.check_key) || [];
           watched.set(
             result.check_key,
-            mergeCheckpointPaths(watched.get(result.check_key), watch),
+            mergeCheckpointPaths(
+              watched.get(result.check_key),
+              mergeCheckpointPaths(
+                watch,
+                stableInputs.length ? stableInputs : watch,
+              ),
+            ),
           );
+          const readCheckpoint = async (paths) => {
+            const response = await fetch(
+              process.env.DEEPSEEK_BASE_URL + "/workspace/checkpoint",
+              {
+                method: "POST",
+                headers: {
+                  "x-api-key": process.env.DEEPSEEK_API_KEY,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ paths }),
+                signal: AbortSignal.any([
+                  exec.signal,
+                  AbortSignal.timeout(6000),
+                ]),
+                redirect: "error",
+              },
+            );
+            const reply = await response.json();
+            if (
+              !response.ok ||
+              !reply.ok ||
+              !validCheckpoint(reply.result) ||
+              !coversCheckpointPaths(reply.result.paths, paths)
+            )
+              throw new Error("文件版本未能核对");
+            return reply.result;
+          };
+          let beforeInputs = null;
+          if (stableInputs.length) {
+            result.inputs_verified = [];
+            try {
+              beforeInputs = await readCheckpoint(stableInputs);
+            } catch {}
+          }
           const limit = Math.min(
             args.timeout_ms ?? 60000,
             budget.remaining_seconds * 1000,
@@ -209,32 +266,33 @@ export function apply(ctx) {
           if (ACTIVE.has(value?.job?.status)) result.state = "timed_out";
           if (result.state === "completed" && result.exit_code === 0) {
             try {
-              const snapshot = await fetch(
-                process.env.DEEPSEEK_BASE_URL + "/workspace/checkpoint",
-                {
-                  method: "POST",
-                  headers: {
-                    "x-api-key": process.env.DEEPSEEK_API_KEY,
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    paths: watched.get(result.check_key),
-                  }),
-                  signal: AbortSignal.any([
-                    exec.signal,
-                    AbortSignal.timeout(6000),
-                  ]),
-                  redirect: "error",
-                },
+              result.checkpoint = await readCheckpoint(
+                watched.get(result.check_key),
               );
-              const reply = await snapshot.json();
-              if (snapshot.ok && reply.ok && validCheckpoint(reply.result))
-                result.checkpoint = reply.result;
-              else
-                result.output +=
-                  "\n文件版本核对未完成，当前退出状态不能证明可交付。";
             } catch {
               result.output += "\n文件版本核对未完成，需再次复验。";
+            }
+            const needed = inputs.get(result.check_key) || [];
+            if (needed.length) {
+              result.inputs_verified = [];
+              try {
+                const afterInputs = await readCheckpoint(needed);
+                if (
+                  beforeInputs?.complete &&
+                  afterInputs.complete &&
+                  coversCheckpointPaths(beforeInputs.paths, needed) &&
+                  JSON.stringify(beforeInputs.paths) ===
+                    JSON.stringify(afterInputs.paths) &&
+                  beforeInputs.sha256 === afterInputs.sha256
+                )
+                  result.inputs_verified = afterInputs.paths;
+                else
+                  result.output +=
+                    "\n检查输入在运行期间变化或未能完整核对；退出0仍保留，当前结果不能证明最终输入已通过。请稳定输入后用同一命令及至少原inputs范围复验。";
+              } catch {
+                result.output +=
+                  "\n检查输入版本未能核对，需在相同inputs范围复验。";
+              }
             }
           }
         } catch (error) {

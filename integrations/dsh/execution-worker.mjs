@@ -16,6 +16,7 @@ import {
   checkpointPaths,
   mergeCheckpointPaths,
   coversCheckpointPaths,
+  coversVerifiedInputs,
   validCheckpoint,
 } from "./execution-checkpoints.mjs";
 
@@ -112,11 +113,20 @@ function declareDeliveryCheck(turnId, event, sessionId) {
     exit_code: null,
     required: false,
     watch: [],
+    inputs: [],
     calls: new Map(),
   };
   declared.required ||= args.required !== false;
   try {
-    declared.watch = mergeCheckpointPaths(declared.watch, args.watch);
+    if (args.inputs)
+      declared.inputs = mergeCheckpointPaths(declared.inputs, args.inputs);
+    declared.watch = mergeCheckpointPaths(
+      declared.watch,
+      mergeCheckpointPaths(
+        args.watch,
+        declared.inputs.length ? declared.inputs : args.watch,
+      ),
+    );
   } catch {
     owner.incompleteChecks = true;
   }
@@ -1221,10 +1231,12 @@ async function run(payload) {
       const snapshots = new Map();
       for (const [key, declaration] of new Map([...latest, ...required])) {
         const value = latest.get(key) || declaration;
+        const inputs = owned.declaredChecks.get(key)?.inputs || [];
         const receiptCurrent =
           value.state === "completed" &&
           value.exit_code === 0 &&
-          currentDeliveryReceipt(owned.declaredChecks.get(key), value);
+          currentDeliveryReceipt(owned.declaredChecks.get(key), value) &&
+          coversVerifiedInputs(value.check_inputs, inputs);
         let freshness = "unavailable";
         const checkpoint = value.check_snapshot;
         const watch = owned.declaredChecks.get(key)?.watch ||
@@ -1262,10 +1274,11 @@ async function run(payload) {
                   ...value,
                   state: freshness === "stale" ? "stale" : "unavailable",
                   watch,
+                  inputs,
                 }
               : value.state === "completed" && value.exit_code === 0
-                ? owned.declaredChecks.get(key)
-                : value,
+                ? { ...owned.declaredChecks.get(key), inputs }
+                : { ...value, watch, inputs },
           );
       }
       return unresolved;
@@ -1297,16 +1310,24 @@ async function run(payload) {
         "[交付检查纠错] 本轮已声明的检查尚未解决：" +
           JSON.stringify(
             unresolved.map(
-              ({ check_label, check_key, state, exit_code, watch }) => ({
+              ({
+                check_label,
+                check_key,
+                state,
+                exit_code,
+                watch,
+                inputs,
+              }) => ({
                 label: check_label,
                 check_key,
                 state,
                 exit_code,
                 watch,
+                inputs,
               }),
             ),
           ) +
-          "。检查命令与实际输出保留在当前会话。stale表示检查通过后依赖文件已改变，需用原命令和至少原watch范围复验；退出0不能沿用旧版本。遵守原用户的文件保护、授权与任务范围；只要求检查报告时不得扩展为修改。先判断实现、测试预期或当前版本API是否有误，在授权范围内修正后用原delivery_check命令复验。不得用无关命令或缩小watch替代，也不能隐藏失败。若范围、预算或时间不足，请如实说明未完成。调用额度和截止时间未重置，只允许本次自动纠错。",
+          "。检查命令与实际输出保留在当前会话。stale表示检查通过后依赖文件已改变，需用原命令和至少原watch范围复验；inputs是检查开始和结束都须保持不变的输入范围，必须保留并复验，不包含生成的输出。退出0或缺失inputs版本证明不能沿用旧通过。遵守原用户的文件保护、授权与任务范围；只要求检查报告时不得扩展为修改。先判断实现、测试预期或当前版本API是否有误，在授权范围内修正后用原delivery_check命令复验。不得用无关命令或缩小watch替代，也不能隐藏失败。若范围、预算或时间不足，请如实说明未完成。调用额度和截止时间未重置，只允许本次自动纠错。",
         { sessionId: config.id },
       );
       collectDeclarations(result);
