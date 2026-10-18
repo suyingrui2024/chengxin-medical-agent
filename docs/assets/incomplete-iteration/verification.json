@@ -151,10 +151,16 @@
     "logs/desktop.log": "64caf5ead6bdf44762d28af74adf5c4f0455249a30d4e3858a2317ac65433be4",
     "logs/native-gui.log": "7db53ca45ff36d814cf65b4a07195d1789c66bf094a114db919fd0bbff499223",
     "logs/persistence.log": "cecb21b1e40261b97a61a25903a735505b4513e5312ece989d8da7ea8183429e",
-    "logs/ui.log": "71e8fdf6ffcb74ac7b96525709b5a744e2fdfd66eff2a6013a96d02f0873086b"
+    "logs/ui.log": "71e8fdf6ffcb74ac7b96525709b5a744e2fdfd66eff2a6013a96d02f0873086b",
+    "windows-native.json": "4b844bc7ce02a858cd803671e45b50240e78b2344b22af0fb8bb7eb871dd6685"
   },
   "windows": {
-    "status": "pending",
-    "required": "Source, portable and installed GUI explanation receipts, plus offline stopped-turn persistence on both matrices."
-  }
+    "status": "passed",
+    "required": "Source, portable and installed GUI explanation receipts, plus offline stopped-turn persistence on both matrices.",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39101689571",
+    "tested_code_commit": "8dfa04cf0e4dad40fb6063e8cf5b8be9e0d97b07",
+    "receipt": "windows-native.json",
+    "gui_windows": 5
+  },
+  "tested_code_commit": "8dfa04cf0e4dad40fb6063e8cf5b8be9e0d97b07"
 }
