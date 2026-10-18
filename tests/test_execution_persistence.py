@@ -21,6 +21,42 @@ CONFIG = {
 
 
 class WorkspaceIndexTests(unittest.TestCase):
+    def test_stopped_turn_explanation_survives_offline_reopen_without_execution(self):
+        for status in ["failed", "cancelled", "interrupted"]:
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as raw:
+                first = ExecutionManager(root=Path(raw))
+                try:
+                    session = first.create(CONFIG)
+                    with patch.object(session, "_run", return_value=None):
+                        session.start_turn("保留未完成事项后继续", 6)
+                    text = "实现已保存，测试未通过；" + CONFIG["MEDAGENT_LLM_API_KEY"]
+                    session.status = status
+                    session.final_response = text
+                    session.turns[-1].update(status=status, final_response=text)
+                    session.persist(strict=True)
+                    identity = session.id
+                finally:
+                    first.close()
+                second = ExecutionManager(root=Path(raw))
+                try:
+                    restored = second.open(identity, {})
+                    snapshot = restored.snapshot()
+                    self.assertEqual(snapshot["status"], status)
+                    stopped = [
+                        e for e in snapshot["events"]
+                        if e["type"] == "turn." + status
+                    ]
+                    self.assertEqual(len(stopped), 1)
+                    self.assertTrue(stopped[0]["restored"])
+                    self.assertIn("实现已保存，测试未通过", stopped[0]["final_response"])
+                    self.assertNotIn(CONFIG["MEDAGENT_LLM_API_KEY"], json.dumps(snapshot))
+                    self.assertIsNone(restored.process)
+                    self.assertFalse(
+                        any(e["type"] == "model.request" for e in snapshot["events"])
+                    )
+                finally:
+                    second.close()
+
     def test_configured_secret_is_redacted_before_title_or_transcript_is_shortened(
         self,
     ):

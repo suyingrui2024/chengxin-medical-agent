@@ -14,6 +14,7 @@ import {
   openFocusWorkspace,
   verifyEditableAnswer,
   verifyExecutionRecovery,
+  verifyIncompleteExplanation,
 } from "../../tests/fixtures/execution-focus.mjs";
 import { verifyNativeArtifactChart } from "../../tests/fixtures/native-artifact-chart.mjs";
 import { verifyDirectoryRecovery } from "../../tests/fixtures/directory-recovery.mjs";
@@ -136,6 +137,10 @@ try {
   const draftReceipt = await verifyEditableAnswer(reopened, focusFixture);
   const recoveryReceipt = await verifyExecutionRecovery(reopened, focusFixture);
   const directoryReceipt = await verifyDirectoryRecovery(reopened);
+  const incompleteReceipt = await verifyIncompleteExplanation(
+    reopened,
+    focusFixture,
+  );
   assert.equal(model.requests.length, beforeChart);
   focusFixture.first.status = "completed";
   await expect(reopened.locator("#execution-focus-label")).toHaveText(
@@ -174,6 +179,7 @@ try {
       artifact_save: "passed (actual CSV snapshot on disk)",
       clarification_draft: draftReceipt,
       execution_recovery: recoveryReceipt,
+      incomplete_explanation: incompleteReceipt,
       profile_path_with_spaces_and_chinese: "passed",
       local_fixture_requests: model.requests.length,
       external_model_calls: 0,

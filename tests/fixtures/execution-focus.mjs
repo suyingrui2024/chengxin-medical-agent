@@ -219,3 +219,37 @@ export async function verifyExecutionRecovery(page, fixture) {
     await page.unroute(pattern, failure);
   }
 }
+
+export async function verifyIncompleteExplanation(page, fixture) {
+  const state = fixture.first;
+  const text = "已保存实现；交付检查仍未通过。请核对现有文件后继续。";
+  state.status = "failed";
+  state.error = "delivery_checks_failed";
+  const sequence = ++state.sequence;
+  state.events.push({
+    sequence,
+    type: "turn.failed",
+    turn_id: state.turn_id,
+    error_type: state.error,
+    final_response: text,
+  });
+  await expect(page.locator("#execution-focus-label")).toHaveText(
+    "本轮尚未完成",
+  );
+  const explanation = page.locator(".execution-incomplete-response").last();
+  await expect(explanation.locator("pre")).toBeHidden();
+  await explanation.getByText("查看本轮说明", { exact: true }).click();
+  await expect(explanation.locator("pre")).toHaveText(text);
+  await expect(page.locator(".execution-final")).toHaveCount(0);
+  await expect(page.locator("#execution-feedback")).toContainText("尚未通过");
+  state.error = null;
+  state.status = "completed";
+  await expect(page.locator("#execution-focus-label")).toHaveText("本轮已完成");
+  return {
+    passed: true,
+    host_snapshot_fixture: true,
+    explanation_preserved: true,
+    failed_status_retained: true,
+    external_model_calls: 0,
+  };
+}

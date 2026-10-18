@@ -1,0 +1,160 @@
+{
+  "schema": "incomplete-explanation/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "dc6063f",
+  "baseline": {
+    "log": "logs/before.log",
+    "failure": "A failed turn with a nonempty final_response had no visible explanation in the workbench."
+  },
+  "checks": {
+    "browser": {
+      "passed": 19,
+      "focused_new_cases": 4,
+      "log": "logs/ui.log",
+      "scope": "Execution focus, incomplete turn explanations and status recovery; not a rerun of the full browser suite."
+    },
+    "native_desktop": {
+      "passed": 1,
+      "log": "logs/desktop.log"
+    },
+    "offline_persistence": {
+      "passed": 8,
+      "log": "logs/persistence.log",
+      "new_case_statuses": ["failed", "cancelled", "interrupted"],
+      "scope": "Actual manager save/close/offline reopen, secret redaction and no worker/model start."
+    },
+    "native_gui_script": {
+      "platform": "macOS arm64",
+      "passed": true,
+      "log": "logs/native-gui.log",
+      "receipt": {
+        "gui": "passed",
+        "directory_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "cached_list_marked_and_disabled": true,
+          "draft_and_preview_preserved": true
+        },
+        "patient_native_zoom": {
+          "passed": true,
+          "native_webcontents_zoom": true,
+          "settings": [
+            {
+              "zoom": 1.25,
+              "pane": {
+                "height": 391,
+                "content": 391,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.5,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.7499999999999998,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 2,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            }
+          ],
+          "synthetic_demo": true,
+          "external_model_calls": 0
+        },
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": ["body", "serif", "mono"],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "artifact_copy": "passed (actual CSV and system clipboard)",
+        "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+        "artifact_save": "passed (actual CSV snapshot on disk)",
+        "clarification_draft": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "edited_answer": true
+        },
+        "execution_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "draft_preserved": true
+        },
+        "incomplete_explanation": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "explanation_preserved": true,
+          "failed_status_retained": true,
+          "external_model_calls": 0
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      }
+    }
+  },
+  "scope": [
+    "A nonempty host event final_response on failed, cancelled or interrupted turns is retained in a collapsed explanation on that same event card.",
+    "Explanation content remains literal text and never becomes a successful final result card.",
+    "Failure status, declared check outcomes and time/call budgets are unchanged.",
+    "Polling preserves the expanded card; later turns retain it as an earlier event without copying it into the new result."
+  ],
+  "boundaries": [
+    "Browser and native GUI probes use explicitly synthetic host snapshots.",
+    "Offline persistence uses actual storage and manager lifecycle without the SDK.",
+    "No new external model calls, clinical claims, reasoning scores or benchmark comparisons.",
+    "Menu accelerators and all-platform accessibility were not assessed."
+  ],
+  "source_files_sha256": {
+    "src/medagent/web/execution-ui.js": "3423b515361e6a583d32bc1793d12af15fc8ad4ee327e97a4ac8e0ac39cc58de",
+    "tests/ui/execution-incomplete.spec.mjs": "c7f78000b825b242c3735933964542442ebbcedfdd4ec97f4068670245704a6b",
+    "tests/fixtures/execution-focus.mjs": "336e5c118fd48083a15ca27c4bc15cb96f7b83561b8addf14ddaae60b61e50bc",
+    "tests/desktop/execution-focus.spec.mjs": "717c094096ab7c3f62bf48ffd64b4cdd9acbcfdac93db6e7aa882bd001d2398f",
+    "scripts/windows/gui-check.mjs": "b657996e8ab6fc632d6f204df18d5210915db66ed7c48cc07a41ff157129fc5a",
+    "tests/test_execution_persistence.py": "ea02137eb0705cf9e549dad753126184bd4c8097ccbc698c4054deff5ac2c5bb",
+    ".github/workflows/windows-native.yml": "5d4846120b233f44c8690de1a44554d14934f447446be2ad7ddab92c6b93849c"
+  },
+  "artifacts_sha256": {
+    "incomplete-explanation.png": "852756a717ae427b5777e0d179f8978da31b0a13edaf1c5fa368009a931dcf3f",
+    "logs/before.log": "dd8d16c61c6bcf1c80b973176efeab164bae14f68c6a9c60ff60804b0f4709fb",
+    "logs/desktop.log": "64caf5ead6bdf44762d28af74adf5c4f0455249a30d4e3858a2317ac65433be4",
+    "logs/native-gui.log": "7db53ca45ff36d814cf65b4a07195d1789c66bf094a114db919fd0bbff499223",
+    "logs/persistence.log": "cecb21b1e40261b97a61a25903a735505b4513e5312ece989d8da7ea8183429e",
+    "logs/ui.log": "71e8fdf6ffcb74ac7b96525709b5a744e2fdfd66eff2a6013a96d02f0873086b"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Source, portable and installed GUI explanation receipts, plus offline stopped-turn persistence on both matrices."
+  }
+}

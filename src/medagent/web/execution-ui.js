@@ -506,6 +506,25 @@ export function createExecutionUI(api) {
       );
       if (item.kind === "request") detail.open = true;
       card.append(detail);
+      // A failed acceptance gate can retain a useful final explanation. Keep it
+      // with the stopped turn, without turning it into a successful result card.
+      if (
+        [
+          "turn.failed",
+          "turn.cancelled",
+          "turn.interrupted",
+          "task.failed",
+        ].includes(event.type) &&
+        typeof event.final_response === "string" &&
+        event.final_response.trim()
+      ) {
+        const explanation = node("details", "execution-incomplete-response");
+        explanation.append(
+          node("summary", "", event.restored ? "查看历史说明" : "查看本轮说明"),
+          node("pre", "", event.final_response),
+        );
+        card.append(explanation);
+      }
       result.append(card);
     }
     // Receipts outlive the bounded live event ring, and are host-owned too.

@@ -1,0 +1,43 @@
+
+Running 1 test using 1 worker
+
+(node:79595) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/execution-incomplete.spec.mjs:13:3 › failed live turn keeps its explanation without claiming success (6.7s)
+
+
+  1) tests/ui/execution-incomplete.spec.mjs:13:3 › failed live turn keeps its explanation without claiming success 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('.execution-incomplete-response').locator('summary')
+    Expected: "查看本轮说明"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" locator('.execution-incomplete-response').locator('summary') with timeout 5000ms
+      - waiting for locator('.execution-incomplete-response').locator('summary')
+
+
+      44 |     );
+      45 |     const explanation = page.locator(".execution-incomplete-response");
+    > 46 |     await expect(explanation.locator("summary")).toHaveText(
+         |                                                  ^
+      47 |       restored ? "查看历史说明" : "查看本轮说明",
+      48 |     );
+      49 |     await expect(explanation.locator("pre")).toBeHidden();
+        at /Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/ui/execution-incomplete.spec.mjs:46:50
+
+    Error Context: test-results/ui/execution-incomplete-faile-e5ab2-on-without-claiming-success/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/execution-incomplete-faile-e5ab2-on-without-claiming-success/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/execution-incomplete-faile-e5ab2-on-without-claiming-success/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/execution-incomplete.spec.mjs:13:3 › failed live turn keeps its explanation without claiming success 
