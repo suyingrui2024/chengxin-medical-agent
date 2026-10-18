@@ -129,8 +129,47 @@ export async function verifyGlucoseCalculation(
   if (shots && mobile)
     await page.screenshot({ path: `${shots}/64-mobile-glucose-input.png` });
   if (mobile) await page.setViewportSize({ width: 1440, height: 1080 });
-  await page.reload();
-  await page.locator("#recent-sessions .recent-item").first().click();
+  const reloadRequests = [];
+  const trackResponse = (response) => {
+    const path = new URL(response.url()).pathname;
+    if (path.startsWith("/api/") || path.endsWith(".js"))
+      reloadRequests.push({ path, status: response.status() });
+  };
+  const trackFailure = (request) => {
+    const path = new URL(request.url()).pathname;
+    if (path.startsWith("/api/") || path.endsWith(".js"))
+      reloadRequests.push({ path, failure: request.failure()?.errorText });
+  };
+  page.on("response", trackResponse);
+  page.on("requestfailed", trackFailure);
+  try {
+    await page.reload();
+    await page.locator("#recent-sessions .recent-item").first().click();
+  } catch (error) {
+    // Synthetic fixture only. Preserve HTTP/module status without headers,
+    // credentials, patient content or retrying a failed application action.
+    const dom = await page
+      .evaluate(() => ({
+        connection: document.querySelector("#connection-status")?.textContent,
+        recentCount: document.querySelector("#recent-count")?.textContent,
+        items: document.querySelectorAll("#recent-sessions .recent-item")
+          .length,
+        toast: document.querySelector("#toast")?.textContent,
+      }))
+      .catch(() => ({ unavailable: true }));
+    console.error(
+      JSON.stringify({
+        glucose_reload_failure: true,
+        requests: reloadRequests,
+        errors,
+        dom,
+      }),
+    );
+    throw error;
+  } finally {
+    page.off("response", trackResponse);
+    page.off("requestfailed", trackFailure);
+  }
   await expect(form).toBeVisible();
   for (const name of ["数值", "原单位", "目标单位"])
     await expect(form.getByLabel(name, { exact: true })).toHaveValue("");
