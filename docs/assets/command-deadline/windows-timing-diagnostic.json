@@ -1,0 +1,640 @@
+{
+  "status": "cancelled",
+  "error": "time_budget_exhausted",
+  "events": [
+    {
+      "sequence": 1,
+      "type": "workspace.baseline",
+      "time": 1792308684.1150255,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "files": 0,
+      "complete": true,
+      "content_complete": true
+    },
+    {
+      "sequence": 2,
+      "type": "task.submitted",
+      "time": 1792308684.1150362,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "text": "Start the fixed synthetic background command."
+    },
+    {
+      "sequence": 3,
+      "type": "ready",
+      "time": 1792308692.5170321,
+      "runtime": "dsh-sdk",
+      "version": "0.2.0-rc.2",
+      "isolation": "windows-processcontainer",
+      "network": "enabled",
+      "model": "fixture"
+    },
+    {
+      "sequence": 4,
+      "type": "turn.started",
+      "time": 1792308692.5198205,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "time_budget_seconds": 5
+    },
+    {
+      "sequence": 5,
+      "type": "runtime.event",
+      "time": 1792308692.5584366,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "status": "running"
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "type": "runtime.event",
+      "time": 1792308692.562236,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "turn/start",
+            "seq": 1,
+            "time": 1792308692560,
+            "data": {
+              "turn": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 7,
+      "type": "model.request_started",
+      "time": 1792308693.0261188,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "index": 1,
+      "lifetime_calls": 1,
+      "session_id": "e16b123a-f5a8-43fc-809a-868d525b2554",
+      "source": "conversation"
+    },
+    {
+      "sequence": 8,
+      "type": "model.request",
+      "time": 1792308693.0687456,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "index": 1,
+      "lifetime_calls": 1,
+      "status": 200
+    },
+    {
+      "sequence": 9,
+      "type": "runtime.event",
+      "time": 1792308693.1040912,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "assistant/message",
+            "seq": 11,
+            "time": 1792308693101,
+            "data": {
+              "turn": 1,
+              "step": 1,
+              "usage": {
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "totalTokens": 20
+              },
+              "message": {
+                "role": "assistant",
+                "content": []
+              }
+            },
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 10,
+      "type": "runtime.event",
+      "time": 1792308693.1076264,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "tool/call",
+            "seq": 12,
+            "time": 1792308693106,
+            "data": {
+              "turn": 1,
+              "step": 1,
+              "callId": "delivery-1",
+              "name": "bash",
+              "arguments": "{\"command\":\"[IO.File]::WriteAllText([IO.Path]::Combine([Environment]::CurrentDirectory, 'old-late.txt.started'), [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()); Start-Sleep -Seconds 8; [IO.File]::WriteAllText([IO.Path]::Combine([Environment]::CurrentDirectory, 'old-late.txt.awake'), [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()); 'finished' | Set-Content -Encoding UTF8 old-late.txt\",\"run_in_background\":true,\"description\":\"Original short task deadline\"}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 11,
+      "type": "runtime.event",
+      "time": 1792308693.1454816,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "tool/result",
+            "seq": 13,
+            "time": 1792308693142,
+            "data": {
+              "turn": 1,
+              "step": 1,
+              "message": {
+                "role": "tool",
+                "source": {
+                  "kind": "tool",
+                  "callId": "delivery-1"
+                },
+                "toolCallId": "delivery-1",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "started background job bash-1"
+                  }
+                ],
+                "isError": false,
+                "id": "e605850e-0cc2-4dfd-bfd9-12bb54f18ffa"
+              }
+            },
+            "sourceEventSeqs": [
+              12
+            ],
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "type": "tool.observed",
+      "time": 1792308693.2267747,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "observation": {
+        "schema": "execution-observation/v1",
+        "epoch": "b2ea5c04-ddcc-4456-bde6-3c43ee2c2899",
+        "sequence": 1,
+        "session_id": "e16b123a-f5a8-43fc-809a-868d525b2554",
+        "call_id": "delivery-1",
+        "sdk_turn": 1,
+        "sdk_step": 1,
+        "call_sequence": 12,
+        "tool": "bash",
+        "state": "background",
+        "exit_code": null,
+        "signal": null,
+        "job_id": "bash-1",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+        "observation_id": "b2ea5c04-ddcc-4456-bde6-3c43ee2c2899:1"
+      }
+    },
+    {
+      "sequence": 13,
+      "type": "jobs.snapshot",
+      "time": 1792308693.2347264,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "running",
+          "kind": "bash"
+        }
+      ]
+    },
+    {
+      "sequence": 14,
+      "type": "model.request_started",
+      "time": 1792308693.3379874,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "index": 2,
+      "lifetime_calls": 2,
+      "session_id": "e16b123a-f5a8-43fc-809a-868d525b2554",
+      "source": "conversation"
+    },
+    {
+      "sequence": 15,
+      "type": "model.request",
+      "time": 1792308693.3467474,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "index": 2,
+      "lifetime_calls": 2,
+      "status": 200
+    },
+    {
+      "sequence": 16,
+      "type": "runtime.event",
+      "time": 1792308693.3653364,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "assistant/message",
+            "seq": 17,
+            "time": 1792308693363,
+            "data": {
+              "turn": 1,
+              "step": 2,
+              "usage": {
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "totalTokens": 20
+              },
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Original background command started."
+                  }
+                ]
+              }
+            },
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 17,
+      "type": "runtime.event",
+      "time": 1792308693.3683798,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "turn/end",
+            "seq": 19,
+            "time": 1792308693367,
+            "data": {
+              "turn": 1,
+              "reason": {
+                "kind": "completed"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 18,
+      "type": "runtime.event",
+      "time": 1792308693.3728633,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "status": "idle"
+        }
+      }
+    },
+    {
+      "sequence": 19,
+      "type": "turn.completed",
+      "time": 1792308693.382333,
+      "turn_id": "40943db3-75aa-4649-b929-8d3382b2452e",
+      "model_calls": 2,
+      "lifetime_calls": 2,
+      "final_response": "Original background command started."
+    },
+    {
+      "sequence": 20,
+      "type": "workspace.baseline",
+      "time": 1792308693.4533389,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "files": 0,
+      "complete": true,
+      "content_complete": true
+    },
+    {
+      "sequence": 21,
+      "type": "task.submitted",
+      "time": 1792308693.4533463,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "text": "Run the independent follow-up command. Do not extend or restart the original job."
+    },
+    {
+      "sequence": 22,
+      "type": "turn.started",
+      "time": 1792308693.4566104,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "time_budget_seconds": 20
+    },
+    {
+      "sequence": 23,
+      "type": "runtime.event",
+      "time": 1792308693.4613185,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "status": "running"
+        }
+      }
+    },
+    {
+      "sequence": 24,
+      "type": "runtime.event",
+      "time": 1792308693.4624052,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "turn/start",
+            "seq": 21,
+            "time": 1792308693461,
+            "data": {
+              "turn": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 25,
+      "type": "model.request_started",
+      "time": 1792308693.5923898,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "index": 1,
+      "lifetime_calls": 3,
+      "session_id": "e16b123a-f5a8-43fc-809a-868d525b2554",
+      "source": "conversation"
+    },
+    {
+      "sequence": 26,
+      "type": "model.request",
+      "time": 1792308693.605287,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "index": 1,
+      "lifetime_calls": 3,
+      "status": 200
+    },
+    {
+      "sequence": 27,
+      "type": "runtime.event",
+      "time": 1792308693.635421,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "assistant/message",
+            "seq": 26,
+            "time": 1792308693632,
+            "data": {
+              "turn": 2,
+              "step": 1,
+              "usage": {
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "totalTokens": 20
+              },
+              "message": {
+                "role": "assistant",
+                "content": []
+              }
+            },
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 28,
+      "type": "runtime.event",
+      "time": 1792308693.6375372,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "tool/call",
+            "seq": 27,
+            "time": 1792308693636,
+            "data": {
+              "turn": 2,
+              "step": 1,
+              "callId": "delivery-3",
+              "name": "bash",
+              "arguments": "{\"command\":\"[IO.File]::WriteAllText([IO.Path]::Combine([Environment]::CurrentDirectory, 'followup.txt.started'), [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()); Start-Sleep -Seconds 6; [IO.File]::WriteAllText([IO.Path]::Combine([Environment]::CurrentDirectory, 'followup.txt.awake'), [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()); 'finished' | Set-Content -Encoding UTF8 followup.txt\",\"description\":\"Independent follow-up outlives the first deadline\",\"timeoutMs\":30000}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 29,
+      "type": "jobs.snapshot",
+      "time": 1792308693.946922,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "running",
+          "kind": "bash"
+        },
+        {
+          "id": "bash-2",
+          "status": "running",
+          "kind": "bash"
+        }
+      ]
+    },
+    {
+      "sequence": 30,
+      "type": "jobs.snapshot",
+      "time": 1792308698.2241066,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "killed",
+          "kind": "bash",
+          "detail": "killed before exit"
+        },
+        {
+          "id": "bash-2",
+          "status": "running",
+          "kind": "bash"
+        }
+      ]
+    },
+    {
+      "sequence": 31,
+      "type": "turn.deadline",
+      "time": 1792308713.458265,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "time_budget_seconds": 20
+    },
+    {
+      "sequence": 32,
+      "type": "runtime.event",
+      "time": 1792308713.533644,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "tool/result",
+            "seq": 30,
+            "time": 1792308713527,
+            "data": {
+              "turn": 2,
+              "step": 1,
+              "message": {
+                "role": "tool",
+                "source": {
+                  "kind": "tool",
+                  "callId": "delivery-3"
+                },
+                "toolCallId": "delivery-3",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Error: tool call aborted"
+                  }
+                ],
+                "isError": true,
+                "id": "0cb5d319-6313-4b31-a45f-143b079e8c4d"
+              },
+              "error": {
+                "name": "AbortError",
+                "code": "ABORTED"
+              }
+            },
+            "sourceEventSeqs": [
+              27
+            ],
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 33,
+      "type": "runtime.event",
+      "time": 1792308713.5337129,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "event": {
+            "type": "turn/end",
+            "seq": 32,
+            "time": 1792308713531,
+            "data": {
+              "turn": 2,
+              "reason": {
+                "kind": "aborted",
+                "reason": {
+                  "kind": "user"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 34,
+      "type": "runtime.event",
+      "time": 1792308713.539039,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "e16b123a-f5a8-43fc-809a-868d525b2554",
+          "status": "idle"
+        }
+      }
+    },
+    {
+      "sequence": 35,
+      "type": "tool.observed",
+      "time": 1792308713.548565,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "observation": {
+        "schema": "execution-observation/v1",
+        "epoch": "b2ea5c04-ddcc-4456-bde6-3c43ee2c2899",
+        "sequence": 2,
+        "session_id": "e16b123a-f5a8-43fc-809a-868d525b2554",
+        "call_id": "delivery-3",
+        "sdk_turn": 2,
+        "sdk_step": 1,
+        "call_sequence": 27,
+        "tool": "bash",
+        "state": "failed",
+        "exit_code": null,
+        "signal": null,
+        "job_id": null,
+        "job_kind": null,
+        "wait_ms": null,
+        "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+        "observation_id": "b2ea5c04-ddcc-4456-bde6-3c43ee2c2899:2"
+      }
+    },
+    {
+      "sequence": 36,
+      "type": "jobs.snapshot",
+      "time": 1792308713.5744295,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "killed",
+          "kind": "bash",
+          "detail": "killed before exit"
+        }
+      ]
+    },
+    {
+      "sequence": 37,
+      "type": "turn.cancelled",
+      "time": 1792308713.5744507,
+      "turn_id": "1040aa5f-27b4-4562-89a1-be2d45a1c643",
+      "model_calls": 1,
+      "lifetime_calls": 3,
+      "final_response": "",
+      "error_type": "time_budget_exhausted"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "bash-1",
+      "status": "killed",
+      "kind": "bash",
+      "detail": "killed before exit"
+    }
+  ],
+  "artifacts": {
+    "old-late.txt.started": "1792308694457",
+    "followup.txt.started": "1792308694912"
+  }
+}

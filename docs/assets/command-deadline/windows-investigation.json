@@ -1,6 +1,6 @@
 {
   "schema": "native-followup-command-investigation/v1",
-  "status": "cache_intervention_failed_and_reverted",
+  "status": "accepted_after_explicit_utility_import",
   "tested_diagnostic_commit": "d89d5b5cedfd1084234947af0f6fac55e88432d1",
   "diagnostic_workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39105929239",
   "diagnostic_job": 117611641381,
@@ -24,9 +24,10 @@
   "intervention_log_sha256": "8516aad02560313b783bc1b0709096038055f2f8e9e6da070297320b33580b7e",
   "reverted_by": "0948706",
   "next_diagnostic": {
-    "commit": "014ed2a",
-    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39107341102",
-    "scope": "Only native isolation and source command-deadline method with entry markers; not full matrix acceptance."
+    "status": "completed",
+    "commit": "85337c4",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39109931174",
+    "scope": "Source-only probe passed, followed by the complete matrix acceptance in full_revalidation."
   },
   "focused_bootstrap_failure": {
     "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39106963221",
@@ -34,5 +35,34 @@
     "target_method_run": false,
     "reason": "Dedicated diagnostic workflow did not export MEDAGENT_PYTHON before the isolation probe; original full matrix exports it through windows.ps1. Corrected in 014ed2a.",
     "log_sha256": "80c621b61af0fe5d8ea20aa6a7d683f4cacf313a366042019d4a662b332707bc"
+  },
+  "entry_timing_result": {
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39107721369",
+    "commit": "953dc50",
+    "job": 117617084408,
+    "status": "failed",
+    "new_command_entry_after_task_start_seconds": 1.455,
+    "post_wait_marker_present": false,
+    "result_file_present": false,
+    "interpretation": "The new script enters about 1.5 seconds after its task starts but does not reach the post-Start-Sleep marker before its own 20-second deadline. This excludes slow command entry as the sole explanation, but does not prove whether module discovery or the cmdlet wait is responsible."
+  },
+  "utility_import_result": {
+    "tested_code_commit": "85337c4bec17bc0c9e95ac07fef7dc26e03985ea",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39109931174",
+    "job": 117623667841,
+    "status": "passed",
+    "scope": "Native isolation probe and one source SDK deadline method with both independent_followup=False/True subcases. Normal matrix job was skipped by explicit diagnostic input. Not full Windows acceptance.",
+    "commands_and_limits_unchanged": true,
+    "log_sha256": "ee930761acf0f1f5031e2ca2af97652869de9a0f6b15abb307eda2d3a4176cab",
+    "interpretation": "Explicitly importing the built-in Utility module before workspace command discovery removes the reproducible failure in this focused run. This supports the initialization fix but is not a trace of the internal Windows module-discovery hang."
+  },
+  "full_revalidation": {
+    "tested_code_commit": "85337c4bec17bc0c9e95ac07fef7dc26e03985ea",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39110352224",
+    "status": "passed",
+    "server": "passed",
+    "windows11_source_sdk": "passed",
+    "windows11_bundled_sdk": "passed",
+    "receipt": "../ownership-iteration/windows-native.json"
   }
 }

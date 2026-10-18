@@ -255,16 +255,19 @@
     "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4",
     "short-followup-open-issue/verification.json": "fe446226125458c4cff1b55bd52bac6f9eea0d714acbbbecb24691b96968a3c5",
     "windows-first-attempt.json": "7d49b4d38666c1589422e1fff4c71bc59dd87e8c0513c9155cd4349e8d865b20",
-    "windows-diagnostic-attempt.json": "52f28404c2cf9b0d1de573286e20361de91884648152e1aa88f49e180c1f5846"
+    "windows-diagnostic-attempt.json": "52f28404c2cf9b0d1de573286e20361de91884648152e1aa88f49e180c1f5846",
+    "windows-native.json": "1f0df140d3bd5025f54b483af7a15e2697fc1c00ebda0fd93cd4cf66a9db8fb2"
   },
   "windows": {
-    "status": "failed_source_diagnostic_running",
+    "status": "passed",
     "required": "Both matrices: 51 Node checks and host record checks; five actual-window earlier-child answer receipts; source and bundled isolated SDK ownership/answer/search cases plus the revised command-deadline case.",
     "initial_attempt": "windows-first-attempt.json",
-    "latest_diagnostic_commit": "014ed2a2ef306c2237c3c9ae2ad5633d9a6ab507",
-    "latest_workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39107341102",
+    "latest_diagnostic_commit": "85337c4bec17bc0c9e95ac07fef7dc26e03985ea",
+    "latest_workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39110352224",
     "diagnostic_attempt": "windows-diagnostic-attempt.json",
-    "latest_scope": "Source command-deadline investigation only; full Windows 11 packaged SDK remains unverified for this iteration."
+    "latest_scope": "Both complete matrices accepted: 51 Node and 17 host checks each (16 pass/1 skip); five GUI windows; four source and four bundled Windows 11 SDK methods; Server installer/uninstaller.",
+    "tested_code_commit": "85337c4bec17bc0c9e95ac07fef7dc26e03985ea",
+    "receipt": "windows-native.json"
   },
   "followup_open_issue": "short-followup-open-issue/verification.json",
   "tested_code_commit": "de34f7c0432461a5839e39ee49012aff43ecb6aa"
