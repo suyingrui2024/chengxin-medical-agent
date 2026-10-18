@@ -26,11 +26,16 @@ jobs:
             .runtime/windows
             node_modules
           key: native-windows-v1-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'scripts/windows/runtime-lock.json', 'scripts/windows.ps1') }}
-      - name: Verify native runtimes and real desktop
+      - name: Verify native runtimes and execution profile
         shell: powershell
         run: |
           if ('${{ steps.runtime-cache.outputs.cache-hit }}' -eq 'true') {
-            ./scripts/windows.ps1 -Mode Check
+            & ./.runtime/windows/node/node.exe --version
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & ./.runtime/windows/python/python.exe --version
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & ./.runtime/windows/node/node.exe integrations/dsh/check.mjs
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
             ./scripts/windows.ps1 -Mode Setup -NoShortcut
           }
@@ -39,6 +44,7 @@ jobs:
         run: |
           $env:PATH = (Join-Path $PWD '.runtime/windows/node') + ';' + $env:PATH
           $env:PYTHONPATH = Join-Path $PWD 'src'
+          $env:MEDAGENT_PYTHON = Join-Path $PWD '.runtime/windows/python/python.exe'
           & ./.runtime/windows/node/node.exe scripts/windows/isolation-check.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & ./.runtime/windows/python/python.exe -m unittest tests.test_windows_execution.WindowsExecutionTests.test_original_command_deadline_survives_an_independent_followup -v
