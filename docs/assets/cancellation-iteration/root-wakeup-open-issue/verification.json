@@ -1,7 +1,7 @@
 {
   "schema": "root-wakeup-ownership-resolution/v1",
-  "status": "resolved_locally_pending_windows",
-  "tested_code_commit": "working-tree-root-wakeup-admission",
+  "status": "resolved_on_native_windows_artifact_upload_pending",
+  "tested_code_commit": "ce6d98ec2b1306d1f36c0f01bba002b7fa8fdecd",
   "scope": "Actual SDK with deterministic loopback provider replies, macOS investigation launcher without outer filesystem isolation. No external model calls.",
   "finding": "The root inbox now binds a foreground prompt or child settlement to its original task before prompt assembly and before a provider request. The original three-call task remains limited to its two root requests and one child request. After a separate follow-up completes, the old child settlement cannot take a second provider request from that newer task.",
   "asserted_pair": {
@@ -14,7 +14,8 @@
     "followup_old_completion_requests_charged_to_new_task": 0
   },
   "distinction": "Selective timeout cancellation remains separately covered by the surrounding cancellation record. This probe contains no file-writing tool and isolates shared-root task attribution; the deterministic provider is local and no external model is called.",
-  "next_work": "Run the full native Windows matrix for this source revision. Tool-job completion notices remain fail-closed unless their source can be canonically attributed; no unlabelled notice may borrow the current task budget.",
+  "native_windows_verification": "GitHub Actions run 39147871084 passed the source and packaged SDK execution on Windows 11 Arm running the x64 application; the Server x64 build, packaged application and installer checks also passed. Both jobs failed only while uploading the archive because GitHub Actions reported its artifact-storage quota as not yet recalculated after cleanup.",
+  "next_work": "Tool-job completion notices remain fail-closed unless their source can be canonically attributed; no unlabelled notice may borrow the current task budget. Re-run the artifact upload after GitHub recalculates storage usage.",
   "replay": "Run probe.mjs and probe.mjs --followup from this repository. The original task has three calls; the independent follow-up has eight calls and 30 seconds. The scripts resolve the repository root from their own directory.",
   "artifacts_sha256": {
     "child-control-events.json": "1d4a5de9d92360c99ee4124da0a98b71ed42a6fadd8142a12a707c026ed4c50d",
