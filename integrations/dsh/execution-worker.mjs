@@ -818,7 +818,17 @@ async function proxy(request, response) {
       pending += decoder.decode(chunk, { stream: true });
       for (const secret of secrets)
         pending = pending.replaceAll(secret, "[REDACTED]");
-      const emitLength = Math.max(0, pending.length - retain);
+      let emitLength = Math.max(0, pending.length - retain);
+      // response.write encodes each string separately. Keep a surrogate pair
+      // together when the redaction lookbehind ends inside an astral character.
+      if (
+        emitLength > 0 &&
+        pending.charCodeAt(emitLength - 1) >= 0xd800 &&
+        pending.charCodeAt(emitLength - 1) <= 0xdbff &&
+        pending.charCodeAt(emitLength) >= 0xdc00 &&
+        pending.charCodeAt(emitLength) <= 0xdfff
+      )
+        emitLength--;
       if (!response.destroyed) response.write(pending.slice(0, emitLength));
       else abort.abort();
       pending = pending.slice(emitLength);

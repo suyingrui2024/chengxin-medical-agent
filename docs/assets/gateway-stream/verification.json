@@ -1,0 +1,48 @@
+{
+  "schema": "gateway-unicode-stream/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "83a7fa852ce5b55383bc59f2d0a1acc31dea36e3",
+  "baseline": {
+    "log": "logs/before.log",
+    "actual": "An actual child host worker, loopback upstream and HTTP gateway changed one astral character into two U+FFFD replacement characters at the redaction flush boundary."
+  },
+  "checks": {
+    "node": {
+      "passed": 17,
+      "new_gateway_cases": 3,
+      "log": "logs/accepted.log"
+    },
+    "profile": {
+      "passed": true,
+      "log": "logs/profile.log"
+    }
+  },
+  "scope": [
+    "Move the outgoing string boundary back by one UTF-16 code unit when it would split a valid surrogate pair.",
+    "Keep the existing UTF-8 streaming decoder and secret-redaction lookbehind; no SDK, tool, budget, deadline or patient-flow change.",
+    "Actual HTTP checks compare complete received text, a four-byte UTF-8 character split across upstream chunks, and a synthetic credential split across chunks alongside Unicode.",
+    "Each gateway case checks one actual loopback provider request and one counted model call; the configured synthetic provider credential is supplied upstream and absent from the forwarded text."
+  ],
+  "boundaries": [
+    "The host worker and HTTP forwarding are real. A test-only Node loader substitutes the SDK client with a double; no real SDK process, command execution, agent reasoning or filesystem isolation is exercised by these three tests.",
+    "Tests use synthetic stream fragments and credentials, not external model calls or patient data.",
+    "These checks do not prove arbitrary transport compatibility or measure model task quality.",
+    "Browser and native GUI suites were not rerun for this transport-only change. Existing layout acceptance remains attached to its earlier tested commits."
+  ],
+  "source_files_sha256": {
+    "integrations/dsh/execution-worker.mjs": "3cd972f58612633e9393680b5db38e767f66954c5bcf066ad5d5b07e9722c7cd",
+    "integrations/dsh/tests/gateway-stream.test.mjs": "ed406c757e16caef5c9c5d557e7ddaa0a4bd54039a44e721c485fe025649e223",
+    "tests/fixtures/gateway-loader.mjs": "918d81048d688ab80a8bcabb2bfcb6210d5329bc71f7d44c634ae484399152fc",
+    "tests/fixtures/gateway-sdk.mjs": "6e27adce661a74e2d7b11ecd9075f88f18230f6f683f1999dfcdb3054795bbeb",
+    ".github/workflows/windows-native.yml": "a7f65f5dc1300ecef0da6f34e655f204a416ff4da44828c692e1c7c1542b9c55"
+  },
+  "artifacts_sha256": {
+    "logs/accepted.log": "8aad20cab14607aabee01e32cf1d84ffc6e3e6d2cfce71e1d811dcf13c12bc8d",
+    "logs/before.log": "90831598f4845af497edfe78acbca9e8ee02ac5a0c61fa61a97ec5e16e7d36e8",
+    "logs/profile.log": "2e855261c8381ed2c57665af31a2552fa68d1d99cdffe360cbaba335b3eba691"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Three actual-host gateway transport cases on both native matrices, plus existing full SDK, GUI and installation acceptance."
+  }
+}

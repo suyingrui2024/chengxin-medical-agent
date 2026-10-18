@@ -1,0 +1,25 @@
+✔ checkpoint scopes keep prior inputs and reject traversal before any scan (0.758167ms)
+✔ only complete canonical checkpoint metadata carries a proof digest (0.15675ms)
+✔ a parent or root scope cannot erase an explicitly watched cache input (0.108334ms)
+✔ scope order uses Unicode scalar order consistently with the Python host (0.466875ms)
+✔ delivery outcomes use the SDK job producer status, never printed claims (0.706917ms)
+✔ actual tool registration rejects invalid commands before launching any process (1.441167ms)
+✔ only typed delivery values acquire command identity and process outcomes (0.198ms)
+✔ late optional results cannot downgrade a concurrent required declaration (0.051708ms)
+✔ accepted check arguments share explicit bounds and explain rejected proposals (0.179583ms)
+✔ a long accepted check reads the same running job again after a bounded wait (8.355583ms)
+✔ stdout cannot override a canonical process outcome (0.494958ms)
+✔ background process detail is separate from output and producer kinds (0.130208ms)
+✔ nested calls and missing call coordinates do not acquire invented identity (0.082583ms)
+✔ active preparation and stopping work cannot be treated as quiescent (0.198666ms)
+✔ actual host gateway preserves astral character at the redaction flush boundary (SDK double, no isolation) (170.563708ms)
+✔ actual host gateway preserves four-byte UTF-8 character split across upstream chunks (SDK double, no isolation) (279.938125ms)
+✔ actual host gateway preserves credential split across chunks alongside Unicode (SDK double, no isolation) (287.798625ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 786.103542
