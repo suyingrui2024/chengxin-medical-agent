@@ -11,15 +11,24 @@ export default class NativePowerShellExecutor extends LocalBashExecutor {
       process.env.SystemRoot,
       "System32/WindowsPowerShell/v1.0/powershell.exe",
     );
-    return this.executeArgv(bounded, [
-      shell,
-      "-NoLogo",
-      "-NoProfile",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-NonInteractive",
-      "-EncodedCommand",
-      Buffer.from(nativePowerShellSource(spec), "utf16le").toString("base64"),
-    ]);
+    // Each managed command uses a fresh PowerShell process. Avoid sharing an
+    // asynchronously written analysis cache across overlapping, killable jobs.
+    // Windows PowerShell 5.1 documents NUL as the supported cache opt-out.
+    return this.executeArgv(
+      {
+        ...bounded,
+        env: { ...bounded.env, PSModuleAnalysisCachePath: "NUL" },
+      },
+      [
+        shell,
+        "-NoLogo",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-NonInteractive",
+        "-EncodedCommand",
+        Buffer.from(nativePowerShellSource(spec), "utf16le").toString("base64"),
+      ],
+    );
   }
 }
