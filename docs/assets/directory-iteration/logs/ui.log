@@ -1,0 +1,149 @@
+
+Running 141 tests using 1 worker
+
+(node:72550) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/141] tests/ui/appearance.spec.mjs:77:3 › forest: all surfaces and live drafts keep contrast and state
+[2/141] tests/ui/appearance.spec.mjs:77:3 › ocean: all surfaces and live drafts keep contrast and state
+[3/141] tests/ui/appearance.spec.mjs:77:3 › iris: all surfaces and live drafts keep contrast and state
+[4/141] tests/ui/appearance.spec.mjs:77:3 › sand: all surfaces and live drafts keep contrast and state
+[5/141] tests/ui/appearance.spec.mjs:77:3 › slate: all surfaces and live drafts keep contrast and state
+[6/141] tests/ui/appearance.spec.mjs:77:3 › night: all surfaces and live drafts keep contrast and state
+[7/141] tests/ui/appearance.spec.mjs:139:3 › forest: urgent summaries retain their meaning and readable measurements
+[8/141] tests/ui/appearance.spec.mjs:139:3 › ocean: urgent summaries retain their meaning and readable measurements
+[9/141] tests/ui/appearance.spec.mjs:139:3 › iris: urgent summaries retain their meaning and readable measurements
+[10/141] tests/ui/appearance.spec.mjs:139:3 › sand: urgent summaries retain their meaning and readable measurements
+[11/141] tests/ui/appearance.spec.mjs:139:3 › slate: urgent summaries retain their meaning and readable measurements
+[12/141] tests/ui/appearance.spec.mjs:139:3 › night: urgent summaries retain their meaning and readable measurements
+[13/141] tests/ui/appearance.spec.mjs:169:3 › appearance picker works at 390×844, with keyboard and reload
+[14/141] tests/ui/appearance.spec.mjs:169:3 › appearance picker works at 320×640, with keyboard and reload
+[15/141] tests/ui/appearance.spec.mjs:169:3 › appearance picker works at 900×648, with keyboard and reload
+[16/141] tests/ui/appearance.spec.mjs:202:1 › system mode responds to OS changes, manual mode stays chosen, tabs sync
+[17/141] tests/ui/appearance.spec.mjs:223:1 › invalid or unavailable storage keeps appearance controls usable
+[18/141] tests/ui/appearance.spec.mjs:244:1 › enlarging each temperature step preserves the draft and progress
+[19/141] tests/ui/appearance.spec.mjs:283:1 › missing instructional artwork keeps the written steps available
+[20/141] tests/ui/appearance.spec.mjs:298:1 › short developer windows can reach all navigation and model settings
+[21/141] tests/ui/appearance.spec.mjs:312:1 › transient status messages remain readable in every skin
+[22/141] tests/ui/artifact-actions.spec.mjs:26:1 › copy and save preserve exact inert original text, independent of table or chart mode
+[23/141] tests/ui/artifact-actions.spec.mjs:68:1 › image exports verify actual bytes and reject stale image content
+[24/141] tests/ui/artifact-actions.spec.mjs:114:1 › a delayed image save cannot export into a newly selected workspace
+[25/141] tests/ui/artifact-chart.spec.mjs:35:1 › tables switch to zero-based charts, keep exact values and retain the selected column in the expanded view
+[26/141] tests/ui/artifact-chart.spec.mjs:81:1 › missing, formula and unsafe numeric columns do not become charts
+[27/141] tests/ui/artifact-chart.spec.mjs:93:1 › truncation and untrusted labels stay explicit and inert
+[28/141] tests/ui/artifact-chart.spec.mjs:119:1 › long previews scroll with the keyboard without changing row order
+[29/141] tests/ui/artifact-chart.spec.mjs:163:1 › changed files retain the snapshot warning and switching workspaces clears the chart
+[30/141] tests/ui/artifact-chart.spec.mjs:196:3 › chart rows remain readable in six themes on wide
+[31/141] tests/ui/artifact-chart.spec.mjs:196:3 › chart rows remain readable in six themes on mobile
+[32/141] tests/ui/artifact-chart.spec.mjs:196:3 › chart rows remain readable in six themes on small
+[33/141] tests/ui/assertion-flow.spec.mjs:7:1 › uncertain denials are rejected atomically, repaired and preserved through patient correction
+[34/141] tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections
+[35/141] tests/ui/calculation-supplements.spec.mjs:8:3 › calculation supplements survive retries and later corrections on a narrow screen
+[36/141] tests/ui/capabilities.spec.mjs:9:1 › patient view removes developer navigation while keeping the same conversation
+[37/141] tests/ui/capabilities.spec.mjs:35:1 › capability workspace calculates without writing cases and pins old session versions
+[38/141] tests/ui/capabilities.spec.mjs:126:1 › a catalog loading in the background cannot replace a template selection
+[39/141] tests/ui/clarification-drafts.spec.mjs:32:1 › choose, revise and edit a draft without submitting until Send, retaining it across host polling
+[40/141] tests/ui/clarification-drafts.spec.mjs:63:1 › failed sending preserves the editable draft and a retry submits exactly once
+[41/141] tests/ui/clarification-drafts.spec.mjs:84:1 › changed or removed questions and workspace switches never reuse an old answer draft
+[42/141] tests/ui/clarification-drafts.spec.mjs:115:3 › editable answers remain within the screen across six themes at 320px
+[43/141] tests/ui/clarification-drafts.spec.mjs:115:3 › editable answers remain within the screen across six themes at 390px
+[44/141] tests/ui/consultation-subjects.spec.mjs:7:1 › unsubmitted patient text stays with its original session
+[45/141] tests/ui/consultation-subjects.spec.mjs:54:1 › choosing an answer does not silently submit or erase a different composer draft
+[46/141] tests/ui/consultation-subjects.spec.mjs:84:3 › consultation subjects stay separate and new-case text remains editable
+[47/141] tests/ui/consultation-subjects.spec.mjs:84:3 › consultation subjects stay separate and new-case text remains editable on a narrow screen
+[48/141] tests/ui/directory-recovery.spec.mjs:9:1 › a stalled directory read times out and retries without losing the file list or task draft
+[49/141] tests/ui/directory-recovery.spec.mjs:40:1 › manual directory recovery preserves preview, draft and keyboard focus without duplicate reads
+[50/141] tests/ui/directory-recovery.spec.mjs:54:1 › failed navigation retries the requested folder and does not relabel the previous listing
+[51/141] tests/ui/directory-recovery.spec.mjs:103:1 › switching workspaces aborts an outstanding directory read and clears the old scope
+[52/141] tests/ui/directory-recovery.spec.mjs:129:1 › changing the hidden-file scope cancels the prior read and cannot retain hidden entries after a failed refresh
+[53/141] tests/ui/directory-recovery.spec.mjs:193:3 › directory recovery and touch controls fit 320px in six themes
+[54/141] tests/ui/directory-recovery.spec.mjs:193:3 › directory recovery and touch controls fit 390px in six themes
+[55/141] tests/ui/execution-focus.spec.mjs:7:1 › host state shows a waiting action and preserves answers and background work
+[56/141] tests/ui/execution-focus.spec.mjs:47:1 › file shortcuts open inert image, table and source previews without automatic reads
+[57/141] tests/ui/execution-focus.spec.mjs:104:1 › a completed turn with a failed tool remains visibly unresolved
+[58/141] tests/ui/execution-focus.spec.mjs:142:1 › long results use a short excerpt, keep the full text and leave failures visible
+[59/141] tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on wide
+[60/141] tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on mobile
+[61/141] tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on small
+[62/141] tests/ui/execution-inputs.spec.mjs:7:1 › an unverified input scope cannot show a passing check even with exit zero and a current end snapshot
+[63/141] tests/ui/execution-recovery.spec.mjs:18:1 › an idle workspace recovers its status automatically after a transient read failure
+[64/141] tests/ui/execution-recovery.spec.mjs:41:1 › manual reconnect preserves file, task draft and execution errors, rejects duplicate reads and restores keyboard focus
+[65/141] tests/ui/execution-recovery.spec.mjs:97:1 › a stalled request times out, permits reconnection and keeps the user's active input focus
+[66/141] tests/ui/execution-recovery.spec.mjs:128:1 › late older poll responses cannot revert a newer submitted answer
+[67/141] tests/ui/execution-recovery.spec.mjs:192:1 › invalid status data and delayed requests cannot replace the selected workspace
+[68/141] tests/ui/execution-recovery.spec.mjs:224:1 › failed reads back off and do not continue while another view is open
+[69/141] tests/ui/execution-recovery.spec.mjs:254:3 › recovery and preview actions have comfortable touch targets and contrast at 320px in six themes
+[70/141] tests/ui/execution-recovery.spec.mjs:254:3 › recovery and preview actions have comfortable touch targets and contrast at 390px in six themes
+[71/141] tests/ui/glucose-calculation.spec.mjs:7:1 › glucose renderer rejects missing basis and unsafe links while preserving legacy results
+[72/141] tests/ui/glucose-calculation.spec.mjs:100:1 › sourced glucose conversion uses a scoped form, approximate result and original consultation
+[73/141] tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on wide
+[74/141] tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on mobile
+[75/141] tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on short
+[76/141] tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on prefill
+[77/141] tests/ui/location-answers.spec.mjs:13:3 › location answers match region, area, side and extent on custom
+[78/141] tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on wide
+[79/141] tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on mobile
+[80/141] tests/ui/location-layout.spec.mjs:10:3 › location controls have separate readable targets on short
+[81/141] tests/ui/location-revisions.spec.mjs:11:3 › confirmed location revision cancels safely and resumes the question on wide
+[82/141] tests/ui/location-revisions.spec.mjs:11:3 › confirmed location revision cancels safely and resumes the question on mobile
+[83/141] tests/ui/location-revisions.spec.mjs:11:3 › confirmed location revision cancels safely and resumes the question on short
+[84/141] tests/ui/location-revisions.spec.mjs:41:1 › location revision returns an unsent severity selection to the original question
+[85/141] tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry
+[86/141] tests/ui/measurement-supplements.spec.mjs:8:3 › full measurement reports retain medication updates through failure and retry on a narrow screen
+[87/141] tests/ui/measurement-supplements.spec.mjs:39:1 › supplement evidence stays inert and invalid processing status falls back
+[88/141] tests/ui/observation-completion.spec.mjs:12:3 › location clarification stays graphical and completed results survive retry on wide
+[89/141] tests/ui/observation-completion.spec.mjs:12:3 › location clarification stays graphical and completed results survive retry on mobile
+[90/141] tests/ui/observation-completion.spec.mjs:12:3 › location clarification stays graphical and completed results survive retry on short
+[91/141] tests/ui/patient-calculation.spec.mjs:7:1 › patient calculation confirms editable inputs, recovers a lost response and stays readable on mobile
+[92/141] tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts
+[93/141] tests/ui/present-provenance.spec.mjs:8:3 › recorded reports expose scoped original evidence without changing facts on a narrow screen
+[94/141] tests/ui/present-provenance.spec.mjs:40:1 › recorded evidence is inert, malformed sources fall back and old summaries remain readable
+[95/141] tests/ui/readiness.spec.mjs:3:1 › workspace mode cannot lose an interaction before module hydration
+[96/141] tests/ui/repeated-observations.spec.mjs:9:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk
+[97/141] tests/ui/repeated-observations.spec.mjs:9:3 › repeated temperatures retain history, distinguish skipped attempts and reassess risk on a narrow screen
+[98/141] tests/ui/repeated-observations.spec.mjs:41:1 › observation rendering rejects malformed histories and treats evidence as inert text
+[99/141] tests/ui/repeated-observations.spec.mjs:107:1 › a narrow-screen repeat returns to the same question with its measurement visible
+[100/141] tests/ui/repeated-observations.spec.mjs:135:3 › short desktop observation keeps choices visible at 900x680
+[101/141] tests/ui/repeated-observations.spec.mjs:135:3 › short desktop observation keeps choices visible at 900x760
+[102/141] tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on wide
+[103/141] tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on mobile
+[104/141] tests/ui/self-check-conversation.spec.mjs:12:3 › self-check conversation resumes and confirms sources on short
+[105/141] tests/ui/self-check-drafts.spec.mjs:10:3 › unconfirmed location and steps survive switching sessions
+[106/141] tests/ui/self-check-drafts.spec.mjs:10:3 › unconfirmed location and steps survive switching sessions on mobile
+[107/141] tests/ui/self-check-drafts.spec.mjs:22:1 › invalid temperature feedback keeps the same task progress without recording a reading
+[108/141] tests/ui/self-check-drafts.spec.mjs:31:1 › new task occurrences reset steps while same occurrences and sessions stay separate
+[109/141] tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on wide
+[110/141] tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on short
+[111/141] tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on mobile
+[112/141] tests/ui/self-check-visuals.spec.mjs:15:3 › the current temperature action and controls fit on small
+[113/141] tests/ui/self-check-visuals.spec.mjs:78:1 › body diagram clicks and keyboard selection keep a draft until explicit confirmation
+[114/141] tests/ui/self-check-visuals.spec.mjs:137:1 › a different capability instruction is never replaced by the compact vocabulary
+[115/141] tests/ui/uncertain-reports.spec.mjs:4:1 › unresolved narratives remain visible and editable through a complete consultation
+[116/141] tests/ui/uncertain-reports.spec.mjs:14:1 › a narrow patient window preserves reports and usable correction controls
+[117/141] tests/ui/uncertain-reports.spec.mjs:25:1 › unresolved reports render inertly, validate their contract and preserve older summaries
+[118/141] tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late response
+[119/141] tests/ui/urgent-interrupt.spec.mjs:4:3 › priority help stays available during a pending message and ignores its late error
+[120/141] tests/ui/urgent-interrupt.spec.mjs:87:1 › priority help preserves a failed request draft and works at a narrow viewport
+[121/141] tests/ui/visual-answer-drafts.spec.mjs:9:3 › visual degree confirms one answer and preserves independent text
+[122/141] tests/ui/visual-answer-drafts.spec.mjs:9:3 › visual degree confirms one answer and preserves independent text on a narrow screen
+[123/141] tests/ui/visual-answer-drafts.spec.mjs:21:1 › pending visual choices stay with their session and never submit on return
+[124/141] tests/ui/visual-answer-drafts.spec.mjs:50:1 › read-only and busy degree cards reject forced programmatic actions
+[125/141] tests/ui/visual-consultation.spec.mjs:25:1 › visual choices show actual questions, keep history available and send one explicit answer
+[126/141] tests/ui/visual-consultation.spec.mjs:67:1 › degree scale confirms one selected answer independently of the text draft
+[127/141] tests/ui/visual-consultation.spec.mjs:106:1 › body location uses a deliberate selection and confirmation, preserving self-report quality
+[128/141] tests/ui/visual-consultation.spec.mjs:135:1 › mobile visual screen and degree scale stay readable without overlapping targets
+[129/141] tests/ui/visual-consultation.spec.mjs:178:1 › custom and malformed visual components preserve question meaning and isolate unsafe data
+[130/141] tests/ui/visual-consultation.spec.mjs:225:1 › the smallest desktop window keeps the actual response controls inside the viewport
+[131/141] tests/ui/workspace.spec.mjs:9:1 › patient conversation, self-check, history, evidence and export use actual server state
+[132/141] tests/ui/workspace.spec.mjs:125:1 › structured components isolate errors and keep patient text inert
+[133/141] tests/ui/workspace.spec.mjs:179:1 › unknown result components produce a visible fallback instead of disappearing
+[134/141] tests/ui/workspace.spec.mjs:197:1 › an emergency notice remains visible through the structured renderer
+[135/141] tests/ui/workspace.spec.mjs:219:1 › settings are real, keep old sessions, and never return credentials
+[136/141] tests/ui/workspace.spec.mjs:249:1 › task library preview cannot write observations and has step navigation
+[137/141] tests/ui/workspace.spec.mjs:275:1 › mobile layout has no horizontal overflow and exposes records and navigation
+[138/141] tests/ui/workspace.spec.mjs:324:1 › editing a fact updates the actual case and retains the previous value
+[139/141] tests/ui/workspace.spec.mjs:352:1 › a stale fact editor preserves the draft and refreshes the current record
+[140/141] tests/ui/workspace.spec.mjs:399:1 › changing the consultation subject opens a separate case and retains the original
+[141/141] tests/ui/workspace.spec.mjs:431:1 › a lost response recovers persisted progress and patient markup stays plain text
+  141 passed (4.4m)

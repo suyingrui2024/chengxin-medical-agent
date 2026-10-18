@@ -1,0 +1,15 @@
+
+Running 7 tests using 1 worker
+
+(node:72475) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/7] tests/ui/directory-recovery.spec.mjs:9:1 › a stalled directory read times out and retries without losing the file list or task draft
+[2/7] tests/ui/directory-recovery.spec.mjs:40:1 › manual directory recovery preserves preview, draft and keyboard focus without duplicate reads
+[3/7] tests/ui/directory-recovery.spec.mjs:54:1 › failed navigation retries the requested folder and does not relabel the previous listing
+[4/7] tests/ui/directory-recovery.spec.mjs:103:1 › switching workspaces aborts an outstanding directory read and clears the old scope
+[5/7] tests/ui/directory-recovery.spec.mjs:129:1 › changing the hidden-file scope cancels the prior read and cannot retain hidden entries after a failed refresh
+[6/7] tests/ui/directory-recovery.spec.mjs:193:3 › directory recovery and touch controls fit 320px in six themes
+[7/7] tests/ui/directory-recovery.spec.mjs:193:3 › directory recovery and touch controls fit 390px in six themes
+  7 passed (41.6s)

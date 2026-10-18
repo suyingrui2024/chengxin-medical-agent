@@ -1,0 +1,40 @@
+
+Running 1 test using 1 worker
+
+(node:72188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/1] tests/ui/directory-recovery.spec.mjs:7:1 › a stalled directory read times out and retries without losing the file list or task draft
+  1) tests/ui/directory-recovery.spec.mjs:7:1 › a stalled directory read times out and retries without losing the file list or task draft 
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 2
+    Received:    1
+
+    Call Log:
+    - Timeout 21000ms exceeded while waiting on the predicate
+
+      21 |     routes.push(route);
+      22 |   });
+    > 23 |   await expect.poll(() => reads, { timeout: 21000 }).toBeGreaterThanOrEqual(2);
+         |                                                      ^
+      24 |   await expect(page.locator("#execution-directory-status")).toContainText(
+      25 |     "上次列表",
+      26 |   );
+        at /Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/ui/directory-recovery.spec.mjs:23:54
+
+    Error Context: test-results/ui/directory-recovery-a-stall-17445-the-file-list-or-task-draft/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/directory-recovery-a-stall-17445-the-file-list-or-task-draft/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/directory-recovery-a-stall-17445-the-file-list-or-task-draft/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    tests/ui/directory-recovery.spec.mjs:7:1 › a stalled directory read times out and retries without losing the file list or task draft 

@@ -2,6 +2,7 @@ import { _electron as electron, test, expect } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyDirectoryRecovery } from "../fixtures/directory-recovery.mjs";
 import {
   installExecutionFocusFixture,
   openFocusWorkspace,
@@ -38,6 +39,7 @@ test("native focused work area renders host snapshots and opens an inert preview
     );
     await verifyEditableAnswer(page, fixture);
     await verifyExecutionRecovery(page, fixture);
+    await verifyDirectoryRecovery(page);
     fixture.first.status = "completed";
     await expect(page.locator("#execution-focus-label")).toHaveText(
       "本轮已完成",

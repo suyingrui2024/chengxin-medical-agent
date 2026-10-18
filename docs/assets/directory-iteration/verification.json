@@ -1,0 +1,86 @@
+{
+  "schema": "directory-recovery-usability/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "83579e5b3f1cfc01850879dae45df8aa308fd111",
+  "baseline": {
+    "commit": "83579e5b3f1cfc01850879dae45df8aa308fd111",
+    "result": "Expected failure: stalled directory GET never retried within 21 seconds; one directory request observed.",
+    "log": "logs/baseline-stalled.log"
+  },
+  "checks": {
+    "browser": {
+      "passed": 141,
+      "log": "logs/ui.log"
+    },
+    "focused": {
+      "passed": 7,
+      "log": "logs/focused.log"
+    },
+    "native_desktop": {
+      "passed": 6,
+      "log": "logs/desktop.log"
+    },
+    "responsive": {
+      "widths": [320, 390],
+      "themes": ["forest", "ocean", "iris", "sand", "slate", "night"],
+      "scoped_axe_rules": [
+        "color-contrast",
+        "button-name",
+        "label",
+        "target-size"
+      ],
+      "minimum_touch_target_height_css_px": 44,
+      "scope": "Directory region, file rows, hidden-file label, direct-path summary and retry control."
+    },
+    "format": "passed",
+    "diff_check": "passed"
+  },
+  "scope": [
+    "15-second actual fetch timeout; automatic bounded retry and manual retry without duplicate reads.",
+    "Same-path and same-hidden-scope cached list marked stale and disabled; unknown counts until recovery.",
+    "Failed folder navigation retains the requested target and pagination; obsolete requests cancelled on replacement, workspace reset and storage failure.",
+    "Changing hidden scope cannot reuse cached entries from the prior scope.",
+    "Focus transfers from unavailable file controls to retry, then back to the list if the user remains there; active task editing retains focus.",
+    "Task draft and existing preview preserved; directory recovery sends GET only.",
+    "Real native Electron failure injection with synthetic host snapshots, included in Windows source, portable and installed GUI checks."
+  ],
+  "research": [
+    {
+      "url": "https://www.assistant-ui.com/elements/connection-state",
+      "applied": "Separate transport trouble from task state; no healthy-state banner."
+    },
+    {
+      "url": "https://tanstack.com/query/latest/docs/framework/react/guides/background-fetching-indicators",
+      "applied": "Keep known content visible while re-reading, with explicit stale labeling and disabled file actions."
+    }
+  ],
+  "boundaries": [
+    "No external model requests, new dependencies, clinical changes or reasoning-performance claim.",
+    "Background retry is driven by existing workspace status updates; actual intervals include their scheduling and status transport delays.",
+    "Client cancellation does not claim to interrupt a filesystem scan already running on the host.",
+    "Snapshot fixtures are not a complete SDK or clinical evaluation.",
+    "Scoped automated accessibility checks are not a full accessibility certification."
+  ],
+  "source_files_sha256": {
+    "src/medagent/web/execution-directory-ui.js": "d1251c10ebf72e7d08c0bd0f7d09d6f009ffe18582f0921e8bc600e1efc76585",
+    "src/medagent/web/execution-focus.css": "0d608a33741a6da5775a136d76c65df70a7bb9a3711f10d9741e439c0ddc936e",
+    "src/medagent/web/index.html": "e38fb8814e92277faffeb0d37b685b3eb3b29514f99d4537e107373a4e36c600",
+    "tests/fixtures/directory-recovery.mjs": "c69976423bea07ac52ce05639ac6ccf067bafc4a1c2b2a3a4989c8624ff6140d",
+    "tests/ui/directory-recovery.spec.mjs": "fbe8dd6e9df28eeda90d94f4a869bc5c14ea9af9eeb75db9d94f521c901c037d",
+    "tests/desktop/execution-focus.spec.mjs": "07750a55ba802b320642859b070815ad5fac4beebe041e83fbcd6ede0bf9f1c5",
+    "scripts/windows/gui-check.mjs": "3eb442b0c4204710a795b19b9b12f54b9e6705ee25d7521f47cadf19f04af1b5"
+  },
+  "artifacts_sha256": {
+    "directory-320-forest.png": "4b7e767c16df739e717342c72e8a6b1af4d6bb8f975cd4ad04abba0a7477b4fa",
+    "directory-320-night.png": "b7db1d37bf9363e3ebd97a079789ccd0fb76f988b7b9e8f90f3f9a786aa29378",
+    "directory-390-forest.png": "8e2fc0c08ede24af2ad6b0aa362cf2f1f2f401f37d06ce8e8042cfcfbf7dda36",
+    "logs/baseline-stalled.log": "9773b94627982931cf0c0dd4635b9632379a4a1dbab444b368faa9e43e0db8b8",
+    "logs/desktop.log": "76b7e76af866402e2b1c55cc2f174b80b1c8fa728843859f1e73563e27cc0d7b",
+    "logs/focused.log": "c704d91fbd830658a46be8240abe056f2cb3a257d486b9487618f504153846a9",
+    "logs/ui.log": "bc923b2e6ef53f9e31ed1097cda3370bd1576519cbc9bcd6a2df2cae0dc0b483"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Windows 11 source and portable windows, and Windows Server source, portable and installed windows, must emit directory_recovery receipts; native SDK, installation and uninstallation checks must remain passing."
+  }
+}

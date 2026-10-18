@@ -701,13 +701,18 @@
                       </button>
                     </form>
                   </details>
-                  <p
-                    id="execution-directory-status"
-                    class="directory-status"
-                    role="status"
-                  >
-                    选择工作区后按目录查看文件。
-                  </p>
+                  <div class="directory-state">
+                    <p
+                      id="execution-directory-status"
+                      class="directory-status"
+                      role="status"
+                    >
+                      选择工作区后按目录查看文件。
+                    </p>
+                    <button id="execution-directory-retry" type="button" hidden>
+                      重新读取
+                    </button>
+                  </div>
                   <div
                     id="execution-files"
                     class="execution-files"

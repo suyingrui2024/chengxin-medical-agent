@@ -218,6 +218,32 @@
   margin: 5px 0 0;
   overflow-wrap: anywhere;
 }
+.directory-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 16px 0;
+}
+.directory-state .directory-status {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.directory-state button {
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--light);
+  color: var(--primary);
+  padding: 7px 9px;
+  min-height: 32px;
+  font-size: 12px;
+}
+.directory-state button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: progress;
+}
 @media (max-width: 700px), (pointer: coarse) {
   .artifact-controls button,
   .execution-focus button,
@@ -225,7 +251,8 @@
   .execution-question-custom,
   .directory-toolbar button,
   .directory-pages button,
-  .directory-direct button {
+  .directory-direct button,
+  .directory-state button {
     min-width: 44px;
     min-height: 44px;
     font-size: 13px;
@@ -236,5 +263,13 @@
   .execution-connection summary {
     min-height: 44px;
     padding-block: 13px;
+  }
+  .directory-toolbar label,
+  .directory-direct summary,
+  .execution-file {
+    min-height: 44px;
+  }
+  .directory-state .directory-status {
+    font-size: 12px;
   }
 }

@@ -16,6 +16,7 @@ import {
   verifyExecutionRecovery,
 } from "../../tests/fixtures/execution-focus.mjs";
 import { verifyNativeArtifactChart } from "../../tests/fixtures/native-artifact-chart.mjs";
+import { verifyDirectoryRecovery } from "../../tests/fixtures/directory-recovery.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const scratch = await mkdtemp(join(tmpdir(), "chengxin native gui 中文-"));
 const model = await createGlucoseModel();
@@ -133,6 +134,7 @@ try {
   );
   const draftReceipt = await verifyEditableAnswer(reopened, focusFixture);
   const recoveryReceipt = await verifyExecutionRecovery(reopened, focusFixture);
+  const directoryReceipt = await verifyDirectoryRecovery(reopened);
   assert.equal(model.requests.length, beforeChart);
   focusFixture.first.status = "completed";
   await expect(reopened.locator("#execution-focus-label")).toHaveText(
@@ -146,6 +148,7 @@ try {
   console.log(
     JSON.stringify({
       gui: "passed",
+      directory_recovery: directoryReceipt,
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,

@@ -10,7 +10,11 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
     cursors = [null],
     signature = "",
     suspended = false,
-    listingUnavailable = false;
+    listingUnavailable = false,
+    controller = null,
+    failures = 0,
+    retryAt = 0,
+    requested = { path: "", cursor: null, index: 0, stack: [null] };
   function node(tag, cls, text) {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -38,9 +42,17 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
     $("execution-directory-hidden").disabled = disabled;
     $("execution-file-path").disabled = disabled;
     $("execution-file-open-button").disabled = disabled;
+    $("execution-directory-retry").hidden = !listingUnavailable;
+    $("execution-directory-retry").disabled = disabled;
+    $("execution-directory-retry").setAttribute(
+      "aria-disabled",
+      String(pending),
+    );
   }
   function reset() {
     generation++;
+    controller?.abort();
+    controller = null;
     pending = false;
     foreground = false;
     lastLoad = 0;
@@ -50,6 +62,8 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
     signature = "";
     suspended = false;
     listingUnavailable = false;
+    failures = retryAt = 0;
+    requested = { path: "", cursor: null, index: 0, stack: [null] };
     $("execution-files").replaceChildren();
     $("execution-directory-breadcrumb").replaceChildren();
     $("execution-directory-hidden").checked = false;
@@ -57,6 +71,7 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
     $("execution-file-count").textContent = "—";
     $("execution-directory-page").textContent = "";
     status("选择工作区后按目录查看文件。");
+    $("execution-directory-status").removeAttribute("title");
     controls();
   }
   function render(value, index, focus = false, note = "") {
@@ -183,14 +198,21 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
     const current = getCurrent();
     if (!current || current.storage_error) return;
     const request = ++generation,
-      id = current.id;
+      id = current.id,
+      includeHidden = $("execution-directory-hidden").checked;
+    controller?.abort();
+    const active = new AbortController();
+    controller = active;
+    const timeout = setTimeout(() => active.abort(), 15000);
+    requested = { path, cursor, index, stack };
     pending = true;
     foreground = !background;
     lastLoad = Date.now();
     controls();
     try {
       const value = await api(
-        `/api/execution/${id}/directory?path=${encodeURIComponent(path)}&hidden=${$("execution-directory-hidden").checked ? 1 : 0}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`,
+        `/api/execution/${id}/directory?path=${encodeURIComponent(path)}&hidden=${includeHidden ? 1 : 0}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`,
+        { signal: active.signal },
       );
       if (
         request !== generation ||
@@ -201,6 +223,7 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
       if (
         value?.schema_version !== "execution-directory/v1" ||
         value.path !== path ||
+        value.include_hidden !== includeHidden ||
         !Array.isArray(value.entries) ||
         value.entries.length > 200 ||
         typeof value.scan_complete !== "boolean" ||
@@ -221,17 +244,35 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
         )
       )
         throw new Error("目录响应无效，请重新读取。");
+      const returnFocus =
+        listingUnavailable &&
+        document.activeElement === $("execution-directory-retry");
       listingUnavailable = false;
+      failures = retryAt = 0;
+      $("execution-directory-status").removeAttribute("title");
       render(value, index, focus, note);
       data = value;
       pageIndex = index;
       cursors = stack;
       onListed(value.entries.filter((e) => e.kind === "file"));
+      if (returnFocus) $("execution-files").focus({ preventScroll: true });
     } catch (error) {
       if (request !== generation || getCurrent()?.id !== id) return;
+      const priorFocus = document.activeElement;
+      const fileFocused =
+        $("execution-files").contains(priorFocus) ||
+        $("execution-quick-files").contains(priorFocus);
       listingUnavailable = true;
       signature = "";
-      $("execution-files").replaceChildren();
+      const cached =
+        data?.path === path && data.include_hidden === includeHidden;
+      if (cached)
+        $("execution-files")
+          .querySelectorAll("button")
+          .forEach((row) => {
+            row.disabled = true;
+          });
+      else $("execution-files").replaceChildren();
       $("execution-file-count").textContent = "—";
       $("execution-directory-page").textContent = "—";
       onListed([]);
@@ -248,8 +289,24 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
         );
         return;
       }
-      status(`目录未能读取：${error.message}`);
+      failures++;
+      retryAt =
+        Date.now() + Math.min(30000, 1000 * 2 ** Math.min(failures - 1, 5));
+      status(
+        `${active.signal.aborted ? "目录读取超时" : "目录暂未更新"} · ${cached ? "上次列表 · " : ""}将自动重试`,
+      );
+      $("execution-directory-status").title =
+        error.message || "暂时无法读取目录。";
+      controls();
+      if (
+        fileFocused &&
+        (document.activeElement === priorFocus ||
+          document.activeElement === document.body)
+      )
+        $("execution-directory-retry").focus({ preventScroll: true });
     } finally {
+      clearTimeout(timeout);
+      if (controller === active) controller = null;
       if (request === generation) {
         pending = false;
         controls();
@@ -260,6 +317,8 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
     if (snapshot.storage_error) {
       if (!suspended) {
         generation++;
+        controller?.abort();
+        controller = null;
         pending = false;
         suspended = true;
         $("execution-files").replaceChildren();
@@ -273,13 +332,14 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
       suspended = false;
       signature = "";
       lastLoad = 0;
+      failures = retryAt = 0;
     }
-    if (!pending && Date.now() - lastLoad >= 2000)
+    if (!pending && Date.now() >= retryAt && Date.now() - lastLoad >= 2000)
       void load(
-        data?.path || "",
-        cursors[pageIndex],
-        pageIndex,
-        cursors,
+        requested.path,
+        requested.cursor,
+        requested.index,
+        requested.stack,
         false,
         "",
         true,
@@ -307,8 +367,17 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
   });
   $("execution-directory-hidden").addEventListener(
     "change",
-    () => void load(data?.path || "", null, 0, [null]),
+    () => void load(requested.path, null, 0, [null]),
   );
+  $("execution-directory-retry").addEventListener("click", () => {
+    if (pending || !listingUnavailable) return;
+    void load(
+      requested.path,
+      requested.cursor,
+      requested.index,
+      requested.stack,
+    );
+  });
   $("execution-file-open").addEventListener("submit", (event) => {
     event.preventDefault();
     if (!getCurrent() || getCurrent().storage_error) return;
