@@ -2,6 +2,8 @@
 export function nativePowerShellSource(spec) {
   return (
     "$ErrorActionPreference='Stop'; [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $OutputEncoding=[Console]::OutputEncoding; $global:LASTEXITCODE=0; " +
+    // Resolve common built-in commands before workspace command discovery.
+    "Microsoft.PowerShell.Core\\Import-Module Microsoft.PowerShell.Utility; " +
     // A workspace-rooted PSDrive avoids PowerShell normalizing every parent
     // from C:\, which would require access outside the selected directory.
     // This changes only the shell's provider view, never the OS policy.
