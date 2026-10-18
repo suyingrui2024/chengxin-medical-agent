@@ -14,6 +14,14 @@ from medagent.execution import ExecutionManager
 
 @unittest.skipUnless(os.name == "nt", "requires native Windows ProcessContainer")
 class WindowsExecutionTests(unittest.TestCase):
+    def test_independent_grant_expiry_and_explicit_workspace_stop(self):
+        from tests.test_execution_cancellation import exercise_task_cancellation
+        exercise_task_cancellation(self)
+
+    def test_background_root_jobs_retain_their_grants(self):
+        from tests.test_execution_cancellation import exercise_root_job_cancellation
+        exercise_root_job_cancellation(self)
+
     def test_original_child_grant_survives_a_foreground_followup(self):
         from tests.test_execution_ownership import exercise_child_ownership
         exercise_child_ownership(self)

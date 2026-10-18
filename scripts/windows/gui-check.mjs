@@ -14,6 +14,7 @@ import {
   openFocusWorkspace,
   verifyEditableAnswer,
   verifyEarlierChildAnswer,
+  verifyChildOnlyActivity,
   verifyExecutionRecovery,
   verifyIncompleteExplanation,
 } from "../../tests/fixtures/execution-focus.mjs";
@@ -138,6 +139,10 @@ try {
   );
   const draftReceipt = await verifyEditableAnswer(reopened, focusFixture);
   const earlierReceipt = await verifyEarlierChildAnswer(reopened, focusFixture);
+  const childActivityReceipt = await verifyChildOnlyActivity(
+    reopened,
+    focusFixture,
+  );
   const recoveryReceipt = await verifyExecutionRecovery(reopened, focusFixture);
   const directoryReceipt = await verifyDirectoryRecovery(reopened);
   const incompleteReceipt = await verifyIncompleteExplanation(
@@ -183,6 +188,7 @@ try {
       artifact_save: "passed (actual CSV snapshot on disk)",
       clarification_draft: draftReceipt,
       earlier_child_answer: earlierReceipt,
+      child_only_activity: childActivityReceipt,
       execution_recovery: recoveryReceipt,
       incomplete_explanation: incompleteReceipt,
       artifact_recovery: artifactRecoveryReceipt,

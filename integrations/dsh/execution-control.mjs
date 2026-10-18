@@ -5,6 +5,7 @@ import { observeTool } from "./execution-observations.mjs";
 import { mergeCheckRequirement } from "./execution-delivery.mjs";
 import { registerControl } from "./execution-control-channel.mjs";
 import { sessionHeaders } from "./execution-ownership.mjs";
+import { cancelRuntime } from "./execution-cancellation.mjs";
 export const name = "chengxin-execution-control";
 export const inject = ["agents", "jobs", "systemPrompt", "tools"];
 export async function apply(ctx) {
@@ -97,7 +98,7 @@ export async function apply(ctx) {
     },
     { prepend: true },
   );
-  const handle = async (method, path) => {
+  const handle = async (method, path, scope) => {
     const url = new URL(path, "http://runtime.local");
     if (method === "GET" && url.pathname === "/status") {
       const requested = Number(url.searchParams.get("after") || 0);
@@ -110,6 +111,7 @@ export async function apply(ctx) {
         for (const job of ctx.jobs.list(agent.id))
           jobs.set(job.id, {
             id: job.id,
+            session_id: agent.id,
             status: job.status,
             kind: job.kind,
             detail: job.detail,
@@ -139,19 +141,7 @@ export async function apply(ctx) {
       return { status: 404, body: "" };
     }
     try {
-      const agents = ctx.agents.list();
-      const jobs = [];
-      for (const agent of agents) {
-        agent.cancel({ kind: "user" });
-        for (const job of ctx.jobs.list(agent.id)) {
-          if (["running", "starting", "stopping"].includes(job.status)) {
-            ctx.jobs.kill(job.id, agent.id, "User cancelled execution");
-            jobs.push(ctx.jobs.wait(job.id, 5000, agent.id));
-          }
-        }
-      }
-      await Promise.all([...agents.map((agent) => agent.whenIdle()), ...jobs]);
-      return { status: 200, body: "cancelled" };
+      return await cancelRuntime(ctx, scope);
     } catch {
       return { status: 500, body: "Cancellation failed" };
     }

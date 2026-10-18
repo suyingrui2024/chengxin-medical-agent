@@ -18,6 +18,18 @@ export class ExecutionOwnership {
   forTurn(id) {
     return this.turns.get(id);
   }
+  forSdkTurn(session, turn) {
+    return this.forTurn(
+      this.canonicalTurns.get(JSON.stringify([session, turn])),
+    );
+  }
+  sessionsFor(owner) {
+    const sessions = [];
+    if (this.current() === owner) sessions.push(this.root());
+    for (const [session, turn] of this.sessions)
+      if (turn === owner.id) sessions.push(session);
+    return sessions;
+  }
   forSession(id) {
     if (!id || id === this.root()) return this.current();
     return this.turns.get(this.sessions.get(id));
@@ -78,7 +90,10 @@ export class ExecutionOwnership {
     return this.forSession(id);
   }
   cancelAll() {
-    for (const owner of this.turns.values()) owner.cancelled = true;
+    for (const owner of this.turns.values()) {
+      owner.cancelled = true;
+      clearTimeout(owner.timer);
+    }
   }
 }
 

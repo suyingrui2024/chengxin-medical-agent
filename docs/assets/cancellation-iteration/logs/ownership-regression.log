@@ -1,0 +1,6 @@
+test_original_child_grant_survives_a_foreground_followup (tests.test_execution_ownership.OwnershipRuntimeTests.test_original_child_grant_survives_a_foreground_followup) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 3.081s
+
+OK

@@ -40,6 +40,57 @@ def question(turn, session):
 
 
 class ClarificationRecordTests(unittest.TestCase):
+    def test_earlier_question_survives_an_unrelated_cancelled_turn_but_not_workspace_stop(self):
+        with tempfile.TemporaryDirectory() as raw:
+            manager = ExecutionManager(root=Path(raw))
+            try:
+                session = manager.create(CONFIG)
+                with patch.object(session, "_run", return_value=None):
+                    session.start_turn("original", 6)
+                    original = session.turn_id
+                    session.status = session.turns[-1]["status"] = "completed"
+                    session.start_turn("separate short task", 6)
+                latest = session.turn_id
+                session.status = session.turns[-1]["status"] = "cancelled"
+                value = question(original, str(uuid4()))
+                self.assertTrue(session._accept_clarification("clarification.requested", {"turn_id": original, "clarification": value}))
+                session._close_clarifications("time_budget_exhausted", turn_id=latest)
+                self.assertEqual(session.clarifications[0]["status"], "pending")
+                with patch.object(session, "process", Mock(poll=lambda: None)), patch.object(session, "_send") as send:
+                    session.answer_clarification(value["id"], original, "保留原要求")
+                    self.assertEqual(send.call_args.args[0]["turn_id"], original)
+                    other = question(original, str(uuid4()))
+                    self.assertTrue(session._accept_clarification("clarification.requested", {"turn_id": original, "clarification": other}))
+                    session.cancel()
+                    self.assertTrue(session.workspace_stopping)
+                    with self.assertRaises(ExecutionError):
+                        session.answer_clarification(other["id"], original, "不能越过整体停止")
+                self.assertEqual(session.turn_id, latest)
+            finally:
+                manager.close()
+
+    def test_completed_root_with_only_an_active_child_can_be_explicitly_stopped(self):
+        with tempfile.TemporaryDirectory() as raw:
+            manager = ExecutionManager(root=Path(raw))
+            try:
+                session = manager.create(CONFIG)
+                with patch.object(session, "_run", return_value=None):
+                    session.start_turn("root reply completed", 6)
+                session.status = session.turns[-1]["status"] = "completed"
+                session.agents = [{"session_id": "child", "turn_id": session.turn_id, "status": "running"}]
+                self.assertEqual(session.jobs, [])
+                with self.assertRaises(ExecutionBusy):
+                    manager.release(session.id)
+                with patch.object(session, "process", Mock(poll=lambda: None)), patch.object(session, "_send") as send:
+                    session.ready.set()
+                    session.last_inspection = time.monotonic()
+                    snapshot = session.cancel()
+                    send.assert_called_once_with({"method": "cancel"})
+                    self.assertEqual(snapshot["status"], "cancelling")
+                    self.assertEqual(snapshot["agents"][0]["session_id"], "child")
+            finally:
+                manager.close()
+
     def test_live_earlier_child_question_can_be_answered_without_changing_the_new_turn(self):
         with tempfile.TemporaryDirectory() as raw:
             manager = ExecutionManager(root=Path(raw))

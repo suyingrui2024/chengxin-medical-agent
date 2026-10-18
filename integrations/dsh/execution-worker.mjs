@@ -51,7 +51,8 @@ let observationEpoch = "",
   observationSequence = 0;
 const callOwners = new Map();
 const pendingObservations = new Map();
-const upstreamRequests = new Set();
+const upstreamRequests = new Map();
+const jobOwners = new Map();
 let capabilityLifetimeCalls = 0;
 let workspaceLifetimeCalls = 0;
 let checkpointLifetimeCalls = 0;
@@ -249,6 +250,7 @@ function forwardNotification(turnId, notification) {
       );
       const observation = pendingObservations.get(key);
       if (observation) {
+        rememberJob(observation, turnId);
         emit("tool.observations", {
           observations: [{ ...observation, turn_id: turnId }],
         });
@@ -335,11 +337,15 @@ function errorResponse(response, code) {
     }),
   );
 }
-function control(method, path) {
+function control(method, path, scope) {
   // Both platforms reuse the already-owned SDK pipe; no extra listener or
   // host-to-container loopback capability is required for lifecycle control.
   return harness.client
-    .request("chengxin/control", { method, path }, 7000)
+    .request(
+      "chengxin/control",
+      { method, path, ...(scope ? { scope } : {}) },
+      7000,
+    )
     .then((result) => {
       if (
         result?.status !== 200 ||
@@ -394,7 +400,7 @@ async function capabilityRequest(request, response) {
   }
   sources.reverse();
   const abort = new AbortController();
-  upstreamRequests.add(abort);
+  upstreamRequests.set(abort, owned);
   const timeout = setTimeout(
     () => abort.abort(),
     Math.min(5000, Math.max(1, owned.deadline - Date.now())),
@@ -519,7 +525,7 @@ async function workspaceRequest(request, response) {
     return fail(400, "文件核对参数无效。");
   }
   const abort = new AbortController();
-  upstreamRequests.add(abort);
+  upstreamRequests.set(abort, owned);
   const timeout = setTimeout(
     () => abort.abort(),
     Math.min(10000, Math.max(1, owned.deadline - Date.now())),
@@ -596,7 +602,7 @@ async function workspaceCheckpoint(paths, owned) {
   owned.checkpointCalls++;
   checkpointLifetimeCalls++;
   const abort = new AbortController();
-  upstreamRequests.add(abort);
+  upstreamRequests.set(abort, owned);
   const timeout = setTimeout(
     () => abort.abort(),
     Math.min(5000, Math.max(1, owned.deadline - Date.now())),
@@ -836,7 +842,7 @@ async function proxy(request, response) {
   if (budget.cancelled || Date.now() >= budget.deadline)
     return errorResponse(response, 429);
   const abort = new AbortController();
-  upstreamRequests.add(abort);
+  upstreamRequests.set(abort, budget);
   const timeout = setTimeout(
     () => abort.abort(),
     Math.min(60000, Math.max(1, budget.deadline - Date.now())),
@@ -1060,6 +1066,101 @@ async function setup(payload) {
     model: config.model,
   });
 }
+function rememberJob(observation, turnId) {
+  if (
+    !observation.job_id ||
+    !["bash", "delivery_check"].includes(observation.tool)
+  )
+    return;
+  // Reading another task's job cannot transfer ownership of that job.
+  if (!jobOwners.has(observation.job_id)) {
+    jobOwners.set(observation.job_id, {
+      id: observation.job_id,
+      session_id: observation.session_id,
+      turn_id: turnId,
+      epoch: observation.epoch,
+    });
+    if (jobOwners.size > 4096) jobOwners.delete(jobOwners.keys().next().value);
+  }
+}
+function scopeFor(owned) {
+  return {
+    root: config.id,
+    sessions: ownership.sessionsFor(owned),
+    jobs: [...jobOwners.values()]
+      .filter((j) => j.turn_id === owned.id && j.epoch === observationEpoch)
+      .map(({ id, session_id }) => ({ id, session_id })),
+  };
+}
+async function cancelGrant(owned) {
+  if (owned.stopping) return owned.stopping;
+  const wasActive = active === owned;
+  const hadHostWork =
+    [...upstreamRequests.values()].some((owner) => owner === owned) ||
+    [...clarifications.pending.values()].some(
+      (pending) => pending.owned === owned,
+    );
+  owned.cancelled = true;
+  clearTimeout(owned.timer);
+  clarifications.cancel(
+    owned.id,
+    owned.timedOut ? "time_budget_exhausted" : "turn_stopped",
+  );
+  for (const [abort, owner] of upstreamRequests)
+    if (owner === owned) abort.abort();
+  owned.stopping = (async () => {
+    await inspect(true).catch(() => {});
+    const scope = scopeFor(owned);
+    const status = JSON.parse(await control("GET", "/status"));
+    if (
+      wasActive &&
+      !owned.timedOut &&
+      status.jobs.some(
+        (job) =>
+          job.session_id === config.id &&
+          hasActiveJobs([job]) &&
+          !jobOwners.has(job.id),
+      )
+    )
+      throw new Error(
+        "Cannot attribute an active root job during task failure",
+      );
+    const work =
+      wasActive ||
+      hadHostWork ||
+      scope.sessions.some((id) => runningAgents.has(id)) ||
+      status.jobs.some(
+        (j) =>
+          hasActiveJobs([j]) &&
+          ((j.session_id !== config.id &&
+            scope.sessions.includes(j.session_id)) ||
+            scope.jobs.some(
+              (ref) => ref.id === j.id && ref.session_id === j.session_id,
+            )),
+      );
+    if (owned.timedOut && work)
+      emit("turn.deadline", {
+        turn_id: owned.id,
+        time_budget_seconds: owned.timeBudgetSeconds,
+      });
+    await control("POST", "/cancel", scope);
+    if (!wasActive && owned.timedOut && work)
+      emit("turn.work_stopped", {
+        turn_id: owned.id,
+        reason: "time_budget_exhausted",
+      });
+    if (lease === owned && active !== owned) lease = null;
+  })().catch(async () => {
+    // Failure to stop the selected work must still fail closed. This exceptional
+    // fallback is observable and may interrupt other grants in this workspace.
+    emit("runtime.control_failed", {
+      turn_id: owned.id,
+      reason: "Task cancellation failed; stopping the entire workspace.",
+    });
+    await cancel();
+  });
+  return owned.stopping;
+}
 async function cancel() {
   if (stopping) return stopping;
   if (!harness) return;
@@ -1071,7 +1172,7 @@ async function cancel() {
   );
   if (active || lease) (active || lease).cancelled = true;
   ownership.cancelAll();
-  for (const abort of upstreamRequests) abort.abort();
+  for (const abort of upstreamRequests.keys()) abort.abort();
   stopping = control("POST", "/cancel").catch(async () => {
     const owned = harness;
     harness = null;
@@ -1119,6 +1220,7 @@ async function inspectNow() {
     if (batch.epoch !== observationEpoch) {
       observationEpoch = batch.epoch;
       observationSequence = 0;
+      jobOwners.clear();
     }
     if (batch.first_sequence > observationSequence + 1) {
       emit("tool.observation_gap", {
@@ -1140,9 +1242,12 @@ async function inspectNow() {
         observation.sdk_step,
         observation.call_id,
       );
-      const turnId = callOwners.get(key);
+      const turnId =
+        callOwners.get(key) ||
+        ownership.forSdkTurn(observation.session_id, observation.sdk_turn)?.id;
       observationSequence = observation.sequence;
       if (turnId) {
+        rememberJob(observation, turnId);
         values.push({ ...observation, turn_id: turnId });
         callOwners.delete(key);
       } else {
@@ -1155,10 +1260,16 @@ async function inspectNow() {
     if (observationSequence >= batch.last_sequence || !batch.items.length)
       break;
   }
-  const signature = JSON.stringify(status.jobs);
+  const agents = [...runningAgents].sort().map((session_id) => ({
+    session_id,
+    turn_id: ownership.forSession(session_id)?.id || null,
+    status: "running",
+  }));
+  const snapshot = { jobs: status.jobs, agents };
+  const signature = JSON.stringify(snapshot);
   if (signature !== lastJobs) {
     lastJobs = signature;
-    emit("jobs.snapshot", { jobs: status.jobs });
+    emit("jobs.snapshot", snapshot);
   }
   const working = hasActiveJobs(status.jobs);
   if (
@@ -1170,7 +1281,6 @@ async function inspectNow() {
   ) {
     if (!quietSince) quietSince = Date.now();
     else if (Date.now() - quietSince > 500) {
-      clearTimeout(lease.timer);
       lease = null;
       emit("workspace.quiescent");
     }
@@ -1202,6 +1312,7 @@ async function run(payload) {
     id: payload.id,
     cancelled: false,
     maxCalls: payload.max_calls,
+    timeBudgetSeconds: seconds,
     modelCalls: 0,
     deadline: Date.now() + seconds * 1000,
     capabilityCalls: 0,
@@ -1212,7 +1323,6 @@ async function run(payload) {
     incompleteChecks: false,
   };
   ownership.remember(active);
-  if (lease) clearTimeout(lease.timer);
   lease = active;
   quietSince = 0;
   calls = 0;
@@ -1225,8 +1335,7 @@ async function run(payload) {
   emit("turn.started", { turn_id: owned.id, time_budget_seconds: seconds });
   const timer = setTimeout(() => {
     owned.timedOut = true;
-    emit("turn.deadline", { turn_id: owned.id, time_budget_seconds: seconds });
-    cancel().catch(() => {});
+    cancelGrant(owned).catch(() => {});
   }, seconds * 1000);
   owned.timer = timer;
   try {
@@ -1437,7 +1546,9 @@ async function run(payload) {
       diagnostic: String(error.message).slice(0, 2000),
     };
   } finally {
-    if (outcome.type === "turn.failed") await cancel().catch(() => {});
+    if (outcome.type === "turn.failed")
+      await cancelGrant(owned).catch(() => {});
+    await owned.stopping?.catch(() => {});
     await stopping?.catch(() => {});
     stopping = null;
     active = null;
@@ -1463,7 +1574,7 @@ async function close() {
   if (lease) clearTimeout(lease.timer);
   await cancel();
   await harness?.close();
-  for (const abort of upstreamRequests) abort.abort();
+  for (const abort of upstreamRequests.keys()) abort.abort();
   gateway?.closeAllConnections();
   await new Promise((resolve) =>
     gateway ? gateway.close(resolve) : resolve(),

@@ -95,6 +95,7 @@ Windows 使用原生 PowerShell 执行命令。上游工具名称仍为 `bash`�
 | `7f13b44`／[39103193751](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39103193751) | 未通过：Server x64 任务成功；Windows 11 完整 SDK 的独立后续命令文件缺失，3 个测试中 1 个子场景报错。该次失败未单独作为已验收版本同步至 main，后续修订另按 `85337c4` 验收。修订前台等待及诊断后，连同子任务归属更改另行复验；[原失败](assets/command-deadline/windows-initial-failure.json)保留 |
 | `de34f7c`／[39105486619](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39105486619)，`d89d5b5`／[39105929239](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39105929239) | 未通过：Windows 11 的子任务预算、回答与辅助搜索方法通过，但独立后续命令在自身 20 秒时限中止，随包 SDK 未执行。后一次 Server 三个真实窗口及安装／卸载通过；前一次 Server 问诊重载超时原记录保留。[详细回执](assets/ownership-iteration/windows-diagnostic-attempt.json) |
 | `85337c4`／[39110352224](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39110352224) | 两套完整任务全部通过：各 51 项 Node、17 项宿主检查（16 通过、1 条件跳过）；Windows 11 源码与随包各 4 项完整 SDK 方法通过，含原后台时限、独立后续命令、旧子任务预算／回答／搜索；5 个真实窗口及 Server 安装／卸载通过。[验收记录](assets/ownership-iteration/windows-native.json) |
+| 后续选择性取消增量，待验收 | 本地已通过按原授权到期、失败清理、旧问题回答与子任务活动界面检查。下一次 Windows 完整矩阵要求各 58 项 Node、19 项宿主检查，Windows 11 源码及随包各 6 项 SDK 方法、各含 5 个子任务和 3 个根作业场景，5 个真实窗口均核对只有子任务时仍能停止。[本地记录](assets/cancellation-iteration/verification.json)不替代 Windows 验收 |
 
 本轮以宿主实际读取产物为验收依据：根任务运行 Python 将结果写入 `result.txt`，调用随包 npm；子智能体独立核对结果并生成 `review.txt`；交付检查必须退出成功。继续原会话后，旧文件仍可读并生成 `notes.txt`。源码与便携包分别执行这一场景，使用回环合成模型服务，不消耗外部模型 API。
 

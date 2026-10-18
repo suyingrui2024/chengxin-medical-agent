@@ -156,6 +156,58 @@ export async function openFocusWorkspace(page) {
   await page.locator("#execution-quick-look > summary").click();
 }
 
+export async function verifyChildOnlyActivity(page, fixture, { shot } = {}) {
+  const saved = {
+    status: fixture.first.status,
+    jobs: fixture.first.jobs,
+    agents: fixture.first.agents,
+    clarifications: fixture.first.clarifications,
+  };
+  const path = "**/api/execution/focus-a/cancel";
+  let stops = 0;
+  const cancel = async (route) => {
+    expect(route.request().method()).toBe("POST");
+    stops++;
+    fixture.first.status = "cancelled";
+    fixture.first.agents = [];
+    fixture.first.sequence++;
+    await route.fulfill({ json: fixture.first });
+  };
+  await page.route(path, cancel);
+  try {
+    Object.assign(fixture.first, {
+      status: "completed",
+      jobs: [],
+      clarifications: [],
+      agents: [
+        { session_id: "older-child", turn_id: "older-turn", status: "running" },
+      ],
+    });
+    fixture.first.sequence++;
+    await expect(page.locator("#execution-focus-label")).toHaveText(
+      "1 个较早子任务运行中",
+    );
+    await expect(page.locator("#execution-stop")).toBeEnabled();
+    if (shot) await page.locator("#execution-focus").screenshot({ path: shot });
+    await page.locator("#execution-stop").click();
+    await expect.poll(() => stops).toBe(1);
+    await expect(page.locator("#execution-focus-label")).toHaveText(
+      "任务已停止",
+    );
+    await expect(page.locator("#execution-stop")).toBeDisabled();
+    return {
+      passed: true,
+      host_snapshot_fixture: true,
+      child_only_activity: true,
+      explicit_workspace_stop: true,
+    };
+  } finally {
+    Object.assign(fixture.first, saved);
+    fixture.first.sequence++;
+    await page.unroute(path, cancel);
+  }
+}
+
 export async function verifyEditableAnswer(page, fixture) {
   fixture.first.clarifications = [
     {

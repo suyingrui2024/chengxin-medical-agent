@@ -1,0 +1,148 @@
+
+Running 12 tests using 1 worker
+
+(node:89350) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 1440px (5.6s)
+(node:89408) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   2 tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 320px (5.7s)
+(node:89441) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 tests/ui/execution-child-activity.spec.mjs:24:1 › runtime activity clears without replaying historical child starts as live work (5.6s)
+(node:89460) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 tests/ui/execution-earlier-question.spec.mjs:55:1 › a live earlier child question remains answerable in its original turn (1.5s)
+  ✓   5 tests/ui/execution-earlier-question.spec.mjs:61:1 › an earlier child question stays readable and answerable at 320px (1.6s)
+  ✓   6 tests/ui/execution-focus.spec.mjs:7:1 › host state shows a waiting action and preserves answers and background work (3.0s)
+  ✓   7 tests/ui/execution-focus.spec.mjs:47:1 › file shortcuts open inert image, table and source previews without automatic reads (1.9s)
+  ✓   8 tests/ui/execution-focus.spec.mjs:104:1 › a completed turn with a failed tool remains visibly unresolved (3.6s)
+  ✓   9 tests/ui/execution-focus.spec.mjs:142:1 › long results use a short excerpt, keep the full text and leave failures visible (3.2s)
+  ✓  10 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on wide (879ms)
+  ✓  11 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on mobile (884ms)
+  ✓  12 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on small (868ms)
+
+
+  1) tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 1440px 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#execution-focus-label')
+    Expected: "1 个子任务运行中"
+    Received: "1 个较早子任务运行中"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" locator('#execution-focus-label') with timeout 5000ms
+      - waiting for locator('#execution-focus-label')
+        5 × locator resolved to <strong id="execution-focus-label">正在处理任务</strong>
+          - unexpected value "正在处理任务"
+        9 × locator resolved to <strong id="execution-focus-label">1 个较早子任务运行中</strong>
+          - unexpected value "1 个较早子任务运行中"
+
+
+       at ../fixtures/execution-focus.mjs:187
+
+      185 |     });
+      186 |     fixture.first.sequence++;
+    > 187 |     await expect(page.locator("#execution-focus-label")).toHaveText(
+          |                                                          ^
+      188 |       "1 个子任务运行中",
+      189 |     );
+      190 |     await expect(page.locator("#execution-stop")).toBeEnabled();
+        at verifyChildOnlyActivity (/Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/fixtures/execution-focus.mjs:187:58)
+        at /Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/ui/execution-child-activity.spec.mjs:16:5
+
+    Error Context: test-results/ui/execution-child-activity-a-59d79-s-remaining-child-at-1440px/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/execution-child-activity-a-59d79-s-remaining-child-at-1440px/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/execution-child-activity-a-59d79-s-remaining-child-at-1440px/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 320px 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#execution-focus-label')
+    Expected: "1 个子任务运行中"
+    Received: "1 个较早子任务运行中"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" locator('#execution-focus-label') with timeout 5000ms
+      - waiting for locator('#execution-focus-label')
+        5 × locator resolved to <strong id="execution-focus-label">正在处理任务</strong>
+          - unexpected value "正在处理任务"
+        9 × locator resolved to <strong id="execution-focus-label">1 个较早子任务运行中</strong>
+          - unexpected value "1 个较早子任务运行中"
+
+
+       at ../fixtures/execution-focus.mjs:187
+
+      185 |     });
+      186 |     fixture.first.sequence++;
+    > 187 |     await expect(page.locator("#execution-focus-label")).toHaveText(
+          |                                                          ^
+      188 |       "1 个子任务运行中",
+      189 |     );
+      190 |     await expect(page.locator("#execution-stop")).toBeEnabled();
+        at verifyChildOnlyActivity (/Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/fixtures/execution-focus.mjs:187:58)
+        at /Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/ui/execution-child-activity.spec.mjs:16:5
+
+    Error Context: test-results/ui/execution-child-activity-a-40009-ts-remaining-child-at-320px/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/execution-child-activity-a-40009-ts-remaining-child-at-320px/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/execution-child-activity-a-40009-ts-remaining-child-at-320px/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/ui/execution-child-activity.spec.mjs:24:1 › runtime activity clears without replaying historical child starts as live work 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#execution-focus-label')
+    Expected: "正在处理任务"
+    Received: "1 个子任务运行中"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" locator('#execution-focus-label') with timeout 5000ms
+      - waiting for locator('#execution-focus-label')
+        14 × locator resolved to <strong id="execution-focus-label">1 个子任务运行中</strong>
+           - unexpected value "1 个子任务运行中"
+
+
+       at ../fixtures/execution-focus.mjs:152
+
+      150 |   ).toHaveCount(1);
+      151 |   await page.locator("#execution-workspace").selectOption("focus-a");
+    > 152 |   await expect(page.locator("#execution-focus-label")).toHaveText(
+          |                                                        ^
+      153 |     "正在处理任务",
+      154 |   );
+      155 |   await expect(page.locator("#execution-quick-files button")).toHaveCount(3);
+        at openFocusWorkspace (/Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/fixtures/execution-focus.mjs:152:56)
+        at /Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/ui/execution-child-activity.spec.mjs:33:3
+
+    Error Context: test-results/ui/execution-child-activity-r-dad3a-l-child-starts-as-live-work/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/execution-child-activity-r-dad3a-l-child-starts-as-live-work/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/execution-child-activity-r-dad3a-l-child-starts-as-live-work/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 1440px 
+    tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 320px 
+    tests/ui/execution-child-activity.spec.mjs:24:1 › runtime activity clears without replaying historical child starts as live work 
+  9 passed (36.2s)

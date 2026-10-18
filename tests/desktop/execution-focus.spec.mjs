@@ -9,6 +9,7 @@ import {
   openFocusWorkspace,
   verifyEditableAnswer,
   verifyEarlierChildAnswer,
+  verifyChildOnlyActivity,
   verifyExecutionRecovery,
   verifyIncompleteExplanation,
 } from "../fixtures/execution-focus.mjs";
@@ -42,6 +43,7 @@ test("native focused work area renders host snapshots and opens an inert preview
     );
     await verifyEditableAnswer(page, fixture);
     await verifyEarlierChildAnswer(page, fixture);
+    await verifyChildOnlyActivity(page, fixture);
     await verifyExecutionRecovery(page, fixture);
     await verifyDirectoryRecovery(page);
     await verifyIncompleteExplanation(page, fixture);

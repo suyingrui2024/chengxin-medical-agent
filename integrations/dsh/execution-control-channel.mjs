@@ -19,5 +19,10 @@ export async function dispatchControl(root, parameters) {
     !parameters.path.startsWith("/")
   )
     throw new Error("Invalid execution control request");
-  return handler(parameters.method, parameters.path);
+  if (
+    parameters.scope !== undefined &&
+    (parameters.method !== "POST" || parameters.path !== "/cancel")
+  )
+    throw new Error("Cancellation scope requires the stop endpoint");
+  return handler(parameters.method, parameters.path, parameters.scope);
 }

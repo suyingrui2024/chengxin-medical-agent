@@ -228,8 +228,10 @@ class ExecutionSession:
         self.reader_thread = None
         self.ready = threading.Event()
         self.closed = False
+        self.workspace_stopping = False
         self.turns = []
         self.jobs = []
+        self.agents = []
         self.clarifications = [
             validate_clarification(value)
             for value in (record or {}).get("clarifications", [])
@@ -531,6 +533,7 @@ class ExecutionSession:
                 pass
             self.event("workspace.baseline", turn_id=self.turn_id, **baseline)
             self.event("task.submitted", turn_id=self.turn_id, text=turn["text"])
+            self.workspace_stopping = False
         threading.Thread(target=self._run, args=(turn,), daemon=True).start()
         return self.snapshot()
 
@@ -551,6 +554,15 @@ class ExecutionSession:
             value["status"] in ACTIVE_CLARIFICATION_STATES
             for value in self.clarifications
         )
+
+    def _clarification_turn_live(self, turn_id):
+        if self.closed or self.workspace_stopping:
+            return False
+        turn = next((value for value in self.turns if value["id"] == turn_id), None)
+        if turn is None:
+            return False
+        status = self.status if turn_id == self.turn_id else turn.get("status")
+        return status not in {"cancelling", "failed", "cancelled", "interrupted"}
 
     def answer_clarification(self, request_id, turn_id, answer):
         if (
@@ -579,8 +591,7 @@ class ExecutionSession:
                 return self.snapshot()
             if (
                 question["status"] != "pending"
-                or self.closed
-                or self.status in {"cancelling", "failed", "cancelled", "interrupted"}
+                or not self._clarification_turn_live(turn_id)
                 or time.time() >= question["deadline_at"]
                 or not self.process
                 or self.process.poll() is not None
@@ -630,7 +641,7 @@ class ExecutionSession:
                 previous is not None
                 or value["status"] != "pending"
                 or time.time() >= value["deadline_at"]
-                or self.status in {"cancelling", "failed", "cancelled", "interrupted"}
+                or not self._clarification_turn_live(value["turn_id"])
             ):
                 return False
             self.clarifications.append(value)
@@ -661,9 +672,11 @@ class ExecutionSession:
         self.event(kind, turn_id=value["turn_id"], clarification=value)
         return True
 
-    def _close_clarifications(self, reason):
+    def _close_clarifications(self, reason, turn_id=None):
         for value in self.clarifications:
-            if value["status"] in ACTIVE_CLARIFICATION_STATES:
+            if value["status"] in ACTIVE_CLARIFICATION_STATES and (
+                turn_id is None or value["turn_id"] == turn_id
+            ):
                 value.update(status="closed", reason=reason)
 
     def _start(self):
@@ -854,8 +867,16 @@ class ExecutionSession:
                                 )
                     elif kind == "jobs.snapshot":
                         self.jobs = record.get("jobs", [])
-                    elif kind == "jobs.cancelled":
-                        self.jobs = []
+                        self.agents = record.get("agents", [])
+                    elif kind in {"jobs.cancelled", "turn.work_stopped"}:
+                        if kind == "jobs.cancelled":
+                            self.jobs = []
+                            self.agents = []
+                            self._close_clarifications(record.get("reason") or "user_cancelled")
+                        for turn in self.turns:
+                            if turn["id"] == record.get("turn_id", self.turn_id) and turn["status"] == "cancelling":
+                                turn["status"] = "cancelled"
+                                persist = True
                         if (
                             self.status == "cancelling"
                             and record.get("turn_id", self.turn_id) == self.turn_id
@@ -869,14 +890,17 @@ class ExecutionSession:
                     elif kind == "worker.error":
                         self.error = record.get("diagnostic", "执行环境未成功")
                         self.ready.set()
-                    elif record.get("turn_id") == self.turn_id:
-                        if kind == "turn.deadline":
+                    elif kind == "turn.deadline":
+                        for turn in self.turns:
+                            if turn["id"] == record.get("turn_id"):
+                                turn["status"] = "cancelling"
+                                persist = True
+                        if record.get("turn_id") == self.turn_id:
                             self.status = "cancelling"
                             self.error = "time_budget_exhausted"
-                            if self.turns:
-                                self.turns[-1]["status"] = "cancelling"
                             persist = True
-                        elif kind == "turn.started":
+                    elif record.get("turn_id") == self.turn_id:
+                        if kind == "turn.started":
                             self.status = "running"
                         elif kind in {
                             "turn.completed",
@@ -890,7 +914,8 @@ class ExecutionSession:
                             }.get(kind, "failed")
                             if kind != "turn.completed":
                                 self._close_clarifications(
-                                    record.get("error_type") or "turn_stopped"
+                                    record.get("error_type") or "turn_stopped",
+                                    record.get("turn_id"),
                                 )
                             self.final_response = record.get("final_response", "")
                             self.error = record.get("error_type") or record.get(
@@ -926,6 +951,7 @@ class ExecutionSession:
                         "cancelling",
                     }
                     or self.has_pending_clarification()
+                    or (bool(self.agents) and not self.closed)
                 ):
                     self._close_clarifications("worker_exited")
                     self.status, self.error = "failed", "执行进程意外结束"
@@ -933,6 +959,8 @@ class ExecutionSession:
                     if self.turns:
                         self.turns[-1]["status"] = "interrupted"
                     self.persist()
+                if process is self.process:
+                    self.agents = []
                 self.ready.set()
 
     def _run(self, turn):
@@ -972,8 +1000,10 @@ class ExecutionSession:
                 self.status not in {"starting", "running", "cancelling"}
                 and not self.has_pending_clarification()
                 and not any(job["status"] in ACTIVE_JOB_STATES for job in self.jobs)
+                and not self.agents
             ):
                 return self.snapshot()
+            self.workspace_stopping = True
             self.status = "cancelling"
             self.event("task.cancel_requested", turn_id=self.turn_id)
             if self.process and self.ready.is_set():
@@ -1256,6 +1286,7 @@ class ExecutionSession:
                 "events": [event for event in self.events if event["sequence"] > after],
                 "turns": list(self.turns),
                 "jobs": list(self.jobs),
+                "agents": [dict(agent) for agent in self.agents],
                 "artifacts": overview["entries"],
                 "artifact_scan": overview["scan"],
                 "storage_error": self.storage_error,
@@ -1430,6 +1461,7 @@ class ExecutionManager:
                     session.status in {"starting", "running", "cancelling"}
                     or session.has_pending_clarification()
                     or any(j["status"] in ACTIVE_JOB_STATES for j in session.jobs)
+                    or bool(session.agents)
                 ):
                     raise ExecutionBusy("请先停止当前任务和后台工作，再关闭工作区")
             session.close()

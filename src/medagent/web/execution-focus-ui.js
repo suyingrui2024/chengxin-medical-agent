@@ -65,6 +65,9 @@ export function createExecutionFocus(getCurrent, openFile) {
     const activeJobs = (snapshot.jobs || []).filter((job) =>
       ["starting", "running", "stopping"].includes(job.status),
     ).length;
+    const activeAgents = (snapshot.agents || []).filter(
+      (agent) => agent.status === "running",
+    );
     let kind = "ready",
       label = "准备开始";
     if (snapshot.storage_error) {
@@ -83,6 +86,20 @@ export function createExecutionFocus(getCurrent, openFile) {
       kind = "running";
       label =
         snapshot.status === "starting" ? "正在准备工作区" : "正在处理任务";
+    } else if (activeAgents.length) {
+      kind = "running";
+      const children = activeAgents.filter(
+        (agent) => agent.session_id !== snapshot.id,
+      ).length;
+      const older = activeAgents.every(
+        (agent) =>
+          agent.session_id !== snapshot.id &&
+          agent.turn_id &&
+          agent.turn_id !== snapshot.turn_id,
+      );
+      label = children
+        ? `${children} 个${older ? "较早" : ""}子任务运行中`
+        : "后台仍在处理";
     } else if (needsReview || snapshot.status === "failed") {
       kind = "attention";
       label = snapshot.status === "failed" ? "本轮尚未完成" : "结果待核对";

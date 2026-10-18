@@ -55,6 +55,20 @@ test("canonical returned turns protect a delayed creation notification from a ne
   ledger.eventOwner("root", { data: { turn: 2 } });
   ledger.bind("root", "new-child");
   assert.equal(ledger.forSession("new-child"), next);
+  assert.equal(ledger.forSdkTurn("root", 1), first);
+  assert.equal(ledger.forSdkTurn("root", 2), next);
+  assert.equal(ledger.forSdkTurn("root", 999), undefined);
+  ledger.bind("root", "after-reading-an-old-job");
+  assert.equal(ledger.forSession("after-reading-an-old-job"), next);
+});
+
+test("cancellation sessions follow descendant grants while the shared root follows the foreground", () => {
+  const { ledger, first, next, advance } = fixture();
+  ledger.bind("root", "child");
+  advance();
+  ledger.bind("child", "grandchild");
+  assert.deepEqual(ledger.sessionsFor(first), ["child", "grandchild"]);
+  assert.deepEqual(ledger.sessionsFor(next), ["root"]);
 });
 
 test("an HTTP request can wait for canonical creation without adopting the foreground grant", async () => {

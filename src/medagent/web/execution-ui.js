@@ -105,6 +105,7 @@ export function createExecutionUI(api) {
       ["pending", "submitted"].includes(value.status),
     );
   const hasJobs = () =>
+    current?.agents?.some((agent) => agent.status === "running") ||
     current?.jobs?.some((job) =>
       ["starting", "running", "stopping"].includes(job.status),
     );

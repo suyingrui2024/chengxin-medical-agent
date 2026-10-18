@@ -1,0 +1,6 @@
+test_original_command_deadline_survives_an_independent_followup (tests.test_execution_command_deadline.CommandDeadlineTests.test_original_command_deadline_survives_an_independent_followup) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 11.920s
+
+OK

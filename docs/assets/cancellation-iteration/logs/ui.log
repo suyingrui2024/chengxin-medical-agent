@@ -1,0 +1,20 @@
+
+Running 13 tests using 1 worker
+
+(node:90461) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 1440px (1.5s)
+  ✓   2 tests/ui/execution-child-activity.spec.mjs:9:3 › a completed root exposes and stops its remaining child at 320px (1.5s)
+  ✓   3 tests/ui/execution-child-activity.spec.mjs:26:1 › runtime activity clears without replaying historical child starts as live work (2.1s)
+  ✓   4 tests/ui/execution-child-activity.spec.mjs:57:1 › an earlier child can receive an answer after the latest task has timed out (1.3s)
+  ✓   5 tests/ui/execution-earlier-question.spec.mjs:55:1 › a live earlier child question remains answerable in its original turn (1.4s)
+  ✓   6 tests/ui/execution-earlier-question.spec.mjs:61:1 › an earlier child question stays readable and answerable at 320px (1.6s)
+  ✓   7 tests/ui/execution-focus.spec.mjs:7:1 › host state shows a waiting action and preserves answers and background work (3.0s)
+  ✓   8 tests/ui/execution-focus.spec.mjs:47:1 › file shortcuts open inert image, table and source previews without automatic reads (2.0s)
+  ✓   9 tests/ui/execution-focus.spec.mjs:104:1 › a completed turn with a failed tool remains visibly unresolved (3.6s)
+  ✓  10 tests/ui/execution-focus.spec.mjs:142:1 › long results use a short excerpt, keep the full text and leave failures visible (3.2s)
+  ✓  11 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on wide (881ms)
+  ✓  12 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on mobile (888ms)
+  ✓  13 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on small (853ms)
+
+  13 passed (24.6s)

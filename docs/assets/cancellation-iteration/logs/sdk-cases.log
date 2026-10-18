@@ -1,0 +1,15 @@
+test_background_root_jobs_retain_their_grants (tests.test_execution_cancellation.TaskCancellationRuntimeTests.test_background_root_jobs_retain_their_grants) ... {"root_job_cancellation_case": "short_new_with_only_old_job", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true}
+{"root_job_cancellation_case": "two_grants_with_jobs", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true}
+{"root_job_cancellation_case": "new_failure_with_old_job", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true}
+ok
+test_independent_grant_expiry_and_explicit_workspace_stop (tests.test_execution_cancellation.TaskCancellationRuntimeTests.test_independent_grant_expiry_and_explicit_workspace_stop) ... {"task_cancellation_case": "idle_short_followup", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true, "original_turn": "0e7560e8-4cda-45c0-a781-f36c18e38d60", "latest_turn": "746897e8-af55-4bc0-b51e-ad652d5bce20", "latest_status": "completed", "child_status": "ok", "root_requests": 3, "child_requests": 2}
+{"task_cancellation_case": "busy_short_followup", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true, "original_turn": "dc2dfd48-190d-4868-b8ef-cd38906fe598", "latest_turn": "9a9e2911-9f90-427e-8655-9f279071a18b", "latest_status": "cancelled", "child_status": "ok", "root_requests": 3, "child_requests": 3}
+{"task_cancellation_case": "busy_pending_question", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true, "original_turn": "281dff84-6d25-408a-8e29-adaabcfad249", "latest_turn": "7f54cf3c-15d8-4d7d-a5e7-ccd9e5c160d6", "latest_status": "cancelled", "child_status": "ok", "root_requests": 3, "child_requests": 3}
+{"task_cancellation_case": "old_expiry", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true, "original_turn": "445a3233-8e5f-4eaa-942d-e0406282d2ce", "latest_turn": "070d4b9f-3654-42a1-b1a0-9e1d84ae1c11", "latest_status": "completed", "child_status": "error", "root_requests": 4, "child_requests": 1}
+{"task_cancellation_case": "user_stop", "passed": true, "actual_sdk": true, "synthetic_loopback_provider": true, "original_turn": "7af88c74-d3a6-4793-b270-1d75fb68007f", "latest_turn": "11468ef2-42f7-44e8-bde8-af99bcfd4227", "latest_status": "cancelled", "child_status": "error", "root_requests": 3, "child_requests": 1}
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 31.430s
+
+OK

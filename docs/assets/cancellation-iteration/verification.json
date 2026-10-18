@@ -1,0 +1,239 @@
+{
+  "schema": "task-scoped-cancellation/v1",
+  "date": "2026-10-18",
+  "status": "local_passed_windows_pending",
+  "source_parent_commit": "5537f1e8bdd55481f621c321b5f1e120702e6de4",
+  "baseline": {
+    "historical_issue": "../ownership-iteration/short-followup-open-issue/verification.json",
+    "revalidated_at_parent": "logs/before.log",
+    "before_child_calls": 1,
+    "before_artifact": null,
+    "after": "logs/after.log",
+    "after_child_calls": 2,
+    "after_artifact": "child",
+    "finding": "A funded 15-second original child now completes after a normally completed independent two-second follow-up. Its tool activity retains the original task ID."
+  },
+  "behavior": [
+    "Original deadlines stay attached to their grant; new task expiry or failure selects owned descendant agents, upstream requests, questions and recorded command jobs.",
+    "A shared root job is stopped only when its canonical producer established that grant as owner; reading job output cannot transfer ownership.",
+    "Old pending questions survive an unrelated failed/cancelled latest task, and user answers retain the original task ID.",
+    "Explicit user stop remains workspace-wide, including child-only model work after the root has completed.",
+    "Runtime agent activity is exposed in a compact existing status row; historic child-start events do not imply live activity after reopening."
+  ],
+  "checks": {
+    "node": {
+      "passed": 58,
+      "log": "logs/node.log"
+    },
+    "host": {
+      "passed": 19,
+      "log": "logs/host.log"
+    },
+    "real_sdk_local": {
+      "methods_passed": 2,
+      "child_cases_passed": 5,
+      "root_job_cases_passed": 3,
+      "log": "logs/sdk-cases.log",
+      "scope": "Actual Python host, public SDK and canonical tools with deterministic loopback provider replies; test-only macOS launcher bypasses the outer Linux filesystem isolation. No production bypass flag or SDK private override."
+    },
+    "regressions": {
+      "original_command_deadline": "logs/deadline-regression.log",
+      "descendant_budget_answer_search": "logs/ownership-regression.log"
+    },
+    "native_desktop": {
+      "passed": 1,
+      "log": "logs/desktop.log"
+    },
+    "native_gui": {
+      "platform": "macOS arm64",
+      "log": "logs/native-gui.log",
+      "receipt": {
+        "gui": "passed",
+        "directory_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "cached_list_marked_and_disabled": true,
+          "draft_and_preview_preserved": true
+        },
+        "patient_native_zoom": {
+          "passed": true,
+          "native_webcontents_zoom": true,
+          "settings": [
+            {
+              "zoom": 1.25,
+              "pane": {
+                "height": 391,
+                "content": 391,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.5,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.7499999999999998,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 2,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            }
+          ],
+          "synthetic_demo": true,
+          "external_model_calls": 0
+        },
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": [
+          "body",
+          "serif",
+          "mono"
+        ],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "artifact_copy": "passed (actual CSV and system clipboard)",
+        "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+        "artifact_save": "passed (actual CSV snapshot on disk)",
+        "clarification_draft": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "edited_answer": true
+        },
+        "earlier_child_answer": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "earlier_turn_preserved": true,
+          "external_model_calls": 0
+        },
+        "child_only_activity": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "child_only_activity": true,
+          "explicit_workspace_stop": true
+        },
+        "execution_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "draft_preserved": true
+        },
+        "incomplete_explanation": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "explanation_preserved": true,
+          "failed_status_retained": true,
+          "external_model_calls": 0
+        },
+        "artifact_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "preview_failure_and_manual_retry": true,
+          "freshness_failure_and_recovery": true,
+          "snapshot_preserved": true,
+          "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+          "external_model_calls": 0
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      }
+    },
+    "profile": "logs/profile.log",
+    "browser": {
+      "unique_cases_passed": 13,
+      "log": "logs/ui.log",
+      "scope": "Four child activity/old-answer cases, two earlier-question cases and seven focused-status/file-preview cases. Screenshots at 1440 and 320 CSS pixels."
+    }
+  },
+  "fixture_failures": {
+    "sdk": "logs/fixture-initial-errors.log",
+    "sdk_reason": "The initial root-job fixture omitted mandatory bash descriptions; tools were rejected, so the test could not observe a running job. Descriptions and an early active-job assertion were added.",
+    "browser": "logs/ui-fixture-errors.log",
+    "browser_reason": "The expected caption and baseline fixture state lagged the new older-child label. Subsequent screenshot callbacks also required the Playwright test-info argument. Final accepted checks use the corrected fixtures."
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Both matrices: 58 Node and 19 host checks (18 pass, one filesystem-conditional skip expected on Windows); Windows 11 source and bundled SDK each six methods with five child and three root-job scenario receipts; five actual-window child-only activity receipts, Server installer/uninstaller."
+  },
+  "boundaries": [
+    "No external model calls or new reasoning/clinical benchmark; synthetic engineering checks are not model capability scores.",
+    "Native GUI child-only activity and earlier answers use explicit host snapshot fixtures; actual host-to-SDK answers and selective cancellation are checked separately.",
+    "A failed selective control request or unattributed active root job during task failure emits runtime.control_failed and stops the workspace as a fail-closed fallback. Isolation during that infrastructure failure is not claimed.",
+    "Root automatic wakeup and queued-inbox causal ownership still use the current root context and remain a separate open problem.",
+    "The original reproduced_unfixed receipt remains a historical record at its tested commit; this new record is the subsequent fix evidence."
+  ],
+  "replay": "Copy probe/*.mjs together into a fresh .runtime/<directory> (two levels below repository root), then node probe.mjs --funded --followup. For host regressions copy host-run.py as run.py and the loader/native SDK files into .runtime/selective-runtime-replay and run python3 run.py with Node 24/Python 3.12, PYTHONPATH=src. Both are macOS investigation launchers, not Windows isolation acceptance.",
+  "source_files_sha256": {
+    ".github/workflows/windows-native.yml": "7d55ab81479ac95f50228d48d3d80f2adc368081ee80ea7c408b4cd1f896a1c1",
+    "integrations/dsh/execution-cancellation.mjs": "2ec2fd5a880c1fa949e0d3c26fd3720f0c8846056c56b2723b52ab806c81136e",
+    "integrations/dsh/execution-control-channel.mjs": "0f733dcd77b67345809257eef350f7d4c414f2c397890c09189331a3761c3aad",
+    "integrations/dsh/execution-control.mjs": "48ebcda977eeffffc312331d70b70680356a67d3aa319fd4d2a921cb3b48a764",
+    "integrations/dsh/execution-ownership.mjs": "ecdb70a86c7a7f839ffd46273b913841ff677b219718afb624d29a4b5a15add0",
+    "integrations/dsh/execution-worker.mjs": "0b1fa25f5d79fe0736d71ca65722095a97d743cf54a8dcb20487a2ca17499f39",
+    "integrations/dsh/tests/execution-cancellation.test.mjs": "f713f39fb33ccccd2f72f50d794cf3e624e191834626d680c22800abefd8ab02",
+    "integrations/dsh/tests/execution-ownership.test.mjs": "1c3ce4d27c61a476183e7fc013963e673b5d6bf34d9e8eaf5e4460407950c36a",
+    "scripts/windows/gui-check.mjs": "fa58226467febc64b41b8dd967a673dbdeab573fcd176962320d5437872ab734",
+    "src/medagent/execution.py": "749a8c4d17d78caf3098cbdd1087f397440d7ef65edf8586db56de2ffda90971",
+    "src/medagent/web/execution-focus-ui.js": "7fba9fb4d91d3bb486700c3671712ebbc0639a9b1b15ecab3c63bd12b42eeccb",
+    "src/medagent/web/execution-ui.js": "505bb11664c33d2944d6e3ade648955fb749bf1413ee29c82e40e48e316a6605",
+    "tests/desktop/execution-focus.spec.mjs": "41515ee80284eb160375a69494fe8ea4c3f3667191b86cd85685373fb53d7808",
+    "tests/fixtures/execution-focus.mjs": "9d6696077479c0c6bc81162ab105562e9cef234ff17bd27e64979acbca4d256e",
+    "tests/test_execution_cancellation.py": "cd6012d207e4c3a5e69b6ede5f6d0faadb24fd8dd8da7e17dadd1e6cdebb12bb",
+    "tests/test_execution_clarifications.py": "b71acb53bc9111f6c4f3bc922dfad5f941a206b762e5abf566184b6d0cff773f",
+    "tests/test_windows_execution.py": "3e29372f9e1c188e592180b302a4193b71a1dccf0e94d3b2b8d82f74018c159a",
+    "tests/ui/execution-child-activity.spec.mjs": "22b106c6b21e1c21d1617edb811b4c55bda3f1e507231ae6a43bbca7f9344895"
+  },
+  "artifacts_sha256": {
+    "after-lifecycle.json": "4a14362db0dff78587318c2d7d70972da10b66c7b7d54a7d271eb60822e7273f",
+    "before-lifecycle.json": "26333b4d23465f0bbcbdf49e9a075407db571ff8e95e70dc1a08e3359f7009f5",
+    "child-activity-1440.png": "cde97949330582981fcffe2ee02b64ed987448ab3d5bbda40be74f72ef594505",
+    "child-activity-320.png": "1425d4c40f3474d7c0b77d4fbdf3bdbcd9c71e86fb40417ac029447e03575882",
+    "logs/after.log": "1433eb5650c945014c64b9d78e0d8ac8097dcd4a7ea728ec0b4af00499d5c500",
+    "logs/before.log": "2a36f0f891409a549bef6be758a022b346ca18063f1451fee2e8427fd11e4cb5",
+    "logs/deadline-regression.log": "173be4b1569bff4a982949b780df08f449b359447d4eac8214b1edb4db053eaf",
+    "logs/desktop.log": "abe9d5fd94399a3fdd41a84c28f34265a0f9e2716344240145a6c2e8b18b16ed",
+    "logs/fixture-initial-errors.log": "cf8ef78d50eb1d9e78e497c21baf3974d9d93e77fe1e7fd36e5714b748c9e0f5",
+    "logs/host.log": "3699839d59b7050aed0261a61c2570bcd90ce754ea235144a69503a50e2e739e",
+    "logs/native-gui.log": "87a0bbd6eaafc18f2bbd001f793134e3cda4791ab1982a705ce032a5281d952f",
+    "logs/node.log": "83c392e85c9469d7d670867fdabdf9f934d270ea5bc24f84ddccdcef6f2521b3",
+    "logs/ownership-regression.log": "51f65ffe210ce040c081b878c2cfafe3f91f91da9ce75440304659214d12fab5",
+    "logs/profile.log": "2e855261c8381ed2c57665af31a2552fa68d1d99cdffe360cbaba335b3eba691",
+    "logs/sdk-cases.log": "7fe20ede88d82f0c2607ef467d1dc3b0a59fb2086b715eb876d69f05e2374416",
+    "logs/ui-fixture-errors.log": "d73ebd10a7e829a7c6a5d3ad0c31bcc5c79c97bec7e11b90763b3ae0d1736d65",
+    "logs/ui.log": "832a9f1d4e0d6501f402449018bd55cb44fb3aa387e2de3076fe5e0f2d395867",
+    "probe/host-run.py": "5b459eca516b2e036ab708b9240bef503dc361cdf604fdf669d874582f161515",
+    "probe/native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
+    "probe/probe.mjs": "08ea9aacb78e335e64f4e1179698cb80a0366a28183333027cdf745fed8040c5",
+    "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4"
+  }
+}
