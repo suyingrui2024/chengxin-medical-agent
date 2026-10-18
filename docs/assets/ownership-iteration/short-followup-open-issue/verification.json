@@ -1,0 +1,24 @@
+{
+  "schema": "short-followup-open-issue/v1",
+  "status": "reproduced_unfixed",
+  "tested_code_commit": "de34f7c0432461a5839e39ee49012aff43ecb6aa",
+  "scope": "Actual SDK and host with scripted loopback replies; direct macOS launcher without outer isolation. No external model calls.",
+  "finding": "A funded original 15-second child survives the three-second hold without a follow-up. An independent two-second foreground follow-up completes, but its retained global timer aborts the still-valid old child before its own deadline. Descendant call ownership does not fix selective timeout cancellation.",
+  "asserted_pair": {
+    "control_child_calls": 2,
+    "followup_child_calls": 1,
+    "control_artifact": "child",
+    "followup_artifact": null
+  },
+  "next_work": "Cancel only the expiring grant and its owned descendants, requests and jobs while preserving explicit workspace-wide user cancellation; separately resolve root automatic wakeup ownership.",
+  "replay": "Copy the three mjs files together to a fresh directory two levels below the repository root, then run probe.mjs --funded and probe.mjs --funded --followup. Do not copy these nested scripts in place and expect relative imports to resolve.",
+  "artifacts_sha256": {
+    "control-lifecycle.json": "e97edb38b077520a93faca2fa264d2122c02c4c08dc4e2306175d603b42f20ad",
+    "control.log": "100817dd25fd88b5cb101f23f4739dbbcde9e63fd3a1a5aeaca0ffcd48a2afe4",
+    "followup-lifecycle.json": "2d59d21538b0cf43bf386726875550d585894a4c5721c2034511fdf01b377043",
+    "followup.log": "ce65de5d86df1f183db044bfada6adf25b422fa8d31c44c04577903a7eed5145",
+    "native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
+    "probe.mjs": "08ea9aacb78e335e64f4e1179698cb80a0366a28183333027cdf745fed8040c5",
+    "sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4"
+  }
+}

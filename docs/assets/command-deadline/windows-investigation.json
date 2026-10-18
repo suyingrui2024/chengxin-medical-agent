@@ -1,0 +1,38 @@
+{
+  "schema": "native-followup-command-investigation/v1",
+  "status": "cache_intervention_failed_and_reverted",
+  "tested_diagnostic_commit": "d89d5b5cedfd1084234947af0f6fac55e88432d1",
+  "diagnostic_workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39105929239",
+  "diagnostic_job": 117611641381,
+  "diagnostic_log_sha256": "f8fc6c72799c22a7b6b3b56029c63fc45a1b5461af7991fac65e32e0c03226a8",
+  "record": "windows-tool-diagnostic.json",
+  "record_sha256": "1db632dc16c2e91ed83f66440fec493f68d640e52b8feeb2f7f746306a846f9e",
+  "observed": "The old job becomes killed around the original five-second deadline. The second job is already registered before that and remains running until the new task independently reaches its 20-second deadline; its tool result then reports AbortError. The log does not establish where the PowerShell process was waiting.",
+  "hypothesis": "Parallel non-interactive Windows PowerShell jobs share a module-analysis cache that is written asynchronously. Test the documented NUL cache opt-out in each managed shell process. The macOS PowerShell Core issue is only a related hypothesis, not proof of this Windows 5.1 failure.",
+  "reference": "https://github.com/MicrosoftDocs/PowerShell-Docs/blob/main/reference/5.1/Microsoft.PowerShell.Core/About/about_Windows_PowerShell_5.1.md",
+  "intervention_commit": "3b490630fc741a8e13ddb7cd9b0f200f3fef6354",
+  "unchanged_assertions": [
+    "original task five seconds / old sleep eight seconds",
+    "new task twenty seconds / new sleep six seconds / foreground wait thirty seconds",
+    "old file absent and independent new file present",
+    "same SDK host process retained and provider request count unchanged"
+  ],
+  "status_boundary": "Do not claim the cache is the cause or that native command deadlines are accepted until the unchanged source and bundled SDK methods pass.",
+  "intervention_workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39106416844",
+  "intervention_job": 117613115121,
+  "intervention_result": "Same independent follow-up remains running until its own 20-second deadline; NUL module-cache opt-out did not remove the failure.",
+  "intervention_log_sha256": "8516aad02560313b783bc1b0709096038055f2f8e9e6da070297320b33580b7e",
+  "reverted_by": "0948706",
+  "next_diagnostic": {
+    "commit": "014ed2a",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39107341102",
+    "scope": "Only native isolation and source command-deadline method with entry markers; not full matrix acceptance."
+  },
+  "focused_bootstrap_failure": {
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39106963221",
+    "commit": "11bb3a2",
+    "target_method_run": false,
+    "reason": "Dedicated diagnostic workflow did not export MEDAGENT_PYTHON before the isolation probe; original full matrix exports it through windows.ps1. Corrected in 014ed2a.",
+    "log_sha256": "80c621b61af0fe5d8ea20aa6a7d683f4cacf313a366042019d4a662b332707bc"
+  }
+}

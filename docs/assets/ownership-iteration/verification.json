@@ -18,7 +18,10 @@
     },
     "browser": {
       "unique_cases_passed": 21,
-      "logs": ["logs/ui.log", "logs/ui-question.log"],
+      "logs": [
+        "logs/ui.log",
+        "logs/ui-question.log"
+      ],
       "scope": "The first run passed 20 cases including the wide earlier-question case. The final question-file run passed wide and 320px cases; wide overlaps, so there are 21 distinct cases, not 22."
     },
     "native_desktop": {
@@ -81,7 +84,11 @@
         "sandbox": true,
         "contextIsolation": true,
         "nodeIntegration": false,
-        "bundled_font_roles": ["body", "serif", "mono"],
+        "bundled_font_roles": [
+          "body",
+          "serif",
+          "mono"
+        ],
         "patient_calculation_and_resume": "passed",
         "appearance_themes": [
           "ocean",
@@ -181,7 +188,8 @@
     "Retain at most 256 grants and 4096 session/turn mappings; evicted or unknown descendants fail closed rather than adopting another task.",
     "The initial command-deadline Windows run failed; see ../command-deadline/windows-initial-failure.json. Its underlying cause was not established from the available tool trace, and the revised source/packaged test remains pending CI.",
     "Two new broker test fixtures initially sent string chunks to Buffer.concat and returned 400; they were corrected to Buffer chunks. The failed fixture log is retained separately and is not counted as a product failure or a pass.",
-    "The full browser suite and Linux isolated SDK suite were not rerun. Native GUI checks use explicitly labeled host snapshots."
+    "The full browser suite and Linux isolated SDK suite were not rerun. Native GUI checks use explicitly labeled host snapshots.",
+    "A paired 15-second-child/two-second-followup probe reproduces workspace-wide timeout cancellation of a valid earlier child. Selective per-grant cancellation is not fixed by this iteration; see followup_open_issue."
   ],
   "replay": {
     "instructions": "Copy probe files together into a fresh directory under .runtime (two levels below the repository root) and use the pinned Node runtime. child-owner-probe.mjs runs control or --followup; advisory/deadline/answer probes use --followup --funded; search probe uses --followup with or without --funded. Each case should use its own fresh directory to retain raw events. Baseline source is source_parent_commit; current replay uses current source.",
@@ -244,10 +252,20 @@
     "probe/child-search-probe.mjs": "689e4f444a49fea31f979e2272168d3fc49841a501ff96c168ef7014bfa47c5a",
     "probe/independent-probe.mjs": "a4602f6b6c195177b242089b0dae31932e6c5ac2d625aae133d16edf20eb4907",
     "probe/native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
-    "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4"
+    "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4",
+    "short-followup-open-issue/verification.json": "fe446226125458c4cff1b55bd52bac6f9eea0d714acbbbecb24691b96968a3c5",
+    "windows-first-attempt.json": "7d49b4d38666c1589422e1fff4c71bc59dd87e8c0513c9155cd4349e8d865b20",
+    "windows-diagnostic-attempt.json": "52f28404c2cf9b0d1de573286e20361de91884648152e1aa88f49e180c1f5846"
   },
   "windows": {
-    "status": "pending",
-    "required": "Both matrices: 51 Node checks and host record checks; five actual-window earlier-child answer receipts; source and bundled isolated SDK ownership/answer/search cases plus the revised command-deadline case."
-  }
+    "status": "failed_source_diagnostic_running",
+    "required": "Both matrices: 51 Node checks and host record checks; five actual-window earlier-child answer receipts; source and bundled isolated SDK ownership/answer/search cases plus the revised command-deadline case.",
+    "initial_attempt": "windows-first-attempt.json",
+    "latest_diagnostic_commit": "014ed2a2ef306c2237c3c9ae2ad5633d9a6ab507",
+    "latest_workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39107341102",
+    "diagnostic_attempt": "windows-diagnostic-attempt.json",
+    "latest_scope": "Source command-deadline investigation only; full Windows 11 packaged SDK remains unverified for this iteration."
+  },
+  "followup_open_issue": "short-followup-open-issue/verification.json",
+  "tested_code_commit": "de34f7c0432461a5839e39ee49012aff43ecb6aa"
 }

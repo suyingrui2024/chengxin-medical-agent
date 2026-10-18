@@ -1,0 +1,42 @@
+[
+  {
+    "sequence": 2,
+    "type": "turn.started",
+    "turn_id": "d5214e1a-6109-423d-97e3-adf1d0bf6d51",
+    "time_budget_seconds": 15
+  },
+  {
+    "sequence": 20,
+    "type": "turn.completed",
+    "turn_id": "d5214e1a-6109-423d-97e3-adf1d0bf6d51",
+    "model_calls": 3,
+    "lifetime_calls": 3,
+    "final_response": "Root acknowledgement."
+  },
+  {
+    "sequence": 21,
+    "type": "turn.started",
+    "turn_id": "dfe058f0-14da-4f1f-b4bf-084cd6e404bf",
+    "time_budget_seconds": 2
+  },
+  {
+    "sequence": 29,
+    "type": "turn.completed",
+    "turn_id": "dfe058f0-14da-4f1f-b4bf-084cd6e404bf",
+    "model_calls": 1,
+    "lifetime_calls": 4,
+    "final_response": "Root acknowledgement."
+  },
+  {
+    "sequence": 30,
+    "type": "turn.deadline",
+    "turn_id": "dfe058f0-14da-4f1f-b4bf-084cd6e404bf",
+    "time_budget_seconds": 2
+  },
+  {
+    "sequence": 33,
+    "type": "jobs.cancelled",
+    "turn_id": "dfe058f0-14da-4f1f-b4bf-084cd6e404bf",
+    "reason": "time_budget_exhausted"
+  }
+]

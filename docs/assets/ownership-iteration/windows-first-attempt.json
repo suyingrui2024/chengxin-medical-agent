@@ -1,0 +1,222 @@
+{
+  "schema": "descendant-ownership-windows-attempt/v1",
+  "status": "failed",
+  "tested_code_commit": "de34f7c0432461a5839e39ee49012aff43ecb6aa",
+  "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39105486619",
+  "conclusion": "failure",
+  "jobs": {
+    "server": {
+      "job_id": 117610294081,
+      "conclusion": "failure",
+      "log_sha256": "91f8e1af488989218a659398508d2cef55223967a6e8c84e11bfe0f659b63b8c",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "diagnostic": [
+        "2026-10-18T06:52:16.4460045Z locator.click: Timeout 30000ms exceeded.",
+        "2026-10-18T06:52:16.4460698Z Call log:",
+        "2026-10-18T06:52:16.4461798Z \u001b[2m  - waiting for locator('#recent-sessions .recent-item').first()\u001b[22m",
+        "2026-10-18T06:52:16.4462425Z ",
+        "2026-10-18T06:52:16.4463259Z     at verifyGlucoseCalculation (D:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\tests\\fixtures\\glucose-calculation.mjs:133:63)",
+        "2026-10-18T06:52:16.4464786Z     at async file:///D:/a/chengxin-medical-agent/chengxin-medical-agent/scripts/windows/gui-check.mjs:81:3 {",
+        "2026-10-18T06:52:16.4465693Z   log: [",
+        "2026-10-18T06:52:16.4466236Z     \"  - waiting for locator('#recent-sessions .recent-item').first()\""
+      ],
+      "interpretation": "Initial native GUI timed out reopening the recent consultation list. The same app code passed this stage in the following diagnostic run; the original failure cause is not established."
+    },
+    "arm": {
+      "job_id": 117610294304,
+      "conclusion": "failure",
+      "log_sha256": "b131c9bab49798cfac683d90be7dd48dca85a7e9b8be4774dda93c101f2cd0ee",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "diagnostic": [
+        "2026-10-18T06:56:31.1937733Z FAIL: test_original_command_deadline_survives_an_independent_followup (__main__.WindowsExecutionTests.test_original_command_deadline_survives_an_independent_followup) (independent_followup=True)",
+        "2026-10-18T06:56:31.1938797Z ----------------------------------------------------------------------",
+        "2026-10-18T06:56:31.1939305Z Traceback (most recent call last):",
+        "2026-10-18T06:56:31.1940055Z   File \"C:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\tests\\test_execution_command_deadline.py\", line 63, in exercise_command_deadline",
+        "2026-10-18T06:56:31.1940900Z     finish(session)",
+        "2026-10-18T06:56:31.1941276Z     ~~~~~~^^^^^^^^^",
+        "2026-10-18T06:56:31.1941866Z   File \"C:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\tests\\test_execution_command_deadline.py\", line 48, in finish",
+        "2026-10-18T06:56:31.1942647Z     owner.assertEqual(session.status, \"completed\", session.error)",
+        "2026-10-18T06:56:31.1943079Z     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "2026-10-18T06:56:31.1943458Z AssertionError: 'cancelled' != 'completed'",
+        "2026-10-18T06:56:31.1943825Z - cancelled",
+        "2026-10-18T06:56:31.1944073Z + completed",
+        "2026-10-18T06:56:31.1944347Z  : time_budget_exhausted",
+        "2026-10-18T06:56:31.1944634Z ",
+        "2026-10-18T06:56:31.1944966Z ----------------------------------------------------------------------",
+        "2026-10-18T06:56:31.1945559Z Ran 4 tests in 120.427s",
+        "2026-10-18T06:56:31.1945832Z ",
+        "2026-10-18T06:56:31.1946098Z FAILED (failures=1)",
+        "2026-10-18T06:56:31.3896818Z C:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\scripts\\windows.ps1 : Command failed (exit 1): ",
+        "2026-10-18T06:56:31.3898331Z C:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\.runtime\\windows\\python\\python.exe",
+        "2026-10-18T06:56:31.3898940Z At C:\\a\\_temp\\580dd06c-7013-4987-8bcb-8974b86ca62a.ps1:2 char:1",
+        "2026-10-18T06:56:31.3899617Z + ./scripts/windows.ps1 -Mode ExecutionTest",
+        "2026-10-18T06:56:31.3900159Z + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+        "2026-10-18T06:56:31.3900808Z     + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException"
+      ],
+      "node": {
+        "passed": 51,
+        "failed": 0
+      },
+      "host": {
+        "run": 17,
+        "passed": 16,
+        "skipped": 1
+      },
+      "isolated_sdk": {
+        "run": 4,
+        "passed": 3,
+        "failed": 1,
+        "ownership_answer_search_cases": "passed",
+        "independent_followup_command": "cancelled at its 20-second deadline; tool receipt was not included by the failing finish assertion"
+      },
+      "gui_windows_passed": 1
+    }
+  },
+  "interpretation": "Not accepted. All grant/answer/search isolated SDK assertions passed on Windows 11, but the command-deadline method failed. Diagnostics were subsequently added to failures before completion as well as to missing files. Neither later receipt nor a partial successful matrix changes this failure."
+}

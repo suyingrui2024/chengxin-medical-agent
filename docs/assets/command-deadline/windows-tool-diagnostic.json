@@ -1,0 +1,642 @@
+{
+  "status": "cancelled",
+  "error": "time_budget_exhausted",
+  "events": [
+    {
+      "sequence": 1,
+      "type": "workspace.baseline",
+      "time": 1792307016.7448268,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "files": 0,
+      "complete": true,
+      "content_complete": true
+    },
+    {
+      "sequence": 2,
+      "type": "task.submitted",
+      "time": 1792307016.7448337,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "text": "Start the fixed synthetic background command."
+    },
+    {
+      "sequence": 3,
+      "type": "ready",
+      "time": 1792307028.2708178,
+      "runtime": "dsh-sdk",
+      "version": "0.2.0-rc.2",
+      "isolation": "windows-processcontainer",
+      "network": "enabled",
+      "model": "fixture"
+    },
+    {
+      "sequence": 4,
+      "type": "turn.started",
+      "time": 1792307028.2739754,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "time_budget_seconds": 5
+    },
+    {
+      "sequence": 5,
+      "type": "runtime.event",
+      "time": 1792307028.325848,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "status": "running"
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "type": "runtime.event",
+      "time": 1792307028.3305,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "turn/start",
+            "seq": 1,
+            "time": 1792307028328,
+            "data": {
+              "turn": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 7,
+      "type": "model.request_started",
+      "time": 1792307028.930023,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "index": 1,
+      "lifetime_calls": 1,
+      "session_id": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+      "source": "conversation"
+    },
+    {
+      "sequence": 8,
+      "type": "model.request",
+      "time": 1792307028.9797618,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "index": 1,
+      "lifetime_calls": 1,
+      "status": 200
+    },
+    {
+      "sequence": 9,
+      "type": "jobs.snapshot",
+      "time": 1792307028.9952307,
+      "jobs": []
+    },
+    {
+      "sequence": 10,
+      "type": "runtime.event",
+      "time": 1792307029.025314,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "assistant/message",
+            "seq": 11,
+            "time": 1792307029019,
+            "data": {
+              "turn": 1,
+              "step": 1,
+              "usage": {
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "totalTokens": 20
+              },
+              "message": {
+                "role": "assistant",
+                "content": []
+              }
+            },
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 11,
+      "type": "runtime.event",
+      "time": 1792307029.0307205,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "tool/call",
+            "seq": 12,
+            "time": 1792307029028,
+            "data": {
+              "turn": 1,
+              "step": 1,
+              "callId": "delivery-1",
+              "name": "bash",
+              "arguments": "{\"command\":\"Start-Sleep -Seconds 8; 'finished' | Set-Content -Encoding UTF8 old-late.txt\",\"run_in_background\":true,\"description\":\"Original short task deadline\"}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "type": "runtime.event",
+      "time": 1792307029.081326,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "tool/result",
+            "seq": 13,
+            "time": 1792307029070,
+            "data": {
+              "turn": 1,
+              "step": 1,
+              "message": {
+                "role": "tool",
+                "source": {
+                  "kind": "tool",
+                  "callId": "delivery-1"
+                },
+                "toolCallId": "delivery-1",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "started background job bash-1"
+                  }
+                ],
+                "isError": false,
+                "id": "656c4bc2-8d5f-42d4-85d3-90d5928c83f9"
+              }
+            },
+            "sourceEventSeqs": [
+              12
+            ],
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 13,
+      "type": "model.request_started",
+      "time": 1792307029.5220935,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "index": 2,
+      "lifetime_calls": 2,
+      "session_id": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+      "source": "conversation"
+    },
+    {
+      "sequence": 14,
+      "type": "model.request",
+      "time": 1792307029.5412018,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "index": 2,
+      "lifetime_calls": 2,
+      "status": 200
+    },
+    {
+      "sequence": 15,
+      "type": "runtime.event",
+      "time": 1792307029.6237602,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "assistant/message",
+            "seq": 17,
+            "time": 1792307029621,
+            "data": {
+              "turn": 1,
+              "step": 2,
+              "usage": {
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "totalTokens": 20
+              },
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Original background command started."
+                  }
+                ]
+              }
+            },
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 16,
+      "type": "runtime.event",
+      "time": 1792307029.627979,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "turn/end",
+            "seq": 19,
+            "time": 1792307029626,
+            "data": {
+              "turn": 1,
+              "reason": {
+                "kind": "completed"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 17,
+      "type": "runtime.event",
+      "time": 1792307029.6337585,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "status": "idle"
+        }
+      }
+    },
+    {
+      "sequence": 18,
+      "type": "tool.observed",
+      "time": 1792307029.9848845,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "observation": {
+        "schema": "execution-observation/v1",
+        "epoch": "aa8d7f2a-b0fe-400a-8a1b-c8b792707d22",
+        "sequence": 1,
+        "session_id": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+        "call_id": "delivery-1",
+        "sdk_turn": 1,
+        "sdk_step": 1,
+        "call_sequence": 12,
+        "tool": "bash",
+        "state": "background",
+        "exit_code": null,
+        "signal": null,
+        "job_id": "bash-1",
+        "job_kind": "bash",
+        "wait_ms": null,
+        "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+        "observation_id": "aa8d7f2a-b0fe-400a-8a1b-c8b792707d22:1"
+      }
+    },
+    {
+      "sequence": 19,
+      "type": "jobs.snapshot",
+      "time": 1792307029.9962025,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "running",
+          "kind": "bash"
+        }
+      ]
+    },
+    {
+      "sequence": 20,
+      "type": "turn.completed",
+      "time": 1792307030.0749593,
+      "turn_id": "c7e48284-4f98-4ec2-9b67-c780ba895eb9",
+      "model_calls": 2,
+      "lifetime_calls": 2,
+      "final_response": "Original background command started."
+    },
+    {
+      "sequence": 21,
+      "type": "workspace.baseline",
+      "time": 1792307030.6507573,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "files": 0,
+      "complete": true,
+      "content_complete": true
+    },
+    {
+      "sequence": 22,
+      "type": "task.submitted",
+      "time": 1792307030.6507664,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "text": "Run the independent follow-up command. Do not extend or restart the original job."
+    },
+    {
+      "sequence": 23,
+      "type": "turn.started",
+      "time": 1792307030.805884,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "time_budget_seconds": 20
+    },
+    {
+      "sequence": 24,
+      "type": "runtime.event",
+      "time": 1792307030.8879452,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "status": "running"
+        }
+      }
+    },
+    {
+      "sequence": 25,
+      "type": "runtime.event",
+      "time": 1792307030.8892577,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "turn/start",
+            "seq": 21,
+            "time": 1792307030888,
+            "data": {
+              "turn": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 26,
+      "type": "model.request_started",
+      "time": 1792307032.1701076,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "index": 1,
+      "lifetime_calls": 3,
+      "session_id": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+      "source": "conversation"
+    },
+    {
+      "sequence": 27,
+      "type": "model.request",
+      "time": 1792307032.2519126,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "index": 1,
+      "lifetime_calls": 3,
+      "status": 200
+    },
+    {
+      "sequence": 28,
+      "type": "runtime.event",
+      "time": 1792307032.3176656,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "assistant/message",
+            "seq": 26,
+            "time": 1792307032198,
+            "data": {
+              "turn": 2,
+              "step": 1,
+              "usage": {
+                "inputTokens": 10,
+                "outputTokens": 10,
+                "totalTokens": 20
+              },
+              "message": {
+                "role": "assistant",
+                "content": []
+              }
+            },
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 29,
+      "type": "runtime.event",
+      "time": 1792307032.3177004,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "tool/call",
+            "seq": 27,
+            "time": 1792307032200,
+            "data": {
+              "turn": 2,
+              "step": 1,
+              "callId": "delivery-3",
+              "name": "bash",
+              "arguments": "{\"command\":\"Start-Sleep -Seconds 6; 'finished' | Set-Content -Encoding UTF8 followup.txt\",\"description\":\"Independent follow-up outlives the first deadline\",\"timeoutMs\":30000}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 30,
+      "type": "jobs.snapshot",
+      "time": 1792307032.577611,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "running",
+          "kind": "bash"
+        },
+        {
+          "id": "bash-2",
+          "status": "running",
+          "kind": "bash"
+        }
+      ]
+    },
+    {
+      "sequence": 31,
+      "type": "jobs.snapshot",
+      "time": 1792307033.995236,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "killed",
+          "kind": "bash",
+          "detail": "killed before exit"
+        },
+        {
+          "id": "bash-2",
+          "status": "running",
+          "kind": "bash"
+        }
+      ]
+    },
+    {
+      "sequence": 32,
+      "type": "turn.deadline",
+      "time": 1792307050.8169386,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "time_budget_seconds": 20
+    },
+    {
+      "sequence": 33,
+      "type": "runtime.event",
+      "time": 1792307050.8877914,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "tool/result",
+            "seq": 30,
+            "time": 1792307050885,
+            "data": {
+              "turn": 2,
+              "step": 1,
+              "message": {
+                "role": "tool",
+                "source": {
+                  "kind": "tool",
+                  "callId": "delivery-3"
+                },
+                "toolCallId": "delivery-3",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Error: tool call aborted"
+                  }
+                ],
+                "isError": true,
+                "id": "6c6f818e-23bb-4b29-88e2-2394f80916a5"
+              },
+              "error": {
+                "name": "AbortError",
+                "code": "ABORTED"
+              }
+            },
+            "sourceEventSeqs": [
+              27
+            ],
+            "surfaceOp": "append"
+          }
+        }
+      }
+    },
+    {
+      "sequence": 34,
+      "type": "runtime.event",
+      "time": 1792307050.8887212,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "notification": {
+        "method": "session.event",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "event": {
+            "type": "turn/end",
+            "seq": 32,
+            "time": 1792307050888,
+            "data": {
+              "turn": 2,
+              "reason": {
+                "kind": "aborted",
+                "reason": {
+                  "kind": "user"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "sequence": 35,
+      "type": "runtime.event",
+      "time": 1792307050.8919756,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "notification": {
+        "method": "session.status",
+        "params": {
+          "sessionId": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+          "status": "idle"
+        }
+      }
+    },
+    {
+      "sequence": 36,
+      "type": "tool.observed",
+      "time": 1792307050.896421,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "observation": {
+        "schema": "execution-observation/v1",
+        "epoch": "aa8d7f2a-b0fe-400a-8a1b-c8b792707d22",
+        "sequence": 2,
+        "session_id": "cdfef26e-c3cf-441d-8007-5a93d233d072",
+        "call_id": "delivery-3",
+        "sdk_turn": 2,
+        "sdk_step": 1,
+        "call_sequence": 27,
+        "tool": "bash",
+        "state": "failed",
+        "exit_code": null,
+        "signal": null,
+        "job_id": null,
+        "job_kind": null,
+        "wait_ms": null,
+        "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+        "observation_id": "aa8d7f2a-b0fe-400a-8a1b-c8b792707d22:2"
+      }
+    },
+    {
+      "sequence": 37,
+      "type": "jobs.snapshot",
+      "time": 1792307050.9046144,
+      "jobs": [
+        {
+          "id": "bash-1",
+          "status": "killed",
+          "kind": "bash",
+          "detail": "killed before exit"
+        }
+      ]
+    },
+    {
+      "sequence": 38,
+      "type": "turn.cancelled",
+      "time": 1792307050.9046354,
+      "turn_id": "897ec295-fdbc-46d3-a6cf-2007b2211096",
+      "model_calls": 1,
+      "lifetime_calls": 3,
+      "final_response": "",
+      "error_type": "time_budget_exhausted"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "bash-1",
+      "status": "killed",
+      "kind": "bash",
+      "detail": "killed before exit"
+    }
+  ]
+}

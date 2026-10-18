@@ -70,14 +70,17 @@
     "probe/native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
     "probe/overlap-probe.mjs": "ad98bc7bbb73f236bb7bedcee812a94763d02d5022b5ece098997a9f066da725",
     "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4",
-    "windows-initial-failure.json": "172847b75cb306289d0ec8d4f9de7a36863a9ca0e73a327468f24e29aa67bed7"
+    "windows-initial-failure.json": "172847b75cb306289d0ec8d4f9de7a36863a9ca0e73a327468f24e29aa67bed7",
+    "windows-investigation.json": "d84e87be4b3d42f9f646ed1ee83d437913e272c18e3acb62f98d84983dda328e",
+    "windows-tool-diagnostic.json": "1db632dc16c2e91ed83f66440fec493f68d640e52b8feeb2f7f746306a846f9e"
   },
   "windows": {
     "status": "failed",
     "required": "Both matrices deadline contract checks and existing acceptance, plus original background deadline with independent follow-up in source and packaged actual isolated Windows SDK.",
     "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39103193751",
     "receipt": "windows-initial-failure.json",
-    "revision": "The foreground-wait fixture and diagnostics are revised in the ownership iteration; native source and packaged SDK revalidation remains pending."
+    "revision": "The foreground-wait fixture and diagnostics are revised in the ownership iteration; native source and packaged SDK revalidation remains pending.",
+    "investigation": "windows-investigation.json"
   },
   "tested_code_commit": "7f13b4449df8164ca84eefa200d326da1cbb91a0"
 }

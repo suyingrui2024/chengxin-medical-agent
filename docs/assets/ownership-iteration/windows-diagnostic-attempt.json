@@ -1,0 +1,515 @@
+{
+  "schema": "ownership-native-diagnostic-attempt/v1",
+  "status": "failed",
+  "tested_code_commit": "d89d5b5cedfd1084234947af0f6fac55e88432d1",
+  "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39105929239",
+  "jobs": {
+    "arm": {
+      "job_id": 117611641381,
+      "conclusion": "failure",
+      "log_sha256": "f8fc6c72799c22a7b6b3b56029c63fc45a1b5461af7991fac65e32e0c03226a8",
+      "node": {
+        "passed": 51,
+        "failed": 0
+      },
+      "host": {
+        "run": 17,
+        "passed": 16,
+        "skipped": 1
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "earlier_child_answer": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "earlier_turn_preserved": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "patient_calculation_and_resume": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "installer_receipts": [],
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "source_sdk": {
+        "run": 4,
+        "passed": 3,
+        "failed": 1,
+        "failure": "independent_followup=True at its own 20-second deadline",
+        "tool_diagnostic": "../command-deadline/windows-tool-diagnostic.json"
+      }
+    },
+    "server": {
+      "job_id": 117611641647,
+      "conclusion": "success",
+      "log_sha256": "4e9254079e7a31ac88c991ac75644f093c5a2dc4e07d91367e8b87add5af5c86",
+      "node": {
+        "passed": 51,
+        "failed": 0
+      },
+      "host": {
+        "run": 17,
+        "passed": 16,
+        "skipped": 1
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "earlier_child_answer": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "earlier_turn_preserved": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "patient_calculation_and_resume": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "earlier_child_answer": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "earlier_turn_preserved": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "patient_calculation_and_resume": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "earlier_child_answer": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "earlier_turn_preserved": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "patient_calculation_and_resume": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "installer_receipts": [
+        {
+          "passed": true,
+          "desktop_shortcut": true,
+          "start_menu_shortcut": true,
+          "installer": true,
+          "bundled_runtime_launched": true,
+          "uninstalled": true
+        }
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  },
+  "boundaries": [
+    "Four GUI windows passed: three Server and one Windows 11 source window. Packaged Windows 11 SDK and portable window were not reached.",
+    "Do not accept the whole workflow from the passed ownership method or Server matrix.",
+    "Fixed synthetic local provider plans; no external model or reasoning benchmark."
+  ]
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "sequence": 2,
+    "type": "turn.started",
+    "turn_id": "43d78816-c868-4725-a842-b174179488f0",
+    "time_budget_seconds": 15
+  },
+  {
+    "sequence": 19,
+    "type": "turn.completed",
+    "turn_id": "43d78816-c868-4725-a842-b174179488f0",
+    "model_calls": 2,
+    "lifetime_calls": 2,
+    "final_response": "Root acknowledgement."
+  }
+]
