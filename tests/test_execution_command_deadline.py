@@ -17,10 +17,16 @@ def exercise_command_deadline(owner):
 
     def command(seconds, path):
         if native:
+            def marker(stage):
+                return (
+                    f"[IO.File]::WriteAllText([IO.Path]::Combine([Environment]::CurrentDirectory, '{path}.{stage}'), "
+                    "[DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds().ToString()); "
+                )
             return (
-                f"[IO.File]::WriteAllText([IO.Path]::Combine([Environment]::CurrentDirectory, '{path}.started'), 'started'); "
-                f"Start-Sleep -Seconds {seconds}; "
-                f"'finished' | Set-Content -Encoding UTF8 {path}"
+                marker("started")
+                + f"Start-Sleep -Seconds {seconds}; "
+                + marker("awake")
+                + f"'finished' | Set-Content -Encoding UTF8 {path}"
             )
         return f"sleep {seconds}; printf finished > {path}"
 
@@ -51,7 +57,7 @@ def exercise_command_deadline(owner):
                     json.dumps({"status": session.status, "error": session.error,
                                 "events": list(session.events)[-60:], "jobs": session.jobs,
                                 "artifacts": {name: (session.directory / name).read_text(encoding="utf-8-sig")
-                                              for name in ["old-late.txt", "old-late.txt.started", "followup.txt", "followup.txt.started"]
+                                              for name in ["old-late.txt", "old-late.txt.started", "old-late.txt.awake", "followup.txt", "followup.txt.started", "followup.txt.awake"]
                                               if (session.directory / name).is_file()}}, ensure_ascii=False),
                 )
 
@@ -75,7 +81,7 @@ def exercise_command_deadline(owner):
                         (session.directory / "followup.txt").exists(),
                         json.dumps({"events": list(session.events)[-60:], "jobs": session.jobs,
                                 "artifacts": {name: (session.directory / name).read_text(encoding="utf-8-sig")
-                                              for name in ["old-late.txt", "old-late.txt.started", "followup.txt", "followup.txt.started"]
+                                              for name in ["old-late.txt", "old-late.txt.started", "old-late.txt.awake", "followup.txt", "followup.txt.started", "followup.txt.awake"]
                                               if (session.directory / name).is_file()}}, ensure_ascii=False),
                     )
                     owner.assertEqual(
@@ -93,7 +99,7 @@ def exercise_command_deadline(owner):
                     json.dumps({"status": session.status, "error": session.error,
                                 "events": list(session.events)[-60:], "jobs": session.jobs,
                                 "artifacts": {name: (session.directory / name).read_text(encoding="utf-8-sig")
-                                              for name in ["old-late.txt", "old-late.txt.started", "followup.txt", "followup.txt.started"]
+                                              for name in ["old-late.txt", "old-late.txt.started", "old-late.txt.awake", "followup.txt", "followup.txt.started", "followup.txt.awake"]
                                               if (session.directory / name).is_file()}}, ensure_ascii=False),
                 )
                     owner.assertEqual(session.turns[-1]["time_budget_seconds"], 20)
