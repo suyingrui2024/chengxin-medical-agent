@@ -1,0 +1,46 @@
+✔ checkpoint scopes keep prior inputs and reject traversal before any scan (1.696917ms)
+✔ only complete canonical checkpoint metadata carries a proof digest (0.387792ms)
+✔ a parent or root scope cannot erase an explicitly watched cache input (0.175834ms)
+✔ scope order uses Unicode scalar order consistently with the Python host (1.130333ms)
+✔ a promoted or background process keeps the captured task deadline without changing its waiting spec (0.686459ms)
+✔ an existing foreground kill deadline never grows beyond either bound (0.173625ms)
+✔ missing, expired, excessive or malformed grants cannot launch an unbounded command (0.905458ms)
+✔ a failed host read cannot replace a process deadline with the command wait limit (0.084667ms)
+✔ delivery outcomes use the SDK job producer status, never printed claims (0.81375ms)
+✔ actual tool registration rejects invalid commands before launching any process (3.200416ms)
+✔ only typed delivery values acquire command identity and process outcomes (0.48525ms)
+✔ late optional results cannot downgrade a concurrent required declaration (0.132916ms)
+✔ accepted check arguments share explicit bounds and explain rejected proposals (0.409917ms)
+✔ a long accepted check reads the same running job again after a bounded wait (11.475708ms)
+✔ actual exit zero and matching final snapshot do not verify input modified during checking (390.02625ms)
+✔ stable explicit inputs permit generated outputs and keep the post-run file binding (328.793833ms)
+✔ post-run-only checks retain their documented scope and cannot satisfy a later input requirement (236.186959ms)
+✔ input proof scopes must be canonical, explicit and cover the declared dependencies (0.366625ms)
+✔ only the typed delivery producer can attach verified input scope (0.206959ms)
+✔ input requirements survive later omission and expansion; missing start proof=false (1.106375ms)
+✔ input requirements survive later omission and expansion; missing start proof=true (0.5325ms)
+✔ stdout cannot override a canonical process outcome (0.571083ms)
+✔ background process detail is separate from output and producer kinds (0.146375ms)
+✔ nested calls and missing call coordinates do not acquire invented identity (0.088333ms)
+✔ active preparation and stopping work cannot be treated as quiescent (0.0745ms)
+✔ actual host gateway preserves astral character at the redaction flush boundary (SDK double, no isolation) (178.768417ms)
+✔ actual host gateway preserves four-byte UTF-8 character split across upstream chunks (SDK double, no isolation) (266.083375ms)
+✔ actual host gateway preserves credential split across chunks alongside Unicode (SDK double, no isolation) (261.984833ms)
+✔ path metadata rejects siblings, escaping links and undeclared files (6.720959ms)
+✔ native realpath adapter preserves sync, callback, promise and error results (57.810959ms)
+✔ only the trusted Job runner receives the preload after NODE_OPTIONS is scrubbed (24.381917ms)
+✔ chart cells accept finite decimal numbers without coercing missing, formatted or unsafe values (1.130416ms)
+✔ bars retain original row order, exact labels and values and include the zero baseline (0.985792ms)
+✔ negative, positive and zero bars share one scale without magnitude distortion (0.245083ms)
+✔ missing and ragged numeric columns stay unavailable and are never filled with zero (1.759ms)
+✔ zero-only and very small signed series remain finite and preserve the source snapshot (0.352583ms)
+✔ only the current private app main document gets clipboard write permission (0.438584ms)
+✔ input proof and command exit status remain distinct in presentation (0.368417ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1034.912166

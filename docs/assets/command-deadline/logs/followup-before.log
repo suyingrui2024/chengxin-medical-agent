@@ -1,0 +1,1 @@
+{"real_sdk":true,"host_worker":true,"outer_isolation":false,"followup":true,"calls":4,"artifact":"original","elapsed_ms":4910,"original":"a38d0b10-bf94-4673-b62d-997349eeeda7","followupId":"6b78f71e-4d84-44f6-8d74-b75250bcbe54","initialJobs":[{"id":"bash-1","status":"running","kind":"bash"}],"deadlines":[],"cancelled":[]}

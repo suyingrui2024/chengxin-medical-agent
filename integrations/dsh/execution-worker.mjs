@@ -727,6 +727,7 @@ async function proxy(request, response) {
     response.end(
       JSON.stringify({
         turn_id: budget?.id || null,
+        deadline_at_ms: budget && !budget.cancelled ? budget.deadline : null,
         remaining_calls: budget
           ? Math.max(0, Math.min(budget.maxCalls - calls, 200 - lifetimeCalls))
           : 0,

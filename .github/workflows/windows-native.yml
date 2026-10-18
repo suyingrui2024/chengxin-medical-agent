@@ -61,7 +61,7 @@ jobs:
       - name: Path boundaries, delivery evidence and preview data
         shell: powershell
         run: |
-          & ./.runtime/windows/node/node.exe --test integrations/dsh/tests/windows-path-broker.test.mjs integrations/dsh/tests/execution-inputs.test.mjs integrations/dsh/tests/execution-delivery.test.mjs integrations/dsh/tests/execution-checkpoints.test.mjs integrations/dsh/tests/execution-observations.test.mjs integrations/dsh/tests/gateway-stream.test.mjs tests/unit/artifact-chart.test.mjs tests/unit/clipboard-permission.test.mjs tests/unit/execution-inputs-ui.test.mjs
+          & ./.runtime/windows/node/node.exe --test integrations/dsh/tests/windows-path-broker.test.mjs integrations/dsh/tests/execution-inputs.test.mjs integrations/dsh/tests/execution-delivery.test.mjs integrations/dsh/tests/execution-checkpoints.test.mjs integrations/dsh/tests/execution-observations.test.mjs integrations/dsh/tests/gateway-stream.test.mjs integrations/dsh/tests/execution-deadline.test.mjs tests/unit/artifact-chart.test.mjs tests/unit/clipboard-permission.test.mjs tests/unit/execution-inputs-ui.test.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $env:PYTHONPATH = Join-Path (Get-Location) 'src'
           & ./.runtime/windows/python/python.exe -m unittest tests.test_execution_observations.ObservationContractTests tests.test_execution_checkpoints tests.test_execution_persistence.WorkspaceIndexTests.test_stopped_turn_explanation_survives_offline_reopen_without_execution -v

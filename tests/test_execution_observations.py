@@ -182,10 +182,10 @@ class PreparingJobTests(unittest.TestCase):
                 )
                 shell = source / "integrations/dsh/execution-shell.mjs"
                 text = shell.read_text()
-                self.assertEqual(text.count("execute(spec) {"), 1)
+                self.assertEqual(text.count("async execute(spec) {"), 1)
                 shell.write_text(
                     text.replace(
-                        "execute(spec) {",
+                        "async execute(spec) {",
                         """async execute(spec) {
     if (spec.command.includes('PREPARATION_DELAY')) {
       await new Promise(resolve => setTimeout(resolve, 2500));

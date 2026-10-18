@@ -14,6 +14,10 @@ from medagent.execution import ExecutionManager
 
 @unittest.skipUnless(os.name == "nt", "requires native Windows ProcessContainer")
 class WindowsExecutionTests(unittest.TestCase):
+    def test_original_command_deadline_survives_an_independent_followup(self):
+        from tests.test_execution_command_deadline import exercise_command_deadline
+        exercise_command_deadline(self)
+
     def test_explicit_inputs_reject_mutation_and_allow_generated_outputs(self):
         for mutation in [False, True]:
             with (

@@ -1,0 +1,78 @@
+{
+  "schema": "command-launch-deadline/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "5958c8e",
+  "counterexample": {
+    "control": "logs/control-before.log",
+    "followup": "logs/followup-before.log",
+    "result": "The original two-second background job was cancelled in the no-followup control. Starting a ten-second follow-up cleared its old host timer and allowed its four-second write. Both used the real host worker and SDK with a test-only direct launcher, not outer filesystem isolation."
+  },
+  "checks": {
+    "node": {
+      "passed": 38,
+      "new_deadline_cases": 4,
+      "log": "logs/node.log"
+    },
+    "real_sdk_probe": {
+      "platform": "macOS arm64",
+      "log": "logs/independent-after.log",
+      "real_sdk": true,
+      "host_worker": true,
+      "outer_isolation": false,
+      "provider": "deterministic loopback",
+      "external_model_calls": 0,
+      "model_calls": 4,
+      "old_late_artifact": null,
+      "independent_followup_artifact": "followup"
+    },
+    "profile": {
+      "passed": true,
+      "log": "logs/profile.log"
+    },
+    "python_compile": "passed",
+    "preparation_fixture_generated_js_syntax": "passed"
+  },
+  "scope": [
+    "The private host budget endpoint adds deadline_at_ms, the current task absolute deadline in milliseconds; cancelled grants return null.",
+    "Each Linux Bash or native PowerShell process captures the host deadline before launch. Background/promoted processes use it as a kill deadline independently of later root turns.",
+    "Ordinary foreground kill bounds are kept if shorter. The original resolved tool spec is not mutated, preserving its foreground wait and background handoff behavior.",
+    "Missing, expired, malformed or failed deadline reads refuse command launch rather than falling back to an unbounded background process."
+  ],
+  "boundaries": [
+    "The Mac investigation uses the actual worker, official SDK and shell processes with a test-only loader that bypasses the outer isolation launcher. It is not native application isolation acceptance.",
+    "Only fixed synthetic commands and a deterministic loopback model are used. No external model requests or reasoning benchmark scores.",
+    "This change pins command process lifetimes. It does not redesign per-descendant model-call ownership or prove all overlapping agent budgets are independent.",
+    "The Linux SDK preparation fixture is updated for the now-async shell method; syntax is checked locally, but that full isolated fixture was not rerun on this Mac.",
+    "The added source and packaged Windows full-SDK case is pending CI. No browser or native GUI regression rerun is claimed for this execution-only change."
+  ],
+  "replay": {
+    "instructions": "Copy probe files together into a fresh .runtime directory two levels below the repository root, then run overlap-probe.mjs for control and with --followup for the original scenario, or independent-probe.mjs --followup for independent foreground work. Baseline logs used source 5958c8e; current replay uses current source. This direct-launch investigation intentionally has no outer isolation.",
+    "probe_files": "probe/"
+  },
+  "source_files_sha256": {
+    "integrations/dsh/execution-deadline.mjs": "9362281133a8520ff926b195079132adcee45164a04ad232c559465ef39f51ac",
+    "integrations/dsh/execution-shell.mjs": "529bd5870faf80ae9ab0ee460f45663a5c7b3e5e00cfc3b9eaff170ceef098e8",
+    "integrations/windows/powershell-executor.mjs": "8aee03b587719f2cac46042fe7fca82aa0f388ab8e9746dc15e8321e2f334bcb",
+    "integrations/dsh/execution-worker.mjs": "384994fdb05f15deff011247b4128c3db1e583664dab4cb9be07003cc3174817",
+    "integrations/dsh/tests/execution-deadline.test.mjs": "52a0eaf49c8a697ddc854ec2b44c93ac68518b7202864f343138664827257f30",
+    "tests/test_execution_command_deadline.py": "727fb285153779694ba0a0321ee1e58ceab8f63659177261c090f88a5bb9d6c8",
+    "tests/test_windows_execution.py": "3161e71ba1c69c54c99e4f8b5382ee75eb48873a7cf0881c947fae3db2c64cba",
+    "tests/test_execution_observations.py": "4557c91f2a1c9401cdc22133aedf42634d1b7ac4bf8ed79a02b95c7c46d0d6f3",
+    ".github/workflows/windows-native.yml": "8c882f05904f21c1520cf8ba4fcf69bf50452badd65229a6b4e0dea5dafd8816"
+  },
+  "artifacts_sha256": {
+    "logs/control-before.log": "ddd413fdb93fe2ae3babd67f87a3465f3ffae7ad4cbd54abe4dd622eaacc431f",
+    "logs/followup-before.log": "7a79c771b3316c39b4dbaf4d7e50af3b2b48cd3a40b402dd7b81a915ccdf85a9",
+    "logs/independent-after.log": "6dbcbba16be27f184e6833f3733fe2e396a1acdb441a7704bb5a231ebecb428b",
+    "logs/node.log": "6b2793f39c7d8e431aeb8bb989a4511a6efdeb24c19fdd65bb43ac14cab3417c",
+    "logs/profile.log": "2e855261c8381ed2c57665af31a2552fa68d1d99cdffe360cbaba335b3eba691",
+    "probe/independent-probe.mjs": "a4602f6b6c195177b242089b0dae31932e6c5ac2d625aae133d16edf20eb4907",
+    "probe/native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
+    "probe/overlap-probe.mjs": "ad98bc7bbb73f236bb7bedcee812a94763d02d5022b5ece098997a9f066da725",
+    "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Both matrices deadline contract checks and existing acceptance, plus original background deadline with independent follow-up in source and packaged actual isolated Windows SDK."
+  }
+}

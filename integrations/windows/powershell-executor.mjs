@@ -2,14 +2,16 @@
 import { LocalBashExecutor } from "@deepseek-ai/dsh-bash-local";
 import { join } from "node:path";
 import { nativePowerShellSource } from "./powershell-command.mjs";
+import { taskBoundSpec } from "../dsh/execution-deadline.mjs";
 
 export default class NativePowerShellExecutor extends LocalBashExecutor {
-  execute(spec) {
+  async execute(spec) {
+    const bounded = await taskBoundSpec(spec);
     const shell = join(
       process.env.SystemRoot,
       "System32/WindowsPowerShell/v1.0/powershell.exe",
     );
-    return this.executeArgv(spec, [
+    return this.executeArgv(bounded, [
       shell,
       "-NoLogo",
       "-NoProfile",
