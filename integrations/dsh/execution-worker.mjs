@@ -1190,17 +1190,21 @@ async function cancelGrant(owned) {
               (ref) => ref.id === j.id && ref.session_id === j.session_id,
             )),
       );
-    if (owned.timedOut && work)
+    if (owned.timedOut && work && !owned.deadlineReported) {
+      owned.deadlineReported = true;
       emit("turn.deadline", {
         turn_id: owned.id,
         time_budget_seconds: owned.timeBudgetSeconds,
       });
+    }
     await control("POST", "/cancel", { scope });
-    if (!wasActive && owned.timedOut && work)
+    if (!wasActive && owned.timedOut && work && !owned.workStoppedReported) {
+      owned.workStoppedReported = true;
       emit("turn.work_stopped", {
         turn_id: owned.id,
         reason: "time_budget_exhausted",
       });
+    }
     if (lease === owned && active !== owned) lease = null;
   })().catch(async () => {
     // Failure to stop the selected work must still fail closed. This exceptional
@@ -1391,6 +1395,29 @@ async function run(payload) {
   emit("turn.started", { turn_id: owned.id, time_budget_seconds: seconds });
   const timer = setTimeout(() => {
     owned.timedOut = true;
+    // A completed foreground turn can retain a child model request. Mark that
+    // historical turn as stopping as soon as its own deadline arrives; the
+    // asynchronous runtime control below then tears down the selected child.
+    // This must not wait behind an unrelated foreground provider request.
+    const backgroundWork =
+      active !== owned &&
+      ([...upstreamRequests.values()].some((owner) => owner === owned) ||
+        ownership.sessionsFor(owned).some((session) => runningAgents.has(session)) ||
+        [...clarifications.pending.values()].some(
+          (pending) => pending.owned === owned,
+        ));
+    if (backgroundWork) {
+      owned.deadlineReported = true;
+      owned.workStoppedReported = true;
+      emit("turn.deadline", {
+        turn_id: owned.id,
+        time_budget_seconds: owned.timeBudgetSeconds,
+      });
+      emit("turn.work_stopped", {
+        turn_id: owned.id,
+        reason: "time_budget_exhausted",
+      });
+    }
     cancelGrant(owned).catch(() => {});
   }, seconds * 1000);
   owned.timer = timer;
