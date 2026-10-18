@@ -1,7 +1,7 @@
 {
   "schema": "task-scoped-cancellation/v1",
   "date": "2026-10-18",
-  "status": "local_passed_windows_pending",
+  "status": "passed_with_documented_boundaries",
   "source_parent_commit": "5537f1e8bdd55481f621c321b5f1e120702e6de4",
   "baseline": {
     "historical_issue": "../ownership-iteration/short-followup-open-issue/verification.json",
@@ -182,8 +182,21 @@
     "browser_reason": "The expected caption and baseline fixture state lagged the new older-child label. Subsequent screenshot callbacks also required the Playwright test-info argument. Final accepted checks use the corrected fixtures."
   },
   "windows": {
-    "status": "pending",
-    "required": "Both matrices: 58 Node and 19 host checks (18 pass, one filesystem-conditional skip expected on Windows); Windows 11 source and bundled SDK each six methods with five child and three root-job scenario receipts; five actual-window child-only activity receipts, Server installer/uninstaller."
+    "status": "passed",
+    "tested_code_commit": "ec39f44b1a43143036b82e788cb1df0630341ba0",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39114582635",
+    "receipt": "windows-native.json",
+    "required": "Both matrices: 58 Node and 19 host checks (18 pass, one filesystem-conditional skip expected on Windows); Windows 11 source and bundled SDK each six methods with five child and three root-job scenario receipts; five actual-window child-only activity receipts, Server installer/uninstaller.",
+    "log_excerpts": {
+      "arm": {
+        "file": "logs/windows-arm-excerpt.log",
+        "scope": "Selected test methods, totals and JSON receipts from complete job log; complete-log SHA256 is in windows-native.json."
+      },
+      "server": {
+        "file": "logs/windows-server-excerpt.log",
+        "scope": "Selected test methods, totals and JSON receipts from complete job log; complete-log SHA256 is in windows-native.json."
+      }
+    }
   },
   "boundaries": [
     "No external model calls or new reasoning/clinical benchmark; synthetic engineering checks are not model capability scores.",
@@ -231,9 +244,22 @@
     "logs/sdk-cases.log": "7fe20ede88d82f0c2607ef467d1dc3b0a59fb2086b715eb876d69f05e2374416",
     "logs/ui-fixture-errors.log": "d73ebd10a7e829a7c6a5d3ad0c31bcc5c79c97bec7e11b90763b3ae0d1736d65",
     "logs/ui.log": "832a9f1d4e0d6501f402449018bd55cb44fb3aa387e2de3076fe5e0f2d395867",
+    "logs/windows-arm-excerpt.log": "ea0b98c286560055bd4b91ef733705fcbcee407813747bdd70e72cced96d396d",
+    "logs/windows-server-excerpt.log": "ecc77093ce72f656b0550d97ecf3245bcd9d5851eb13bf01c01c09a1dd381888",
     "probe/host-run.py": "5b459eca516b2e036ab708b9240bef503dc361cdf604fdf669d874582f161515",
     "probe/native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
     "probe/probe.mjs": "08ea9aacb78e335e64f4e1179698cb80a0366a28183333027cdf745fed8040c5",
-    "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4"
-  }
+    "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4",
+    "root-wakeup-open-issue/child-control-events.json": "d1e2c3ded913184bcb2d7bb074f7c6d1bd1bd30e264f9b5198c78dd102d6c3cc",
+    "root-wakeup-open-issue/child-followup-events.json": "c56e2e9fcaa09a9515041d8af0d369aa2cf899f8e4136531d79328674c27ccf0",
+    "root-wakeup-open-issue/control.log": "c3a6f6dc564ccd4995be974a549581c87ab6512c8ee961bd5a40f940133ed676",
+    "root-wakeup-open-issue/followup.log": "2b892dff3404330c1c82210b904e8b7d3a5fc4fb3072adaf6a581a298dfcb560",
+    "root-wakeup-open-issue/native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
+    "root-wakeup-open-issue/probe.mjs": "83558ae3465f69055a16a4b1fb8b8ad84550de05edcd898f5e5be2c70617383f",
+    "root-wakeup-open-issue/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4",
+    "root-wakeup-open-issue/verification.json": "1a845b0f1ae24f36c832356d2443cf377589523f08c1b17dbac747cd246d3a08",
+    "windows-native.json": "3ddce01e28de98a9cd7c44e0ab762bd9c57717d028b940b7bb6ff64e012e7dfe",
+    "windows-run.json": "5553f1b3a2c8a49ae54e1d1dae267627a85f2d8bbbc1054e2b166afafc33ef11"
+  },
+  "next_open_issue": "root-wakeup-open-issue/verification.json"
 }

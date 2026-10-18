@@ -1,0 +1,328 @@
+{
+  "conclusion": "success",
+  "headSha": "ec39f44b1a43143036b82e788cb1df0630341ba0",
+  "jobs": [
+    {
+      "completedAt": "2026-10-18T09:26:13Z",
+      "conclusion": "success",
+      "databaseId": 117637650904,
+      "name": "Windows Server x64 desktop",
+      "startedAt": "2026-10-18T09:15:02Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-18T09:15:04Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-18T09:15:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:15:12Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "number": 2,
+          "startedAt": "2026-10-18T09:15:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:15:39Z",
+          "conclusion": "success",
+          "name": "Restore verified native dependencies",
+          "number": 3,
+          "startedAt": "2026-10-18T09:15:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:16:28Z",
+          "conclusion": "success",
+          "name": "Install native runtimes and exercise real desktop",
+          "number": 4,
+          "startedAt": "2026-10-18T09:15:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:16:28Z",
+          "conclusion": "skipped",
+          "name": "Save verified native dependencies",
+          "number": 5,
+          "startedAt": "2026-10-18T09:16:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:16:32Z",
+          "conclusion": "success",
+          "name": "Win32 filesystem, locks and process trees",
+          "number": 6,
+          "startedAt": "2026-10-18T09:16:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:16:41Z",
+          "conclusion": "success",
+          "name": "Path boundaries, delivery evidence and preview data",
+          "number": 7,
+          "startedAt": "2026-10-18T09:16:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:16:41Z",
+          "conclusion": "skipped",
+          "name": "Native Windows isolation and full SDK execution",
+          "number": 8,
+          "startedAt": "2026-10-18T09:16:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:16:42Z",
+          "conclusion": "success",
+          "name": "Native isolation host diagnostics",
+          "number": 9,
+          "startedAt": "2026-10-18T09:16:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:20:54Z",
+          "conclusion": "success",
+          "name": "Build Windows desktop with bundled Python and Node",
+          "number": 10,
+          "startedAt": "2026-10-18T09:16:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:21:36Z",
+          "conclusion": "success",
+          "name": "Run packaged Windows executable",
+          "number": 11,
+          "startedAt": "2026-10-18T09:20:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:24:37Z",
+          "conclusion": "success",
+          "name": "Compile and verify native Windows installer",
+          "number": 12,
+          "startedAt": "2026-10-18T09:21:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:24:37Z",
+          "conclusion": "skipped",
+          "name": "Execute full SDK with packaged Python and Node",
+          "number": 13,
+          "startedAt": "2026-10-18T09:24:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:25:31Z",
+          "conclusion": "success",
+          "name": "Archive portable native Windows application",
+          "number": 14,
+          "startedAt": "2026-10-18T09:24:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:25:52Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 15,
+          "startedAt": "2026-10-18T09:25:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:26:07Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 16,
+          "startedAt": "2026-10-18T09:25:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:26:11Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "number": 32,
+          "startedAt": "2026-10-18T09:26:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:26:11Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 33,
+          "startedAt": "2026-10-18T09:26:11Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39114582635/job/117637650904"
+    },
+    {
+      "completedAt": "2026-10-18T09:34:45Z",
+      "conclusion": "success",
+      "databaseId": 117637651010,
+      "name": "Windows 11 on Arm running x64 application",
+      "startedAt": "2026-10-18T09:15:01Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-18T09:15:04Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-18T09:15:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:15:14Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "number": 2,
+          "startedAt": "2026-10-18T09:15:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:16:22Z",
+          "conclusion": "success",
+          "name": "Restore verified native dependencies",
+          "number": 3,
+          "startedAt": "2026-10-18T09:15:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:18:09Z",
+          "conclusion": "success",
+          "name": "Install native runtimes and exercise real desktop",
+          "number": 4,
+          "startedAt": "2026-10-18T09:16:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:18:09Z",
+          "conclusion": "skipped",
+          "name": "Save verified native dependencies",
+          "number": 5,
+          "startedAt": "2026-10-18T09:18:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:18:13Z",
+          "conclusion": "success",
+          "name": "Win32 filesystem, locks and process trees",
+          "number": 6,
+          "startedAt": "2026-10-18T09:18:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:18:28Z",
+          "conclusion": "success",
+          "name": "Path boundaries, delivery evidence and preview data",
+          "number": 7,
+          "startedAt": "2026-10-18T09:18:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:22:55Z",
+          "conclusion": "success",
+          "name": "Native Windows isolation and full SDK execution",
+          "number": 8,
+          "startedAt": "2026-10-18T09:18:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:22:55Z",
+          "conclusion": "success",
+          "name": "Native isolation host diagnostics",
+          "number": 9,
+          "startedAt": "2026-10-18T09:22:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:27:51Z",
+          "conclusion": "success",
+          "name": "Build Windows desktop with bundled Python and Node",
+          "number": 10,
+          "startedAt": "2026-10-18T09:22:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:28:56Z",
+          "conclusion": "success",
+          "name": "Run packaged Windows executable",
+          "number": 11,
+          "startedAt": "2026-10-18T09:27:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:28:56Z",
+          "conclusion": "skipped",
+          "name": "Compile and verify native Windows installer",
+          "number": 12,
+          "startedAt": "2026-10-18T09:28:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:33:45Z",
+          "conclusion": "success",
+          "name": "Execute full SDK with packaged Python and Node",
+          "number": 13,
+          "startedAt": "2026-10-18T09:28:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:34:19Z",
+          "conclusion": "success",
+          "name": "Archive portable native Windows application",
+          "number": 14,
+          "startedAt": "2026-10-18T09:33:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:34:38Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 15,
+          "startedAt": "2026-10-18T09:34:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:34:38Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 16,
+          "startedAt": "2026-10-18T09:34:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:34:43Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "number": 32,
+          "startedAt": "2026-10-18T09:34:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-18T09:34:43Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 33,
+          "startedAt": "2026-10-18T09:34:43Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39114582635/job/117637651010"
+    },
+    {
+      "completedAt": "2026-10-18T09:14:58Z",
+      "conclusion": "skipped",
+      "databaseId": 117637651919,
+      "name": "Windows 11 command deadline investigation (source only)",
+      "startedAt": "2026-10-18T09:14:58Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39114582635/job/117637651919"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39114582635"
+}
