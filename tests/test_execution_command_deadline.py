@@ -45,7 +45,11 @@ def exercise_command_deadline(owner):
                 limit = time.monotonic() + 30
                 while session.status in {"starting", "running", "cancelling"} and time.monotonic() < limit:
                     time.sleep(0.05)
-                owner.assertEqual(session.status, "completed", session.error)
+                owner.assertEqual(
+                    session.status, "completed",
+                    json.dumps({"status": session.status, "error": session.error,
+                                "events": list(session.events)[-60:], "jobs": session.jobs}, ensure_ascii=False),
+                )
 
             try:
                 session = manager.create(settings)
@@ -77,7 +81,11 @@ def exercise_command_deadline(owner):
                 owner.assertEqual(len(provider.requests), 4 if followup else 2)
                 owner.assertEqual(session.turns[0]["time_budget_seconds"], old_seconds)
                 if followup:
-                    owner.assertEqual(session.status, "completed", session.error)
+                    owner.assertEqual(
+                    session.status, "completed",
+                    json.dumps({"status": session.status, "error": session.error,
+                                "events": list(session.events)[-60:], "jobs": session.jobs}, ensure_ascii=False),
+                )
                     owner.assertEqual(session.turns[-1]["time_budget_seconds"], 20)
             finally:
                 manager.close()
