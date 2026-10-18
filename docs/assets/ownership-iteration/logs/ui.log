@@ -1,0 +1,27 @@
+
+Running 20 tests using 1 worker
+
+(node:83496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/ui/execution-earlier-question.spec.mjs:7:1 › a live earlier child question remains answerable in its original turn (1.7s)
+  ✓   2 tests/ui/execution-focus.spec.mjs:7:1 › host state shows a waiting action and preserves answers and background work (3.0s)
+  ✓   3 tests/ui/execution-focus.spec.mjs:47:1 › file shortcuts open inert image, table and source previews without automatic reads (1.9s)
+  ✓   4 tests/ui/execution-focus.spec.mjs:104:1 › a completed turn with a failed tool remains visibly unresolved (3.6s)
+  ✓   5 tests/ui/execution-focus.spec.mjs:142:1 › long results use a short excerpt, keep the full text and leave failures visible (3.2s)
+  ✓   6 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on wide (858ms)
+  ✓   7 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on mobile (850ms)
+  ✓   8 tests/ui/execution-focus.spec.mjs:216:3 › focused status and file shortcuts fit on small (837ms)
+  ✓   9 tests/ui/execution-incomplete.spec.mjs:13:3 › failed live turn keeps its explanation without claiming success (5.6s)
+  ✓  10 tests/ui/execution-incomplete.spec.mjs:13:3 › failed saved turn keeps its explanation without claiming success (5.6s)
+  ✓  11 tests/ui/execution-incomplete.spec.mjs:13:3 › cancelled saved turn keeps its explanation without claiming success (5.6s)
+  ✓  12 tests/ui/execution-incomplete.spec.mjs:13:3 › interrupted saved turn keeps its explanation without claiming success (5.6s)
+  ✓  13 tests/ui/execution-recovery.spec.mjs:18:1 › an idle workspace recovers its status automatically after a transient read failure (5.1s)
+  ✓  14 tests/ui/execution-recovery.spec.mjs:41:1 › manual reconnect preserves file, task draft and execution errors, rejects duplicate reads and restores keyboard focus (3.3s)
+  ✓  15 tests/ui/execution-recovery.spec.mjs:97:1 › a stalled request times out, permits reconnection and keeps the user's active input focus (19.4s)
+  ✓  16 tests/ui/execution-recovery.spec.mjs:128:1 › late older poll responses cannot revert a newer submitted answer (2.3s)
+  ✓  17 tests/ui/execution-recovery.spec.mjs:192:1 › invalid status data and delayed requests cannot replace the selected workspace (3.7s)
+  ✓  18 tests/ui/execution-recovery.spec.mjs:224:1 › failed reads back off and do not continue while another view is open (11.7s)
+  ✓  19 tests/ui/execution-recovery.spec.mjs:254:3 › recovery and preview actions have comfortable touch targets and contrast at 320px in six themes (4.4s)
+  ✓  20 tests/ui/execution-recovery.spec.mjs:254:3 › recovery and preview actions have comfortable touch targets and contrast at 390px in six themes (4.4s)
+
+  20 passed (1.6m)

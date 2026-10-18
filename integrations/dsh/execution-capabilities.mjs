@@ -1,5 +1,6 @@
 // Registered tools call a host dispatcher; model code never runs in that host.
 import { defineTool } from "@deepseek-ai/dsh-tools";
+import { sessionHeaders } from "./execution-ownership.mjs";
 export const name = "chengxin-execution-capabilities";
 export const inject = ["tools"];
 export function apply(ctx) {
@@ -13,6 +14,7 @@ export function apply(ctx) {
         headers: {
           "x-api-key": process.env.DEEPSEEK_API_KEY,
           "Content-Type": "application/json",
+          ...sessionHeaders(exec?.agent?.id),
         },
         body: operation === "execute" ? JSON.stringify(args) : undefined,
         signal: AbortSignal.any([

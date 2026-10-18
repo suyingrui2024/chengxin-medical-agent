@@ -1,0 +1,54 @@
+✔ pinned SDK compiles a nonparallel question tool (1.098959ms)
+✔ question waits for host input and does not invent a default (1.336ms)
+✔ wrong turns, expired questions and cancellation cannot supply an answer (0.296584ms)
+✔ invalid or excessive questions fail without waiting (1.258ms)
+✖ an earlier child's answer uses its retained grant after the foreground changes (0.322792ms)
+✖ a retained question closes at its original deadline without a foreground timer (0.718584ms)
+✔ a promoted or background process keeps the captured task deadline without changing its waiting spec (0.628584ms)
+✔ an existing foreground kill deadline never grows beyond either bound (0.143041ms)
+✔ missing, expired, excessive or malformed grants cannot launch an unbounded command (0.901542ms)
+✔ a failed host read cannot replace a process deadline with the command wait limit (0.103625ms)
+✔ a child and grandchild retain their original grant across a foreground follow-up (0.396458ms)
+✔ canonical returned turns protect a delayed creation notification from a newer foreground grant (0.097875ms)
+✔ an HTTP request can wait for canonical creation without adopting the foreground grant (0.104ms)
+✔ unknown or conflicting sessions never fall back to the latest foreground grant (1001.27225ms)
+✔ workspace cancellation revokes all retained grants and evicted grants cannot be adopted (0.875875ms)
+✔ actual host gateway preserves astral character at the redaction flush boundary (SDK double, no isolation) (168.7785ms)
+✔ actual host gateway preserves four-byte UTF-8 character split across upstream chunks (SDK double, no isolation) (269.5575ms)
+✔ actual host gateway preserves credential split across chunks alongside Unicode (SDK double, no isolation) (272.146208ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 16
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1044.079
+
+✖ failing tests:
+
+test at integrations/dsh/tests/execution-clarifications.test.mjs:113:1
+✖ an earlier child's answer uses its retained grant after the foreground changes (0.322792ms)
+  TypeError: Cannot read properties of undefined (reading 'clarification')
+      at TestContext.<anonymous> (file:///Users/dancer/Desktop/su_workspace/chengxin-medical-agent/integrations/dsh/tests/execution-clarifications.test.mjs:135:30)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7)
+
+test at integrations/dsh/tests/execution-clarifications.test.mjs:143:1
+✖ a retained question closes at its original deadline without a foreground timer (0.718584ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  400 !== 409
+  
+      at TestContext.<anonymous> (file:///Users/dancer/Desktop/su_workspace/chengxin-medical-agent/integrations/dsh/tests/execution-clarifications.test.mjs:170:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 400,
+    expected: 409,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

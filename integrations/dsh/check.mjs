@@ -83,6 +83,10 @@ try {
   const entry = (id) => execution.find((row) => row.id === id);
   if (
     entry("bash-sandbox")?.disabled !== true ||
+    entry("web-search-deepseek")?.disabled !== true ||
+    !entry("chengxin-execution-search")?.name.endsWith(
+      "/execution-search.mjs",
+    ) ||
     entry("chengxin-execution-shell")?.config?.timeoutMs !== 10000 ||
     entry("chengxin-execution-shell")?.config?.maxTimeoutMs !== 30000 ||
     entry("tool-bash")?.config?.promoteOnTimeout !== true ||

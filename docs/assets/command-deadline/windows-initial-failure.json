@@ -1,0 +1,41 @@
+{
+  "schema": "command-deadline-windows-initial-failure/v1",
+  "status": "failed",
+  "tested_code_commit": "7f13b4449df8164ca84eefa200d326da1cbb91a0",
+  "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39103193751",
+  "arm_job": 117603499829,
+  "server_job": 117603500012,
+  "server_conclusion": "success",
+  "arm_conclusion": "failure",
+  "source_sdk_result": {
+    "run": 3,
+    "errors": 1,
+    "failed_subcase": "independent_followup=True",
+    "symptom": "Follow-up file was absent after the scripted model returned its acknowledgement.",
+    "diagnostic": [
+      "ERROR: test_original_command_deadline_survives_an_independent_followup (__main__.WindowsExecutionTests.test_original_command_deadline_survives_an_independent_followup) (independent_followup=True)",
+      "----------------------------------------------------------------------",
+      "Traceback (most recent call last):",
+      "  File \"C:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\tests\\test_execution_command_deadline.py\", line 66, in exercise_command_deadline",
+      "    (session.directory / \"followup.txt\").read_text(encoding=\"utf-8-sig\").strip(),",
+      "    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^",
+      "  File \"C:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\.runtime\\windows\\python\\Lib\\pathlib\\__init__.py\", line 787, in read_text",
+      "    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:",
+      "         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+      "  File \"C:\\a\\chengxin-medical-agent\\chengxin-medical-agent\\.runtime\\windows\\python\\Lib\\pathlib\\__init__.py\", line 771, in open",
+      "    return io.open(self, mode, buffering, encoding, errors, newline)",
+      "           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+      "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\tmpuda4fz31\\\\af2e4d22-37f5-4a3a-a92c-d961326d3359\\\\followup.txt'",
+      "",
+      "----------------------------------------------------------------------",
+      "Ran 3 tests in 93.427s",
+      "",
+      "FAILED (errors=1)"
+    ]
+  },
+  "interpretation": "The required independent follow-up assertion did not pass. The raw log did not include its tool receipt, so the underlying cause is not established. The revised fixture requests the supported 30-second foreground wait within its separate 20-second task budget, retains both artifact invariants and adds tool/job diagnostics on failure. This needs a new native SDK acceptance; it is not a reinterpretation of this run as passed.",
+  "log_sha256": {
+    "arm": "4dfa884eb3efa809f708781a9c61a87f6399ab772f4724e459c3ec83524d7deb",
+    "server": "8de62f9b69b73d13769a4c64c71dccac611783a8d5561e88522ac0c2014acc0e"
+  }
+}

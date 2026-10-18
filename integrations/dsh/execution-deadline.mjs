@@ -1,8 +1,12 @@
 // Pin a process to the host deadline at launch, independently of later turns.
 // The original resolved spec remains the tool's foreground waiting bound.
+import { sessionHeaders } from "./execution-ownership.mjs";
 export async function taskBoundSpec(spec) {
   const response = await fetch(process.env.DEEPSEEK_BASE_URL + "/budget", {
-    headers: { "x-api-key": process.env.DEEPSEEK_API_KEY },
+    headers: {
+      "x-api-key": process.env.DEEPSEEK_API_KEY,
+      ...sessionHeaders(spec.dshEnv?.DSH_SESSION_ID),
+    },
     signal: AbortSignal.any([
       AbortSignal.timeout(2000),
       ...(spec.signal ? [spec.signal] : []),

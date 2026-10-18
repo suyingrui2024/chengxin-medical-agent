@@ -579,7 +579,6 @@ class ExecutionSession:
                 return self.snapshot()
             if (
                 question["status"] != "pending"
-                or turn_id != self.turn_id
                 or self.closed
                 or self.status in {"cancelling", "failed", "cancelled", "interrupted"}
                 or time.time() >= question["deadline_at"]
@@ -630,7 +629,7 @@ class ExecutionSession:
             if (
                 previous is not None
                 or value["status"] != "pending"
-                or value["turn_id"] != self.turn_id
+                or time.time() >= value["deadline_at"]
                 or self.status in {"cancelling", "failed", "cancelled", "interrupted"}
             ):
                 return False

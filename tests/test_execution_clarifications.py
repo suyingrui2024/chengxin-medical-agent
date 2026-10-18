@@ -40,6 +40,32 @@ def question(turn, session):
 
 
 class ClarificationRecordTests(unittest.TestCase):
+    def test_live_earlier_child_question_can_be_answered_without_changing_the_new_turn(self):
+        with tempfile.TemporaryDirectory() as raw:
+            manager = ExecutionManager(root=Path(raw))
+            try:
+                session = manager.create(CONFIG)
+                with patch.object(session, "_run", return_value=None):
+                    session.start_turn("original", 6)
+                    original = session.turn_id
+                    session.status = "completed"
+                    session.turns[-1]["status"] = "completed"
+                    session.start_turn("independent follow-up", 6)
+                latest = session.turn_id
+                value = question(original, str(uuid4()))
+                self.assertTrue(session._accept_clarification(
+                    "clarification.requested", {"turn_id": original, "clarification": value}
+                ))
+                with patch.object(session, "process", Mock(poll=lambda: None)), patch.object(session, "_send") as send:
+                    session.answer_clarification(value["id"], original, "保留原要求")
+                    self.assertEqual(send.call_args.args[0]["turn_id"], original)
+                self.assertEqual(session.turn_id, latest)
+                saved = manager.store.read(session.id)["clarifications"][0]
+                self.assertEqual(saved["turn_id"], original)
+                self.assertEqual(saved["answer"], "保留原要求")
+            finally:
+                manager.close()
+
     def test_invalid_records_cannot_enter_the_host_ledger(self):
         original = question(str(uuid4()), str(uuid4()))
         self.assertEqual(validate_clarification(original), original)

@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { observeTool } from "./execution-observations.mjs";
 import { mergeCheckRequirement } from "./execution-delivery.mjs";
 import { registerControl } from "./execution-control-channel.mjs";
+import { sessionHeaders } from "./execution-ownership.mjs";
 export const name = "chengxin-execution-control";
 export const inject = ["agents", "jobs", "systemPrompt", "tools"];
 export async function apply(ctx) {
@@ -73,7 +74,12 @@ export async function apply(ctx) {
         const response = await fetch(
           process.env.DEEPSEEK_BASE_URL + "/budget",
           {
-            headers: { "x-api-key": process.env.DEEPSEEK_API_KEY },
+            headers: {
+              "x-api-key": process.env.DEEPSEEK_API_KEY,
+              ...sessionHeaders(
+                context.scope?.session?.id || context.scope?.id,
+              ),
+            },
             signal: AbortSignal.timeout(2000),
             redirect: "error",
           },

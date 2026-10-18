@@ -1,4 +1,5 @@
 import { defineTool } from "@deepseek-ai/dsh-tools";
+import { sessionHeaders } from "./execution-ownership.mjs";
 export const name = "chengxin-execution-clarification";
 export const inject = ["tools"];
 export function apply(ctx) {
@@ -41,6 +42,7 @@ export function apply(ctx) {
             headers: {
               "x-api-key": process.env.DEEPSEEK_API_KEY,
               "Content-Type": "application/json",
+              ...sessionHeaders(exec.agent?.id),
             },
             body: JSON.stringify({ ...args, session_id: exec.agent?.id }),
             signal: AbortSignal.any([

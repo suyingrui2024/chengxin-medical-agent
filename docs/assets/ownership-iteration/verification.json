@@ -1,0 +1,253 @@
+{
+  "schema": "descendant-task-ownership/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "eddeef38464ed60de73085420830605f2f0561de",
+  "baseline": {
+    "control": "logs/control-before.log",
+    "followup": "logs/followup-before.log",
+    "finding": "The original shared three-call grant was exhausted. A new foreground grant let the old child make an additional provider request; its subsequent events were attributed to the new task."
+  },
+  "checks": {
+    "node": {
+      "passed": 51,
+      "log": "logs/node.log"
+    },
+    "host": {
+      "passed": 12,
+      "log": "logs/host.log"
+    },
+    "browser": {
+      "unique_cases_passed": 21,
+      "logs": ["logs/ui.log", "logs/ui-question.log"],
+      "scope": "The first run passed 20 cases including the wide earlier-question case. The final question-file run passed wide and 320px cases; wide overlaps, so there are 21 distinct cases, not 22."
+    },
+    "native_desktop": {
+      "passed": 1,
+      "log": "logs/desktop.log"
+    },
+    "native_gui": {
+      "platform": "macOS arm64",
+      "passed": true,
+      "log": "logs/native-gui.log",
+      "receipt": {
+        "gui": "passed",
+        "directory_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "cached_list_marked_and_disabled": true,
+          "draft_and_preview_preserved": true
+        },
+        "patient_native_zoom": {
+          "passed": true,
+          "native_webcontents_zoom": true,
+          "settings": [
+            {
+              "zoom": 1.25,
+              "pane": {
+                "height": 391,
+                "content": 391,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.5,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.7499999999999998,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 2,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            }
+          ],
+          "synthetic_demo": true,
+          "external_model_calls": 0
+        },
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": ["body", "serif", "mono"],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "artifact_copy": "passed (actual CSV and system clipboard)",
+        "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+        "artifact_save": "passed (actual CSV snapshot on disk)",
+        "clarification_draft": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "edited_answer": true
+        },
+        "earlier_child_answer": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "earlier_turn_preserved": true,
+          "external_model_calls": 0
+        },
+        "execution_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "draft_preserved": true
+        },
+        "incomplete_explanation": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "explanation_preserved": true,
+          "failed_status_retained": true,
+          "external_model_calls": 0
+        },
+        "artifact_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "preview_failure_and_manual_retry": true,
+          "freshness_failure_and_recovery": true,
+          "snapshot_preserved": true,
+          "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+          "external_model_calls": 0
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      }
+    },
+    "profile": {
+      "passed": true,
+      "log": "logs/profile.log"
+    },
+    "python_compile": "passed",
+    "provider_fixture": "logs/provider-fixture.log",
+    "sdk_probes": {
+      "real_sdk": true,
+      "real_host_worker": true,
+      "outer_isolation": false,
+      "platform": "macOS arm64",
+      "external_model_calls": 0,
+      "records": [
+        "control-before.log",
+        "followup-before.log",
+        "exhausted-after.log",
+        "funded-after.log",
+        "deadline-after.log",
+        "answer-after.log",
+        "search-funded-after.log",
+        "search-exhausted-after.log",
+        "command-regression.log"
+      ]
+    }
+  },
+  "scope": [
+    "Retain original task grants and bind descendants from canonical SDK parent/child notifications. Ordinary SDK model headers, registered host tools, command deadline lookup and events use the retained owner.",
+    "Per-task model counters reserve before awaits and share the unchanged 200-request process ceiling; model forwarding is bounded by its own grant deadline.",
+    "Canonical returned SDK turn records protect delayed creation notifications from a newer foreground context; unknown session tags wait at most one second and never adopt the current grant.",
+    "Keep the official DeepSeekSearchProvider and its result mapping, token/use limits and cancellation; replace its untagged internal route with an initiating-session route and charge auxiliary requests to the same retained grant.",
+    "Live earlier child questions remain answerable in their own turn, carry a short earlier-task label and close at their original deadline. Workspace cancellation revokes all retained grants.",
+    "The required command-deadline test keeps both artifact invariants, requests a 30-second foreground wait within the separate 20-second task budget, and records tools/jobs on failure."
+  ],
+  "boundaries": [
+    "Direct SDK probes intentionally bypass only the outer isolation launcher through archived test-only loaders. They are not native application isolation acceptance.",
+    "All provider responses and search sources are synthetic loopback fixtures. No external model or web search was called; there is no reasoning benchmark score.",
+    "Root-session automatic wakeups still use the current root context. This iteration proves descendant ownership, not complete causal isolation of all parent wakeups.",
+    "Legacy requests without a session tag retain current-context handling. Normal SDK calls and the configured official search adapter are tagged; arbitrary future providers require their own integration.",
+    "Retain at most 256 grants and 4096 session/turn mappings; evicted or unknown descendants fail closed rather than adopting another task.",
+    "The initial command-deadline Windows run failed; see ../command-deadline/windows-initial-failure.json. Its underlying cause was not established from the available tool trace, and the revised source/packaged test remains pending CI.",
+    "Two new broker test fixtures initially sent string chunks to Buffer.concat and returned 400; they were corrected to Buffer chunks. The failed fixture log is retained separately and is not counted as a product failure or a pass.",
+    "The full browser suite and Linux isolated SDK suite were not rerun. Native GUI checks use explicitly labeled host snapshots."
+  ],
+  "replay": {
+    "instructions": "Copy probe files together into a fresh directory under .runtime (two levels below the repository root) and use the pinned Node runtime. child-owner-probe.mjs runs control or --followup; advisory/deadline/answer probes use --followup --funded; search probe uses --followup with or without --funded. Each case should use its own fresh directory to retain raw events. Baseline source is source_parent_commit; current replay uses current source.",
+    "probe_directory": "probe/"
+  },
+  "source_files_sha256": {
+    ".github/workflows/windows-native.yml": "4c94da7f751250c104e42f0854c743ef491e9f2905194b2451036b62cb662dca",
+    "integrations/dsh/check.mjs": "b43c46deea57b22cbdd8acd239a65f5fe14ea9eddaa21465245bb85401257642",
+    "integrations/dsh/execution.patch.yml": "497b45769d5da3def77fae8594f31684acbfaeaacb8c759de7441108274d00fb",
+    "integrations/dsh/execution-ownership.mjs": "c473c510e9462d21160899260c1cd6b44032ea88be5bac25c9e44f7440ead582",
+    "integrations/dsh/execution-search.mjs": "2fd0bdfafb3758da9a24d90ef83e782ff1bb6c9585930939e609c26cea6c17cd",
+    "integrations/dsh/execution-worker.mjs": "0b816c8080395a7692a8604f3451de04f6ce482d2f5cc737cb41687dd00e0459",
+    "integrations/dsh/execution-control.mjs": "00319d62fdf81e27ae8630284b12a14b75a13b53782626be1d4f78fddc362163",
+    "integrations/dsh/execution-capabilities.mjs": "6eb9220c1ba36ecab82908a090e15ec0e30d51b3f7e88ce0e00b6b18a3d1ea12",
+    "integrations/dsh/execution-workspace.mjs": "e00d88f42b476a43a70df9d78bc2d11d5465e4da8169339893e7a83168098f03",
+    "integrations/dsh/execution-clarification-tool.mjs": "a40e10f92c35d42d1082b9f53fe0a154b812e8229dc2bd7339db436fc5078ff8",
+    "integrations/dsh/execution-clarifications.mjs": "c9b5babaf13e376923601489f8cf7950ee3ce6d37edccd48b493440a138dd993",
+    "integrations/dsh/execution-delivery.mjs": "770fc31f5cbac55a751315a02f488b5bb7d239d8440b8dae2f03b944a6bcf715",
+    "integrations/dsh/execution-deadline.mjs": "2472ca2060bce51a705cad4b229f83977bb657396dfe8029995a5c686aab2daa",
+    "src/medagent/execution.py": "dc32ec6d2d9c9153b1ecf9dbc07a9d71898fbcd3c91a9ff45b4f750ed0afc228",
+    "src/medagent/web/execution-clarification-ui.js": "b11cb3839b098a3be2736bb204e381292df4f1174ad902b4b11701fa2fab7c30",
+    "src/medagent/web/execution-focus-ui.js": "b4f5d0a5d54e42043042ab6ac552b0930df47aa2ee7c261d6fd6123d1a34af25",
+    "scripts/windows/gui-check.mjs": "a2a98f38bf4c46ed6978e14b2c37fbe8a3028cf015b67fa506d0c75fac552303",
+    "tests/fixtures/execution-focus.mjs": "51b42b59fcbd8af73409fb68849d8c58c508f2de3df4123a0e5ba1117eb980f0",
+    "tests/desktop/execution-focus.spec.mjs": "33a01212f2e06c838fb686c48ee214694dacfa663c56b8c66089af1fe9a6b66d",
+    "integrations/dsh/tests/execution-ownership.test.mjs": "ca3c8eb3b7390871fa3fb2efb55f9e2f420522abb9c1f3ffb6e18839e5c79d5a",
+    "integrations/dsh/tests/execution-search.test.mjs": "4eb695b9fee260c57cfb3ae63ecaf362555138f49dbfe0f5ffd4d03e60824018",
+    "integrations/dsh/tests/execution-clarifications.test.mjs": "f5228a854747a183b0f05435c84e7aa5a8b443b3d354e543109a6989ef088349",
+    "tests/test_execution_ownership.py": "890d37033fa6c9db26dd3fac2c700dee3141d1c943c2256a01514d4a3567de43",
+    "tests/test_execution_clarifications.py": "e2660895c6c9d523f96698f9ccb1bb2d60c9c56b19b9ba12aa1d4fbba672c486",
+    "tests/test_execution_command_deadline.py": "fb3d4fdf7fe743c2c59d756e89c9380a883ade6b975b28415f46af4dac8e93c0",
+    "tests/test_windows_execution.py": "b2bcad25840e5eb6fe7f6e23044f8216473fc8e6b7612a31097c218d57c29fb2",
+    "tests/test_execution_delivery.py": "ff4cc996d97b1304c65ad81eb4bd7135dd6185b3d7cf589c2f7eddca55754494",
+    "tests/ui/execution-earlier-question.spec.mjs": "397605296ad8ad01dd09402ea39aefda950b7699627defe7ac002b77ab5f959d"
+  },
+  "artifacts_sha256": {
+    "earlier-question-320.png": "baf0131471e97e1e843ce626efb48bc38e6a65896509709ccf62e243d2ec25af",
+    "logs/answer-after.log": "352614f66aa9a6321680f7941a4d82ef033f8e161ddee537b0a0fb4ccc82f154",
+    "logs/command-regression.log": "4648eb632fadfdfc87ba8975e1696dd5fd7246978486c5b731c7226d4fb83abe",
+    "logs/control-before.log": "99b44fd78bd0d3c65fafaa6ac2ef9a4fe381cc2a14387c8b26969596cb841fae",
+    "logs/deadline-after.log": "bbff27a9ce8e730ef40212a5b8dac7e1e8ebbf627fa4b161f367a3f782ea59ca",
+    "logs/desktop.log": "7eac039a390434f162ffdb118e47b8abb52d332a80cc1fed330d738046750e0d",
+    "logs/exhausted-after.log": "8f4c3d9d6d4bda6e0b1c8b7b1ec69ce069a98e343606ba9faf438882091ece99",
+    "logs/fixture-string-chunks-before.log": "9d6092a3760101ba1db02ba9db76ed2b219eaaab71dfad5b981c5df1a1cf2365",
+    "logs/followup-before.log": "43a7dd7f7b20ccf848eaff638c251f4e49ed804dbfcf5833c57178bda85c2467",
+    "logs/funded-after.log": "7a1ee20d64cc71e470a78bd95ee455b37aed1dcde6af13f0226e20c136f2ac0c",
+    "logs/host.log": "701bf7e226c16db48974f8fbcb4fce49fbfd13b9c10d8fc30f63bb3bf697e873",
+    "logs/native-gui.log": "e1caafd43e01f6f959829dd4e1f810f484d48a2589bb4b4d6b2ec6ba7832e185",
+    "logs/node.log": "feab1de0e67b53d4bf796de5a7a2d480a019c8a1098bd0553b4e0b0735bb35f2",
+    "logs/profile.log": "2e855261c8381ed2c57665af31a2552fa68d1d99cdffe360cbaba335b3eba691",
+    "logs/provider-fixture.log": "133b41b200117d20e6a689c4884871066341dbdcb81a688ffb2c8f5c6cbd5c39",
+    "logs/search-exhausted-after.log": "fa8db924ac5c204809b54f07864edb13c7adf8e6a946151b96c81ee4ee2e057b",
+    "logs/search-funded-after.log": "903bc6d3e6ad8d81a79f4c642cae202139a884d38098c89a33763b76ac870567",
+    "logs/ui-question.log": "15f07142a414f8e1b0dc0ba5dff7427dacc09fb4f7bd06393e03e19726e74e8a",
+    "logs/ui.log": "a89786c1429b8d166c410b2942c004e2e83dd5ee3387a4f034d2d3465b63cbf5",
+    "probe/child-advisory-probe.mjs": "69ca62a53f3243a0c821044797053e18a28510f0fef976b9a9408b16754a9d1e",
+    "probe/child-answer-proof.mjs": "ec6f8db39e5c45975dc89aba00cc3ee41f4f249cef09225500a954a809964f16",
+    "probe/child-deadline-probe.mjs": "da718170d138bd37466ec165bce79a26eb41a1ae1bd2b99376985274d2378a90",
+    "probe/child-owner-probe.mjs": "f506a42638ce9bec981284358e5d4d785609a12efeb68e0ad77f11824b842a91",
+    "probe/child-search-probe.mjs": "689e4f444a49fea31f979e2272168d3fc49841a501ff96c168ef7014bfa47c5a",
+    "probe/independent-probe.mjs": "a4602f6b6c195177b242089b0dae31932e6c5ac2d625aae133d16edf20eb4907",
+    "probe/native-sdk.mjs": "13c20ebc1371658653271ddd769880f65bee0f206cc78129719f2809216203c8",
+    "probe/sdk-loader.mjs": "41d0b305726a9fe7b9c96a5808a0f4f81d16a4f887f036f1dba0acfe03c708b4"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Both matrices: 51 Node checks and host record checks; five actual-window earlier-child answer receipts; source and bundled isolated SDK ownership/answer/search cases plus the revised command-deadline case."
+  }
+}

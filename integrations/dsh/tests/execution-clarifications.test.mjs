@@ -109,3 +109,70 @@ test("invalid or excessive questions fail without waiting", async () => {
   assert.equal((await ask()).status, 429);
   broker.cancel(null, "closed");
 });
+
+test("an earlier child's answer uses its retained grant after the foreground changes", async () => {
+  const first = { id: "original", deadline: Date.now() + 5000 };
+  const latest = { id: "followup", deadline: Date.now() + 10000 };
+  const events = [];
+  const broker = new ClarificationBroker({
+    owner: (session) => (session === "child" ? first : latest),
+    emit: (type, value) => events.push({ type, ...value }),
+    addSource() {},
+  });
+  const request = Readable.from([
+    Buffer.from(
+      JSON.stringify({ question: "原任务使用哪种格式？", session_id: "child" }),
+    ),
+  ]);
+  request.headers = { "x-chengxin-session-id": "child" };
+  const response = Object.assign(new EventEmitter(), {
+    writeHead(status) {
+      this.status = status;
+    },
+    end(body) {
+      this.body = JSON.parse(body);
+    },
+  });
+  await broker.request(request, response);
+  const question = events[0].clarification;
+  assert.equal(question.turn_id, first.id);
+  broker.answer({ request_id: question.id, turn_id: first.id, answer: "CSV" });
+  assert.equal(response.status, 200);
+  assert.equal(events.at(-1).turn_id, first.id);
+  assert.equal(broker.pending.size, 0);
+});
+
+test("a retained question closes at its original deadline without a foreground timer", async () => {
+  const owner = { id: "original", deadline: Date.now() + 40 };
+  const events = [];
+  const broker = new ClarificationBroker({
+    owner: () => owner,
+    emit: (type, value) => events.push({ type, ...value }),
+    addSource() {},
+  });
+  const request = Readable.from([
+    Buffer.from(JSON.stringify({ question: "选择格式", session_id: "child" })),
+  ]);
+  const ended = new Promise((resolve) => {
+    const response = Object.assign(new EventEmitter(), {
+      writeHead(status) {
+        this.status = status;
+      },
+      end(body) {
+        this.body = JSON.parse(body);
+        resolve(this);
+      },
+    });
+    void broker.request(request, response);
+  });
+  // Keep the test alive independently of the broker's deliberately unref'd timer.
+  const keepAlive = setTimeout(() => {}, 1000);
+  try {
+    const response = await ended;
+    assert.equal(response.status, 409);
+    assert.equal(events.at(-1).clarification.reason, "time_budget_exhausted");
+    assert.equal(broker.pending.size, 0);
+  } finally {
+    clearTimeout(keepAlive);
+  }
+});

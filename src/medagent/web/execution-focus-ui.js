@@ -56,7 +56,9 @@ export function createExecutionFocus(getCurrent, openFile) {
       browser.open = true;
     }
     const questions = (snapshot.clarifications || []).filter(
-      (q) => q.turn_id === snapshot.turn_id,
+      (q) =>
+        q.turn_id === snapshot.turn_id ||
+        ["pending", "submitted"].includes(q.status),
     );
     const pending = questions.some((q) => q.status === "pending");
     const submitted = questions.some((q) => q.status === "submitted");

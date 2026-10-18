@@ -1,6 +1,7 @@
 """Real SDK processes retain their launch deadline across another user turn."""
 
 import os
+import json
 from pathlib import Path
 import tempfile
 import time
@@ -29,7 +30,7 @@ def exercise_command_deadline(owner):
                      run_in_background=True, description="Original short task deadline"),
                 final("Original background command started."),
                 tool("bash", command=command(new_sleep, "followup.txt"),
-                     description="Independent follow-up outlives the first deadline"),
+                     description="Independent follow-up outlives the first deadline", timeoutMs=30000),
                 final("Independent follow-up completed."),
             ]
             provider = Provider(responses)
@@ -62,6 +63,10 @@ def exercise_command_deadline(owner):
                     finish(session)
                     owner.assertNotEqual(session.turn_id, original)
                     owner.assertIs(session.process, process)
+                    owner.assertTrue(
+                        (session.directory / "followup.txt").exists(),
+                        json.dumps({"events": list(session.events)[-60:], "jobs": session.jobs}, ensure_ascii=False),
+                    )
                     owner.assertEqual(
                         (session.directory / "followup.txt").read_text(encoding="utf-8-sig").strip(),
                         "finished",

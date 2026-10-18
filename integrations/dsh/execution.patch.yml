@@ -3,6 +3,8 @@
 - insert:
     - id: chengxin-execution-control
       name: /opt/medical-agent/integrations/dsh/execution-control.mjs
+    - id: chengxin-execution-search
+      name: /opt/medical-agent/integrations/dsh/execution-search.mjs
     - id: chengxin-execution-sdk
       name: /opt/medical-agent/integrations/dsh/execution-sdk.mjs
     - id: chengxin-execution-capabilities
@@ -99,6 +101,7 @@
       Save the requested artifacts and finish with a brief concrete outcome and any remaining failures.
       Communicate in Chinese unless the user requests another language.
 - id: web-search-deepseek
+  disabled: true
   config:
     baseURL: !!js process.env.DEEPSEEK_BASE_URL
     model: !!js process.env.CHENGXIN_MODEL

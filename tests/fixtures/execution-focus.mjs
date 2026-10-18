@@ -220,6 +220,40 @@ export async function verifyExecutionRecovery(page, fixture) {
   }
 }
 
+export async function verifyEarlierChildAnswer(page, fixture) {
+  fixture.first.turns.unshift({ id: "prior-turn", model_calls: 3 });
+  fixture.first.clarifications.push({
+    id: "native-earlier-child",
+    session_id: "prior-child",
+    turn_id: "prior-turn",
+    status: "pending",
+    question: "原任务保留哪种格式？",
+    options: ["CSV", "JSON"],
+  });
+  const card = page.locator('[data-question-id="native-earlier-child"]');
+  await expect(card.locator(".execution-question-heading")).toContainText(
+    "较早子任务",
+  );
+  await card.getByRole("button", { name: "CSV", exact: true }).click();
+  await card.getByRole("button", { name: "发送回答 ↗", exact: true }).click();
+  await expect
+    .poll(() => fixture.answers.at(-1)?.request_id)
+    .toBe("native-earlier-child");
+  expect(fixture.answers.at(-1)).toEqual({
+    request_id: "native-earlier-child",
+    turn_id: "prior-turn",
+    answer: "CSV",
+  });
+  expect(fixture.first.turn_id).toBe("turn-1");
+  await expect(card).toHaveCount(0);
+  return {
+    passed: true,
+    host_snapshot_fixture: true,
+    earlier_turn_preserved: true,
+    external_model_calls: 0,
+  };
+}
+
 export async function verifyIncompleteExplanation(page, fixture) {
   const state = fixture.first;
   const text = "已保存实现；交付检查仍未通过。请核对现有文件后继续。";

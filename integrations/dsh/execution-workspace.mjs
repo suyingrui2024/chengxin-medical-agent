@@ -1,5 +1,6 @@
 // Research file observations are host-generated; they are not clinical receipts.
 import { defineTool } from "@deepseek-ai/dsh-tools";
+import { sessionHeaders } from "./execution-ownership.mjs";
 export const name = "chengxin-execution-workspace";
 export const inject = ["tools"];
 export function apply(ctx) {
@@ -36,6 +37,7 @@ export function apply(ctx) {
             headers: {
               "x-api-key": process.env.DEEPSEEK_API_KEY,
               "Content-Type": "application/json",
+              ...sessionHeaders(exec.agent?.id),
             },
             body: JSON.stringify(args),
             signal: AbortSignal.any([

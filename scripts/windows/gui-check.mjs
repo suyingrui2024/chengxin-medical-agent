@@ -13,6 +13,7 @@ import {
   installExecutionFocusFixture,
   openFocusWorkspace,
   verifyEditableAnswer,
+  verifyEarlierChildAnswer,
   verifyExecutionRecovery,
   verifyIncompleteExplanation,
 } from "../../tests/fixtures/execution-focus.mjs";
@@ -136,6 +137,7 @@ try {
     "1250",
   );
   const draftReceipt = await verifyEditableAnswer(reopened, focusFixture);
+  const earlierReceipt = await verifyEarlierChildAnswer(reopened, focusFixture);
   const recoveryReceipt = await verifyExecutionRecovery(reopened, focusFixture);
   const directoryReceipt = await verifyDirectoryRecovery(reopened);
   const incompleteReceipt = await verifyIncompleteExplanation(
@@ -180,6 +182,7 @@ try {
       clipboard_line_endings: "OS-native; CRLF normalized only for comparison",
       artifact_save: "passed (actual CSV snapshot on disk)",
       clarification_draft: draftReceipt,
+      earlier_child_answer: earlierReceipt,
       execution_recovery: recoveryReceipt,
       incomplete_explanation: incompleteReceipt,
       artifact_recovery: artifactRecoveryReceipt,

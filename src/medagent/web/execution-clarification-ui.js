@@ -17,7 +17,9 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
       container.replaceChildren();
     }
     const questions = (snapshot.clarifications || []).filter(
-      (q) => q.turn_id === snapshot.turn_id,
+      (q) =>
+        q.turn_id === snapshot.turn_id ||
+        ["pending", "submitted"].includes(q.status),
     );
     container.hidden = !questions.length;
     const activeIds = new Set(questions.map((question) => question.id));
@@ -74,7 +76,11 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
         node(
           "small",
           "",
-          value.session_id === snapshot.id ? "主任务" : "子任务",
+          value.turn_id !== snapshot.turn_id
+            ? "较早子任务"
+            : value.session_id === snapshot.id
+              ? "主任务"
+              : "子任务",
         ),
       );
       element.append(header, node("h3", "", value.question));
@@ -111,7 +117,7 @@ export function createClarificationUI(api, getCurrent, applySnapshot) {
           if (
             context === key &&
             current?.id === snapshot.id &&
-            current?.turn_id === value.turn_id &&
+            current?.turn_id === snapshot.turn_id &&
             result.sequence >= current.sequence
           )
             applySnapshot(result);

@@ -13,6 +13,10 @@ import { hasActiveJobs, observationKey } from "./execution-observations.mjs";
 import { ClarificationBroker } from "./execution-clarifications.mjs";
 import { checkArguments } from "./execution-delivery-contract.mjs";
 import {
+  ExecutionOwnership,
+  scopedModelRequest,
+} from "./execution-ownership.mjs";
+import {
   checkpointPaths,
   mergeCheckpointPaths,
   coversCheckpointPaths,
@@ -52,6 +56,10 @@ let capabilityLifetimeCalls = 0;
 let workspaceLifetimeCalls = 0;
 let checkpointLifetimeCalls = 0;
 const integration = dirname(fileURLToPath(import.meta.url));
+const ownership = new ExecutionOwnership(
+  () => active || lease,
+  () => config?.id,
+);
 function trustedHelperEnvironment() {
   return {
     PATH: process.env.PATH || "/usr/bin:/bin",
@@ -67,7 +75,7 @@ function trustedHelperEnvironment() {
   };
 }
 const clarifications = new ClarificationBroker({
-  owner: () => active || lease,
+  owner: (sessionId) => ownership.forSession(sessionId),
   emit: (type, value) => emit(type, value),
   addSource: (source) => {
     config.user_turns = [...config.user_turns, source].slice(-64);
@@ -85,7 +93,7 @@ function emit(type, payload = {}) {
   );
 }
 function declareDeliveryCheck(turnId, event, sessionId) {
-  const owner = active || lease;
+  const owner = ownership.forTurn(turnId);
   const data = event?.data;
   if (owner?.id !== turnId || data?.name !== "delivery_check") return;
   let args = data.arguments;
@@ -281,7 +289,21 @@ function observeRuntime() {
         }
         if (notification.method === "subagent.finished")
           runningAgents.delete(notification.params.childSessionId);
-        const owner = active || lease;
+        if (notification.method === "subagent.started")
+          ownership.bind(
+            notification.params.parentSessionId,
+            notification.params.childSessionId,
+          );
+        const owner =
+          notification.method === "session.event"
+            ? ownership.eventOwner(
+                notification.params.sessionId,
+                notification.params.event,
+              )
+            : ownership.forSession(
+                notification.params?.sessionId ||
+                  notification.params?.childSessionId,
+              );
         forwardNotification(owner?.id || config.id, notification);
         if (
           !active &&
@@ -329,7 +351,7 @@ function control(method, path) {
     });
 }
 async function capabilityRequest(request, response) {
-  const owned = active || lease;
+  const owned = request.executionOwner;
   const fail = (status, code, message) => {
     if (!response.headersSent && !response.destroyed) {
       response.writeHead(status, { "Content-Type": "application/json" });
@@ -419,7 +441,7 @@ async function capabilityRequest(request, response) {
     });
     if (
       owned.cancelled ||
-      (active || lease) !== owned ||
+      ownership.forTurn(owned.id) !== owned ||
       Date.now() >= owned.deadline
     )
       return fail(
@@ -457,7 +479,7 @@ async function capabilityRequest(request, response) {
   }
 }
 async function workspaceRequest(request, response) {
-  const owned = active || lease;
+  const owned = request.executionOwner;
   const reply = (status, value) => {
     if (response.destroyed || response.writableEnded) return;
     response.writeHead(status, { "Content-Type": "application/json" });
@@ -548,7 +570,7 @@ async function workspaceRequest(request, response) {
     });
     if (
       owned.cancelled ||
-      (active || lease) !== owned ||
+      ownership.forTurn(owned.id) !== owned ||
       Date.now() >= owned.deadline
     )
       return fail(409, "当前任务已经停止。");
@@ -565,7 +587,7 @@ async function workspaceCheckpoint(paths, owned) {
   if (
     !owned ||
     owned.cancelled ||
-    (active || lease) !== owned ||
+    ownership.forTurn(owned.id) !== owned ||
     Date.now() >= owned.deadline ||
     owned.checkpointCalls >= 256 ||
     checkpointLifetimeCalls >= 1024
@@ -619,7 +641,7 @@ async function workspaceCheckpoint(paths, owned) {
     });
     if (
       owned.cancelled ||
-      (active || lease) !== owned ||
+      ownership.forTurn(owned.id) !== owned ||
       Date.now() >= owned.deadline ||
       !result.ok ||
       !validCheckpoint(result.result)
@@ -656,7 +678,10 @@ async function checkpointRequest(request, response) {
     const args = JSON.parse(Buffer.concat(chunks));
     if (!args || Object.keys(args).some((key) => key !== "paths"))
       throw new Error("文件版本参数无效");
-    const result = await workspaceCheckpoint(args.paths, active || lease);
+    const result = await workspaceCheckpoint(
+      args.paths,
+      request.executionOwner,
+    );
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(redact({ ok: true, result }));
   } catch {
@@ -707,6 +732,18 @@ async function proxy(request, response) {
     response.end(JSON.stringify(result));
     return;
   }
+  const scoped = scopedModelRequest(request.url);
+  if (scoped) {
+    if (
+      scoped.invalid ||
+      (request.headers["x-chengxin-session-id"] &&
+        request.headers["x-chengxin-session-id"] !== scoped.sessionId)
+    )
+      return errorResponse(response, 400);
+    request.headers["x-chengxin-session-id"] = scoped.sessionId;
+    request.url = scoped.path;
+  }
+  request.executionOwner = await ownership.forRequest(request.headers);
   if (
     (request.method === "GET" && request.url === "/model/capabilities") ||
     (request.method === "POST" && request.url === "/model/capabilities/execute")
@@ -722,16 +759,23 @@ async function proxy(request, response) {
   if (request.method === "POST" && request.url === "/model/clarifications")
     return clarifications.request(request, response);
   if (request.method === "GET" && request.url === "/model/budget") {
-    const budget = active || lease;
+    const budget = request.executionOwner;
+    const usable = budget && !budget.cancelled && Date.now() < budget.deadline;
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(
       JSON.stringify({
         turn_id: budget?.id || null,
-        deadline_at_ms: budget && !budget.cancelled ? budget.deadline : null,
-        remaining_calls: budget
-          ? Math.max(0, Math.min(budget.maxCalls - calls, 200 - lifetimeCalls))
+        deadline_at_ms: usable ? budget.deadline : null,
+        remaining_calls: usable
+          ? Math.max(
+              0,
+              Math.min(
+                budget.maxCalls - budget.modelCalls,
+                200 - lifetimeCalls,
+              ),
+            )
           : 0,
-        remaining_seconds: budget
+        remaining_seconds: usable
           ? Math.max(0, Math.floor((budget.deadline - Date.now()) / 1000))
           : 0,
       }),
@@ -743,24 +787,31 @@ async function proxy(request, response) {
     !["/model/messages", "/model/v1/messages"].includes(request.url)
   )
     return errorResponse(response, 404);
-  const budget = active || lease;
+  const budget = request.executionOwner;
   if (
     !budget ||
     budget.cancelled ||
-    calls >= budget.maxCalls ||
+    Date.now() >= budget.deadline ||
+    budget.modelCalls >= budget.maxCalls ||
     lifetimeCalls >= 200
   )
     return errorResponse(response, 429);
   // Reserve before await: root and concurrent descendants share a hard bound.
-  calls++;
+  budget.modelCalls++;
+  if (budget === active || budget === lease) calls = budget.modelCalls;
   lifetimeCalls++;
-  const reservedIndex = calls;
+  const reservedIndex = budget.modelCalls;
   const reservedLifetimeIndex = lifetimeCalls;
   const turnId = budget.id;
   emit("model.request_started", {
     turn_id: turnId,
     index: reservedIndex,
     lifetime_calls: reservedLifetimeIndex,
+    session_id:
+      request.headers["x-deepseek-harness-session-id"] ||
+      request.headers["x-chengxin-session-id"] ||
+      null,
+    source: scoped ? "search" : "conversation",
   });
   const chunks = [];
   let length = 0;
@@ -782,9 +833,14 @@ async function proxy(request, response) {
     modelRequest.max_tokens > 8192
   )
     return errorResponse(response, 400);
+  if (budget.cancelled || Date.now() >= budget.deadline)
+    return errorResponse(response, 429);
   const abort = new AbortController();
   upstreamRequests.add(abort);
-  const timeout = setTimeout(() => abort.abort(), 60000);
+  const timeout = setTimeout(
+    () => abort.abort(),
+    Math.min(60000, Math.max(1, budget.deadline - Date.now())),
+  );
   try {
     const suffix = request.url.slice("/model".length);
     const headers = {
@@ -1010,10 +1066,11 @@ async function cancel() {
   const ownedTurn = active;
   const ownedBudget = active || lease;
   clarifications.cancel(
-    ownedBudget?.id,
+    null,
     ownedBudget?.timedOut ? "time_budget_exhausted" : "user_cancelled",
   );
   if (active || lease) (active || lease).cancelled = true;
+  ownership.cancelAll();
   for (const abort of upstreamRequests) abort.abort();
   stopping = control("POST", "/cancel").catch(async () => {
     const owned = harness;
@@ -1145,6 +1202,7 @@ async function run(payload) {
     id: payload.id,
     cancelled: false,
     maxCalls: payload.max_calls,
+    modelCalls: 0,
     deadline: Date.now() + seconds * 1000,
     capabilityCalls: 0,
     workspaceCalls: 0,
@@ -1153,6 +1211,7 @@ async function run(payload) {
     declaredCheckCalls: 0,
     incompleteChecks: false,
   };
+  ownership.remember(active);
   if (lease) clearTimeout(lease.timer);
   lease = active;
   quietSince = 0;
@@ -1183,9 +1242,11 @@ async function run(payload) {
     const collectDeclarations = (value) => {
       // The tree subscription can lag behind run(); canonical returned events
       // provide a second, idempotent source for root declarations.
-      for (const event of value.events)
+      for (const event of value.events) {
+        ownership.recordTurn(config.id, event.data?.turn, owned);
         if (event.type === "tool/call")
           declareDeliveryCheck(owned.id, event, config.id);
+      }
     };
     collectDeclarations(result);
     // One bounded recovery for a truncated output, within this same user task.

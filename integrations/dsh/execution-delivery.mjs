@@ -1,5 +1,6 @@
 // Explicit delivery checks use the same official executor, jobs and cancellation.
 import { defineTool } from "@deepseek-ai/dsh-tools";
+import { sessionHeaders } from "./execution-ownership.mjs";
 import { createHash } from "node:crypto";
 import {
   mergeCheckpointPaths,
@@ -139,7 +140,10 @@ export function apply(ctx) {
           const response = await fetch(
             process.env.DEEPSEEK_BASE_URL + "/budget",
             {
-              headers: { "x-api-key": process.env.DEEPSEEK_API_KEY },
+              headers: {
+                "x-api-key": process.env.DEEPSEEK_API_KEY,
+                ...sessionHeaders(exec.agent?.id),
+              },
               signal: AbortSignal.any([exec.signal, AbortSignal.timeout(2000)]),
               redirect: "error",
             },
@@ -196,6 +200,7 @@ export function apply(ctx) {
                 headers: {
                   "x-api-key": process.env.DEEPSEEK_API_KEY,
                   "Content-Type": "application/json",
+                  ...sessionHeaders(exec.agent?.id),
                 },
                 body: JSON.stringify({ paths }),
                 signal: AbortSignal.any([

@@ -35,8 +35,9 @@ def wait_until(predicate, timeout=10):
 class Provider(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, responses):
+    def __init__(self, responses, json_reply=None):
         self.responses, self.requests = responses, []
+        self.json_reply = json_reply
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *args):
@@ -45,6 +46,19 @@ class Provider(ThreadingHTTPServer):
             def do_POST(self):
                 body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
                 self.server.requests.append(body)
+                if self.server.json_reply is not None:
+                    reply = self.server.json_reply(body)
+                    if reply is not None:
+                        data = json.dumps(reply).encode()
+                        self.send_response(200)
+                        self.send_header("Content-Type", "application/json")
+                        self.send_header("Content-Length", str(len(data)))
+                        self.end_headers()
+                        try:
+                            self.wfile.write(data)
+                        except (BrokenPipeError, ConnectionResetError):
+                            pass
+                        return
                 index = len(self.server.requests)
                 content = dict(
                     self.server.responses(index, body)

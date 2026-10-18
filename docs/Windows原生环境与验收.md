@@ -92,6 +92,7 @@ Windows 使用原生 PowerShell 执行命令。上游工具名称仍为 `bash`�
 | `8dfa04c`／[39101689571](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39101689571) | 两套任务全部通过：源码、便携版及 Server 安装后共 5 个真实窗口核对未完成说明默认折叠、原文保留与失败状态。两套平台各通过实际停止回合的离线保存／恢复；Windows 11 源码／随包完整 SDK 及隔离通过，Server 安装、快捷方式与卸载通过 |
 | `83a7fa8`／[39102065354](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102065354) | 两套任务全部通过：源码、便携版及 Server 安装后共 5 个真实窗口注入 HTTP 503，核对预览手动重读、快照核对恢复与内容保留。Windows 11 源码／随包完整 SDK 与隔离通过；Server 安装、快捷方式与卸载通过。15 秒真实挂起时限另见网页检查 |
 | `561b89b`／[39102424997](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102424997) | 两套任务全部通过：各 3 项真实宿主网关传输检查覆盖代理对边界、上游 UTF-8 字节分段与跨段密钥脱敏；这些检查使用 SDK 客户端替身。实际 Windows 11 源码／随包完整 SDK 与隔离另通过，5 个 GUI 窗口及 Server 安装、快捷方式与卸载通过 |
+| `7f13b44`／[39103193751](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39103193751) | 未通过：Server x64 任务成功；Windows 11 完整 SDK 的独立后续命令文件缺失，3 个测试中 1 个子场景报错。该代码未作为最新已验收实现同步至远程 main。修订前台等待及诊断后，连同子任务归属更改另行复验；[原失败](assets/command-deadline/windows-initial-failure.json)保留 |
 
 本轮以宿主实际读取产物为验收依据：根任务运行 Python 将结果写入 `result.txt`，调用随包 npm；子智能体独立核对结果并生成 `review.txt`；交付检查必须退出成功。继续原会话后，旧文件仍可读并生成 `notes.txt`。源码与便携包分别执行这一场景，使用回环合成模型服务，不消耗外部模型 API。
 

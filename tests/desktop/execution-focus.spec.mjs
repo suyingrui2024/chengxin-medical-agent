@@ -8,6 +8,7 @@ import {
   installExecutionFocusFixture,
   openFocusWorkspace,
   verifyEditableAnswer,
+  verifyEarlierChildAnswer,
   verifyExecutionRecovery,
   verifyIncompleteExplanation,
 } from "../fixtures/execution-focus.mjs";
@@ -40,6 +41,7 @@ test("native focused work area renders host snapshots and opens an inert preview
       "1250",
     );
     await verifyEditableAnswer(page, fixture);
+    await verifyEarlierChildAnswer(page, fixture);
     await verifyExecutionRecovery(page, fixture);
     await verifyDirectoryRecovery(page);
     await verifyIncompleteExplanation(page, fixture);

@@ -21,7 +21,7 @@ export class ClarificationBroker {
     this.lifetime = 0;
   }
   async request(request, response) {
-    const owned = this.owner();
+    const owned = this.owner(request.headers?.["x-chengxin-session-id"]);
     const fail = (status, message) =>
       send(response, status, { ok: false, error: { message } });
     if (!owned || owned.cancelled || Date.now() >= owned.deadline)
@@ -85,7 +85,7 @@ export class ClarificationBroker {
     }
     // Recheck after body input: cancellation/other requests may have advanced.
     if (
-      this.owner() !== owned ||
+      this.owner(args.session_id) !== owned ||
       owned.cancelled ||
       Date.now() >= owned.deadline
     )
@@ -112,9 +112,15 @@ export class ClarificationBroker {
       answer: null,
       reason: null,
     };
-    this.pending.set(value.id, { value, response, owned });
+    const timer = setTimeout(
+      () => this.cancel(owned.id, "time_budget_exhausted"),
+      Math.max(1, owned.deadline - Date.now()),
+    );
+    timer.unref?.();
+    this.pending.set(value.id, { value, response, owned, timer });
     response.once("close", () => {
       if (!this.pending.delete(value.id)) return;
+      clearTimeout(timer);
       this.emit("clarification.closed", {
         turn_id: value.turn_id,
         clarification: {
@@ -134,7 +140,7 @@ export class ClarificationBroker {
     if (
       !pending ||
       pending.value.turn_id !== payload.turn_id ||
-      this.owner() !== pending.owned ||
+      this.owner(pending.value.session_id) !== pending.owned ||
       pending.owned.cancelled ||
       Date.now() >= pending.owned.deadline ||
       !text(payload.answer, 2000)
@@ -146,6 +152,7 @@ export class ClarificationBroker {
       return;
     }
     this.pending.delete(payload.request_id);
+    clearTimeout(pending.timer);
     const value = {
       ...pending.value,
       status: "answered",
@@ -170,6 +177,7 @@ export class ClarificationBroker {
     for (const [id, pending] of this.pending) {
       if (turnId && pending.value.turn_id !== turnId) continue;
       this.pending.delete(id);
+      clearTimeout(pending.timer);
       const value = { ...pending.value, status: "closed", reason };
       this.emit("clarification.closed", {
         turn_id: value.turn_id,
