@@ -1,0 +1,45 @@
+
+Running 1 test using 1 worker
+
+(node:80338) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/artifact-recovery.spec.mjs:7:1 › a stalled preview times out and allows an explicit reread (18.6s)
+
+
+  1) tests/ui/artifact-recovery.spec.mjs:7:1 › a stalled preview times out and allows an explicit reread 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  locator('#execution-preview-reload')
+    Expected: enabled
+    Received: disabled
+    Timeout:  18000ms
+
+    Call log:
+      - Expect "toBeEnabled" locator('#execution-preview-reload') with timeout 18000ms
+      - waiting for locator('#execution-preview-reload')
+        40 × locator resolved to <button disabled type="button" id="execution-preview-reload">↵                    重新读取↵                  </button>
+           - unexpected value "disabled"
+
+
+      18 |   await expect.poll(() => Boolean(held)).toBe(true);
+      19 |   const reload = page.locator("#execution-preview-reload");
+    > 20 |   await expect(reload).toBeEnabled({ timeout: 18000 });
+         |                        ^
+      21 |   await expect(page.locator("#execution-preview")).toContainText("超时");
+      22 |   expect(reads).toBe(1);
+      23 |   await reload.click();
+        at /Users/dancer/Desktop/su_workspace/chengxin-medical-agent/tests/ui/artifact-recovery.spec.mjs:20:24
+
+    Error Context: test-results/ui/artifact-recovery-a-stalle-000d1-d-allows-an-explicit-reread/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui/artifact-recovery-a-stalle-000d1-d-allows-an-explicit-reread/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui/artifact-recovery-a-stalle-000d1-d-allows-an-explicit-reread/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/ui/artifact-recovery.spec.mjs:7:1 › a stalled preview times out and allows an explicit reread 

@@ -1,0 +1,20 @@
+
+Running 13 tests using 1 worker
+
+(node:80416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/ui/artifact-actions.spec.mjs:26:1 › copy and save preserve exact inert original text, independent of table or chart mode (1.7s)
+  ✓   2 tests/ui/artifact-actions.spec.mjs:68:1 › image exports verify actual bytes and reject stale image content (562ms)
+  ✓   3 tests/ui/artifact-actions.spec.mjs:114:1 › a delayed image save cannot export into a newly selected workspace (1.3s)
+  ✓   4 tests/ui/artifact-chart.spec.mjs:35:1 › tables switch to zero-based charts, keep exact values and retain the selected column in the expanded view (729ms)
+  ✓   5 tests/ui/artifact-chart.spec.mjs:81:1 › missing, formula and unsafe numeric columns do not become charts (496ms)
+  ✓   6 tests/ui/artifact-chart.spec.mjs:93:1 › truncation and untrusted labels stay explicit and inert (528ms)
+  ✓   7 tests/ui/artifact-chart.spec.mjs:119:1 › long previews scroll with the keyboard without changing row order (663ms)
+  ✓   8 tests/ui/artifact-chart.spec.mjs:163:1 › changed files retain the snapshot warning and switching workspaces clears the chart (3.7s)
+  ✓   9 tests/ui/artifact-chart.spec.mjs:196:3 › chart rows remain readable in six themes on wide (1.0s)
+  ✓  10 tests/ui/artifact-chart.spec.mjs:196:3 › chart rows remain readable in six themes on mobile (1.1s)
+  ✓  11 tests/ui/artifact-chart.spec.mjs:196:3 › chart rows remain readable in six themes on small (1.2s)
+  ✓  12 tests/ui/artifact-recovery.spec.mjs:7:1 › a stalled preview times out and allows an explicit reread (16.0s)
+  ✓  13 tests/ui/artifact-recovery.spec.mjs:34:1 › a stalled freshness check releases its slot and preserves the snapshot for copying (19.7s)
+
+  13 passed (49.5s)

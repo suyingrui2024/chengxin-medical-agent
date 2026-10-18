@@ -1,0 +1,8 @@
+
+Running 1 test using 1 worker
+
+(node:80737) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/desktop/execution-focus.spec.mjs:19:1 › native focused work area renders host snapshots and opens an inert preview (18.2s)
+
+  1 passed (18.4s)

@@ -12,6 +12,26 @@ export function createArtifactPreview(api, getCurrent) {
     checking = 0,
     lastChecked = 0;
   const empty = "选择文件查看图像、表格或代码。";
+  const reads = new Set();
+  function cancelReads() {
+    for (const controller of reads) controller.abort();
+    reads.clear();
+  }
+  async function boundedRead(operation) {
+    const controller = new AbortController();
+    reads.add(controller);
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      return await operation(controller.signal);
+    } catch (error) {
+      if (controller.signal.aborted)
+        throw new Error("文件读取超时，请重新读取。");
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+      reads.delete(controller);
+    }
+  }
   function setMeta(text) {
     const region = $("execution-preview-meta");
     if (region.textContent !== text) region.textContent = text;
@@ -39,6 +59,7 @@ export function createArtifactPreview(api, getCurrent) {
   }
   function reset(message = empty, title = "文件预览") {
     ticket++;
+    cancelReads();
     checking = 0;
     selected = content = null;
     source = false;
@@ -181,6 +202,7 @@ export function createArtifactPreview(api, getCurrent) {
     const current = getCurrent();
     if (!current || current.storage_error) return;
     const request = ++ticket;
+    cancelReads();
     checking = 0;
     lastChecked = Date.now();
     close();
@@ -214,8 +236,11 @@ export function createArtifactPreview(api, getCurrent) {
       getCurrent()?.id === selected?.id &&
       !getCurrent()?.storage_error;
     try {
-      const value = await api(
-        `/api/execution/${current.id}/preview?path=${encodeURIComponent(artifact.path)}`,
+      const value = await boundedRead((signal) =>
+        api(
+          `/api/execution/${current.id}/preview?path=${encodeURIComponent(artifact.path)}`,
+          { signal },
+        ),
       );
       if (!active()) return;
       if (!valid(value, artifact.path))
@@ -253,8 +278,11 @@ export function createArtifactPreview(api, getCurrent) {
       getCurrent()?.id === workspace &&
       !getCurrent()?.storage_error;
     try {
-      const status = await api(
-        `/api/execution/${workspace}/artifact-status?path=${encodeURIComponent(expected.path)}&sha256=${expected.sha256}`,
+      const status = await boundedRead((signal) =>
+        api(
+          `/api/execution/${workspace}/artifact-status?path=${encodeURIComponent(expected.path)}&sha256=${expected.sha256}`,
+          { signal },
+        ),
       );
       if (!active()) return;
       if (
@@ -274,7 +302,10 @@ export function createArtifactPreview(api, getCurrent) {
         close();
       }
     } finally {
-      if (checking === request) checking = 0;
+      if (checking === request) {
+        checking = 0;
+        lastChecked = Date.now();
+      }
     }
   }
   function update(snapshot) {
@@ -372,12 +403,15 @@ export function createArtifactPreview(api, getCurrent) {
         let blob,
           extension = "txt";
         if (value.kind === "image") {
-          const response = await fetch(
-            `/api/execution/${encodeURIComponent(workspace)}/image?path=${encodeURIComponent(value.path)}&sha256=${value.sha256}`,
-          );
-          if (!response.ok)
-            throw new Error("图像已变化或暂不可用，请重新读取后保存。");
-          const bytes = await response.arrayBuffer();
+          const bytes = await boundedRead(async (signal) => {
+            const response = await fetch(
+              `/api/execution/${encodeURIComponent(workspace)}/image?path=${encodeURIComponent(value.path)}&sha256=${value.sha256}`,
+              { signal },
+            );
+            if (!response.ok)
+              throw new Error("图像已变化或暂不可用，请重新读取后保存。");
+            return await response.arrayBuffer();
+          });
           const digest = [
             ...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
           ]

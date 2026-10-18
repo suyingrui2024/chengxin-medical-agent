@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:80535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/artifact-recovery.spec.mjs:78:3 › switching file cancels an outstanding preview and rejects its late result (1.4s)
+  ✓  2 tests/ui/artifact-recovery.spec.mjs:78:3 › switching workspace cancels an outstanding preview and rejects its late result (1.3s)
+  ✓  3 tests/ui/artifact-recovery.spec.mjs:138:1 › a stalled image export times out without downloading and permits retry (15.6s)
+
+  3 passed (19.0s)

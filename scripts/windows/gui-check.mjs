@@ -18,6 +18,7 @@ import {
 } from "../../tests/fixtures/execution-focus.mjs";
 import { verifyNativeArtifactChart } from "../../tests/fixtures/native-artifact-chart.mjs";
 import { verifyDirectoryRecovery } from "../../tests/fixtures/directory-recovery.mjs";
+import { verifyArtifactRecovery } from "../../tests/fixtures/artifact-recovery.mjs";
 import { verifyNativePatientZoom } from "../../tests/fixtures/patient-reflow.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const scratch = await mkdtemp(join(tmpdir(), "chengxin native gui 中文-"));
@@ -141,6 +142,7 @@ try {
     reopened,
     focusFixture,
   );
+  const artifactRecoveryReceipt = await verifyArtifactRecovery(reopened);
   assert.equal(model.requests.length, beforeChart);
   focusFixture.first.status = "completed";
   await expect(reopened.locator("#execution-focus-label")).toHaveText(
@@ -180,6 +182,7 @@ try {
       clarification_draft: draftReceipt,
       execution_recovery: recoveryReceipt,
       incomplete_explanation: incompleteReceipt,
+      artifact_recovery: artifactRecoveryReceipt,
       profile_path_with_spaces_and_chinese: "passed",
       local_fixture_requests: model.requests.length,
       external_model_calls: 0,

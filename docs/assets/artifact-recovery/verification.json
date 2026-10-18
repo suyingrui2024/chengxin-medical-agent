@@ -1,0 +1,165 @@
+{
+  "schema": "artifact-read-recovery/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "8dfa04cf0e4dad40fb6063e8cf5b8be9e0d97b07",
+  "baseline": {
+    "log": "logs/before.log",
+    "failure": "An actually stalled preview still disabled reread after 18 seconds; no bounded read or retry path."
+  },
+  "checks": {
+    "browser": {
+      "passed": 16,
+      "new_recovery_cases": 5,
+      "logs": ["logs/ui-primary.log", "logs/ui-additional.log"],
+      "scope": "Two non-overlapping invocations: 13 artifact action/chart/recovery cases, then 3 added cancellation/image-timeout cases. Production source and the first two recovery test bodies were unchanged between invocations; not a full browser-suite rerun."
+    },
+    "native_desktop": {
+      "passed": 1,
+      "log": "logs/desktop.log"
+    },
+    "native_gui_script": {
+      "platform": "macOS arm64",
+      "passed": true,
+      "log": "logs/native-gui.log",
+      "receipt": {
+        "gui": "passed",
+        "directory_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "cached_list_marked_and_disabled": true,
+          "draft_and_preview_preserved": true
+        },
+        "patient_native_zoom": {
+          "passed": true,
+          "native_webcontents_zoom": true,
+          "settings": [
+            {
+              "zoom": 1.25,
+              "pane": {
+                "height": 391,
+                "content": 391,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.5,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.7499999999999998,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 2,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            }
+          ],
+          "synthetic_demo": true,
+          "external_model_calls": 0
+        },
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": ["body", "serif", "mono"],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "artifact_copy": "passed (actual CSV and system clipboard)",
+        "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+        "artifact_save": "passed (actual CSV snapshot on disk)",
+        "clarification_draft": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "edited_answer": true
+        },
+        "execution_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "draft_preserved": true
+        },
+        "incomplete_explanation": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "explanation_preserved": true,
+          "failed_status_retained": true,
+          "external_model_calls": 0
+        },
+        "artifact_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "preview_failure_and_manual_retry": true,
+          "freshness_failure_and_recovery": true,
+          "snapshot_preserved": true,
+          "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+          "external_model_calls": 0
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      }
+    },
+    "format": "passed",
+    "diff_check": "passed"
+  },
+  "scope": [
+    "Preview GET, freshness GET and image export fetch including body reads share a 15-second abort deadline.",
+    "Preview timeout reenables explicit reread; no automatic preview or image-export replay.",
+    "Freshness failure retains the inert snapshot, marks it unverified, closes the expanded view and releases the in-flight slot for a later GET check.",
+    "A freshness check is paced from completion, leaving at least two seconds before a later attempt.",
+    "New file selection and workspace reset abort superseded reads; existing generation checks still reject old results and exports.",
+    "Image export timeout reenables saving without creating a download; byte hash verification remains mandatory."
+  ],
+  "boundaries": [
+    "Actual 15-second stalls are exercised in the browser for preview, freshness and image export.",
+    "Native GUI checks inject HTTP 503 with an explicitly synthetic host snapshot and verify manual preview reread plus freshness recovery; they do not claim native timeout timing or model reasoning improvement.",
+    "This change does not retain a prior preview while an explicit reread of that file is loading; snapshot preservation refers to freshness-check failures.",
+    "No task, answer, command or external model request is replayed.",
+    "The first native desktop attempt failed because the fixture tried to click a shortcut in a collapsed disclosure. The helper now opens it through its summary; the final desktop run and full GUI script passed. Failed harness logs remain under .runtime/artifact-recovery/desktop.log."
+  ],
+  "source_files_sha256": {
+    "src/medagent/web/execution-artifact-ui.js": "3de119a2e70a7770e36b5c13cb47f48e05b06038ae0de83e8027ea41ae84866c",
+    "tests/ui/artifact-recovery.spec.mjs": "1866856f02761c5f29cf10d15b2c4211c71129a23a60625664abecea5dca0a0c",
+    "tests/fixtures/artifact-recovery.mjs": "9b2c355fff7cf2cdb25399a3193bed8fa93c40ce35f16aa8986ad896aa339bed",
+    "tests/desktop/execution-focus.spec.mjs": "51fb59eedfb3e8bfdd865fc45caf32f53e1f2bd560860952a83ff09d7e5fb649",
+    "scripts/windows/gui-check.mjs": "347372eda1bbed92c66cdffc71076b81c67221532256990f8cc3a52a96791e96"
+  },
+  "artifacts_sha256": {
+    "logs/before.log": "572c41419892c8591e22b6babedc4aa85c4cf9474c731ea293a5cbe0971f79ea",
+    "logs/desktop.log": "25a5bd8bbfb948d1311cda81c0a4863b79678783299844ce44f2717cda103823",
+    "logs/native-gui.log": "6d960fa039565de58fbf3cba2aff768220596f9630c7332f379b6df8be201361",
+    "logs/ui-additional.log": "c3f87c7679edac85d14bc859562a44f2769bfda92fe6d73b96fc9ec23cc541c3",
+    "logs/ui-primary.log": "39dd9b38a25ce4d4838bcb215b98c2c6438a51733c2b3af39d59465defce61d2"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Both native matrices, source/portable/installed artifact_recovery receipts; preserve isolation, full SDK and installer acceptance."
+  }
+}

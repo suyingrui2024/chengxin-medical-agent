@@ -3,6 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { verifyDirectoryRecovery } from "../fixtures/directory-recovery.mjs";
+import { verifyArtifactRecovery } from "../fixtures/artifact-recovery.mjs";
 import {
   installExecutionFocusFixture,
   openFocusWorkspace,
@@ -42,6 +43,7 @@ test("native focused work area renders host snapshots and opens an inert preview
     await verifyExecutionRecovery(page, fixture);
     await verifyDirectoryRecovery(page);
     await verifyIncompleteExplanation(page, fixture);
+    await verifyArtifactRecovery(page);
     fixture.first.status = "completed";
     await expect(page.locator("#execution-focus-label")).toHaveText(
       "本轮已完成",
