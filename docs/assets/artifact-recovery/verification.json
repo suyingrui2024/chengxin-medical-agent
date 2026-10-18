@@ -156,10 +156,16 @@
     "logs/desktop.log": "25a5bd8bbfb948d1311cda81c0a4863b79678783299844ce44f2717cda103823",
     "logs/native-gui.log": "6d960fa039565de58fbf3cba2aff768220596f9630c7332f379b6df8be201361",
     "logs/ui-additional.log": "c3f87c7679edac85d14bc859562a44f2769bfda92fe6d73b96fc9ec23cc541c3",
-    "logs/ui-primary.log": "39dd9b38a25ce4d4838bcb215b98c2c6438a51733c2b3af39d59465defce61d2"
+    "logs/ui-primary.log": "39dd9b38a25ce4d4838bcb215b98c2c6438a51733c2b3af39d59465defce61d2",
+    "windows-native.json": "a81d9d83873c1553d6f906611258bbf30f1f42f89fe0fdf027ced2099bcead1f"
   },
   "windows": {
-    "status": "pending",
-    "required": "Both native matrices, source/portable/installed artifact_recovery receipts; preserve isolation, full SDK and installer acceptance."
-  }
+    "status": "passed",
+    "required": "Both native matrices, source/portable/installed artifact_recovery receipts; preserve isolation, full SDK and installer acceptance.",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102065354",
+    "tested_code_commit": "83a7fa852ce5b55383bc59f2d0a1acc31dea36e3",
+    "receipt": "windows-native.json",
+    "gui_windows": 5
+  },
+  "tested_code_commit": "83a7fa852ce5b55383bc59f2d0a1acc31dea36e3"
 }

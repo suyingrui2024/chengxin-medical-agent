@@ -90,6 +90,7 @@ Windows 使用原生 PowerShell 执行命令。上游工具名称仍为 `bash`�
 | `682caf0`／[39083192293](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39083192293) | 两套任务全部通过：源码、便携版与 Server 安装后共 5 次真实窗口核对目录读取失败、上次列表标记、手动重试、草稿与预览保留。Windows 11 源码／随包完整 SDK、输入证明、原生隔离和会话接续通过；Server 安装、快捷方式与卸载通过。目录恢复使用宿主快照夹具，不创建外部模型请求 |
 | `3c0b430`／[39086380368](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39086380368) | 两套任务全部通过：源码、便携版及 Server 安装后共 5 次实际窗口分别核对原生 125%／150%／175%／200% 放大后的测温步骤、图示弹窗、焦点与草稿保留。Windows 11 源码／随包完整 SDK、原生隔离和接续通过；Server 安装、快捷方式与卸载通过。新增缩放阶段使用本地演示，无外部模型请求 |
 | `8dfa04c`／[39101689571](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39101689571) | 两套任务全部通过：源码、便携版及 Server 安装后共 5 个真实窗口核对未完成说明默认折叠、原文保留与失败状态。两套平台各通过实际停止回合的离线保存／恢复；Windows 11 源码／随包完整 SDK 及隔离通过，Server 安装、快捷方式与卸载通过 |
+| `83a7fa8`／[39102065354](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102065354) | 两套任务全部通过：源码、便携版及 Server 安装后共 5 个真实窗口注入 HTTP 503，核对预览手动重读、快照核对恢复与内容保留。Windows 11 源码／随包完整 SDK 与隔离通过；Server 安装、快捷方式与卸载通过。15 秒真实挂起时限另见网页检查 |
 
 本轮以宿主实际读取产物为验收依据：根任务运行 Python 将结果写入 `result.txt`，调用随包 npm；子智能体独立核对结果并生成 `review.txt`；交付检查必须退出成功。继续原会话后，旧文件仍可读并生成 `notes.txt`。源码与便携包分别执行这一场景，使用回环合成模型服务，不消耗外部模型 API。
 
@@ -119,4 +120,4 @@ Linux 回归：完整 DSH 执行与交付检查 30 项通过；项目目录保�
 
 `scripts/windows/gui-check.mjs` 新增六套皮肤的实际切换与偏好文件检查、关闭后重新启动恢复检查，并使用含空格和中文的配置目录。本轮 Windows 工作流已在两套系统的源码与便携包中通过此检查，Server x64 安装后的应用也通过。最终构建包含聚焦当前动作的自检卡片、收起的详细文字，以及重新绘制的三步体温人物图示。
 
-本轮将验收通过的 Windows 实现与可视化更改合并回 `main`，并同步 `windows-native`。最新验收代码为 `8dfa04cf0e4dad40fb6063e8cf5b8be9e0d97b07`，后续文档提交不改变已测试的程序代码。完整范围、夹具边界与条件跳过见 [本轮 Windows 记录](assets/incomplete-iteration/windows-native.json)。安装器与便携包可从本轮工作流下载，保留 3 天。本轮安装包尚未下载到本地；最近完整下载的本地安装器仍为 `dist/windows-validated/39083192293/installer/Chengxin-Setup-0.11.17-Windows-x64.exe`，对应上一轮 `682caf0`，不能当作本轮构建。旧运行编号目录仍保留各自历史构建。
+本轮将验收通过的 Windows 实现与可视化更改合并回 `main`，并同步 `windows-native`。最新验收代码为 `83a7fa852ce5b55383bc59f2d0a1acc31dea36e3`，后续文档提交不改变已测试的程序代码。完整范围、夹具边界与条件跳过见 [本轮 Windows 记录](assets/artifact-recovery/windows-native.json)。安装器与便携包可从本轮工作流下载，保留 3 天。本轮安装包尚未下载到本地；最近完整下载的本地安装器仍为 `dist/windows-validated/39083192293/installer/Chengxin-Setup-0.11.17-Windows-x64.exe`，对应上一轮 `682caf0`，不能当作本轮构建。旧运行编号目录仍保留各自历史构建。
