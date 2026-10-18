@@ -39,10 +39,17 @@
   "artifacts_sha256": {
     "logs/accepted.log": "8aad20cab14607aabee01e32cf1d84ffc6e3e6d2cfce71e1d811dcf13c12bc8d",
     "logs/before.log": "90831598f4845af497edfe78acbca9e8ee02ac5a0c61fa61a97ec5e16e7d36e8",
-    "logs/profile.log": "2e855261c8381ed2c57665af31a2552fa68d1d99cdffe360cbaba335b3eba691"
+    "logs/profile.log": "2e855261c8381ed2c57665af31a2552fa68d1d99cdffe360cbaba335b3eba691",
+    "windows-native.json": "8501d0c7a513d1a6d80a76b9dcbe23c6fcaa999d72c7f5db113b9086c5801ef2"
   },
   "windows": {
-    "status": "pending",
-    "required": "Three actual-host gateway transport cases on both native matrices, plus existing full SDK, GUI and installation acceptance."
-  }
+    "status": "passed",
+    "required": "Three actual-host gateway transport cases on both native matrices, plus existing full SDK, GUI and installation acceptance.",
+    "tested_code_commit": "561b89bfa13b2cd152f7e47d22bab2ef0f342de5",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102424997",
+    "receipt": "windows-native.json",
+    "gui_windows": 5,
+    "gateway_cases_per_matrix": 3
+  },
+  "tested_code_commit": "561b89bfa13b2cd152f7e47d22bab2ef0f342de5"
 }

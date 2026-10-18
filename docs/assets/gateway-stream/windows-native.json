@@ -1,0 +1,733 @@
+{
+  "schema": "gateway-unicode-windows/v1",
+  "status": "passed",
+  "tested_code_commit": "561b89bfa13b2cd152f7e47d22bab2ef0f342de5",
+  "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102424997",
+  "scope": "Both native matrices pass three actual-host gateway transport cases for Unicode flush boundaries, UTF-8 byte splits and synthetic credential redaction. SDK clients in these cases are doubles; real SDK and isolation acceptance are separate steps.",
+  "platforms": {
+    "arm": {
+      "job_id": 117601246831,
+      "log_sha256": "57c20851fc59597ac0ced4d5cb237b2e8d923940694a954bfe59f4f6dcacb322",
+      "gateway_cases": [
+        "ok 22 - actual host gateway preserves astral character at the redaction flush boundary (SDK double, no isolation)",
+        "ok 23 - actual host gateway preserves four-byte UTF-8 character split across upstream chunks (SDK double, no isolation)",
+        "ok 24 - actual host gateway preserves credential split across chunks alongside Unicode (SDK double, no isolation)"
+      ],
+      "node": {
+        "passed": 34,
+        "failed": 0
+      },
+      "python": {
+        "run": 13,
+        "passed": 12,
+        "skipped": 1,
+        "skip_reason": "Filesystem lacks the tested combined Unicode/case alias; ASCII native case alias passes."
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "full_sdk_summaries": ["Ran 2 tests in 50.172s", "Ran 2 tests in 59.678s"]
+    },
+    "server": {
+      "job_id": 117601246718,
+      "log_sha256": "93a0610da4f6e505b41c05ced524237f9eb76a7ee5ba8e009ca425be560e7ebd",
+      "gateway_cases": [
+        "ok 22 - actual host gateway preserves astral character at the redaction flush boundary (SDK double, no isolation)",
+        "ok 23 - actual host gateway preserves four-byte UTF-8 character split across upstream chunks (SDK double, no isolation)",
+        "ok 24 - actual host gateway preserves credential split across chunks alongside Unicode (SDK double, no isolation)"
+      ],
+      "node": {
+        "passed": 34,
+        "failed": 0
+      },
+      "python": {
+        "run": 13,
+        "passed": 12,
+        "skipped": 1,
+        "skip_reason": "Filesystem lacks the tested combined Unicode/case alias; ASCII native case alias passes."
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "patient_native_zoom": {
+            "passed": true,
+            "native_webcontents_zoom": true,
+            "settings": [
+              {
+                "zoom": 1.25,
+                "pane": {
+                  "height": 390,
+                  "content": 390,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.5,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 1.7499999999999998,
+                "pane": {
+                  "height": 404,
+                  "content": 404,
+                  "overflow": "visible"
+                }
+              },
+              {
+                "zoom": 2,
+                "pane": {
+                  "height": 424,
+                  "content": 424,
+                  "overflow": "visible"
+                }
+              }
+            ],
+            "synthetic_demo": true,
+            "external_model_calls": 0
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "incomplete_explanation": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "explanation_preserved": true,
+            "failed_status_retained": true,
+            "external_model_calls": 0
+          },
+          "artifact_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "preview_failure_and_manual_retry": true,
+            "freshness_failure_and_recovery": true,
+            "snapshot_preserved": true,
+            "actual_timeout_scope": "Separate browser probes hold real requests beyond 15 seconds; native checks inject HTTP 503.",
+            "external_model_calls": 0
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ],
+      "installer_receipt": {
+        "passed": true,
+        "desktop_shortcut": true,
+        "start_menu_shortcut": true,
+        "installer": true,
+        "bundled_runtime_launched": true,
+        "uninstalled": true
+      }
+    }
+  },
+  "boundaries": [
+    "Gateway transport cases do not launch SDK commands or prove isolation by themselves.",
+    "No external model calls or reasoning evaluation.",
+    "No complete local installer for this source commit was downloaded."
+  ]
+}
