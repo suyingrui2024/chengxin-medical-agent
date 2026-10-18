@@ -77,10 +77,27 @@
     "logs/baseline-stalled.log": "9773b94627982931cf0c0dd4635b9632379a4a1dbab444b368faa9e43e0db8b8",
     "logs/desktop.log": "76b7e76af866402e2b1c55cc2f174b80b1c8fa728843859f1e73563e27cc0d7b",
     "logs/focused.log": "c704d91fbd830658a46be8240abe056f2cb3a257d486b9487618f504153846a9",
-    "logs/ui.log": "bc923b2e6ef53f9e31ed1097cda3370bd1576519cbc9bcd6a2df2cae0dc0b483"
+    "logs/ui.log": "bc923b2e6ef53f9e31ed1097cda3370bd1576519cbc9bcd6a2df2cae0dc0b483",
+    "windows-native.json": "5923d8a5e732295ff6af59a66b14a2dbc6c7b986341c058f4787b3f3d002a886"
   },
   "windows": {
-    "status": "pending",
-    "required": "Windows 11 source and portable windows, and Windows Server source, portable and installed windows, must emit directory_recovery receipts; native SDK, installation and uninstallation checks must remain passing."
+    "status": "passed",
+    "required": "Windows 11 source and portable windows, and Windows Server source, portable and installed windows, must emit directory_recovery receipts; native SDK, installation and uninstallation checks must remain passing.",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39083192293",
+    "tested_code_commit": "682caf026505d9cdd7eab861502353d7efa324af",
+    "receipt": "windows-native.json",
+    "gui_receipts": {
+      "arm": 2,
+      "server": 3
+    },
+    "full_sdk_runs": 2,
+    "node_per_matrix": {
+      "passed": 31,
+      "failed": 0
+    },
+    "python_per_matrix": {
+      "passed": 11,
+      "skipped": 1
+    }
   }
 }

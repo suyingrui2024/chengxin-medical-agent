@@ -1,0 +1,458 @@
+{
+  "schema": "directory-recovery-windows/v1",
+  "status": "passed",
+  "tested_code_commit": "682caf026505d9cdd7eab861502353d7efa324af",
+  "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39083192293",
+  "directory_failure_injection": "HTTP 503 synthetic host directory snapshot in actual Electron windows; cached-list labeling and disabled actions, explicit retry deduplication, task draft and prior preview preservation.",
+  "actual_timeout_scope": "The real 15-second fetch timeout and automatic retry are exercised by browser regression; native Windows GUI checks inject HTTP 503 and manual recovery.",
+  "external_model_calls": 0,
+  "platforms": {
+    "arm": {
+      "job_id": 117544238176,
+      "log_sha256": "6e4abac3fa8b94fd8f8b2fb3f24ac6fd5ed6c1483e81c07cf0e7f71d11dfacfa",
+      "node": {
+        "passed": 31,
+        "failed": 0
+      },
+      "python": {
+        "run": 12,
+        "passed": 11,
+        "skipped": 1,
+        "skip_reason": "Filesystem lacks the tested combined Unicode/case alias; ASCII native case alias passes."
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "full_sdk_summaries": ["Ran 2 tests in 46.378s", "Ran 2 tests in 55.989s"]
+    },
+    "server": {
+      "job_id": 117544238315,
+      "log_sha256": "0f286a9e4a9cedd6dd895bb83d3cb7943237077a292e1d07fa862e1447231127",
+      "node": {
+        "passed": 31,
+        "failed": 0
+      },
+      "python": {
+        "run": 12,
+        "passed": 11,
+        "skipped": 1,
+        "skip_reason": "Filesystem lacks the tested combined Unicode/case alias; ASCII native case alias passes."
+      },
+      "gui_receipts": [
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        },
+        {
+          "gui": "passed",
+          "directory_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "cached_list_marked_and_disabled": true,
+            "draft_and_preview_preserved": true
+          },
+          "sandbox": true,
+          "contextIsolation": true,
+          "nodeIntegration": false,
+          "bundled_font_roles": ["body", "serif", "mono"],
+          "patient_calculation_and_resume": "passed",
+          "appearance_themes": [
+            "ocean",
+            "iris",
+            "sand",
+            "slate",
+            "forest",
+            "night"
+          ],
+          "appearance_restart": "passed",
+          "execution_focus_ui": "passed (host snapshot fixture)",
+          "artifact_chart": {
+            "passed": true,
+            "actual_csv": true,
+            "rows": 3,
+            "agent_turns": 0
+          },
+          "artifact_copy": "passed (actual CSV and system clipboard)",
+          "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+          "artifact_save": "passed (actual CSV snapshot on disk)",
+          "clarification_draft": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "edited_answer": true
+          },
+          "execution_recovery": {
+            "passed": true,
+            "host_snapshot_fixture": true,
+            "read_failure_and_manual_retry": true,
+            "draft_preserved": true
+          },
+          "profile_path_with_spaces_and_chinese": "passed",
+          "local_fixture_requests": 2,
+          "external_model_calls": 0
+        }
+      ],
+      "full_sdk_summaries": []
+    }
+  },
+  "installer": {
+    "schema": "downloaded-windows-installer/v1",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39083192293",
+    "tested_code_commit": "682caf026505d9cdd7eab861502353d7efa324af",
+    "installer": "installer/Chengxin-Setup-0.11.17-Windows-x64.exe",
+    "bytes": 365228852,
+    "sha256": "8e46e6a7800f01aac36303e296812209ee430108fd7ccb9fe384861ae950ce7f",
+    "pe_machine": "0x14c",
+    "native_server_job": "success",
+    "native_windows11_job": "success",
+    "workflow_conclusion": "success",
+    "local_verification": "Downloaded GitHub artifact and checked PE signature and SHA256; execution and installation are verified by Windows jobs, not this Mac."
+  },
+  "jobs": [
+    {
+      "id": 117544238176,
+      "name": "Windows 11 on Arm running x64 application",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 117544238315,
+      "name": "Windows Server x64 desktop",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Restore verified native dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install native runtimes and exercise real desktop",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verified native dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Win32 filesystem, locks and process trees",
+          "conclusion": "success"
+        },
+        {
+          "name": "Path boundaries, delivery evidence and preview data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Windows isolation and full SDK execution",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Native isolation host diagnostics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build Windows desktop with bundled Python and Node",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run packaged Windows executable",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile and verify native Windows installer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Execute full SDK with packaged Python and Node",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Archive portable native Windows application",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}
