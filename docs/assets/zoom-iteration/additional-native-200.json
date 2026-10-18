@@ -1,0 +1,46 @@
+{
+  "source_commit": "3c0b4308c9b01397cec38bfe527c625a681ec967",
+  "results": [
+    {
+      "kind": "calculation",
+      "passed": true,
+      "zoom": 2,
+      "width": 450,
+      "height": 324,
+      "pageWidth": 450,
+      "local_provider_requests": 1,
+      "external_model_calls": 0
+    },
+    {
+      "kind": "summary",
+      "passed": true,
+      "zoom": 2,
+      "width": 450,
+      "height": 324,
+      "pageWidth": 450,
+      "local_provider_requests": 0,
+      "external_model_calls": 0
+    }
+  ],
+  "schema": "additional-native-zoom-probes/v1",
+  "platform": "macOS arm64",
+  "probe_kind": "Ad hoc native acceptance, separate from the 149 browser and 7 desktop regression cases.",
+  "checked_operations": {
+    "calculation": [
+      "Actual local synthetic provider proposes registered glucose conversion.",
+      "Fill source value and both units at native 200% zoom.",
+      "Invoke the registered calculation and verify the actual result.",
+      "Continue to the original question without a second provider request."
+    ],
+    "summary": [
+      "Complete a local demo to the summary at native 200% zoom.",
+      "Edit medication/handling through the existing dialog and save.",
+      "Confirm the summary explicitly and verify the session closes."
+    ]
+  },
+  "boundaries": [
+    "These probes do not add to the regression test count.",
+    "No external model or clinical evaluation was performed.",
+    "Windows native zoom receipts cover the temperature flow separately."
+  ]
+}

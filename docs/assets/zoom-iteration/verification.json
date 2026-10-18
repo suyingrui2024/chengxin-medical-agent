@@ -154,7 +154,14 @@
       [320, 256]
     ],
     "format": "passed",
-    "diff_check": "passed"
+    "diff_check": "passed",
+    "additional_native_probes": {
+      "platform": "macOS arm64",
+      "native_zoom": 2,
+      "passed": true,
+      "receipt": "additional-native-200.json",
+      "scope": "Ad-hoc calculation and summary-edit/confirmation probes; separate from the 149 browser and 7 desktop regression counts."
+    }
   },
   "baseline": {
     "record": "baseline-native-metrics.json",
@@ -217,10 +224,17 @@
     "obstructed-notice.json": "cf8600cc597affde7155c1ba1b0a672213a71fe92a4c7c891d14409bdbfbb4d4",
     "obstructed-notice.png": "2c7657b95823219e84356051ba22e8a1bff1e9c7816a94c90d04f246d0140c8a",
     "temperature-320.png": "8c5fcbd1d068fa5b4b01b592f4ecf3502b475f99304a35c9d5977eeb20a5eb90",
-    "temperature-720.png": "1bd619ddc5685aafccd9691659e2fe2a03055cb109c99896fdd0da18aed20c78"
+    "temperature-720.png": "1bd619ddc5685aafccd9691659e2fe2a03055cb109c99896fdd0da18aed20c78",
+    "windows-native.json": "5dad0ae1f45f02fdb8d4a7af72afb10bf7feb617685ef01fe38218f8651fc3fa",
+    "additional-native-200.json": "bfe48e98e839b89317cca61636f9fb7e74e052512edc8c944694e76349caec73"
   },
   "windows": {
-    "status": "pending",
-    "required": "Source and portable Windows 11 x64-compat windows plus source, portable and installed Windows Server windows must emit successful patient_native_zoom receipts for all four native zoom values. Preserve native isolation, source and bundled SDK, installation, shortcuts and uninstall acceptance."
+    "status": "passed",
+    "required": "Source and portable Windows 11 x64-compat windows plus source, portable and installed Windows Server windows must emit successful patient_native_zoom receipts for all four native zoom values. Preserve native isolation, source and bundled SDK, installation, shortcuts and uninstall acceptance.",
+    "tested_code_commit": "3c0b4308c9b01397cec38bfe527c625a681ec967",
+    "workflow": "https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39086380368",
+    "receipt": "windows-native.json",
+    "gui_windows": 5,
+    "zoom_factors": [1.25, 1.5, 1.75, 2]
   }
 }
