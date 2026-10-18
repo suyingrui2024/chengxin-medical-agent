@@ -18,7 +18,7 @@ def exercise_command_deadline(owner):
     def command(seconds, path):
         if native:
             return (
-                f"[IO.File]::WriteAllText((Join-Path $PWD.Path '{path}.started'), 'started'); "
+                f"[IO.File]::WriteAllText([IO.Path]::Combine([Environment]::CurrentDirectory, '{path}.started'), 'started'); "
                 f"Start-Sleep -Seconds {seconds}; "
                 f"'finished' | Set-Content -Encoding UTF8 {path}"
             )
