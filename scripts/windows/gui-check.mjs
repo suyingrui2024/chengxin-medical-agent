@@ -17,6 +17,7 @@ import {
 } from "../../tests/fixtures/execution-focus.mjs";
 import { verifyNativeArtifactChart } from "../../tests/fixtures/native-artifact-chart.mjs";
 import { verifyDirectoryRecovery } from "../../tests/fixtures/directory-recovery.mjs";
+import { verifyNativePatientZoom } from "../../tests/fixtures/patient-reflow.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const scratch = await mkdtemp(join(tmpdir(), "chengxin native gui 中文-"));
 const model = await createGlucoseModel();
@@ -145,10 +146,20 @@ try {
     "已保存的工作区",
   );
   await expect(reopened.locator("#execution-quick-look")).toBeHidden();
+  const zoomReceipt = await verifyNativePatientZoom(reopened, (factor) =>
+    app.evaluate(({ BrowserWindow }, value) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      window.setSize(900, 680);
+      window.webContents.setZoomFactor(value);
+      return window.webContents.getZoomFactor();
+    }, factor),
+  );
+  assert.equal(model.requests.length, beforeChart);
   console.log(
     JSON.stringify({
       gui: "passed",
       directory_recovery: directoryReceipt,
+      patient_native_zoom: zoomReceipt,
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,

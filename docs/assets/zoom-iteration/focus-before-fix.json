@@ -1,0 +1,28 @@
+{
+  "stage": "Page-flow CSS applied before focus scrolling fix; not the untouched baseline commit.",
+  "measurement": {
+    "y": 402.25,
+    "h": 324,
+    "pane": {
+      "x": 16,
+      "y": -226.75,
+      "width": 418,
+      "height": 404.99609375,
+      "top": -226.75,
+      "right": 434,
+      "bottom": 178.24609375,
+      "left": 16
+    },
+    "title": {
+      "x": 43,
+      "y": -205.75,
+      "width": 126,
+      "height": 25.19921875,
+      "top": -205.75,
+      "right": 169,
+      "bottom": -180.55078125,
+      "left": 43
+    },
+    "focus": "<h3 tabindex=\"-1\">测一次腋下体温</h3>"
+  }
+}

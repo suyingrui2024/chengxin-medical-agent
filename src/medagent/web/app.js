@@ -119,9 +119,24 @@ function button(label, className, handler) {
   node.addEventListener("click", handler);
   return node;
 }
+function positionToast() {
+  const notice = $("#toast");
+  const inline =
+    window.matchMedia("(max-height: 560px)").matches &&
+    !$("#view-consultation").hidden;
+  const parent = inline
+    ? document.querySelector(".conversation-footer")
+    : document.body;
+  notice.classList.toggle("toast-inline", inline);
+  if (notice.parentElement !== parent) {
+    if (inline) parent.insertBefore(notice, $("#composer"));
+    else parent.append(notice);
+  }
+}
 function toast(text) {
   clearTimeout(toastTimer);
   $("#toast").textContent = text;
+  positionToast();
   $("#toast").hidden = false;
   toastTimer = setTimeout(() => {
     $("#toast").hidden = true;
@@ -299,6 +314,8 @@ function focusCurrentAction() {
   ) {
     target.tabIndex = -1;
     target.focus({ preventScroll: true });
+    if (window.matchMedia("(max-height: 560px)").matches)
+      target.scrollIntoView({ block: "start", inline: "nearest" });
     if (state.reply?.task && state.reply?.input_error) {
       const pane = $("#active-task");
       const bounds = pane.getBoundingClientRect();
@@ -366,6 +383,7 @@ function navigate(view) {
     loadEvents().catch((error) => toast(error.message));
   }
   history.replaceState(null, "", `#${view}`);
+  if (!$("#toast").hidden) positionToast();
 }
 
 function setWorkspaceMode(mode) {
@@ -834,6 +852,7 @@ function syncTaskFocus() {
       !state.taskHistory &&
       Boolean(question.data?.choices?.length),
   );
+  if (!$("#toast").hidden) positionToast();
 }
 function renderChoices(items) {
   if (preparedSubjectDraft()) items = [];
@@ -2066,6 +2085,9 @@ $("#mobile-menu").addEventListener("click", () =>
 );
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") $("#sidebar").classList.remove("open");
+});
+window.addEventListener("resize", () => {
+  if (!$("#toast").hidden) positionToast();
 });
 document.addEventListener("click", (event) => {
   if (

@@ -1,0 +1,54 @@
+/* Native zoom and short screens need page flow, not a shrinking question pane. */
+@media (max-height: 560px) {
+  .toast.toast-inline {
+    position: static;
+    transform: none;
+    max-width: none;
+    margin: 0 0 8px;
+    padding: 9px 12px;
+    box-shadow: none;
+    overflow-wrap: anywhere;
+  }
+  body.has-session:has(#view-consultation:not([hidden])) .conversation-panel {
+    height: auto;
+    min-height: 0;
+  }
+  body.has-session:has(#view-consultation:not([hidden])) .active-question,
+  body.has-session:has(#view-consultation:not([hidden])) .active-task {
+    flex: none;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+  body.has-session:has(#view-consultation:not([hidden])) .conversation-scroll {
+    flex: none;
+    max-height: max(220px, 70dvh);
+  }
+  body.has-session.summary-focused:has(#view-consultation:not([hidden]))
+    .conversation-scroll {
+    max-height: none;
+  }
+  body.has-session:has(#view-consultation:not([hidden]))
+    #view-consultation
+    .page-heading {
+    display: none;
+  }
+  body.has-session:has(#view-consultation:not([hidden])) .conversation-header {
+    height: auto;
+    min-height: 48px;
+    padding-block: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  body.has-session:has(#view-consultation:not([hidden])) .task-focus-bar {
+    flex-wrap: wrap;
+  }
+}
+@media (min-width: 701px) and (max-width: 980px) and (max-height: 560px) {
+  .illustrated-task .step-track li {
+    flex-direction: column;
+    white-space: nowrap;
+    gap: 4px;
+  }
+}

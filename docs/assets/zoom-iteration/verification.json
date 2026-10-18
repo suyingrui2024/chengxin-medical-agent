@@ -1,0 +1,226 @@
+{
+  "schema": "patient-native-zoom/v1",
+  "date": "2026-10-18",
+  "source_parent_commit": "59f8302674e0e876782072149a18ba795bd03b19",
+  "checks": {
+    "browser": {
+      "passed": 149,
+      "focused_cases_in_complete_suite": 8,
+      "log": "logs/ui.log",
+      "last_run_status": "passed",
+      "failed_tests": []
+    },
+    "native_desktop": {
+      "passed": 7,
+      "log": "logs/desktop.log"
+    },
+    "native_gui_script": {
+      "platform": "macOS arm64",
+      "passed": true,
+      "log": "logs/native-gui.log",
+      "receipt": {
+        "gui": "passed",
+        "directory_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "cached_list_marked_and_disabled": true,
+          "draft_and_preview_preserved": true
+        },
+        "patient_native_zoom": {
+          "passed": true,
+          "native_webcontents_zoom": true,
+          "settings": [
+            {
+              "zoom": 1.25,
+              "pane": {
+                "height": 391,
+                "content": 391,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.5,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 1.7499999999999998,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            },
+            {
+              "zoom": 2,
+              "pane": {
+                "height": 405,
+                "content": 405,
+                "overflow": "visible"
+              }
+            }
+          ],
+          "synthetic_demo": true,
+          "external_model_calls": 0
+        },
+        "sandbox": true,
+        "contextIsolation": true,
+        "nodeIntegration": false,
+        "bundled_font_roles": ["body", "serif", "mono"],
+        "patient_calculation_and_resume": "passed",
+        "appearance_themes": [
+          "ocean",
+          "iris",
+          "sand",
+          "slate",
+          "forest",
+          "night"
+        ],
+        "appearance_restart": "passed",
+        "execution_focus_ui": "passed (host snapshot fixture)",
+        "artifact_chart": {
+          "passed": true,
+          "actual_csv": true,
+          "rows": 3,
+          "agent_turns": 0
+        },
+        "artifact_copy": "passed (actual CSV and system clipboard)",
+        "clipboard_line_endings": "OS-native; CRLF normalized only for comparison",
+        "artifact_save": "passed (actual CSV snapshot on disk)",
+        "clarification_draft": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "edited_answer": true
+        },
+        "execution_recovery": {
+          "passed": true,
+          "host_snapshot_fixture": true,
+          "read_failure_and_manual_retry": true,
+          "draft_preserved": true
+        },
+        "profile_path_with_spaces_and_chinese": "passed",
+        "local_fixture_requests": 2,
+        "external_model_calls": 0
+      }
+    },
+    "native_zoom": {
+      "passed": true,
+      "native_webcontents_zoom": true,
+      "settings": [
+        {
+          "zoom": 1.25,
+          "pane": {
+            "height": 391,
+            "content": 391,
+            "overflow": "visible"
+          }
+        },
+        {
+          "zoom": 1.5,
+          "pane": {
+            "height": 405,
+            "content": 405,
+            "overflow": "visible"
+          }
+        },
+        {
+          "zoom": 1.7499999999999998,
+          "pane": {
+            "height": 405,
+            "content": 405,
+            "overflow": "visible"
+          }
+        },
+        {
+          "zoom": 2,
+          "pane": {
+            "height": 405,
+            "content": 405,
+            "overflow": "visible"
+          }
+        }
+      ],
+      "synthetic_demo": true,
+      "external_model_calls": 0
+    },
+    "short_css_viewports": [
+      [720, 518],
+      [600, 432],
+      [450, 324],
+      [320, 256]
+    ],
+    "format": "passed",
+    "diff_check": "passed"
+  },
+  "baseline": {
+    "record": "baseline-native-metrics.json",
+    "source_commit": "59f8302674e0e876782072149a18ba795bd03b19",
+    "window_dip": [900, 680],
+    "native_zoom": 2,
+    "css_viewport": [450, 324],
+    "task_client_height": 21,
+    "task_scroll_height": 405,
+    "state_unchanged": true
+  },
+  "intermediate_reproductions": {
+    "focus": "focus-before-fix.json",
+    "notification_occlusion": "obstructed-notice.json",
+    "scope": "Explicitly tagged intermediate working-tree stages; not presented as the untouched baseline."
+  },
+  "scope": [
+    "At short viewport heights, current patient questions and tasks use page flow, with complete illustrations, instructions, stop conditions and controls reachable by scrolling.",
+    "New-action focus is scrolled into the visible short viewport; task drafts and records are preserved across step controls and figure dialogs.",
+    "Short consultation notifications join normal form flow; resizing and view changes reconcile their host without changing message text or status semantics.",
+    "Narrow desktop step labels stay horizontal beneath their numbered markers.",
+    "Actual native webContents zoom values 1.25, 1.5, 1.75 and 2, including modal figure viewing, Escape and focus restoration.",
+    "Severity and body-location drafts require explicit confirmation; clipping ancestors and actual center hit targets are checked."
+  ],
+  "research": [
+    {
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+      "applied": "Retain readable content and operations during native page enlargement."
+    },
+    {
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/reflow.html",
+      "applied": "Use vertical page flow rather than a collapsed nested task scroller on short and narrow viewports."
+    }
+  ],
+  "boundaries": [
+    "Native zoom uses programmatic webContents.setZoomFactor; menu accelerators are not individually exercised by this helper.",
+    "Screenshots from capturePage retain actual device pixels; CSS viewport measurements are recorded separately.",
+    "The native acceptance helper switches to the existing local demo through application controls as its last phase; it does not query an external model.",
+    "The complete GUI script still makes two local synthetic calculation-provider requests; the added zoom phase makes none.",
+    "These engineering and scoped layout checks are not full accessibility certification, reasoning benchmarks, clinical review or user-understanding research."
+  ],
+  "source_files_sha256": {
+    "src/medagent/web/app.js": "fbc371a80737f7f8a5fcf7c1807eea0d876036f0b120e31dcefbc9c38d689cf8",
+    "src/medagent/web/index.html": "0dd9582117957b77d372355395531e1e130d5be1aeba58ea8e2090f92dd14091",
+    "src/medagent/web/patient-reflow.css": "8678dcb4dfce9e7778d35aef8131ecbf312bfaa806721a8011868708d11850d5",
+    "tests/fixtures/patient-reflow.mjs": "d586b381753297286f2b5c469c8cefde4b3ab423bcf03b8b082115b929be90fa",
+    "tests/ui/patient-reflow.spec.mjs": "d8535f5da0410510621c709c26d5d331814569d93113f383c29b35dfae531476",
+    "tests/desktop/patient-zoom.spec.mjs": "2d3a2583cf9b37306266f34543d8b033f6ba533e352172c480eba3245ea8407d",
+    "scripts/windows/gui-check.mjs": "27369842842f62038aa70f7237373da923333c07b589e86d43b124b2c126157c"
+  },
+  "artifacts_sha256": {
+    "baseline-native-metrics.json": "a25884688c44fd89325f659a81c591cd333bcbceaa124c38fa8bd4588ec87c26",
+    "focus-before-fix.json": "7a44852a5c0c3f4c33279066b56497d25b90bae9e4187bc50cad3311b409c5d9",
+    "logs/desktop.log": "b6f9fdfbbd9afc405a779f347de8fda67e105929021ae862c96cce633f349652",
+    "logs/native-gui.log": "45636559369014095cb16631542f5b527c07c3def0be16889331edf89734490a",
+    "logs/ui.log": "7428f7beabb204a1549a4933ef186960a4e1a7f4a28954041ec5791ea26b7aaa",
+    "native-temperature-125.png": "bccae0281dd1ba2100837f4438fa4df272a259afa3e17a962ff85ef299a03515",
+    "native-temperature-200.png": "d4b923cecb86b19c91e2285f94b7743edc5ad5d71340fdf4b20a4c3da4c76f49",
+    "native-zoom.json": "9d0c5483c2c7ce02436158769704e1a1de060e87b4627f75aed0b0ca978c33f9",
+    "obstructed-notice.json": "cf8600cc597affde7155c1ba1b0a672213a71fe92a4c7c891d14409bdbfbb4d4",
+    "obstructed-notice.png": "2c7657b95823219e84356051ba22e8a1bff1e9c7816a94c90d04f246d0140c8a",
+    "temperature-320.png": "8c5fcbd1d068fa5b4b01b592f4ecf3502b475f99304a35c9d5977eeb20a5eb90",
+    "temperature-720.png": "1bd619ddc5685aafccd9691659e2fe2a03055cb109c99896fdd0da18aed20c78"
+  },
+  "windows": {
+    "status": "pending",
+    "required": "Source and portable Windows 11 x64-compat windows plus source, portable and installed Windows Server windows must emit successful patient_native_zoom receipts for all four native zoom values. Preserve native isolation, source and bundled SDK, installation, shortcuts and uninstall acceptance."
+  }
+}

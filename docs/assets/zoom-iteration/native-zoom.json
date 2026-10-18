@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "native_webcontents_zoom": true,
+  "settings": [
+    {
+      "zoom": 1.25,
+      "pane": {
+        "height": 391,
+        "content": 391,
+        "overflow": "visible"
+      }
+    },
+    {
+      "zoom": 1.5,
+      "pane": {
+        "height": 405,
+        "content": 405,
+        "overflow": "visible"
+      }
+    },
+    {
+      "zoom": 1.7499999999999998,
+      "pane": {
+        "height": 405,
+        "content": 405,
+        "overflow": "visible"
+      }
+    },
+    {
+      "zoom": 2,
+      "pane": {
+        "height": 405,
+        "content": 405,
+        "overflow": "visible"
+      }
+    }
+  ],
+  "synthetic_demo": true,
+  "external_model_calls": 0
+}

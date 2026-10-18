@@ -1,0 +1,12 @@
+{
+  "stage": "Page-flow and focus fixes applied; before inline notification fix.",
+  "source_parent_commit": "59f8302674e0e876782072149a18ba795bd03b19",
+  "source_files_sha256": {
+    "src/medagent/web/app.js": "35e4916770c1d45f7870b311ead1dc577c068bcecb5e4d188e8aa3a91b455373",
+    "src/medagent/web/index.html": "0dd9582117957b77d372355395531e1e130d5be1aeba58ea8e2090f92dd14091",
+    "src/medagent/web/patient-reflow.css": "87d5ed86fdd6fac07d51faa19c8addded0c3de3d62646fb1559d084be3cd1795"
+  },
+  "native_capture": "obstructed-notice.png",
+  "capture_sha256": "2c7657b95823219e84356051ba22e8a1bff1e9c7816a94c90d04f246d0140c8a",
+  "observation": "The unchanged settings-applied toast overlaps temperature controls and the stop condition at native 200% zoom."
+}
