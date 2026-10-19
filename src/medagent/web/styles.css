@@ -5461,6 +5461,24 @@ body[data-mode="patient"] .task-header {
   background: var(--red);
   font-size: 16px;
   font-weight: 650;
+  text-decoration: none;
+}
+body[data-mode="patient"] .structured-notice .notice-level,
+body[data-mode="patient"] .structured-notice .notice-reasons,
+body[data-mode="patient"] .illustrated-task .task-equipment,
+body[data-mode="patient"] .illustrated-task .step-progress > span,
+body[data-mode="patient"] .illustrated-task .step-track li,
+body[data-mode="patient"] .illustrated-task .step-cue,
+body[data-mode="patient"] .illustrated-task .step-full-instruction,
+body[data-mode="patient"] .illustrated-task .task-stop,
+body[data-mode="patient"]:has(#active-task .illustrated-task)
+  .quick-replies
+  button {
+  font-size: 14px;
+}
+body[data-mode="patient"] .structured-notice p,
+body[data-mode="patient"] .structured-notice .notice-reasons {
+  font-size: 16px;
 }
 
 /* During a patient self-check, retain only the current action and urgent help. */

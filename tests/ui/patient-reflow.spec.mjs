@@ -37,6 +37,27 @@ for (const [width, height] of [
   });
 }
 
+test("the 320px patient layout provides a 400-percent reflow equivalent without horizontal scrolling", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/");
+  await reachSelfCheck(page, "发热");
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+      ),
+    )
+    .toBe(true);
+  const sizes = await page
+    .locator("#active-task .step-cue, #active-task .task-stop")
+    .evaluateAll((nodes) =>
+      nodes.map((node) => parseFloat(getComputedStyle(node).fontSize)),
+    );
+  expect(sizes.every((size) => size >= 14)).toBe(true);
+});
+
 test("a real notification follows short-page flow and returns to its global host on other views", async ({
   page,
 }) => {

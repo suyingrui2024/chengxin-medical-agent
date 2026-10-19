@@ -412,6 +412,7 @@ export function replyEnvelope(reply) {
               items: reply.summary.triggers || [],
               level: "emergency",
               action_label: "现在拨打 120",
+              action_href: "tel:120",
             },
           }
         : { id: `summary:${id}`, type: "summary", data: reply.summary },
@@ -802,6 +803,10 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       if (data.message !== undefined) text(data.message);
       list(data.items).forEach(text);
       if (data.action_label !== undefined) text(data.action_label);
+      if (data.action_href !== undefined && data.action_href !== "tel:120")
+        throw new Error("Invalid emergency action");
+      if (Boolean(data.action_label) !== Boolean(data.action_href))
+        throw new Error("Incomplete emergency action");
       if (
         data.level !== undefined &&
         !["emergency", "urgent", "routine"].includes(data.level)
@@ -823,8 +828,12 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       const heading = el("div", "notice-heading");
       heading.append(visualIcon("shield"), el("h2", "", data.title));
       node.append(heading);
-      if (data.action_label)
-        node.append(el("p", "notice-cta", data.action_label));
+      if (data.action_label) {
+        const action = el("a", "notice-cta", data.action_label);
+        action.href = data.action_href;
+        action.setAttribute("aria-label", "拨打急救电话 120");
+        node.append(action);
+      }
       if (data.message) {
         node.append(el("p", "notice-action", data.message));
         if (data.items.length) {

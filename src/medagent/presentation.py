@@ -121,6 +121,7 @@ def reply_presentation(reply):
                         "items": reply["summary"].get("triggers", []),
                         "level": "emergency",
                         "action_label": "现在拨打 120",
+                        "action_href": "tel:120",
                     },
                 )
             )

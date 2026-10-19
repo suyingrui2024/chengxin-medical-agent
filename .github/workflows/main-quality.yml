@@ -1,0 +1,35 @@
+name: Main patient safety
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: main-patient-safety-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  patient-safety:
+    name: Patient contracts and reflow
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.23.0
+          cache: npm
+      - name: Install locked browser test dependencies
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps chromium
+          node -e "console.log('CHROME_BIN=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      - name: Verify patient state and presentation contracts
+        env:
+          PYTHONPATH: src
+        run: python3 -m unittest tests.test_consultation tests.test_presentation tests.test_state_consistency -v
+      - name: Verify patient emergency actions and 400 percent reflow equivalent
+        run: node node_modules/@playwright/test/cli.js test tests/ui/p0-summary-status.spec.mjs tests/ui/patient-reflow.spec.mjs
+      - name: Check changed interface formatting
+        run: node node_modules/prettier/bin/prettier.cjs --check desktop/main.cjs src/medagent/web/structured-ui.js src/medagent/web/styles.css tests/fixtures/patient-reflow.mjs tests/ui/p0-summary-status.spec.mjs tests/ui/patient-reflow.spec.mjs

@@ -116,6 +116,8 @@ test("priority help preserves a failed request draft and works at a narrow viewp
   const action = page.locator(".notice-action");
   await expect(action).toBeVisible();
   await expect(action).toContainText("120");
+  const call = page.getByRole("link", { name: "拨打急救电话 120" });
+  await expect(call).toHaveAttribute("href", "tel:120");
   const bounds = await action.boundingBox();
   expect(bounds.y).toBeGreaterThanOrEqual(0);
   expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);

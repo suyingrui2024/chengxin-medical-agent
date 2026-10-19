@@ -6,6 +6,7 @@ const {
   session,
   ipcMain,
   nativeTheme,
+  shell,
 } = require("electron");
 const { spawn } = require("node:child_process");
 const { randomBytes } = require("node:crypto");
@@ -262,8 +263,9 @@ async function createWindow() {
   });
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   window.webContents.on("will-navigate", (event, url) => {
-    if (!readyOrigin || new URL(url).origin !== readyOrigin)
-      event.preventDefault();
+    if (readyOrigin && new URL(url).origin === readyOrigin) return;
+    event.preventDefault();
+    if (url === "tel:120") void shell.openExternal(url).catch(() => {});
   });
   window.on("page-title-updated", (event) => event.preventDefault());
   window.once("ready-to-show", () => window.show());

@@ -53,7 +53,7 @@ test("summary status distinguishes confirmation from automatic urgent closure", 
 
 test("emergency notice exposes an immediate call action", async ({ page }) => {
   await page.goto("/");
-  const content = await page.evaluate(async () => {
+  const action = await page.evaluate(async () => {
     const { replyEnvelope, createRenderer } = await import("/structured-ui.js");
     const envelope = replyEnvelope({
       message: "请现在拨打 120。",
@@ -61,10 +61,20 @@ test("emergency notice exposes an immediate call action", async ({ page }) => {
       summary: { care_route: "立即急救", triggers: ["严重呼吸困难"] },
     });
     const block = envelope.blocks.at(-1);
-    return createRenderer().render(block, {}).textContent;
+    const notice = createRenderer().render(block, {});
+    const link = notice.querySelector(".notice-cta");
+    return {
+      content: notice.textContent,
+      tag: link.tagName,
+      href: link.getAttribute("href"),
+      label: link.getAttribute("aria-label"),
+    };
   });
-  expect(content).toContain("现在拨打 120");
-  expect(content).toContain("严重呼吸困难");
+  expect(action.content).toContain("现在拨打 120");
+  expect(action.content).toContain("严重呼吸困难");
+  expect(action.tag).toBe("A");
+  expect(action.href).toBe("tel:120");
+  expect(action.label).toBe("拨打急救电话 120");
 });
 
 test("correction feedback offers one reachable undo action", async ({

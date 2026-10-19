@@ -120,6 +120,9 @@ test("native priority help interrupts real DSH while the provider is still waiti
     await expect(page.locator("#urgent-help-dialog")).toBeHidden();
     await expect(page.locator(".notice-action")).toBeVisible();
     await expect(page.locator(".notice-action")).toContainText("120");
+    await expect(
+      page.getByRole("link", { name: "拨打急救电话 120" }),
+    ).toHaveAttribute("href", "tel:120");
     await page.screenshot({
       path: "docs/assets/ui/41-native-priority-response.png",
       animations: "disabled",

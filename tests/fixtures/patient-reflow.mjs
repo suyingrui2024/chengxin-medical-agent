@@ -51,7 +51,6 @@ export async function expectReachable(locator) {
 export async function verifyTemperatureReflow(page, id, { shot } = {}) {
   const before = await degreeSnapshot(page, id);
   const input = page.getByRole("textbox", { name: "输入你的描述" });
-  await input.fill("放大显示时保留这份还没填写的读数");
   const task = page.locator("#active-task");
   const pane = await task.evaluate((node) => ({
     height: node.clientHeight,
@@ -71,6 +70,7 @@ export async function verifyTemperatureReflow(page, id, { shot } = {}) {
     ])
       await expectReachable(task.locator(selector));
     await expect(task.locator(".task-stop")).toContainText("操作引起明显不适");
+    if (step < 2) await expect(input).toBeHidden();
     if (step === 0) {
       const zoom = task.getByRole("button", { name: "放大图示", exact: true });
       await zoom.click();
@@ -90,6 +90,8 @@ export async function verifyTemperatureReflow(page, id, { shot } = {}) {
     if (step < 2)
       await task.getByRole("button", { name: "下一步", exact: true }).click();
   }
+  await expect(input).toBeVisible();
+  await input.fill("放大显示时保留这份还没填写的读数");
   await task.getByRole("button", { name: "填写结果", exact: true }).click();
   await expect(input).toBeFocused();
   await expectReachable(input);
