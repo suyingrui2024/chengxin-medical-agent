@@ -1707,6 +1707,14 @@ h1 {
   border-radius: 5px;
   white-space: nowrap;
 }
+
+.review-status {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.25;
+  max-width: 15rem;
+  text-align: right;
+}
 .consult-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 270px;

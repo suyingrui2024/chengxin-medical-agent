@@ -28,8 +28,8 @@ jobs:
       - name: Verify patient state and presentation contracts
         env:
           PYTHONPATH: src
-        run: python3 -m unittest tests.test_consultation tests.test_presentation tests.test_state_consistency -v
+        run: python3 -m unittest tests.test_consultation tests.test_presentation tests.test_state_consistency tests.test_background_review -v
       - name: Verify patient emergency actions, self-check guidance and 400 percent reflow equivalent
         run: node node_modules/@playwright/test/cli.js test tests/ui/p0-summary-status.spec.mjs tests/ui/patient-reflow.spec.mjs tests/ui/self-check-visuals.spec.mjs
       - name: Check changed interface formatting
-        run: node node_modules/prettier/bin/prettier.cjs --check desktop/main.cjs src/medagent/web/structured-ui.js src/medagent/web/styles.css tests/fixtures/patient-reflow.mjs tests/ui/p0-summary-status.spec.mjs tests/ui/patient-reflow.spec.mjs
+        run: node node_modules/prettier/bin/prettier.cjs --check desktop/main.cjs src/medagent/web/app.js src/medagent/web/index.html src/medagent/web/structured-ui.js src/medagent/web/styles.css tests/fixtures/patient-reflow.mjs tests/ui/p0-summary-status.spec.mjs tests/ui/patient-reflow.spec.mjs

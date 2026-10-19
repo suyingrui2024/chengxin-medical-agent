@@ -529,6 +529,14 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 {key: value for key, value in result.items() if key != "presentation"}
                 for result in state.calculations[-3:]
             ],
+            **(
+                {"background_review": state.background_review["advice"]}
+                if state.background_review
+                and state.background_review.get("status") == "completed"
+                and state.background_review.get("source_revision") == state.revision
+                and isinstance(state.background_review.get("advice"), dict)
+                else {}
+            ),
         }
 
     def _messages(self, state, text):

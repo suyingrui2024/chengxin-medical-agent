@@ -220,14 +220,9 @@ function setBusy(busy) {
     .forEach((node) => {
       node.disabled = busy;
     });
-  clearInterval(pollTimer);
-  pollTimer = null;
+  syncEventPolling();
   if (busy && state.sessionId) {
-    pollTimer = setInterval(() => loadEvents().catch(() => {}), 1100);
     scrollBottom();
-  } else {
-    clearInterval(pollTimer);
-    pollTimer = null;
   }
   syncSummaryEdits();
   document
@@ -267,6 +262,15 @@ function setBusy(busy) {
           ? "本次问诊已整理"
           : "核对记录 · 可以更正"
         : "当前这一步";
+}
+function syncEventPolling() {
+  clearInterval(pollTimer);
+  pollTimer = null;
+  const reviewActive = ["queued", "running"].includes(
+    state.case?.background_review?.status,
+  );
+  if (state.sessionId && (state.busy || reviewActive))
+    pollTimer = setInterval(() => loadEvents().catch(() => {}), 1100);
 }
 function scrollBottom() {
   const scroll = $("#conversation-scroll");
@@ -960,6 +964,18 @@ function renderCase(data) {
         : phaseNames[phase] || "进行中";
   $("#phase-label").textContent = status;
   $("#conversation-status").textContent = status;
+  const review = data.background_review;
+  const reviewStatus = $("#review-status");
+  reviewStatus.hidden =
+    !review || !["queued", "running", "completed"].includes(review.status);
+  if (!reviewStatus.hidden)
+    reviewStatus.textContent =
+      review.status === "completed"
+        ? review.actionable_count
+          ? `后台复核发现 ${review.actionable_count} 项待确认`
+          : "后台复核完成"
+        : "后台复核中";
+  syncEventPolling();
   const activities = {
     opening: ["先了解主要问题", "先说最困扰你的事，再按需要补充信息。"],
     emergency_screen: [
@@ -1440,7 +1456,12 @@ async function loadEvents() {
   const data = await api(`/api/sessions/${id}/events`);
   if (state.sessionId !== id) return;
   if (data.events.length < state.events.length) return;
+  const added = data.events.slice(state.events.length);
   state.events = data.events;
+  if (added.some((event) => event.event_type.startsWith("advisor."))) {
+    const snapshot = await api(`/api/sessions/${id}/snapshot`);
+    if (state.sessionId === id) renderCase(snapshot.state);
+  }
   renderInspection();
 }
 
@@ -1651,6 +1672,12 @@ const eventLabels = {
   "model.responded": "收到模型响应",
   "model.failed": "模型调用失败",
   "agent.backend_failed": "决策服务失败",
+  "advisor.queued": "安排后台复核",
+  "advisor.started": "开始后台复核",
+  "advisor.completed": "完成后台复核",
+  "advisor.cancelled": "取消过期复核",
+  "advisor.discarded": "丢弃过期复核结果",
+  "advisor.unavailable": "后台复核暂不可用",
   "self_check.offered": "展示图示任务",
   "self_check.completed": "记录任务反馈",
   "turn.rejected": "拒绝过期回答",

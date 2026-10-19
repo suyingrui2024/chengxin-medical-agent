@@ -18,6 +18,7 @@ from .consultation import (
     ConsultationBusyError,
 )
 from .events import EventStore
+from .background_review import BackgroundReviewCoordinator
 from .runtime import build_runtime
 from .workspace import Workspace, StaleCompositionError
 from . import __version__
@@ -50,8 +51,10 @@ class MedicalAgentServer(ThreadingHTTPServer):
         self.workspace = Workspace(engine, events, backend_mode)
         self.access_token = access_token
         self.execution = ExecutionManager()
+        self.reviews = BackgroundReviewCoordinator(events)
 
     def server_close(self):
+        self.reviews.close()
         self.execution.close()
         super().server_close()
         self.workspace.close()
@@ -260,6 +263,8 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 engine = self.app.workspace.engine_for(parts[2])
                 with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    self.app.reviews.invalidate(state, "new_submitted_message")
                     reply = engine.submit(
                         parts[2],
                         UserInput(
@@ -270,6 +275,7 @@ class Handler(BaseHTTPRequestHandler):
                             observation=observation,
                         ),
                     )
+                    self.app.reviews.schedule(engine, state)
                     response = {
                         "reply": reply.to_dict(),
                         "state": engine.state(parts[2]).to_dict(),
@@ -308,9 +314,12 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 engine = self.app.workspace.engine_for(parts[2])
                 with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    self.app.reviews.invalidate(state, "fact_restored")
                     reply = engine.restore_fact(
                         parts[2], parts[4], expected_fact_id
                     )
+                    self.app.reviews.schedule(engine, state)
                     response = {
                         "reply": reply.to_dict(),
                         "state": engine.state(parts[2]).to_dict(),
@@ -350,9 +359,12 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 engine = self.app.workspace.engine_for(parts[2])
                 with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    self.app.reviews.invalidate(state, "fact_corrected")
                     reply = engine.correct_fact(
                         parts[2], parts[4], text.strip(), expected_fact_id
                     )
+                    self.app.reviews.schedule(engine, state)
                     response = {
                         "reply": reply.to_dict(),
                         "state": engine.state(parts[2]).to_dict(),

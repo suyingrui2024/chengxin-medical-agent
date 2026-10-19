@@ -118,6 +118,7 @@ class CaseState:
     calculation_feedback: Optional[Dict[str, Any]] = None
     subject_resume: Optional[Any] = None
     subject_candidate: Optional[Any] = None
+    background_review: Optional[Dict[str, Any]] = None
 
     def record(self, fact: Fact) -> None:
         previous = self.facts.get(fact.key)
@@ -168,6 +169,19 @@ class CaseState:
             "pending_calculation": self.pending_calculation,
             "pending_self_checks": [dict(item) for item in self.pending_self_checks],
             "observation_attempts": [dict(item) for item in self.observation_attempts],
+            "background_review": (
+                {
+                    "status": self.background_review.get("status"),
+                    "source_revision": self.background_review.get("source_revision"),
+                    "actionable_count": sum(
+                        len(items)
+                        for items in self.background_review.get("advice", {}).values()
+                        if isinstance(items, list)
+                    ),
+                }
+                if self.background_review
+                else None
+            ),
         }
 
 
