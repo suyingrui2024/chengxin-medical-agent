@@ -103,7 +103,11 @@ class ConsultationTestCase(unittest.TestCase):
         self.test_respiratory_path_offers_self_check_before_background()
         self.answer("40.1℃")
         self.assertEqual(self.state.risk.level, RiskLevel.URGENT)
-        self.assertIn("今天", self.engine._finish(self.state).summary["care_route"])
+        summary = self.engine._finish(self.state)
+        self.assertIn("今天", summary.summary["care_route"])
+        self.assertEqual(self.state.phase, Phase.CLOSED)
+        self.assertEqual(summary.summary["review_status"], "closed_unconfirmed")
+        self.assertTrue(summary.summary["risk_triggers"])
 
     def test_fact_history_preserves_superseded_values(self):
         self.answer("我自己", "self")
@@ -194,12 +198,22 @@ class ConsultationTestCase(unittest.TestCase):
                 self.state.session_id,
                 UserInput("摘要准确", "confirm_summary", previous_action),
             )
+        corrected_fact_id = self.state.facts["allergies"].fact_id
+        restored = self.engine.restore_fact(
+            self.state.session_id,
+            "allergies",
+            corrected_fact_id,
+        )
+        self.assertEqual(restored.kind, "summary")
+        self.assertEqual(self.state.facts["allergies"].assertion, Assertion.UNKNOWN)
+        self.assertEqual(self.state.history[-1].supersedes, corrected_fact_id)
         final = self.engine.submit(
             self.state.session_id,
-            UserInput("摘要准确", "confirm_summary", changed.action_id),
+            UserInput("摘要准确", "confirm_summary", restored.action_id),
         )
         self.assertEqual(final.kind, "closed")
         self.assertEqual(self.state.closed_reason, "confirmed_by_user")
+        self.assertEqual(final.summary["review_status"], "confirmed_by_user")
 
 
 if __name__ == "__main__":

@@ -411,6 +411,7 @@ export function replyEnvelope(reply) {
               message: reply.message,
               items: reply.summary.triggers || [],
               level: "emergency",
+              action_label: "现在拨打 120",
             },
           }
         : { id: `summary:${id}`, type: "summary", data: reply.summary },
@@ -800,6 +801,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       text(data.title);
       if (data.message !== undefined) text(data.message);
       list(data.items).forEach(text);
+      if (data.action_label !== undefined) text(data.action_label);
       if (
         data.level !== undefined &&
         !["emergency", "urgent", "routine"].includes(data.level)
@@ -821,6 +823,8 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       const heading = el("div", "notice-heading");
       heading.append(visualIcon("shield"), el("h2", "", data.title));
       node.append(heading);
+      if (data.action_label)
+        node.append(el("p", "notice-cta", data.action_label));
       if (data.message) {
         node.append(el("p", "notice-action", data.message));
         if (data.items.length) {
@@ -1235,37 +1239,71 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       }
       text(data.care_route);
       list(data.return_now_if).forEach(text);
+      if (data.risk_triggers !== undefined)
+        list(data.risk_triggers).forEach(text);
+      if (
+        data.review_status !== undefined &&
+        !["pending_review", "confirmed_by_user", "closed_unconfirmed"].includes(
+          data.review_status,
+        )
+      )
+        throw new Error("Invalid summary review status");
     },
     (data, context) => {
+      const reviewStatus =
+        data.review_status ||
+        context.reviewStatus ||
+        (context.readOnly ? "closed_unconfirmed" : "pending_review");
+      const reviewCopy = {
+        pending_review: {
+          kicker: "核对记录 · 可以更正",
+          intro: "请核对已记录的信息。“未知”表示尚未确认。",
+          label: "待你核对",
+          detail: "不准确可直接更正；确认后会结束本次问诊。",
+          record: "待核对",
+        },
+        confirmed_by_user: {
+          kicker: "会谈记录 · 已由你确认",
+          intro: "这是你已确认的本次记录；“未知”表示当时尚未确认。",
+          label: "你已确认",
+          detail: "会谈已结束，可展开记录回看原话与来源。",
+          record: "已确认",
+        },
+        closed_unconfirmed: {
+          kicker: "会谈记录 · 未经核对",
+          intro: "系统因分流建议结束了会谈；“未知”表示尚未确认。",
+          label: "会谈已结束，尚未核对",
+          detail: "请以原始记录为准，并按页面建议尽快求助。",
+          record: "未核对",
+        },
+      }[reviewStatus];
       const card = el("article", "summary-card");
       card.append(
-        el(
-          "p",
-          "task-kicker",
-          context.readOnly ? "会谈记录 · 可回看" : "核对记录 · 可以更正",
-        ),
+        el("p", "task-kicker", reviewCopy.kicker),
         el("h3", "", "本次问诊摘要"),
       );
-      card.append(
-        el("p", "summary-intro", "请核对已记录的信息。“未知”表示尚未确认。"),
-      );
+      card.append(el("p", "summary-intro", reviewCopy.intro));
       const review = el("div", "summary-review-status");
       review.setAttribute("role", "status");
       review.append(
-        el("strong", "", context.readOnly ? "当时已完成核对" : "待本次核对"),
-        el(
-          "span",
-          "",
-          context.readOnly
-            ? "展开记录可回看原话与来源。"
-            : "展开记录可查看原话与来源；不准确可直接更正。",
-        ),
+        el("strong", "", reviewCopy.label),
+        el("span", "", reviewCopy.detail),
       );
       card.append(review);
-      if (context.reviewFeedback)
-        card.append(
-          el("p", "summary-correction-feedback", context.reviewFeedback),
-        );
+      if (context.reviewFeedback) {
+        const feedback = el("div", "summary-correction-feedback");
+        feedback.append(el("span", "", context.reviewFeedback.message));
+        if (context.onUndoCorrection && context.reviewFeedback.factId) {
+          const undo = button(
+            "撤销本次更正",
+            () => context.onUndoCorrection(context.reviewFeedback),
+            "summary-undo",
+          );
+          undo.disabled = Boolean(context.readOnly);
+          feedback.append(undo);
+        }
+        card.append(feedback);
+      }
       const groups = [
         { title: "当前不适", icon: "activity", items: [] },
         { title: "观察记录", icon: "person", items: [] },
@@ -1309,7 +1347,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         const recordState = el("div", "summary-record-state");
         recordState.append(
           el("span", "", item.structured_input ? "已确认选项" : "系统整理"),
-          el("span", "", context.readOnly ? "已核对" : "待核对"),
+          el("span", "", reviewCopy.record),
         );
         value.append(recordState);
         if (item.key !== "temperature_c" || item.evidence || item.context) {
@@ -1531,6 +1569,14 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         el("p", "summary-route-action", data.care_route),
       );
       card.append(route);
+      if (data.risk_triggers?.length) {
+        const reasons = el("details", "summary-risk-triggers");
+        reasons.append(
+          el("summary", "", "查看本次需要尽快评估的原因"),
+          el("p", "", data.risk_triggers.join("；")),
+        );
+        card.append(reasons);
+      }
       if (data.return_now_if.length) {
         const details = el("details");
         details.append(

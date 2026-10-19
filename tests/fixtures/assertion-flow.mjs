@@ -134,7 +134,9 @@ export async function verifyAssertionFlow(page, model) {
   expect(recorded.every((event) => event.payload.assertion === "unknown")).toBe(
     true,
   );
-  await page.getByRole("button", { name: "摘要准确", exact: true }).click();
+  await page
+    .getByRole("button", { name: "确认摘要并结束本次问诊", exact: true })
+    .click();
   await expect(page.locator("#composer")).toBeHidden();
   expect(model.requests).toHaveLength(3);
 }

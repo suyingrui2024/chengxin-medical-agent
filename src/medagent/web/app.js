@@ -444,15 +444,15 @@ function summaryContext(
   readOnly = false,
   actionId = state.reply?.action_id,
   revisionAction = state.reply?.location_revision_action,
+  reviewStatus = null,
 ) {
   const sessionId = state.sessionId;
   return {
     readOnly,
+    reviewStatus,
     actionId,
     reviewFeedback:
-      state.lastCorrection?.actionId === actionId
-        ? state.lastCorrection.message
-        : null,
+      state.lastCorrection?.actionId === actionId ? state.lastCorrection : null,
     locationRevisionAction: revisionAction,
     onReviseLocation: (factId) => {
       if (
@@ -544,6 +544,7 @@ function summaryContext(
       )
         openEdit(key, state.case.facts[key]);
     },
+    onUndoCorrection: (correction) => restoreCorrection(correction),
   };
 }
 function syncSummaryEdits() {
@@ -613,6 +614,7 @@ function renderReply(reply, { replay = false } = {}) {
             replay || reply.phase === "closed",
             reply.action_id,
             reply.location_revision_action,
+            block.type === "summary" ? block.data.review_status : null,
           ),
         ),
       );
@@ -1641,6 +1643,7 @@ const eventLabels = {
   "fact.recorded": "记录病例事实",
   "fact.invalidated": "使依赖事实失效",
   "fact.correction_requested": "提交信息更正",
+  "fact.restored": "撤销信息更正",
   "triage.assessed": "重新评估风险",
   "tool.requested": "请求医疗工具",
   "tool.completed": "工具执行完成",
@@ -1846,6 +1849,34 @@ function openEdit(key, fact) {
         : "保留更正前的记录，并重新评估受影响的信息。同一患者更正年龄会保留已报告的体温。";
   $("#edit-dialog").showModal();
   (key === "consult_for" ? $("#edit-new-session") : $("#edit-value")).focus();
+}
+async function restoreCorrection(correction) {
+  if (
+    state.busy ||
+    state.sessionId !== correction.sessionId ||
+    state.case?.phase !== "summary" ||
+    state.case?.facts[correction.key]?.fact_id !== correction.factId
+  )
+    return;
+  setBusy(true);
+  try {
+    const data = await api(
+      `/api/sessions/${correction.sessionId}/facts/${correction.key}/restore`,
+      { method: "PATCH", body: { expected_fact_id: correction.factId } },
+    );
+    appendMessage(`撤销更正${names[correction.key]}。`, "user");
+    renderCase(data.state);
+    state.lastCorrection = null;
+    renderReply(data.reply);
+    toast(`已撤销“${names[correction.key]}”的本次更正。`);
+    await Promise.all([loadEvents(), refreshSessions()]);
+  } catch (error) {
+    toast(`无法撤销本次更正：${error.message}`);
+    if (error.code === "stale_fact")
+      await resumeSession(correction.sessionId, true).catch(() => {});
+  } finally {
+    setBusy(false);
+  }
 }
 function renderModeFields() {
   const mode = $("#settings-form").elements.backend.value;
@@ -2067,6 +2098,9 @@ $("#edit-form").addEventListener("submit", async (event) => {
     state.lastCorrection = {
       actionId: data.reply.action_id,
       message: `已更新“${names[editing.key]}”，请核对受影响的内容。`,
+      key: editing.key,
+      factId: data.state.facts[editing.key]?.fact_id,
+      sessionId: editing.sessionId,
     };
     renderReply(data.reply);
     $("#edit-dialog").close();

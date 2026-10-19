@@ -758,6 +758,83 @@ class ConsultationEngine(
             self._record_reply(state, reply, turn_id, f"用户更正字段 {fact_key} 后重新规划")
             return reply
 
+    def restore_fact(
+        self,
+        session_id: str,
+        fact_key: str,
+        expected_fact_id: Optional[str] = None,
+    ) -> AgentReply:
+        """Restore the value immediately preceding one UI correction.
+
+        Restoration creates a new fact rather than mutating history, so the
+        patient-visible record and the audit trail retain both the correction
+        and the reversal.
+        """
+        state = self.state(session_id)
+        with self._session_locks[session_id]:
+            self._check_fact_version(state, fact_key, expected_fact_id)
+            current = state.facts.get(fact_key)
+            if current is None:
+                raise ValueError("没有可撤销的更正记录")
+            previous = next(
+                (
+                    fact
+                    for fact in reversed(state.history)
+                    if fact.key == fact_key and fact.fact_id != current.fact_id
+                ),
+                None,
+            )
+            if previous is None:
+                raise ValueError("没有可撤销的更正记录")
+            turn_id = str(uuid4())
+            self._prepare_fact_updates(
+                state,
+                [
+                    {
+                        "key": fact_key,
+                        "value": previous.value,
+                        "assertion": previous.assertion,
+                    }
+                ],
+                turn_id,
+            )
+            restored = Fact(
+                key=fact_key,
+                value=deepcopy(previous.value),
+                assertion=previous.assertion,
+                source=previous.source,
+                quality=previous.quality,
+                turn_id=turn_id,
+                evidence=previous.evidence,
+                structured_input=deepcopy(previous.structured_input),
+            )
+            state.record(restored)
+            self.events.append(
+                Event(
+                    session_id,
+                    "fact.restored",
+                    {
+                        "fact_key": fact_key,
+                        "restored_from_fact_id": previous.fact_id,
+                        "replaced_fact_id": current.fact_id,
+                        "new_fact_id": restored.fact_id,
+                    },
+                    turn_id=turn_id,
+                )
+            )
+            state.active_question = None
+            state.active_task = None
+            state.risk = self.triage.assess(state)
+            if state.risk.level == RiskLevel.EMERGENCY:
+                reply = self._emergency_reply(state, state.risk.triggers)
+            elif state.risk.level == RiskLevel.URGENT:
+                reply = self._urgent(state)
+            else:
+                state.closed_reason = None
+                reply = self._plan_next(state)
+            self._record_reply(state, reply, turn_id, f"用户撤销字段 {fact_key} 的更正")
+            return reply
+
     def _correction_emergency(self, state, text):
         triggers = self.triage.scan_text(text)
         if not triggers:
@@ -905,7 +982,12 @@ class ConsultationEngine(
                 state.closed_reason = "confirmed_by_user"
                 state.active_question = None
                 reply = AgentReply(
-                    "已核对本次摘要。可以回看记录；情况变化时请重新评估。", Phase.CLOSED, kind="closed"
+                    "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
+                    Phase.CLOSED,
+                    kind="closed",
+                    summary=self._summary_payload(
+                        state, review_status="confirmed_by_user"
+                    ),
                 )
             else:
                 reply = self._finish(state)
@@ -1440,9 +1522,15 @@ class ConsultationEngine(
             }
         return detail
 
-    def _finish(self, state: CaseState) -> AgentReply:
-        state.phase = Phase.SUMMARY
-        state.risk = self.triage.assess(state)
+    def _summary_payload(
+        self, state: CaseState, *, review_status: str
+    ) -> Dict[str, Any]:
+        """Build the patient-facing record with an explicit review outcome.
+
+        A closed session is not necessarily a user-confirmed session: urgent
+        routing closes automatically.  Keeping that distinction in the data
+        lets every renderer show the same truthful status.
+        """
         known: List[Dict[str, Any]] = []
         unknown: List[str] = []
         unknown_details: List[Dict[str, Any]] = []
@@ -1489,7 +1577,7 @@ class ConsultationEngine(
             route = "建议尽快线下评估；基于当前规则，优先考虑今天联系医疗机构。"
         else:
             route = "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。"
-        summary = {
+        return {
             "content_versions": self.content.versions,
             "known": known,
             "unknown": unknown,
@@ -1497,6 +1585,7 @@ class ConsultationEngine(
             "care_route": route,
             "risk_level": state.risk.level.value,
             "risk_triggers": state.risk.triggers,
+            "review_status": review_status,
             "return_now_if": ["意识异常或抽搐", "严重呼吸困难或嘴唇发紫", "持续压榨样胸痛", "大量或无法控制的出血"],
             "observations": [
                 self._observation_series(state, task)
@@ -1504,6 +1593,10 @@ class ConsultationEngine(
                 if task.get("repeatable") and task["result_key"] in state.facts
             ],
         }
+
+    def _finish(self, state: CaseState) -> AgentReply:
+        state.phase = Phase.SUMMARY
+        state.risk = self.triage.assess(state)
         needs_confirmation = state.risk.level not in {
             RiskLevel.EMERGENCY,
             RiskLevel.URGENT,
@@ -1513,13 +1606,23 @@ class ConsultationEngine(
         state.active_question = f"summary:{uuid4()}" if needs_confirmation else None
         state.active_question_is_clarification = False
         state.active_task = None
+        summary = self._summary_payload(
+            state,
+            review_status=(
+                "pending_review" if needs_confirmation else "closed_unconfirmed"
+            ),
+        )
         return AgentReply(
-            "问诊信息已整理完成。请先核对摘要；其中“未知”不代表没有，测量结果也保留了来源和质量。",
+            (
+                "问诊信息已整理完成。请先核对摘要；其中“未知”不代表没有，测量结果也保留了来源和质量。"
+                if needs_confirmation
+                else "本次信息已整理。系统已提示尽快线下评估；当前记录未经你核对确认。"
+            ),
             state.phase,
             kind="summary",
             action_id=state.active_question,
             quick_replies=[
-                QuickReply("摘要准确", "confirm_summary"),
+                QuickReply("确认摘要并结束本次问诊", "confirm_summary"),
                 QuickReply("我需要更正", "correct_summary"),
             ]
             if needs_confirmation

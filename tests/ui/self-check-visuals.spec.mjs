@@ -24,7 +24,6 @@ for (const [name, width, height] of [
       await expect(page.locator(".facts-panel")).toBeHidden();
     }
     const input = page.getByRole("textbox", { name: "输入你的描述" });
-    await input.fill("测量时间还没填写");
     const before = await degreeSnapshot(page, id);
     const task = page.locator("#active-task");
     const captions = ["擦干腋窝", "探头放在腋窝中央", "等待完成，再记录"];
@@ -58,6 +57,7 @@ for (const [name, width, height] of [
         });
       });
       expect(geometry.filter((item) => !item.visible)).toEqual([]);
+      if (step < 2) await expect(input).toBeHidden();
       await page.screenshot({
         path: info.outputPath(`${name}-step-${step + 1}.png`),
       });
@@ -65,6 +65,8 @@ for (const [name, width, height] of [
         await task.getByRole("button", { name: "下一步", exact: true }).click();
       if (step < 2) await expect(task.locator(".step-text")).toBeFocused();
     }
+    await expect(input).toBeVisible();
+    await input.fill("测量时间还没填写");
     await task.locator(".task-details > summary").click();
     await expect(task.locator(".step-full-list")).toContainText(
       "记录数值、腋温和测量时间",
@@ -80,6 +82,23 @@ for (const [name, width, height] of [
     expect(await degreeSnapshot(page, id)).toEqual(before);
   });
 }
+
+test("the composer appears only when the temperature guide reaches the input step", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await reachSelfCheck(page, "发热");
+  const task = page.locator("#active-task .illustrated-task");
+  const input = page.getByRole("textbox", { name: "输入你的描述" });
+  await expect(task).toHaveAttribute("data-guide-step", "1");
+  await expect(input).toBeHidden();
+  await task.getByRole("button", { name: "下一步", exact: true }).click();
+  await expect(task).toHaveAttribute("data-guide-step", "2");
+  await expect(input).toBeHidden();
+  await task.getByRole("button", { name: "下一步", exact: true }).click();
+  await expect(task).toHaveAttribute("data-guide-step", "3");
+  await expect(input).toBeVisible();
+});
 
 test("body diagram clicks and keyboard selection keep a draft until explicit confirmation", async ({
   page,

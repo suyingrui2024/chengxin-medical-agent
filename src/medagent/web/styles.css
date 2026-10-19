@@ -4369,8 +4369,8 @@ input[type="password"],
 }
 .summary-grid .summary-item > span {
   color: var(--primary);
-  font-size: 12px;
-  padding-right: 38px;
+  font-size: 14px;
+  padding-right: 52px;
 }
 .summary-grid .summary-item strong {
   color: var(--ink);
@@ -4383,11 +4383,12 @@ input[type="password"],
   position: absolute;
   top: 6px;
   right: 6px;
-  min-height: 34px;
+  min-width: 44px;
+  min-height: 44px;
 }
 .summary-provenance {
   margin-top: 6px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
 }
 .summary-provenance summary {
@@ -4395,7 +4396,7 @@ input[type="password"],
   min-height: 44px;
   width: fit-content;
   align-content: center;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--primary);
 }
 .summary-provenance .summary-evidence {
@@ -5377,7 +5378,7 @@ body[data-mode="patient"] .task-header {
   gap: 7px 10px;
   margin: -2px 0 14px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.6;
 }
 .summary-review-status strong,
@@ -5386,19 +5387,32 @@ body[data-mode="patient"] .task-header {
   background: var(--light);
   border: 1px solid var(--line);
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 550;
   line-height: 1.4;
   padding: 3px 7px;
 }
 .summary-correction-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   margin: -3px 0 14px;
   padding: 9px 11px;
   color: var(--primary);
   background: var(--selected);
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.6;
+}
+.summary-undo {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 10px;
+  color: var(--primary);
+  background: var(--surface);
+  border-color: var(--line-strong);
 }
 .summary-record-state {
   display: flex;
@@ -5417,8 +5431,36 @@ body[data-mode="patient"] .task-header {
   margin: 0;
 }
 .summary-route-action {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.8;
+}
+.summary-risk-triggers {
+  margin-top: 12px;
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.summary-risk-triggers summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  font-weight: 550;
+}
+.summary-risk-triggers p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+.structured-notice .notice-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 2px 0 10px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--on-danger, #fff);
+  background: var(--red);
+  font-size: 16px;
+  font-weight: 650;
 }
 
 /* During a patient self-check, retain only the current action and urgent help. */

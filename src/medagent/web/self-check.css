@@ -60,6 +60,10 @@ body:has(#active-task .illustrated-task) .composer-note {
   clip-path: inset(50%);
   margin: 0;
 }
+body:has(#active-task .illustrated-task[data-guide-step="1"]) #composer,
+body:has(#active-task .illustrated-task[data-guide-step="2"]) #composer {
+  display: none;
+}
 .illustrated-task .task-stage {
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 24px;

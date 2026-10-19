@@ -405,10 +405,16 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         ):
             state.phase = Phase.CLOSED
             state.closed_reason = "confirmed_by_user"
+            state.active_question = None
             return self._deliver(
                 state,
                 AgentReply(
-                    "已核对本次摘要。可以把它提供给接诊医生；情况有变化时请重新评估。", Phase.CLOSED, kind="closed"
+                    "你已确认本次摘要，会谈现已结束。可以把它提供给接诊医生；情况有变化时请重新评估。",
+                    Phase.CLOSED,
+                    kind="closed",
+                    summary=self._summary_payload(
+                        state, review_status="confirmed_by_user"
+                    ),
                 ),
                 turn_id,
             )
@@ -944,7 +950,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             if state.pending_self_checks:
                 reply.message += "你提出的图示请求尚未执行，未完成的筛查不能当作阴性。"
             reply.quick_replies = [
-                QuickReply("摘要准确", "confirm_summary"),
+                QuickReply("确认摘要并结束本次问诊", "confirm_summary"),
                 QuickReply("我需要更正", "correct_summary"),
             ]
             return reply

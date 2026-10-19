@@ -291,6 +291,45 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         parts = path.strip("/").split("/")
         if (
+            len(parts) == 6
+            and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "facts"
+            and parts[5] == "restore"
+        ):
+            payload = self._read_json()
+            if payload is None:
+                return
+            expected_fact_id = payload.get("expected_fact_id")
+            if not isinstance(expected_fact_id, str) or not expected_fact_id:
+                self._error(
+                    HTTPStatus.BAD_REQUEST, "invalid_fact_version", "请从最新记录撤销更正"
+                )
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                with engine._session_locks[parts[2]]:
+                    reply = engine.restore_fact(
+                        parts[2], parts[4], expected_fact_id
+                    )
+                    response = {
+                        "reply": reply.to_dict(),
+                        "state": engine.state(parts[2]).to_dict(),
+                    }
+            except KeyError:
+                self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
+                return
+            except ConsultationBusyError as exc:
+                self._error(HTTPStatus.CONFLICT, "consultation_busy", str(exc))
+                return
+            except StaleActionError as exc:
+                self._error(HTTPStatus.CONFLICT, "stale_fact", str(exc))
+                return
+            except ValueError as exc:
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_restore", str(exc))
+                return
+            self._json(response)
+            return
+        if (
             len(parts) == 5
             and parts[0:2] == ["api", "sessions"]
             and parts[3] == "facts"

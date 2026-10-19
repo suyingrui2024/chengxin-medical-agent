@@ -120,6 +120,7 @@ def reply_presentation(reply):
                         "message": reply["message"],
                         "items": reply["summary"].get("triggers", []),
                         "level": "emergency",
+                        "action_label": "现在拨打 120",
                     },
                 )
             )

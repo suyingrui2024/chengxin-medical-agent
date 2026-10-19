@@ -91,7 +91,9 @@ test("patient conversation, self-check, history, evidence and export use actual 
     path: `${shots}/09-structured-summary.png`,
     fullPage: true,
   });
-  await page.getByRole("button", { name: "摘要准确", exact: true }).click();
+  await page
+    .getByRole("button", { name: "确认摘要并结束本次问诊", exact: true })
+    .click();
   await expect(page.locator("#composer")).toBeHidden();
   await page.getByLabel("界面模式").selectOption("developer");
   await page.getByRole("button", { name: "查看本次运行记录" }).click();

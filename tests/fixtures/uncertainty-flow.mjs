@@ -115,7 +115,9 @@ export async function exerciseUncertainReports(page, screenshot) {
   expect(
     data.events.filter((event) => event.event_type === "model.requested"),
   ).toHaveLength(0);
-  await page.getByRole("button", { name: "摘要准确", exact: true }).click();
+  await page
+    .getByRole("button", { name: "确认摘要并结束本次问诊", exact: true })
+    .click();
   await expect(page.locator("#composer")).toBeHidden();
   await expect(page.locator(".summary-edit:enabled")).toHaveCount(0);
   await expect(page.locator(".summary-card").last()).toContainText(updated);
