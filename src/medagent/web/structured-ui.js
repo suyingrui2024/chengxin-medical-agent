@@ -410,6 +410,7 @@ export function replyEnvelope(reply) {
               title: reply.summary.care_route,
               message: reply.message,
               items: reply.summary.triggers || [],
+              level: "emergency",
             },
           }
         : { id: `summary:${id}`, type: "summary", data: reply.summary },
@@ -799,10 +800,24 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       text(data.title);
       if (data.message !== undefined) text(data.message);
       list(data.items).forEach(text);
+      if (
+        data.level !== undefined &&
+        !["emergency", "urgent", "routine"].includes(data.level)
+      )
+        throw new Error("Invalid notice level");
     },
     (data) => {
-      const node = el("article", "structured-notice");
+      const level = data.level || "emergency";
+      const node = el("article", `structured-notice level-${level}`);
       node.setAttribute("role", "alert");
+      node.dataset.level = level;
+      node.append(
+        el(
+          "p",
+          "notice-level",
+          level === "emergency" ? "立即行动" : "需要尽快处理",
+        ),
+      );
       const heading = el("div", "notice-heading");
       heading.append(visualIcon("shield"), el("h2", "", data.title));
       node.append(heading);
@@ -1068,14 +1083,14 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         if (!context.preview && (context.readOnly || context.isBusy?.()))
           return;
         step--;
-        update();
+        update({ focusInstruction: true });
       });
       const next = button("下一步", () => {
         if (!context.preview && (context.readOnly || context.isBusy?.()))
           return;
         if (step < data.steps.length - 1) {
           step++;
-          update();
+          update({ focusInstruction: true });
         } else context.onAnswer?.();
       });
       controls.append(previous, next);
@@ -1101,7 +1116,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         stage.replaceChildren(figure, guide);
       }
       card.append(stage);
-      function update() {
+      function update({ focusInstruction = false } = {}) {
         step = Math.max(0, Math.min(step, data.steps.length - 1));
         if (compactGuide) card.dataset.guideStep = String(step + 1);
         taskProgress.set(progressKey, step);
@@ -1155,6 +1170,10 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         next.disabled =
           next.dataset.ready !== "true" ||
           (!context.preview && Boolean(context.isBusy?.()));
+        if (focusInstruction) {
+          instruction.tabIndex = -1;
+          instruction.focus({ preventScroll: true });
+        }
       }
       update();
       const details = compactGuide
@@ -1230,6 +1249,23 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       card.append(
         el("p", "summary-intro", "请核对已记录的信息。“未知”表示尚未确认。"),
       );
+      const review = el("div", "summary-review-status");
+      review.setAttribute("role", "status");
+      review.append(
+        el("strong", "", context.readOnly ? "当时已完成核对" : "待本次核对"),
+        el(
+          "span",
+          "",
+          context.readOnly
+            ? "展开记录可回看原话与来源。"
+            : "展开记录可查看原话与来源；不准确可直接更正。",
+        ),
+      );
+      card.append(review);
+      if (context.reviewFeedback)
+        card.append(
+          el("p", "summary-correction-feedback", context.reviewFeedback),
+        );
       const groups = [
         { title: "当前不适", icon: "activity", items: [] },
         { title: "观察记录", icon: "person", items: [] },
@@ -1270,6 +1306,12 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
             renderLocationChips(item.structured_input.answers),
           );
         }
+        const recordState = el("div", "summary-record-state");
+        recordState.append(
+          el("span", "", item.structured_input ? "已确认选项" : "系统整理"),
+          el("span", "", context.readOnly ? "已核对" : "待核对"),
+        );
+        value.append(recordState);
         if (item.key !== "temperature_c" || item.evidence || item.context) {
           const provenance = el("details", "summary-provenance");
           const reported = ["patient", "caregiver"].includes(item.source);
@@ -1469,13 +1511,26 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         section.append(grid);
         card.append(section);
       }
-      card.append(
-        el(
-          "div",
-          `summary-route ${data.risk_level === "urgent" ? "urgent" : ""}`,
-          data.care_route,
-        ),
+      const riskLevel = ["emergency", "urgent", "routine"].includes(
+        data.risk_level,
+      )
+        ? data.risk_level
+        : "routine";
+      const route = el("section", `summary-route ${riskLevel}`);
+      route.setAttribute(
+        "aria-label",
+        riskLevel === "urgent" ? "尽快就医评估建议" : "下一步建议",
       );
+      if (riskLevel === "urgent") route.setAttribute("role", "alert");
+      route.append(
+        el(
+          "p",
+          "summary-route-label",
+          riskLevel === "urgent" ? "尽快就医评估" : "下一步建议",
+        ),
+        el("p", "summary-route-action", data.care_route),
+      );
+      card.append(route);
       if (data.return_now_if.length) {
         const details = el("details");
         details.append(

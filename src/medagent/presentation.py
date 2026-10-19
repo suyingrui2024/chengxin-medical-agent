@@ -119,6 +119,7 @@ def reply_presentation(reply):
                         "title": reply["summary"]["care_route"],
                         "message": reply["message"],
                         "items": reply["summary"].get("triggers", []),
+                        "level": "emergency",
                     },
                 )
             )

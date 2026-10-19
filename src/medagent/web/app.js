@@ -92,6 +92,7 @@ const state = {
   catalog: null,
   capabilityBusy: false,
   taskHistory: false,
+  lastCorrection: null,
   shownCalculations: new Map(),
 };
 let pollTimer = null;
@@ -448,6 +449,10 @@ function summaryContext(
   return {
     readOnly,
     actionId,
+    reviewFeedback:
+      state.lastCorrection?.actionId === actionId
+        ? state.lastCorrection.message
+        : null,
     locationRevisionAction: revisionAction,
     onReviseLocation: (factId) => {
       if (
@@ -589,6 +594,8 @@ function syncSummaryEdits() {
   });
 }
 function renderReply(reply, { replay = false } = {}) {
+  if (!replay && state.lastCorrection?.actionId !== reply.action_id)
+    state.lastCorrection = null;
   for (const block of structuredUI.blocks(replyEnvelope(reply))) {
     if (
       ![
@@ -639,6 +646,10 @@ function syncTaskFocus() {
     task &&
     state.case?.active_task === task.id &&
     state.case?.phase !== "closed",
+  );
+  document.body.classList.toggle(
+    "task-focused",
+    active && !state.taskHistory && state.workspaceMode === "patient",
   );
   document.body.classList.toggle(
     "location-focused",
@@ -2053,8 +2064,13 @@ $("#edit-form").addEventListener("submit", async (event) => {
         if (key.startsWith(prefix)) taskProgress.delete(key);
     }
     renderCase(data.state);
+    state.lastCorrection = {
+      actionId: data.reply.action_id,
+      message: `已更新“${names[editing.key]}”，请核对受影响的内容。`,
+    };
     renderReply(data.reply);
     $("#edit-dialog").close();
+    toast(`已更新“${names[editing.key]}”，摘要已重新整理。`);
     await Promise.all([loadEvents(), refreshSessions()]);
   } catch (error) {
     $("#edit-feedback").textContent = error.message;

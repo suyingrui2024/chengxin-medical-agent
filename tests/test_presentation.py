@@ -91,6 +91,7 @@ class PresentationTests(unittest.TestCase):
         self.assertEqual(blocks[-1]["type"], "notice")
         self.assertEqual(blocks[-1]["data"]["title"], "立即急救")
         self.assertEqual(blocks[-1]["data"]["message"], reply.message)
+        self.assertEqual(blocks[-1]["data"]["level"], "emergency")
 
     def test_step_assets_cannot_load_external_content_or_mismatch_steps(self):
         registry = load_registry()

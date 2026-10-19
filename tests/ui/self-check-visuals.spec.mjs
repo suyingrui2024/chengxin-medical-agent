@@ -18,6 +18,11 @@ for (const [name, width, height] of [
     await page.setViewportSize({ width, height });
     await page.goto("/");
     const id = await reachSelfCheck(page, "发热");
+    if (width > 980) {
+      await expect(page.locator("body")).toHaveClass(/task-focused/);
+      await expect(page.locator(".sidebar")).toBeHidden();
+      await expect(page.locator(".facts-panel")).toBeHidden();
+    }
     const input = page.getByRole("textbox", { name: "输入你的描述" });
     await input.fill("测量时间还没填写");
     const before = await degreeSnapshot(page, id);
@@ -58,6 +63,7 @@ for (const [name, width, height] of [
       });
       if (step < 2)
         await task.getByRole("button", { name: "下一步", exact: true }).click();
+      if (step < 2) await expect(task.locator(".step-text")).toBeFocused();
     }
     await task.locator(".task-details > summary").click();
     await expect(task.locator(".step-full-list")).toContainText(

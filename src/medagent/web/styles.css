@@ -3959,6 +3959,14 @@ input[type="password"],
   margin-left: 37px;
   font-size: 15px;
 }
+.notice-level,
+.summary-route-label {
+  margin: 0 0 7px;
+  color: currentColor;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+}
 .structured-notice p {
   font-size: 13px;
   line-height: 1.8;
@@ -3981,6 +3989,14 @@ input[type="password"],
   font-size: 17px;
   margin: 16px 0;
   overflow-wrap: anywhere;
+}
+.structured-notice.level-urgent {
+  color: var(--orange);
+  background: var(--warning-bg);
+  border-color: var(--warning-line);
+}
+.structured-notice.level-urgent .notice-reasons {
+  border-color: var(--warning-line);
 }
 .notice-reasons {
   border-top: 1px solid var(--danger-line);
@@ -5351,6 +5367,96 @@ body[data-mode="patient"] .task-header {
   color: var(--primary);
   background: var(--selected);
   border-color: var(--line);
+}
+
+/* Patient summaries make record status legible without repeating the full source text. */
+.summary-review-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 10px;
+  margin: -2px 0 14px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.summary-review-status strong,
+.summary-record-state span {
+  color: var(--primary);
+  background: var(--light);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.4;
+  padding: 3px 7px;
+}
+.summary-correction-feedback {
+  margin: -3px 0 14px;
+  padding: 9px 11px;
+  color: var(--primary);
+  background: var(--selected);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.summary-record-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+.summary-record-state span:last-child {
+  color: var(--muted);
+  background: transparent;
+}
+.summary-route.routine {
+  border: 1px solid var(--line);
+}
+.summary-route p {
+  margin: 0;
+}
+.summary-route-action {
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* During a patient self-check, retain only the current action and urgent help. */
+@media (min-width: 981px) {
+  body[data-mode="patient"].task-focused .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-mode="patient"].task-focused .sidebar,
+  body[data-mode="patient"].task-focused .topbar,
+  body[data-mode="patient"].task-focused #view-consultation .page-heading,
+  body[data-mode="patient"].task-focused .facts-panel {
+    display: none;
+  }
+  body[data-mode="patient"].task-focused main {
+    max-width: 1080px;
+    padding: 18px 28px;
+  }
+  body[data-mode="patient"].task-focused .consult-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  body[data-mode="patient"].task-focused .conversation-panel {
+    height: calc(100dvh - 36px);
+    min-height: 620px;
+  }
+  body[data-mode="patient"].task-focused .task-focus-bar {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  body[data-mode="patient"].task-focused .active-task {
+    padding: 24px 28px;
+  }
+}
+body[data-mode="patient"].task-focused .step-controls button:focus-visible,
+body[data-mode="patient"].task-focused .illustration-zoom:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 4px;
 }
 .field-extent .location-answer-choice {
   display: flex;
