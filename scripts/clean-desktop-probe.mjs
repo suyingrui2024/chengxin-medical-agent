@@ -163,7 +163,7 @@ print(json.dumps({'executable': sys.executable, 'version': sys.version.split()[0
   await page.getByRole("button", { name: "下一步", exact: true }).click();
   await expect(page.locator("#active-task .task-image")).toHaveAttribute(
     "src",
-    "/temperature.svg#step-2",
+    "/neutral-temperature.svg#step-2",
   );
   expect(
     (
@@ -178,14 +178,14 @@ print(json.dumps({'executable': sys.executable, 'version': sys.version.split()[0
     await page.getByRole("button", { name: "上一步", exact: true }).click();
     await expect(page.locator("#active-task .task-image")).toHaveAttribute(
       "src",
-      "/temperature.svg#step-1",
+      "/neutral-temperature.svg#step-1",
     );
     await page.screenshot({ path: "/out/temperature-step-1.png" });
     await page.getByRole("button", { name: "下一步", exact: true }).click();
     await page.getByRole("button", { name: "下一步", exact: true }).click();
     await expect(page.locator("#active-task .task-image")).toHaveAttribute(
       "src",
-      "/temperature.svg#step-3",
+      "/neutral-temperature.svg#step-3",
     );
     await page.screenshot({ path: "/out/temperature-step-3.png" });
     await page.getByRole("button", { name: "上一步", exact: true }).click();

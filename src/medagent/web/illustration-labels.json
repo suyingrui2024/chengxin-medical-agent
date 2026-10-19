@@ -2,26 +2,19 @@
   "schema": "illustration-labels/v1",
   "font": "NotoSansCJKsc-Regular.otf",
   "font_sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
-  "method": "Local glyph outlines, explicit advances and original text anchors; title/desc and label text retained. No external font requests inside SVG images.",
+  "method": "The active temperature illustration uses local vector primitives with title and description text only; labels remain in the accessible HTML step instructions. Body-location labels use local glyph outlines and explicit advances. No external font requests inside SVG images.",
   "files": [
     {
-      "file": "temperature.svg",
-      "editable_source": "assets/illustrations/temperature.svg",
-      "source_sha256": "eaa9b81d13ad4488f2306a088c085e4ccd0fde7f982f9c2fed395a29dba2c10e",
-      "output_sha256": "69bc4ee9953b323aaba91eda27b2195e4ca5f6843ea255fd6be382b93a3db0bd",
+      "file": "neutral-temperature.svg",
+      "editable_source": "src/medagent/web/neutral-temperature.svg",
+      "source_sha256": "baeab16cd4fab03eb40a6a71c292befe6e4f66245dd956348c905ee50160009b",
+      "output_sha256": "baeab16cd4fab03eb40a6a71c292befe6e4f66245dd956348c905ee50160009b",
       "labels": [
-        "1",
-        "先擦干腋窝",
-        "先阅读体温计说明书",
-        "2",
+        "擦干腋窝",
         "腋窝中央",
-        "探头贴在腋窝中央",
-        "位置示意，不代表动作已正确",
-        "3",
-        "夹紧手臂，等测量完成",
-        "等待时长以设备说明为准"
+        "数值、腋温和测量时间"
       ],
-      "outlined_glyphs": 52
+      "outlined_glyphs": 0
     },
     {
       "file": "body-location.svg",

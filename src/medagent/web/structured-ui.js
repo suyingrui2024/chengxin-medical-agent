@@ -939,7 +939,8 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           (item, index) => data.steps[index] === item[0],
         ) &&
         data.step_assets?.every(
-          (value, index) => value === `/temperature.svg#step-${index + 1}`,
+          (value, index) =>
+            value === `/neutral-temperature.svg#step-${index + 1}`,
         ) &&
         data.step_assets.length === temperatureGuide.length;
       if (compactGuide) card.classList.add("illustrated-task");

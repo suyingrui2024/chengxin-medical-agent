@@ -377,3 +377,14 @@ body:has(#active-task .illustrated-task[data-guide-step="2"]) #composer {
     line-height: 1.5;
   }
 }
+@media (max-width: 350px) {
+  .illustrated-task .task-stage {
+    padding-bottom: 2px;
+  }
+  .active-task .illustrated-task .task-image {
+    height: 94px;
+  }
+  .illustrated-task .task-stop {
+    margin-top: 0;
+  }
+}

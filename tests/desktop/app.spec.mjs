@@ -147,7 +147,7 @@ test("desktop app owns its window, private sidecar and shutdown lifecycle", asyn
     await window.getByRole("button", { name: "下一步", exact: true }).click();
     await expect(window.locator("#task-preview .task-image")).toHaveAttribute(
       "src",
-      "/temperature.svg#step-2",
+      "/neutral-temperature.svg#step-2",
     );
     await window.screenshot({
       path: path.join(root, "docs/assets/ui/11-desktop-structured.png"),

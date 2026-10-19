@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">数字体温计腋温测量：局部步骤示意</title>
+  <desc id="desc">三个中性局部图依次表示擦干腋窝、将探头放在腋窝中央并夹紧手臂、读取体温计并记录数值和时间。图示不用于判断动作是否正确。</desc>
+  <view id="step-1" viewBox="0 0 320 360" />
+  <view id="step-2" viewBox="320 0 320 360" />
+  <view id="step-3" viewBox="640 0 320 360" />
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#f7faf5" />
+      <stop offset="1" stop-color="#edf4ed" />
+    </linearGradient>
+    <g id="local-outline" fill="none" stroke="#4d7465" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M78 273V160c0-41 34-74 76-74h18c39 0 70 31 70 70v117" stroke-width="12" />
+      <path d="M78 160c24 1 47 17 58 40l18 39" stroke-width="12" />
+      <path d="M242 160c-24 1-47 17-58 40l-18 39" stroke-width="12" />
+      <path d="M106 274h108" stroke-width="12" />
+    </g>
+    <g id="target">
+      <circle cx="160" cy="223" r="32" fill="#dfeecf" stroke="#4b8069" stroke-width="3" stroke-dasharray="5 6" />
+      <circle cx="160" cy="223" r="7" fill="#2f6c59" />
+    </g>
+    <g id="thermometer" fill="none" stroke="#2f6c59" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="0" y="-13" width="70" height="26" rx="13" fill="#fff" stroke-width="4" />
+      <rect x="15" y="-6" width="27" height="12" rx="3" fill="#cde2d5" stroke="none" />
+      <path d="M70 0h35" stroke-width="7" />
+    </g>
+    <g id="record-card" fill="#fff" stroke="#4d7465" stroke-linejoin="round">
+      <rect x="93" y="86" width="134" height="188" rx="18" stroke-width="4" />
+      <rect x="116" y="112" width="88" height="48" rx="8" fill="#dfeecf" stroke="none" />
+      <path d="M119 190h82M119 216h62M119 242h72" fill="none" stroke-width="7" stroke-linecap="round" />
+    </g>
+  </defs>
+  <rect width="960" height="360" fill="#f3f7f1" />
+  <g aria-label="擦干腋窝" transform="translate(18 18)">
+    <rect width="284" height="324" rx="30" fill="url(#panel)" />
+    <g transform="translate(-18 -8)">
+      <use href="#local-outline" />
+      <use href="#target" />
+      <rect x="121" y="181" width="53" height="42" rx="8" fill="#fff" stroke="#4d7465" stroke-width="3" transform="rotate(-24 147.5 202)" />
+      <path d="m128 196 35-16m-28 30 34-15" fill="none" stroke="#96b9a7" stroke-width="3" stroke-linecap="round" />
+      <path d="M206 157c14 10 23 25 25 42" fill="none" stroke="#2f6c59" stroke-width="4" stroke-linecap="round" />
+      <path d="m228 191 3 11-10-4" fill="none" stroke="#2f6c59" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+  <g aria-label="腋窝中央" transform="translate(338 18)">
+    <rect width="284" height="324" rx="30" fill="url(#panel)" />
+    <g transform="translate(-18 -8)">
+      <use href="#local-outline" />
+      <use href="#target" />
+      <use href="#thermometer" transform="translate(112 235) rotate(-57)" />
+      <path d="M232 145v76" fill="none" stroke="#2f6c59" stroke-width="4" stroke-linecap="round" />
+      <path d="m224 211 8 11 8-11" fill="none" stroke="#2f6c59" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+  <g aria-label="数值、腋温和测量时间" transform="translate(658 18)">
+    <rect width="284" height="324" rx="30" fill="url(#panel)" />
+    <use href="#record-card" transform="translate(-18 -8)" />
+    <use href="#thermometer" transform="translate(108 136) rotate(-90)" />
+    <circle cx="208" cy="137" r="15" fill="#fff" stroke="#4d7465" stroke-width="3" />
+    <path d="M208 128v10l7 5" fill="none" stroke="#2f6c59" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

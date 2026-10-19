@@ -33,10 +33,9 @@ SOURCES = [
     "src/medagent/web/NotoSansCJKsc-Regular.otf",
     "src/medagent/web/fonts-OFL.txt",
     "src/medagent/web/font-sources.json",
-    "src/medagent/web/temperature.svg",
+    "src/medagent/web/neutral-temperature.svg",
     "src/medagent/web/body-location.svg",
     "src/medagent/web/illustration-labels.json",
-    "assets/illustrations/temperature.svg",
     "assets/illustrations/body-location.svg",
 ]
 LABELS = {
@@ -187,7 +186,7 @@ def render(records, version):
             panels = []
             for i, (step, asset) in enumerate(zip(steps, assets), 1):
                 if asset.split("#")[0] not in [
-                    "/temperature.svg",
+                    "/neutral-temperature.svg",
                     "/body-location.svg",
                 ]:
                     raise ValueError("Unapproved illustration path")
@@ -351,9 +350,10 @@ def export(root, output):
                 "source_sha256": item["source_sha256"],
             }
         )
-    (output / "review-form.csv").write_text(
-        stream.getvalue(), encoding="utf-8-sig", newline=""
-    )
+    with (output / "review-form.csv").open(
+        "w", encoding="utf-8-sig", newline=""
+    ) as review_form:
+        review_form.write(stream.getvalue())
     (output / "readme.txt").write_text(
         "澄心问诊 " + version + " · 待审核内容快照\n\n"
         "打开index.html可离线筛选问题、规则、图示和计算能力。所有项目均待审核。\n"

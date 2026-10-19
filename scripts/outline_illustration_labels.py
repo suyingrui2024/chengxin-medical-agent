@@ -116,14 +116,36 @@ def generate(name, font):
     }
 
 
+def neutral_temperature_entry():
+    """Describe the hand-drawn, text-free temperature asset without rewriting it."""
+    target = WEB / "neutral-temperature.svg"
+    original = target.read_bytes()
+    svg = ET.fromstring(original)
+    labels = [
+        group.attrib["aria-label"]
+        for group in svg.findall(".//" + tag("g"))
+        if group.attrib.get("aria-label")
+    ]
+    assert labels == ["擦干腋窝", "腋窝中央", "数值、腋温和测量时间"]
+    assert not svg.findall(".//" + tag("text"))
+    return {
+        "file": target.name,
+        "editable_source": str(target.relative_to(ROOT)),
+        "source_sha256": digest(original),
+        "output_sha256": digest(original),
+        "labels": labels,
+        "outlined_glyphs": 0,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     path = WEB / "NotoSansCJKsc-Regular.otf"
     font = TTFont(path)
-    entries = []
-    for name in ("temperature.svg", "body-location.svg"):
+    entries = [neutral_temperature_entry()]
+    for name in ("body-location.svg",):
         data, entry = generate(name, font)
         target = WEB / name
         if args.check:
@@ -138,7 +160,7 @@ def main():
         "schema": "illustration-labels/v1",
         "font": path.name,
         "font_sha256": digest(path.read_bytes()),
-        "method": "Local glyph outlines, explicit advances and original text anchors; title/desc and label text retained. No external font requests inside SVG images.",
+        "method": "The active temperature illustration uses local vector primitives with title and description text only; labels remain in the accessible HTML step instructions. Body-location labels use local glyph outlines and explicit advances. No external font requests inside SVG images.",
         "files": entries,
     }
     encoded = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode()

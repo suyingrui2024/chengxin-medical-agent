@@ -259,7 +259,7 @@ test("enlarging each temperature step preserves the draft and progress", async (
       await expect(dialog).toBeVisible();
       await expect(dialog.locator("img")).toHaveAttribute(
         "src",
-        new RegExp(`temperature.svg#step-${step}$`),
+        new RegExp(`neutral-temperature.svg#step-${step}$`),
       );
       await contrast(page);
       await page.screenshot({
@@ -283,7 +283,7 @@ test("enlarging each temperature step preserves the draft and progress", async (
 test("missing instructional artwork keeps the written steps available", async ({
   page,
 }) => {
-  await page.route("**/temperature.svg", (route) => route.abort());
+  await page.route("**/neutral-temperature.svg", (route) => route.abort());
   await page.goto("/");
   await reachSelfCheck(page, "发热");
   await expect(page.locator("#active-task figcaption")).toContainText(

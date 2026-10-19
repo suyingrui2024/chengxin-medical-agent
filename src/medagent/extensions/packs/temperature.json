@@ -46,11 +46,11 @@
       "chief_complaint_contains_any": ["发热", "发烧", "低烧", "高烧", "体温"]
     },
     "equipment": ["可正常使用的数字体温计"],
-    "asset": "/temperature.svg",
+    "asset": "/neutral-temperature.svg",
     "step_assets": [
-      "/temperature.svg#step-1",
-      "/temperature.svg#step-2",
-      "/temperature.svg#step-3"
+      "/neutral-temperature.svg#step-1",
+      "/neutral-temperature.svg#step-2",
+      "/neutral-temperature.svg#step-3"
     ],
     "steps": [
       "先阅读体温计说明书；擦干腋窝。",

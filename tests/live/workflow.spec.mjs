@@ -198,7 +198,7 @@ test("synthetic patient completes a native live consultation, emergency routing 
             .click();
           await expect(
             window.locator("#active-task .task-image"),
-          ).toHaveAttribute("src", "/temperature.svg#step-2");
+          ).toHaveAttribute("src", "/neutral-temperature.svg#step-2");
           await window.screenshot({
             path: path.join(artifacts, "live-self-check.png"),
           });
