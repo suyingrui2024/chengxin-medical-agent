@@ -12,6 +12,16 @@
 
 Python 3.10+；DSH 模式另需 Node 22.19+。以下命令从项目根目录运行。
 
+### 平台支持与启动方式
+
+| 平台 | 当前支持范围 | 首次配置 | 日常启动 |
+| --- | --- | --- | --- |
+| Windows 10 19044+／Windows 11 x64 | 已验证的原生桌面版；Windows 11 Arm 可运行 x64 应用 | 在 PowerShell 执行 `scripts/windows.ps1 -Mode Setup`。脚本下载项目专用 Python、Node、Electron 与原生执行器，并创建桌面快捷方式。 | 双击桌面“澄心问诊”，或执行 `scripts/windows.ps1 -Mode Start`。 |
+| Ubuntu／其他 Linux x64 | 已验证 Linux x64 的源码版与桌面打包版 | 准备系统 Python 3.10+；DSH 模式另需系统 Node 22.19+。从源码运行时执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`，可再运行 `npm run desktop:shortcut` 创建 GNOME 启动器。 | 双击“澄心问诊.desktop”，或执行 `./scripts/start-desktop.sh`。打包目录也必须完整保留。 |
+| macOS（Apple Silicon／Intel） | 暂未提供正式支持 | 当前没有 macOS 打包产物、安装器或 CI 验收；不要将 Linux 或 Windows 产物复制到 macOS 运行。 | 暂无受支持的启动方式。 |
+
+上述桌面快捷方式和启动器只提供“点击启动”，不设置登录后或开机自动启动。Windows 的安装与完整验收范围见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)，Linux 的打包与验证细节见 [桌面版使用、打包和验证](docs/桌面应用使用与打包.md)。
+
 ### Windows 原生环境
 
 Windows 使用独立的 Python、Node 和 Electron，直接显示原生 Windows 桌面窗口，无需 WSL。当前目标 Windows 10 19044+／Windows 11 x64。首次配置在项目根目录的普通 PowerShell 中运行：
