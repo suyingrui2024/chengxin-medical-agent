@@ -125,4 +125,4 @@ Linux 回归：完整 DSH 执行与交付检查 30 项通过；项目目录保�
 
 `scripts/windows/gui-check.mjs` 新增六套皮肤的实际切换与偏好文件检查、关闭后重新启动恢复检查，并使用含空格和中文的配置目录。本轮 Windows 工作流已在两套系统的源码与便携包中通过此检查，Server x64 安装后的应用也通过。最终构建包含聚焦当前动作的自检卡片、收起的详细文字，以及重新绘制的三步体温人物图示。
 
-本轮将验收通过的 Windows 实现与可视化更改合并回 `main`，并同步 `windows-native`。最新验收代码为 `ec39f44b1a43143036b82e788cb1df0630341ba0`，验收范围按该代码提交固定；之后的源码变更需单独复验。完整范围、夹具边界与条件跳过见 [本轮 Windows 记录](assets/cancellation-iteration/windows-native.json)。安装器与便携包可从本轮工作流下载，保留 3 天。本轮安装包尚未下载到本地；最近完整下载的本地安装器仍为 `dist/windows-validated/39083192293/installer/Chengxin-Setup-0.11.17-Windows-x64.exe`，对应上一轮 `682caf0`，不能当作本轮构建。旧运行编号目录仍保留各自历史构建。
+本轮将验收通过的 Windows 实现与可视化更改合并回 `main`，并同步 `windows-native`。最新验收代码为 `ec39f44b1a43143036b82e788cb1df0630341ba0`，验收范围按该代码提交固定；之后的源码变更需单独复验。完整范围、夹具边界与条件跳过见 [本轮 Windows 记录](assets/cancellation-iteration/windows-native.json)。推送触发的工作流只验证源码和打包结果，不再保存大体积制品；需要可下载的安装器或便携包时，在 Actions 中手动运行工作流并保持“上传制品”开启，制品保留 3 天。本轮安装包尚未下载到本地；最近完整下载的本地安装器仍为 `dist/windows-validated/39083192293/installer/Chengxin-Setup-0.11.17-Windows-x64.exe`，对应上一轮 `682caf0`，不能当作本轮构建。旧运行编号目录仍保留各自历史构建。

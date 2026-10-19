@@ -6,6 +6,10 @@ on:
         description: Run only the source deadline investigation; not full Windows acceptance
         type: boolean
         default: false
+      publish_artifacts:
+        description: Upload the portable ZIP and installer after a full manual acceptance run
+        type: boolean
+        default: true
   push:
     branches: [windows-native]
 permissions:
@@ -154,18 +158,20 @@ jobs:
           $metadata = Get-Content package.json -Raw | ConvertFrom-Json
           ./scripts/windows/packaged-execution-check.ps1 -ApplicationDirectory "dist/desktop/Chengxin-$($metadata.version)-win32-x64" -PathWithSpaces
       - name: Archive portable native Windows application
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_artifacts }}
         shell: powershell
         run: |
           $metadata = Get-Content package.json -Raw | ConvertFrom-Json
           tar.exe -a -c -f dist/Chengxin-Windows-x64.zip -C "dist/desktop/Chengxin-$($metadata.version)-win32-x64" .
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_artifacts }}
         with:
           name: Chengxin-${{ matrix.artifact }}
           path: dist/Chengxin-Windows-x64.zip
           retention-days: 3
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: ${{ !matrix.execution }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_artifacts && !matrix.execution }}
         with:
           name: Chengxin-Setup-Windows-x64
           path: dist/windows/*.exe
