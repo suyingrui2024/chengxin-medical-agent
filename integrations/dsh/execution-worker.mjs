@@ -764,7 +764,9 @@ async function proxy(request, response) {
         Number.isSafeInteger(value?.turn) &&
         value.turn > 0 &&
         ownership.admitRootTurn(config.id, value.turn, owner);
-      response.writeHead(admitted ? 200 : 409, { "Content-Type": "application/json" });
+      response.writeHead(admitted ? 200 : 409, {
+        "Content-Type": "application/json",
+      });
       response.end(JSON.stringify({ ok: Boolean(admitted) }));
     } catch {
       errorResponse(response, 400);
@@ -976,7 +978,10 @@ async function makeHarness() {
     provider: "deepseek-official",
     model: config.model,
     maxTokens: 8192,
-    initializeTimeoutMs: 20000,
+    // A packaged ProcessContainer can need an extra few seconds for its first
+    // native SDK startup on Windows (for example, while Windows scans the
+    // bundled runtime). Keep this below the owner-side startup budget.
+    initializeTimeoutMs: native ? 40000 : 20000,
     // The owner timer, shared by all descendants, enforces the selected budget.
     requestTimeoutMs: 1820000,
     disposeEofGraceMs: 1500,
@@ -1402,7 +1407,9 @@ async function run(payload) {
     const backgroundWork =
       active !== owned &&
       ([...upstreamRequests.values()].some((owner) => owner === owned) ||
-        ownership.sessionsFor(owned).some((session) => runningAgents.has(session)) ||
+        ownership
+          .sessionsFor(owned)
+          .some((session) => runningAgents.has(session)) ||
         [...clarifications.pending.values()].some(
           (pending) => pending.owned === owned,
         ));

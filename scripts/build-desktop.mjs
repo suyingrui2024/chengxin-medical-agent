@@ -1,13 +1,44 @@
 import { packager } from "@electron/packager";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { readFile, mkdir, mkdtemp, cp, rm } from "node:fs/promises";
+import {
+  access,
+  readFile,
+  mkdir,
+  mkdtemp,
+  cp,
+  readdir,
+  rm,
+} from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const metadata = JSON.parse(
   await readFile(path.join(root, "package.json"), "utf8"),
 );
+async function findCachedWindowsElectronZip() {
+  if (process.platform !== "win32" || !process.env.ELECTRON_CACHE)
+    return undefined;
+  const fileName = `electron-v${metadata.devDependencies.electron}-win32-x64.zip`;
+  try {
+    for (const entry of await readdir(process.env.ELECTRON_CACHE, {
+      withFileTypes: true,
+    })) {
+      if (!entry.isDirectory()) continue;
+      const candidate = path.join(
+        process.env.ELECTRON_CACHE,
+        entry.name,
+        fileName,
+      );
+      try {
+        await access(candidate);
+        return path.dirname(candidate);
+      } catch {}
+    }
+  } catch {}
+  return undefined;
+}
+
 if (!["linux", "win32"].includes(process.platform) || process.arch !== "x64") {
   throw new Error("当前打包目标为 Linux x64 或 Windows x64。");
 }
@@ -63,6 +94,16 @@ try {
       );
     }
   }
+  // Setup verifies Electron before caching it. Reuse that cache on Windows so
+  // Packager does not block on an additional SHASUMS256 network request.
+  const electronZipDir = await findCachedWindowsElectronZip();
+  // Electron Packager otherwise expands more than 1 GB under the system TEMP.
+  // Keep the build-only workspace on the project drive; DSH tests retain their
+  // own host-temp behavior because container-owned session folders need it.
+  const packagerTemp = windows
+    ? path.join(root, ".runtime", "windows", "desktop-packager-temp")
+    : undefined;
+  if (packagerTemp) await mkdir(packagerTemp, { recursive: true });
   const outputs = await packager({
     dir: staging,
     name: `Chengxin-${metadata.version}`,
@@ -74,6 +115,8 @@ try {
     asar: false, // Python and DSH need real filesystem paths.
     prune: false,
     electronVersion: metadata.devDependencies.electron,
+    electronZipDir,
+    tmpdir: packagerTemp,
     ignore: [
       /^\/(?:dist|build|vendor|docs|tests|experiments|test-results|playwright-report|data|scripts|workspaces|\.runtime|\.venv|\.git|\.agents|\.codex)(?:\/|$)/,
       /(?:^|\/)\.env(?:[ .]|$)/,
