@@ -55,9 +55,16 @@ export function requestFor({
       throw new Error("Invalid Windows runtime path");
   }
   const home = join(state, "home"),
-    temporary = join(state, "tmp");
+    temporary = join(state, "tmp"),
+    // DSH's native loader otherwise defaults to the AppContainer profile
+    // under LOCALAPPDATA\\Packages. That profile is container-owned and can
+    // outlive a one-shot ProcessContainer, preventing a caller from removing
+    // its own per-session state directory. Pre-create a state-scoped cache
+    // instead; the loader verifies cached content before it loads it.
+    nativeAddonCache = join(state, "native-addon-cache");
   mkdirSync(home, { recursive: true });
   mkdirSync(temporary, { recursive: true });
+  mkdirSync(nativeAddonCache, { recursive: true });
   const systemRoot = process.env.SystemRoot || process.env.WINDIR;
   if (!systemRoot || !win32.isAbsolute(systemRoot))
     throw new Error("Windows system runtime is unavailable");
@@ -89,6 +96,7 @@ export function requestFor({
     // only this read-only built-in directory, never the host user's modules.
     PSModulePath: join(powerShellRoot, "Modules"),
     PSModuleAnalysisCachePath: join(temporary, "ModuleAnalysisCache"),
+    NARB_NATIVE_CACHE_DIR: nativeAddonCache,
     DSH_HOME: home,
     NO_COLOR: "1",
     // Node's realpath walk lstats drive-root metadata before loading a file.

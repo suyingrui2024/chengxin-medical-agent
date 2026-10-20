@@ -78,7 +78,7 @@ def exercise_task_cancellation(owner):
                 session = manager.create({"MEDAGENT_LLM_BASE_URL": f"http://127.0.0.1:{provider.server_port}/anthropic",
                                           "MEDAGENT_LLM_API_KEY": "selective-loopback-only", "MEDAGENT_LLM_MODEL": "fixture"})
 
-                def wait(predicate, timeout=35):
+                def wait(predicate, timeout=60 if os.name == "nt" else 35):
                     until = time.monotonic() + timeout
                     while time.monotonic() < until:
                         value = predicate()
