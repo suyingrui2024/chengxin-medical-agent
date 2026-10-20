@@ -85,10 +85,16 @@ class MedicalAgentServer(ThreadingHTTPServer):
         return self._patient_store
 
     def server_close(self):
-        self.reviews.close()
-        self.execution.close()
+        reviews = getattr(self, "reviews", None)
+        if reviews is not None:
+            reviews.close()
+        execution = getattr(self, "execution", None)
+        if execution is not None:
+            execution.close()
         super().server_close()
-        self.workspace.close()
+        workspace = getattr(self, "workspace", None)
+        if workspace is not None:
+            workspace.close()
 
 
 class Handler(BaseHTTPRequestHandler):
