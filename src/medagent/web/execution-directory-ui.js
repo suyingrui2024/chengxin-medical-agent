@@ -197,6 +197,7 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
   ) {
     const current = getCurrent();
     if (!current || current.storage_error) return;
+    const focusBeforeLoad = document.activeElement;
     const request = ++generation,
       id = current.id,
       includeHidden = $("execution-directory-hidden").checked;
@@ -261,7 +262,9 @@ export function createDirectoryUI(api, getCurrent, onSelect, onListed) {
       const priorFocus = document.activeElement;
       const fileFocused =
         $("execution-files").contains(priorFocus) ||
-        $("execution-quick-files").contains(priorFocus);
+        $("execution-quick-files").contains(priorFocus) ||
+        $("execution-files").contains(focusBeforeLoad) ||
+        $("execution-quick-files").contains(focusBeforeLoad);
       listingUnavailable = true;
       signature = "";
       const cached =

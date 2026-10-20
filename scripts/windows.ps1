@@ -21,6 +21,9 @@ $previousPipelineEncoding = $OutputEncoding
 $previousPython = $env:MEDAGENT_PYTHON
 $previousNpm = $env:MEDAGENT_NPM_CLI
 $previousElectronMode = $env:ELECTRON_RUN_AS_NODE
+$previousElectronCache = $env:ELECTRON_CACHE
+$previousElectronConfigCache = $env:electron_config_cache
+$previousElectronMirror = $env:ELECTRON_MIRROR
 $previousSecurityProtocol = [Net.ServicePointManager]::SecurityProtocol
 $previousProgress = $ProgressPreference
 $previousNpmCache = $env:npm_config_cache
@@ -109,6 +112,22 @@ function Invoke-ChengxinPython {
     Invoke-ChengxinCommand $python (@('-I', '-X', 'utf8', '-c', $bootstrap, (Join-Path $projectRoot 'src'), $Script) + $ScriptArguments)
 }
 
+function Install-ChengxinElectron {
+    try {
+        Invoke-ChengxinCommand $node @('node_modules/electron/install.js')
+        return
+    } catch {
+        if ($env:ELECTRON_MIRROR) { throw }
+        Write-Warning 'Official Electron download failed; retrying through the mirror with Electron bundled SHA256 verification.'
+    }
+    $env:ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/'
+    try {
+        Invoke-ChengxinCommand $node @('node_modules/electron/install.js')
+    } finally {
+        $env:ELECTRON_MIRROR = $previousElectronMirror
+    }
+}
+
 function Test-ChengxinInstallation {
     Invoke-ChengxinCommand $python @('-I', '-X', 'utf8', '-c', 'import sys,ssl,ctypes;assert sys.version_info[:3]==(3,14,8);print("Windows Python:",sys.version.split()[0])')
     Invoke-ChengxinCommand $node @('-e', 'if(process.platform!=="win32"||process.versions.node!=="22.23.3")process.exit(1);console.log("Windows Node:",process.versions.node)')
@@ -155,10 +174,12 @@ try {
         $env:MEDAGENT_PYTHON = $python
         $env:MEDAGENT_NPM_CLI = $npmCli
         $env:npm_config_cache = Join-Path $runtimeRoot 'npm-cache'
+        $env:ELECTRON_CACHE = Join-Path $runtimeRoot 'electron-cache'
+        $env:electron_config_cache = $env:ELECTRON_CACHE
         Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
         if ($Mode -eq 'Setup') {
             Invoke-ChengxinCommand $node @($npmCli, 'ci', '--ignore-scripts', '--no-audit', '--no-fund')
-            Invoke-ChengxinCommand $node @('node_modules/electron/install.js')
+            Install-ChengxinElectron
             Test-ChengxinInstallation
             if (-not $NoShortcut) { New-ChengxinShortcut }
             Write-Host 'Native Windows installation checks passed. Start with -Mode Start; add -Live to explicitly load .env.'
@@ -191,6 +212,9 @@ try {
     $env:MEDAGENT_PYTHON = $previousPython
     $env:MEDAGENT_NPM_CLI = $previousNpm
     $env:ELECTRON_RUN_AS_NODE = $previousElectronMode
+    $env:ELECTRON_CACHE = $previousElectronCache
+    $env:electron_config_cache = $previousElectronConfigCache
+    $env:ELECTRON_MIRROR = $previousElectronMirror
     [Net.ServicePointManager]::SecurityProtocol = $previousSecurityProtocol
     $ProgressPreference = $previousProgress
     $env:npm_config_cache = $previousNpmCache

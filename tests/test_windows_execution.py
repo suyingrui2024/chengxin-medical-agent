@@ -3,12 +3,12 @@ import json
 import os
 from pathlib import Path
 import sys
-import tempfile
 import time
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tests.test_execution_delivery import Provider, tool, final
+from tests.windows_process_container_temp import process_container_temporary_directory
 from medagent.execution import ExecutionManager
 
 
@@ -34,7 +34,7 @@ class WindowsExecutionTests(unittest.TestCase):
         for mutation in [False, True]:
             with (
                 self.subTest(input_mutation=mutation),
-                tempfile.TemporaryDirectory(prefix="chengxin-inputs-") as raw,
+                process_container_temporary_directory("chengxin-inputs-") as raw,
             ):
                 update = (
                     "p.write_text('bad');"
@@ -194,7 +194,7 @@ class WindowsExecutionTests(unittest.TestCase):
             return final("Native Windows task complete")
 
         provider = Provider(respond)
-        with tempfile.TemporaryDirectory(prefix="chengxin-execution-") as raw:
+        with process_container_temporary_directory("chengxin-execution-") as raw:
             manager = ExecutionManager(root=Path(raw))
             try:
                 session = manager.create(

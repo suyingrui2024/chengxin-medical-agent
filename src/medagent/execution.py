@@ -745,7 +745,12 @@ class ExecutionSession:
                 ],
             }
         )
-        if not self.ready.wait(25):
+        # The first packaged ProcessContainer startup on Windows can be slower
+        # while Defender inspects the bundled native runtime.  Keep a bounded,
+        # platform-specific owner timeout that leaves the SDK enough time to
+        # report its own initialization result.
+        startup_timeout_seconds = 45 if os.name == "nt" else 25
+        if not self.ready.wait(startup_timeout_seconds):
             raise ExecutionError("隔离执行环境未能就绪")
         if process.poll() is not None or self.error:
             raise ExecutionError(self.error or "隔离执行环境启动失败")
