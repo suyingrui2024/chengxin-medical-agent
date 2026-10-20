@@ -83,6 +83,22 @@ export async function createRepeatedObservationModel(extraCommands = []) {
   };
 }
 
+export async function sendPatientText(page, text) {
+  const input = page.getByRole("textbox", { name: "输入你的描述" });
+  if (!(await input.isVisible())) {
+    const guide = page.locator("#active-task .illustrated-task");
+    // The compact measurement guide exposes the composer only after the
+    // patient has reviewed its preparation and placement steps.
+    await expect(guide).toHaveAttribute("data-guide-step", "1");
+    await guide.getByRole("button", { name: "下一步", exact: true }).click();
+    await expect(guide).toHaveAttribute("data-guide-step", "2");
+    await guide.getByRole("button", { name: "下一步", exact: true }).click();
+  }
+  await expect(input).toBeVisible();
+  await input.fill(text);
+  await page.getByRole("button", { name: "发送回答" }).click();
+}
+
 export async function verifyRepeatedObservations(
   page,
   model,
@@ -96,10 +112,7 @@ export async function verifyRepeatedObservations(
   );
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const id = (await (await created).json()).session_id;
-  const send = async (text) => {
-    await page.getByRole("textbox", { name: "输入你的描述" }).fill(text);
-    await page.getByRole("button", { name: "发送回答" }).click();
-  };
+  const send = (text) => sendPatientText(page, text);
   const current = () => page.locator(".summary-card.current-summary");
   const series = () => current().locator(".observation-card");
   await send(opening);
@@ -139,6 +152,9 @@ export async function verifyRepeatedObservations(
       fullPage: true,
     });
   await series().getByRole("button", { name: "再测一次", exact: true }).click();
+  await expect(page.locator("#active-task .step-progress")).toContainText(
+    "1 / 3",
+  );
   await send("38.6还是39.2");
   await expect(page.locator("#active-task .task-feedback")).toBeVisible();
   await page.getByRole("button", { name: "暂时跳过", exact: true }).click();
@@ -221,10 +237,7 @@ export async function verifyResumedObservationQuestion(
 ) {
   await expect(page.getByText("本机服务已连接")).toBeVisible();
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  const send = async (text) => {
-    await page.getByRole("textbox", { name: "输入你的描述" }).fill(text);
-    await page.getByRole("button", { name: "发送回答" }).click();
-  };
+  const send = (text) => sendPatientText(page, text);
   await send(
     "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。",
   );

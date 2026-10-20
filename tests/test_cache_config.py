@@ -71,6 +71,19 @@ class CacheConfigTests(unittest.TestCase):
             self.assertEqual(
                 settings["MEDAGENT_LLM_BASE_URL"], "https://api.deepseek.com"
             )
+            self.assertEqual(settings["MEDAGENT_DSH_REVIEW_MODE"], "shadow")
+
+    def test_env_rejects_an_unknown_background_review_mode(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / ".env"
+            path.write_text(
+                "MEDAGENT_LLM_BASE_URL=https://api.deepseek.com\n"
+                "MEDAGENT_LLM_MODEL=fixture\n"
+                "MEDAGENT_LLM_API_KEY=fixture-key\n"
+                "MEDAGENT_DSH_REVIEW_MODE=unbounded\n"
+            )
+            with self.assertRaisesRegex(ValueError, "MEDAGENT_DSH_REVIEW_MODE"):
+                read_env(path)
 
     def test_dsh_counts_disjoint_cache_tokens_without_double_counting(self):
         usage = dsh_usage(

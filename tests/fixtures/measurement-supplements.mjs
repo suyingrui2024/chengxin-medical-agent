@@ -1,5 +1,8 @@
 import { expect } from "@playwright/test";
-import { createRepeatedObservationModel } from "./repeated-observations.mjs";
+import {
+  createRepeatedObservationModel,
+  sendPatientText,
+} from "./repeated-observations.mjs";
 
 const medication = "昨晚用药物甲2次，具体用量不清楚";
 const secondMedication = "今天用过药物乙，用量不清楚";
@@ -41,10 +44,7 @@ export async function verifyMeasurementSupplements(
   );
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const id = (await (await created).json()).session_id;
-  const send = async (text) => {
-    await page.getByRole("textbox", { name: "输入你的描述" }).fill(text);
-    await page.getByRole("button", { name: "发送回答" }).click();
-  };
+  const send = (text) => sendPatientText(page, text);
   const current = () => page.locator(".summary-card.current-summary");
   await send(
     "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。",
@@ -60,6 +60,7 @@ export async function verifyMeasurementSupplements(
   await current()
     .getByRole("button", { name: "再测一次", exact: true })
     .click();
+  await expect(page.locator("#active-task .illustrated-task")).toBeVisible();
   await send(report);
   await expect(
     page.getByRole("button", { name: "重试这一轮", exact: true }),
@@ -120,6 +121,7 @@ export async function verifyMeasurementSupplements(
   await current()
     .getByRole("button", { name: "再测一次", exact: true })
     .click();
+  await expect(page.locator("#active-task .illustrated-task")).toBeVisible();
   await send(secondReport);
   await expect(
     current().locator(".summary-item[data-fact-key='medications_taken']"),

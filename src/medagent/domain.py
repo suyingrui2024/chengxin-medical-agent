@@ -119,6 +119,9 @@ class CaseState:
     subject_resume: Optional[Any] = None
     subject_candidate: Optional[Any] = None
     background_review: Optional[Dict[str, Any]] = None
+    report_drafts: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    report_items: List[Dict[str, Any]] = field(default_factory=list)
+    committed_phase: Optional[Phase] = None
 
     def record(self, fact: Fact) -> None:
         previous = self.facts.get(fact.key)
@@ -145,6 +148,9 @@ class CaseState:
             "session_id": self.session_id,
             "consultation_subject": subject_profile(self),
             "phase": self.phase.value,
+            "committed_phase": (
+                self.committed_phase.value if self.committed_phase else None
+            ),
             "facts": {key: fact.to_dict() for key, fact in self.facts.items()},
             "history": [fact.to_dict() for fact in self.history],
             "asked_questions": list(self.asked_questions),
@@ -169,10 +175,13 @@ class CaseState:
             "pending_calculation": self.pending_calculation,
             "pending_self_checks": [dict(item) for item in self.pending_self_checks],
             "observation_attempts": [dict(item) for item in self.observation_attempts],
+            "report_items": [dict(item) for item in self.report_items],
             "background_review": (
                 {
                     "status": self.background_review.get("status"),
+                    "mode": self.background_review.get("mode"),
                     "source_revision": self.background_review.get("source_revision"),
+                    "duration_ms": self.background_review.get("duration_ms"),
                     "actionable_count": sum(
                         len(items)
                         for items in self.background_review.get("advice", {}).values()

@@ -155,29 +155,32 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             present = {"type": "string", "minLength": 1, "maxLength": 2000}
         return {"present": present, "absent_or_unknown_value": None}
 
-    def create_session(self):
-        state = self._create_state()
-        state.active_question = "chief_complaint"
-        state.asked_questions = ["chief_complaint"]
-        reply = self._ask(
-            state, self.content.question("chief_complaint"), "先听取主诉，自然叙述后再补关键缺口"
-        )
-        reply.message = "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。"
-        state.transcript.append({"role": "assistant", "content": reply.message})
-        self._record_reply(state, reply, "session_start", "开放式开场")
-        self.events.append(
-            Event(
-                state.session_id,
-                "agent.started",
-                {
-                    "backend": self.backend.name,
-                    "reply": reply.to_dict(),
-                    "policy_version": "medical-tools-v0.11.16",
-                    "prompt_sha256": self.prefix_sha256,
-                    "prompt_layout": "static-catalog-prefix/v1",
-                },
+    def create_session(self, request_id=None):
+        trace_id = str(uuid4())
+        state = self._create_state(trace_id, request_id)
+        try:
+            state.active_question = "chief_complaint"
+            state.asked_questions = ["chief_complaint"]
+            reply = self._ask(
+                state, self.content.question("chief_complaint"), "先听取主诉，自然叙述后再补关键缺口"
             )
-        )
+            reply.message = "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。"
+            self._record_reply(state, reply, "session_start", "开放式开场")
+            self.events.append(
+                Event(
+                    state.session_id,
+                    "agent.started",
+                    {
+                        "backend": self.backend.name,
+                        "reply": reply.to_dict(),
+                        "policy_version": "medical-tools-v0.11.16",
+                        "prompt_sha256": self.prefix_sha256,
+                        "prompt_layout": "static-catalog-prefix/v1",
+                    },
+                )
+            )
+        finally:
+            self.events.clear_trace(state.session_id)
         return state, reply
 
     def _interrupt_or_reject(self, state, text, explicit_help=False):
@@ -205,9 +208,18 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             )
             turn = DecisionTurn()
             self._active_turns[session_id] = turn
+            trace_id = str(uuid4())
+            decision_id = str(uuid4())
+            self.events.bind_trace(
+                session_id,
+                trace_id,
+                user_input.request_id,
+                decision_id,
+            )
             try:
                 return self._submit(state, user_input)
             finally:
+                self.events.clear_trace(session_id)
                 if self._active_turns.get(session_id) is turn:
                     self._active_turns.pop(session_id, None)
 
@@ -529,9 +541,17 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 {key: value for key, value in result.items() if key != "presentation"}
                 for result in state.calculations[-3:]
             ],
+            "patient_confirmed_report_items": [
+                {
+                    key: item.get(key)
+                    for key in ("name", "reported_value", "unit", "reference_range")
+                }
+                for item in state.report_items[-20:]
+            ],
             **(
                 {"background_review": state.background_review["advice"]}
                 if state.background_review
+                and state.background_review.get("mode") == "advisory"
                 and state.background_review.get("status") == "completed"
                 and state.background_review.get("source_revision") == state.revision
                 and isinstance(state.background_review.get("advice"), dict)
@@ -976,7 +996,6 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             reply.quick_replies = [QuickReply("重试这一轮", "retry_turn")]
         elif reply.kind != "subject_change":
             state.pending_input = None
-        state.transcript.append({"role": "assistant", "content": reply.message})
         self._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
         return reply
 

@@ -4,6 +4,7 @@ import {
   calculationEnvelope,
 } from "./structured-ui.js";
 import { createExecutionUI } from "./execution-ui.js";
+import { createPatientRecordsUI } from "./patient-records-ui.js";
 import { renderLocationChips } from "./location-answer-ui.js";
 
 const $ = (selector) => document.querySelector(selector);
@@ -94,10 +95,13 @@ const state = {
   taskHistory: false,
   lastCorrection: null,
   shownCalculations: new Map(),
+  handoffText: "",
+  reportDraft: null,
 };
 let pollTimer = null;
 let toastTimer = null;
 const executionUI = createExecutionUI(api);
+const patientRecordsUI = createPatientRecordsUI(api, toast);
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -211,6 +215,9 @@ function setBusy(busy) {
   $("#start-consultation").disabled = busy;
   $("#message-input").disabled = busy;
   $("#urgent-help").disabled = state.priorityBusy || !state.sessionId;
+  $("#delete-current-session").disabled = busy || !state.sessionId;
+  $("#open-report-draft").disabled = busy || !state.sessionId;
+  $("#open-handoff").disabled = busy || !state.sessionId;
   $("#busy-indicator").hidden = !busy;
   $("#messages").setAttribute("aria-busy", String(busy));
   document
@@ -219,6 +226,11 @@ function setBusy(busy) {
     )
     .forEach((node) => {
       node.disabled = busy;
+    });
+  document
+    .querySelectorAll(".report-draft-row .secondary-button")
+    .forEach((node) => {
+      node.disabled = busy || node.dataset.confirmed === "true";
     });
   syncEventPolling();
   if (busy && state.sessionId) {
@@ -337,6 +349,7 @@ function navigate(view) {
   if (
     ![
       "consultation",
+      "records",
       "history",
       "tasks",
       "inspect",
@@ -352,7 +365,11 @@ function navigate(view) {
     view = "consultation";
   state.view = view;
   $("#workspace-storage-note").textContent =
-    view === "execution" ? "文件与任务记录保存在本机" : "会谈仅保留到服务关闭";
+    view === "execution"
+      ? "文件与任务记录保存在本机"
+      : view === "records"
+        ? "健康档案保存在本机"
+        : "会谈仅保留到服务关闭";
   document.querySelectorAll(".view").forEach((node) => {
     const active = node.id === `view-${view}`;
     node.hidden = !active;
@@ -365,6 +382,7 @@ function navigate(view) {
   });
   $("#page-title").textContent = {
     consultation: "问诊",
+    records: "健康档案",
     history: "会谈记录",
     tasks: "图示任务库",
     inspect: "运行检查",
@@ -374,6 +392,8 @@ function navigate(view) {
   $("#sidebar").classList.remove("open");
   if (view === "history")
     refreshSessions().catch((error) => toast(error.message));
+  if (view === "records")
+    patientRecordsUI.refresh().catch((error) => toast(error.message));
   if (view === "tasks") renderLibrary();
   if (view === "execution") executionUI.refresh();
   if (view === "capabilities" && !state.capabilityBusy) {
@@ -953,6 +973,9 @@ function renderCase(data) {
     .querySelector(".conversation-actions")
     .classList.toggle("show-help", data.phase !== "closed");
   document.body.classList.add("has-session");
+  $("#delete-current-session").hidden = false;
+  $("#open-report-draft").hidden = false;
+  $("#open-handoff").hidden = false;
   $("#welcome").hidden = true;
   const phase = data.phase;
   const risk = data.risk?.level;
@@ -971,9 +994,11 @@ function renderCase(data) {
   if (!reviewStatus.hidden)
     reviewStatus.textContent =
       review.status === "completed"
-        ? review.actionable_count
-          ? `后台复核发现 ${review.actionable_count} 项待确认`
-          : "后台复核完成"
+        ? review.mode === "shadow"
+          ? "后台复核完成"
+          : review.actionable_count
+            ? `后台复核发现 ${review.actionable_count} 项待确认`
+            : "后台复核完成"
         : "后台复核中";
   syncEventPolling();
   const activities = {
@@ -1058,6 +1083,7 @@ function renderCase(data) {
         .replaceChildren(renderLocationChips(fact.structured_input.answers));
     $("#fact-list").append(row);
   }
+  renderReportItems(data.report_items || []);
   updateComposer();
   (data.calculations || []).forEach(appendCalculation);
   syncTaskFocus();
@@ -1068,6 +1094,215 @@ function emptyState(message) {
   const node = el("div", "empty-state compact");
   node.append(icon("cards"), el("p", "", message));
   return node;
+}
+function renderReportItems(items) {
+  const summary = $("#report-items-summary");
+  summary.replaceChildren();
+  summary.hidden = !items.length;
+  if (!items.length) return;
+  const heading = el("div", "report-items-heading");
+  heading.append(
+    el("span", "", "已确认报告"),
+    el("small", "", `${items.length} 项`),
+  );
+  const list = el("div", "report-items-list");
+  items.forEach((item) => {
+    const row = el("div", "report-item-row");
+    const label = [item.reported_value, item.unit].filter(Boolean).join(" ");
+    row.append(el("strong", "", item.name), el("span", "", label || "已确认"));
+    row.append(
+      button("移除", "fact-edit", () => removeReportItem(item.report_item_id)),
+    );
+    list.append(row);
+  });
+  summary.append(heading, list);
+}
+function reportItemText(item) {
+  return [item.name, item.reported_value, item.unit, item.reference_range]
+    .filter(Boolean)
+    .join(" · ");
+}
+function renderReportDraft(draft) {
+  const target = $("#report-draft-result");
+  target.replaceChildren();
+  if (!draft) return;
+  if (draft.missing_context?.length)
+    target.append(
+      el("p", "report-note", `还需要：${draft.missing_context.join("、")}`),
+    );
+  if (!draft.items?.length) {
+    target.append(
+      el(
+        "p",
+        "report-note",
+        "未识别到可逐项核对的内容。可尝试按“项目 数值 单位 参考范围”分行粘贴。",
+      ),
+    );
+    return;
+  }
+  target.append(el("h3", "report-result-title", "逐项确认"));
+  const list = el("div", "report-draft-list");
+  draft.items.forEach((item) => {
+    const row = el("div", "report-draft-row");
+    row.append(el("strong", "", item.name), el("p", "", reportItemText(item)));
+    if (item.source_excerpt)
+      row.append(el("small", "", `原文：${item.source_excerpt}`));
+    const confirmed = item.status === "confirmed";
+    const confirm = button(
+      confirmed ? "已确认" : "确认加入",
+      "secondary-button",
+      () => confirmReportItem(draft.draft_id, item.source_item_id),
+    );
+    confirm.dataset.confirmed = String(confirmed);
+    confirm.disabled = confirmed || state.busy;
+    row.append(confirm);
+    list.append(row);
+  });
+  target.append(list);
+}
+async function openReportDraft() {
+  if (!state.sessionId) return;
+  $("#report-feedback").textContent = "";
+  $("#report-dialog").showModal();
+  $("#report-text").focus();
+}
+async function submitReportDraft(event) {
+  event.preventDefault();
+  if (!state.sessionId || state.busy) return;
+  const text = $("#report-text").value.trim();
+  if (!text) return;
+  const feedback = $("#report-feedback");
+  feedback.textContent = "";
+  setBusy(true);
+  try {
+    const data = await api(`/api/sessions/${state.sessionId}/report-drafts`, {
+      method: "POST",
+      body: { text, format: $("#report-format").value },
+    });
+    state.reportDraft = data.draft;
+    renderReportDraft(data.draft);
+    feedback.textContent = data.draft.items.length
+      ? "请核对每一项后再加入本次记录。"
+      : "尚未写入任何问诊记录。";
+  } catch (error) {
+    feedback.textContent = error.message;
+    feedback.classList.add("error");
+  } finally {
+    setBusy(false);
+  }
+}
+async function confirmReportItem(draftId, sourceItemId) {
+  if (!state.sessionId || state.busy) return;
+  setBusy(true);
+  try {
+    const data = await api(
+      `/api/sessions/${state.sessionId}/report-drafts/${draftId}/confirm`,
+      { method: "POST", body: { source_item_id: sourceItemId } },
+    );
+    renderCase(data.state);
+    if (state.reportDraft?.draft_id === draftId) {
+      const item = state.reportDraft.items.find(
+        (entry) => entry.source_item_id === sourceItemId,
+      );
+      if (item) item.status = "confirmed";
+      renderReportDraft(state.reportDraft);
+    }
+    toast("已加入本次记录。可随时移除。");
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+async function removeReportItem(itemId) {
+  if (!state.sessionId || state.busy) return;
+  if (!window.confirm("从本次记录中移除此报告项目？")) return;
+  setBusy(true);
+  try {
+    const data = await api(
+      `/api/sessions/${state.sessionId}/report-items/${itemId}`,
+      {
+        method: "DELETE",
+      },
+    );
+    renderCase(data.state);
+    toast("已移除该报告项目。");
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+function handoffValue(value) {
+  return typeof value === "object"
+    ? JSON.stringify(value)
+    : String(value ?? "");
+}
+function handoffLines(handoff) {
+  const rows = handoff.facts.map(
+    (item) => `${item.label}：${handoffValue(item.value)}`,
+  );
+  if (handoff.report_items.length) {
+    rows.push("已确认报告：");
+    handoff.report_items.forEach((item) =>
+      rows.push(`- ${reportItemText(item)}`),
+    );
+  }
+  if (handoff.needs_confirmation.length)
+    rows.push(
+      `待补充：${handoff.needs_confirmation.map((item) => item.label).join("、")}`,
+    );
+  return [handoff.title, ...rows, handoff.limitations].join("\n");
+}
+function renderHandoff(handoff, renderDialog = true) {
+  state.handoffText = handoffLines(handoff);
+  if (!renderDialog) return;
+  const target = $("#handoff-content");
+  target.replaceChildren();
+  const addSection = (title, items, renderer) => {
+    if (!items.length) return;
+    const section = el("section", "handoff-section");
+    section.append(el("h3", "", title));
+    const list = el("div", "handoff-list");
+    items.forEach((item) => list.append(renderer(item)));
+    section.append(list);
+    target.append(section);
+  };
+  addSection("已记录", handoff.facts, (item) =>
+    el("p", "", `${item.label}：${handoffValue(item.value)}`),
+  );
+  addSection("已确认报告", handoff.report_items, (item) =>
+    el("p", "", reportItemText(item)),
+  );
+  addSection("仍待补充", handoff.needs_confirmation, (item) =>
+    el("p", "", item.label),
+  );
+  target.append(el("p", "handoff-limitation", handoff.limitations));
+}
+async function openHandoff() {
+  if (!state.sessionId) return;
+  try {
+    const data = await api(`/api/sessions/${state.sessionId}/handoff`);
+    renderHandoff(data.handoff);
+    $("#handoff-dialog").showModal();
+  } catch (error) {
+    toast(error.message);
+  }
+}
+async function copyHandoff() {
+  if (!state.handoffText) return;
+  try {
+    await navigator.clipboard.writeText(state.handoffText);
+    toast("摘要已复制。");
+  } catch {
+    const area = el("textarea");
+    area.value = state.handoffText;
+    document.body.append(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+    toast("摘要已复制。");
+  }
 }
 function renderConversationSubtitle(backend = state.settings?.backend) {
   const subject = state.case?.consultation_subject;
@@ -1118,6 +1353,8 @@ async function startSession() {
     state.taskHistory = false;
     state.shownCalculations.clear();
     state.events = [];
+    state.reportDraft = null;
+    state.handoffText = "";
     $("#messages").replaceChildren();
     $("#welcome").hidden = true;
     renderCase(data.state);
@@ -1288,6 +1525,10 @@ async function resumeSession(id, force = false) {
     const trace = { events: data.events };
     const changingSession = state.sessionId !== id;
     if (changingSession) rememberComposerDraft();
+    if (changingSession) {
+      state.reportDraft = null;
+      state.handoffText = "";
+    }
     state.sessionId = id;
     state.events = trace.events;
     state.taskHistory = false;
@@ -1673,6 +1914,7 @@ const eventLabels = {
   "model.failed": "模型调用失败",
   "agent.backend_failed": "决策服务失败",
   "advisor.queued": "安排后台复核",
+  "advisor.skipped": "跳过无变化的后台复核",
   "advisor.started": "开始后台复核",
   "advisor.completed": "完成后台复核",
   "advisor.cancelled": "取消过期复核",
@@ -1727,6 +1969,14 @@ function renderInspection() {
   const rejected = events.filter(
     (e) => e.event_type === "tool.completed" && e.payload.result?.ok === false,
   ).length;
+  const reviews = events.filter((e) => e.event_type.startsWith("advisor."));
+  const completedReviews = reviews.filter(
+    (e) => e.event_type === "advisor.completed",
+  );
+  const reviewDuration = completedReviews.reduce(
+    (total, event) => total + (event.payload.duration_ms || 0),
+    0,
+  );
   const metrics = [
     [
       "已记录信息",
@@ -1738,6 +1988,15 @@ function renderInspection() {
       "模型请求",
       events.filter((e) => e.event_type === "model.requested").length,
       "直接读取真实请求事件",
+    ],
+    [
+      "后台复核",
+      completedReviews.length,
+      completedReviews.length
+        ? `完成 ${completedReviews.length} 次 · 平均 ${Math.round(reviewDuration / completedReviews.length)} ms`
+        : reviews.length
+          ? `已记录 ${reviews.length} 个复核事件，尚未完成`
+          : "当前会谈尚未触发复核",
     ],
     [
       "会谈状态",
@@ -1917,6 +2176,15 @@ function renderModeFields() {
     mode === "dsh"
       ? "DSH 使用 DeepSeek Messages 协议，例如 https://api.deepseek.com/anthropic。"
       : "填写 Chat Completions 的根地址，例如 https://你的服务/v1。";
+  const reviewNotice = $("#dsh-review-notice");
+  const reviewControl = $("#dsh-review-control");
+  reviewNotice.hidden = mode !== "dsh";
+  reviewControl.hidden = mode !== "dsh";
+  if (mode === "dsh")
+    reviewNotice.textContent =
+      state.settings?.dsh_review_mode === "advisory"
+        ? "DSH 会收到已提交内容的结构化病例快照进行受限复核；仅作为下一轮追问的内部参考，不会直接形成患者结论。"
+        : "DSH 会收到已提交内容的结构化病例快照，用于后台影子复核；它不会读取正在输入的内容，也不会直接形成患者结论。";
 }
 async function openSettings() {
   try {
@@ -1930,6 +2198,8 @@ async function openSettings() {
   $("#base-url").value = state.settings.base_url || "";
   $("#model-id").value = state.settings.model || "";
   $("#api-key").value = "";
+  $("#dsh-review-enabled").checked =
+    state.settings.dsh_background_review_enabled !== false;
   $("#api-key").placeholder = state.settings.has_api_key
     ? "已设置；留空保留现有密钥"
     : "仅在服务器内存保存";
@@ -1981,6 +2251,60 @@ async function configure(testOnly) {
   } finally {
     $("#test-connection").disabled = false;
     $("#save-settings").disabled = false;
+  }
+}
+
+async function setBackgroundReviewEnabled(enabled) {
+  try {
+    const result = await api("/api/reviews/enabled", {
+      method: "POST",
+      body: { enabled },
+    });
+    state.settings.dsh_background_review_enabled = result.enabled;
+    toast(
+      result.enabled
+        ? "已启用本次服务的后台复核。"
+        : "已关闭后台复核并取消未完成任务。",
+    );
+  } catch (error) {
+    $("#dsh-review-enabled").checked =
+      state.settings.dsh_background_review_enabled !== false;
+    toast(error.message);
+  }
+}
+
+async function deleteCurrentSession() {
+  const id = state.sessionId;
+  if (!id || state.busy) return;
+  if (!window.confirm("删除后将清除本次会谈的记录和后台复核数据，且无法恢复。"))
+    return;
+  setBusy(true);
+  try {
+    await api(`/api/sessions/${id}`, { method: "DELETE" });
+    composerDrafts.delete(id);
+    subjectDrafts.delete(id);
+    state.pendingMessages.clear();
+    state.sessionId = null;
+    state.case = null;
+    state.reply = null;
+    state.events = [];
+    state.lastCorrection = null;
+    state.reportDraft = null;
+    state.handoffText = "";
+    $("#messages").replaceChildren();
+    $("#welcome").hidden = false;
+    $("#delete-current-session").hidden = true;
+    $("#open-report-draft").hidden = true;
+    $("#open-handoff").hidden = true;
+    document.body.classList.remove("has-session");
+    renderInspection();
+    await refreshSessions();
+    navigate("consultation");
+    toast("本次会谈记录已删除。");
+  } catch (error) {
+    toast(`无法删除记录：${error.message}`);
+  } finally {
+    setBusy(false);
   }
 }
 function updateMode() {
@@ -2098,6 +2422,14 @@ $("#export-session").addEventListener("click", exportSession);
 $("#open-settings").addEventListener("click", openSettings);
 $("#backend-pill").addEventListener("click", openSettings);
 $("#settings-form").addEventListener("change", renderModeFields);
+$("#dsh-review-enabled").addEventListener("change", (event) =>
+  setBackgroundReviewEnabled(event.target.checked),
+);
+$("#delete-current-session").addEventListener("click", deleteCurrentSession);
+$("#open-report-draft").addEventListener("click", openReportDraft);
+$("#open-handoff").addEventListener("click", openHandoff);
+$("#report-form").addEventListener("submit", submitReportDraft);
+$("#copy-handoff").addEventListener("click", copyHandoff);
 $("#settings-form").addEventListener("submit", (event) => {
   event.preventDefault();
   configure(false);

@@ -1,0 +1,347 @@
+.records-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.records-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.records-summary article {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px 17px;
+  background: var(--surface);
+}
+
+.records-summary strong,
+.records-summary span {
+  display: block;
+}
+
+.records-summary strong {
+  font-size: 22px;
+  font-weight: 550;
+}
+
+.records-summary span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.records-timeline {
+  position: relative;
+  display: grid;
+  gap: 12px;
+}
+
+.records-trend {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 17px 19px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--light);
+}
+
+.records-trend h2,
+.records-trend p {
+  margin: 0;
+}
+
+.records-trend h2 {
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.records-trend p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.records-trend-value {
+  text-align: right;
+}
+
+.records-trend-value strong,
+.records-trend-value small {
+  display: block;
+}
+
+.records-trend-value strong {
+  font-size: 20px;
+  font-weight: 550;
+}
+
+.records-trend-value small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.record-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  text-align: left;
+}
+
+.record-card:hover {
+  border-color: var(--line-strong);
+  background: var(--raised);
+}
+
+.record-date {
+  display: grid;
+  place-items: center;
+  min-width: 58px;
+  min-height: 52px;
+  padding: 7px;
+  border-radius: 11px;
+  background: var(--light);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.record-date strong {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 550;
+}
+
+.record-main {
+  min-width: 0;
+}
+
+.record-main strong,
+.record-main small {
+  display: block;
+}
+
+.record-main > strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-main small {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.record-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.record-state .icon {
+  width: 16px;
+  color: var(--muted);
+}
+
+.record-pending {
+  color: var(--orange);
+  background: var(--warning-bg);
+}
+
+.medical-image-dialog,
+.record-detail-dialog {
+  width: min(640px, calc(100% - 30px));
+}
+
+.medical-image-preview {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  margin: 12px 0;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--light);
+}
+
+.record-value-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 12px;
+}
+
+.record-detail-content {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.record-source-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--light);
+}
+
+.record-detail-meta,
+.record-description,
+.record-observation,
+.record-history {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 14px;
+  background: var(--surface);
+}
+
+.record-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.record-description h3,
+.record-observations h3,
+.record-observation h4,
+.record-history summary {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.record-description p,
+.record-observation p,
+.record-history li {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.record-observation-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.record-observation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.record-observation-value {
+  color: var(--ink) !important;
+  font-size: 16px !important;
+}
+
+.record-observation-actions,
+.record-alternatives,
+.record-detail-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.record-observation-actions button,
+.record-alternatives button {
+  min-height: 31px;
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
+.record-inline-edit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px auto;
+  align-items: end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.record-inline-edit .field {
+  margin: 0;
+}
+
+.record-inline-edit button {
+  min-height: 38px;
+}
+
+.record-history ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.record-delete {
+  color: var(--danger, #9f3434);
+}
+
+@media (max-width: 700px) {
+  .records-heading {
+    align-items: stretch;
+  }
+
+  .records-actions,
+  .records-actions button {
+    width: 100%;
+  }
+
+  .records-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .records-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .records-trend {
+    grid-template-columns: 1fr;
+  }
+
+  .records-trend-value {
+    text-align: left;
+  }
+
+  .record-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 15px;
+  }
+
+  .record-state {
+    grid-column: 2;
+    justify-content: space-between;
+  }
+
+  .record-value-row,
+  .record-inline-edit {
+    grid-template-columns: 1fr;
+  }
+}

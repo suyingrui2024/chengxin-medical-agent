@@ -2169,6 +2169,53 @@ h1 {
   overflow: auto;
   padding: 0 20px;
 }
+.report-items-summary {
+  margin: 12px 20px 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+.report-items-heading,
+.report-item-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.report-items-heading {
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--primary);
+}
+.report-items-heading small {
+  color: var(--muted);
+}
+.report-items-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 9px;
+}
+.report-item-row {
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+.report-item-row strong {
+  font-weight: 550;
+}
+.report-item-row span {
+  color: var(--muted);
+}
+.report-item-row .fact-edit {
+  margin-left: auto;
+}
+.record-actions {
+  display: grid;
+  gap: 4px;
+  padding: 12px 20px 0;
+}
+.record-actions .text-button {
+  justify-content: flex-start;
+  padding: 4px 0;
+  font-size: 10px;
+}
 .fact-row {
   padding: 12px 0;
   border-bottom: 1px solid var(--line);
@@ -2800,6 +2847,75 @@ dialog::backdrop {
 }
 .small-dialog {
   width: min(440px, calc(100% - 30px));
+}
+.report-dialog,
+.handoff-dialog {
+  width: min(540px, calc(100% - 30px));
+}
+.report-dialog textarea,
+.report-dialog select {
+  width: 100%;
+}
+.report-dialog textarea {
+  resize: vertical;
+}
+.report-draft-result {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+.report-result-title,
+.handoff-section h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 550;
+}
+.report-note,
+.handoff-limitation {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.report-draft-list,
+.handoff-content,
+.handoff-list {
+  display: grid;
+  gap: 8px;
+}
+.report-draft-row,
+.handoff-section {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 12px;
+}
+.report-draft-row strong {
+  font-size: 12px;
+  font-weight: 550;
+}
+.report-draft-row p,
+.report-draft-row small,
+.handoff-list p {
+  margin: 5px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.report-draft-row small {
+  display: block;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.report-draft-row .secondary-button {
+  min-height: 30px;
+  margin-top: 10px;
+  padding: 5px 9px;
+  font-size: 11px;
+}
+.handoff-content {
+  margin-top: 18px;
+}
+.handoff-section h3 {
+  margin-bottom: 7px;
 }
 .task-dialog {
   width: min(650px, calc(100% - 30px));
@@ -5494,11 +5610,32 @@ body[data-mode="patient"] .structured-notice .notice-reasons {
   body[data-mode="patient"].task-focused .app-shell {
     grid-template-columns: minmax(0, 1fr);
   }
-  body[data-mode="patient"].task-focused .sidebar,
   body[data-mode="patient"].task-focused .topbar,
   body[data-mode="patient"].task-focused #view-consultation .page-heading,
   body[data-mode="patient"].task-focused .facts-panel {
     display: none;
+  }
+  body[data-mode="patient"].task-focused .sidebar {
+    display: block;
+    position: fixed;
+    width: 0;
+    height: 0;
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    visibility: hidden;
+  }
+  body[data-mode="patient"].task-focused .sidebar > :not(#new-session) {
+    display: none;
+  }
+  body[data-mode="patient"].task-focused #new-session {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 40;
+    width: auto;
+    margin: 0;
+    visibility: visible;
   }
   body[data-mode="patient"].task-focused main {
     max-width: 1080px;
@@ -5510,7 +5647,7 @@ body[data-mode="patient"] .structured-notice .notice-reasons {
     margin: 0 auto;
   }
   body[data-mode="patient"].task-focused .conversation-panel {
-    height: calc(100dvh - 36px);
+    height: calc(100dvh - 72px);
     min-height: 620px;
   }
   body[data-mode="patient"].task-focused .task-focus-bar {

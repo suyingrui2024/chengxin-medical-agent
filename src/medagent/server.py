@@ -3,7 +3,10 @@ from __future__ import annotations
 import argparse
 import json
 import mimetypes
+import os
+import re
 import secrets
+from uuid import uuid4
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
@@ -17,8 +20,23 @@ from .consultation import (
     UserInput,
     ConsultationBusyError,
 )
-from .events import EventStore
+from .domain import utc_now
+from .events import Event, EventStore
 from .background_review import BackgroundReviewCoordinator
+from .handoff import build_handoff
+from .medical_images import (
+    MedicalImageError,
+    RecognitionError,
+    decode_image_data_url,
+    inspect_image,
+    recognizer_from_settings,
+)
+from .patient_records import (
+    PatientRecordConflict,
+    PatientRecordError,
+    PatientRecordStore,
+)
+from .report_drafts import parse_report_draft
 from .runtime import build_runtime
 from .workspace import Workspace, StaleCompositionError
 from . import __version__
@@ -27,6 +45,7 @@ from .execution_files import DirectoryChanged
 
 
 MAX_BODY_BYTES = 64 * 1024
+MAX_IMAGE_BODY_BYTES = 6 * 1024 * 1024
 
 
 class MedicalAgentServer(ThreadingHTTPServer):
@@ -43,6 +62,8 @@ class MedicalAgentServer(ThreadingHTTPServer):
         events: EventStore,
         backend_mode: str = "demo",
         access_token: Optional[str] = None,
+        patient_store: Optional[PatientRecordStore] = None,
+        image_recognizer=None,
     ):
         super().__init__(address, handler)
         self.engine = engine
@@ -51,7 +72,17 @@ class MedicalAgentServer(ThreadingHTTPServer):
         self.workspace = Workspace(engine, events, backend_mode)
         self.access_token = access_token
         self.execution = ExecutionManager()
-        self.reviews = BackgroundReviewCoordinator(events)
+        self._patient_store = patient_store
+        self.image_recognizer = image_recognizer
+        self.reviews = BackgroundReviewCoordinator(
+            events, mode=os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow")
+        )
+
+    @property
+    def patient_records(self) -> PatientRecordStore:
+        if self._patient_store is None:
+            self._patient_store = PatientRecordStore()
+        return self._patient_store
 
     def server_close(self):
         self.reviews.close()
@@ -77,6 +108,12 @@ class Handler(BaseHTTPRequestHandler):
         ):
             self._error(HTTPStatus.UNAUTHORIZED, "desktop_only", "此服务只接受当前桌面应用的请求")
             return False
+        candidate = self.headers.get("X-Request-ID", "")
+        self.request_id = (
+            candidate
+            if re.fullmatch(r"[A-Za-z0-9._-]{1,128}", candidate)
+            else str(uuid4())
+        )
         return True
 
     def log_message(self, format: str, *args: Any) -> None:
@@ -95,11 +132,20 @@ class Handler(BaseHTTPRequestHandler):
                 }
             )
             return
+        if path == "/api/patients" or path.startswith(
+            ("/api/patients/", "/api/entries/", "/api/assets/")
+        ):
+            self._patient_get(path)
+            return
         if path == "/api/execution" or path.startswith("/api/execution/"):
             self._execution_get(path)
             return
         if path == "/api/settings":
-            self._json(self.app.workspace.public_settings())
+            settings = self.app.workspace.public_settings()
+            settings["dsh_background_review_enabled"] = (
+                self.app.reviews.enabled_for_process
+            )
+            self._json(settings)
             return
         if path == "/api/capabilities":
             self._json(self.app.workspace.catalog())
@@ -145,6 +191,9 @@ class Handler(BaseHTTPRequestHandler):
                             ],
                         }
                     )
+            elif len(parts) == 4 and parts[3] == "handoff":
+                with engine._session_locks[state.session_id]:
+                    self._json({"handoff": build_handoff(state)})
             else:
                 with engine._session_locks[state.session_id]:
                     self._json({"state": state.to_dict()})
@@ -153,6 +202,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = urlparse(self.path).path
+        if path == "/api/patients" or path.startswith(
+            ("/api/patients/", "/api/assets/", "/api/clarifications/", "/api/observations/")
+        ):
+            self._patient_post(path)
+            return
         if path == "/api/execution" or path.startswith("/api/execution/"):
             self._execution_post(path)
             return
@@ -214,11 +268,41 @@ class Handler(BaseHTTPRequestHandler):
                     "连接未成功，请检查地址、协议、模型 ID 与密钥",
                 )
                 return
+            result["dsh_background_review_enabled"] = (
+                self.app.reviews.enabled_for_process
+            )
             self._json(result)
+            return
+        if path == "/api/reviews/enabled":
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            payload = self._read_json()
+            if payload is None:
+                return
+            if set(payload) != {"enabled"} or not isinstance(payload["enabled"], bool):
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_review_setting", "复核开关格式错误")
+                return
+            enabled = payload["enabled"]
+            if not enabled:
+                for session in self.app.workspace.sessions():
+                    try:
+                        engine = self.app.workspace.engine_for(session["session_id"])
+                        with engine._session_locks[session["session_id"]]:
+                            self.app.reviews.invalidate(
+                                engine.state(session["session_id"]), "disabled_by_user"
+                            )
+                    except KeyError:
+                        continue
+            self.app.reviews.set_enabled_for_process(enabled)
+            self._json({"enabled": enabled})
             return
         if path == "/api/sessions":
             with self.app.workspace.lock:
-                state, reply = self.app.workspace.engine.create_session()
+                state, reply = self.app.workspace.engine.create_session(
+                    request_id=self.request_id
+                )
             self._json(
                 {
                     "session_id": state.session_id,
@@ -230,6 +314,116 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         parts = path.strip("/").split("/")
+        if (
+            len(parts) == 6
+            and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "report-drafts"
+            and parts[5] == "confirm"
+        ):
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            payload = self._read_json()
+            if payload is None:
+                return
+            source_item_id = payload.get("source_item_id")
+            if set(payload) != {"source_item_id"} or not isinstance(source_item_id, str):
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_report_item", "请指定要确认的报告项目")
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    draft = state.report_drafts.get(parts[4])
+                    if not draft:
+                        raise ValueError("报告草稿不存在或已失效")
+                    draft_item = next(
+                        (item for item in draft["items"] if item["source_item_id"] == source_item_id),
+                        None,
+                    )
+                    if not draft_item:
+                        raise ValueError("报告项目不存在")
+                    item_id = f"{parts[4]}:{source_item_id}"
+                    confirmed = {
+                        "report_item_id": item_id,
+                        "name": draft_item["name"],
+                        "reported_value": draft_item["reported_value"],
+                        "unit": draft_item["unit"],
+                        "reference_range": draft_item["reference_range"],
+                        "status": "confirmed_by_patient",
+                    }
+                    state.report_items = [
+                        item for item in state.report_items if item.get("report_item_id") != item_id
+                    ]
+                    state.report_items.append(confirmed)
+                    draft_item["status"] = "confirmed"
+                    state.revision += 1
+                    state.updated_at = utc_now()
+                    self.app.events.append(
+                        Event(
+                            state.session_id,
+                            "report.item_confirmed",
+                            {"draft_id": parts[4], "source_item_id": source_item_id},
+                        )
+                    )
+                    self.app.reviews.invalidate(state, "report_item_confirmed")
+                    self.app.reviews.schedule(engine, state)
+                    response = {"item": confirmed, "state": state.to_dict()}
+            except KeyError:
+                self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
+                return
+            except ValueError as exc:
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_report_item", str(exc))
+                return
+            self._json(response)
+            return
+        if (
+            len(parts) == 4
+            and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "report-drafts"
+        ):
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            payload = self._read_json()
+            if payload is None:
+                return
+            if set(payload) - {"text", "format"} or not isinstance(payload.get("text"), str):
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_report", "报告内容格式错误")
+                return
+            format_hint = payload.get("format", "auto")
+            if not isinstance(format_hint, str):
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_report", "报告格式错误")
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    draft = parse_report_draft(payload["text"], format_hint)
+                    draft["draft_id"] = str(uuid4())
+                    state.report_drafts[draft["draft_id"]] = draft
+                    state.updated_at = utc_now()
+                    self.app.events.append(
+                        Event(
+                            state.session_id,
+                            "report.draft_created",
+                            {
+                                "draft_id": draft["draft_id"],
+                                "source_format": draft["source_format"],
+                                "item_count": len(draft["items"]),
+                            },
+                        )
+                    )
+            except KeyError:
+                self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
+                return
+            except ValueError as exc:
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_report", str(exc))
+                return
+            self._json({"draft": draft}, HTTPStatus.CREATED)
+            return
         if (
             len(parts) == 4
             and parts[0:2] == ["api", "sessions"]
@@ -273,6 +467,7 @@ class Handler(BaseHTTPRequestHandler):
                             expected_action_id=expected_action_id,
                             calculation=calculation,
                             observation=observation,
+                            request_id=self.request_id,
                         ),
                     )
                     self.app.reviews.schedule(engine, state)
@@ -290,6 +485,66 @@ class Handler(BaseHTTPRequestHandler):
                 self._error(HTTPStatus.CONFLICT, "stale_action", str(exc))
                 return
             self._json(response)
+            return
+        self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
+
+    def do_DELETE(self) -> None:
+        path = urlparse(self.path).path
+        if path.startswith("/api/entries/"):
+            self._patient_delete(path)
+            return
+        parts = path.strip("/").split("/")
+        if (
+            len(parts) == 5
+            and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "report-items"
+        ):
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    before = len(state.report_items)
+                    state.report_items = [
+                        item
+                        for item in state.report_items
+                        if item.get("report_item_id") != parts[4]
+                    ]
+                    if len(state.report_items) == before:
+                        raise ValueError("报告项目不存在")
+                    state.revision += 1
+                    state.updated_at = utc_now()
+                    self.app.events.append(
+                        Event(state.session_id, "report.item_removed", {"report_item_id": parts[4]})
+                    )
+                    self.app.reviews.invalidate(state, "report_item_removed")
+                    response = {"deleted": True, "state": state.to_dict()}
+            except KeyError:
+                self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
+                return
+            except ValueError as exc:
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_report_item", str(exc))
+                return
+            self._json(response)
+            return
+        if len(parts) == 3 and parts[0:2] == ["api", "sessions"]:
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    self.app.reviews.invalidate(state, "session_deleted")
+                    self.app.workspace.delete_session(parts[2])
+            except KeyError:
+                self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
+                return
+            self._json({"deleted": True})
             return
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
@@ -385,13 +640,13 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
-    def _read_json(self) -> Optional[Dict[str, Any]]:
+    def _read_json(self, max_bytes: int = MAX_BODY_BYTES) -> Optional[Dict[str, Any]]:
         try:
             length = int(self.headers.get("Content-Length", "0"))
         except ValueError:
             self._error(HTTPStatus.BAD_REQUEST, "invalid_length", "请求长度无效")
             return None
-        if length <= 0 or length > MAX_BODY_BYTES:
+        if length <= 0 or length > max_bytes:
             self._error(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, "body_size", "请求内容过大或为空")
             return None
         try:
@@ -404,6 +659,269 @@ class Handler(BaseHTTPRequestHandler):
             return None
         return payload
 
+    def _same_origin(self) -> bool:
+        origin = self.headers.get("Origin")
+        if origin and urlparse(origin).netloc != self.headers.get("Host"):
+            self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+            return False
+        return True
+
+    def _configured_recognizer(self):
+        if self.app.image_recognizer is not None:
+            return self.app.image_recognizer
+        with self.app.workspace.lock:
+            return recognizer_from_settings(
+                dict(self.app.workspace.settings), self.app.workspace.backend
+            )
+
+    def _patient_get(self, path: str) -> None:
+        try:
+            parts = path.strip("/").split("/")
+            if path == "/api/patients":
+                default = self.app.patient_records.ensure_default_patient()
+                self._json(
+                    {
+                        "patients": self.app.patient_records.list_patients(),
+                        "default_patient_id": default["patient_id"],
+                        "vision_available": self._configured_recognizer() is not None,
+                    }
+                )
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "patients"]
+                and parts[3] == "timeline"
+            ):
+                self._json(self.app.patient_records.timeline(parts[2]))
+                return
+            if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "patients"]
+                and parts[3:] == ["trends", "blood-glucose"]
+            ):
+                self._json(self.app.patient_records.glucose_trend(parts[2]))
+                return
+            if len(parts) == 3 and parts[0:2] == ["api", "entries"]:
+                self._json(self.app.patient_records.entry(parts[2]))
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "assets"]
+                and parts[3] == "content"
+            ):
+                data, mime = self.app.patient_records.asset(parts[2])
+                self.send_response(HTTPStatus.OK)
+                self.send_header("Content-Type", mime)
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Content-Type-Options", "nosniff")
+                self.send_header("Content-Security-Policy", "default-src 'none'; sandbox")
+                self.end_headers()
+                self.wfile.write(data)
+                return
+            self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
+        except PatientRecordError as exc:
+            self._error(HTTPStatus.NOT_FOUND, "record_not_found", str(exc))
+
+    def _patient_post(self, path: str) -> None:
+        if not self._same_origin():
+            return
+        parts = path.strip("/").split("/")
+        payload = self._read_json(
+            MAX_IMAGE_BODY_BYTES
+            if len(parts) == 5 and parts[0:2] == ["api", "patients"] and parts[3:] == ["entries", "images"]
+            else MAX_BODY_BYTES
+        )
+        if payload is None:
+            return
+        try:
+            if path == "/api/patients":
+                if set(payload) - {"display_name"}:
+                    raise PatientRecordError("患者档案参数无效")
+                patient = self.app.patient_records.create_patient(
+                    payload.get("display_name", "我的健康档案")
+                )
+                self._json({"patient": patient}, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "patients"]
+                and parts[3:] == ["entries", "images"]
+            ):
+                if set(payload) - {
+                    "title",
+                    "measured_at",
+                    "reported_at",
+                    "filename",
+                    "data_url",
+                }:
+                    raise PatientRecordError("图片归档参数无效")
+                image = decode_image_data_url(payload.get("data_url"))
+                detail = self.app.patient_records.create_image_entry(
+                    parts[2],
+                    payload.get("title"),
+                    payload.get("measured_at"),
+                    payload.get("reported_at"),
+                    payload.get("filename"),
+                    image,
+                )
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.asset_archived",
+                        {
+                            "entry_id": detail["entry"]["entry_id"],
+                            "asset_id": detail["asset_id"],
+                            "mime_type": image.mime_type,
+                            "byte_size": len(image.data),
+                        },
+                    )
+                )
+                self._json(detail, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "patients"]
+                and parts[3:] == ["measurements", "blood-glucose"]
+            ):
+                allowed = {"value_text", "unit", "measured_at", "measurement_context"}
+                if set(payload) != allowed:
+                    raise PatientRecordError("血糖记录参数不完整")
+                detail = self.app.patient_records.add_measurement(
+                    parts[2], kind="blood_glucose", **payload
+                )
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.measurement_recorded",
+                        {
+                            "entry_id": detail["entry"]["entry_id"],
+                            "kind": "blood_glucose",
+                        },
+                    )
+                )
+                self._json(detail, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "assets"]
+                and parts[3] == "recognitions"
+            ):
+                if payload:
+                    raise PatientRecordError("识别请求不接受额外参数")
+                recognizer = self._configured_recognizer()
+                if recognizer is None:
+                    self._error(
+                        HTTPStatus.CONFLICT,
+                        "vision_unavailable",
+                        "当前没有可用的视觉模型配置；图片已经安全归档，可稍后识别",
+                    )
+                    return
+                raw, _ = self.app.patient_records.asset(parts[2])
+                image = inspect_image(raw)
+                recognition_id = self.app.patient_records.start_recognition(
+                    parts[2], "deepseek", recognizer.model
+                )
+                try:
+                    result = recognizer.recognize(image)
+                    detail = self.app.patient_records.finish_recognition(
+                        recognition_id, result
+                    )
+                except RecognitionError:
+                    self.app.patient_records.fail_recognition(
+                        recognition_id, "provider_failed"
+                    )
+                    raise
+                except Exception:
+                    self.app.patient_records.fail_recognition(
+                        recognition_id, "provider_failed"
+                    )
+                    raise RecognitionError("视觉模型没有完成有效识别") from None
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.asset_recognized",
+                        {
+                            "entry_id": detail["entry"]["entry_id"],
+                            "asset_id": parts[2],
+                            "recognition_id": recognition_id,
+                            "observation_count": len(detail["observations"]),
+                        },
+                    )
+                )
+                self._json({"recognition_id": recognition_id, **detail}, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "clarifications"]
+                and parts[3] == "answers"
+            ):
+                allowed = {"value_text", "unit", "expected_revision_id"}
+                if set(payload) != allowed:
+                    raise PatientRecordError("核对答案参数不完整")
+                detail = self.app.patient_records.answer_clarification(parts[2], **payload)
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.clarification_answered",
+                        {"entry_id": detail["entry"]["entry_id"], "clarification_id": parts[2]},
+                    )
+                )
+                self._json(detail)
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "observations"]
+                and parts[3] == "revisions"
+            ):
+                allowed = {"value_text", "unit", "expected_revision_id"}
+                if set(payload) != allowed:
+                    raise PatientRecordError("数据修改参数不完整")
+                detail = self.app.patient_records.revise_observation(parts[2], **payload)
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.observation_revised",
+                        {"entry_id": detail["entry"]["entry_id"], "observation_id": parts[2]},
+                    )
+                )
+                self._json(detail)
+                return
+            self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
+        except PatientRecordConflict as exc:
+            self._error(HTTPStatus.CONFLICT, "stale_patient_record", str(exc))
+        except (PatientRecordError, MedicalImageError) as exc:
+            self._error(HTTPStatus.BAD_REQUEST, "invalid_patient_record", str(exc))
+        except RecognitionError as exc:
+            self._error(HTTPStatus.BAD_GATEWAY, "recognition_failed", str(exc))
+
+    def _patient_delete(self, path: str) -> None:
+        if not self._same_origin():
+            return
+        parts = path.strip("/").split("/")
+        if len(parts) != 3 or parts[0:2] != ["api", "entries"]:
+            self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
+            return
+        payload = self._read_json()
+        if payload is None:
+            return
+        try:
+            if set(payload) != {"expected_version"}:
+                raise PatientRecordError("删除请求缺少记录版本")
+            self.app.patient_records.delete_entry(parts[2], payload["expected_version"])
+            self.app.events.append(
+                Event(
+                    "patient-records",
+                    "patient.entry_deleted",
+                    {"entry_id": parts[2]},
+                )
+            )
+            self._json({"deleted": True})
+        except PatientRecordConflict as exc:
+            self._error(HTTPStatus.CONFLICT, "stale_patient_record", str(exc))
+        except PatientRecordError as exc:
+            self._error(HTTPStatus.BAD_REQUEST, "invalid_patient_record", str(exc))
+
     def _json(
         self, payload: Dict[str, Any], status: HTTPStatus = HTTPStatus.OK
     ) -> None:
@@ -413,6 +931,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(encoded)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Request-ID", getattr(self, "request_id", str(uuid4())))
         self.end_headers()
         self.wfile.write(encoded)
 

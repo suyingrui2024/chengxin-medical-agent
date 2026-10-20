@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="appearance.css" />
     <link rel="stylesheet" href="self-check.css" />
     <link rel="stylesheet" href="patient-reflow.css" />
+    <link rel="stylesheet" href="patient-records.css" />
     <link rel="stylesheet" href="execution-focus.css" />
     <link rel="stylesheet" href="artifact-chart.css" />
   </head>
@@ -125,6 +126,13 @@
           <button class="nav-item" data-view="history" type="button">
             <svg class="icon"><use href="#i-clock" /></svg>会谈记录<span
               id="history-count"
+              class="count"
+              >0</span
+            >
+          </button>
+          <button class="nav-item" data-view="records" type="button">
+            <svg class="icon"><use href="#i-cards" /></svg>健康档案<span
+              id="records-count"
               class="count"
               >0</span
             >
@@ -418,6 +426,11 @@
                     <p>每一步的信息，会在这里<br />逐渐变得清晰。</p>
                   </div>
                 </div>
+                <div
+                  id="report-items-summary"
+                  class="report-items-summary"
+                  hidden
+                ></div>
                 <div class="source-legend">
                   <span><i class="legend-present"></i>已提供</span
                   ><span><i class="legend-unknown"></i>待确认 / 未知</span>
@@ -425,6 +438,32 @@
                 <p class="records-hint">
                   记录可以更正。没有提到的信息，不会自动记为“没有”。
                 </p>
+                <div class="record-actions">
+                  <button
+                    id="open-report-draft"
+                    class="text-button"
+                    type="button"
+                    hidden
+                  >
+                    添加报告内容
+                  </button>
+                  <button
+                    id="open-handoff"
+                    class="text-button"
+                    type="button"
+                    hidden
+                  >
+                    就诊交接摘要
+                  </button>
+                </div>
+                <button
+                  id="delete-current-session"
+                  class="text-button"
+                  type="button"
+                  hidden
+                >
+                  删除本次记录
+                </button>
                 <button
                   id="view-current-trace"
                   class="text-button inspect-link developer-only"
@@ -836,6 +875,37 @@
               <p id="execution-artifact-caption" class="artifact-meta"></p>
             </dialog>
           </section>
+          <section id="view-records" class="view" aria-label="健康档案" hidden>
+            <div class="page-heading records-heading">
+              <div>
+                <p class="eyebrow">LONGITUDINAL HEALTH RECORD</p>
+                <h1>每次数据，按时间留下来。</h1>
+                <p class="page-description">
+                  报告和自测数据分别归档。模糊内容会单独请你核对。
+                </p>
+              </div>
+              <div class="records-actions">
+                <button id="add-glucose" class="secondary-button" type="button">
+                  记录血糖
+                </button>
+                <button
+                  id="upload-medical-image"
+                  class="primary-button"
+                  type="button"
+                >
+                  上传医疗图片
+                </button>
+              </div>
+            </div>
+            <div id="records-notice" class="notice-strip">
+              <svg class="icon"><use href="#i-info" /></svg>
+              原始图片、模型识别和你的修改分别保留；你可以随时查看或删除。
+            </div>
+            <div id="records-summary" class="records-summary" hidden></div>
+            <section id="records-trend" class="records-trend" hidden></section>
+            <div id="records-timeline" class="records-timeline"></div>
+          </section>
+
           <section id="view-history" class="view" aria-label="会谈记录" hidden>
             <div class="page-heading">
               <div>
@@ -931,6 +1001,7 @@
                       <option value="tool">工具调用</option>
                       <option value="fact">病例变化</option>
                       <option value="model">模型请求</option>
+                      <option value="advisor">后台复核</option>
                       <option value="triage">风险评估</option>
                       <option value="capability">能力执行</option>
                     </select>
@@ -1022,6 +1093,156 @@
     </div>
 
     <dialog
+      id="medical-image-dialog"
+      class="small-dialog medical-image-dialog"
+      aria-labelledby="medical-image-title"
+    >
+      <form id="medical-image-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">MEDICAL IMAGE</p>
+            <h2 id="medical-image-title">上传一张医疗图片</h2>
+          </div>
+          <button
+            class="icon-button close-dialog"
+            type="button"
+            aria-label="关闭"
+          >
+            <svg class="icon"><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <p class="dialog-description">
+          支持 JPEG、PNG 和 WebP，单张不超过 4
+          MB。测量时间用于放入正确的健康时间线。
+        </p>
+        <label class="field"
+          ><span>图片</span
+          ><input
+            id="medical-image-file"
+            name="image"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            required
+        /></label>
+        <img
+          id="medical-image-preview"
+          class="medical-image-preview"
+          alt="待上传图片预览"
+          hidden
+        />
+        <label class="field"
+          ><span>记录名称</span
+          ><input
+            id="medical-image-name"
+            maxlength="120"
+            value="医疗检查图片"
+            required
+        /></label>
+        <label class="field"
+          ><span>实际检查或测量时间</span
+          ><input id="medical-image-time" type="datetime-local"
+        /></label>
+        <label class="field"
+          ><span>报告出具时间（可选）</span
+          ><input id="medical-report-time" type="datetime-local"
+        /></label>
+        <p id="medical-image-feedback" class="form-feedback" role="status"></p>
+        <div class="dialog-footer">
+          <button class="secondary-button close-dialog" type="button">
+            取消
+          </button>
+          <button class="primary-button" type="submit">归档并识别</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      id="glucose-record-dialog"
+      class="small-dialog"
+      aria-labelledby="glucose-record-title"
+    >
+      <form id="glucose-record-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">SELF MEASUREMENT</p>
+            <h2 id="glucose-record-title">记录一次血糖</h2>
+          </div>
+          <button
+            class="icon-button close-dialog"
+            type="button"
+            aria-label="关闭"
+          >
+            <svg class="icon"><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <p class="dialog-description">
+          保存原始数值、单位、测量时间和测量场景。
+        </p>
+        <div class="record-value-row">
+          <label class="field"
+            ><span>数值</span
+            ><input
+              id="glucose-record-value"
+              inputmode="decimal"
+              maxlength="20"
+              required
+          /></label>
+          <label class="field"
+            ><span>单位</span
+            ><select id="glucose-record-unit">
+              <option value="mmol/L">mmol/L</option>
+              <option value="mg/dL">mg/dL</option>
+            </select></label
+          >
+        </div>
+        <label class="field"
+          ><span>测量时间</span
+          ><input id="glucose-record-time" type="datetime-local" required
+        /></label>
+        <label class="field"
+          ><span>测量场景</span
+          ><select id="glucose-record-context">
+            <option value="fasting">空腹</option>
+            <option value="before_meal">餐前</option>
+            <option value="after_meal_1h">餐后 1 小时</option>
+            <option value="after_meal_2h">餐后 2 小时</option>
+            <option value="bedtime">睡前</option>
+            <option value="random">随机</option>
+            <option value="unknown">暂不确定</option>
+          </select></label
+        >
+        <p id="glucose-record-feedback" class="form-feedback" role="status"></p>
+        <div class="dialog-footer">
+          <button class="secondary-button close-dialog" type="button">
+            取消
+          </button>
+          <button class="primary-button" type="submit">保存记录</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      id="record-detail-dialog"
+      class="record-detail-dialog"
+      aria-labelledby="record-detail-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">SOURCE & REVISIONS</p>
+          <h2 id="record-detail-title">医疗记录</h2>
+        </div>
+        <button
+          class="icon-button close-dialog"
+          type="button"
+          aria-label="关闭"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <div id="record-detail-content" class="record-detail-content"></div>
+    </dialog>
+
+    <dialog
       id="settings-dialog"
       class="settings-dialog"
       aria-labelledby="settings-title"
@@ -1091,6 +1312,14 @@
           <p class="field-hint" id="key-hint">
             密钥不会写入浏览器存储或配置文件。
           </p>
+          <p id="dsh-review-notice" class="field-hint" hidden>
+            DSH
+            会收到已提交内容的结构化病例快照，用于后台影子复核；它不会读取正在输入的内容，也不会直接形成患者结论。
+          </p>
+          <label id="dsh-review-control" class="field-hint" hidden>
+            <input id="dsh-review-enabled" type="checkbox" checked />
+            启用本次服务的后台复核。关闭后会取消仍在运行的复核；重新启动应用会恢复默认设置。
+          </label>
         </div>
         <p id="settings-feedback" class="form-feedback" role="status"></p>
         <div class="dialog-footer">
@@ -1101,6 +1330,86 @@
           </button>
         </div>
       </form>
+    </dialog>
+    <dialog
+      id="report-dialog"
+      class="small-dialog report-dialog"
+      aria-labelledby="report-title"
+    >
+      <form id="report-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">REPORT REVIEW</p>
+            <h2 id="report-title">核对报告内容</h2>
+          </div>
+          <button
+            class="icon-button close-dialog"
+            type="button"
+            aria-label="关闭报告录入"
+          >
+            <svg class="icon"><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <p class="dialog-description">
+          粘贴可复制的文字或
+          CSV。系统只提取项目、数值和参考范围；每一项须经你确认后才会进入本次记录。
+        </p>
+        <label class="field-label" for="report-text">报告原文</label>
+        <textarea
+          id="report-text"
+          rows="7"
+          maxlength="32000"
+          placeholder="例如：空腹血糖 4.2 mmol/L 3.9-6.1"
+          required
+        ></textarea>
+        <label class="field-label" for="report-format">内容格式</label>
+        <select id="report-format">
+          <option value="auto">自动识别</option>
+          <option value="text">文本</option>
+          <option value="csv">CSV 表格</option>
+        </select>
+        <p id="report-feedback" class="form-feedback" role="status"></p>
+        <div class="dialog-footer">
+          <button class="primary-button" type="submit">提取待核对项目</button>
+        </div>
+      </form>
+      <div
+        id="report-draft-result"
+        class="report-draft-result"
+        aria-live="polite"
+      ></div>
+    </dialog>
+    <dialog
+      id="handoff-dialog"
+      class="small-dialog handoff-dialog"
+      aria-labelledby="handoff-title"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">PATIENT HANDOFF</p>
+          <h2 id="handoff-title">就诊交接摘要</h2>
+        </div>
+        <button
+          class="icon-button close-dialog"
+          type="button"
+          aria-label="关闭交接摘要"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <p class="dialog-description">
+        只整理本次已记录和已确认的内容；请在就诊时自行补充或更正。
+      </p>
+      <div
+        id="handoff-content"
+        class="handoff-content"
+        aria-live="polite"
+      ></div>
+      <div class="dialog-footer">
+        <button id="copy-handoff" class="primary-button" type="button">
+          复制摘要
+        </button>
+      </div>
     </dialog>
     <dialog
       id="urgent-help-dialog"

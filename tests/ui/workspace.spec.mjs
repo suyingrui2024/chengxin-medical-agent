@@ -55,11 +55,13 @@ test("patient conversation, self-check, history, evidence and export use actual 
     path: `${shots}/02-consultation-self-check.png`,
     fullPage: true,
   });
+  await page.getByRole("button", { name: "下一步", exact: true }).click();
+  await expect(page.getByText("3 / 3")).toBeVisible();
   await answer("380");
   await expect(page.locator("#active-task")).toBeVisible();
   await expect(page.locator("#active-task .task-feedback")).toBeVisible();
   await expect(page.locator("#messages")).not.toContainText("380 ℃");
-  await expect(page.getByText("2 / 3")).toBeVisible();
+  await expect(page.getByText("3 / 3")).toBeVisible();
   await answer("38.2℃");
   await answer("没有");
   await answer("不知道");

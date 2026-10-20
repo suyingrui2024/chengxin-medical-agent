@@ -39,9 +39,15 @@ async function contrast(page) {
 }
 
 async function choose(page, theme) {
-  await page.getByRole("button", { name: "外观与皮肤", exact: true }).click();
+  const trigger = page.getByRole("button", { name: "外观与皮肤", exact: true });
+  const returnToTask = !(await trigger.isVisible());
+  if (returnToTask)
+    await page.getByRole("button", { name: "展开对话记录" }).click();
+  await trigger.click();
   await page.locator(`input[name="appearance"][value="${theme}"]`).check();
   await page.getByRole("button", { name: "关闭外观设置" }).click();
+  if (returnToTask)
+    await page.getByRole("button", { name: "返回当前任务" }).click();
 }
 
 async function controlContrast(page) {
@@ -119,6 +125,7 @@ for (const theme of themes) {
       fullPage: true,
     });
 
+    await page.getByRole("button", { name: "展开对话记录" }).click();
     await page.getByLabel("界面模式").selectOption("developer");
     for (const view of [
       "history",
@@ -247,7 +254,15 @@ test("enlarging each temperature step preserves the draft and progress", async (
   await page.goto("/");
   const id = await reachSelfCheck(page, "发热");
   const input = page.getByRole("textbox", { name: "输入你的描述" });
+  // The compact guide exposes free text after the preparation and placement
+  // steps.  Create the draft through that patient-visible path, then return
+  // to step 1 so each illustration is still audited below.
+  await page.getByRole("button", { name: "下一步", exact: true }).click();
+  await page.getByRole("button", { name: "下一步", exact: true }).click();
+  await expect(input).toBeVisible();
   await input.fill("尚未发送的读数补充");
+  await page.getByRole("button", { name: "上一步", exact: true }).click();
+  await page.getByRole("button", { name: "上一步", exact: true }).click();
   const before = await degreeSnapshot(page, id);
   for (const theme of ["forest", "night"]) {
     await choose(page, theme);
@@ -276,7 +291,9 @@ test("enlarging each temperature step preserves the draft and progress", async (
     await page.getByRole("button", { name: "上一步", exact: true }).click();
     await page.getByRole("button", { name: "上一步", exact: true }).click();
   }
-  await expect(input).toHaveValue("尚未发送的读数补充");
+  await expect(page.locator("#message-input")).toHaveValue(
+    "尚未发送的读数补充",
+  );
   expect(await degreeSnapshot(page, id)).toEqual(before);
 });
 

@@ -127,7 +127,10 @@ class DirectoryTests(unittest.TestCase):
 
     def test_unsupported_utf8_name_does_not_break_json_or_hide_coverage_status(self):
         raw = os.fsencode(self.root) + b"/bad-\xff.txt"
-        fd = os.open(raw, os.O_CREAT | os.O_WRONLY, 0o600)
+        try:
+            fd = os.open(raw, os.O_CREAT | os.O_WRONLY, 0o600)
+        except OSError as exc:
+            self.skipTest(f"filesystem does not allow undecodable names: {exc}")
         os.close(fd)
         (self.root / "good.txt").write_text("ok")
         page = self.session.list_directory()
@@ -156,7 +159,12 @@ class DirectoryTests(unittest.TestCase):
         )
 
     def test_invalid_paths_and_cursors_do_not_leak_directory_descriptors(self):
-        before = len(list(Path("/proc/self/fd").iterdir()))
+        fd_directory = Path("/proc/self/fd")
+        if not fd_directory.is_dir():
+            fd_directory = Path("/dev/fd")
+        if not fd_directory.is_dir():
+            self.skipTest("platform does not expose process file descriptors")
+        before = len(list(fd_directory.iterdir()))
         for path in [
             "../outside",
             "/etc",
@@ -178,7 +186,7 @@ class DirectoryTests(unittest.TestCase):
         ]:
             with self.assertRaises(ExecutionError):
                 self.session.list_directory(cursor=cursor)
-        self.assertLessEqual(len(list(Path("/proc/self/fd").iterdir())), before + 1)
+        self.assertLessEqual(len(list(fd_directory.iterdir())), before + 1)
 
     def test_cheap_snapshots_still_detect_missing_or_replaced_roots(self):
         with patch.object(

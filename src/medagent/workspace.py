@@ -44,6 +44,7 @@ class Workspace:
                 "base_url": self.settings["MEDAGENT_LLM_BASE_URL"],
                 "model": self.settings["MEDAGENT_LLM_MODEL"],
                 "has_api_key": bool(self.settings["MEDAGENT_LLM_API_KEY"]),
+                "dsh_review_mode": os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow"),
                 "storage": "process_memory",
             }
 
@@ -222,6 +223,12 @@ class Workspace:
                         }
                     )
         return sorted(output, key=lambda s: s["created_at"], reverse=True)
+
+    def delete_session(self, session_id):
+        with self.lock:
+            engine = self.engine_for(session_id)
+            engine.delete_session(session_id)
+            self.events.discard_session(session_id)
 
     def close(self):
         with self.lock:

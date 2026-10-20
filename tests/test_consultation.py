@@ -31,7 +31,15 @@ class ConsultationTestCase(unittest.TestCase):
         kinds = [
             event.event_type for event in self.events.for_session(self.state.session_id)
         ]
-        self.assertEqual(kinds, ["session.created", "turn.agent_reply"])
+        self.assertEqual(
+            kinds,
+            [
+                "session.created",
+                "reply.publication_allowed",
+                "case.phase_transition",
+                "turn.agent_reply",
+            ],
+        )
 
     def test_invalid_age_is_not_recorded_as_a_fact(self):
         self.answer("我自己", "self")

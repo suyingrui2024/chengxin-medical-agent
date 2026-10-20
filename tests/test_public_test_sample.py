@@ -18,6 +18,12 @@ def instance(failed, passed):
 
 
 class PublicTestOracleTests(unittest.TestCase):
+    def require_isolated_oracle(self):
+        if not shutil.which("node"):
+            self.skipTest("requires Node for the public-test oracle transport")
+        if not sys.platform.startswith("linux") or not Path("/usr/bin/bwrap").is_file():
+            self.skipTest("requires the Linux bwrap isolated oracle")
+
     def test_selection_uses_the_entire_population_and_is_order_independent(self):
         rows = [
             {"instance_id": f"repo-{n:03d}", "repo": "project/repo"} for n in range(300)
@@ -85,6 +91,7 @@ class PublicTestOracleTests(unittest.TestCase):
         )
 
     def test_long_oracle_program_uses_stdin_and_does_not_hit_argv_limit(self):
+        self.require_isolated_oracle()
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
             directory = root / "workspace"
@@ -101,6 +108,7 @@ class PublicTestOracleTests(unittest.TestCase):
     def test_real_collection_original_failure_and_reference_pass_use_separate_copies(
         self,
     ):
+        self.require_isolated_oracle()
         root = Path(__file__).resolve().parents[1]
         wheel = (
             root

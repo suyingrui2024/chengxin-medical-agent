@@ -19,6 +19,8 @@ from .domain import (
     Source,
 )
 from .events import Event, EventStore
+from .publication import ReplyPublicationGate
+from .state_transitions import commit_phase
 from .interpreter import Interpretation, Interpreter, ObservationInputError
 from .knowledge import ContentRepository, Question
 from .self_checks import SelfCheckService
@@ -77,6 +79,7 @@ class UserInput:
     expected_action_id: Optional[str] = None
     calculation: Optional[Dict[str, Any]] = None
     observation: Optional[Dict[str, Any]] = None
+    request_id: Optional[str] = None
 
 
 class StaleActionError(RuntimeError):
@@ -112,6 +115,7 @@ class ConsultationEngine(
         self.events = events
         self.ranker = ranker
         self.interpreter = Interpreter()
+        self.publication_gate = ReplyPublicationGate()
         self._sessions: Dict[str, CaseState] = {}
         self._session_locks: Dict[str, RLock] = {}
         self._session_conditions = {}
@@ -119,13 +123,21 @@ class ConsultationEngine(
         self._help_requests = {}
         self._sessions_lock = Lock()
 
-    def create_session(self) -> tuple[CaseState, AgentReply]:
-        state = self._create_state()
-        reply = self._ask(state, self.content.questions[0], reason="开始会谈并确认咨询对象")
-        self._record_reply(state, reply, "session_start", "开始会谈并确认咨询对象")
+    def create_session(
+        self, request_id: Optional[str] = None
+    ) -> tuple[CaseState, AgentReply]:
+        trace_id = str(uuid4())
+        state = self._create_state(trace_id, request_id)
+        try:
+            reply = self._ask(state, self.content.questions[0], reason="开始会谈并确认咨询对象")
+            self._record_reply(state, reply, "session_start", "开始会谈并确认咨询对象")
+        finally:
+            self.events.clear_trace(state.session_id)
         return state, reply
 
-    def _create_state(self) -> CaseState:
+    def _create_state(
+        self, trace_id: Optional[str] = None, request_id: Optional[str] = None
+    ) -> CaseState:
         session_id = str(uuid4())
         state = CaseState(session_id=session_id)
         state.runtime_snapshot = {
@@ -140,6 +152,8 @@ class ConsultationEngine(
             self._session_conditions[session_id] = Condition(
                 self._session_locks[session_id]
             )
+        if trace_id:
+            self.events.bind_trace(session_id, trace_id, request_id)
         self.events.append(
             Event(
                 session_id,
@@ -158,10 +172,29 @@ class ConsultationEngine(
                 raise KeyError(session_id)
             return self._sessions[session_id]
 
+    def delete_session(self, session_id: str) -> None:
+        """Forget one in-memory consultation and every controller-side reference."""
+        with self._sessions_lock:
+            if session_id not in self._sessions:
+                raise KeyError(session_id)
+            lock = self._session_locks[session_id]
+        with lock:
+            with self._sessions_lock:
+                self._sessions.pop(session_id, None)
+                self._session_locks.pop(session_id, None)
+                self._session_conditions.pop(session_id, None)
+                self._latest_replies.pop(session_id, None)
+                self._help_requests.pop(session_id, None)
+
     def submit(self, session_id: str, user_input: UserInput) -> AgentReply:
         state = self.state(session_id)
         with self._session_locks[session_id]:
-            return self._submit(state, user_input)
+            trace_id = str(uuid4())
+            self.events.bind_trace(session_id, trace_id, user_input.request_id)
+            try:
+                return self._submit(state, user_input)
+            finally:
+                self.events.clear_trace(session_id)
 
     def run_capability(
         self, state, identity, arguments, origin, turn_id, confirmation=None
@@ -852,7 +885,6 @@ class ConsultationEngine(
         state.risk = self.triage.assess(state, text)
         reply = self._emergency_reply(state, state.risk.triggers)
         state.pending_input = None
-        state.transcript.append({"role": "assistant", "content": reply.message})
         self._record_reply(state, reply, turn_id, "更正原文命中急症门，优先于字段和旧版本校验")
         return reply
 
@@ -883,7 +915,6 @@ class ConsultationEngine(
         reply = self._emergency_reply(state, state.risk.triggers, requested_help=True)
         reply.developer_trace = {"reason": "用户主动请求紧急帮助，未新增症状事实"}
         state.pending_input = None
-        state.transcript.append({"role": "assistant", "content": reply.message})
         self._record_reply(state, reply, turn_id, "用户主动请求优先求助")
         self._help_requests[state.session_id] = text
         return reply
@@ -1634,6 +1665,35 @@ class ConsultationEngine(
     def _record_reply(
         self, state: CaseState, reply: AgentReply, turn_id: str, reason: str
     ) -> None:
+        decision = self.publication_gate.validate(state, reply)
+        if not decision.allowed:
+            if state.risk.level == RiskLevel.EMERGENCY:
+                state.phase = Phase.CLOSED
+                state.closed_reason = "emergency_route"
+                state.active_question = None
+                state.active_question_is_clarification = False
+                state.active_task = None
+            fallback = self.publication_gate.fallback(state, decision)
+            for field_name in AgentReply.__dataclass_fields__:
+                setattr(reply, field_name, getattr(fallback, field_name))
+        trace = dict(reply.developer_trace or {})
+        trace["publication"] = {
+            "status": "allowed" if decision.allowed else "blocked",
+            "rule_ids": list(decision.rule_ids),
+        }
+        reply.developer_trace = trace
+        self.events.append(
+            Event(
+                state.session_id,
+                "reply.publication_allowed" if decision.allowed else "reply.publication_blocked",
+                {"rule_ids": list(decision.rule_ids)},
+                turn_id=turn_id,
+            )
+        )
+        transition_id = commit_phase(self.events, state, reason, turn_id)
+        if transition_id:
+            trace["transition_id"] = transition_id
+            reply.developer_trace = trace
         state.subject_candidate = None
         if reply.kind != "subject_change":
             if reply.kind != "service_error":
@@ -1662,6 +1722,7 @@ class ConsultationEngine(
                     turn_id=turn_id,
                 )
             )
+            state.transcript.append({"role": "assistant", "content": reply.message})
             self._latest_replies[state.session_id] = deepcopy(reply)
             self._session_conditions[state.session_id].notify_all()
 

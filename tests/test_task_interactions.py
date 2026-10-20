@@ -142,6 +142,7 @@ class TaskInteractionTests(unittest.TestCase):
         self.assertEqual(result["interaction_id"], "action:action")
 
     def test_legacy_task_without_offer_falls_back_to_the_specific_action(self):
+        self.state.phase = Phase.OBSERVATION
         first = self.record(
             AgentReply(
                 "task",

@@ -29,14 +29,15 @@ class ProjectBindingTests(unittest.TestCase):
             try:
                 session = manager.attach_project(directory, CONFIG)
                 identity = session.id
-                self.assertEqual(session.directory, directory)
+                self.assertEqual(session.directory, directory.resolve())
                 self.assertEqual(session.snapshot()["workspace_kind"], "project")
                 self.assertIsNone(session.process)
                 self.assertEqual(list(directory.iterdir()), [directory / "keep.txt"])
                 self.assertIs(manager.attach_project(directory, CONFIG), session)
                 self.assertFalse((directory / ".state").exists())
                 self.assertEqual(
-                    session.state_directory, root / "records/.state" / identity
+                    session.state_directory,
+                    (root / "records/.state" / identity).resolve(),
                 )
             finally:
                 manager.close()
@@ -78,7 +79,7 @@ class ProjectBindingTests(unittest.TestCase):
                 record = json.loads(
                     (root / "records/.index" / (session.id + ".json")).read_text()
                 )
-                self.assertEqual(record["project_path"], str(directory))
+                self.assertEqual(record["project_path"], str(directory.resolve()))
             finally:
                 manager.close()
 
@@ -98,7 +99,7 @@ class ProjectBindingTests(unittest.TestCase):
                     second.attach_project(alias, CONFIG)
                 first.release(session.id)
                 opened = second.attach_project(directory, CONFIG)
-                self.assertEqual(opened.directory, directory)
+                self.assertEqual(opened.directory, directory.resolve())
             finally:
                 first.close()
                 second.close()

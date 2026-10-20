@@ -12,6 +12,8 @@ ALLOWED = {
     "MEDAGENT_LLM_MODEL",
     "MEDAGENT_LLM_MAX_TOKENS",
     "MEDAGENT_LLM_THINKING",
+    "MEDAGENT_VISION_MODEL",
+    "MEDAGENT_DSH_REVIEW_MODE",
 }
 
 
@@ -53,6 +55,10 @@ def read_env(path):
         raise ValueError(
             "Evaluation endpoint must be HTTPS without embedded credentials or query parameters"
         )
+    review_mode = settings.get("MEDAGENT_DSH_REVIEW_MODE", "shadow")
+    if review_mode not in {"shadow", "advisory"}:
+        raise ValueError("MEDAGENT_DSH_REVIEW_MODE must be shadow or advisory")
+    settings["MEDAGENT_DSH_REVIEW_MODE"] = review_mode
     return settings
 
 
