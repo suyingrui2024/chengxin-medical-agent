@@ -30,6 +30,9 @@ try {
         PATH: process.env.PATH,
         DSH_HOME: scratch,
         DEEPSEEK_API_KEY: "installation-check-only",
+        ...(process.env.ELECTRON_RUN_AS_NODE
+          ? { ELECTRON_RUN_AS_NODE: process.env.ELECTRON_RUN_AS_NODE }
+          : {}),
       },
       timeout: 20000,
     },
@@ -75,6 +78,9 @@ try {
         PATH: process.env.PATH,
         DSH_HOME: scratch,
         DEEPSEEK_API_KEY: "installation-check-only",
+        ...(process.env.ELECTRON_RUN_AS_NODE
+          ? { ELECTRON_RUN_AS_NODE: process.env.ELECTRON_RUN_AS_NODE }
+          : {}),
       },
       timeout: 20000,
     },
