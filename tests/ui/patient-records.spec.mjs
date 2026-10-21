@@ -12,10 +12,10 @@ test("patient records keep dated measurements editable and archive images locall
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
+  await page.getByRole("button", { name: "开始问诊", exact: true }).click();
+  await page.getByRole("button", { name: "我自己", exact: true }).click();
   await page.getByRole("button", { name: /健康档案/ }).click();
-  await expect(
-    page.getByRole("heading", { name: "每次数据，按时间留下来。" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "健康档案" })).toBeVisible();
 
   await page.getByRole("button", { name: "记录血糖" }).click();
   const glucose = page.getByRole("dialog", { name: "记录一次血糖" });
@@ -34,7 +34,12 @@ test("patient records keep dated measurements editable and archive images locall
   await detail.getByRole("button", { name: "保存修改" }).click();
   await expect(detail).toContainText("6.6 mmol/L");
   await expect(detail.getByText("2 个版本")).toBeVisible();
-  await detail.getByRole("button", { name: "关闭" }).click();
+  await expect(detail).toContainText("只会带入你已经确认的数据");
+  await detail.getByRole("button", { name: "带入 1 项数据" }).click();
+  await expect(page.locator("#view-consultation")).toBeVisible();
+  await expect(page.locator("#report-items-summary")).toContainText("6.6");
+  await expect(page.locator("#report-items-summary")).toContainText("血糖自测");
+  await page.getByRole("button", { name: /健康档案/ }).click();
 
   await page.getByRole("button", { name: "上传医疗图片" }).click();
   const upload = page.getByRole("dialog", { name: "上传一张医疗图片" });

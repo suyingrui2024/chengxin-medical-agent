@@ -544,7 +544,15 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             "patient_confirmed_report_items": [
                 {
                     key: item.get(key)
-                    for key in ("name", "reported_value", "unit", "reference_range")
+                    for key in (
+                        "name",
+                        "reported_value",
+                        "unit",
+                        "reference_range",
+                        "record_title",
+                        "measured_at",
+                        "source",
+                    )
                 }
                 for item in state.report_items[-20:]
             ],

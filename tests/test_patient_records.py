@@ -239,6 +239,53 @@ class PatientRecordStoreTests(unittest.TestCase):
                 expected_revision_id=observation["current_revision_id"],
             )
 
+    def test_timeline_highlights_values_and_only_verified_values_are_shareable(self):
+        manual = self.store.add_measurement(
+            self.patient["patient_id"],
+            kind="blood_glucose",
+            value_text="6.2",
+            unit="mmol/L",
+            measured_at="2026-08-30T07:20:00+08:00",
+            measurement_context="fasting",
+        )
+        uploaded = self.upload("2026-08-20T08:00:00+08:00")
+        run = self.store.start_recognition(uploaded["asset_id"], "deepseek", "fixture")
+        recognized = self.store.finish_recognition(run, recognition())
+
+        timeline = self.store.timeline(self.patient["patient_id"])
+        manual_row = next(
+            item for item in timeline["entries"] if item["entry_id"] == manual["entry"]["entry_id"]
+        )
+        self.assertEqual(manual_row["highlights"][0]["value_text"], "6.2")
+        self.assertEqual(manual_row["confirmed_count"], 1)
+        self.assertEqual(
+            self.store.shareable_entry(uploaded["entry"]["entry_id"])["observations"],
+            [],
+        )
+        uploaded_row = next(
+            item
+            for item in timeline["entries"]
+            if item["entry_id"] == uploaded["entry"]["entry_id"]
+        )
+        self.assertEqual(uploaded_row["review_count"], 3)
+
+        clear = next(
+            item
+            for item in recognized["observations"]
+            if item["verification_status"] == "model_extracted"
+            and item["kind"] == "document_number"
+        )
+        self.store.revise_observation(
+            clear["observation_id"],
+            value_text=clear["value_text"],
+            unit=clear["unit"],
+            expected_revision_id=clear["current_revision_id"],
+            reason="confirmation",
+        )
+        shared = self.store.shareable_entry(uploaded["entry"]["entry_id"])
+        self.assertEqual(len(shared["observations"]), 1)
+        self.assertEqual(shared["observations"][0]["verification_status"], "patient_confirmed")
+
     def test_glucose_trend_uses_confirmed_values_and_registered_conversion(self):
         for value, unit, measured_at in (
             ("5.5", "mmol/L", "2026-08-20T07:00:00+08:00"),

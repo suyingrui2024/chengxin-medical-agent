@@ -809,6 +809,10 @@ class PatientRecordStore:
                     (SELECT COUNT(*) FROM clarification_requests c
                      JOIN observations o ON o.observation_id = c.observation_id
                      WHERE o.entry_id = e.entry_id AND c.status = 'pending') AS pending_count,
+                    (SELECT COUNT(*) FROM observations o
+                     WHERE o.entry_id = e.entry_id
+                       AND o.verification_status IN ('model_extracted', 'needs_confirmation'))
+                       AS review_count,
                     (SELECT asset_id FROM source_assets a
                      WHERE a.entry_id = e.entry_id AND a.deleted_at IS NULL LIMIT 1) AS asset_id
                    FROM medical_entries e
@@ -817,7 +821,61 @@ class PatientRecordStore:
                             e.uploaded_at DESC""",
                 (patient_id,),
             ).fetchall()
-        return {"patient": patient, "entries": [dict(row) for row in rows]}
+            observations = connection.execute(
+                """SELECT o.entry_id, o.observation_id, o.kind, o.display_name,
+                          o.value_text, o.unit, o.measurement_context,
+                          o.verification_status, o.current_revision_id
+                   FROM observations o
+                   JOIN medical_entries e ON e.entry_id = o.entry_id
+                   WHERE e.patient_id = ? AND e.deleted_at IS NULL
+                     AND o.kind != 'document_content'
+                   ORDER BY o.created_at, o.observation_id""",
+                (patient_id,),
+            ).fetchall()
+        highlights: dict[str, list[dict[str, Any]]] = {}
+        for observation in observations:
+            highlights.setdefault(observation["entry_id"], []).append(dict(observation))
+        entries = []
+        for row in rows:
+            item = dict(row)
+            item["highlights"] = highlights.get(item["entry_id"], [])[:3]
+            item["confirmed_count"] = sum(
+                observation["verification_status"]
+                in {"patient_confirmed", "patient_corrected"}
+                for observation in highlights.get(item["entry_id"], [])
+            )
+            entries.append(item)
+        return {"patient": patient, "entries": entries}
+
+    def shareable_entry(self, entry_id: str) -> dict[str, Any]:
+        """Return current patient-verified values that may enter a consultation."""
+        detail = self.entry(entry_id)
+        verified = []
+        for observation in detail["observations"]:
+            if observation["verification_status"] not in {
+                "patient_confirmed",
+                "patient_corrected",
+            }:
+                continue
+            if not observation.get("value_text"):
+                continue
+            verified.append(
+                {
+                    key: observation.get(key)
+                    for key in (
+                        "observation_id",
+                        "current_revision_id",
+                        "kind",
+                        "display_name",
+                        "value_text",
+                        "unit",
+                        "measurement_context",
+                        "measured_at",
+                        "verification_status",
+                    )
+                }
+            )
+        return {"entry": detail["entry"], "observations": verified}
 
     def glucose_trend(self, patient_id: str) -> dict[str, Any]:
         self.patient(patient_id)

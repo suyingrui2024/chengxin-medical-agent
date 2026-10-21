@@ -879,9 +879,9 @@
             <div class="page-heading records-heading">
               <div>
                 <p class="eyebrow">LONGITUDINAL HEALTH RECORD</p>
-                <h1>每次数据，按时间留下来。</h1>
+                <h1>健康档案</h1>
                 <p class="page-description">
-                  报告和自测数据分别归档。模糊内容会单独请你核对。
+                  按时间查看自测与报告；你决定哪些数据用于问诊。
                 </p>
               </div>
               <div class="records-actions">
@@ -899,10 +899,41 @@
             </div>
             <div id="records-notice" class="notice-strip">
               <svg class="icon"><use href="#i-info" /></svg>
-              原始图片、模型识别和你的修改分别保留；你可以随时查看或删除。
+              原图、识别结果和修改记录分别保留；待核对内容不会自动进入问诊。
             </div>
             <div id="records-summary" class="records-summary" hidden></div>
             <section id="records-trend" class="records-trend" hidden></section>
+            <div class="records-toolbar" aria-label="筛选健康档案">
+              <button
+                type="button"
+                class="active"
+                data-record-filter="all"
+                aria-pressed="true"
+              >
+                全部
+              </button>
+              <button
+                type="button"
+                data-record-filter="pending"
+                aria-pressed="false"
+              >
+                待核对
+              </button>
+              <button
+                type="button"
+                data-record-filter="manual"
+                aria-pressed="false"
+              >
+                自测
+              </button>
+              <button
+                type="button"
+                data-record-filter="images"
+                aria-pressed="false"
+              >
+                图片
+              </button>
+            </div>
             <div id="records-timeline" class="records-timeline"></div>
           </section>
 

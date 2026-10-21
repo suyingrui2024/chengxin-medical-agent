@@ -85,7 +85,7 @@ const verification = {
   patient_corrected: "你已修正",
 };
 
-export function createPatientRecordsUI(api, toast) {
+export function createPatientRecordsUI(api, toast, options = {}) {
   const state = {
     patientId: null,
     visionAvailable: false,
@@ -93,6 +93,7 @@ export function createPatientRecordsUI(api, toast) {
     glucoseTrend: null,
     previewUrl: null,
     busy: false,
+    filter: "all",
   };
 
   function setFormBusy(form, busy) {
@@ -113,16 +114,16 @@ export function createPatientRecordsUI(api, toast) {
       target.hidden = true;
       return;
     }
-    const pending = entries.reduce((sum, item) => sum + item.pending_count, 0);
+    const pending = entries.reduce((sum, item) => sum + item.review_count, 0);
     const measurements = entries.filter(
       (item) => item.entry_type === "manual_measurement",
     ).length;
-    for (const [count, label] of [
-      [entries.length, "时间线记录"],
-      [pending, "待核对内容"],
-      [measurements, "患者自测"],
+    for (const [count, label, accent] of [
+      [pending, "待核对", pending > 0],
+      [entries.length, "全部记录", false],
+      [measurements, "自测数据", false],
     ]) {
-      const card = node("article");
+      const card = node("article", accent ? "attention" : "");
       card.append(node("strong", "", count), node("span", "", label));
       target.append(card);
     }
@@ -145,7 +146,21 @@ export function createPatientRecordsUI(api, toast) {
       target.append(empty);
       return;
     }
-    for (const item of entries) {
+    const visible = entries.filter((item) => {
+      if (state.filter === "pending") return item.review_count > 0;
+      if (state.filter === "manual")
+        return item.entry_type === "manual_measurement";
+      if (state.filter === "images")
+        return item.entry_type === "uploaded_document";
+      return true;
+    });
+    if (!visible.length) {
+      const empty = node("div", "empty-state compact");
+      empty.append(node("p", "", "这个分类下还没有记录。"));
+      target.append(empty);
+      return;
+    }
+    for (const item of visible) {
       const date = dateParts(
         item.measured_at || item.reported_at || item.uploaded_at,
       );
@@ -158,22 +173,42 @@ export function createPatientRecordsUI(api, toast) {
         document.createTextNode(date.rest),
       );
       const main = node("span", "record-main");
-      main.append(
-        node("strong", "", item.title),
-        node(
-          "small",
-          "",
-          `${item.entry_type === "manual_measurement" ? "患者手动录入" : "图片材料"} · ${item.observation_count} 项数据`,
-        ),
-      );
+      main.append(node("strong", "", item.title));
+      if (item.highlights?.length) {
+        const highlights = node("span", "record-highlights");
+        for (const observation of item.highlights) {
+          highlights.append(
+            node(
+              "span",
+              observation.verification_status === "needs_confirmation"
+                ? "pending"
+                : "",
+              `${observation.display_name} ${observation.value_text || "待核对"}${observation.unit ? ` ${observation.unit}` : ""}`,
+            ),
+          );
+        }
+        main.append(highlights);
+      } else {
+        main.append(
+          node(
+            "small",
+            "",
+            item.entry_type === "manual_measurement"
+              ? "患者手动录入"
+              : "原图已归档",
+          ),
+        );
+      }
       const status = node("span", "record-state");
       status.append(
         node(
           "span",
-          `subtle-pill ${item.pending_count ? "record-pending" : ""}`,
+          `subtle-pill ${item.review_count ? "record-pending" : ""}`,
           item.pending_count
-            ? `${item.pending_count} 项待核对`
-            : statuses[item.status] || item.status,
+            ? `${item.pending_count} 项内容模糊`
+            : item.review_count
+              ? `${item.review_count} 项待确认`
+              : statuses[item.status] || item.status,
         ),
         icon("arrow"),
       );
@@ -199,6 +234,33 @@ export function createPatientRecordsUI(api, toast) {
         `平均 ${trend.summary.average}，范围 ${trend.summary.minimum}–${trend.summary.maximum} mmol/L。仅展示描述性变化，不判断高低。`,
       ),
     );
+    const visual = node("div", "records-trend-visual");
+    if (trend.points.length > 1) {
+      const values = trend.points.map((point) =>
+        Number(point.normalized_value),
+      );
+      const minimum = Math.min(...values);
+      const maximum = Math.max(...values);
+      const spread = maximum - minimum || 1;
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 180 48");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", `近期 ${values.length} 次血糖变化`);
+      const points = values
+        .map((value, index) => {
+          const x = 8 + (index * 164) / (values.length - 1);
+          const y = 40 - ((value - minimum) / spread) * 32;
+          return `${x},${y}`;
+        })
+        .join(" ");
+      const line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polyline",
+      );
+      line.setAttribute("points", points);
+      svg.append(line);
+      visual.append(svg);
+    }
     const latest = node("div", "records-trend-value");
     latest.append(
       node("strong", "", `${trend.summary.latest.normalized_value} mmol/L`),
@@ -208,7 +270,8 @@ export function createPatientRecordsUI(api, toast) {
         `最近一次 · ${formatTime(trend.summary.latest.measured_at)}`,
       ),
     );
-    target.append(copy, latest);
+    visual.append(latest);
+    target.append(copy, visual);
     target.hidden = false;
   }
 
@@ -330,6 +393,34 @@ export function createPatientRecordsUI(api, toast) {
       }
     }
     const controls = node("div", "record-observation-actions");
+    if (observation.verification_status === "model_extracted") {
+      controls.append(
+        action("确认无误", "secondary-button", async (event) => {
+          const trigger = event.currentTarget;
+          trigger.disabled = true;
+          try {
+            const updated = await api(
+              `/api/observations/${observation.observation_id}/revisions`,
+              {
+                method: "POST",
+                body: {
+                  value_text: observation.value_text,
+                  unit: observation.unit || "",
+                  expected_revision_id: observation.current_revision_id,
+                  reason: "confirmation",
+                },
+              },
+            );
+            toast("已确认这项识别内容。");
+            await refresh();
+            rerender(updated);
+          } catch (error) {
+            toast(error.message);
+            trigger.disabled = false;
+          }
+        }),
+      );
+    }
     const edit = action(
       pending ? "手动填写" : "编辑",
       "secondary-button",
@@ -360,6 +451,63 @@ export function createPatientRecordsUI(api, toast) {
       card.append(history);
     }
     return card;
+  }
+
+  function consultationPanel(detail) {
+    const panel = node("section", "record-consultation-panel");
+    const copy = node("div");
+    copy.append(node("h3", "", "用于本次问诊"));
+    const verified = detail.observations.filter(
+      (item) =>
+        ["patient_confirmed", "patient_corrected"].includes(
+          item.verification_status,
+        ) && item.value_text,
+    );
+    const context = options.getConsultationContext?.() || {};
+    const attached = context.reportItems?.some(
+      (item) => item.source_entry_id === detail.entry.entry_id,
+    );
+    let message = "只会带入你已经确认的数据，并保留测量时间和来源。";
+    if (!verified.length)
+      message = "先核对识别内容；未经你确认的数据不会进入问诊。";
+    else if (!context.sessionId)
+      message = "先开始一次问诊并确认咨询对象为本人，再选择要使用的档案。";
+    else if (context.subject && context.subject !== "self")
+      message = "当前问诊对象不是本人，为避免混淆，这份档案不能带入。";
+    else if (!context.subject)
+      message = "请先在问诊中确认咨询对象为本人，再带入这份档案。";
+    copy.append(node("p", "", message));
+    panel.append(copy);
+    if (verified.length && context.sessionId && context.subject === "self") {
+      const attach = action(
+        attached ? "更新本次问诊" : `带入 ${verified.length} 项数据`,
+        "primary-button",
+        async (event) => {
+          const trigger = event.currentTarget;
+          trigger.disabled = true;
+          try {
+            const result = await api(
+              `/api/sessions/${context.sessionId}/patient-records/${detail.entry.entry_id}/attach`,
+              { method: "POST", body: {} },
+            );
+            $("#record-detail-dialog").close();
+            options.onAttached?.(result);
+          } catch (error) {
+            toast(error.message);
+            trigger.disabled = false;
+          }
+        },
+      );
+      panel.append(attach);
+    } else if (options.openConsultation) {
+      panel.append(
+        action("前往问诊", "secondary-button", () => {
+          $("#record-detail-dialog").close();
+          options.openConsultation();
+        }),
+      );
+    }
+    return panel;
   }
 
   function renderDetail(detail) {
@@ -424,6 +572,7 @@ export function createPatientRecordsUI(api, toast) {
       section.append(list);
       target.append(section);
     }
+    target.append(consultationPanel(detail));
     const actions = node("div", "record-detail-actions");
     if (
       asset &&
@@ -566,6 +715,17 @@ export function createPatientRecordsUI(api, toast) {
   }
 
   function bind() {
+    document.querySelectorAll("[data-record-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.filter = button.dataset.recordFilter;
+        document.querySelectorAll("[data-record-filter]").forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("active", active);
+          item.setAttribute("aria-pressed", String(active));
+        });
+        renderTimeline();
+      });
+    });
     $("#upload-medical-image").addEventListener("click", () => {
       $("#medical-image-feedback").textContent = "";
       $("#medical-image-dialog").showModal();

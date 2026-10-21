@@ -141,14 +141,13 @@ class PatientRecordApiTests(unittest.TestCase):
         with urlopen(self.base + f"/api/assets/{asset_id}/content", timeout=2) as response:
             self.assertEqual(response.headers["Content-Type"], "image/png")
             self.assertEqual(response.read(), image)
-        self.assertEqual(
-            self.request(
-                f"/api/entries/{entry_id}",
-                "DELETE",
-                {"expected_version": edited["entry"]["version"]},
-            ),
-            {"deleted": True},
+        deleted = self.request(
+            f"/api/entries/{entry_id}",
+            "DELETE",
+            {"expected_version": edited["entry"]["version"]},
         )
+        self.assertTrue(deleted["deleted"])
+        self.assertEqual(deleted["detached_session_count"], 0)
         self.assertEqual(
             self.request(f"/api/patients/{patient_id}/timeline")["entries"], []
         )
@@ -176,6 +175,73 @@ class PatientRecordApiTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as error:
             self.request(path, "POST", payload)
         self.assertEqual(error.exception.code, 409)
+
+    def test_verified_record_can_be_attached_only_to_a_self_consultation(self):
+        patient_id = self.request("/api/patients")["default_patient_id"]
+        detail = self.request(
+            f"/api/patients/{patient_id}/measurements/blood-glucose",
+            "POST",
+            {
+                "value_text": "6.8",
+                "unit": "mmol/L",
+                "measured_at": "2026-08-30T07:20:00+08:00",
+                "measurement_context": "fasting",
+            },
+        )
+        entry_id = detail["entry"]["entry_id"]
+        session_id = self.request("/api/sessions", "POST", {})["session_id"]
+        attach_path = f"/api/sessions/{session_id}/patient-records/{entry_id}/attach"
+        with self.assertRaises(HTTPError) as blocked:
+            self.request(attach_path, "POST", {})
+        self.assertEqual(blocked.exception.code, 400)
+
+        identity = self.request(
+            f"/api/sessions/{session_id}/messages", "POST", {"text": "我自己"}
+        )
+        self.assertEqual(identity["state"]["facts"]["consult_for"]["value"], "self")
+        attached = self.request(attach_path, "POST", {})
+        self.assertEqual(len(attached["items"]), 1)
+        item = attached["items"][0]
+        self.assertEqual(item["source"], "patient_record")
+        self.assertEqual(item["reported_value"], "6.8")
+        self.assertEqual(item["measured_at"], "2026-08-30T07:20:00+08:00")
+        handoff = self.request(f"/api/sessions/{session_id}/handoff")["handoff"]
+        self.assertEqual(handoff["report_items"][0]["record_title"], "血糖自测")
+
+        observation = detail["observations"][0]
+        revised = self.request(
+            f"/api/observations/{observation['observation_id']}/revisions",
+            "POST",
+            {
+                "value_text": "6.6",
+                "unit": "mmol/L",
+                "expected_revision_id": observation["current_revision_id"],
+            },
+        )
+        refreshed = self.request(attach_path, "POST", {})
+        matching = [
+            row
+            for row in refreshed["state"]["report_items"]
+            if row.get("source_observation_id") == observation["observation_id"]
+        ]
+        self.assertEqual(len(matching), 1)
+        self.assertEqual(matching[0]["reported_value"], "6.6")
+        self.assertEqual(
+            matching[0]["source_revision_id"],
+            revised["observations"][0]["current_revision_id"],
+        )
+        deleted = self.request(
+            f"/api/entries/{entry_id}",
+            "DELETE",
+            {"expected_version": revised["entry"]["version"]},
+        )
+        self.assertEqual(deleted["detached_session_count"], 1)
+        self.assertEqual(
+            self.request(f"/api/sessions/{session_id}/handoff")["handoff"][
+                "report_items"
+            ],
+            [],
+        )
 
 
 if __name__ == "__main__":

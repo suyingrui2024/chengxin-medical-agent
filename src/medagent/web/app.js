@@ -101,7 +101,19 @@ const state = {
 let pollTimer = null;
 let toastTimer = null;
 const executionUI = createExecutionUI(api);
-const patientRecordsUI = createPatientRecordsUI(api, toast);
+const patientRecordsUI = createPatientRecordsUI(api, toast, {
+  getConsultationContext: () => ({
+    sessionId: state.sessionId,
+    subject: state.case?.facts?.consult_for?.value || null,
+    reportItems: state.case?.report_items || [],
+  }),
+  openConsultation: () => navigate("consultation"),
+  onAttached: (data) => {
+    renderCase(data.state);
+    navigate("consultation");
+    toast(`已将 ${data.items.length} 项确认数据用于本次问诊。`);
+  },
+});
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -1102,13 +1114,23 @@ function renderReportItems(items) {
   if (!items.length) return;
   const heading = el("div", "report-items-heading");
   heading.append(
-    el("span", "", "已确认报告"),
+    el("span", "", "本次问诊使用的数据"),
     el("small", "", `${items.length} 项`),
   );
   const list = el("div", "report-items-list");
   items.forEach((item) => {
     const row = el("div", "report-item-row");
-    const label = [item.reported_value, item.unit].filter(Boolean).join(" ");
+    const value = [item.reported_value, item.unit].filter(Boolean).join(" ");
+    const provenance =
+      item.source === "patient_record"
+        ? [
+            item.record_title,
+            item.measured_at && formatTime(item.measured_at, true),
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : "";
+    const label = [value, provenance].filter(Boolean).join(" · ");
     row.append(el("strong", "", item.name), el("span", "", label || "已确认"));
     row.append(
       button("移除", "fact-edit", () => removeReportItem(item.report_item_id)),
@@ -1118,9 +1140,18 @@ function renderReportItems(items) {
   summary.append(heading, list);
 }
 function reportItemText(item) {
-  return [item.name, item.reported_value, item.unit, item.reference_range]
-    .filter(Boolean)
-    .join(" · ");
+  const parts = [
+    item.name,
+    item.reported_value,
+    item.unit,
+    item.reference_range,
+  ].filter(Boolean);
+  if (item.source === "patient_record") {
+    if (item.record_title && item.record_title !== item.name)
+      parts.push(item.record_title);
+    if (item.measured_at) parts.push(formatTime(item.measured_at, true));
+  }
+  return parts.join(" · ");
 }
 function renderReportDraft(draft) {
   const target = $("#report-draft-result");
@@ -1243,7 +1274,7 @@ function handoffLines(handoff) {
     (item) => `${item.label}：${handoffValue(item.value)}`,
   );
   if (handoff.report_items.length) {
-    rows.push("已确认报告：");
+    rows.push("本次问诊使用的数据：");
     handoff.report_items.forEach((item) =>
       rows.push(`- ${reportItemText(item)}`),
     );
@@ -1271,7 +1302,7 @@ function renderHandoff(handoff, renderDialog = true) {
   addSection("已记录", handoff.facts, (item) =>
     el("p", "", `${item.label}：${handoffValue(item.value)}`),
   );
-  addSection("已确认报告", handoff.report_items, (item) =>
+  addSection("本次问诊使用的数据", handoff.report_items, (item) =>
     el("p", "", reportItemText(item)),
   );
   addSection("仍待补充", handoff.needs_confirmation, (item) =>

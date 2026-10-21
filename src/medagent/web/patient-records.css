@@ -7,33 +7,66 @@
 }
 
 .records-summary {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 18px;
+  display: flex;
+  gap: 18px;
+  margin: 18px 0;
 }
 
 .records-summary article {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 15px 17px;
-  background: var(--surface);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding-right: 18px;
+  border-right: 1px solid var(--line);
+}
+
+.records-summary article:last-child {
+  border-right: 0;
+}
+
+.records-summary article.attention strong,
+.records-summary article.attention span {
+  color: var(--orange);
 }
 
 .records-summary strong,
 .records-summary span {
-  display: block;
+  display: inline;
 }
 
 .records-summary strong {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 550;
 }
 
 .records-summary span {
-  margin-top: 4px;
   color: var(--muted);
   font-size: 10px;
+}
+
+.records-toolbar {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.records-toolbar button {
+  min-height: 32px;
+  padding: 6px 13px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--muted);
+  background: transparent;
+}
+
+.records-toolbar button:hover {
+  background: var(--raised);
+}
+
+.records-toolbar button.active {
+  border-color: var(--line);
+  color: var(--ink);
+  background: var(--surface);
 }
 
 .records-timeline {
@@ -73,6 +106,26 @@
 
 .records-trend-value {
   text-align: right;
+}
+
+.records-trend-visual {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.records-trend-visual svg {
+  width: 150px;
+  height: 42px;
+  overflow: visible;
+}
+
+.records-trend-visual polyline {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .records-trend-value strong,
@@ -137,6 +190,27 @@
 .record-main strong,
 .record-main small {
   display: block;
+}
+
+.record-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.record-highlights span {
+  padding: 3px 7px;
+  border-radius: 7px;
+  color: var(--muted);
+  background: var(--light);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.record-highlights span.pending {
+  color: var(--orange);
+  background: var(--warning-bg);
 }
 
 .record-main > strong {
@@ -209,11 +283,41 @@
 .record-detail-meta,
 .record-description,
 .record-observation,
-.record-history {
+.record-history,
+.record-consultation-panel {
   border: 1px solid var(--line);
   border-radius: 11px;
   padding: 14px;
   background: var(--surface);
+}
+
+.record-consultation-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background: var(--light);
+}
+
+.record-consultation-panel h3,
+.record-consultation-panel p {
+  margin: 0;
+}
+
+.record-consultation-panel h3 {
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.record-consultation-panel p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.record-consultation-panel button {
+  flex: 0 0 auto;
 }
 
 .record-detail-meta {
@@ -319,7 +423,15 @@
   }
 
   .records-summary {
-    grid-template-columns: 1fr;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .records-summary article {
+    display: grid;
+    justify-items: center;
+    gap: 1px;
+    padding-right: 8px;
   }
 
   .records-trend {
@@ -328,6 +440,14 @@
 
   .records-trend-value {
     text-align: left;
+  }
+
+  .records-trend-visual {
+    justify-content: space-between;
+  }
+
+  .records-toolbar {
+    overflow-x: auto;
   }
 
   .record-card {
@@ -343,5 +463,10 @@
   .record-value-row,
   .record-inline-edit {
     grid-template-columns: 1fr;
+  }
+
+  .record-consultation-panel {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

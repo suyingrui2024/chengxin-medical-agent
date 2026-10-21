@@ -25,6 +25,7 @@ MATERIAL_EVENT_TYPES = {
     "capability.completed",
     "agent.summary_ready",
     "report.item_confirmed",
+    "patient_record.attached",
 }
 
 REVIEW_INSTRUCTIONS = """You are an asynchronous clinical-review assistant.
@@ -226,7 +227,15 @@ class BackgroundReviewCoordinator:
             "patient_confirmed_report_items": [
                 {
                     key: item.get(key)
-                    for key in ("name", "reported_value", "unit", "reference_range")
+                    for key in (
+                        "name",
+                        "reported_value",
+                        "unit",
+                        "reference_range",
+                        "record_title",
+                        "measured_at",
+                        "source",
+                    )
                 }
                 for item in state.report_items[-20:]
             ],

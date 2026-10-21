@@ -43,7 +43,16 @@ def build_handoff(state) -> dict[str, Any]:
         "report_items": [
             {
                 key: item.get(key)
-                for key in ("name", "reported_value", "unit", "reference_range", "status")
+                for key in (
+                    "name",
+                    "reported_value",
+                    "unit",
+                    "reference_range",
+                    "status",
+                    "record_title",
+                    "measured_at",
+                    "source",
+                )
             }
             for item in state.report_items
         ],

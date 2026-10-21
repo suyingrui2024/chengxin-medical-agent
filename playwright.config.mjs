@@ -16,7 +16,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      "PYTHONPATH=src python3 -m medagent.server --backend demo --port 18766",
+      "MEDAGENT_PATIENT_DATA_DIR=test-results/ui/patient-data PYTHONPATH=src python3 -m medagent.server --backend demo --port 18766",
     url: "http://127.0.0.1:18766/api/health",
     reuseExistingServer: false,
   },

@@ -323,6 +323,115 @@ class Handler(BaseHTTPRequestHandler):
         if (
             len(parts) == 6
             and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "patient-records"
+            and parts[5] == "attach"
+        ):
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            payload = self._read_json()
+            if payload is None:
+                return
+            if payload:
+                self._error(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_patient_record",
+                    "健康档案带入参数无效",
+                )
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    if state.get("consult_for") != "self":
+                        raise PatientRecordError(
+                            "请先在本次问诊中确认咨询对象为本人，再带入这份健康档案"
+                        )
+                    shared = self.app.patient_records.shareable_entry(parts[4])
+                    default_patient = self.app.patient_records.ensure_default_patient()
+                    if shared["entry"]["patient_id"] != default_patient["patient_id"]:
+                        raise PatientRecordError("这条记录不属于本人的默认健康档案")
+                    observations = shared["observations"]
+                    if not observations:
+                        raise PatientRecordError(
+                            "这条记录还没有经你确认的数据，请先完成核对"
+                        )
+                    observation_ids = {
+                        item["observation_id"] for item in observations
+                    }
+                    state.report_items = [
+                        item
+                        for item in state.report_items
+                        if item.get("source_observation_id") not in observation_ids
+                    ]
+                    entry = shared["entry"]
+                    attached = []
+                    for observation in observations:
+                        confirmed = {
+                            "report_item_id": (
+                                f"patient-record:{observation['observation_id']}:"
+                                f"{observation['current_revision_id']}"
+                            ),
+                            "name": observation["display_name"],
+                            "reported_value": observation["value_text"],
+                            "unit": observation["unit"] or "",
+                            "reference_range": "",
+                            "status": "confirmed_by_patient",
+                            "source": "patient_record",
+                            "source_entry_id": entry["entry_id"],
+                            "source_observation_id": observation["observation_id"],
+                            "source_revision_id": observation["current_revision_id"],
+                            "record_title": entry["title"],
+                            "measured_at": observation["measured_at"]
+                            or entry["measured_at"],
+                        }
+                        state.report_items.append(confirmed)
+                        attached.append(confirmed)
+                    state.revision += 1
+                    state.updated_at = utc_now()
+                    latest_turn_id = next(
+                        (
+                            event.turn_id
+                            for event in reversed(
+                                self.app.events.for_session(state.session_id)
+                            )
+                            if event.event_type == "turn.agent_reply"
+                        ),
+                        None,
+                    )
+                    self.app.events.append(
+                        Event(
+                            state.session_id,
+                            "patient_record.attached",
+                            {
+                                "entry_id": entry["entry_id"],
+                                "observation_count": len(attached),
+                                "revision_ids": [
+                                    item["source_revision_id"] for item in attached
+                                ],
+                            },
+                            turn_id=latest_turn_id,
+                        )
+                    )
+                    self.app.reviews.invalidate(state, "patient_record_attached")
+                    self.app.reviews.schedule(engine, state)
+                    response = {"items": attached, "state": state.to_dict()}
+            except KeyError:
+                self._error(
+                    HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话"
+                )
+                return
+            except PatientRecordError as exc:
+                self._error(
+                    HTTPStatus.BAD_REQUEST, "invalid_patient_record", str(exc)
+                )
+                return
+            self._json(response)
+            return
+        if (
+            len(parts) == 6
+            and parts[0:2] == ["api", "sessions"]
             and parts[3] == "report-drafts"
             and parts[5] == "confirm"
         ):
@@ -880,8 +989,8 @@ class Handler(BaseHTTPRequestHandler):
                 and parts[0:2] == ["api", "observations"]
                 and parts[3] == "revisions"
             ):
-                allowed = {"value_text", "unit", "expected_revision_id"}
-                if set(payload) != allowed:
+                required = {"value_text", "unit", "expected_revision_id"}
+                if not required.issubset(payload) or set(payload) - (required | {"reason"}):
                     raise PatientRecordError("数据修改参数不完整")
                 detail = self.app.patient_records.revise_observation(parts[2], **payload)
                 self.app.events.append(
@@ -915,6 +1024,34 @@ class Handler(BaseHTTPRequestHandler):
             if set(payload) != {"expected_version"}:
                 raise PatientRecordError("删除请求缺少记录版本")
             self.app.patient_records.delete_entry(parts[2], payload["expected_version"])
+            detached_sessions = []
+            for session in self.app.workspace.sessions():
+                session_id = session["session_id"]
+                try:
+                    engine = self.app.workspace.engine_for(session_id)
+                    with engine._session_locks[session_id]:
+                        state = engine.state(session_id)
+                        retained = [
+                            item
+                            for item in state.report_items
+                            if item.get("source_entry_id") != parts[2]
+                        ]
+                        if len(retained) == len(state.report_items):
+                            continue
+                        state.report_items = retained
+                        state.revision += 1
+                        state.updated_at = utc_now()
+                        self.app.reviews.invalidate(state, "patient_record_deleted")
+                        detached_sessions.append(session_id)
+                        self.app.events.append(
+                            Event(
+                                session_id,
+                                "patient_record.detached",
+                                {"entry_id": parts[2], "reason": "record_deleted"},
+                            )
+                        )
+                except KeyError:
+                    continue
             self.app.events.append(
                 Event(
                     "patient-records",
@@ -922,7 +1059,9 @@ class Handler(BaseHTTPRequestHandler):
                     {"entry_id": parts[2]},
                 )
             )
-            self._json({"deleted": True})
+            self._json(
+                {"deleted": True, "detached_session_count": len(detached_sessions)}
+            )
         except PatientRecordConflict as exc:
             self._error(HTTPStatus.CONFLICT, "stale_patient_record", str(exc))
         except PatientRecordError as exc:
