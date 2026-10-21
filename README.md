@@ -16,9 +16,9 @@ Python 3.10+；DSH 模式另需 Node 22.19+。以下命令从项目根目录运�
 
 | 平台 | 当前支持范围 | 首次配置 | 日常启动 |
 | --- | --- | --- | --- |
-| Windows 10 19044+／Windows 11 x64 | 已验证的原生桌面版；Windows 11 Arm 可运行 x64 应用 | 在 PowerShell 执行 `scripts/windows.ps1 -Mode Setup`。脚本下载项目专用 Python、Node、Electron 与原生执行器，并创建桌面快捷方式。 | 双击桌面“澄心问诊”，或执行 `scripts/windows.ps1 -Mode Start`。 |
-| Ubuntu／其他 Linux x64 | 已验证 Linux x64 的源码版与桌面打包版 | 准备系统 Python 3.10+；DSH 模式另需系统 Node 22.19+。从源码运行时执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`，可再运行 `npm run desktop:shortcut` 创建 GNOME 启动器。 | 双击“澄心问诊.desktop”，或执行 `./scripts/start-desktop.sh`。打包目录也必须完整保留。 |
-| macOS（Apple Silicon／Intel） | 可从源码启动开发版；尚无安装器、打包产物或 CI 验收 | 准备 Python 3.10+ 和 Node 22.19+（Homebrew 可执行 `brew install node@22`），再执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`。 | 执行 `./scripts/start-desktop.sh`；读取项目 `.env` 时执行 `./scripts/start-desktop.sh --live`。启动器会优先使用 Homebrew 的 `node@22`。 |
+| Windows 10 19044+／Windows 11 x64 | 已验证的原生桌面版；Windows 11 Arm 可运行 x64 应用 | 在 PowerShell 执行 `scripts/windows.ps1 -Mode Setup`。脚本下载项目专用 Python、Node、Electron 与原生执行器，并创建桌面快捷方式；`scripts/config/windows/03-configure-full.ps1` 生成两层本地配置。 | 双击桌面“澄心问诊”，或执行 `scripts/windows.ps1 -Mode Start`。 |
+| Ubuntu／其他 Linux x64 | 已验证 Linux x64 的源码版与桌面打包版 | 准备系统 Python 3.10+；DSH 模式另需系统 Node 22.19+。从源码运行时执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`；`./scripts/config/ubuntu/03-configure-full.sh` 生成两层本地配置。 | 双击“澄心问诊.desktop”，或执行 `./scripts/start-desktop.sh`。打包目录也必须完整保留。 |
+| macOS（Apple Silicon／Intel） | 可从源码启动开发版；尚无安装器、打包产物或 CI 验收 | 准备 Python 3.10+ 和 Node 22.19+（Homebrew 可执行 `brew install node@22`），再执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`。可运行 `./scripts/config/macos/03-configure-full.sh` 生成两层本地配置。 | 执行 `./scripts/start-desktop.sh`；读取项目 `.env` 时执行 `./scripts/start-desktop.sh --live`。启动器会优先使用 Homebrew 的 `node@22`。 |
 
 上述桌面快捷方式和启动器只提供“点击启动”，不设置登录后或开机自动启动。Windows 的安装与完整验收范围见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)，Linux 的打包与验证细节见 [桌面版使用、打包和验证](docs/桌面应用使用与打包.md)。
 
@@ -38,15 +38,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode 
 
 安装脚本下载 SHA256 固定的完整便携 Windows Python 3.14.8、Node 22.23.3 与 Microsoft MXC 原生执行器到 `.runtime/windows`，安装锁定依赖和 Electron，检查成功后创建桌面快捷方式。不修改系统 PATH，不要求预装 Windows Python、Node、Conda 或 pip。首次下载需要网络；Python 随带 venv 和 pip，工作台可在自己的工作区建立项目环境。
 
-真实问诊可在患者界面的“模型服务”中配置自己的 DeepSeek API；密钥默认只保留到应用关闭。桌面系统提供安全凭据存储时，患者可主动选择在本机记住，密钥由操作系统对应的安全存储加密，页面、病例数据库和普通日志都不能读回明文。开发者也可在原项目根目录自行填写 `.env` 后显式启动：
+真实问诊可在患者界面的“模型服务”中配置自己的 DeepSeek API；密钥默认只保留到应用关闭。桌面系统提供安全凭据存储时，患者可主动选择在本机记住，密钥由操作系统对应的安全存储加密，页面、病例数据库和普通日志都不能读回明文。开发者可使用完整配置脚本生成两层 `.env` 后显式启动：
 
 ```powershell
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-notepad .env
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\config\windows\03-configure-full.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start -Live
 ```
 
 Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。`561b89b` 的 [Windows CI 验收](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102424997)已通过：Server 2025 x64 覆盖桌面、安装器、快捷方式与卸载；Windows 11 Arm 运行 x64 应用覆盖原生隔离、源码与便携包的完整 SDK 执行、产物落盘、子智能体验证及会话接续。六套皮肤及重启恢复、真实 CSV 数值图表也已实测。完整执行要求支持 ProcessContainer 的已更新 Windows 11，启动时实际探测；Windows 10 和实体 Windows 11 x64 尚未实际验证。更改已合并到 `main`，详见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)。
+
+Windows 两层配置的三个入口和启动命令见 [`scripts/config/windows`](scripts/config/windows/README.md)。
 
 ### 独立桌面应用（推荐）
 
@@ -71,6 +72,10 @@ npm start
 ```bash
 ./scripts/start-desktop.sh --live
 ```
+
+macOS 开发环境提供三个快速配置入口：`01-configure-common.sh` 生成通用模型层并启用直接模型模式，`02-configure-dsh.sh` 生成 DSH 覆盖层并合并，`03-configure-full.sh` 一次生成两个分层和最终 `.env`。脚本位于 [`scripts/config/macos`](scripts/config/macos/README.md)，隐藏读取 API Key，生成文件均不会进入 Git。
+
+Ubuntu 使用相同的两层和三个入口，说明见 [`scripts/config/ubuntu`](scripts/config/ubuntu/README.md)。
 
 默认桌面图标保持离线演示；`--live` 才读取本地密钥和模型配置，适配 DSH 或直接接口。启动和初始会谈不自动调用模型，提交描述后才调用。
 
@@ -226,7 +231,7 @@ npm run dsh:check
 
 export MEDAGENT_LLM_BASE_URL="https://api.deepseek.com/anthropic"
 export MEDAGENT_LLM_API_KEY="你的API密钥"
-export MEDAGENT_LLM_MODEL="deepseek-v4-flash"
+export MEDAGENT_LLM_MODEL="deepseek-flash"
 # 默认影子复核；完成独立评测后才可显式改为 advisory。
 export MEDAGENT_DSH_REVIEW_MODE="shadow"
 PYTHONPATH=src python3 -m medagent.server --backend dsh --port 18765

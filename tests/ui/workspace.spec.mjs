@@ -275,7 +275,7 @@ test("patient can open a simplified DeepSeek preset without exposing a key", asy
     "https://api.deepseek.com/anthropic",
   );
   await expect(page.getByLabel("模型 ID", { exact: true })).toHaveValue(
-    "deepseek-v4-flash",
+    "deepseek-flash",
   );
   await expect(page.getByLabel("图片模型 ID（可选）")).toHaveValue(
     "deepseek-flash",

@@ -26,6 +26,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode 
 
 `Setup` 下载 SHA256 固定的 Python 3.14.8、Node 22.23.3 和 MXC 1.0.1 原生执行器到 `.runtime/windows`，安装锁定依赖和 Electron，并检查实际窗口。无须预装 Python、Node、Conda 或 pip，不修改全局 PATH。源码安装默认创建演示与显式加载 `.env` 的两个快捷方式；自动化可加 `-NoShortcut`。首次安装需要访问官方发行源与 npm。
 
+真实模型开发配置分为通用模型层和 DSH 覆盖层。可分别运行 `scripts/config/windows/01-configure-common.ps1`、`02-configure-dsh.ps1`，或使用 `03-configure-full.ps1` 一次生成 `.env.common`、`.env.dsh` 和最终 `.env`。三个入口使用项目便携 Python，API Key 隐藏输入，随后以 `-Mode Start -Live` 显式加载。
+
 可选命令：
 
 | 模式 | 用途 |

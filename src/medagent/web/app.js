@@ -2228,7 +2228,7 @@ function renderModeFields() {
 function useDeepSeekPreset() {
   $("#settings-form").elements.backend.value = "dsh";
   $("#base-url").value = "https://api.deepseek.com/anthropic";
-  $("#model-id").value = "deepseek-v4-flash";
+  $("#model-id").value = "deepseek-flash";
   $("#vision-model").value = "deepseek-flash";
   renderModeFields();
   $("#api-key").focus();
