@@ -13,6 +13,9 @@ fi
 if [ -x "$project_dir/dist/desktop/Chengxin-0.11.17-linux-x64/Chengxin" ]; then
     exec "$project_dir/dist/desktop/Chengxin-0.11.17-linux-x64/Chengxin" "$@"
 fi
+if [ -x "$project_dir/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron" ]; then
+    exec "$project_dir/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron" "$project_dir" "$@"
+fi
 if [ -x "$project_dir/node_modules/electron/dist/electron" ]; then
     exec "$project_dir/node_modules/electron/dist/electron" "$project_dir" "$@"
 fi
