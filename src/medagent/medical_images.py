@@ -9,7 +9,6 @@ from __future__ import annotations
 import base64
 import binascii
 import json
-import os
 import re
 import struct
 from dataclasses import dataclass
@@ -330,19 +329,35 @@ class DeepSeekVisionRecognizer:
             raise RecognitionError("视觉模型没有返回有效的识别协议") from None
 
 
-def recognizer_from_settings(settings: dict[str, str], backend_mode: str):
+def vision_configuration_status(
+    settings: dict[str, str], backend_mode: str
+) -> dict[str, str]:
     if backend_mode == "demo":
-        return None
+        return {"status": "offline", "message": "离线模式不发送图片"}
     base_url = settings.get("MEDAGENT_LLM_BASE_URL", "").strip()
     api_key = settings.get("MEDAGENT_LLM_API_KEY", "").strip()
     if not base_url or not api_key:
-        return None
+        return {"status": "not_configured", "message": "尚未配置图片服务"}
     host = (urlparse(base_url).hostname or "").lower()
-    explicit_model = os.environ.get("MEDAGENT_VISION_MODEL", "").strip()
+    explicit_model = settings.get("MEDAGENT_VISION_MODEL", "").strip()
     if not explicit_model and host != "api.deepseek.com":
+        return {
+            "status": "not_configured",
+            "message": "自定义服务需要填写图片模型 ID",
+        }
+    return {"status": "configured", "message": "已配置，首次识别时验证图片能力"}
+
+
+def recognizer_from_settings(settings: dict[str, str], backend_mode: str):
+    status = vision_configuration_status(settings, backend_mode)
+    if status["status"] != "configured":
         return None
+    base_url = settings.get("MEDAGENT_LLM_BASE_URL", "").strip()
+    api_key = settings.get("MEDAGENT_LLM_API_KEY", "").strip()
+    host = (urlparse(base_url).hostname or "").lower()
+    explicit_model = settings.get("MEDAGENT_VISION_MODEL", "").strip()
     return DeepSeekVisionRecognizer(
         base_url,
         api_key,
-        explicit_model or "deepseek-flash",
+        explicit_model or ("deepseek-flash" if host == "api.deepseek.com" else ""),
     )

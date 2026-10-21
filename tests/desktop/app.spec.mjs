@@ -63,6 +63,85 @@ test("explicit live mode configures a model without making an automatic model ca
   }
 });
 
+test("patient model credentials persist only through native secure storage", async () => {
+  const profile = await mkdtemp(
+    path.join(root, ".runtime", "desktop-test-credentials-"),
+  );
+  const environment = {
+    ...process.env,
+    MEDAGENT_DESKTOP_PROFILE: profile,
+    MEDAGENT_DESKTOP_LIVE: "0",
+  };
+  delete environment.ELECTRON_RUN_AS_NODE;
+  const executablePath = process.env.MEDAGENT_DESKTOP_BINARY;
+  const launch = () =>
+    electron.launch({
+      executablePath,
+      args: executablePath ? [] : [root],
+      env: environment,
+    });
+  let desktop = await launch();
+  try {
+    let window = await desktop.firstWindow();
+    await expect(window.getByText("本机服务已连接")).toBeVisible({
+      timeout: 15000,
+    });
+    await window.getByRole("button", { name: "模型与运行配置" }).click();
+    const status = await window.evaluate(() =>
+      window.chengxinDesktop.modelCredentials.status(),
+    );
+    if (!status.available) {
+      await expect(window.locator("#remember-model-control")).toBeHidden();
+      return;
+    }
+    const secret = "desktop-secure-storage-test-only";
+    await window
+      .getByRole("button", { name: "使用 DeepSeek 推荐配置" })
+      .click();
+    await window.getByLabel("API 密钥").fill(secret);
+    await window.locator("#model-data-consent-input").check();
+    await window.locator("#remember-model").check();
+    await window.getByRole("button", { name: "应用配置" }).click();
+    await expect(window.locator("#settings-dialog")).not.toBeVisible();
+    await desktop.close();
+    desktop = null;
+
+    const stored = await readFile(
+      path.join(profile, "model-credentials.v1"),
+      "utf8",
+    );
+    expect(stored).not.toContain(secret);
+
+    desktop = await launch();
+    window = await desktop.firstWindow();
+    await expect(window.getByText("本机服务已连接")).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(window.locator("#patient-mode-label")).toHaveText("DSH 问诊");
+    const settings = await window.evaluate(async () =>
+      (await fetch("/api/settings")).json(),
+    );
+    expect(settings.has_api_key).toBe(true);
+    expect(JSON.stringify(settings)).not.toContain(secret);
+
+    await window.getByRole("button", { name: "模型与运行配置" }).click();
+    await expect(window.locator("#forget-saved-model")).toBeVisible();
+    window.once("dialog", (dialog) => dialog.accept());
+    await window.locator("#forget-saved-model").click();
+    await expect(window.locator("#patient-mode-label")).toHaveText("离线演示");
+    const cleared = await window.evaluate(async () =>
+      (await fetch("/api/settings")).json(),
+    );
+    expect(cleared.has_api_key).toBe(false);
+    await expect(
+      readFile(path.join(profile, "model-credentials.v1"), "utf8"),
+    ).rejects.toThrow();
+  } finally {
+    if (desktop) await desktop.close();
+    await rm(profile, { recursive: true, force: true });
+  }
+});
+
 test("desktop app owns its window, private sidecar and shutdown lifecycle", async () => {
   const profile = await mkdtemp(path.join(root, ".runtime", "desktop-test-"));
   const environment = { ...process.env };

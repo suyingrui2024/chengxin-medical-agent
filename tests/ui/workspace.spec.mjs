@@ -234,13 +234,20 @@ test("settings are real, keep old sessions, and never return credentials", async
   await page.screenshot({ path: `${shots}/04-settings.png`, fullPage: true });
   await page.getByRole("radio", { name: /直接模型/ }).check();
   await page.getByLabel("服务地址").fill("file:///tmp/nope");
-  await page.getByLabel("模型 ID").fill("fixture");
+  await page.getByLabel("模型 ID", { exact: true }).fill("fixture");
   await page.getByLabel("API 密钥").fill("ui-test-only-secret");
+  await page.locator("#model-data-consent-input").check();
   await page.getByRole("button", { name: "应用配置" }).click();
   await expect(page.locator("#settings-feedback")).toContainText("HTTP(S)");
   await page.getByRole("radio", { name: /离线演示/ }).check();
   await page.getByRole("button", { name: "测试连接" }).click();
   await expect(page.locator("#settings-feedback")).toContainText("已就绪");
+  await expect(page.locator("#model-capability-results")).toContainText(
+    "文字问诊",
+  );
+  await expect(page.locator("#model-capability-results")).toContainText(
+    "图片识别",
+  );
   await page.getByRole("button", { name: "应用配置" }).click();
   await expect(page.locator("#settings-dialog")).not.toBeVisible();
   const settings = await (await request.get("/api/settings")).json();
@@ -248,6 +255,35 @@ test("settings are real, keep old sessions, and never return credentials", async
   await expect(
     page.getByRole("button", { name: "我自己", exact: true }),
   ).toBeVisible();
+});
+
+test("patient can open a simplified DeepSeek preset without exposing a key", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const trigger = page.getByRole("button", {
+    name: "模型与运行配置",
+    exact: true,
+  });
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  await page.getByRole("button", { name: "使用 DeepSeek 推荐配置" }).click();
+  await expect(
+    page.locator('input[name="backend"][value="dsh"]'),
+  ).toBeChecked();
+  await expect(page.getByLabel("服务地址")).toHaveValue(
+    "https://api.deepseek.com/anthropic",
+  );
+  await expect(page.getByLabel("模型 ID", { exact: true })).toHaveValue(
+    "deepseek-v4-flash",
+  );
+  await expect(page.getByLabel("图片模型 ID（可选）")).toHaveValue(
+    "deepseek-flash",
+  );
+  await expect(page.locator("#credential-storage-hint")).toContainText(
+    "浏览器模式不会保存密钥",
+  );
+  expect(await page.getByLabel("API 密钥").inputValue()).toBe("");
 });
 
 test("task library preview cannot write observations and has step navigation", async ({

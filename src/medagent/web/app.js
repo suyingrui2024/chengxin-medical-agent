@@ -81,6 +81,7 @@ const state = {
   sessions: [],
   tasks: [],
   settings: { backend: "demo" },
+  modelCredentials: { available: false, has_saved_config: false },
   view: "consultation",
   busy: false,
   starting: false,
@@ -2217,9 +2218,60 @@ function renderModeFields() {
         ? "DSH 会收到已提交内容的结构化病例快照进行受限复核；仅作为下一轮追问的内部参考，不会直接形成患者结论。"
         : "DSH 会收到已提交内容的结构化病例快照，用于后台影子复核；它不会读取正在输入的内容，也不会直接形成患者结论。";
 }
+function useDeepSeekPreset() {
+  $("#settings-form").elements.backend.value = "dsh";
+  $("#base-url").value = "https://api.deepseek.com/anthropic";
+  $("#model-id").value = "deepseek-v4-flash";
+  $("#vision-model").value = "deepseek-flash";
+  renderModeFields();
+  $("#api-key").focus();
+}
+function renderCapabilityResults(capabilities) {
+  const container = $("#model-capability-results");
+  if (!capabilities) {
+    container.hidden = true;
+    container.replaceChildren();
+    return;
+  }
+  const labels = { consultation: "文字问诊", dsh: "DSH", vision: "图片识别" };
+  container.replaceChildren(
+    ...Object.entries(labels).map(([key, label]) => {
+      const item = capabilities[key] || { message: "未检查" };
+      const row = el("div", "model-capability-row");
+      row.append(el("strong", "", label), el("span", "", item.message));
+      return row;
+    }),
+  );
+  container.hidden = false;
+}
+async function readCredentialStatus() {
+  const bridge = window.chengxinDesktop?.modelCredentials;
+  if (!bridge) return { available: false, has_saved_config: false };
+  try {
+    return await bridge.status();
+  } catch {
+    return { available: false, has_saved_config: false };
+  }
+}
+function renderCredentialOptions() {
+  const status = state.modelCredentials;
+  $("#remember-model-control").hidden = !status.available;
+  $("#remember-model").checked = status.has_saved_config;
+  $("#forget-saved-model").hidden = !status.has_saved_config;
+  $("#credential-storage-hint").textContent = status.available
+    ? status.has_saved_config
+      ? "这台设备已有一份由操作系统加密保存的模型配置。"
+      : "勾选后由操作系统安全凭据存储加密保存；应用无法从页面读取已保存密钥。"
+    : window.chengxinDesktop
+      ? "当前系统没有可用的安全凭据存储，密钥只能用于本次运行。"
+      : "浏览器模式不会保存密钥；关闭服务后配置失效。";
+}
 async function openSettings() {
   try {
-    state.settings = await api("/api/settings");
+    [state.settings, state.modelCredentials] = await Promise.all([
+      api("/api/settings"),
+      readCredentialStatus(),
+    ]);
   } catch (error) {
     toast(error.message);
     return;
@@ -2228,7 +2280,9 @@ async function openSettings() {
   form.elements.backend.value = state.settings.backend;
   $("#base-url").value = state.settings.base_url || "";
   $("#model-id").value = state.settings.model || "";
+  $("#vision-model").value = state.settings.vision_model || "";
   $("#api-key").value = "";
+  $("#model-data-consent-input").checked = false;
   $("#dsh-review-enabled").checked =
     state.settings.dsh_background_review_enabled !== false;
   $("#api-key").placeholder = state.settings.has_api_key
@@ -2238,6 +2292,8 @@ async function openSettings() {
     ? "服务器已持有密钥；浏览器不会读取它。填写新值可替换。"
     : "密钥不会写入浏览器存储或配置文件。";
   $("#settings-feedback").textContent = "";
+  renderCapabilityResults();
+  renderCredentialOptions();
   renderModeFields();
   $("#settings-dialog").showModal();
 }
@@ -2247,6 +2303,7 @@ function settingsPayload() {
     base_url: $("#base-url").value,
     model: $("#model-id").value,
     api_key: $("#api-key").value,
+    vision_model: $("#vision-model").value,
   };
 }
 async function configure(testOnly) {
@@ -2255,6 +2312,27 @@ async function configure(testOnly) {
     return;
   }
   const feedback = $("#settings-feedback");
+  const payload = settingsPayload();
+  if (
+    !testOnly &&
+    payload.backend !== "demo" &&
+    !$("#model-data-consent-input").checked
+  ) {
+    feedback.classList.add("error");
+    feedback.textContent = "请先确认已了解数据会发送到所选模型服务。";
+    return;
+  }
+  if (
+    !testOnly &&
+    payload.backend !== "demo" &&
+    $("#remember-model").checked &&
+    !payload.api_key.trim() &&
+    !state.modelCredentials.has_saved_config
+  ) {
+    feedback.classList.add("error");
+    feedback.textContent = "首次保存到本机时，请填写 API 密钥。";
+    return;
+  }
   feedback.classList.remove("error");
   feedback.textContent = testOnly
     ? "正在发送不含患者数据的连接测试…"
@@ -2264,15 +2342,34 @@ async function configure(testOnly) {
   try {
     const data = await api(testOnly ? "/api/settings/test" : "/api/settings", {
       method: "POST",
-      body: settingsPayload(),
+      body: payload,
     });
     if (testOnly) {
       feedback.textContent = data.message;
+      renderCapabilityResults(data.capabilities);
     } else {
+      const credentials = window.chengxinDesktop?.modelCredentials;
+      let persistenceError = null;
+      if (credentials) {
+        try {
+          if (payload.backend === "demo" || !$("#remember-model").checked)
+            await credentials.clear();
+          else await credentials.save(payload);
+        } catch (error) {
+          persistenceError = error;
+        }
+        state.modelCredentials = await readCredentialStatus();
+      }
       $("#api-key").value = "";
       state.settings = data;
       await executionUI.updateConfiguration();
       updateMode();
+      if (persistenceError) {
+        renderCredentialOptions();
+        feedback.classList.add("error");
+        feedback.textContent = `配置已用于本次运行，但未能保存到本机：${persistenceError.message}`;
+        return;
+      }
       $("#settings-dialog").close();
       toast("配置已应用。开始新的问诊时使用新后端，已有会谈继续保留。");
     }
@@ -2282,6 +2379,30 @@ async function configure(testOnly) {
   } finally {
     $("#test-connection").disabled = false;
     $("#save-settings").disabled = false;
+  }
+}
+
+async function forgetSavedModel() {
+  if (!window.confirm("删除这台设备保存的模型密钥，并将新问诊恢复为离线模式？"))
+    return;
+  const feedback = $("#settings-feedback");
+  feedback.classList.remove("error");
+  feedback.textContent = "正在删除本机密钥…";
+  try {
+    await window.chengxinDesktop.modelCredentials.clear();
+    const data = await api("/api/settings", {
+      method: "POST",
+      body: { backend: "demo" },
+    });
+    state.settings = data;
+    state.modelCredentials = await readCredentialStatus();
+    updateMode();
+    renderCredentialOptions();
+    $("#settings-dialog").close();
+    toast("本机模型密钥已删除，新问诊已恢复离线模式。");
+  } catch (error) {
+    feedback.classList.add("error");
+    feedback.textContent = error.message;
   }
 }
 
@@ -2453,6 +2574,8 @@ $("#export-session").addEventListener("click", exportSession);
 $("#open-settings").addEventListener("click", openSettings);
 $("#backend-pill").addEventListener("click", openSettings);
 $("#settings-form").addEventListener("change", renderModeFields);
+$("#use-deepseek-preset").addEventListener("click", useDeepSeekPreset);
+$("#forget-saved-model").addEventListener("click", forgetSavedModel);
 $("#dsh-review-enabled").addEventListener("change", (event) =>
   setBackgroundReviewEnabled(event.target.checked),
 );
@@ -2519,6 +2642,8 @@ document
   );
 $("#settings-dialog").addEventListener("close", () => {
   $("#api-key").value = "";
+  $("#model-data-consent-input").checked = false;
+  renderCapabilityResults();
 });
 $("#mobile-menu").addEventListener("click", () =>
   $("#sidebar").classList.toggle("open"),

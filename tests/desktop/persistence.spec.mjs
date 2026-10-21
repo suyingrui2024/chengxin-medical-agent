@@ -185,6 +185,7 @@ test("desktop restores offline history, rotates credentials and resumes the orig
     await page.locator("#base-url").fill(endpoint);
     await page.locator("#model-id").fill("deepseek-flash");
     await page.locator("#api-key").fill("native-persist-rotated-key");
+    await page.locator("#model-data-consent-input").check();
     await page.locator("#save-settings").click();
     await expect(page.locator("#settings-dialog")).not.toBeVisible();
     await expect(page.locator("#execution-run")).toBeEnabled();

@@ -6,14 +6,14 @@ test.beforeAll(async () => {
   await mkdir(shots, { recursive: true });
 });
 
-test("patient view removes developer navigation while keeping the same conversation", async ({
+test("patient view keeps model service while removing developer navigation", async ({
   page,
 }) => {
   await page.goto("/");
   await expect(page.getByText("本机服务已连接")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "模型与运行配置" }),
-  ).toBeHidden();
+  ).toBeVisible();
   await expect(page.locator('.nav-item[data-view="inspect"]')).toBeHidden();
   await expect(
     page.locator('.nav-item[data-view="capabilities"]'),

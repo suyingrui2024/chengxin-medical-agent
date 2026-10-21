@@ -183,10 +183,11 @@
           </div>
           <button
             id="open-settings"
-            class="nav-item settings-button developer-only"
+            class="nav-item settings-button"
             type="button"
+            aria-label="模型与运行配置"
           >
-            <svg class="icon"><use href="#i-settings" /></svg>模型与运行配置
+            <svg class="icon"><use href="#i-settings" /></svg>模型服务
           </button>
           <div class="version-line">
             <span>研究原型</span><span>能力协议 v1</span>
@@ -1293,7 +1294,7 @@
           </button>
         </div>
         <p class="dialog-description">
-          配置只在本次服务进程中生效。已有会谈继续使用创建时的后端，新配置用于新的会谈。
+          选择离线流程或连接你自己的模型服务。已有会谈继续使用创建时的配置，新配置用于新的会谈。
         </p>
         <fieldset class="mode-options">
           <legend>运行方式</legend>
@@ -1313,6 +1314,13 @@
             ><span class="mode-index">03</span></label
           >
         </fieldset>
+        <button
+          id="use-deepseek-preset"
+          class="secondary-button model-preset"
+          type="button"
+        >
+          使用 DeepSeek 推荐配置
+        </button>
         <div id="model-fields">
           <label class="field-label" for="base-url">服务地址</label
           ><input
@@ -1343,6 +1351,35 @@
           <p class="field-hint" id="key-hint">
             密钥不会写入浏览器存储或配置文件。
           </p>
+          <label class="field-label" for="vision-model"
+            >图片模型 ID（可选）</label
+          ><input
+            id="vision-model"
+            name="vision_model"
+            type="text"
+            placeholder="DeepSeek 官方服务可留空"
+            autocomplete="off"
+          />
+          <p class="field-hint">
+            自定义服务需要明确填写支持图片输入的模型。图片能力会在首次识别时验证。
+          </p>
+          <label id="model-data-consent" class="settings-check">
+            <input id="model-data-consent-input" type="checkbox" />
+            <span>我知道提交问诊或图片后，相应内容会发送到所选模型服务。</span>
+          </label>
+          <label id="remember-model-control" class="settings-check" hidden>
+            <input id="remember-model" type="checkbox" />
+            <span>使用操作系统安全凭据存储，在这台设备上记住模型配置。</span>
+          </label>
+          <p id="credential-storage-hint" class="field-hint"></p>
+          <button
+            id="forget-saved-model"
+            class="text-button forget-model"
+            type="button"
+            hidden
+          >
+            删除本机密钥并恢复离线模式
+          </button>
           <p id="dsh-review-notice" class="field-hint" hidden>
             DSH
             会收到已提交内容的结构化病例快照，用于后台影子复核；它不会读取正在输入的内容，也不会直接形成患者结论。
@@ -1353,6 +1390,11 @@
           </label>
         </div>
         <p id="settings-feedback" class="form-feedback" role="status"></p>
+        <div
+          id="model-capability-results"
+          class="model-capability-results"
+          hidden
+        ></div>
         <div class="dialog-footer">
           <button id="test-connection" class="secondary-button" type="button">
             测试连接</button

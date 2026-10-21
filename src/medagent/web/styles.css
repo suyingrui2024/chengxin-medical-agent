@@ -1493,9 +1493,7 @@ svg.icon {
 }
 .recent-sessions {
   margin-top: 12px;
-  overflow: auto;
-  min-height: 0;
-  flex: 1;
+  flex: 0 0 auto;
 }
 .sidebar-empty {
   padding: 10px 12px;
@@ -1526,6 +1524,7 @@ svg.icon {
   margin-right: 9px;
 }
 .sidebar-bottom {
+  flex: 0 0 auto;
   margin-top: auto;
   padding-top: 24px;
 }
@@ -2978,6 +2977,48 @@ dialog::backdrop {
   color: var(--muted);
   font-size: 9px;
   margin-top: 5px;
+}
+.model-preset {
+  width: 100%;
+  margin: -6px 0 4px;
+}
+.settings-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+.settings-check input {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  accent-color: var(--green);
+}
+.forget-model {
+  justify-content: flex-start;
+  color: var(--red);
+  padding-bottom: 0;
+}
+.model-capability-results {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+.model-capability-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.model-capability-row strong {
+  color: var(--ink);
+  font-weight: 550;
 }
 .mode-index {
   margin-left: auto;

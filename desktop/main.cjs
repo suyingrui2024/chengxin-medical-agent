@@ -6,6 +6,7 @@ const {
   session,
   ipcMain,
   nativeTheme,
+  safeStorage,
   shell,
 } = require("electron");
 const { spawn } = require("node:child_process");
@@ -19,6 +20,7 @@ const {
   saveAppearance,
   valid: validAppearance,
 } = require("./appearance.cjs");
+const { createModelCredentialStore } = require("./model-credentials.cjs");
 
 const projectRoot = path.resolve(__dirname, "..");
 const { version } = require("../package.json");
@@ -27,6 +29,11 @@ app.setPath(
   "userData",
   process.env.MEDAGENT_DESKTOP_PROFILE ||
     path.join(app.getPath("appData"), `chengxin-medagent-${version}`),
+);
+const modelCredentials = createModelCredentialStore(
+  safeStorage,
+  process.env.MEDAGENT_DESKTOP_PROFILE ||
+    path.join(app.getPath("appData"), "chengxin-medagent"),
 );
 app.setAppUserModelId("org.medagent.chengxin");
 if (process.platform === "linux") {
@@ -61,7 +68,7 @@ function nativeAppearance(value) {
   }[resolved];
 }
 
-function trustedAppearanceSender(event) {
+function trustedRendererSender(event) {
   return (
     !stopping &&
     event.sender === window?.webContents &&
@@ -73,16 +80,32 @@ function trustedAppearanceSender(event) {
 }
 
 ipcMain.on("appearance:read", (event) => {
-  event.returnValue = trustedAppearanceSender(event)
+  event.returnValue = trustedRendererSender(event)
     ? readAppearance(app.getPath("userData"))
     : null;
 });
 ipcMain.handle("appearance:save", (event, value, ...args) => {
-  if (!trustedAppearanceSender(event) || args.length || !validAppearance(value))
+  if (!trustedRendererSender(event) || args.length || !validAppearance(value))
     throw new Error("只能保存当前应用的外观选项");
   saveAppearance(app.getPath("userData"), value);
   window.setBackgroundColor(nativeAppearance(value));
   return { saved: true };
+});
+
+ipcMain.handle("model-credentials:status", (event, ...args) => {
+  if (!trustedRendererSender(event) || args.length)
+    throw new Error("只能从当前应用检查模型凭据");
+  return modelCredentials.status();
+});
+ipcMain.handle("model-credentials:save", (event, config, ...args) => {
+  if (!trustedRendererSender(event) || args.length)
+    throw new Error("只能从当前应用保存模型凭据");
+  return modelCredentials.save(config);
+});
+ipcMain.handle("model-credentials:clear", (event, ...args) => {
+  if (!trustedRendererSender(event) || args.length)
+    throw new Error("只能从当前应用删除模型凭据");
+  return modelCredentials.clear();
 });
 
 function pythonCommand() {
@@ -111,6 +134,20 @@ function pythonCommand() {
 function startBackend(token) {
   return new Promise((resolve, reject) => {
     const runtimeEnv = { ...process.env };
+    const remembered =
+      process.env.MEDAGENT_DESKTOP_LIVE === "1"
+        ? null
+        : modelCredentials.read();
+    if (remembered) {
+      Object.assign(runtimeEnv, {
+        MEDAGENT_DESKTOP_LIVE: "1",
+        MEDAGENT_BACKEND: remembered.backend,
+        MEDAGENT_LLM_BASE_URL: remembered.base_url,
+        MEDAGENT_LLM_API_KEY: remembered.api_key,
+        MEDAGENT_LLM_MODEL: remembered.model,
+        MEDAGENT_VISION_MODEL: remembered.vision_model,
+      });
+    }
     if (process.platform === "win32") {
       for (const relative of ["runtime/node", ".runtime/windows/node"]) {
         const directory = path.join(projectRoot, relative);
@@ -359,7 +396,7 @@ if (!app.requestSingleInstanceLock()) {
                   title: "澄心问诊",
                   message: "澄心问诊 · 桌面研究原型",
                   detail:
-                    "本地独立窗口。默认离线演示；会谈和模型配置仅在进程内保存。",
+                    "本地独立窗口。默认离线演示；模型密钥可仅用于本次运行，或由系统安全凭据存储加密保存。",
                 }),
             },
             { type: "separator" },

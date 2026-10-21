@@ -38,7 +38,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode 
 
 安装脚本下载 SHA256 固定的完整便携 Windows Python 3.14.8、Node 22.23.3 与 Microsoft MXC 原生执行器到 `.runtime/windows`，安装锁定依赖和 Electron，检查成功后创建桌面快捷方式。不修改系统 PATH，不要求预装 Windows Python、Node、Conda 或 pip。首次下载需要网络；Python 随带 venv 和 pip，工作台可在自己的工作区建立项目环境。
 
-真实问诊可在界面配置模型；也可在原项目根目录自行填写 `.env` 后显式启动：
+真实问诊可在患者界面的“模型服务”中配置自己的 DeepSeek API；密钥默认只保留到应用关闭。桌面系统提供安全凭据存储时，患者可主动选择在本机记住，密钥由操作系统对应的安全存储加密，页面、病例数据库和普通日志都不能读回明文。开发者也可在原项目根目录自行填写 `.env` 后显式启动：
 
 ```powershell
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
@@ -232,7 +232,7 @@ export MEDAGENT_DSH_REVIEW_MODE="shadow"
 PYTHONPATH=src python3 -m medagent.server --backend dsh --port 18765
 ```
 
-DSH 模式使用固定发行版的 DeepSeek Messages 协议。端点必须支持这个协议；普通 `/chat/completions` 端点应使用下面的 `compatible` 模式。项目不会自动读取 `.env`，请在启动环境导出变量。不要把真实密钥写进仓库。
+DSH 模式使用固定发行版的 DeepSeek Messages 协议。端点必须支持这个协议；普通 `/chat/completions` 端点应使用下面的 `compatible` 模式。普通启动不会自动读取 `.env`；只有 `--live` 开发入口会显式读取项目根目录 `.env`。不要把真实密钥写进仓库。
 
 患者视图的“健康档案”会把不同测量日期的材料分别保存到本机 SQLite 数据库。JPEG、PNG、WebP 图片经格式与尺寸检查后，使用 DeepSeek 视觉模型提取数值候选和整体内容；模糊数值保持为空，只展示候选供患者按需核对。使用 DeepSeek 官方端点时视觉模型默认是 `deepseek-flash`，也可显式设置 `MEDAGENT_VISION_MODEL`；请求格式对应 [DeepSeek 官方 Vision 文档](https://api-docs.deepseek.com/guides/vision/)。原始图片、模型结果和患者修订分别保留；普通日志不记录图片、识别文字或测量值。详细数据模型、删除边界和实施范围见 [患者纵向医疗数据与图片识别归档设计](docs/患者纵向医疗数据与图片识别归档设计.md)。
 

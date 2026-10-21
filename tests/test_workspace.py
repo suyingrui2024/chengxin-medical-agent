@@ -38,6 +38,10 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIs(self.workspace.engine, engine)
         self.assertEqual(self.workspace.backend, "demo")
 
+    def test_remote_http_provider_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "HTTPS"):
+            self.workspace.apply(self.config(base_url="http://model.example/v1"))
+
     def test_changed_endpoint_cannot_silently_reuse_a_previous_key(self):
         self.workspace.apply(self.config())
         with self.assertRaises(ValueError):
@@ -58,7 +62,40 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(history[0]["fact_count"], 0)
 
     def test_demo_connection_check_does_not_invoke_a_model(self):
-        self.assertTrue(self.workspace.probe({"backend": "demo"})["ok"])
+        result = self.workspace.probe({"backend": "demo"})
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["capabilities"]["consultation"]["status"], "offline")
+        self.assertEqual(result["capabilities"]["vision"]["status"], "offline")
+
+    def test_runtime_configuration_carries_a_separate_vision_model(self):
+        result = self.workspace.apply(
+            self.config(vision_model="deepseek-vision-fixture")
+        )
+        self.assertEqual(result["vision_model"], "deepseek-vision-fixture")
+        self.assertNotIn("test-secret", json.dumps(result))
+
+    def test_returning_to_demo_clears_the_current_process_configuration(self):
+        self.workspace.apply(self.config(vision_model="vision-fixture"))
+        result = self.workspace.apply({"backend": "demo"})
+        self.assertFalse(result["has_api_key"])
+        self.assertEqual(result["base_url"], "")
+        self.assertEqual(result["model"], "")
+        self.assertEqual(result["vision_model"], "")
+
+    @patch("medagent.workspace.CompatibleBackend")
+    def test_connection_probe_reports_text_dsh_and_vision_separately(self, backend):
+        backend.return_value.decide.return_value = {
+            "tool": "inspect_case",
+            "arguments": {},
+        }
+        result = self.workspace.probe(
+            self.config(vision_model="vision-fixture")
+        )
+        self.assertEqual(result["capabilities"]["consultation"]["status"], "verified")
+        self.assertEqual(result["capabilities"]["dsh"]["status"], "not_selected")
+        self.assertEqual(result["capabilities"]["vision"]["status"], "configured")
+        messages = backend.return_value.decide.call_args.args[1]
+        self.assertEqual(messages[1]["content"], "Connection test. No patient data.")
 
 
 if __name__ == "__main__":

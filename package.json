@@ -11,6 +11,7 @@
     "desktop:build": "node scripts/build-desktop.mjs",
     "desktop:shortcut": "node scripts/create-desktop-shortcut.mjs",
     "test:desktop": "playwright test --config playwright.desktop.config.mjs",
+    "test:desktop-credentials": "node --test desktop/model-credentials.test.cjs",
     "test:desktop:live": "PYTHONPATH=src python3 scripts/test_live_desktop.py",
     "test:execution": "RUN_DSH_EXECUTION=1 PYTHONPATH=src python3 -m unittest discover -s tests -p test_execution.py -v",
     "test:execution:live": "PYTHONPATH=src python3 scripts/evaluate_execution.py",

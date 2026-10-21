@@ -14,7 +14,9 @@ from medagent.medical_images import (
     MedicalImageError,
     decode_image_data_url,
     inspect_image,
+    recognizer_from_settings,
     validate_recognition,
+    vision_configuration_status,
 )
 from medagent.patient_records import (
     PatientRecordConflict,
@@ -73,6 +75,21 @@ def recognition():
 
 
 class MedicalImageContractTests(unittest.TestCase):
+    def test_runtime_settings_can_configure_a_distinct_image_model(self):
+        settings = {
+            "MEDAGENT_LLM_BASE_URL": "https://model.example/v1",
+            "MEDAGENT_LLM_API_KEY": "test-key",
+            "MEDAGENT_VISION_MODEL": "vision-fixture",
+        }
+        self.assertEqual(
+            vision_configuration_status(settings, "compatible")["status"],
+            "configured",
+        )
+        self.assertEqual(
+            recognizer_from_settings(settings, "compatible").model,
+            "vision-fixture",
+        )
+
     def test_intake_uses_actual_image_content_and_dimensions(self):
         data = png(80, 48)
         inspected = inspect_image(data)

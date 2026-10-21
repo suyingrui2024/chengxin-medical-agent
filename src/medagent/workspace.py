@@ -12,6 +12,7 @@ from .runtime import build_runtime
 from pathlib import Path
 from .extensions.builtin import load_registry, templates
 from .events import Event
+from .medical_images import vision_configuration_status
 
 
 class StaleCompositionError(ValueError):
@@ -34,6 +35,7 @@ class Workspace:
                 "MEDAGENT_LLM_BASE_URL",
                 "MEDAGENT_LLM_API_KEY",
                 "MEDAGENT_LLM_MODEL",
+                "MEDAGENT_VISION_MODEL",
             )
         }
 
@@ -43,13 +45,20 @@ class Workspace:
                 "backend": self.backend,
                 "base_url": self.settings["MEDAGENT_LLM_BASE_URL"],
                 "model": self.settings["MEDAGENT_LLM_MODEL"],
+                "vision_model": self.settings["MEDAGENT_VISION_MODEL"],
                 "has_api_key": bool(self.settings["MEDAGENT_LLM_API_KEY"]),
                 "dsh_review_mode": os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow"),
                 "storage": "process_memory",
             }
 
     def resolve(self, payload):
-        if set(payload) - {"backend", "base_url", "model", "api_key"}:
+        if set(payload) - {
+            "backend",
+            "base_url",
+            "model",
+            "api_key",
+            "vision_model",
+        }:
             raise ValueError("配置包含不支持的字段")
         mode = payload.get("backend")
         if mode not in {"demo", "compatible", "dsh"}:
@@ -59,6 +68,7 @@ class Workspace:
             "base_url": "MEDAGENT_LLM_BASE_URL",
             "model": "MEDAGENT_LLM_MODEL",
             "api_key": "MEDAGENT_LLM_API_KEY",
+            "vision_model": "MEDAGENT_VISION_MODEL",
         }
         for key, name in mapping.items():
             value = payload.get(key)
@@ -68,6 +78,8 @@ class Workspace:
                 if key == "api_key" and not value.strip():
                     continue  # Blank retains an existing key, never sends it back to the browser.
                 config[name] = value.strip()
+        if mode == "demo":
+            config = {name: "" for name in self.settings}
         url = config["MEDAGENT_LLM_BASE_URL"]
         if mode != "demo":
             changing_service = mode != self.backend or url.rstrip("/") != self.settings[
@@ -89,6 +101,12 @@ class Workspace:
                 or parsed.fragment
             ):
                 raise ValueError("请填写不含账号、查询参数或片段的 HTTP(S) 服务地址")
+            if parsed.scheme == "http" and parsed.hostname not in {
+                "127.0.0.1",
+                "::1",
+                "localhost",
+            }:
+                raise ValueError("外部模型服务必须使用 HTTPS；HTTP 只允许本机测试地址")
             if not config["MEDAGENT_LLM_API_KEY"] or not config["MEDAGENT_LLM_MODEL"]:
                 raise ValueError("请填写模型 ID 和 API 密钥")
         return mode, config
@@ -160,7 +178,15 @@ class Workspace:
                 raise RuntimeError("工作台正在关闭")
             mode, config = self.resolve(payload)
             if mode == "demo":
-                return {"ok": True, "message": "离线演示已就绪，无需模型连接。"}
+                return {
+                    "ok": True,
+                    "message": "离线演示已就绪，无需模型连接。",
+                    "capabilities": {
+                        "consultation": {"status": "offline", "message": "使用本地固定流程"},
+                        "dsh": {"status": "offline", "message": "离线模式未启用"},
+                        "vision": {"status": "offline", "message": "离线模式不发送图片"},
+                    },
+                }
             events = EventStore()
             backend = (
                 CompatibleBackend(events, config)
@@ -186,7 +212,18 @@ class Workspace:
                     backend.close()
         if result != {"tool": "inspect_case", "arguments": {}}:
             raise ValueError("服务有响应，但未返回预期 JSON 协议")
-        return {"ok": True, "message": "连接成功，模型返回了有效的协议响应。"}
+        return {
+            "ok": True,
+            "message": "连接成功，模型返回了有效的协议响应。",
+            "capabilities": {
+                "consultation": {"status": "verified", "message": "问诊协议已验证"},
+                "dsh": {
+                    "status": "verified" if mode == "dsh" else "not_selected",
+                    "message": "DSH 协议已验证" if mode == "dsh" else "当前使用直接模型接口",
+                },
+                "vision": vision_configuration_status(config, mode),
+            },
+        }
 
     def engine_for(self, session_id):
         with self.lock:
