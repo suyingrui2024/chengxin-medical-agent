@@ -377,6 +377,7 @@ class ConsultationEngine(
                 reply.quick_replies = [
                     QuickReply(**item) for item in old.get("quick_replies", [])
                 ]
+                reply.adaptive_question = deepcopy(old.get("adaptive_question"))
                 state.active_question_is_clarification = bool(
                     resume.get("clarification")
                 )
@@ -1508,7 +1509,7 @@ class ConsultationEngine(
         self._clear_calculation(state, "urgent")
         self._clear_observation(state, "urgent")
         self._clear_task_conversation(state, "urgent")
-        reply = self._finish(state)
+        reply = self._finish(state, risk_override=deepcopy(state.risk))
         reply.kind = "urgent"
         reply.message = (
             "目前有需要尽快就医评估的线索（"
@@ -1625,9 +1626,14 @@ class ConsultationEngine(
             ],
         }
 
-    def _finish(self, state: CaseState) -> AgentReply:
+    def _finish(
+        self,
+        state: CaseState,
+        *,
+        risk_override: Optional[RiskAssessment] = None,
+    ) -> AgentReply:
         state.phase = Phase.SUMMARY
-        state.risk = self.triage.assess(state)
+        state.risk = risk_override or self.triage.assess(state)
         needs_confirmation = state.risk.level not in {
             RiskLevel.EMERGENCY,
             RiskLevel.URGENT,

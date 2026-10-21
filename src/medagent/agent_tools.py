@@ -38,6 +38,34 @@ TOOL_DEFINITIONS = [
         "arguments": {"question_id": "candidate ID"},
     },
     {
+        "name": "ask_patient",
+        "description": (
+            "针对一个尚未处理的注册字段生成一个患者问题和0到8个上下文相关选项。"
+            "按钮文字与数量可以动态变化；文字模式不带选项。单选可标记需要补充，"
+            "多选可标记互斥项。allow_other启用自由补充。风险标签只能描述选项中"
+            "明确可见的症状，不是诊断或隐藏推断。"
+        ),
+        "arguments": {
+            "topic": "registered fact field",
+            "question": "one concise patient question",
+            "selection_mode": "single|multiple|text",
+            "options": [
+                {
+                    "id": "stable snake_case id",
+                    "label": "patient-visible button text",
+                    "response_text": "patient answer submitted when selected; must include label verbatim",
+                    "risk_tags": [],
+                    "exclusive": False,
+                    "requires_detail": False,
+                    "detail_placeholder": "optional prompt when detail is required",
+                }
+            ],
+            "allow_other": True,
+            "other_label": "其他情况",
+            "other_placeholder": "请补充具体情况",
+        },
+    },
+    {
         "name": "clarify",
         "description": "就问诊字段或当前symptom_location澄清。定位时用answer_fields声明需回答的region/area/side/extent，宿主展示对应输入；粗部位只选region。定位补问最多80字，不写伴随症状。其他主题不传answer_fields。",
         "arguments": {
@@ -116,6 +144,13 @@ ARGUMENTS = {
     "list_questions": set(),
     "change_subject": {"evidence"},
     "ask_question": {"question_id"},
+    "ask_patient": {
+        "topic",
+        "question",
+        "selection_mode",
+        "options",
+        "allow_other",
+    },
     "clarify": {"topic", "message"},
     "show_self_check": {"task_id"},
     "revise_self_check": {"task_id", "evidence"},
@@ -138,6 +173,8 @@ def validate_command(command: Dict[str, Any]) -> None:
     optional = (
         {"answer_fields"}
         if name == "clarify"
+        else {"other_label", "other_placeholder"}
+        if name == "ask_patient"
         else {"input", "input_evidence"}
         if name == "propose_self_check_result"
         else set()

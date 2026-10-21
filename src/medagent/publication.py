@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .domain import AgentReply, CaseState, Phase, QuickReply, RiskLevel
+from .adaptive_questions import AdaptiveQuestionError, validate_adaptive_question
 
 
 @dataclass(frozen=True)
@@ -39,6 +40,13 @@ class ReplyPublicationGate:
             failures.append("quick_replies_are_bounded")
         if len({choice.value for choice in choices}) != len(choices):
             failures.append("quick_reply_values_are_unique")
+        if reply.adaptive_question is not None:
+            try:
+                validate_adaptive_question(reply.adaptive_question)
+            except AdaptiveQuestionError:
+                failures.append("adaptive_question_is_valid")
+            if reply.kind != "question" or reply.task or reply.quick_replies:
+                failures.append("adaptive_question_has_one_interaction")
         if state.risk.level == RiskLevel.EMERGENCY and (
             reply.kind != "emergency"
             or reply.phase != Phase.CLOSED

@@ -79,21 +79,41 @@ def reply_presentation(reply):
             )
         )
     if (
-        question
+        (question or reply.get("adaptive_question"))
         and reply["kind"] in {"question", "clarification"}
         and not reply.get("task")
     ):
+        adaptive = deepcopy(reply.get("adaptive_question"))
+        question_id = question["id"] if question else adaptive["topic"]
+        question_data = {
+            "question_id": question_id,
+            "prompt": reply["message"],
+            "canonical": bool(question and reply["message"] == question["prompt"]),
+            "input_kind": question["input"] if question else "adaptive",
+            "choices": reply.get("quick_replies", []),
+        }
+        if adaptive:
+            question_data.update(
+                {
+                    "adaptive": True,
+                    "selection_mode": adaptive["selection_mode"],
+                    "choices": adaptive["options"],
+                    "allow_other": adaptive["allow_other"],
+                    **(
+                        {
+                            "other_label": adaptive["other_label"],
+                            "other_placeholder": adaptive["other_placeholder"],
+                        }
+                        if adaptive["allow_other"]
+                        else {}
+                    ),
+                }
+            )
         blocks.append(
             block(
                 "question",
                 f"question:{identity}",
-                {
-                    "question_id": question["id"],
-                    "prompt": reply["message"],
-                    "canonical": reply["message"] == question["prompt"],
-                    "input_kind": question["input"],
-                    "choices": reply.get("quick_replies", []),
-                },
+                question_data,
             )
         )
     if reply.get("task"):

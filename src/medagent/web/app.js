@@ -444,7 +444,7 @@ function appendMessage(text, role, kind = "") {
   if (role === "user") avatar.textContent = "你";
   else {
     const image = el("img");
-    image.src = "brand.svg";
+    image.src = "brand.png";
     image.alt = "";
     avatar.append(image);
   }
@@ -472,8 +472,8 @@ function patientActionContext() {
     state.reply?.action_id === actionId;
   return {
     isBusy: () => !current(),
-    onChoose: (label, value) => {
-      if (current()) sendMessage(label, value);
+    onChoose: (label, value, responseText = label) => {
+      if (current()) sendMessage(responseText, value);
     },
     onConfirmAnswer: (text) => {
       if (current()) sendMessage(text);

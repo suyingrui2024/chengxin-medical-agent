@@ -213,6 +213,69 @@ export function validateQuestion(data) {
     data.choices.length > 16
   )
     throw new Error("Invalid question");
+  if (data.adaptive !== undefined && typeof data.adaptive !== "boolean")
+    throw new Error("Invalid adaptive question flag");
+  if (data.adaptive) {
+    if (
+      !["single", "multiple", "text"].includes(data.selection_mode) ||
+      typeof data.allow_other !== "boolean" ||
+      data.choices.length > 8 ||
+      (data.selection_mode === "text" && data.choices.length) ||
+      (data.selection_mode === "text" && data.allow_other) ||
+      (data.selection_mode !== "text" && !data.choices.length)
+    )
+      throw new Error("Invalid adaptive question");
+    if (data.allow_other) {
+      if (
+        typeof data.other_label !== "string" ||
+        !data.other_label ||
+        data.other_label.length > 40 ||
+        typeof data.other_placeholder !== "string" ||
+        !data.other_placeholder ||
+        data.other_placeholder.length > 100
+      )
+        throw new Error("Invalid other answer");
+    }
+    const ids = new Set();
+    const riskTags = new Set([
+      "unresponsive",
+      "seizure",
+      "cyanosis",
+      "severe_breathing",
+      "chest_discomfort",
+      "major_bleeding",
+      "cold_sweat",
+      "nausea_or_dizziness",
+      "exertional",
+      "jaw_or_upper_body",
+    ]);
+    data.choices.forEach((item) => {
+      if (
+        typeof item.id !== "string" ||
+        !/^[a-z][a-z0-9_]{0,39}$/.test(item.id) ||
+        ids.has(item.id) ||
+        typeof item.label !== "string" ||
+        !item.label ||
+        item.label.length > 100 ||
+        typeof item.response_text !== "string" ||
+        !item.response_text ||
+        item.response_text.length > 300 ||
+        !item.response_text.includes(item.label) ||
+        !Array.isArray(item.risk_tags) ||
+        item.risk_tags.length > 4 ||
+        item.risk_tags.some((tag) => !riskTags.has(tag)) ||
+        typeof item.exclusive !== "boolean" ||
+        typeof item.requires_detail !== "boolean" ||
+        (item.requires_detail &&
+          (typeof item.detail_placeholder !== "string" ||
+            !item.detail_placeholder ||
+            item.detail_placeholder.length > 100))
+      )
+        throw new Error("Invalid adaptive choice");
+      ids.add(item.id);
+    });
+    return;
+  }
   data.choices.forEach((item) => {
     if (
       typeof item.label !== "string" ||
@@ -222,6 +285,197 @@ export function validateQuestion(data) {
     )
       throw new Error("Invalid choice");
   });
+}
+
+function renderAdaptiveChoices(data, context) {
+  const section = node("section", "adaptive-answer");
+  const options = node("div", "visual-choices adaptive-choices");
+  const available = new Map(data.choices.map((item) => [item.id, item]));
+  const selected = new Set(
+    (context.questionDraft?.adaptiveSelections || []).filter((id) =>
+      available.has(id),
+    ),
+  );
+  const exclusiveDraft = [...selected].find(
+    (id) => available.get(id)?.exclusive,
+  );
+  if (exclusiveDraft && selected.size > 1) {
+    selected.clear();
+    selected.add(exclusiveDraft);
+  }
+  let detailTarget = context.questionDraft?.adaptiveDetailTarget || null;
+  if (
+    (detailTarget === "other" && !data.allow_other) ||
+    (detailTarget !== "other" &&
+      (!available.has(detailTarget) ||
+        !available.get(detailTarget).requires_detail))
+  )
+    detailTarget = null;
+  const detail = node("div", "adaptive-detail");
+  const detailLabel = node("label", "adaptive-detail-label");
+  const input = node("textarea", "adaptive-detail-input");
+  input.maxLength = 2000;
+  input.rows = 3;
+  input.value = context.questionDraft?.adaptiveDetailText || "";
+  const detailConfirm = node(
+    "button",
+    "primary-button adaptive-detail-confirm",
+    "确认回答",
+  );
+  detailConfirm.type = "button";
+  detailLabel.append(input);
+  detail.append(detailLabel, detailConfirm);
+
+  const actionable =
+    !context.readOnly && typeof context.onChoose === "function";
+  input.disabled = !actionable;
+  const persist = () =>
+    context.onQuestionDraft?.({
+      adaptiveSelections: [...selected],
+      adaptiveDetailTarget: detailTarget,
+      adaptiveDetailText: input.value,
+    });
+  let refresh = () => {
+    options.querySelectorAll("button[data-option-id]").forEach((button) => {
+      button.setAttribute(
+        "aria-pressed",
+        String(selected.has(button.dataset.optionId)),
+      );
+      button.disabled = !actionable || Boolean(context.isBusy?.());
+    });
+    const target =
+      detailTarget === "other" ? null : available.get(detailTarget);
+    detail.hidden = !detailTarget;
+    input.placeholder =
+      detailTarget === "other"
+        ? data.other_placeholder || "请补充具体情况"
+        : target?.detail_placeholder || "请补充具体情况";
+    detailConfirm.disabled =
+      !actionable || !input.value.trim() || Boolean(context.isBusy?.());
+  };
+
+  data.choices.forEach((choice) => {
+    const option = node(
+      "button",
+      `visual-choice adaptive-choice choice-${choice.id}`,
+    );
+    option.type = "button";
+    option.dataset.optionId = choice.id;
+    option.setAttribute("aria-label", choice.label);
+    option.append(
+      visualIcon(choiceIcons[choice.id] || "chat"),
+      node("strong", "", choice.label),
+      node(
+        "span",
+        "choice-arrow",
+        data.selection_mode === "multiple" ? "＋" : "↗",
+      ),
+    );
+    option.addEventListener("click", () => {
+      if (!actionable || context.isBusy?.()) return;
+      if (data.selection_mode === "single") {
+        if (choice.requires_detail) {
+          selected.clear();
+          selected.add(choice.id);
+          detailTarget = choice.id;
+          input.value = "";
+          persist();
+          refresh();
+          input.focus();
+          return;
+        }
+        context.onChoose(
+          choice.label,
+          `adaptive_single:${choice.id}`,
+          choice.response_text,
+        );
+        return;
+      }
+      if (choice.exclusive) {
+        selected.clear();
+        selected.add(choice.id);
+      } else {
+        for (const id of [...selected])
+          if (available.get(id)?.exclusive) selected.delete(id);
+        if (selected.has(choice.id)) selected.delete(choice.id);
+        else selected.add(choice.id);
+      }
+      detailTarget = null;
+      persist();
+      refresh();
+    });
+    options.append(option);
+  });
+  section.append(options);
+
+  if (data.selection_mode === "multiple") {
+    const confirm = node(
+      "button",
+      "primary-button adaptive-multiple-confirm",
+      "确认所选内容",
+    );
+    confirm.type = "button";
+    const syncConfirm = () => {
+      confirm.disabled =
+        !actionable || !selected.size || Boolean(context.isBusy?.());
+    };
+    const originalRefresh = refresh;
+    refresh = () => {
+      originalRefresh();
+      syncConfirm();
+    };
+    confirm.addEventListener("click", () => {
+      if (!actionable || !selected.size || context.isBusy?.()) return;
+      const ids = [...selected];
+      const response = ids
+        .map((id) => available.get(id).response_text)
+        .join("；");
+      context.onChoose(
+        response,
+        `adaptive_multiple:${ids.join(",")}`,
+        response,
+      );
+    });
+    section.append(confirm);
+  }
+
+  if (data.allow_other) {
+    const other = node(
+      "button",
+      "text-button adaptive-other",
+      data.other_label,
+    );
+    other.type = "button";
+    other.disabled = !actionable || Boolean(context.isBusy?.());
+    other.addEventListener("click", () => {
+      if (!actionable || context.isBusy?.()) return;
+      selected.clear();
+      detailTarget = "other";
+      input.value = "";
+      persist();
+      refresh();
+      input.focus();
+    });
+    section.append(other);
+  }
+  input.addEventListener("input", () => {
+    persist();
+    refresh();
+  });
+  detailConfirm.addEventListener("click", () => {
+    const value = input.value.trim();
+    if (!actionable || !value || context.isBusy?.()) return;
+    if (detailTarget === "other")
+      context.onChoose(value, "adaptive_other", value);
+    else {
+      const choice = available.get(detailTarget);
+      if (choice)
+        context.onChoose(choice.label, `adaptive_detail:${choice.id}`, value);
+    }
+  });
+  section.append(detail);
+  refresh();
+  return section;
 }
 
 export function renderQuestion(data, context) {
@@ -322,7 +576,10 @@ export function renderQuestion(data, context) {
     scale.append(toolbar, group, ends);
     card.append(scale);
   }
-  if (data.choices.length) {
+  if (data.adaptive) {
+    if (data.selection_mode !== "text")
+      card.append(renderAdaptiveChoices(data, context));
+  } else if (data.choices.length) {
     const options = node("div", `visual-choices choices-${data.question_id}`);
     data.choices.forEach((choice) => {
       const option = node("button", `visual-choice choice-${choice.value}`);

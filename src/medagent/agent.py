@@ -41,6 +41,12 @@ from .consultation_subject import (
     explicit_switch,
 )
 from .interpreter import Interpretation
+from .adaptive_questions import (
+    AdaptiveQuestionError,
+    RISK_TAG_CUES,
+    project_selected_answer,
+    validate_adaptive_question,
+)
 
 
 class AdaptiveConsultationEngine(ConsultationEngine):
@@ -117,6 +123,9 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 for item in self.content.registry.descriptions()
                 if item.get("patient_form")
             ],
+            "adaptive_question_risk_tags": {
+                name: list(cues) for name, cues in RISK_TAG_CUES.items()
+            },
             "content_versions": self.content.versions,
         }
         self.system_prompt = (
@@ -173,7 +182,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     {
                         "backend": self.backend.name,
                         "reply": reply.to_dict(),
-                        "policy_version": "medical-tools-v0.11.16",
+                        "policy_version": "medical-tools-v0.11.17",
                         "prompt_sha256": self.prefix_sha256,
                         "prompt_layout": "static-catalog-prefix/v1",
                     },
@@ -238,6 +247,9 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             if user_input.choice_value == "retry_turn" and state.pending_input
             else user_input.text.strip()
         )
+        adaptive_answer = self._prepare_adaptive_answer(state, user_input, text)
+        if adaptive_answer:
+            text = adaptive_answer["text"]
         location_input_text = self._location_input_text(user_input)
         if self.triage.scan_text(location_input_text):
             text = location_input_text
@@ -259,6 +271,17 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 {
                     "text": text,
                     **(
+                        {
+                            "adaptive_answer": {
+                                "selected": adaptive_answer["selected"],
+                                "kind": adaptive_answer["kind"],
+                                "risk_tags": adaptive_answer["risk_tags"],
+                            }
+                        }
+                        if adaptive_answer
+                        else {}
+                    ),
+                    **(
                         {"structured_input": prepared_location["structured_input"]}
                         if prepared_location
                         else {}
@@ -270,7 +293,11 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         state.transcript.append({"role": "user", "content": text})
 
         # Emergency evaluation precedes model invocation, including closed contexts.
-        risk = self.triage.assess(state, text)
+        risk = self.triage.assess(
+            state,
+            text,
+            adaptive_answer["risk_tags"] if adaptive_answer else (),
+        )
         if state.closed_reason == "emergency_route":
             risk = state.risk
         state.risk = risk
@@ -278,6 +305,8 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             return self._deliver(
                 state, self._emergency_reply(state, risk.triggers), turn_id
             )
+        if adaptive_answer and risk.level == RiskLevel.URGENT:
+            return self._deliver(state, self._urgent(state), turn_id)
         revision_reply = self._handle_location_revision_action(
             state, user_input, text, turn_id
         )
@@ -448,6 +477,18 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 return self._deliver(state, self._urgent(state), turn_id)
         state.pending_input = text
         return self._run(state, text, turn_id)
+
+    def _prepare_adaptive_answer(self, state, user_input, text):
+        choice = user_input.choice_value
+        if not choice or not choice.startswith("adaptive_"):
+            return None
+        latest = self._latest_replies.get(state.session_id)
+        if not latest or not latest.adaptive_question:
+            raise StaleActionError("动态问题已经更新，请按当前问题重新回答")
+        try:
+            return project_selected_answer(latest.adaptive_question, choice, text)
+        except AdaptiveQuestionError as exc:
+            raise StaleActionError(str(exc)) from exc
 
     def _context(self, state: CaseState, text: str) -> Dict[str, Any]:
         chief = str(state.get("chief_complaint", ""))
@@ -908,6 +949,47 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             ):
                 raise ProposalError("问题不适用于当前主诉")
             return self._ask(state, question, "根据本轮证据与尚未处理的缺口选择下一问")
+        if tool == "ask_patient":
+            if state.self_check_conversation:
+                raise ProposalError("图示交互进行中；先用固定问题澄清或接续当前图示")
+            if (
+                state.pending_self_checks
+                and not state.self_check_conversation
+                and not self._self_check_block_reason(state)
+            ):
+                raise ProposalError("患者请求的图示任务已满足条件，应先处理待办")
+            spec = validate_adaptive_question(
+                args,
+                allowed_topics={question.fact_key for question in self.content.questions},
+            )
+            question = next(
+                item
+                for item in self.content.questions
+                if item.fact_key == spec["topic"]
+            )
+            if question.fact_key in state.facts:
+                raise ProposalError("已记录这个字段；需要核实时使用clarify")
+            if not self.content.question_applies(
+                question, str(state.get("chief_complaint", ""))
+            ):
+                raise ProposalError("动态问题不适用于当前主诉")
+            state.phase = question.phase
+            state.active_question = question.id
+            state.active_question_is_clarification = False
+            state.active_task = None
+            if question.id not in state.asked_questions:
+                state.asked_questions.append(question.id)
+            return AgentReply(
+                spec["question"],
+                question.phase,
+                kind="question",
+                question_id=question.id,
+                adaptive_question=spec,
+                developer_trace={
+                    "reason": "模型根据当前病例生成可变数量的受控患者选项",
+                    "content_version": self.content.versions["questions"],
+                },
+            )
         if tool == "clarify":
             topic, message = args.get("topic"), args.get("message")
             fields = {q.fact_key for q in self.content.questions}

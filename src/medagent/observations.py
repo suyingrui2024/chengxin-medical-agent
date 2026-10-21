@@ -271,6 +271,7 @@ class ObservationMixin:
                     quick_replies=[
                         QuickReply(**q) for q in old.get("quick_replies", [])
                     ],
+                    adaptive_question=deepcopy(old.get("adaptive_question")),
                 )
             else:
                 reply = self._plan_next(state)

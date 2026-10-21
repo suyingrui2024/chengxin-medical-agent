@@ -221,6 +221,7 @@ class AgentReply:
     calculation_followup: Optional[Dict[str, Any]] = None
     subject_change: Optional[Dict[str, Any]] = None
     location_revision_action: Optional[Dict[str, Any]] = None
+    adaptive_question: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         from .presentation import reply_presentation
@@ -241,6 +242,7 @@ class AgentReply:
             "observation_result": self.observation_result,
             "calculation_followup": self.calculation_followup,
             "subject_change": self.subject_change,
+            "adaptive_question": self.adaptive_question,
         }
         if self.location_revision_action:
             payload["location_revision_action"] = deepcopy(
