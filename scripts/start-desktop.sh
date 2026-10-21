@@ -2,13 +2,19 @@
 set -eu
 project_dir="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 cd "$project_dir"
-if [ "${1:-}" = "--live" ]; then
-    shift
-    PYTHONPATH="$project_dir/src" exec python3 "$project_dir/scripts/start_live_desktop.py" "$@"
-fi
 unset ELECTRON_RUN_AS_NODE
 if [ -d "$HOME/.volta/bin" ]; then
     export PATH="$HOME/.volta/bin:$PATH"
+fi
+for node22_bin in /opt/homebrew/opt/node@22/bin /usr/local/opt/node@22/bin; do
+    if [ -x "$node22_bin/node" ]; then
+        export PATH="$node22_bin:$PATH"
+        break
+    fi
+done
+if [ "${1:-}" = "--live" ]; then
+    shift
+    PYTHONPATH="$project_dir/src" exec python3 "$project_dir/scripts/start_live_desktop.py" "$@"
 fi
 if [ -x "$project_dir/dist/desktop/Chengxin-0.11.17-linux-x64/Chengxin" ]; then
     exec "$project_dir/dist/desktop/Chengxin-0.11.17-linux-x64/Chengxin" "$@"
