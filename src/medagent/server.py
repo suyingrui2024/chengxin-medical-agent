@@ -138,8 +138,8 @@ class Handler(BaseHTTPRequestHandler):
                 }
             )
             return
-        if path == "/api/patients" or path.startswith(
-            ("/api/patients/", "/api/entries/", "/api/assets/")
+        if path == "/api/patient" or path.startswith(
+            ("/api/patient/", "/api/entries/", "/api/assets/")
         ):
             self._patient_get(path)
             return
@@ -208,8 +208,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = urlparse(self.path).path
-        if path == "/api/patients" or path.startswith(
-            ("/api/patients/", "/api/assets/", "/api/clarifications/", "/api/observations/")
+        if path == "/api/patients":
+            self._error(
+                HTTPStatus.METHOD_NOT_ALLOWED,
+                "single_patient_only",
+                "健康档案仅保存本人数据，不支持创建家属档案",
+            )
+            return
+        if path.startswith(
+            ("/api/patient/", "/api/assets/", "/api/clarifications/", "/api/observations/")
         ):
             self._patient_post(path)
             return
@@ -792,29 +799,30 @@ class Handler(BaseHTTPRequestHandler):
     def _patient_get(self, path: str) -> None:
         try:
             parts = path.strip("/").split("/")
-            if path == "/api/patients":
+            if path == "/api/patient":
                 default = self.app.patient_records.ensure_default_patient()
                 self._json(
                     {
-                        "patients": self.app.patient_records.list_patients(),
-                        "default_patient_id": default["patient_id"],
+                        "patient": default,
                         "vision_available": self._configured_recognizer() is not None,
                     }
                 )
                 return
             if (
-                len(parts) == 4
-                and parts[0:2] == ["api", "patients"]
-                and parts[3] == "timeline"
+                len(parts) == 3
+                and parts[0:2] == ["api", "patient"]
+                and parts[2] == "timeline"
             ):
-                self._json(self.app.patient_records.timeline(parts[2]))
+                patient = self.app.patient_records.ensure_default_patient()
+                self._json(self.app.patient_records.timeline(patient["patient_id"]))
                 return
             if (
-                len(parts) == 5
-                and parts[0:2] == ["api", "patients"]
-                and parts[3:] == ["trends", "blood-glucose"]
+                len(parts) == 4
+                and parts[0:2] == ["api", "patient"]
+                and parts[2:] == ["trends", "blood-glucose"]
             ):
-                self._json(self.app.patient_records.glucose_trend(parts[2]))
+                patient = self.app.patient_records.ensure_default_patient()
+                self._json(self.app.patient_records.glucose_trend(patient["patient_id"]))
                 return
             if len(parts) == 3 and parts[0:2] == ["api", "entries"]:
                 self._json(self.app.patient_records.entry(parts[2]))
@@ -844,24 +852,18 @@ class Handler(BaseHTTPRequestHandler):
         parts = path.strip("/").split("/")
         payload = self._read_json(
             MAX_IMAGE_BODY_BYTES
-            if len(parts) == 5 and parts[0:2] == ["api", "patients"] and parts[3:] == ["entries", "images"]
+            if len(parts) == 4
+            and parts[0:2] == ["api", "patient"]
+            and parts[2:] == ["entries", "images"]
             else MAX_BODY_BYTES
         )
         if payload is None:
             return
         try:
-            if path == "/api/patients":
-                if set(payload) - {"display_name"}:
-                    raise PatientRecordError("患者档案参数无效")
-                patient = self.app.patient_records.create_patient(
-                    payload.get("display_name", "我的健康档案")
-                )
-                self._json({"patient": patient}, HTTPStatus.CREATED)
-                return
             if (
-                len(parts) == 5
-                and parts[0:2] == ["api", "patients"]
-                and parts[3:] == ["entries", "images"]
+                len(parts) == 4
+                and parts[0:2] == ["api", "patient"]
+                and parts[2:] == ["entries", "images"]
             ):
                 if set(payload) - {
                     "title",
@@ -872,8 +874,9 @@ class Handler(BaseHTTPRequestHandler):
                 }:
                     raise PatientRecordError("图片归档参数无效")
                 image = decode_image_data_url(payload.get("data_url"))
+                patient = self.app.patient_records.ensure_default_patient()
                 detail = self.app.patient_records.create_image_entry(
-                    parts[2],
+                    patient["patient_id"],
                     payload.get("title"),
                     payload.get("measured_at"),
                     payload.get("reported_at"),
@@ -895,15 +898,16 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(detail, HTTPStatus.CREATED)
                 return
             if (
-                len(parts) == 5
-                and parts[0:2] == ["api", "patients"]
-                and parts[3:] == ["measurements", "blood-glucose"]
+                len(parts) == 4
+                and parts[0:2] == ["api", "patient"]
+                and parts[2:] == ["measurements", "blood-glucose"]
             ):
                 allowed = {"value_text", "unit", "measured_at", "measurement_context"}
                 if set(payload) != allowed:
                     raise PatientRecordError("血糖记录参数不完整")
+                patient = self.app.patient_records.ensure_default_patient()
                 detail = self.app.patient_records.add_measurement(
-                    parts[2], kind="blood_glucose", **payload
+                    patient["patient_id"], kind="blood_glucose", **payload
                 )
                 self.app.events.append(
                     Event(

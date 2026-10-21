@@ -166,6 +166,11 @@ class PatientRecordStoreTests(unittest.TestCase):
             inspect_image(png()),
         )
 
+    def test_store_keeps_one_self_profile(self):
+        again = self.store.create_patient("家属档案")
+        self.assertEqual(again["patient_id"], self.patient["patient_id"])
+        self.assertEqual(again["display_name"], "测试档案")
+
     def test_different_measurement_dates_remain_separate_timeline_events(self):
         first = self.upload("2026-08-20T08:00:00+08:00")
         second = self.upload("2026-08-30T08:00:00+08:00")

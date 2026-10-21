@@ -87,7 +87,7 @@ const verification = {
 
 export function createPatientRecordsUI(api, toast, options = {}) {
   const state = {
-    patientId: null,
+    initialized: false,
     visionAvailable: false,
     timeline: null,
     glucoseTrend: null,
@@ -101,10 +101,9 @@ export function createPatientRecordsUI(api, toast, options = {}) {
   }
 
   async function ensurePatient() {
-    const catalog = await api("/api/patients");
-    state.patientId = catalog.default_patient_id;
+    const catalog = await api("/api/patient");
+    state.initialized = true;
     state.visionAvailable = catalog.vision_available;
-    return state.patientId;
   }
 
   function renderSummary(entries) {
@@ -276,10 +275,10 @@ export function createPatientRecordsUI(api, toast, options = {}) {
   }
 
   async function refresh() {
-    if (!state.patientId) await ensurePatient();
+    if (!state.initialized) await ensurePatient();
     [state.timeline, state.glucoseTrend] = await Promise.all([
-      api(`/api/patients/${state.patientId}/timeline`),
-      api(`/api/patients/${state.patientId}/trends/blood-glucose`),
+      api("/api/patient/timeline"),
+      api("/api/patient/trends/blood-glucose"),
     ]);
     renderTimeline();
     renderGlucoseTrend();
@@ -644,20 +643,17 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     setFormBusy(form, true);
     $("#medical-image-feedback").textContent = "正在安全归档图片…";
     try {
-      if (!state.patientId) await ensurePatient();
-      const uploaded = await api(
-        `/api/patients/${state.patientId}/entries/images`,
-        {
-          method: "POST",
-          body: {
-            title: $("#medical-image-name").value,
-            measured_at: isoTime($("#medical-image-time").value),
-            reported_at: isoTime($("#medical-report-time").value),
-            filename: file.name,
-            data_url: await readFile(file),
-          },
+      if (!state.initialized) await ensurePatient();
+      const uploaded = await api("/api/patient/entries/images", {
+        method: "POST",
+        body: {
+          title: $("#medical-image-name").value,
+          measured_at: isoTime($("#medical-image-time").value),
+          reported_at: isoTime($("#medical-report-time").value),
+          filename: file.name,
+          data_url: await readFile(file),
         },
-      );
+      });
       let detail = uploaded;
       if (state.visionAvailable) {
         $("#medical-image-feedback").textContent = "正在识别数值和整体内容…";
@@ -692,8 +688,8 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     state.busy = true;
     setFormBusy(form, true);
     try {
-      if (!state.patientId) await ensurePatient();
-      await api(`/api/patients/${state.patientId}/measurements/blood-glucose`, {
+      if (!state.initialized) await ensurePatient();
+      await api("/api/patient/measurements/blood-glucose", {
         method: "POST",
         body: {
           value_text: $("#glucose-record-value").value,

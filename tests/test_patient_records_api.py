@@ -78,13 +78,26 @@ class PatientRecordApiTests(unittest.TestCase):
         ) as response:
             return json.loads(response.read())
 
+    def test_api_exposes_only_the_self_profile_and_rejects_family_profiles(self):
+        catalog = self.request("/api/patient")
+        self.assertEqual(set(catalog), {"patient", "vision_available"})
+        self.assertEqual(catalog["patient"]["display_name"], "我的健康档案")
+        with self.assertRaises(HTTPError) as blocked:
+            self.request(
+                "/api/patients", "POST", {"display_name": "家属档案"}
+            )
+        self.assertEqual(blocked.exception.code, 405)
+        self.assertEqual(
+            self.request("/api/patient")["patient"]["patient_id"],
+            catalog["patient"]["patient_id"],
+        )
+
     def test_full_upload_recognition_confirmation_edit_and_delete_flow(self):
-        catalog = self.request("/api/patients")
-        patient_id = catalog["default_patient_id"]
+        catalog = self.request("/api/patient")
         self.assertTrue(catalog["vision_available"])
         image = png()
         uploaded = self.request(
-            f"/api/patients/{patient_id}/entries/images",
+            "/api/patient/entries/images",
             "POST",
             {
                 "title": "8月血常规",
@@ -132,10 +145,10 @@ class PatientRecordApiTests(unittest.TestCase):
             )["value_text"],
             "137",
         )
-        timeline = self.request(f"/api/patients/{patient_id}/timeline")
+        timeline = self.request("/api/patient/timeline")
         self.assertEqual(timeline["entries"][0]["entry_id"], entry_id)
         self.assertEqual(
-            self.request(f"/api/patients/{patient_id}/trends/blood-glucose")["count"],
+            self.request("/api/patient/trends/blood-glucose")["count"],
             0,
         )
         with urlopen(self.base + f"/api/assets/{asset_id}/content", timeout=2) as response:
@@ -149,13 +162,12 @@ class PatientRecordApiTests(unittest.TestCase):
         self.assertTrue(deleted["deleted"])
         self.assertEqual(deleted["detached_session_count"], 0)
         self.assertEqual(
-            self.request(f"/api/patients/{patient_id}/timeline")["entries"], []
+            self.request("/api/patient/timeline")["entries"], []
         )
 
     def test_stale_revision_is_http_conflict(self):
-        patient_id = self.request("/api/patients")["default_patient_id"]
         detail = self.request(
-            f"/api/patients/{patient_id}/measurements/blood-glucose",
+            "/api/patient/measurements/blood-glucose",
             "POST",
             {
                 "value_text": "6.8",
@@ -177,9 +189,8 @@ class PatientRecordApiTests(unittest.TestCase):
         self.assertEqual(error.exception.code, 409)
 
     def test_verified_record_can_be_attached_only_to_a_self_consultation(self):
-        patient_id = self.request("/api/patients")["default_patient_id"]
         detail = self.request(
-            f"/api/patients/{patient_id}/measurements/blood-glucose",
+            "/api/patient/measurements/blood-glucose",
             "POST",
             {
                 "value_text": "6.8",
@@ -194,6 +205,23 @@ class PatientRecordApiTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as blocked:
             self.request(attach_path, "POST", {})
         self.assertEqual(blocked.exception.code, 400)
+
+        family_session = self.request("/api/sessions", "POST", {})["session_id"]
+        family = self.request(
+            f"/api/sessions/{family_session}/messages",
+            "POST",
+            {"text": "我的孩子", "choice_value": "child"},
+        )
+        self.assertEqual(
+            family["state"]["facts"]["consult_for"]["value"], "child"
+        )
+        with self.assertRaises(HTTPError) as family_blocked:
+            self.request(
+                f"/api/sessions/{family_session}/patient-records/{entry_id}/attach",
+                "POST",
+                {},
+            )
+        self.assertEqual(family_blocked.exception.code, 400)
 
         identity = self.request(
             f"/api/sessions/{session_id}/messages", "POST", {"text": "我自己"}

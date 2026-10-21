@@ -257,6 +257,11 @@ class PatientRecordStore:
         patient_id = str(uuid4())
         now = utc_now()
         with self._transaction() as connection:
+            existing = connection.execute(
+                "SELECT * FROM patient_profiles ORDER BY created_at LIMIT 1"
+            ).fetchone()
+            if existing is not None:
+                return dict(existing)
             connection.execute(
                 "INSERT INTO patient_profiles VALUES (?, ?, 1, ?, ?, ?)",
                 (patient_id, name, SCHEMA_VERSION, now, now),
@@ -278,16 +283,6 @@ class PatientRecordStore:
         if row is None:
             raise PatientRecordError("患者档案不存在")
         return dict(row)
-
-    def list_patients(self) -> list[dict[str, Any]]:
-        with self._read() as connection:
-            rows = connection.execute(
-                """SELECT p.*,
-                    (SELECT COUNT(*) FROM medical_entries e
-                     WHERE e.patient_id = p.patient_id AND e.deleted_at IS NULL) AS entry_count
-                   FROM patient_profiles p ORDER BY p.created_at"""
-            ).fetchall()
-        return [dict(row) for row in rows]
 
     def _require_patient(self, connection: sqlite3.Connection, patient_id: str) -> None:
         if connection.execute(
