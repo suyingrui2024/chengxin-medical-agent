@@ -106,13 +106,14 @@
           <svg class="icon"><use href="#i-plus" /></svg> 新的问诊 <span>↗</span>
         </button>
         <label class="workspace-mode" for="workspace-mode"
-          >界面模式
-          <select id="workspace-mode" disabled>
-            <option value="patient">患者视图</option>
-            <option value="developer">研发视图</option>
+          >测试视图
+          <select id="workspace-mode" aria-label="界面模式" disabled>
+            <option value="patient">患者界面</option>
+            <option value="developer">完整研发界面</option>
           </select>
+          <small id="workspace-mode-description">只显示患者使用的功能</small>
         </label>
-        <p class="nav-label">工作空间</p>
+        <p id="nav-section-label" class="nav-label">患者功能</p>
         <nav class="nav-list">
           <button
             class="nav-item active"
@@ -176,7 +177,8 @@
           <div class="local-note">
             <span class="status-dot"></span
             ><span
-              >本机工作空间<small id="workspace-storage-note"
+              ><span id="local-data-label">本机数据</span
+              ><small id="workspace-storage-note"
                 >会谈仅保留到服务关闭</small
               ></span
             >
@@ -205,8 +207,8 @@
               aria-label="打开导航"
             >
               <svg class="icon"><use href="#i-menu" /></svg></button
-            ><span>工作空间</span><span class="slash">/</span
-            ><strong id="page-title">问诊</strong>
+            ><span id="breadcrumb-root">患者服务</span
+            ><span class="slash">/</span><strong id="page-title">问诊</strong>
           </div>
           <div class="top-actions">
             <button

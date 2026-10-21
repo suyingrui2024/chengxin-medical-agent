@@ -1016,6 +1016,10 @@ body[data-mode="developer"] .patient-only {
   color: var(--ink);
   background: var(--raised);
 }
+.workspace-mode small {
+  line-height: 1.45;
+  color: var(--muted);
+}
 .current-activity {
   padding: 15px 20px 22px;
 }

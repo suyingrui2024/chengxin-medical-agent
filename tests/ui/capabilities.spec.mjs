@@ -14,6 +14,9 @@ test("patient view keeps model service while removing developer navigation", asy
   await expect(
     page.getByRole("button", { name: "模型与运行配置" }),
   ).toBeVisible();
+  for (const view of ["consultation", "history", "records"]) {
+    await expect(page.locator(`.nav-item[data-view="${view}"]`)).toBeVisible();
+  }
   await expect(page.locator('.nav-item[data-view="inspect"]')).toBeHidden();
   await expect(
     page.locator('.nav-item[data-view="capabilities"]'),
@@ -21,11 +24,28 @@ test("patient view keeps model service while removing developer navigation", asy
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
   await page.getByLabel("界面模式").selectOption("developer");
+  await expect(page.locator("#workspace-mode-description")).toHaveText(
+    "显示患者流程和全部研发测试功能",
+  );
+  for (const view of [
+    "consultation",
+    "history",
+    "records",
+    "tasks",
+    "inspect",
+    "capabilities",
+    "execution",
+  ]) {
+    await expect(page.locator(`.nav-item[data-view="${view}"]`)).toBeVisible();
+  }
   await expect(
     page.locator('.nav-item[data-view="capabilities"]'),
   ).toBeVisible();
   await page.locator('.nav-item[data-view="inspect"]').click();
   await page.getByLabel("界面模式").selectOption("patient");
+  await expect(page.locator("#workspace-mode-description")).toHaveText(
+    "只显示患者使用的功能",
+  );
   await expect(
     page.getByRole("textbox", { name: "输入你的描述" }),
   ).toBeVisible();

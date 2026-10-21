@@ -428,6 +428,13 @@ function setWorkspaceMode(mode) {
   state.workspaceMode = mode === "developer" ? "developer" : "patient";
   document.body.dataset.mode = state.workspaceMode;
   $("#workspace-mode").value = state.workspaceMode;
+  const developer = state.workspaceMode === "developer";
+  $("#workspace-mode-description").textContent = developer
+    ? "显示患者流程和全部研发测试功能"
+    : "只显示患者使用的功能";
+  $("#nav-section-label").textContent = developer ? "全部功能" : "患者功能";
+  $("#local-data-label").textContent = developer ? "本机测试数据" : "本机数据";
+  $("#breadcrumb-root").textContent = developer ? "完整研发" : "患者服务";
   navigate(state.view);
 }
 
