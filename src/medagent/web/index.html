@@ -228,35 +228,8 @@
                   从你的描述开始，一起把情况理清楚。
                 </p>
               </div>
-              <button id="toggle-facts" class="text-button" type="button">
-                <svg class="icon"><use href="#i-cards" /></svg>已记录信息
-                <span id="fact-count" class="count">0</span>
-              </button>
-            </div>
-            <div class="consult-grid">
-              <section class="conversation-panel" aria-label="问诊对话">
-                <header class="conversation-header">
-                  <div class="agent-identity">
-                    <span class="agent-avatar"
-                      ><img src="brand.png" width="25" height="25" alt=""
-                    /></span>
-                    <div>
-                      <strong>知微健康助手</strong
-                      ><span id="conversation-subtitle"
-                        >倾听 · 澄清 · 核对</span
-                      >
-                    </div>
-                  </div>
-                  <div class="conversation-actions">
-                    <span id="conversation-status" class="subtle-pill"
-                      >准备开始</span
-                    >
-                    <span
-                      id="review-status"
-                      class="review-status"
-                      hidden
-                    ></span>
-                    <button
+              <div class="page-heading-actions">
+<button
                       id="urgent-help"
                       class="urgent-help"
                       type="button"
@@ -264,8 +237,14 @@
                     >
                       <svg class="icon"><use href="#i-alert" /></svg>紧急求助
                     </button>
-                  </div>
-                </header>
+<button id="toggle-facts" class="text-button" type="button">
+                <svg class="icon"><use href="#i-cards" /></svg>已记录信息
+                <span id="fact-count" class="count">0</span>
+              </button>
+</div>
+            </div>
+            <div class="consult-grid">
+              <section class="conversation-panel" aria-label="问诊对话">
                 <div id="task-focus-bar" class="task-focus-bar" hidden>
                   <span id="focus-label" role="status" aria-live="polite"
                     >当前这一步</span

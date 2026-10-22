@@ -470,3 +470,53 @@
     flex-direction: column;
   }
 }
+
+/* Form fields (record dialogs): label above a properly styled control.
+   These dialogs previously rendered with raw browser defaults because
+   .field never had a base rule. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+  min-width: 0;
+}
+.field > span {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--ink);
+}
+.field input,
+.field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-family: inherit;
+}
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 3px var(--line);
+}
+.record-value-row .field {
+  margin-bottom: 14px;
+}
+.field input[type="file"] {
+  padding: 7px 12px;
+}
+.field input[type="file"]::file-selector-button {
+  border: 1px solid var(--line);
+  background: var(--light);
+  border-radius: 7px;
+  padding: 6px 12px;
+  margin-right: 10px;
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
