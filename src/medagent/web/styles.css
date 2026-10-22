@@ -1320,6 +1320,18 @@ a:focus-visible,
 summary:focus-visible {
   outline: 2px solid var(--green);
 }
+/* Step headings and instructions receive programmatic focus (tabindex=-1)
+   purely so assistive tech and scrolling land on the current step. They are
+   not interactive controls, and the UA outline around them reads as a
+   rendering glitch, so it is suppressed for exactly those targets. */
+#active-question h2:focus,
+#active-question h3:focus,
+#messages .current-summary h3:focus,
+#active-task h3:focus,
+.step-text:focus,
+#execution-focus-label:focus {
+  outline: none;
+}
 [hidden] {
   display: none !important;
 }
@@ -2094,8 +2106,14 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 15px;
   background: var(--raised);
-  overflow: hidden;
+  overflow: hidden auto;
   box-shadow: var(--shadow);
+  /* Keep the whole panel — including its bottom actions — reachable: it
+     sticks while the page scrolls and scrolls internally on short windows
+     instead of extending past the fold. */
+  position: sticky;
+  top: 24px;
+  max-height: calc(100dvh - 48px);
 }
 .panel-heading {
   display: flex;
