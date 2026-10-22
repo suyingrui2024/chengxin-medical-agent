@@ -129,6 +129,9 @@ class CaseState:
     # Post-consultation follow-up plan + recorded outcome (design phase
     # 4), serialized form; the model lives in medagent.followups.
     follow_up: Dict[str, Any] = field(default_factory=dict)
+    # Patient-facing conclusion sheet (docs/问诊结论单设计文档.md),
+    # serialized form; the composer lives in medagent.conclusion.
+    conclusion: Dict[str, Any] = field(default_factory=dict)
 
     def record(self, fact: Fact) -> None:
         previous = self.facts.get(fact.key)
@@ -175,6 +178,7 @@ class CaseState:
             "risk": self.risk.to_dict(),
             "closed_reason": self.closed_reason,
             "follow_up": dict(self.follow_up) if self.follow_up else None,
+            "conclusion": dict(self.conclusion) if self.conclusion else None,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "revision": self.revision,
@@ -228,6 +232,7 @@ class AgentReply:
     observation_result: Optional[Dict[str, Any]] = None
     calculation_followup: Optional[Dict[str, Any]] = None
     follow_up: Optional[Dict[str, Any]] = None
+    conclusion: Optional[Dict[str, Any]] = None
     subject_change: Optional[Dict[str, Any]] = None
     location_revision_action: Optional[Dict[str, Any]] = None
     adaptive_question: Optional[Dict[str, Any]] = None
@@ -251,6 +256,7 @@ class AgentReply:
             "observation_result": self.observation_result,
             "calculation_followup": self.calculation_followup,
             "follow_up": self.follow_up,
+            "conclusion": self.conclusion,
             "subject_change": self.subject_change,
             "adaptive_question": self.adaptive_question,
         }

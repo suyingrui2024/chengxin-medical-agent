@@ -129,6 +129,10 @@ def reply_presentation(reply):
                 reply["observation_result"],
             )
         )
+    if reply.get("conclusion"):
+        blocks.append(
+            block("conclusion", f"conclusion:{identity}", reply["conclusion"])
+        )
     if reply.get("summary"):
         if reply["kind"] == "emergency":
             blocks.append(

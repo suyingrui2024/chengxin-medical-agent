@@ -62,10 +62,53 @@ def check_corpus(service: TriageService, path: Path) -> bool:
     return ok
 
 
+def check_conclusion_sheet(fixtures: Path) -> bool:
+    """Conclusion-sheet hard gates (design: 结论单 §8.2): disposition
+    agreement >= 0.95, must-not-miss recall == 1.0, harmful == 0, over the
+    engineering case set (unreviewed; clinician corpus required for the
+    phase-B directions display gate)."""
+    sys.path.insert(0, str(ROOT))
+    from scripts.evaluation.medical.evaluate_conclusion_sheet import (
+        build_state,
+        score_case,
+    )
+    from medagent.conclusion import compose_conclusion
+
+    corpus = json.loads(
+        (fixtures / "conclusion_cases_v0.json").read_text(encoding="utf-8")
+    )
+    total = disposition_hits = mnm_total = mnm_hits = harmful = 0
+    for case in corpus["cases"]:
+        state, summary = build_state(case)
+        sheet = compose_conclusion(state, summary=summary)
+        failures = score_case(case, sheet)
+        total += 1
+        if (sheet or {}).get("disposition", {}).get("level") in case[
+            "expected_disposition"
+        ]:
+            disposition_hits += 1
+        shown = [d["hypothesis_id"] for d in (sheet or {}).get("directions", [])]
+        for needed in case.get("must_not_miss", []):
+            mnm_total += 1
+            if needed in shown:
+                mnm_hits += 1
+        if any(f.startswith("forbidden") for f in failures):
+            harmful += 1
+    agreement = disposition_hits / total if total else 0.0
+    recall = mnm_hits / mnm_total if mnm_total else 1.0
+    ok = agreement >= 0.95 and recall == 1.0 and harmful == 0
+    print(
+        f"conclusion_cases_v0.json: disposition={agreement:.3f} "
+        f"must_not_miss={recall:.3f} harmful={harmful} -> {'PASS' if ok else 'FAIL'}"
+    )
+    return ok
+
+
 def main() -> int:
     service = TriageService()
     fixtures = ROOT / "tests" / "fixtures"
     results = [check_corpus(service, fixtures / name) for name in CORPORA]
+    results.append(check_conclusion_sheet(fixtures))
     print("release gate:", "PASS" if all(results) else "FAIL")
     return 0 if all(results) else 1
 
