@@ -69,10 +69,10 @@ DSH 后台复核只在一次前台回复提交后、该回合实际改变病例�
 
 ## 本地工具
 
-`scripts/evaluate_background_review.py` 接收经独立审核的 JSON 病例：每项须包含 `expected`、`observed` 两个 `inspect_case` 信封和 `safety_passed`。它只计算精确率、召回率和安全通过率，不调用模型，也不会把演示样本当作临床证据。
+`scripts/evaluation/medical/evaluate_background_review.py` 接收经独立审核的 JSON 病例：每项须包含 `expected`、`observed` 两个 `inspect_case` 信封和 `safety_passed`。它只计算精确率、召回率和安全通过率，不调用模型，也不会把演示样本当作临床证据。
 
 ```bash
-PYTHONPATH=src python3 scripts/evaluate_background_review.py \
+PYTHONPATH=src python3 scripts/evaluation/medical/evaluate_background_review.py \
   --input path/to/reviewer-labelled-cases.json \
   --output /tmp/shadow-review-report.json
 ```

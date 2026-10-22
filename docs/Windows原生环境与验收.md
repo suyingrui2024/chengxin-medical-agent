@@ -20,8 +20,8 @@
 开发者在克隆后的项目根目录运行：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Setup
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\platform\windows\windows.ps1 -Mode Setup
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\platform\windows\windows.ps1 -Mode Start
 ```
 
 `Setup` 下载 SHA256 固定的 Python 3.14.8、Node 22.23.3 和 MXC 1.0.1 原生执行器到 `.runtime/windows`，安装锁定依赖和 Electron，并检查实际窗口。无须预装 Python、Node、Conda 或 pip，不修改全局 PATH。源码安装默认创建演示与显式加载 `.env` 的两个快捷方式；自动化可加 `-NoShortcut`。首次安装需要访问官方发行源与 npm。
@@ -117,7 +117,7 @@ Windows 属性比较统一使用实际文件句柄查询：目录遍历的缓存
 
 `b504a61` 将两套系统的状态与停止统一到 SDK 管道，移除额外控制监听器。本机真实完整 DSH／交付检查与已关闭管道回归共 31 项通过，目录保护及生命周期另外 7 项通过。真实桌面计算、返回问诊、历史恢复和字体检查通过（本地图形会话 `DISPLAY=:1`）。这些本机结果不替代 Windows 验收；本轮 Windows 结果见上方 `9d5d49c` 记录。
 
-新增 `scripts/windows/packaged-execution-check.ps1` 使用打包目录中的解释器、Node 和 Python 源码运行完整 Windows 执行场景，避免只测试源码环境。检查包括写代码、实际执行、子智能体验证、交付检查及原会话接续。
+新增 `scripts/platform/windows/packaged-execution-check.ps1` 使用打包目录中的解释器、Node 和 Python 源码运行完整 Windows 执行场景，避免只测试源码环境。检查包括写代码、实际执行、子智能体验证、交付检查及原会话接续。
 
 Linux 回归：完整 DSH 执行与交付检查 30 项通过；项目目录保护与桌面生命周期 7 项通过；真实桌面计算、继续问诊、历史恢复及三类实际字体检查通过。Linux 结果不替代 Windows 验证。
 
@@ -125,6 +125,6 @@ Linux 回归：完整 DSH 执行与交付检查 30 项通过；项目目录保�
 
 本轮将 `main` 的六套皮肤与图示改动合入 `windows-native`（合并提交 `10a07fe`）。合并后 macOS 上的浏览器回归 96 项、原生桌面回归 3 项及 Node 路径边界检查 3 项通过。完整离线 Python 回归为 340 项通过、60 项跳过、6 项失败；这 6 项在合并前的 `main` 同样失败，涉及 Linux `/proc`、文件名与临时目录路径假设，以及本机缺少研究工具运行环境，并非 Windows 验收证据。
 
-`scripts/windows/gui-check.mjs` 新增六套皮肤的实际切换与偏好文件检查、关闭后重新启动恢复检查，并使用含空格和中文的配置目录。本轮 Windows 工作流已在两套系统的源码与便携包中通过此检查，Server x64 安装后的应用也通过。最终构建包含聚焦当前动作的自检卡片、收起的详细文字，以及重新绘制的三步体温人物图示。
+`scripts/platform/windows/gui-check.mjs` 新增六套皮肤的实际切换与偏好文件检查、关闭后重新启动恢复检查，并使用含空格和中文的配置目录。本轮 Windows 工作流已在两套系统的源码与便携包中通过此检查，Server x64 安装后的应用也通过。最终构建包含聚焦当前动作的自检卡片、收起的详细文字，以及重新绘制的三步体温人物图示。
 
 本轮将验收通过的 Windows 实现与可视化更改合并回 `main`，并同步 `windows-native`。最新验收代码为 `ec39f44b1a43143036b82e788cb1df0630341ba0`，验收范围按该代码提交固定；之后的源码变更需单独复验。完整范围、夹具边界与条件跳过见 [本轮 Windows 记录](assets/cancellation-iteration/windows-native.json)。推送触发的工作流只验证源码和打包结果，不再保存大体积制品；需要可下载的安装器或便携包时，在 Actions 中手动运行工作流并保持“上传制品”开启，制品保留 3 天。本轮安装包尚未下载到本地；最近完整下载的本地安装器仍为 `dist/windows-validated/39083192293/installer/Chengxin-Setup-0.11.17-Windows-x64.exe`，对应上一轮 `682caf0`，不能当作本轮构建。旧运行编号目录仍保留各自历史构建。

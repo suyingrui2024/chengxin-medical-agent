@@ -23,7 +23,7 @@
 ```bash
 ./scripts/config/ubuntu/03-configure-full.sh
 npm run dsh:check
-./scripts/start-desktop.sh --live
+./scripts/app/start-desktop.sh --live
 ```
 
 完整入口会一次生成两个分层和最终 `.env`。重新运行时，回车保留已有值；API Key 使用隐藏输入。脚本要求项目支持的 Python 3.10+；DSH 启动另要求 Node 22.19+ 和已经安装的项目依赖。

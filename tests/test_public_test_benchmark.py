@@ -10,9 +10,9 @@ import threading
 import unittest
 import zipfile
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from benchmark_public_test_sample import evaluate
-from public_test_sample import inventory, ROOT
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.benchmarks.public.benchmark_public_test_sample import evaluate
+from scripts.benchmarks.public.public_test_sample import ROOT, inventory
 
 
 @unittest.skipUnless(

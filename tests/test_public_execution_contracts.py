@@ -7,10 +7,19 @@ import sys
 import tempfile
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from benchmark_public_execution import prompt_for as legacy_prompt
-from execution_task_contract import compliance, prompt_for
-from public_execution_cases import ROOT, inventory, load_cases, seed, sha256, verify
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.benchmarks.execution_task_contract import compliance, prompt_for
+from scripts.benchmarks.public.benchmark_public_execution import (
+    prompt_for as legacy_prompt,
+)
+from scripts.benchmarks.public.public_execution_cases import (
+    ROOT,
+    inventory,
+    load_cases,
+    seed,
+    sha256,
+    verify,
+)
 
 
 FIXTURES = ROOT / "benchmarks/swe-lite-dev-expanded"

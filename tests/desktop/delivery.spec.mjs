@@ -10,6 +10,11 @@ const root = path.resolve(
   "../..",
 );
 
+test.skip(
+  process.platform !== "linux",
+  "full DSH execution requires Linux bubblewrap",
+);
+
 test("native delivery checks show failure, repair within budget and restore the real check history", async () => {
   test.setTimeout(60000);
   const temporary = await mkdtemp(path.join(root, ".runtime/native-delivery-"));

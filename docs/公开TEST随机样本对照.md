@@ -40,11 +40,11 @@
 复现预检和计划（不读取密钥、不调用模型）：
 
 ```bash
-PYTHONPATH=src python3 scripts/prepare_public_test_sample.py --download
-PYTHONPATH=src python3 scripts/build_public_test_native.py
-PYTHONPATH=src python3 scripts/materialize_public_test_sample.py
-PYTHONPATH=src python3 scripts/preflight_public_test_sample.py --output .runtime/public-test-sample/new-preflight
-PYTHONPATH=src python3 scripts/benchmark_public_test_sample.py --output /tmp/unused-test.json --preflight .runtime/public-test-sample/new-preflight/report.json
+PYTHONPATH=src python3 scripts/benchmarks/public/prepare_public_test_sample.py --download
+PYTHONPATH=src python3 scripts/benchmarks/public/build_public_test_native.py
+PYTHONPATH=src python3 scripts/benchmarks/public/materialize_public_test_sample.py
+PYTHONPATH=src python3 scripts/benchmarks/public/preflight_public_test_sample.py --output .runtime/public-test-sample/new-preflight
+PYTHONPATH=src python3 scripts/benchmarks/public/benchmark_public_test_sample.py --output /tmp/unused-test.json --preflight .runtime/public-test-sample/new-preflight/report.json
 ```
 
 编译脚本拒绝覆盖已有构建，预检与正式评测要求全新输出路径；已有构建应先核对其记录再复用。官方发布文件与本地缓存出处、环境修订、请求、候选和结果须一并归档。真实调用需显式增加 `--live`，仅使用本地 `.env`，原始密钥不得进入报告。六题、两次重复及四个仓库的范围有限，无论单轮结果如何，均不足以证明全面达到 DSH、Codex 或临床有效性。

@@ -271,7 +271,7 @@ def configure_common(root: Path, *, interactive: bool) -> None:
     write_common(root / ".env.common", common)
     write_full(root / ".env", common, {})
     print("已生成通用层 .env.common，并将 .env 切换为直接模型开发配置。")
-    print("启动：./scripts/start-desktop.sh --live")
+    print("启动：./scripts/app/start-desktop.sh --live")
 
 
 def configure_dsh(root: Path, *, interactive: bool) -> None:
@@ -284,7 +284,7 @@ def configure_dsh(root: Path, *, interactive: bool) -> None:
     write_full(root / ".env", common, dsh)
     print("已生成 DSH 覆盖层 .env.dsh，并合并为完整 .env。")
     print("检查：npm run dsh:check")
-    print("启动：./scripts/start-desktop.sh --live")
+    print("启动：./scripts/app/start-desktop.sh --live")
 
 
 def configure_full(root: Path, *, interactive: bool) -> None:
@@ -295,7 +295,7 @@ def configure_full(root: Path, *, interactive: bool) -> None:
     write_full(root / ".env", common, dsh)
     print("已生成 .env.common、.env.dsh 和可直接启动的完整 .env。")
     print("检查：npm run dsh:check")
-    print("启动：./scripts/start-desktop.sh --live")
+    print("启动：./scripts/app/start-desktop.sh --live")
 
 
 def main() -> int:

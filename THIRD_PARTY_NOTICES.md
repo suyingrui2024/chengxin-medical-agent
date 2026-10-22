@@ -1,6 +1,6 @@
 # Third-party components
 
-Windows distributions include the official CPython 3.14.8 portable runtime (PSF license), Node.js 22.23.3 Windows runtime (Node's bundled license), and the native `wxc-exec.exe` / `wxc-host-prep.exe` from Microsoft's MXC 1.0.1 distribution (MIT). Original runtime license files are retained. Exact download URLs and pinned SHA256 values are recorded in `scripts/windows/runtime-lock.json`. The MXC integration uses its Windows ProcessContainer JSON CLI and does not invoke WSL or its WSLC backend. MXC diagnostic telemetry is explicitly disabled. Source: https://github.com/microsoft/mxc.
+Windows distributions include the official CPython 3.14.8 portable runtime (PSF license), Node.js 22.23.3 Windows runtime (Node's bundled license), and the native `wxc-exec.exe` / `wxc-host-prep.exe` from Microsoft's MXC 1.0.1 distribution (MIT). Original runtime license files are retained. Exact download URLs and pinned SHA256 values are recorded in `scripts/platform/windows/runtime-lock.json`. The MXC integration uses its Windows ProcessContainer JSON CLI and does not invoke WSL or its WSLC backend. MXC diagnostic telemetry is explicitly disabled. Source: https://github.com/microsoft/mxc.
 
 The application bundles the original, unmodified Noto Sans CJK SC Regular and Noto Serif CJK SC Regular font files from https://github.com/notofonts/noto-cjk at commit `f8d157532fbfaeda587e826d4cd5b21a49186f7c`.
 

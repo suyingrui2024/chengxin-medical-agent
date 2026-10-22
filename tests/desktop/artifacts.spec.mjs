@@ -10,6 +10,11 @@ const root = path.resolve(
   "../..",
 );
 
+test.skip(
+  process.platform !== "linux",
+  "full DSH execution requires Linux bubblewrap",
+);
+
 test("native generated plots and tables preview inertly, detect changed bytes, ignore late responses and reopen offline", async () => {
   test.setTimeout(60000);
   const temporary = await mkdtemp(

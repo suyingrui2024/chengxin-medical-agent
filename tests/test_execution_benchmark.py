@@ -10,10 +10,15 @@ import threading
 import unittest
 from urllib import error, request
 
-SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
-sys.path.insert(0, str(SCRIPTS))
-from benchmark_execution import Baseline, BoundedGateway, check_artifacts, seed_project
-from execution_benchmark_cases import CASES, code
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from scripts.benchmarks.benchmark_execution import (
+    Baseline,
+    BoundedGateway,
+    check_artifacts,
+    seed_project,
+)
+from scripts.benchmarks.execution_benchmark_cases import CASES, code
 
 REFERENCES = {
     "precision-repair": {

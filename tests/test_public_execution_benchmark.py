@@ -7,8 +7,8 @@ import sys
 import tempfile
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from public_execution_cases import (
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.benchmarks.public.public_execution_cases import (
     ROOT,
     frozen_source_check,
     inventory,
@@ -68,7 +68,7 @@ class PublicFixtureTests(unittest.TestCase):
             for case in cases.values()
         ):
             self.skipTest(
-                "Prepare pinned public sources with scripts/prepare_public_execution.py"
+                "Prepare pinned public sources with scripts/benchmarks/public/prepare_public_execution.py"
             )
         with tempfile.TemporaryDirectory() as raw:
             for name, case in cases.items():

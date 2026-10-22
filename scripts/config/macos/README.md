@@ -28,7 +28,7 @@
 
 ```bash
 npm run dsh:check
-./scripts/start-desktop.sh --live
+./scripts/app/start-desktop.sh --live
 ```
 
 重新运行任一脚本时，回车会保留已有值；API Key 使用隐藏输入。默认 `shadow` 只记录受限后台复核结果，`advisory` 应仅用于已经完成相应评测的开发实验。

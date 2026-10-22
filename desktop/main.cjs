@@ -24,7 +24,7 @@ const { createModelCredentialStore } = require("./model-credentials.cjs");
 
 const projectRoot = path.resolve(__dirname, "..");
 const { version } = require("../package.json");
-app.setName("澄心问诊");
+app.setName("知微");
 app.setPath(
   "userData",
   process.env.MEDAGENT_DESKTOP_PROFILE ||
@@ -48,6 +48,13 @@ let readyOrigin;
 let quitting = false;
 let choosingProject = false;
 const projectRequests = new Map();
+
+function defaultExecutionRoot() {
+  const desktop = app.getPath("desktop");
+  const current = path.join(desktop, "知微工作区");
+  const legacy = path.join(desktop, "澄心工作区");
+  return fs.existsSync(current) || !fs.existsSync(legacy) ? current : legacy;
+}
 
 function nativeAppearance(value) {
   nativeTheme.themeSource =
@@ -180,8 +187,7 @@ function startBackend(token) {
           PYTHONPATH: path.join(projectRoot, "src"),
           PYTHONDONTWRITEBYTECODE: "1",
           MEDAGENT_EXECUTION_ROOT:
-            process.env.MEDAGENT_EXECUTION_ROOT ||
-            path.join(app.getPath("desktop"), "澄心工作区"),
+            process.env.MEDAGENT_EXECUTION_ROOT || defaultExecutionRoot(),
         },
       },
     );
@@ -279,7 +285,7 @@ async function createWindow() {
   );
   privateSession.setPermissionCheckHandler(allowClipboard);
   window = new BrowserWindow({
-    title: "澄心问诊",
+    title: "知微",
     width: 1440,
     height: 980,
     minWidth: 900,
@@ -389,12 +395,12 @@ if (!app.requestSingleInstanceLock()) {
           label: "应用",
           submenu: [
             {
-              label: "关于澄心问诊",
+              label: "关于知微",
               click: () =>
                 dialog.showMessageBox(window, {
                   type: "info",
-                  title: "澄心问诊",
-                  message: "澄心问诊 · 桌面研究原型",
+                  title: "知微",
+                  message: "知微 · 个人健康记录与问诊助手",
                   detail:
                     "本地独立窗口。默认离线演示；模型密钥可仅用于本次运行，或由系统安全凭据存储加密保存。",
                 }),
@@ -432,9 +438,9 @@ if (!app.requestSingleInstanceLock()) {
     } catch {
       if (quitting || stopping) return;
       dialog.showErrorBox(
-        "无法打开澄心问诊",
+        "无法打开知微",
         process.platform === "win32"
-          ? "请运行 scripts/windows.ps1 -Mode Check 检查 Windows 运行环境；使用发行包时请先解压整个目录，保留随包 Python 和 Node。"
+          ? "请运行 scripts/platform/windows/windows.ps1 -Mode Check 检查 Windows 运行环境；使用发行包时请先解压整个目录，保留随包 Python 和 Node。"
           : "请确认已安装 Python 3.10+，并保留完整的应用目录。可设置 MEDAGENT_PYTHON 指向 Python 可执行文件。模型依赖安装方法请查看项目说明。",
       );
       app.quit();

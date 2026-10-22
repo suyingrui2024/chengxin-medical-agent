@@ -10,6 +10,11 @@ const root = path.resolve(
   "../..",
 );
 
+test.skip(
+  process.platform !== "linux",
+  "full DSH execution requires Linux bubblewrap",
+);
+
 test("native rejected check inputs remain visible while corrected actual checks complete", async () => {
   const temporary = await mkdtemp(
     path.join(root, ".runtime/native-check-inputs-"),

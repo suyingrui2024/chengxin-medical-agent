@@ -10,6 +10,11 @@ const root = path.resolve(
   "../..",
 );
 
+test.skip(
+  process.platform !== "linux",
+  "full DSH execution requires Linux bubblewrap",
+);
+
 test("native checks mark changed inputs as needing revalidation and accept the actual new check", async () => {
   test.setTimeout(60000);
   const temporary = await mkdtemp(

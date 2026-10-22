@@ -31,7 +31,7 @@ export function executorPath() {
     if (existsSync(candidate)) return candidate;
   }
   throw new Error(
-    "Windows native isolation runtime is missing. Run scripts/windows.ps1 -Mode Setup.",
+    "Windows native isolation runtime is missing. Run scripts/platform/windows/windows.ps1 -Mode Setup.",
   );
 }
 

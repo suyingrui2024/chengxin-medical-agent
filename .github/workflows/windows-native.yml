@@ -29,7 +29,7 @@ jobs:
           path: |
             .runtime/windows
             node_modules
-          key: native-windows-v1-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'scripts/windows/runtime-lock.json', 'scripts/windows.ps1') }}
+          key: native-windows-v1-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'scripts/platform/windows/runtime-lock.json', 'scripts/platform/windows/windows.ps1') }}
       - name: Verify native runtimes and execution profile
         shell: powershell
         run: |
@@ -41,7 +41,7 @@ jobs:
             & ./.runtime/windows/node/node.exe integrations/dsh/check.mjs
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
-            ./scripts/windows.ps1 -Mode Setup -NoShortcut
+            ./scripts/platform/windows/windows.ps1 -Mode Setup -NoShortcut
           }
       - name: Investigate original and independent command deadlines
         shell: powershell
@@ -49,7 +49,7 @@ jobs:
           $env:PATH = (Join-Path $PWD '.runtime/windows/node') + ';' + $env:PATH
           $env:PYTHONPATH = Join-Path $PWD 'src'
           $env:MEDAGENT_PYTHON = Join-Path $PWD '.runtime/windows/python/python.exe'
-          & ./.runtime/windows/node/node.exe scripts/windows/isolation-check.mjs
+          & ./.runtime/windows/node/node.exe scripts/platform/windows/isolation-check.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & ./.runtime/windows/python/python.exe -m unittest tests.test_windows_execution.WindowsExecutionTests.test_original_command_deadline_survives_an_independent_followup -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -86,14 +86,14 @@ jobs:
           path: |
             .runtime/windows
             node_modules
-          key: native-windows-v1-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'scripts/windows/runtime-lock.json', 'scripts/windows.ps1') }}
+          key: native-windows-v1-${{ runner.arch }}-${{ hashFiles('package-lock.json', 'scripts/platform/windows/runtime-lock.json', 'scripts/platform/windows/windows.ps1') }}
       - name: Install native runtimes and exercise real desktop
         shell: powershell
         run: |
           if ('${{ steps.runtime-cache.outputs.cache-hit }}' -eq 'true') {
-            ./scripts/windows.ps1 -Mode Check
+            ./scripts/platform/windows/windows.ps1 -Mode Check
           } else {
-            ./scripts/windows.ps1 -Mode Setup -NoShortcut
+            ./scripts/platform/windows/windows.ps1 -Mode Setup -NoShortcut
           }
       - name: Save verified native dependencies
         if: steps.runtime-cache.outputs.cache-hit != 'true'
@@ -105,7 +105,7 @@ jobs:
           key: ${{ steps.runtime-cache.outputs.cache-primary-key }}
       - name: Win32 filesystem, locks and process trees
         shell: powershell
-        run: ./scripts/windows.ps1 -Mode Test
+        run: ./scripts/platform/windows/windows.ps1 -Mode Test
       - name: Path boundaries, delivery evidence and preview data
         shell: powershell
         run: |
@@ -117,7 +117,7 @@ jobs:
       - name: Native Windows isolation and full SDK execution
         if: matrix.execution
         shell: powershell
-        run: ./scripts/windows.ps1 -Mode ExecutionTest
+        run: ./scripts/platform/windows/windows.ps1 -Mode ExecutionTest
       - name: Native isolation host diagnostics
         if: always()
         shell: powershell
@@ -128,14 +128,14 @@ jobs:
           }
       - name: Build Windows desktop with bundled Python and Node
         shell: powershell
-        run: ./scripts/windows.ps1 -Mode Build
+        run: ./scripts/platform/windows/windows.ps1 -Mode Build
       - name: Run packaged Windows executable
         shell: powershell
         run: |
           $metadata = Get-Content package.json -Raw | ConvertFrom-Json
           $env:MEDAGENT_DESKTOP_BINARY = Join-Path $PWD "dist/desktop/Chengxin-$($metadata.version)-win32-x64/Chengxin.exe"
           $env:MEDAGENT_PYTHON = $null
-          & ./.runtime/windows/node/node.exe scripts/windows/gui-check.mjs
+          & ./.runtime/windows/node/node.exe scripts/platform/windows/gui-check.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Compile and verify native Windows installer
         if: ${{ !matrix.execution }}
@@ -149,14 +149,14 @@ jobs:
           $setup = Start-Process -FilePath $compilerSetup -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/NOICONS', '/TASKS=', ('/DIR="' + $compilerRoot + '"')) -Wait -PassThru
           if ($setup.ExitCode -ne 0) { throw 'Inno Setup compiler installation failed' }
           $env:MEDAGENT_ISCC = Join-Path $compilerRoot 'ISCC.exe'
-          ./scripts/windows.ps1 -Mode Installer
+          ./scripts/platform/windows/windows.ps1 -Mode Installer
           ./tests/windows-installer-e2e.ps1
       - name: Execute full SDK with packaged Python and Node
         if: matrix.execution
         shell: powershell
         run: |
           $metadata = Get-Content package.json -Raw | ConvertFrom-Json
-          ./scripts/windows/packaged-execution-check.ps1 -ApplicationDirectory "dist/desktop/Chengxin-$($metadata.version)-win32-x64" -PathWithSpaces
+          ./scripts/platform/windows/packaged-execution-check.ps1 -ApplicationDirectory "dist/desktop/Chengxin-$($metadata.version)-win32-x64" -PathWithSpaces
       - name: Archive portable native Windows application
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_artifacts }}
         shell: powershell

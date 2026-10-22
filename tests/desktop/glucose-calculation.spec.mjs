@@ -37,6 +37,7 @@ for (const height of [760, 680])
         args: executablePath ? [] : [root],
         env,
       });
+      await app.firstWindow();
       await app.evaluate(
         ({ BrowserWindow }, height) =>
           BrowserWindow.getAllWindows()[0].setSize(900, height),

@@ -9,6 +9,11 @@ const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../..",
 );
+
+test.skip(
+  process.platform !== "linux",
+  "full DSH execution requires Linux bubblewrap",
+);
 function respond(response, step, tool) {
   const events = [
     {

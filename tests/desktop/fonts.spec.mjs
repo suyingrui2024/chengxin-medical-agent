@@ -2,7 +2,7 @@ import { _electron as electron, test, expect } from "@playwright/test";
 import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkBundledFonts } from "../../scripts/check-bundled-fonts.mjs";
+import { checkBundledFonts } from "../../scripts/build/check-bundled-fonts.mjs";
 
 const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

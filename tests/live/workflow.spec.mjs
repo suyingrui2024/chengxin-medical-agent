@@ -12,7 +12,7 @@ const root = path.resolve(
 test("synthetic patient completes a native live consultation, emergency routing and service recovery", async () => {
   test.skip(
     !process.env.MEDAGENT_E2E_GATEWAY,
-    "Use scripts/test_live_desktop.py to enforce the request budget",
+    "Use scripts/evaluation/medical/test_live_desktop.py to enforce the request budget",
   );
   const report = { synthetic_only: true, cases: [] };
   const selected = new Set(

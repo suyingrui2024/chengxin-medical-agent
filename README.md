@@ -1,4 +1,4 @@
-# 澄心问诊 · medical-agent
+# 知微 · medical-agent
 
 面向患者和照护者的中文门诊式问诊研究项目。当前源码版本 **0.11.17** 提供可视化问诊和官方 DSH 完整执行底座：工作区文件、终端、代码、联网搜索与子智能体。患者流程保留聚焦问题、分步图示、明确未知与更正；执行产物独立保存，不自动回写病例。
 
@@ -12,13 +12,15 @@
 
 Python 3.10+；DSH 模式另需 Node 22.19+。以下命令从项目根目录运行。
 
+开发、构建、评测和平台适配工具的分类与常用入口见 [开发脚本索引](scripts/README.md)。
+
 ### 平台支持与启动方式
 
 | 平台 | 当前支持范围 | 首次配置 | 日常启动 |
 | --- | --- | --- | --- |
-| Windows 10 19044+／Windows 11 x64 | 已验证的原生桌面版；Windows 11 Arm 可运行 x64 应用 | 在 PowerShell 执行 `scripts/windows.ps1 -Mode Setup`。脚本下载项目专用 Python、Node、Electron 与原生执行器，并创建桌面快捷方式；`scripts/config/windows/03-configure-full.ps1` 生成两层本地配置。 | 双击桌面“澄心问诊”，或执行 `scripts/windows.ps1 -Mode Start`。 |
-| Ubuntu／其他 Linux x64 | 已验证 Linux x64 的源码版与桌面打包版 | 准备系统 Python 3.10+；DSH 模式另需系统 Node 22.19+。从源码运行时执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`；`./scripts/config/ubuntu/03-configure-full.sh` 生成两层本地配置。 | 双击“澄心问诊.desktop”，或执行 `./scripts/start-desktop.sh`。打包目录也必须完整保留。 |
-| macOS（Apple Silicon／Intel） | 可从源码启动开发版；尚无安装器、打包产物或 CI 验收 | 准备 Python 3.10+ 和 Node 22.19+（Homebrew 可执行 `brew install node@22`），再执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`。可运行 `./scripts/config/macos/03-configure-full.sh` 生成两层本地配置。 | 执行 `./scripts/start-desktop.sh`；读取项目 `.env` 时执行 `./scripts/start-desktop.sh --live`。启动器会优先使用 Homebrew 的 `node@22`。 |
+| Windows 10 19044+／Windows 11 x64 | 已验证的原生桌面版；Windows 11 Arm 可运行 x64 应用 | 在 PowerShell 执行 `scripts/platform/windows/windows.ps1 -Mode Setup`。脚本下载项目专用 Python、Node、Electron 与原生执行器，并创建桌面快捷方式；`scripts/config/windows/03-configure-full.ps1` 生成两层本地配置。 | 双击桌面“知微”，或执行 `scripts/platform/windows/windows.ps1 -Mode Start`。 |
+| Ubuntu／其他 Linux x64 | 已验证 Linux x64 的源码版与桌面打包版 | 准备系统 Python 3.10+；DSH 模式另需系统 Node 22.19+。从源码运行时执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`；`./scripts/config/ubuntu/03-configure-full.sh` 生成两层本地配置。 | 双击“知微.desktop”，或执行 `./scripts/app/start-desktop.sh`。打包目录也必须完整保留。 |
+| macOS（Apple Silicon／Intel） | 可从源码启动开发版；尚无安装器、打包产物或 CI 验收 | 准备 Python 3.10+ 和 Node 22.19+（Homebrew 可执行 `brew install node@22`），再执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`。可运行 `./scripts/config/macos/03-configure-full.sh` 生成两层本地配置。 | 执行 `./scripts/app/start-desktop.sh`；读取项目 `.env` 时执行 `./scripts/app/start-desktop.sh --live`。启动器会优先使用 Homebrew 的 `node@22`。 |
 
 上述桌面快捷方式和启动器只提供“点击启动”，不设置登录后或开机自动启动。Windows 的安装与完整验收范围见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)，Linux 的打包与验证细节见 [桌面版使用、打包和验证](docs/桌面应用使用与打包.md)。
 
@@ -27,13 +29,13 @@ Python 3.10+；DSH 模式另需 Node 22.19+。以下命令从项目根目录运�
 Windows 使用独立的 Python、Node 和 Electron，直接显示原生 Windows 桌面窗口，无需 WSL。当前目标 Windows 10 19044+／Windows 11 x64。首次配置在项目根目录的普通 PowerShell 中运行：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Setup
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\platform\windows\windows.ps1 -Mode Setup
 # 启动离线演示
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\platform\windows\windows.ps1 -Mode Start
 # 重新检查原生运行时、DSH、后端鉴权与实际窗口
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\platform\windows\windows.ps1 -Mode Check
 # Win32 文件／进程回归
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Test
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\platform\windows\windows.ps1 -Mode Test
 ```
 
 安装脚本下载 SHA256 固定的完整便携 Windows Python 3.14.8、Node 22.23.3 与 Microsoft MXC 原生执行器到 `.runtime/windows`，安装锁定依赖和 Electron，检查成功后创建桌面快捷方式。不修改系统 PATH，不要求预装 Windows Python、Node、Conda 或 pip。首次下载需要网络；Python 随带 venv 和 pip，工作台可在自己的工作区建立项目环境。
@@ -42,7 +44,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode 
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\config\windows\03-configure-full.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows.ps1 -Mode Start -Live
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\platform\windows\windows.ps1 -Mode Start -Live
 ```
 
 Windows 打包入口为 `-Mode Build`，产物在 `dist/desktop/Chengxin-0.11.17-win32-x64/`；整个目录携带 Python、Node 和 Electron，用户保留完整目录后运行 `Chengxin.exe`。`561b89b` 的 [Windows CI 验收](https://github.com/suyingrui2024/chengxin-medical-agent/actions/runs/39102424997)已通过：Server 2025 x64 覆盖桌面、安装器、快捷方式与卸载；Windows 11 Arm 运行 x64 应用覆盖原生隔离、源码与便携包的完整 SDK 执行、产物落盘、子智能体验证及会话接续。六套皮肤及重启恢复、真实 CSV 数值图表也已实测。完整执行要求支持 ProcessContainer 的已更新 Windows 11，启动时实际探测；Windows 10 和实体 Windows 11 x64 尚未实际验证。更改已合并到 `main`，详见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)。
@@ -51,10 +53,10 @@ Windows 两层配置的三个入口和启动命令见 [`scripts/config/windows`]
 
 ### 独立桌面应用（推荐）
 
-当前电脑直接双击桌面的 **“澄心问诊”** 图标；会自动打开独立应用窗口，无需浏览器或手动启动服务。也可运行：
+当前电脑直接双击桌面的 **“知微”** 图标；会自动打开独立应用窗口，无需浏览器或手动启动服务。也可运行：
 
 ```bash
-./scripts/start-desktop.sh
+./scripts/app/start-desktop.sh
 ```
 
 从干净源码环境准备桌面版：
@@ -70,7 +72,7 @@ npm start
 已经配置项目根目录 `.env` 时，可显式启动真实模型桌面版：
 
 ```bash
-./scripts/start-desktop.sh --live
+./scripts/app/start-desktop.sh --live
 ```
 
 macOS 开发环境提供三个快速配置入口：`01-configure-common.sh` 生成通用模型层并启用直接模型模式，`02-configure-dsh.sh` 生成 DSH 覆盖层并合并，`03-configure-full.sh` 一次生成两个分层和最终 `.env`。脚本位于 [`scripts/config/macos`](scripts/config/macos/README.md)，隐藏读取 API Key，生成文件均不会进入 Git。
@@ -85,7 +87,7 @@ v0.11.17随包提供正文与标题的本地中文字体，页面和启动页共
 
 ### 外观与皮肤
 
-右上角「外观」可即时切换澄心绿、海盐蓝、鸢尾紫、暖砂金、雾石灰、夜航六套皮肤，或跟随系统。浏览器与桌面版分别保存外观偏好；切换保留问诊进度和未发送文字。定位图增加正背面区别、患者自身左右与大范围标示，测温图支持放大查看。实现、实际截图、检查范围与图示后续优先级见[多套皮肤与图示评审](docs/图形界面设计与检查.md#2026-10-18-多套皮肤与图示评审)。
+右上角「外观」可即时切换知微绿、海盐蓝、鸢尾紫、暖砂金、雾石灰、夜航六套皮肤，或跟随系统。浏览器与桌面版分别保存外观偏好；切换保留问诊进度和未发送文字。定位图增加正背面区别、患者自身左右与大范围标示，测温图支持放大查看。实现、实际截图、检查范围与图示后续优先级见[多套皮肤与图示评审](docs/图形界面设计与检查.md#2026-10-18-多套皮肤与图示评审)。
 
 ### 已确认定位的修改
 
@@ -167,7 +169,7 @@ v0.10.1 支持执行中的结构化澄清：主任务和子任务可提出必要
 
 点击“打开本地项目”，可通过原生文件夹选择器在已有项目中直接读写、运行代码和委托子任务；修改保存在原位置，记录与基线单独保存。选择目录不调用模型，只有提交任务才执行。所选目录中的文件可被读取或修改，包括其中自行放置的配置；应用运行目录、私有记录目录及系统／账户保护目录不能作为项目。详见 [本地项目设计与范围](docs/本地项目目录与原位执行.md)。
 
-工作区默认保存在桌面的“澄心工作区”目录。正常后续回合保留同一 DSH 进程和会话；可停止前台、后台进程及子任务。源码版也可通过 `medagent.execution.ExecutionManager` 使用；默认文件夹为项目 `workspaces`。运行时隔离看不到项目密钥与其他用户目录，网络明确允许。普通无鉴权开发网页不开放执行 API。
+工作区默认保存在桌面的“知微工作区”目录。若旧版“澄心工作区”已经存在且尚未创建“知微工作区”，应用会继续使用旧目录，避免已有任务与文件在改名后消失。正常后续回合保留同一 DSH 进程和会话；可停止前台、后台进程及子任务。源码版也可通过 `medagent.execution.ExecutionManager` 使用；默认文件夹为项目 `workspaces`。运行时隔离看不到项目密钥与其他用户目录，网络明确允许。普通无鉴权开发网页不开放执行 API。
 
 0.9.3 新建的工作区支持关闭应用后恢复：从选择器打开历史，离线查看文件和任务记录；配置原模型服务与当前密钥后继续原 DSH 会话。配置密钥不写入宿主索引；执行任务记录会明文保存在本机，适用于合成研究任务。患者问诊仍不持久化。详情见 [工作区恢复与存储](docs/执行工作区恢复与存储.md)。
 
@@ -292,7 +294,7 @@ flowchart TD
     C --> E[事件轨迹]
 ```
 
-实际使用的 DSH CLI、SDK 和协议包统一固定为 `0.2.0-rc.2`，完整依赖及校验值在 `package-lock.json`。源码已经下载到 `vendor/deepseek-harness` 用于接口核对，检查过的提交记录在 `vendor/upstream.lock.json`；上游源码保持原样。可运行 `python3 scripts/fetch_dsh.py` 复现该源码检查目录。
+实际使用的 DSH CLI、SDK 和协议包统一固定为 `0.2.0-rc.2`，完整依赖及校验值在 `package-lock.json`。源码已经下载到 `vendor/deepseek-harness` 用于接口核对，检查过的提交记录在 `vendor/upstream.lock.json`；上游源码保持原样。可运行 `python3 scripts/maintenance/fetch_dsh.py` 复现该源码检查目录。
 
 `integrations/dsh/medical.patch.yml` 覆盖官方 `sdk-minimal`：关闭 shell、终端、子进程、会话日志上传和插件清单上传；使用独立临时工作区与 DSH home，调用结束后回收。模型只返回提议，医疗工具由 Python 控制器校验后执行。这里是进程级后端接入，未宣称是已发布的 DSH 原生医疗插件。
 

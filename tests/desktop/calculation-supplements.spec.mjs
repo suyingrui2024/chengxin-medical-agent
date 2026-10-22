@@ -35,6 +35,7 @@ test("native mixed calculation keeps supplementary history, retries and later co
       args: executablePath ? [] : [root],
       env,
     });
+    await app.firstWindow();
     await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setSize(900, 680),
     );

@@ -3,7 +3,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$scriptPath = Join-Path $projectRoot 'scripts/windows.ps1'
+$scriptPath = Join-Path $projectRoot 'scripts/platform/windows/windows.ps1'
 $errorsFound = $null
 $tokensFound = $null
 $ast = [System.Management.Automation.Language.Parser]::ParseFile($scriptPath, [ref]$tokensFound, [ref]$errorsFound)

@@ -35,6 +35,7 @@ test("native location clarification and completion retry preserve the original t
       args: executablePath ? [] : [root],
       env,
     });
+    await app.firstWindow();
     await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setSize(900, 680),
     );

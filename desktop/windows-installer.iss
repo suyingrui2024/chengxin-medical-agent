@@ -11,11 +11,11 @@
 
 [Setup]
 AppId={{79EB871E-B8AC-4E0B-A6D5-3EE559833AC1}
-AppName=Chengxin
+AppName=知微
 AppVersion={#AppVersion}
-AppPublisher=Chengxin Project
+AppPublisher=知微项目
 DefaultDirName={localappdata}\Programs\Chengxin
-DefaultGroupName=Chengxin
+DefaultGroupName=知微
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
@@ -37,8 +37,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#AppSource}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{userprograms}\Chengxin"; Filename: "{app}\Chengxin.exe"; WorkingDir: "{app}"
-Name: "{userdesktop}\Chengxin"; Filename: "{app}\Chengxin.exe"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{userprograms}\知微"; Filename: "{app}\Chengxin.exe"; WorkingDir: "{app}"
+Name: "{userdesktop}\知微"; Filename: "{app}\Chengxin.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\Chengxin.exe"; Description: "{cm:LaunchProgram,Chengxin}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Chengxin.exe"; Description: "{cm:LaunchProgram,知微}"; Flags: nowait postinstall skipifsilent

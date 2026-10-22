@@ -13,7 +13,7 @@ class LiveGatewayTests(unittest.TestCase):
     def test_gateway_auth_budget_failure_injection_and_credential_redaction(self):
         root = Path(__file__).resolve().parents[1]
         spec = importlib.util.spec_from_file_location(
-            "live_gateway", root / "scripts/test_live_desktop.py"
+            "live_gateway", root / "scripts/evaluation/medical/test_live_desktop.py"
         )
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)

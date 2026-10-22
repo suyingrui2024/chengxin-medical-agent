@@ -16,7 +16,7 @@ $python = Join-Path $projectRoot '.runtime\windows\python\python.exe'
 $generator = Join-Path $configRoot 'configure.py'
 
 if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
-    throw 'Windows portable Python is missing. Run .\scripts\windows.ps1 -Mode Setup first.'
+    throw 'Windows portable Python is missing. Run .\scripts\platform\windows\windows.ps1 -Mode Setup first.'
 }
 
 $arguments = @('-I', '-X', 'utf8', $generator, $Mode, '--project-root', $projectRoot)

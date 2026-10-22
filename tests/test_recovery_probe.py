@@ -9,9 +9,9 @@ import threading
 import unittest
 from urllib import error, request
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from benchmark_execution import BoundedGateway
-from evaluate_recovery import FirstOutputLimitHandler
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.benchmarks.benchmark_execution import BoundedGateway
+from scripts.evaluation.execution.evaluate_recovery import FirstOutputLimitHandler
 
 
 class RecoveryProbeTests(unittest.TestCase):

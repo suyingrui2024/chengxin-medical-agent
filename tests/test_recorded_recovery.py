@@ -9,7 +9,8 @@ class RecordedRecoveryTests(unittest.TestCase):
     ):
         root = Path(__file__).resolve().parents[1]
         spec = importlib.util.spec_from_file_location(
-            "recorded_recovery", root / "scripts/verify_recorded_recovery.py"
+            "recorded_recovery",
+            root / "scripts/evaluation/medical/verify_recorded_recovery.py",
         )
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)

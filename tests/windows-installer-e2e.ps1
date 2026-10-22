@@ -4,7 +4,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $astErrors = $null
 $astTokens = $null
-$ast = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $projectRoot 'scripts/windows.ps1'), [ref]$astTokens, [ref]$astErrors)
+$ast = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $projectRoot 'scripts/platform/windows/windows.ps1'), [ref]$astTokens, [ref]$astErrors)
 if ($astErrors.Count) { throw ($astErrors | Out-String) }
 foreach ($name in @('ConvertTo-ChengxinArgument', 'Invoke-ChengxinCommand')) {
     $function = $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) | Where-Object { $_.Name -eq $name }
@@ -19,7 +19,7 @@ try {
     Invoke-ChengxinCommand $setup @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', ('/DIR=' + $target), '/TASKS=desktopicon')
     $env:MEDAGENT_DESKTOP_BINARY = Join-Path $target 'Chengxin.exe'
     $env:MEDAGENT_PYTHON = $null
-    Invoke-ChengxinCommand (Join-Path $projectRoot '.runtime/windows/node/node.exe') @('scripts/windows/gui-check.mjs')
+    Invoke-ChengxinCommand (Join-Path $projectRoot '.runtime/windows/node/node.exe') @('scripts/platform/windows/gui-check.mjs')
     $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Chengxin.lnk'
     if (-not (Test-Path -LiteralPath $shortcutPath)) { throw 'Installer did not create its desktop shortcut.' }
     $shell = New-Object -ComObject WScript.Shell

@@ -41,6 +41,7 @@ for (const resumeHeight of [null, 760, 680])
           args: executablePath ? [] : [root],
           env,
         });
+        await app.firstWindow();
         if (resumeHeight) {
           const size = await app.evaluate(({ BrowserWindow }, height) => {
             const window = BrowserWindow.getAllWindows()[0];

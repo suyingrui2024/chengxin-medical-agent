@@ -17,7 +17,8 @@ class Subscription {
   }
   close() {
     this.closed = true;
-    for (const resolve of this.waiters) resolve(Promise.reject(new Error("subscription closed")));
+    for (const resolve of this.waiters)
+      resolve(Promise.reject(new Error("subscription closed")));
     this.waiters = [];
   }
   async *[Symbol.asyncIterator]() {
@@ -34,10 +35,7 @@ export class DeepSeekHarness {
     this.pendingTask = null;
     this.client = {
       request: async (method, parameters = {}) => {
-        if (
-          method === "chengxin/control" &&
-          parameters.path === "/admission"
-        )
+        if (method === "chengxin/control" && parameters.path === "/admission")
           this.pendingTask = parameters.admission?.task_id || null;
         return {
           status: 200,
@@ -79,7 +77,8 @@ export class DeepSeekHarness {
     for (const subscription of this.subscriptions) subscription.close();
   }
   publish(notification) {
-    for (const subscription of this.subscriptions) subscription.push(notification);
+    for (const subscription of this.subscriptions)
+      subscription.push(notification);
   }
   async respond(sessionId, taskId) {
     const turn = ++this.turn;
@@ -88,24 +87,37 @@ export class DeepSeekHarness {
       "x-chengxin-session-id": sessionId,
       "content-type": "application/json",
     };
-    const admitted = await fetch(this.options.env.DEEPSEEK_BASE_URL + "/admission", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ task_id: taskId, turn }),
-    });
+    const admitted = await fetch(
+      this.options.env.DEEPSEEK_BASE_URL + "/admission",
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ task_id: taskId, turn }),
+      },
+    );
     if (!admitted.ok) return;
     const event = (type, data) =>
       this.publish({
         method: "session.event",
         params: { sessionId, event: { type, data } },
       });
-    this.publish({ method: "session.status", params: { sessionId, status: "running" } });
-    event("turn/start", { turn });
-    const response = await fetch(this.options.env.DEEPSEEK_BASE_URL + "/messages", {
-      method: "POST",
-      headers: { ...headers, "x-deepseek-harness-session-id": sessionId },
-      body: JSON.stringify({ model: "fixture", max_tokens: 64, messages: [] }),
+    this.publish({
+      method: "session.status",
+      params: { sessionId, status: "running" },
     });
+    event("turn/start", { turn });
+    const response = await fetch(
+      this.options.env.DEEPSEEK_BASE_URL + "/messages",
+      {
+        method: "POST",
+        headers: { ...headers, "x-deepseek-harness-session-id": sessionId },
+        body: JSON.stringify({
+          model: "fixture",
+          max_tokens: 64,
+          messages: [],
+        }),
+      },
+    );
     if (!response.ok) return;
     const text = await response.text();
     event("assistant/message", {
@@ -114,6 +126,9 @@ export class DeepSeekHarness {
       message: { role: "assistant", content: [{ type: "text", text }] },
     });
     event("turn/end", { turn, reason: { kind: "completed" } });
-    this.publish({ method: "session.status", params: { sessionId, status: "idle" } });
+    this.publish({
+      method: "session.status",
+      params: { sessionId, status: "idle" },
+    });
   }
 }

@@ -25,8 +25,8 @@ Github Issues?, ICLR 2024. https://openreview.net/forum?id=VTF8yNQM66
 在新副本应用上游 test_patch 运行独立检查；篡改已有测试/配置/依赖判失败。
 
 复现（项目根目录）：
-python3 scripts/prepare_public_execution.py
+python3 scripts/benchmarks/public/prepare_public_execution.py
 RUN_DSH_EXECUTION=1 PYTHONPATH=src python3 -m unittest tests.test_public_execution_benchmark -v
-PYTHONPATH=src python3 scripts/benchmark_public_execution.py --output .runtime/evaluations/public-dev-check/report.json
+PYTHONPATH=src python3 scripts/benchmarks/public/benchmark_public_execution.py --output .runtime/evaluations/public-dev-check/report.json
 真实模型：增加 --live --repetitions 2 --max-total-calls 256；需已配置本地 .env。
 输出路径必须全新，同父目录 requests.json 累计计费尝试，不覆盖失败报告。

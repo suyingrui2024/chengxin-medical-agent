@@ -9,6 +9,11 @@ const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../..",
 );
+
+test.skip(
+  process.platform !== "linux",
+  "full DSH execution requires Linux bubblewrap",
+);
 test("native directory pages reach deep files, expose incomplete coverage, reject stale pages and ignore old workspace responses", async () => {
   test.setTimeout(60000);
   const temporary = await mkdtemp(

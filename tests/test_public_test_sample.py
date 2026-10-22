@@ -8,9 +8,15 @@ import unittest
 import shutil
 import zipfile
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from select_public_test_cases import selection
-from public_test_sample import classify, resolve_ids, run_code, code_for, parse
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.benchmarks.public.public_test_sample import (
+    classify,
+    code_for,
+    parse,
+    resolve_ids,
+    run_code,
+)
+from scripts.benchmarks.public.select_public_test_cases import selection
 
 
 def instance(failed, passed):

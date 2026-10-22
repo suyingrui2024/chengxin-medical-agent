@@ -173,7 +173,7 @@ test("desktop app owns its window, private sidecar and shutdown lifecycle", asyn
       };
     });
     expect(preferences).toEqual({
-      title: "澄心问诊",
+      title: "知微",
       sandbox: true,
       nodeIntegration: false,
       contextIsolation: true,

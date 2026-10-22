@@ -788,7 +788,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       );
       const avatar = el("span", "message-avatar");
       const image = el("img");
-      image.src = "brand.svg";
+      image.src = "brand.png";
       image.alt = "";
       avatar.append(image);
       row.append(avatar, el("div", "bubble", data.text));

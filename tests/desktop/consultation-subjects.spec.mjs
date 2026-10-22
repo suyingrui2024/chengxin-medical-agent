@@ -33,6 +33,7 @@ test("native consultation changes preserve the old case and prepare a separate e
       args: executablePath ? [] : [root],
       env,
     });
+    await app.firstWindow();
     await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setSize(900, 680),
     );

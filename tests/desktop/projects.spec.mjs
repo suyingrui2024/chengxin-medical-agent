@@ -18,6 +18,11 @@ const root = path.resolve(
   "../..",
 );
 
+test.skip(
+  process.platform !== "linux",
+  "full DSH execution requires Linux bubblewrap",
+);
+
 function respond(response, serial, tool) {
   const events = [
     {
