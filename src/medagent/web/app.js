@@ -1693,10 +1693,10 @@ function renderLibrary() {
   for (const task of state.tasks) {
     const card = el("article", "library-card");
     const image = el("img", "library-image");
-    // 问诊任务用同一 SVG 的 #step-N 视图片段；片段视图会污染同 URL 的
-    // 固有视口，使库预览把整幅图缩在中央。加一个不匹配任何视图的片段
-    // 隔离资源，库里永远渲染完整画布（F11a 根因）。
-    image.src = task.asset.includes("#") ? task.asset : `${task.asset}#library`;
+    // 问诊任务用同一 SVG 的 #step-N 视图片段；本会话一旦加载过片段视图，
+    // 无片段加载会继承会话内的活动视图状态，把整幅画布缩在中央（F11a 根因）。
+    // 库预览改用第一步的显式视图（与任务内渲染一致、幅面清晰），无分步图才用原图。
+    image.src = task.step_assets?.[0] || task.asset;
     image.alt = `${task.title}图示预览`;
     // 图资产是无固有像素尺寸的 SVG：加载后按真实宽高比锁定画框，
     // 避免个别引擎把内容缩在画框中央（走查 F11a）。
