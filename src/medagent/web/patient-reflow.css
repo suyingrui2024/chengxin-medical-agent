@@ -1,5 +1,44 @@
 /* Native zoom and short screens need page flow, not a shrinking question pane. */
+@media (max-width: 980px) {
+  /* Mobile is a single scrolling column: release the full-height lock
+     and size the panel by the pre-lock formula so task content fits. */
+  #view-consultation:not([hidden]) {
+    height: auto;
+  }
+  .consult-grid {
+    flex: none;
+  }
+  .conversation-panel {
+    flex: none;
+    height: calc(100dvh - 231px);
+    min-height: 590px;
+  }
+}
+@media (max-width: 700px) {
+  .has-session .conversation-panel {
+    height: calc(100dvh - 215px);
+    min-height: 540px;
+  }
+}
 @media (max-height: 560px) {
+  body:not(.has-session):has(#view-consultation:not([hidden]))
+    #view-consultation {
+    height: auto;
+  }
+  body:not(.has-session):has(#view-consultation:not([hidden])) .consult-grid {
+    flex: none;
+  }
+  body:not(.has-session):has(#view-consultation:not([hidden]))
+    .conversation-panel {
+    height: auto;
+    flex: none;
+    min-height: 0;
+  }
+  body:not(.has-session):has(#view-consultation:not([hidden]))
+    .conversation-scroll {
+    flex: none;
+    max-height: max(220px, 70dvh);
+  }
   .toast.toast-inline {
     position: static;
     transform: none;
@@ -9,9 +48,16 @@
     box-shadow: none;
     overflow-wrap: anywhere;
   }
+  body.has-session:has(#view-consultation:not([hidden])) #view-consultation {
+    height: auto;
+  }
+  body.has-session:has(#view-consultation:not([hidden])) .consult-grid {
+    flex: none;
+  }
   body.has-session:has(#view-consultation:not([hidden])) .conversation-panel {
     height: auto;
     min-height: 0;
+    flex: none;
   }
   body.has-session:has(#view-consultation:not([hidden])) .active-question,
   body.has-session:has(#view-consultation:not([hidden])) .active-task {
@@ -33,13 +79,6 @@
     #view-consultation
     .page-heading {
     display: none;
-  }
-  body.has-session:has(#view-consultation:not([hidden])) .conversation-header {
-    height: auto;
-    min-height: 48px;
-    padding-block: 10px;
-    flex-wrap: wrap;
-    gap: 8px;
   }
   body.has-session:has(#view-consultation:not([hidden])) .task-focus-bar {
     flex-wrap: wrap;

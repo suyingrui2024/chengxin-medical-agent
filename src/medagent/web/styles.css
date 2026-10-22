@@ -1731,7 +1731,6 @@ h1 {
   white-space: nowrap;
 }
 
-
 .consult-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 270px;
@@ -1749,10 +1748,6 @@ h1 {
   flex: 1;
   min-height: 0;
 }
-
-
-
-
 
 .conversation-scroll {
   overflow-y: auto;
@@ -4696,9 +4691,7 @@ input[type="password"],
 }
 .summary-focused
   #messages
-  > :not(.current-summary):not(.current-summary-message):not(
-    .current-outcome
-  ) {
+  > :not(.current-summary):not(.current-summary-message):not(.current-outcome) {
   display: none;
 }
 .summary-focused #messages {
@@ -5371,7 +5364,6 @@ body[data-mode="patient"] .task-header {
 #urgent-help-error {
   color: var(--red);
 }
-
 
 @media (max-width: 700px) {
   .urgent-help {
@@ -6142,11 +6134,19 @@ html[data-font-scale="small"] .fact-value {
 
 /* Topbar removal + full-height consultation column (2026-10-22 plan). */
 @media (min-width: 981px) {
-  .topbar { display: none; }
+  .topbar {
+    display: none;
+  }
 }
 @media (max-width: 980px) {
-  .topbar { background: var(--paper); border-bottom: 1px solid var(--line); }
-  .breadcrumb #breadcrumb-root, .breadcrumb .slash { display: none; }
+  .topbar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .breadcrumb #breadcrumb-root,
+  .breadcrumb .slash {
+    display: none;
+  }
 }
 #view-consultation:not([hidden]) {
   display: flex;
@@ -6169,7 +6169,9 @@ html[data-font-scale="small"] .fact-value {
   color: var(--warning-ink);
   font-size: 13.5px;
 }
-.connection-alert .status-dot { background: var(--red); }
+.connection-alert .status-dot {
+  background: var(--red);
+}
 .sidebar-bottom .backend-pill {
   width: 100%;
   display: flex;
@@ -6178,4 +6180,14 @@ html[data-font-scale="small"] .fact-value {
   padding: 9px 12px;
   font-size: 12.5px;
   margin-bottom: 8px;
+}
+
+/* Flex children of the panel must be allowed to shrink below content
+   height on short screens; otherwise the question spills over the page
+   footnote and blocks clicks (CI patient-reflow regression). */
+.conversation-panel > #active-question,
+.conversation-panel > #active-task,
+.conversation-panel > #active-observation {
+  min-height: 0;
+  overflow-y: auto;
 }

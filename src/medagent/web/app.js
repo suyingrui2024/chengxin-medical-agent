@@ -286,7 +286,7 @@ function setBusy(busy) {
       ? "按图观察 · 可以跳过"
       : document.body.classList.contains("summary-focused")
         ? state.case?.phase === "closed"
-          ? "本次问诊已整理"
+          ? "结论与后续安排"
           : "核对记录 · 可以更正"
         : "当前这一步";
 }
@@ -799,7 +799,7 @@ function syncTaskFocus() {
       ? "按图观察 · 可以跳过"
       : summaryFocus
         ? state.case.phase === "closed"
-          ? "本次问诊已整理"
+          ? "结论与后续安排"
           : "核对记录 · 可以更正"
         : "当前这一步";
   $("#active-task").hidden = !active || state.taskHistory;
@@ -1057,7 +1057,7 @@ function renderCase(data) {
       : phase === "summary"
         ? "核对本次记录"
         : phase === "closed"
-          ? "本次问诊已整理"
+          ? "结论与后续安排"
           : "本次问诊";
   const facts = Object.entries(data.facts);
   $("#fact-count").textContent = String(facts.length);

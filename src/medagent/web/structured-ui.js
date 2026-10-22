@@ -1720,7 +1720,11 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
                 );
               if (item.against_note)
                 box.append(
-                  el("p", "conclusion-direction-basis", item.against_note + "。"),
+                  el(
+                    "p",
+                    "conclusion-direction-basis",
+                    item.against_note + "。",
+                  ),
                 );
               directions.append(box);
             }
@@ -1804,8 +1808,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         throw new Error("Invalid follow-up due time");
       text(data.reason);
       if (data.status !== undefined) text(data.status);
-      if (data.due_at !== undefined && data.due_at !== null)
-        text(data.due_at);
+      if (data.due_at !== undefined && data.due_at !== null) text(data.due_at);
     },
     (data) => {
       const urgent = data.kind === "urgent_checkin";
@@ -1826,8 +1829,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         ),
       );
       card.append(due);
-      if (data.reason)
-        card.append(el("p", "followup-reason", data.reason));
+      if (data.reason) card.append(el("p", "followup-reason", data.reason));
       card.append(
         el(
           "p",

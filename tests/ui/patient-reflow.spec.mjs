@@ -63,6 +63,7 @@ test("a real notification follows short-page flow and returns to its global host
 }) => {
   await page.setViewportSize({ width: 900, height: 648 });
   await page.goto("/");
+  await page.locator('.nav-item[data-view="settings"]').click();
   await page.getByLabel("界面模式").selectOption("developer");
   await page
     .getByRole("button", { name: "模型与运行配置", exact: true })
@@ -74,6 +75,7 @@ test("a real notification follows short-page flow and returns to its global host
     "配置已应用。开始新的问诊时使用新后端，已有会谈继续保留。",
   );
   await expect(notice).toHaveCSS("position", "fixed");
+  await page.locator('.nav-item[data-view="consultation"]').click();
   await page.setViewportSize({ width: 450, height: 324 });
   await expect(notice).toHaveCSS("position", "static");
   await expect(page.locator(".conversation-footer > #toast")).toHaveCount(1);
