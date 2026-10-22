@@ -1695,6 +1695,15 @@ function renderLibrary() {
     const image = el("img", "library-image");
     image.src = task.asset;
     image.alt = `${task.title}图示预览`;
+    // 图资产是无固有像素尺寸的 SVG：加载后按真实宽高比锁定画框，
+    // 避免个别引擎把内容缩在画框中央（走查 F11a）。
+    image.addEventListener("load", () => {
+      if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+        image.style.aspectRatio = `${image.naturalWidth} / ${image.naturalHeight}`;
+        image.style.height = "auto";
+        image.style.maxHeight = "240px";
+      }
+    });
     const heading = el("div", "library-heading");
     heading.append(
       el("h2", "", task.title),
