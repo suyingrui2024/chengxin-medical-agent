@@ -15,7 +15,7 @@ A future reasoning-review provider (design phase 3) plugs in behind the
 
 Definitions live in ``content/red_flags.json`` so clinicians can review and
 version them as data. Changing them requires a corpus evaluation report
-(``scripts/evaluate_red_flags.py``).
+(``scripts/evaluation/medical/evaluate_red_flags.py``).
 """
 from __future__ import annotations
 

@@ -8,7 +8,7 @@ The corpus is an *engineering* corpus (review_status: unreviewed in the
 JSON). Numbers here are engineering signals, not clinical validation.
 
 Usage:
-    PYTHONPATH=src python3 scripts/evaluate_red_flags.py \
+    PYTHONPATH=src python3 scripts/evaluation/medical/evaluate_red_flags.py \
         [--corpus tests/fixtures/red_flag_corpus_v0.json] [--json-out report.json]
 """
 from __future__ import annotations
@@ -19,7 +19,8 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / "src"))
 
 from medagent.domain import CaseState  # noqa: E402
 from medagent.triage import TriageService  # noqa: E402
@@ -27,7 +28,7 @@ from medagent.triage import TriageService  # noqa: E402
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--corpus", default=str(Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "red_flag_corpus_v0.json"))
+    parser.add_argument("--corpus", default=str(ROOT / "tests" / "fixtures" / "red_flag_corpus_v0.json"))
     parser.add_argument("--json-out", default=None)
     args = parser.parse_args()
 

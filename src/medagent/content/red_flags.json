@@ -129,6 +129,6 @@
       ]
     }
   ],
-  "note": "Red-flag definitions for the deterministic + curated-pattern triage layers. Phrases are exact-match (layer: rule_phrase). Patterns are curated paraphrase regexes (layer: semantic_pattern); combo is a location x signal co-occurrence rule (layer: semantic_combo). All pattern/combo hits pass clause-scoped negation suppression. Changes to this file require a red-flag corpus evaluation report (see scripts/evaluate_red_flags.py).",
+  "note": "Red-flag definitions for the deterministic + curated-pattern triage layers. Phrases are exact-match (layer: rule_phrase). Patterns are curated paraphrase regexes (layer: semantic_pattern); combo is a location x signal co-occurrence rule (layer: semantic_combo). All pattern/combo hits pass clause-scoped negation suppression. Changes to this file require a red-flag corpus evaluation report (see scripts/evaluation/medical/evaluate_red_flags.py).",
   "version": "1.0.0"
 }
