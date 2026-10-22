@@ -447,18 +447,18 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.phase = Phase.CLOSED
             state.closed_reason = "confirmed_by_user"
             state.active_question = None
-            return self._deliver(
-                state,
-                AgentReply(
-                    "你已确认本次摘要，会谈现已结束。可以把它提供给接诊医生；情况有变化时请重新评估。",
-                    Phase.CLOSED,
-                    kind="closed",
-                    summary=self._summary_payload(
-                        state, review_status="confirmed_by_user"
-                    ),
+            reply = AgentReply(
+                "你已确认本次摘要，会谈现已结束。可以把它提供给接诊医生；情况有变化时请重新评估。",
+                Phase.CLOSED,
+                kind="closed",
+                summary=self._summary_payload(
+                    state, review_status="confirmed_by_user"
                 ),
-                turn_id,
             )
+            # Parity with the deterministic pipeline's confirm handler:
+            # a user-confirmed close also derives the follow-up plan.
+            self._schedule_follow_up(state, reply, turn_id)
+            return self._deliver(state, reply, turn_id)
         if state.active_task:
             from .task_conversation import is_observation_entry
 

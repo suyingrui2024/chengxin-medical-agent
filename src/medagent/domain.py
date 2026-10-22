@@ -174,6 +174,7 @@ class CaseState:
             ),
             "risk": self.risk.to_dict(),
             "closed_reason": self.closed_reason,
+            "follow_up": dict(self.follow_up) if self.follow_up else None,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "revision": self.revision,
@@ -226,6 +227,7 @@ class AgentReply:
     calculation_result: Optional[Dict[str, Any]] = None
     observation_result: Optional[Dict[str, Any]] = None
     calculation_followup: Optional[Dict[str, Any]] = None
+    follow_up: Optional[Dict[str, Any]] = None
     subject_change: Optional[Dict[str, Any]] = None
     location_revision_action: Optional[Dict[str, Any]] = None
     adaptive_question: Optional[Dict[str, Any]] = None
@@ -248,6 +250,7 @@ class AgentReply:
             "calculation_result": self.calculation_result,
             "observation_result": self.observation_result,
             "calculation_followup": self.calculation_followup,
+            "follow_up": self.follow_up,
             "subject_change": self.subject_change,
             "adaptive_question": self.adaptive_question,
         }

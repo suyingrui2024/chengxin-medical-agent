@@ -417,6 +417,12 @@ export function replyEnvelope(reply) {
           }
         : { id: `summary:${id}`, type: "summary", data: reply.summary },
     );
+  if (reply.follow_up?.kind)
+    blocks.push({
+      id: `followup:${id}`,
+      type: "follow_up",
+      data: reply.follow_up,
+    });
   return { schema_version: UI_VERSION, blocks };
 }
 
@@ -1314,6 +1320,41 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         }
         card.append(feedback);
       }
+      // The closing guidance leads the card: what to do next and which
+      // changes need immediate help must not sit below the full fact list.
+      const riskLevel = ["emergency", "urgent", "routine"].includes(
+        data.risk_level,
+      )
+        ? data.risk_level
+        : "routine";
+      const route = el("section", `summary-route ${riskLevel}`);
+      route.setAttribute(
+        "aria-label",
+        riskLevel === "urgent" ? "尽快就医评估建议" : "下一步建议",
+      );
+      if (riskLevel === "urgent") route.setAttribute("role", "alert");
+      route.append(
+        el(
+          "p",
+          "summary-route-label",
+          riskLevel === "urgent" ? "尽快就医评估" : "下一步建议",
+        ),
+        el("p", "summary-route-action", data.care_route),
+      );
+      card.append(route);
+      if (data.return_now_if?.length) {
+        const safety = el("section", "summary-safety");
+        safety.setAttribute("aria-label", "出现以下变化请立即求助");
+        safety.append(
+          el("p", "summary-safety-label", "出现以下变化，请立即求助"),
+        );
+        const safetyList = el("ul", "summary-safety-list");
+        data.return_now_if.forEach((item) =>
+          safetyList.append(el("li", "", item)),
+        );
+        safety.append(safetyList);
+        card.append(safety);
+      }
       const groups = [
         { title: "当前不适", icon: "activity", items: [] },
         { title: "观察记录", icon: "person", items: [] },
@@ -1559,26 +1600,6 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         section.append(grid);
         card.append(section);
       }
-      const riskLevel = ["emergency", "urgent", "routine"].includes(
-        data.risk_level,
-      )
-        ? data.risk_level
-        : "routine";
-      const route = el("section", `summary-route ${riskLevel}`);
-      route.setAttribute(
-        "aria-label",
-        riskLevel === "urgent" ? "尽快就医评估建议" : "下一步建议",
-      );
-      if (riskLevel === "urgent") route.setAttribute("role", "alert");
-      route.append(
-        el(
-          "p",
-          "summary-route-label",
-          riskLevel === "urgent" ? "尽快就医评估" : "下一步建议",
-        ),
-        el("p", "summary-route-action", data.care_route),
-      );
-      card.append(route);
       if (data.risk_triggers?.length) {
         const reasons = el("details", "summary-risk-triggers");
         reasons.append(
@@ -1587,14 +1608,50 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         );
         card.append(reasons);
       }
-      if (data.return_now_if.length) {
-        const details = el("details");
-        details.append(
-          el("summary", "", "哪些变化需要立即求助"),
-          el("p", "", data.return_now_if.join("；")),
-        );
-        card.append(details);
-      }
+      return card;
+    },
+  );
+
+  register(
+    "follow_up",
+    (data) => {
+      if (!["routine_checkin", "urgent_checkin"].includes(data.kind))
+        throw new Error("Invalid follow-up kind");
+      if (!Number.isFinite(data.due_in_hours) || data.due_in_hours <= 0)
+        throw new Error("Invalid follow-up due time");
+      text(data.reason);
+      if (data.status !== undefined) text(data.status);
+      if (data.due_at !== undefined && data.due_at !== null)
+        text(data.due_at);
+    },
+    (data) => {
+      const urgent = data.kind === "urgent_checkin";
+      const card = el("article", "followup-card");
+      card.append(el("p", "task-kicker", "后续随访"));
+      card.append(
+        el(
+          "h3",
+          "",
+          urgent ? "请确认是否已获得线下评估" : "例行回访 · 确认恢复情况",
+        ),
+      );
+      const due = el("p", "followup-due");
+      due.append(
+        el("strong", "", `约 ${data.due_in_hours} 小时后`),
+        document.createTextNode(
+          "到期。到期后可以记录当时的情况：已恢复、好转、没变化、加重，或已经就医。",
+        ),
+      );
+      card.append(due);
+      if (data.reason)
+        card.append(el("p", "followup-reason", data.reason));
+      card.append(
+        el(
+          "p",
+          "followup-note",
+          "如果情况加重或出现上方警示信号，请不要等随访，立即就医并重新评估。",
+        ),
+      );
       return card;
     },
   );

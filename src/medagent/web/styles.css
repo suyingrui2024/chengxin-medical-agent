@@ -2507,7 +2507,52 @@ h1 {
   font-size: 11px;
   line-height: 1.9;
   border-radius: 7px;
-  margin-top: 15px;
+  margin: 14px 0 6px;
+}
+.summary-safety {
+  margin: 10px 0 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--danger-line);
+  background: var(--danger-bg);
+  border-radius: 7px;
+}
+.summary-safety-label {
+  margin: 0 0 6px;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 13px;
+}
+.summary-safety-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+.followup-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  margin: 0 0 3px 37px;
+  padding: 18px;
+}
+.followup-card h3 {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+.followup-due {
+  color: var(--ink);
+  line-height: 1.8;
+  margin: 0 0 6px;
+}
+.followup-reason,
+.followup-note {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.8;
+  margin: 0 0 4px;
 }
 .summary-route.urgent {
   background: var(--warning-bg);
@@ -3374,7 +3419,8 @@ input[type="password"],
     line-height: 1.9;
   }
   .task-card,
-  .summary-card {
+  .summary-card,
+  .followup-card {
     margin-left: 0;
   }
   .task-header {
@@ -4582,7 +4628,8 @@ input[type="password"],
 .summary-focused #messages {
   padding-top: 6px;
 }
-.summary-focused .summary-card {
+.summary-focused .summary-card,
+.summary-focused .followup-card {
   margin: 0;
 }
 .summary-group {

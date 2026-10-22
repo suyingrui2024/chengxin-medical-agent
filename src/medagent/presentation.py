@@ -147,6 +147,10 @@ def reply_presentation(reply):
             )
         else:
             blocks.append(block("summary", f"summary:{identity}", reply["summary"]))
+    if reply.get("follow_up"):
+        blocks.append(
+            block("follow_up", f"followup:{identity}", reply["follow_up"])
+        )
     return {"schema_version": UI_VERSION, "blocks": blocks}
 
 
