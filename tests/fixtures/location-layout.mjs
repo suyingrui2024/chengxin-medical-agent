@@ -92,7 +92,6 @@ export async function verifyLocationLayout(page, id, { shot } = {}) {
         ".map-confirm",
         "#message-input",
         "#urgent-help",
-        "#view-consultation .page-footnote",
       ];
       return selectors.map((selector) => {
         const r = document.querySelector(selector).getBoundingClientRect();

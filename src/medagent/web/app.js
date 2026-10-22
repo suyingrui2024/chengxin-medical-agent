@@ -1048,17 +1048,6 @@ function renderCase(data) {
     : activities[phase] || activities.history;
   $("#activity-title").textContent = activity[0];
   $("#activity-reason").textContent = activity[1];
-  $("#view-consultation h1").textContent = ["emergency", "urgent"].includes(
-    risk,
-  )
-    ? "优先求助"
-    : phase === "observation"
-      ? "观察与记录"
-      : phase === "summary"
-        ? "核对本次记录"
-        : phase === "closed"
-          ? "结论与后续安排"
-          : "本次问诊";
   const facts = Object.entries(data.facts);
   $("#fact-count").textContent = String(facts.length);
   $("#facts-count-label").textContent = `${facts.length} 项`;

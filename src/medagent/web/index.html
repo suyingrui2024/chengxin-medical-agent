@@ -226,24 +226,28 @@
                 <p class="page-description">
                   从你的描述开始，一起把情况理清楚。
                 </p>
-              </div>
-              <div class="page-heading-actions">
-                <button
-                  id="urgent-help"
-                  class="urgent-help"
-                  type="button"
-                  hidden
-                >
-                  <svg class="icon"><use href="#i-alert" /></svg>紧急求助
-                </button>
-                <button id="toggle-facts" class="text-button" type="button">
-                  <svg class="icon"><use href="#i-cards" /></svg>已记录信息
-                  <span id="fact-count" class="count">0</span>
-                </button>
+                <p class="hero-note">
+                  研究原型用于信息采集与流程评审 ·
+                  请勿输入姓名、证件号等身份信息
+                </p>
               </div>
             </div>
             <div class="consult-grid">
               <section class="conversation-panel" aria-label="问诊对话">
+                <div class="surface-actions">
+                  <button
+                    id="urgent-help"
+                    class="urgent-help"
+                    type="button"
+                    hidden
+                  >
+                    <svg class="icon"><use href="#i-alert" /></svg>紧急求助
+                  </button>
+                  <button id="toggle-facts" class="text-button" type="button">
+                    <svg class="icon"><use href="#i-cards" /></svg>已记录信息
+                    <span id="fact-count" class="count">0</span>
+                  </button>
+                </div>
                 <div id="task-focus-bar" class="task-focus-bar" hidden>
                   <span id="focus-label" role="status" aria-live="polite"
                     >当前这一步</span
@@ -449,13 +453,6 @@
                 </button>
               </aside>
               <div id="facts-scrim" hidden></div>
-            </div>
-            <div class="page-footnote">
-              <svg class="icon"><use href="#i-info" /></svg
-              ><span
-                >研究原型用于信息采集与流程评审。请勿输入姓名、证件号等身份信息；紧急情况请立即拨打
-                120。</span
-              >
             </div>
           </section>
 
@@ -1280,7 +1277,8 @@
                   </label>
                   <p class="settings-hint">
                     本机数据：会谈仅保留到服务关闭，健康档案保存在本机。研究原型
-                    · 能力协议 v1。
+                    · 能力协议
+                    v1。请勿输入姓名、证件号等身份信息；紧急情况请立即拨打 120。
                   </p>
                 </section>
               </div>
