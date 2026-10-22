@@ -187,6 +187,8 @@ function displayFact(key, fact) {
     return fact.quality === "not_done" ? "未执行 / 已跳过" : "未知 / 尚未确认";
   if (fact.assertion === "absent")
     return key === "emergency_screen" ? "用户否认上述紧急信号" : "明确否认";
+  if (key === "emergency_screen") return "报告了紧急信号";
+  if (typeof fact.value === "boolean") return fact.value ? "是" : "否";
   if (key === "age_years" && typeof fact.value === "number")
     return fact.value < 2
       ? `${Math.round(fact.value * 12)} 个月`
@@ -694,7 +696,6 @@ function syncTaskFocus() {
   if (supplementPending && state.case?.phase !== "closed") {
     $("#view-consultation h1").textContent = "补充信息待处理";
     $("#phase-label").textContent = "补充待处理";
-    $("#conversation-status").textContent = "补充待处理";
   }
   const task = state.reply?.task;
   const active = Boolean(
@@ -1009,9 +1010,6 @@ function renderCase(data) {
   state.case = data;
   renderConversationSubtitle();
   $("#urgent-help").hidden = data.phase === "closed";
-  document
-    .querySelector(".conversation-actions")
-    .classList.toggle("show-help", data.phase !== "closed");
   document.body.classList.add("has-session");
   $("#delete-current-session").hidden = false;
   $("#open-report-draft").hidden = false;
@@ -1026,20 +1024,6 @@ function renderCase(data) {
         ? "尽快评估"
         : phaseNames[phase] || "进行中";
   $("#phase-label").textContent = status;
-  $("#conversation-status").textContent = status;
-  const review = data.background_review;
-  const reviewStatus = $("#review-status");
-  reviewStatus.hidden =
-    !review || !["queued", "running", "completed"].includes(review.status);
-  if (!reviewStatus.hidden)
-    reviewStatus.textContent =
-      review.status === "completed"
-        ? review.mode === "shadow"
-          ? "后台复核完成"
-          : review.actionable_count
-            ? `后台复核发现 ${review.actionable_count} 项待确认`
-            : "后台复核完成"
-        : "后台复核中";
   syncEventPolling();
   const activities = {
     opening: ["先了解主要问题", "先说最困扰你的事，再按需要补充信息。"],
@@ -1372,14 +1356,6 @@ function renderConversationSubtitle(backend = state.settings?.backend) {
       ?.backend ||
     backend;
   const mode = modeNames[actualBackend] || "问诊";
-  $("#conversation-subtitle").textContent = subject
-    ? `${subject.label} · ${subject.category === "self" ? "本次问诊" : "家属代问"} · ${mode}`
-    : prepared
-      ? `${prepared.label} · 原话待发送 · ${mode}`
-      : `${mode} · 本次会谈`;
-  $("#conversation-subtitle").title = subject
-    ? "按用户原话报告的就诊对象，未核验身份。"
-    : "";
 }
 
 function preparedSubjectDraft() {
