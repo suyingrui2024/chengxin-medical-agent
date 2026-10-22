@@ -1,0 +1,134 @@
+{
+  "flags": [
+    {
+      "id": "unresponsive",
+      "label": "意识明显异常",
+      "level": "emergency",
+      "negation_exempt_patterns": [
+        "(叫|喊|唤|推|摇)[^，。；;]{0,10}(不醒|不应|没反应|没有反应|不动|醒不过来)",
+        "反应都没有"
+      ],
+      "patterns": [
+        "(叫|喊|唤|推|摇)[^，。；;]{0,10}(不醒|不应|没反应|没有反应|不动|醒不过来)",
+        "反应都没有",
+        "人事不省",
+        "不省人事",
+        "晕(过去|倒|厥)",
+        "失去知觉"
+      ],
+      "phrases": [
+        "叫不醒",
+        "失去意识",
+        "意识不清",
+        "昏迷"
+      ]
+    },
+    {
+      "combo": null,
+      "id": "seizure",
+      "label": "抽搐",
+      "level": "emergency",
+      "patterns": [
+        "抽风",
+        "(全身|四肢|浑身).{0,4}(抽搐|抽动|发抖|抖动)",
+        "眼(睛|球).{0,3}(上翻|上吊)",
+        "口吐白沫",
+        "牙关紧闭"
+      ],
+      "phrases": [
+        "正在抽搐",
+        "持续抽搐",
+        "反复抽搐"
+      ]
+    },
+    {
+      "combo": null,
+      "id": "cyanosis",
+      "label": "口唇发紫",
+      "level": "emergency",
+      "patterns": [
+        "(嘴唇|口唇|唇).{0,5}(发紫|发青|紫了|青了|发绀)"
+      ],
+      "phrases": [
+        "嘴唇发紫",
+        "口唇发紫"
+      ]
+    },
+    {
+      "combo": null,
+      "id": "severe_breathing",
+      "label": "严重呼吸困难",
+      "level": "emergency",
+      "patterns": [
+        "喘.{0,3}上不来气",
+        "上不来气",
+        "吸不(进|到)(气|空气)",
+        "吸不到(气|底)",
+        "呼吸.{0,5}(费劲|费力|急促|窘迫)",
+        "气短.{0,6}(说不出|说不完整|说不了)",
+        "喘得.{0,3}(厉害|费劲|急)"
+      ],
+      "phrases": [
+        "喘不上气",
+        "不能呼吸",
+        "严重呼吸困难"
+      ]
+    },
+    {
+      "combo": {
+        "any_location": [
+          "胸口",
+          "心口",
+          "前胸",
+          "胸部",
+          "心前区",
+          "胸"
+        ],
+        "any_signal": [
+          "疼",
+          "痛",
+          "闷",
+          "压",
+          "紧",
+          "窜",
+          "放射"
+        ],
+        "exclusions": [
+          "血压",
+          "气压",
+          "胸围"
+        ],
+        "window": 12
+      },
+      "id": "chest_pain",
+      "label": "高风险胸痛描述",
+      "level": "emergency",
+      "patterns": [],
+      "phrases": [
+        "持续胸痛",
+        "压榨样胸痛",
+        "胸痛大汗"
+      ]
+    },
+    {
+      "combo": null,
+      "id": "major_bleeding",
+      "label": "大量或无法控制的出血",
+      "level": "emergency",
+      "patterns": [
+        "呕血",
+        "(吐|呕|咳|咯)[^，。；;]{0,7}血",
+        "冒血",
+        "血.{0,5}(不停|不止|按不住)",
+        "(便血|尿血).{0,8}(全是|大量|很多|好多|不停|一大片)"
+      ],
+      "phrases": [
+        "大出血",
+        "血止不住",
+        "大量呕血"
+      ]
+    }
+  ],
+  "note": "Red-flag definitions for the deterministic + curated-pattern triage layers. Phrases are exact-match (layer: rule_phrase). Patterns are curated paraphrase regexes (layer: semantic_pattern); combo is a location x signal co-occurrence rule (layer: semantic_combo). All pattern/combo hits pass clause-scoped negation suppression. Changes to this file require a red-flag corpus evaluation report (see scripts/evaluate_red_flags.py).",
+  "version": "1.0.0"
+}

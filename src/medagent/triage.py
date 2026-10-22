@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
-from typing import Iterable, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 from .domain import Assertion, CaseState, RiskAssessment, RiskLevel, utc_now
 from .adaptive_questions import DIRECT_EMERGENCY_TAGS
+from .red_flags import (
+    FlagHit,
+    RedFlagScanner,
+    SemanticProvider,
+    load_definitions,
+    phrase_not_negated,
+)
 
 
 @dataclass(frozen=True)
@@ -15,16 +21,14 @@ class PhraseRule:
     label: str
 
 
-EMERGENCY_RULES = (
-    PhraseRule("unresponsive", ("叫不醒", "失去意识", "意识不清", "昏迷"), "意识明显异常"),
-    PhraseRule("seizure", ("正在抽搐", "持续抽搐", "反复抽搐"), "抽搐"),
-    PhraseRule("cyanosis", ("嘴唇发紫", "口唇发紫"), "口唇发紫"),
-    PhraseRule("severe_breathing", ("喘不上气", "不能呼吸", "严重呼吸困难"), "严重呼吸困难"),
-    PhraseRule("chest_pain", ("持续胸痛", "压榨样胸痛", "胸痛大汗"), "高风险胸痛描述"),
-    PhraseRule("major_bleeding", ("大出血", "血止不住", "大量呕血"), "大量或无法控制的出血"),
+# Derived from content/red_flags.json so existing imports keep working; the
+# JSON definitions are the single source of truth.
+EMERGENCY_RULES = tuple(
+    PhraseRule(d.id, d.phrases, d.label) for d in load_definitions()
 )
 
-NEGATIONS = ("没有", "无", "否认", "不是", "未出现", "不伴")
+# Kept importable for compatibility; the canonical copy lives in red_flags.
+from .red_flags import NEGATIONS  # noqa: E402,F401
 
 RISK_TAG_LABELS = {
     "unresponsive": "意识明显异常",
@@ -39,24 +43,47 @@ OROFACIAL_TERMS = ("牙", "牙齿", "牙龈", "下颌", "颌部", "口腔", "面
 
 
 class TriageService:
-    """Deterministic safety gate evaluated before and after every planning step."""
+    """Layered deterministic-first safety gate.
+
+    ``scan_text`` is a pure function of the input text, so results are
+    memoized per instance: within a turn the same text is scanned by
+    several callers (consultation + adaptive engine) but computed once.
+    Layers only ever add triggers; see ``red_flags.RedFlagScanner``.
+    """
+
+    _CACHE_LIMIT = 512
+
+    def __init__(
+        self,
+        scanner: RedFlagScanner | None = None,
+        semantic_provider: SemanticProvider | None = None,
+    ) -> None:
+        if scanner is None:
+            scanner = RedFlagScanner(provider=semantic_provider)
+        elif semantic_provider is not None:
+            scanner.provider = semantic_provider
+        self._scanner = scanner
+        self._scan_cache: Dict[str, Tuple[str, ...]] = {}
 
     @staticmethod
     def _not_negated(text: str, start: int) -> bool:
-        prefix = re.split(r"[，。！？；,;!?\n]|但是|但|不过|现在", text[:start])[-1][-6:]
-        return not any(token in prefix for token in NEGATIONS)
+        return phrase_not_negated(text, start)
+
+    def scan_detailed(self, text: str) -> List[FlagHit]:
+        return self._scanner.scan(text)
 
     def scan_text(self, text: str) -> List[str]:
-        triggers: List[str] = []
-        for rule in EMERGENCY_RULES:
-            for phrase in rule.phrases:
-                if any(
-                    self._not_negated(text, match.start())
-                    for match in re.finditer(re.escape(phrase), text)
-                ):
-                    triggers.append(rule.label)
-                    break
-        return triggers
+        cached = self._scan_cache.get(text)
+        if cached is not None:
+            return list(cached)
+        labels: List[str] = []
+        for hit in self._scanner.scan(text):
+            if hit.label not in labels:
+                labels.append(hit.label)
+        if len(self._scan_cache) >= self._CACHE_LIMIT:
+            self._scan_cache.clear()
+        self._scan_cache[text] = tuple(labels)
+        return list(labels)
 
     def assess(
         self,
