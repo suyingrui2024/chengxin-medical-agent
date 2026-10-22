@@ -115,7 +115,7 @@ test("native priority help interrupts real DSH while the provider is still waiti
     });
     const start = Date.now();
     await page.getByRole("button", { name: "优先求助", exact: true }).click();
-    await expect(page.locator("#conversation-status")).toHaveText("立即求助");
+    await expect(page.locator("#phase-label")).toHaveText("立即求助");
     expect(Date.now() - start).toBeLessThan(1500);
     await expect(page.locator("#urgent-help-dialog")).toBeHidden();
     await expect(page.locator(".notice-action")).toBeVisible();

@@ -106,8 +106,8 @@ export async function verifyConsultationSubjects(
   const first = await send(firstText),
     fatherId = first.state.session_id;
   const facts = first.state.facts;
-  await expect(page.locator("#conversation-subtitle")).toHaveText(
-    "父亲 · 家属代问 · 直接模型",
+  expect((await snapshot(fatherId)).state.consultation_subject).toMatchObject(
+    { label: "父亲", category: "proxy" },
   );
   const question = await page.locator("#active-question h2").textContent();
   const changed = await send(nextText);
@@ -193,8 +193,8 @@ export async function verifyConsultationSubjects(
   );
   expect(model.requests).toHaveLength(2);
   await page.getByRole("button", { name: "发送回答" }).click();
-  await expect(page.locator("#conversation-subtitle")).toHaveText(
-    "母亲 · 家属代问 · 直接模型",
+  expect((await snapshot(motherId)).state.consultation_subject).toMatchObject(
+    { label: "母亲", category: "proxy" },
   );
   expect(model.requests).toHaveLength(4);
   const father = await snapshot(fatherId),
@@ -217,8 +217,8 @@ export async function verifyConsultationSubjects(
     .locator(`#recent-sessions .recent-item[data-session-id="${fatherId}"]`)
     .click();
   await expect(card).toBeVisible();
-  await expect(page.locator("#conversation-subtitle")).toHaveText(
-    "父亲 · 家属代问 · 直接模型",
+  expect((await snapshot(fatherId)).state.consultation_subject).toMatchObject(
+    { label: "父亲", category: "proxy" },
   );
   await resume.click();
   await expect(page.locator("#active-question h2")).toHaveText(question);

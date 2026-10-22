@@ -41,7 +41,7 @@ for (const late of ["response", "error"]) {
       });
       await page.getByRole("button", { name: "优先求助", exact: true }).click();
       await expect(dialog).toBeHidden();
-      await expect(page.locator("#conversation-status")).toHaveText("立即求助");
+      await expect(page.locator("#phase-label")).toHaveText("立即求助");
       await expect(page.locator("#messages .emergency")).toHaveCount(1);
       await expect(page.locator("#busy-indicator")).toBeHidden();
       expect(await page.locator('img[src="x"]').count()).toBe(0);
@@ -51,7 +51,7 @@ for (const late of ["response", "error"]) {
       });
       if (late === "error") {
         await page.locator("#new-session").click();
-        await expect(page.locator("#conversation-status")).toHaveText(
+        await expect(page.locator("#phase-label")).toHaveText(
           "明确问题",
         );
       }
@@ -72,7 +72,7 @@ for (const late of ["response", "error"]) {
       await expect(page.locator("#messages .emergency")).toHaveCount(
         late === "error" ? 0 : 1,
       );
-      await expect(page.locator("#conversation-status")).toHaveText(
+      await expect(page.locator("#phase-label")).toHaveText(
         late === "error" ? "明确问题" : "立即求助",
       );
       await expect(page.locator(".transport-error")).toHaveCount(0);
@@ -111,7 +111,7 @@ test("priority help preserves a failed request draft and works at a narrow viewp
     ),
   ).toBe(true);
   await page.getByRole("button", { name: "优先求助", exact: true }).click();
-  await expect(page.locator("#conversation-status")).toHaveText("立即求助");
+  await expect(page.locator("#phase-label")).toHaveText("立即求助");
   await expect(page.locator("#urgent-help-dialog")).toBeHidden();
   const action = page.locator(".notice-action");
   await expect(action).toBeVisible();
