@@ -14,17 +14,17 @@
       <rect x="15" y="-6" width="27" height="12" rx="3" fill="#cde2d5" stroke="none" />
       <path d="M70 0h35" stroke-width="7" />
     </g>
-    <!-- 上身（腰线以上）：头:肩:躯干按约 1 : 2.7 : 2.2 的示意比例 -->
+    <!-- 上身（腰线以上）：肩宽约 2.4 头宽，肩到腰收分 -->
     <g id="torso">
-      <path d="M117 78 L139 78 L139 100 L117 100 Z" fill="#e9f1ea" />
+      <path d="M119 76 L137 76 L137 98 L119 98 Z" fill="#e9f1ea" />
       <path
-        d="M117 88 C88 92 62 100 54 118 C48 132 50 170 54 205 L58 252 L198 252 L202 205 C206 170 208 132 202 118 C194 100 168 92 139 88 Z"
+        d="M119 86 C94 90 74 98 66 116 C60 130 62 168 66 204 L70 250 L186 250 L190 204 C194 168 196 130 190 116 C182 98 162 90 137 86 Z"
         fill="#e9f1ea"
         stroke="#4d7465"
         stroke-width="5"
         stroke-linejoin="round"
       />
-      <circle cx="128" cy="54" r="29" fill="#e9f1ea" stroke="#4d7465" stroke-width="5" />
+      <circle cx="128" cy="54" r="27" fill="#e9f1ea" stroke="#4d7465" stroke-width="5" />
     </g>
     <g id="spot">
       <circle r="15" fill="#dfeecf" stroke="#4b8069" stroke-width="2.5" stroke-dasharray="4 5" />
@@ -36,48 +36,48 @@
     <rect width="284" height="324" rx="30" fill="url(#panel)" />
     <use href="#torso" />
     <!-- 右臂自然下垂 -->
-    <path d="M198 112 L214 176 L208 230" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" />
-    <path d="M198 112 L214 176 L208 230" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
-    <circle cx="208" cy="238" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
+    <path d="M188 110 L202 174 L196 226" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M188 110 L202 174 L196 226" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="196" cy="234" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
     <!-- 左臂抬起，露出腋窝 -->
-    <path d="M60 110 C42 84 34 56 44 26" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" />
-    <path d="M60 110 C42 84 34 56 44 26" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" />
-    <circle cx="46" cy="19" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
-    <use href="#spot" transform="translate(76 118)" />
+    <path d="M68 108 C50 82 42 54 50 26" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" />
+    <path d="M68 108 C50 82 42 54 50 26" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" />
+    <circle cx="52" cy="19" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
+    <use href="#spot" transform="translate(82 114)" />
     <!-- 擦汗的布 -->
-    <g transform="rotate(-18 74 120)">
-      <rect x="50" y="102" width="48" height="36" rx="9" fill="#fff" stroke="#4d7465" stroke-width="3.5" />
-      <path d="M60 112h28M60 124h28" stroke="#96b9a7" stroke-width="3" stroke-linecap="round" />
+    <g transform="rotate(-18 86 124)">
+      <rect x="62" y="106" width="48" height="36" rx="9" fill="#fff" stroke="#4d7465" stroke-width="3.5" />
+      <path d="M72 116h28M72 128h28" stroke="#96b9a7" stroke-width="3" stroke-linecap="round" />
     </g>
-    <path d="M102 96 A24 24 0 0 1 105 132" fill="none" stroke="#2f6c59" stroke-width="3.5" stroke-linecap="round" />
-    <path d="M97 123 L106 135 L116 124" fill="none" stroke="#2f6c59" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M116 102 A20 20 0 0 1 119 130" fill="none" stroke="#2f6c59" stroke-width="3.5" stroke-linecap="round" />
+    <path d="M111 122 L119 132 L128 122" fill="none" stroke="#2f6c59" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
     <!-- 标注 -->
-    <text x="6" y="88" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">抬臂</text>
-    <circle cx="102" cy="122" r="3" fill="#2f6c59" />
-    <path d="M106 124 L144 130" stroke="#96b9a7" stroke-width="2" />
-    <text x="148" y="135" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">擦干腋窝</text>
+    <text x="6" y="86" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">抬臂</text>
+    <circle cx="110" cy="140" r="3" fill="#2f6c59" />
+    <path d="M114 141 L146 143" stroke="#96b9a7" stroke-width="2" />
+    <text x="150" y="148" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">擦干腋窝</text>
   </g>
   <g aria-label="探头放在腋窝中央，手臂夹紧" transform="translate(338 18)">
     <rect width="284" height="324" rx="30" fill="url(#panel)" />
     <use href="#torso" />
     <!-- 右臂自然下垂 -->
-    <path d="M198 112 L214 176 L208 230" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" />
-    <path d="M198 112 L214 176 L208 230" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
-    <circle cx="208" cy="238" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
+    <path d="M188 110 L202 174 L196 226" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M188 110 L202 174 L196 226" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="196" cy="234" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
     <!-- 左臂放下夹紧 -->
-    <path d="M60 110 L42 172 L48 228" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" />
-    <path d="M60 110 L42 172 L48 228" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
-    <circle cx="49" cy="236" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
+    <path d="M68 108 L52 168 L58 224" fill="none" stroke="#4d7465" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M68 108 L52 168 L58 224" fill="none" stroke="#e9f1ea" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="59" cy="232" r="9" fill="#e9f1ea" stroke="#4d7465" stroke-width="4" />
     <!-- 体温计画在手臂之上：探头越过手臂指向腋窝，表身自臂下伸出 -->
-    <use href="#thermometer" transform="translate(-2 186) rotate(-42)" />
-    <use href="#spot" transform="translate(76 116)" />
+    <use href="#thermometer" transform="translate(4 182) rotate(-42)" />
+    <use href="#spot" transform="translate(82 112)" />
     <!-- 标注 -->
-    <circle cx="94" cy="108" r="3" fill="#2f6c59" />
-    <path d="M98 104 L144 96" stroke="#96b9a7" stroke-width="2" />
-    <text x="148" y="101" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">探头居中</text>
-    <circle cx="60" cy="232" r="3" fill="#2f6c59" />
-    <path d="M64 236 L144 242" stroke="#96b9a7" stroke-width="2" />
-    <text x="148" y="247" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">手臂夹紧</text>
+    <circle cx="98" cy="104" r="3" fill="#2f6c59" />
+    <path d="M102 102 L146 94" stroke="#96b9a7" stroke-width="2" />
+    <text x="150" y="99" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">探头居中</text>
+    <circle cx="70" cy="228" r="3" fill="#2f6c59" />
+    <path d="M74 232 L146 238" stroke="#96b9a7" stroke-width="2" />
+    <text x="150" y="243" font-family="sans-serif" font-size="13" font-weight="600" fill="#2f5d4c">手臂夹紧</text>
   </g>
   <g aria-label="读数并记录时间" transform="translate(658 18)">
     <rect width="284" height="324" rx="30" fill="url(#panel)" />
