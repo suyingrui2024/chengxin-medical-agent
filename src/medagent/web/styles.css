@@ -6292,6 +6292,12 @@ body.task-focused .surface-actions {
   font-weight: 600;
 }
 /* F6: custom file picker for the medical-image dialog. */
+#medical-image-file.sr-only {
+  /* Beat the generic full-width input rule, or the clipped 100%-wide input
+     still stretches the dialog's scrollable overflow (horizontal scrollbar). */
+  width: 1px;
+  height: 1px;
+}
 .file-drop {
   display: flex;
   align-items: center;
