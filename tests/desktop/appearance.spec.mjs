@@ -24,9 +24,7 @@ test("appearance survives desktop restarts and a different private service origi
     await expect(window.getByText("本机服务已连接")).toBeVisible({
       timeout: 15000,
     });
-    await window
-      .getByRole("button", { name: "外观与皮肤", exact: true })
-      .click();
+    await window.locator('.nav-item[data-view="settings"]').click();
     await window.locator('input[name="appearance"][value="night"]').check();
     await expect(window.locator("#appearance-status")).toContainText(
       "下次打开会保留",
@@ -54,9 +52,7 @@ test("appearance survives desktop restarts and a different private service origi
       "data-theme",
       "night",
     );
-    await reopened
-      .getByRole("button", { name: "外观与皮肤", exact: true })
-      .click();
+    await reopened.locator('.nav-item[data-view="settings"]').click();
     await expect(reopened.locator('input[value="night"]')).toBeChecked();
     const saved = JSON.parse(
       await readFile(path.join(profile, "appearance.json"), "utf8"),

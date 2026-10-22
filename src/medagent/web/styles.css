@@ -6090,3 +6090,84 @@ html[data-font-scale="small"] .fact-value {
   height: 42px;
   margin-bottom: 8px;
 }
+
+/* Settings view (design: docs/设置视图改造方案.md) */
+#view-settings .settings-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 36px;
+  max-width: 1020px;
+  margin-inline: auto;
+}
+.settings-rail {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.settings-rail a {
+  padding: 10px 14px;
+  border-radius: 9px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14.5px;
+}
+.settings-rail a:hover {
+  background: var(--light);
+  color: var(--primary);
+}
+.settings-section {
+  padding: 26px 0 34px;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 20px;
+}
+.settings-section:first-child {
+  padding-top: 6px;
+}
+.settings-section:last-child {
+  border-bottom: 0;
+}
+.settings-section h2 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 550;
+  margin: 0 0 8px;
+}
+.settings-hint {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 20px;
+  max-width: 640px;
+}
+#view-settings .appearance-options {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+#view-settings .workspace-mode {
+  max-width: 340px;
+  margin-bottom: 18px;
+}
+@media (max-width: 700px) {
+  #view-settings .settings-layout {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .settings-rail {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+.fontscale-option {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: center;
+  background: var(--surface);
+}
+.fontscale-option:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--selected);
+}

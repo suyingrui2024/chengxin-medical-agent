@@ -105,14 +105,6 @@
         <button class="new-button" id="new-session" type="button">
           <svg class="icon"><use href="#i-plus" /></svg> 新的问诊 <span>↗</span>
         </button>
-        <label class="workspace-mode" for="workspace-mode"
-          >测试视图
-          <select id="workspace-mode" aria-label="界面模式" disabled>
-            <option value="patient">患者界面</option>
-            <option value="developer">完整研发界面</option>
-          </select>
-          <small id="workspace-mode-description">只显示患者使用的功能</small>
-        </label>
         <p id="nav-section-label" class="nav-label">患者功能</p>
         <nav class="nav-list">
           <button
@@ -183,13 +175,14 @@
               ></span
             >
           </div>
+          
           <button
-            id="open-settings"
-            class="nav-item settings-button"
+            class="nav-item"
+            data-view="settings"
             type="button"
-            aria-label="模型与运行配置"
+            aria-label="设置"
           >
-            <svg class="icon"><use href="#i-settings" /></svg>模型服务
+            <svg class="icon"><use href="#i-settings" /></svg>设置
           </button>
           <div class="version-line">
             <span>研究原型</span><span>能力协议 v1</span>
@@ -211,17 +204,6 @@
             ><span class="slash">/</span><strong id="page-title">问诊</strong>
           </div>
           <div class="top-actions">
-            <button
-              id="open-appearance"
-              class="appearance-trigger"
-              type="button"
-              aria-haspopup="dialog"
-              aria-controls="appearance-dialog"
-              aria-label="外观与皮肤"
-            >
-              <svg class="icon"><use href="#i-appearance" /></svg>
-              <span>外观</span>
-            </button>
             <span id="connection-status" class="connection"
               ><span class="status-dot"></span>正在连接</span
             ><span id="patient-mode-label" class="subtle-pill patient-only"
@@ -1131,7 +1113,148 @@
               </section>
             </div>
           </section>
-        </main>
+        
+          <section id="view-settings" class="view" aria-label="设置" hidden>
+            <div class="settings-layout">
+              <aside class="settings-rail" aria-label="设置分类">
+                <a href="#settings-appearance">外观</a>
+                <a href="#settings-model">模型服务</a>
+                <a href="#settings-data">界面与数据</a>
+              </aside>
+              <div class="settings-content">
+                <section id="settings-appearance" class="settings-section">
+                  <h2>外观</h2>
+                  <p class="settings-hint">
+                    选一种让你自在的颜色，字号也可以调大。选择后立即生效，下次打开会保留。
+                  </p>
+                  <fieldset class="appearance-options">
+        <legend class="sr-only">选择界面皮肤</legend>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="forest" checked />
+          <span class="theme-swatch" data-palette="forest" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>知微绿</strong><small>熟悉的自然与安心</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="ocean" />
+          <span class="theme-swatch" data-palette="ocean" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>海盐蓝</strong><small>清透、利落、有条理</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="iris" />
+          <span class="theme-swatch" data-palette="iris" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>鸢尾紫</strong><small>柔和、轻盈、舒展</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="sand" />
+          <span class="theme-swatch" data-palette="sand" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>暖砂金</strong><small>纸张般温润的陪伴</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="slate" />
+          <span class="theme-swatch" data-palette="slate" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>雾石灰</strong><small>克制简洁，专注当下</small></span
+          >
+        </label>
+        <label class="appearance-option">
+          <input type="radio" name="appearance" value="night" />
+          <span class="theme-swatch" data-palette="night" aria-hidden="true"
+            ><span class="swatch-sidebar"></span
+            ><span class="swatch-content"><i></i><b></b><em></em></span
+            ><span class="swatch-check">✓</span></span
+          >
+          <span class="theme-title"
+            ><strong>夜航</strong><small>深色界面，安静相伴</small></span
+          >
+        </label>
+        <label class="appearance-system"
+          ><input type="radio" name="appearance" value="system" /><span
+            ><strong>跟随系统</strong
+            ><small>随设备自动切换知微绿与夜航</small></span
+          ><svg class="icon" aria-hidden="true">
+            <use href="#i-appearance" /></svg
+        ></label>
+      </fieldset>
+      <fieldset class="appearance-options fontscale-options">
+        <legend>字号大小</legend>
+        <label class="appearance-option fontscale-option">
+          <input type="radio" name="fontscale" value="small" />
+          <span class="theme-title"><strong>小</strong></span>
+        </label>
+        <label class="appearance-option fontscale-option">
+          <input type="radio" name="fontscale" value="standard" checked />
+          <span class="theme-title"><strong>标准</strong></span>
+        </label>
+        <label class="appearance-option fontscale-option">
+          <input type="radio" name="fontscale" value="large" />
+          <span class="theme-title"><strong>大</strong></span>
+        </label>
+      </fieldset>
+      <p id="appearance-status" class="appearance-status" role="status">
+        外观偏好保存在当前浏览器中。
+      </p>
+                </section>
+                <section id="settings-model" class="settings-section">
+                  <h2>模型服务</h2>
+                  <p class="settings-hint">
+                    选择离线流程，或连接你自己的模型服务。已有会谈继续使用创建时的配置，新配置用于新的会谈。
+                  </p>
+                  <button
+            id="open-settings"
+            class="secondary-button settings-open-config"
+            type="button"
+            aria-label="模型与运行配置"
+          >
+            <svg class="icon"><use href="#i-settings" /></svg>打开模型与运行配置
+          </button>
+                </section>
+                <section id="settings-data" class="settings-section">
+                  <h2>界面与数据</h2>
+                  <label class="workspace-mode" for="workspace-mode"
+          >测试视图
+          <select id="workspace-mode" aria-label="界面模式" disabled>
+            <option value="patient">患者界面</option>
+            <option value="developer">完整研发界面</option>
+          </select>
+          <small id="workspace-mode-description">只显示患者使用的功能</small>
+        </label>
+                  <p class="settings-hint">
+                    本机数据：会谈仅保留到服务关闭，健康档案保存在本机。研究原型 · 能力协议
+                    v1。
+                  </p>
+                </section>
+              </div>
+            </div>
+          </section>
+</main>
       </div>
     </div>
 
@@ -1637,123 +1760,7 @@
         </section>
       </div>
     </dialog>
-    <dialog
-      id="appearance-dialog"
-      class="appearance-dialog"
-      aria-labelledby="appearance-title"
-      aria-describedby="appearance-description"
-    >
-      <div class="dialog-heading">
-        <div>
-          <p class="eyebrow">MAKE YOURSELF COMFORTABLE</p>
-          <h2 id="appearance-title">选一种，让你自在的颜色。</h2>
-        </div>
-        <button
-          class="icon-button appearance-close"
-          type="button"
-          aria-label="关闭外观设置"
-        >
-          <svg class="icon"><use href="#i-close" /></svg>
-        </button>
-      </div>
-      <p id="appearance-description" class="appearance-description">
-        从清晨的明亮，到夜间的安静。选择后立即应用。
-      </p>
-      <fieldset class="appearance-options">
-        <legend class="sr-only">选择界面皮肤</legend>
-        <label class="appearance-option">
-          <input type="radio" name="appearance" value="forest" checked />
-          <span class="theme-swatch" data-palette="forest" aria-hidden="true"
-            ><span class="swatch-sidebar"></span
-            ><span class="swatch-content"><i></i><b></b><em></em></span
-            ><span class="swatch-check">✓</span></span
-          >
-          <span class="theme-title"
-            ><strong>知微绿</strong><small>熟悉的自然与安心</small></span
-          >
-        </label>
-        <label class="appearance-option">
-          <input type="radio" name="appearance" value="ocean" />
-          <span class="theme-swatch" data-palette="ocean" aria-hidden="true"
-            ><span class="swatch-sidebar"></span
-            ><span class="swatch-content"><i></i><b></b><em></em></span
-            ><span class="swatch-check">✓</span></span
-          >
-          <span class="theme-title"
-            ><strong>海盐蓝</strong><small>清透、利落、有条理</small></span
-          >
-        </label>
-        <label class="appearance-option">
-          <input type="radio" name="appearance" value="iris" />
-          <span class="theme-swatch" data-palette="iris" aria-hidden="true"
-            ><span class="swatch-sidebar"></span
-            ><span class="swatch-content"><i></i><b></b><em></em></span
-            ><span class="swatch-check">✓</span></span
-          >
-          <span class="theme-title"
-            ><strong>鸢尾紫</strong><small>柔和、轻盈、舒展</small></span
-          >
-        </label>
-        <label class="appearance-option">
-          <input type="radio" name="appearance" value="sand" />
-          <span class="theme-swatch" data-palette="sand" aria-hidden="true"
-            ><span class="swatch-sidebar"></span
-            ><span class="swatch-content"><i></i><b></b><em></em></span
-            ><span class="swatch-check">✓</span></span
-          >
-          <span class="theme-title"
-            ><strong>暖砂金</strong><small>纸张般温润的陪伴</small></span
-          >
-        </label>
-        <label class="appearance-option">
-          <input type="radio" name="appearance" value="slate" />
-          <span class="theme-swatch" data-palette="slate" aria-hidden="true"
-            ><span class="swatch-sidebar"></span
-            ><span class="swatch-content"><i></i><b></b><em></em></span
-            ><span class="swatch-check">✓</span></span
-          >
-          <span class="theme-title"
-            ><strong>雾石灰</strong><small>克制简洁，专注当下</small></span
-          >
-        </label>
-        <label class="appearance-option">
-          <input type="radio" name="appearance" value="night" />
-          <span class="theme-swatch" data-palette="night" aria-hidden="true"
-            ><span class="swatch-sidebar"></span
-            ><span class="swatch-content"><i></i><b></b><em></em></span
-            ><span class="swatch-check">✓</span></span
-          >
-          <span class="theme-title"
-            ><strong>夜航</strong><small>深色界面，安静相伴</small></span
-          >
-        </label>
-        <label class="appearance-system"
-          ><input type="radio" name="appearance" value="system" /><span
-            ><strong>跟随系统</strong
-            ><small>随设备自动切换知微绿与夜航</small></span
-          ><svg class="icon" aria-hidden="true">
-            <use href="#i-appearance" /></svg
-        ></label>
-      </fieldset>
-      <fieldset class="appearance-options fontscale-options">
-        <legend>字号大小</legend>
-        <label class="appearance-option fontscale-option">
-          <input type="radio" name="fontscale" value="small" />
-          <span class="theme-title"><strong>小</strong></span>
-        </label>
-        <label class="appearance-option fontscale-option">
-          <input type="radio" name="fontscale" value="standard" checked />
-          <span class="theme-title"><strong>标准</strong></span>
-        </label>
-        <label class="appearance-option fontscale-option">
-          <input type="radio" name="fontscale" value="large" />
-          <span class="theme-title"><strong>大</strong></span>
-        </label>
-      </fieldset>
-      <p id="appearance-status" class="appearance-status" role="status">
-        外观偏好保存在当前浏览器中。
-      </p>
-    </dialog>
+    
     <div id="toast" class="toast" role="status" hidden></div>
     <script src="app.js" type="module"></script>
   </body>

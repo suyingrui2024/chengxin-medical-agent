@@ -39,13 +39,13 @@ async function contrast(page) {
 }
 
 async function choose(page, theme) {
-  const trigger = page.getByRole("button", { name: "外观与皮肤", exact: true });
-  const returnToTask = !(await trigger.isVisible());
+  const nav = page.locator('.nav-item[data-view="settings"]');
+  const returnToTask = !(await nav.isVisible());
   if (returnToTask)
     await page.getByRole("button", { name: "展开对话记录" }).click();
-  await trigger.click();
+  await nav.click();
   await page.locator(`input[name="appearance"][value="${theme}"]`).check();
-  await page.getByRole("button", { name: "关闭外观设置" }).click();
+  await page.locator('.nav-item[data-view="consultation"]').click();
   if (returnToTask)
     await page.getByRole("button", { name: "返回当前任务" }).click();
 }
@@ -93,13 +93,10 @@ for (const theme of themes) {
       path: info.outputPath(`${theme}-welcome.png`),
       fullPage: true,
     });
-    await page.getByRole("button", { name: "外观与皮肤", exact: true }).click();
+    await page.locator('.nav-item[data-view="settings"]').click();
     await contrast(page);
     await page.screenshot({ path: info.outputPath(`${theme}-chooser.png`) });
-    await page.keyboard.press("Escape");
-    await expect(
-      page.getByRole("button", { name: "外观与皮肤", exact: true }),
-    ).toBeFocused();
+    await page.locator('.nav-item[data-view="consultation"]').click();
 
     const id = await reachSelfCheck(page);
     await page.getByRole("button", { name: "背/腰部", exact: true }).click();
@@ -181,11 +178,9 @@ for (const [width, height] of [
     await choose(page, "ocean");
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "ocean");
-    const trigger = page.getByRole("button", {
-      name: "外观与皮肤",
-      exact: true,
-    });
-    await trigger.click();
+    const nav = page.locator('.nav-item[data-view="settings"]');
+    await nav.click();
+    await page.locator('input[value="ocean"]').focus();
     await expect(page.locator('input[value="ocean"]')).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "iris");
@@ -194,15 +189,15 @@ for (const [width, height] of [
       await contrast(page);
     }
     const overflow = await page.evaluate(() => {
-      const d = document.querySelector("#appearance-dialog");
+      const d = document.querySelector("#view-settings");
       return {
         page: document.documentElement.scrollWidth > innerWidth,
         dialog: d.scrollWidth > d.clientWidth,
       };
     });
     expect(overflow).toEqual({ page: false, dialog: false });
-    await page.keyboard.press("Escape");
-    await expect(trigger).toBeFocused();
+    await page.locator('.nav-item[data-view="consultation"]').click();
+    await expect(page.locator("#view-consultation")).toBeVisible();
   });
 }
 
@@ -241,7 +236,7 @@ test("invalid or unavailable storage keeps appearance controls usable", async ({
     };
   });
   await choose(page, "night");
-  await page.getByRole("button", { name: "外观与皮肤", exact: true }).click();
+  await page.locator('.nav-item[data-view="settings"]').click();
   await expect(page.locator("#appearance-status")).toContainText(
     "暂时无法保存",
   );
