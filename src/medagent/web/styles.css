@@ -1024,19 +1024,19 @@ body[data-mode="developer"] .patient-only {
   padding: 15px 20px 22px;
 }
 .current-activity p {
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.85;
   color: var(--muted);
   margin: 10px 0;
 }
 .current-activity strong {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 550;
   line-height: 1.8;
 }
 .current-activity small {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   color: var(--muted);
 }
@@ -1450,7 +1450,7 @@ svg.icon {
 .nav-label {
   margin: 30px 12px 12px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11.5px;
   letter-spacing: 0.1em;
 }
 .nav-list {
@@ -1467,7 +1467,7 @@ svg.icon {
   background: transparent;
   text-align: left;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   width: 100%;
 }
 .nav-item.active {
@@ -1554,7 +1554,7 @@ svg.icon {
 }
 .local-note small {
   display: block;
-  font-size: 10px;
+  font-size: 11.5px;
   color: var(--muted);
   margin-top: 6px;
 }
@@ -1614,7 +1614,7 @@ svg.icon {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 11px;
+  font-size: 12.5px;
   color: var(--muted);
 }
 .backend-pill {
@@ -1633,7 +1633,7 @@ svg.icon {
   display: none;
 }
 main {
-  padding: 36px 42px 20px;
+  padding: 26px 42px 20px;
   max-width: 1640px;
   margin: auto;
 }
@@ -1645,7 +1645,7 @@ main {
   margin-bottom: 27px;
 }
 .eyebrow {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   color: var(--muted);
   font-weight: 650;
@@ -1661,7 +1661,7 @@ h1 {
 }
 .page-description {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14.5px;
   margin: 10px 0 0;
   line-height: 1.7;
 }
@@ -1673,7 +1673,7 @@ h1 {
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   padding: 9px 0;
 }
 .text-button .icon {
@@ -1790,14 +1790,14 @@ h1 {
   min-height: 0;
 }
 .welcome {
-  padding: 18px 30px 25px;
+  padding: 10px 30px 18px;
   text-align: center;
   max-width: 650px;
   margin: auto;
 }
 .welcome-illustration {
   position: relative;
-  height: 156px;
+  height: 118px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1862,14 +1862,14 @@ h1 {
   margin: 0 0 11px;
 }
 .welcome > p {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.9;
   color: var(--muted);
   margin: 0 0 20px;
 }
 .welcome > .primary-button {
-  padding: 11px 23px;
-  font-size: 12px;
+  padding: 12px 26px;
+  font-size: 14px;
 }
 .welcome-divider {
   display: flex;
@@ -1962,8 +1962,8 @@ h1 {
   color: var(--muted);
 }
 .bubble {
-  font-size: 13px;
-  line-height: 1.9;
+  font-size: 15px;
+  line-height: 1.85;
   padding: 12px 15px;
   border: 1px solid var(--line);
   border-radius: 3px 12px 12px 12px;
@@ -2053,7 +2053,7 @@ h1 {
   border: 0;
   background: transparent;
   color: var(--ink);
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.7;
   padding: 7px;
   outline: 0;
@@ -2091,12 +2091,12 @@ h1 {
   margin-bottom: 12px;
 }
 .quick-replies button {
-  padding: 8px 11px;
+  padding: 9px 14px;
   border: 1px solid var(--line);
   border-radius: 7px;
   color: var(--muted);
   background: var(--raised);
-  font-size: 11px;
+  font-size: 13.5px;
   min-height: 33px;
 }
 .quick-replies button:hover {
@@ -2120,7 +2120,7 @@ h1 {
   justify-content: space-between;
   align-items: center;
   padding: 20px 20px 0;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 550;
 }
 .phase-track {
@@ -2248,10 +2248,10 @@ h1 {
   align-items: center;
   gap: 6px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 11.5px;
 }
 .fact-value {
-  font-size: 11px;
+  font-size: 13.5px;
   color: var(--primary);
   line-height: 1.8;
   margin: 5px 0 0;
@@ -2337,7 +2337,7 @@ h1 {
   color: var(--muted);
 }
 .empty-state p {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.9;
 }
 .empty-state h2 {
@@ -2365,6 +2365,7 @@ h1 {
 .task-card,
 .summary-card {
   border: 1px solid var(--line);
+  box-shadow: 0 1px 2px #1f2a2412;
   border-radius: 12px;
   background: var(--raised);
   margin: 0 0 3px 37px;
@@ -4623,20 +4624,20 @@ input[type="password"],
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 20px 0 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 16px 0 0;
 }
 .signal-grid li {
   display: flex;
   align-items: center;
-  flex-direction: column;
-  gap: 9px;
-  padding: 14px 9px;
+  flex-direction: row;
+  gap: 10px;
+  padding: 9px 12px;
   background: var(--warning-bg);
   color: var(--orange);
-  border: 1px solid var(--warning-line);
-  border-radius: 12px;
+  border: 0;
+  border-radius: 8px;
 }
 .signal-grid svg {
   width: 34px;
@@ -4687,6 +4688,21 @@ input[type="password"],
 }
 .severity-options button:hover {
   background: var(--selected);
+}
+.severity-options button:nth-child(n + 5):nth-child(-n + 7) {
+  background: var(--warning-bg);
+  border-color: var(--warning-line);
+  color: var(--orange);
+}
+.severity-options button:nth-child(n + 8) {
+  background: var(--danger-bg);
+  border-color: var(--danger-line);
+  color: var(--red);
+}
+.severity-options button[aria-pressed="true"] {
+  background: var(--primary);
+  border-color: var(--line-strong);
+  color: var(--on-primary);
 }
 .severity-options button[aria-pressed="true"] {
   background: var(--primary);
@@ -5956,4 +5972,121 @@ body[data-mode="patient"].task-focused .illustration-zoom:focus-visible {
     h3 {
     margin-top: 0;
   }
+}
+
+/* ============================================================
+   Visual refresh (design: docs/知微视觉改版设计说明.md)
+   Single narrative column; the facts panel becomes a drawer.
+   ============================================================ */
+#view-consultation .page-heading,
+#view-consultation .consult-grid {
+  max-width: 880px;
+  margin-inline: auto;
+  width: 100%;
+}
+.consult-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.facts-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(370px, 94vw);
+  height: 100dvh;
+  max-height: none;
+  border-radius: 0;
+  z-index: 70;
+  transform: translateX(106%);
+  transition: transform 220ms ease;
+  box-shadow: var(--elevation);
+}
+.facts-panel.open {
+  transform: translateX(0);
+}
+@media (max-width: 980px) {
+  .facts-panel {
+    display: block;
+    visibility: hidden;
+  }
+  .facts-panel.open {
+    visibility: visible;
+  }
+}
+#facts-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 65;
+}
+#facts-scrim[hidden] {
+  display: none;
+}
+#facts-close {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .facts-panel {
+    transition: none;
+  }
+}
+.fontscale-options {
+  margin-top: 18px;
+}
+.fontscale-options legend {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 0;
+  margin-bottom: 8px;
+}
+.fontscale-option {
+  min-width: 86px;
+  justify-content: center;
+}
+/* Font-scale steps (patient surfaces; design: 视觉改版 §2.1) */
+html[data-font-scale="large"] .bubble,
+html[data-font-scale="large"] .composer textarea {
+  font-size: 16.5px;
+}
+html[data-font-scale="large"] .quick-replies button,
+html[data-font-scale="large"] .fact-value,
+html[data-font-scale="large"] .page-description {
+  font-size: 15px;
+}
+html[data-font-scale="large"] .conclusion-disposition-text {
+  font-size: 16.5px;
+}
+html[data-font-scale="small"] .bubble,
+html[data-font-scale="small"] .composer textarea {
+  font-size: 14px;
+}
+html[data-font-scale="small"] .quick-replies button,
+html[data-font-scale="small"] .fact-value {
+  font-size: 12.5px;
+}
+/* Emergency screen: signals read as a checklist, not buttons (design §4.5) */
+.screen-question .question-cues {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 18px 0 12px;
+}
+.screen-question .question-cue {
+  flex-direction: row;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+}
+.screen-question .question-cue svg {
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+.screen-question .question-symbol {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 8px;
 }

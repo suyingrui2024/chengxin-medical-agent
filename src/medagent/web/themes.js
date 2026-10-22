@@ -35,6 +35,18 @@
     );
   }
   apply();
+  // Font-size preference (design: 视觉改版 §2.1): small | standard | large,
+  // stored separately from the palette and applied before paint.
+  const fontKey = "chengxin.fontscale.v1";
+  const fontSizes = ["small", "standard", "large"];
+  let fontScale = "standard";
+  try {
+    const savedFont = localStorage.getItem(fontKey);
+    if (fontSizes.includes(savedFont)) fontScale = savedFont;
+  } catch {
+    // Restricted storage: the dialog still applies for this window.
+  }
+  document.documentElement.dataset.fontScale = fontScale;
   media.addEventListener("change", () => {
     if (preference === "system") apply();
   });
@@ -72,6 +84,25 @@
         event.clientY > rect.bottom
       )
         dialog.close();
+    });
+    const syncFontScale = () => {
+      document.querySelectorAll('[name="fontscale"]').forEach((input) => {
+        input.checked = input.value === fontScale;
+      });
+    };
+    syncFontScale();
+    dialog.addEventListener("change", (event) => {
+      const input = event.target;
+      if (input.name !== "fontscale" || !fontSizes.includes(input.value))
+        return;
+      fontScale = input.value;
+      document.documentElement.dataset.fontScale = fontScale;
+      try {
+        localStorage.setItem(fontKey, fontScale);
+        status.textContent = "字号已调整，下次打开会保留。";
+      } catch {
+        status.textContent = "字号已调整，本次窗口内有效。";
+      }
     });
     let saveSequence = 0;
     dialog.addEventListener("change", async (event) => {

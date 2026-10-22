@@ -2587,6 +2587,26 @@ $("#toggle-facts").addEventListener("click", () => {
   if (window.innerWidth <= 980 && $("#facts-panel").classList.contains("open"))
     $("#facts-panel").scrollIntoView({ behavior: "smooth" });
 });
+// The view switcher is a testing affordance, not patient UI: demote it to
+// the sidebar bottom (design: 视觉改版 §4.8) without removing the function.
+{
+  const switcher = $(".workspace-mode");
+  const bottom = $(".sidebar-bottom");
+  if (switcher && bottom) bottom.prepend(switcher);
+}
+const syncFactsScrim = () => {
+  $("#facts-scrim").hidden = !$("#facts-panel").classList.contains("open");
+};
+new MutationObserver(syncFactsScrim).observe($("#facts-panel"), {
+  attributes: true,
+  attributeFilter: ["class"],
+});
+const closeFactsPanel = () => $("#facts-panel").classList.remove("open");
+$("#facts-scrim").addEventListener("click", closeFactsPanel);
+$("#facts-close").addEventListener("click", closeFactsPanel);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeFactsPanel();
+});
 $("#view-current-trace").addEventListener("click", () => navigate("inspect"));
 $("#refresh-history").addEventListener("click", () =>
   refreshSessions().catch((error) => toast(error.message)),

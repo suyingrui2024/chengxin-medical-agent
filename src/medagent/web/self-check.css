@@ -199,8 +199,8 @@ body:has(#active-task .illustrated-task[data-guide-step="2"]) #composer {
   stroke: transparent;
 }
 .location-option-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   flex: none;
   fill: none;
   stroke: currentColor;
