@@ -122,6 +122,13 @@ class CaseState:
     report_drafts: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     report_items: List[Dict[str, Any]] = field(default_factory=list)
     committed_phase: Optional[Phase] = None
+    # Differential-diagnosis workspace (design phase 3), serialized form;
+    # the typed model lives in medagent.reasoning. Empty until a
+    # DifferentialPlanner maintains it.
+    reasoning: Dict[str, Any] = field(default_factory=dict)
+    # Post-consultation follow-up plan + recorded outcome (design phase
+    # 4), serialized form; the model lives in medagent.followups.
+    follow_up: Dict[str, Any] = field(default_factory=dict)
 
     def record(self, fact: Fact) -> None:
         previous = self.facts.get(fact.key)

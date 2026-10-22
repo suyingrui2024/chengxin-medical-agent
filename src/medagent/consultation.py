@@ -25,6 +25,10 @@ from .interpreter import Interpretation, Interpreter, ObservationInputError
 from .knowledge import ContentRepository, Question
 from .self_checks import SelfCheckService
 from .triage import TriageService
+from .turn_context import TurnContext
+from .planner import RulePlanner
+from .phase_graph import planning_rank
+from .followups import RETRIAGE_OUTCOMES, apply_outcome, build_follow_up_plan
 from .reasoner import QuestionRanker
 from . import __version__
 from .presentation import calculation_presentation
@@ -116,6 +120,18 @@ class ConsultationEngine(
         self.ranker = ranker
         self.interpreter = Interpreter()
         self.publication_gate = ReplyPublicationGate()
+        self.planner = RulePlanner(self)
+        self._turn_pipeline = (
+            ("location_revision", self._h_location_revision),
+            ("closed_session", self._h_closed_session),
+            ("subject_control", self._h_subject_control),
+            ("prepared_location", self._h_prepared_location),
+            ("observation_action", self._h_observation_action),
+            ("summary_review", self._h_summary_review),
+            ("intake", self._h_intake),
+            ("risk_escalation", self._h_risk_escalation),
+            ("planning", self._h_planning),
+        )
         self._sessions: Dict[str, CaseState] = {}
         self._session_locks: Dict[str, RLock] = {}
         self._session_conditions = {}
@@ -920,9 +936,30 @@ class ConsultationEngine(
         self._help_requests[state.session_id] = text
         return reply
 
+    # -- turn pipeline (design phase 2) --------------------------------
+    # _submit orchestrates: emergency-help short-circuit, stale-action
+    # guard, turn setup, the direct emergency gate, then an ordered
+    # handler pipeline. Each handler returns a reply to short-circuit the
+    # turn (with ctx.reply_reason set) or None to continue. Handler order
+    # reproduces the historical branch order exactly.
+
     def _submit(self, state: CaseState, user_input: UserInput) -> AgentReply:
         if user_input.choice_value == "request_emergency_help":
             return self._requested_emergency_help(state, user_input.text)
+        self._guard_stale_action(state, user_input)
+        ctx = self._begin_turn(state, user_input)
+        direct = self._direct_emergency(state, ctx)
+        if direct is not None:
+            return direct
+        for name, handler in self._turn_pipeline:
+            ctx.trace.append(name)
+            reply = handler(state, user_input, ctx)
+            if reply is not None:
+                self._record_reply(state, reply, ctx.turn_id, ctx.reply_reason)
+                return reply
+        raise RuntimeError("turn pipeline exhausted without producing a reply")
+
+    def _guard_stale_action(self, state: CaseState, user_input: UserInput) -> None:
         current_action = f"{state.session_id}:{state.revision}"
         if (
             user_input.expected_action_id
@@ -941,6 +978,8 @@ class ConsultationEngine(
                 )
             )
             raise StaleActionError("页面上的问题已经变化，请按当前问题重新回答")
+
+    def _begin_turn(self, state: CaseState, user_input: UserInput) -> TurnContext:
         turn_id = str(uuid4())
         text = user_input.text.strip()
         urgent_text = self._location_input_text(user_input)
@@ -962,77 +1001,99 @@ class ConsultationEngine(
                 turn_id=turn_id,
             )
         )
-        direct_triggers = self.triage.scan_text(text)
-        if direct_triggers:
-            state.risk = self.triage.assess(state, text)
-            reply = self._emergency_reply(state, direct_triggers)
-            self._record_reply(state, reply, turn_id, "原始输入命中确定性急症门")
-            return reply
+        return TurnContext(
+            turn_id=turn_id, text=text, prepared_location=prepared_location
+        )
 
+    def _direct_emergency(self, state: CaseState, ctx: TurnContext):
+        direct_triggers = self.triage.scan_text(ctx.text)
+        if not direct_triggers:
+            return None
+        state.risk = self.triage.assess(state, ctx.text)
+        reply = self._emergency_reply(state, direct_triggers)
+        self._record_reply(state, reply, ctx.turn_id, "原始输入命中确定性急症门")
+        return reply
+
+    def _h_location_revision(self, state, user_input, ctx):
         revision_reply = self._handle_location_revision_action(
-            state, user_input, text, turn_id
+            state, user_input, ctx.text, ctx.turn_id
         )
         if revision_reply is not None:
-            self._record_reply(state, revision_reply, turn_id, "定位修改与原问诊接续")
-            return revision_reply
-        if state.phase == Phase.CLOSED:
-            reply = (
-                self._emergency_reply(state, state.risk.triggers)
-                if state.closed_reason == "emergency_route"
-                else AgentReply(
-                    "这次问诊已经结束。如情况有变化，请开始一次新的问诊；出现紧急情况请立即拨打 120。",
-                    Phase.CLOSED,
-                    kind="closed",
-                )
-            )
-            self._record_reply(state, reply, turn_id, "会话已关闭")
-            return reply
+            ctx.reply_reason = "定位修改与原问诊接续"
+        return revision_reply
 
-        subject_reply = self._subject_control(state, user_input, text, turn_id)
-        if subject_reply is not None:
-            self._record_reply(state, subject_reply, turn_id, "就诊对象边界与原问诊接续")
-            return subject_reply
-        if prepared_location:
-            revised = self._complete_location_revision(
-                state, prepared_location, turn_id
+    def _h_closed_session(self, state, user_input, ctx):
+        if state.phase != Phase.CLOSED:
+            return None
+        reply = (
+            self._emergency_reply(state, state.risk.triggers)
+            if state.closed_reason == "emergency_route"
+            else AgentReply(
+                "这次问诊已经结束。如情况有变化，请开始一次新的问诊；出现紧急情况请立即拨打 120。",
+                Phase.CLOSED,
+                kind="closed",
             )
-            if revised is None:
-                self._record_location_answer(state, prepared_location, turn_id)
-                revised = self._plan_next(state)
-            self._record_reply(state, revised, turn_id, "结构化定位答案已核对")
-            return revised
+        )
+        ctx.reply_reason = "会话已关闭"
+        return reply
+
+    def _h_subject_control(self, state, user_input, ctx):
+        subject_reply = self._subject_control(state, user_input, ctx.text, ctx.turn_id)
+        if subject_reply is not None:
+            ctx.reply_reason = "就诊对象边界与原问诊接续"
+        return subject_reply
+
+    def _h_prepared_location(self, state, user_input, ctx):
+        if not ctx.prepared_location:
+            return None
+        revised = self._complete_location_revision(
+            state, ctx.prepared_location, ctx.turn_id
+        )
+        if revised is None:
+            self._record_location_answer(state, ctx.prepared_location, ctx.turn_id)
+            revised = self._plan_next(state)
+        ctx.reply_reason = "结构化定位答案已核对"
+        return revised
+
+    def _h_observation_action(self, state, user_input, ctx):
         observation_reply = self._handle_observation_action(
-            state, user_input, text, turn_id
+            state, user_input, ctx.text, ctx.turn_id
         )
         if observation_reply is not None:
-            self._record_reply(state, observation_reply, turn_id, "重复观察及原问诊接续")
-            return observation_reply
+            ctx.reply_reason = "重复观察及原问诊接续"
+        return observation_reply
 
-        if state.phase == Phase.SUMMARY:
-            if user_input.choice_value == "confirm_summary":
-                state.phase = Phase.CLOSED
-                state.closed_reason = "confirmed_by_user"
-                state.active_question = None
-                reply = AgentReply(
-                    "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
-                    Phase.CLOSED,
-                    kind="closed",
-                    summary=self._summary_payload(
-                        state, review_status="confirmed_by_user"
-                    ),
-                )
-            else:
-                reply = self._finish(state)
-                reply.message = "请点击摘要或右侧记录中的“更正”，修改对应信息后再核对。"
-            self._record_reply(state, reply, turn_id, "用户核对摘要")
-            return reply
+    def _h_summary_review(self, state, user_input, ctx):
+        if state.phase != Phase.SUMMARY:
+            return None
+        if user_input.choice_value == "confirm_summary":
+            state.phase = Phase.CLOSED
+            state.closed_reason = "confirmed_by_user"
+            state.active_question = None
+            reply = AgentReply(
+                "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
+                Phase.CLOSED,
+                kind="closed",
+                summary=self._summary_payload(
+                    state, review_status="confirmed_by_user"
+                ),
+            )
+        else:
+            reply = self._finish(state)
+            reply.message = "请点击摘要或右侧记录中的“更正”，修改对应信息后再核对。"
+        if user_input.choice_value == "confirm_summary":
+            self._schedule_follow_up(state, reply, ctx.turn_id)
+        ctx.reply_reason = "用户核对摘要"
+        return reply
 
+    def _h_intake(self, state, user_input, ctx):
+        text, turn_id = ctx.text, ctx.turn_id
         if state.active_task:
             failure = self._try_task_result(
                 state, text, user_input.choice_value, turn_id
             )
             if failure:
-                self._record_reply(state, failure, turn_id, "图示反馈失败，保持当前任务")
+                ctx.reply_reason = "图示反馈失败，保持当前任务"
                 return failure
         elif state.active_question:
             question = self.content.question(state.active_question)
@@ -1041,15 +1102,14 @@ class ConsultationEngine(
                 not isinstance(result.value, (int, float))
                 or not 0 <= result.value <= 120
             ):
-                reply = AgentReply(
+                ctx.reply_reason = "年龄输入未通过校验"
+                return AgentReply(
                     "我没能确认年龄。请写成“8个月”或“32岁”这样的格式。",
                     question.phase,
                     kind="clarification",
                     question_id=question.id,
                     developer_trace={"reason": "年龄格式或范围未通过确定性校验，原输入未写入年龄字段"},
                 )
-                self._record_reply(state, reply, turn_id, "年龄输入未通过校验")
-                return reply
             self._record_fact(state, question.fact_key, result, turn_id, text)
             state.active_question = None
             state.active_question_is_clarification = False
@@ -1061,7 +1121,10 @@ class ConsultationEngine(
                 turn_id,
                 text,
             )
+        return None
 
+    def _h_risk_escalation(self, state, user_input, ctx):
+        text, turn_id = ctx.text, ctx.turn_id
         state.risk = self.triage.assess(state, text)
         self.events.append(
             Event(
@@ -1072,21 +1135,17 @@ class ConsultationEngine(
             )
         )
         if state.risk.level == RiskLevel.EMERGENCY:
-            reply = self._emergency_reply(state, state.risk.triggers)
-            self._record_reply(state, reply, turn_id, "结构化急症门触发")
-            return reply
-
+            ctx.reply_reason = "结构化急症门触发"
+            return self._emergency_reply(state, state.risk.triggers)
         if state.risk.level == RiskLevel.URGENT:
-            reply = self._urgent(state)
-            self._record_reply(state, reply, turn_id, "风险升级后优先求助")
-            return reply
+            ctx.reply_reason = "风险升级后优先求助"
+            return self._urgent(state)
+        return None
 
-        reply = self._plan_next(state)
-        self._record_reply(
-            state,
-            reply,
-            turn_id,
-            reply.developer_trace.get("reason", "") if reply.developer_trace else "",
+    def _h_planning(self, state, user_input, ctx):
+        reply = self.planner.plan(state)
+        ctx.reply_reason = (
+            reply.developer_trace.get("reason", "") if reply.developer_trace else ""
         )
         return reply
 
@@ -1291,13 +1350,7 @@ class ConsultationEngine(
 
     @staticmethod
     def _phase_rank(phase: Phase) -> int:
-        order = {
-            Phase.OPENING: 0,
-            Phase.EMERGENCY_SCREEN: 1,
-            Phase.HISTORY: 2,
-            Phase.BACKGROUND: 3,
-        }
-        return order.get(phase, 9)
+        return planning_rank(phase)
 
     def _offer_task(
         self, state: CaseState, chief: str, task_id: Optional[str] = None
@@ -1649,7 +1702,7 @@ class ConsultationEngine(
                 "pending_review" if needs_confirmation else "closed_unconfirmed"
             ),
         )
-        return AgentReply(
+        reply = AgentReply(
             (
                 "问诊信息已整理完成。请先核对摘要；其中“未知”不代表没有，测量结果也保留了来源和质量。"
                 if needs_confirmation
@@ -1667,6 +1720,59 @@ class ConsultationEngine(
             summary=summary,
             developer_trace={"reason": "必要通用字段与适用的定向字段均已处理"},
         )
+        if state.closed_reason == "urgent_route":
+            self._schedule_follow_up(state, reply)
+        return reply
+
+    def _schedule_follow_up(self, state, reply=None, turn_id=None):
+        """Design phase 4: derive, persist and announce a follow-up plan."""
+        plan = build_follow_up_plan(state)
+        if plan is None:
+            return None
+        state.follow_up = plan
+        self.events.append(
+            Event(state.session_id, "followup.scheduled", dict(plan), turn_id=turn_id)
+        )
+        if reply is not None:
+            reply.follow_up = dict(plan)
+        return plan
+
+    def record_follow_up_outcome(
+        self, session_id: str, outcome: str, note: str = ""
+    ) -> Dict[str, Any]:
+        """Record a follow-up outcome; worsening reopens triage as a new
+        session linked to this one (design phase 4 longitudinal loop)."""
+        state = self.state(session_id)
+        with self._session_locks[session_id]:
+            plan = state.follow_up
+            if not plan:
+                raise ValueError("该会话没有随访计划，无法记录结局")
+            apply_outcome(plan, outcome, note)
+            self.events.append(
+                Event(
+                    session_id,
+                    "followup.outcome_recorded",
+                    {"outcome": outcome, "note": note},
+                )
+            )
+            result: Dict[str, Any] = {
+                "outcome": outcome,
+                "requires_retriage": outcome in RETRIAGE_OUTCOMES,
+                "new_session_id": None,
+            }
+            if outcome in RETRIAGE_OUTCOMES:
+                new_state, _opening = self.create_session()
+                new_state.runtime_snapshot["follow_up_of"] = session_id
+                plan["retriage_session_id"] = new_state.session_id
+                result["new_session_id"] = new_state.session_id
+                self.events.append(
+                    Event(
+                        session_id,
+                        "followup.retriage_session_created",
+                        {"new_session_id": new_state.session_id, "outcome": outcome},
+                    )
+                )
+            return result
 
     def _record_reply(
         self, state: CaseState, reply: AgentReply, turn_id: str, reason: str

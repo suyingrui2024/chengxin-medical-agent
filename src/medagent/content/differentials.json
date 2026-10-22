@@ -1,0 +1,278 @@
+{
+  "note": "Differential-diagnosis pathways for the reasoning core (design phase 3, rule-based proposer v1). Conditions are a small deterministic DSL over recorded facts: contains_any (substring on the fact value's text), assertion, equals, gte/lte (numeric). Every support/refute entry that fires becomes an EvidenceRef whose quote is the matched text, validated against the fact's recorded evidence before the hypothesis may enter the workspace. Clinical ownership: these pathways are engineering v1 content for the existing respiratory/chest scope and require clinician review before any clinical claim.",
+  "pathways": [
+    {
+      "chief_complaint_contains_any": [
+        "咳",
+        "喘",
+        "呼吸",
+        "感冒",
+        "发热",
+        "发烧",
+        "喉咙",
+        "咽痛"
+      ],
+      "hypotheses": [
+        {
+          "category": "common_condition",
+          "discriminating_questions": [
+            "resp_cough_details",
+            "resp_breathing",
+            "associated_symptoms"
+          ],
+          "id": "uri",
+          "label": "上呼吸道感染",
+          "prior_band": "high",
+          "red_flags": [],
+          "refute": [
+            {
+              "fact_key": "temperature_c",
+              "gte": 39.5
+            },
+            {
+              "equals": "worsening",
+              "fact_key": "trajectory"
+            }
+          ],
+          "support": [
+            {
+              "contains_any": [
+                "感冒",
+                "喉咙",
+                "咽痛",
+                "鼻塞",
+                "流鼻涕"
+              ],
+              "fact_key": "chief_complaint"
+            },
+            {
+              "assertion": "present",
+              "fact_key": "resp_cough_details"
+            }
+          ]
+        },
+        {
+          "category": "serious_condition",
+          "discriminating_questions": [
+            "resp_breathing",
+            "resp_intake",
+            "trajectory",
+            "severity"
+          ],
+          "id": "lower_respiratory",
+          "label": "下呼吸道感染/肺炎可能",
+          "prior_band": "medium",
+          "red_flag_questions": [
+            "resp_breathing"
+          ],
+          "red_flags": [
+            "severe_breathing"
+          ],
+          "refute": [
+            {
+              "assertion": "absent",
+              "fact_key": "resp_breathing"
+            }
+          ],
+          "support": [
+            {
+              "fact_key": "temperature_c",
+              "gte": 38.5
+            },
+            {
+              "equals": "worsening",
+              "fact_key": "trajectory"
+            },
+            {
+              "contains_any": [
+                "气短",
+                "喘",
+                "困难",
+                "费力"
+              ],
+              "fact_key": "resp_breathing"
+            },
+            {
+              "fact_key": "severity",
+              "gte": 5
+            }
+          ]
+        },
+        {
+          "category": "serious_condition",
+          "discriminating_questions": [
+            "resp_breathing",
+            "relevant_history",
+            "trajectory"
+          ],
+          "id": "asthma_exacerbation",
+          "label": "哮喘急性发作可能",
+          "prior_band": "low",
+          "red_flag_questions": [
+            "resp_breathing"
+          ],
+          "red_flags": [
+            "severe_breathing"
+          ],
+          "refute": [],
+          "support": [
+            {
+              "contains_any": [
+                "哮喘"
+              ],
+              "fact_key": "chief_complaint"
+            },
+            {
+              "contains_any": [
+                "哮喘"
+              ],
+              "fact_key": "relevant_history"
+            },
+            {
+              "contains_any": [
+                "喘"
+              ],
+              "fact_key": "resp_breathing"
+            }
+          ]
+        },
+        {
+          "category": "common_condition",
+          "discriminating_questions": [
+            "associated_symptoms",
+            "trajectory",
+            "severity"
+          ],
+          "id": "influenza_like",
+          "label": "流感样疾病",
+          "prior_band": "medium",
+          "red_flags": [],
+          "refute": [
+            {
+              "fact_key": "temperature_c",
+              "lte": 37.3
+            }
+          ],
+          "support": [
+            {
+              "contains_any": [
+                "发热",
+                "发烧"
+              ],
+              "fact_key": "chief_complaint"
+            },
+            {
+              "contains_any": [
+                "酸痛",
+                "乏力",
+                "头痛"
+              ],
+              "fact_key": "associated_symptoms"
+            }
+          ]
+        }
+      ],
+      "id": "respiratory"
+    },
+    {
+      "chief_complaint_contains_any": [
+        "胸痛",
+        "胸口",
+        "胸闷",
+        "心口"
+      ],
+      "hypotheses": [
+        {
+          "category": "red_flag_condition",
+          "discriminating_questions": [
+            "severity",
+            "trajectory",
+            "associated_symptoms",
+            "relevant_history"
+          ],
+          "id": "acs_possible",
+          "label": "急性冠脉综合征可能（待排除）",
+          "prior_band": "medium",
+          "red_flag_questions": [
+            "associated_symptoms",
+            "severity"
+          ],
+          "red_flags": [
+            "chest_pain"
+          ],
+          "refute": [],
+          "support": [
+            {
+              "contains_any": [
+                "压榨",
+                "压迫",
+                "紧缩"
+              ],
+              "fact_key": "chief_complaint"
+            },
+            {
+              "contains_any": [
+                "冷汗",
+                "大汗",
+                "放射",
+                "左臂",
+                "下颌"
+              ],
+              "fact_key": "associated_symptoms"
+            },
+            {
+              "contains_any": [
+                "冠心病",
+                "心梗",
+                "支架",
+                "高血压",
+                "糖尿病"
+              ],
+              "fact_key": "relevant_history"
+            }
+          ]
+        },
+        {
+          "category": "common_condition",
+          "discriminating_questions": [
+            "trajectory",
+            "severity",
+            "medications_taken"
+          ],
+          "id": "non_cardiac_chest",
+          "label": "非心源性胸痛（胸壁/胃食管等）",
+          "prior_band": "medium",
+          "red_flags": [],
+          "refute": [
+            {
+              "contains_any": [
+                "压榨",
+                "压迫"
+              ],
+              "fact_key": "chief_complaint"
+            },
+            {
+              "contains_any": [
+                "冷汗",
+                "大汗"
+              ],
+              "fact_key": "associated_symptoms"
+            }
+          ],
+          "support": [
+            {
+              "equals": "stable",
+              "fact_key": "trajectory"
+            },
+            {
+              "equals": "improving",
+              "fact_key": "trajectory"
+            }
+          ]
+        }
+      ],
+      "id": "chest"
+    }
+  ],
+  "version": "1.0.0"
+}
