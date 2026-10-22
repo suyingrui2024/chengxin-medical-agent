@@ -177,6 +177,13 @@
           </div>
           
           <button
+              id="backend-pill"
+              class="backend-pill developer-only"
+              type="button"
+            >
+              离线演示 <span>⌄</span>
+            </button>
+          <button
             class="nav-item"
             data-view="settings"
             type="button"
@@ -203,22 +210,12 @@
             ><span id="breadcrumb-root">患者服务</span
             ><span class="slash">/</span><strong id="page-title">问诊</strong>
           </div>
-          <div class="top-actions">
-            <span id="connection-status" class="connection"
-              ><span class="status-dot"></span>正在连接</span
-            ><span id="patient-mode-label" class="subtle-pill patient-only"
-              >离线演示</span
-            ><button
-              id="backend-pill"
-              class="backend-pill developer-only"
-              type="button"
-            >
-              离线演示 <span>⌄</span>
-            </button>
-          </div>
         </header>
 
         <main id="main" tabindex="-1">
+          <div id="connection-alert" class="connection-alert" hidden><span id="connection-status" class="connection"
+              ><span class="status-dot"></span>正在连接</span
+            ></div>
           <section id="view-consultation" class="view active" aria-label="问诊">
             <div class="page-heading">
               <div>

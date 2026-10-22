@@ -114,10 +114,10 @@ test("patient model credentials persist only through native secure storage", asy
 
     desktop = await launch();
     window = await desktop.firstWindow();
-    await expect(window.getByText("本机服务已连接")).toBeVisible({
+    await expect(window.locator("#local-data-label")).toBeVisible({
       timeout: 15000,
     });
-    await expect(window.locator("#patient-mode-label")).toHaveText("DSH 问诊");
+    await expect(window.locator("#backend-pill")).toHaveText(/DSH 问诊/);
     const settings = await window.evaluate(async () =>
       (await fetch("/api/settings")).json(),
     );
@@ -128,7 +128,7 @@ test("patient model credentials persist only through native secure storage", asy
     await expect(window.locator("#forget-saved-model")).toBeVisible();
     window.once("dialog", (dialog) => dialog.accept());
     await window.locator("#forget-saved-model").click();
-    await expect(window.locator("#patient-mode-label")).toHaveText("离线演示");
+    await expect(window.locator("#backend-pill")).toHaveText(/离线演示/);
     const cleared = await window.evaluate(async () =>
       (await fetch("/api/settings")).json(),
     );
