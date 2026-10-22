@@ -465,6 +465,17 @@ const TREE = [
       );
       await sleep(400);
     },
+    // 如实标注实际拍到的状态：本路径若已到摘要，图库不得冒充追问覆盖（F12）
+    extra: async (p) => {
+      const atQuestion = await p.evl(
+        `Boolean(document.querySelector("#active-question") && document.querySelector("#active-question").offsetParent !== null)`,
+      );
+      return [
+        atQuestion
+          ? "实际拍到：定向追问题面"
+          : "实际拍到：摘要（本路径无独立追问步，与摘要节点同屏）",
+      ];
+    },
     after: async (p) => {
       const ok = await drive(p, atSummary, 14);
       if (!ok) throw new Error("推进 14 步仍未到达摘要");
