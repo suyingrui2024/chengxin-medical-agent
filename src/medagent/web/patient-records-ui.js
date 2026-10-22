@@ -737,10 +737,13 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
       const file = event.target.files[0];
       const preview = $("#medical-image-preview");
+      const fileLabel = $("#medical-image-file-label");
       if (!file) {
         preview.hidden = true;
+        fileLabel.textContent = "尚未选择文件";
         return;
       }
+      fileLabel.textContent = `${file.name} · ${(file.size / 1024).toFixed(0)} KB`;
       state.previewUrl = URL.createObjectURL(file);
       preview.src = state.previewUrl;
       preview.hidden = false;
@@ -751,6 +754,7 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
       state.previewUrl = null;
       $("#medical-image-preview").removeAttribute("src");
+      $("#medical-image-file-label").textContent = "尚未选择文件";
     });
   }
 

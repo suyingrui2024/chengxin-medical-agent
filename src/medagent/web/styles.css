@@ -6262,3 +6262,82 @@ body.task-focused .surface-actions {
   max-width: 812px;
   margin-inline: auto;
 }
+
+/* ---- 2026-10-22 visual refinement pass (see docs/evaluations/2026-10-22/桌面端视觉精修清单.md) ---- */
+/* F2: unselected severity readout is a watermark, not a stray mark. */
+.severity-value[data-empty="true"] {
+  color: color-mix(in srgb, var(--ink) 16%, transparent);
+}
+/* F4: cues and emergency signals join the choice-card family (border + radius). */
+.question-cue {
+  border: 1px solid var(--line);
+  border-radius: 17px;
+}
+.signal-grid li {
+  border: 1px solid color-mix(in srgb, var(--orange) 24%, transparent);
+  border-radius: 12px;
+}
+/* F5: summary overview items match the detail cards; emphasis stays typographic. */
+.summary-overview .summary-item {
+  background: var(--surface);
+}
+/* F7: the full-question disclosure recedes. */
+.question-original {
+  color: var(--muted);
+}
+/* F8: settings rail active section. */
+.settings-rail a.active {
+  background: var(--light);
+  color: var(--ink);
+  font-weight: 600;
+}
+/* F6: custom file picker for the medical-image dialog. */
+.file-drop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background 120ms;
+}
+.file-drop:hover {
+  border-color: var(--primary);
+  background: var(--light);
+}
+.file-drop .icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+  flex: none;
+}
+.file-drop-action {
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+.file-drop-name {
+  color: var(--muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* F3 + F10: in task focus the footer takes the task card's measure, and the
+   task card centers vertically like focused questions do. */
+@media (min-width: 981px) {
+  body[data-mode="patient"].task-focused .conversation-footer > * {
+    max-width: none;
+  }
+  body[data-mode="patient"].task-focused .active-task {
+    display: flex;
+    flex-direction: column;
+  }
+  body[data-mode="patient"].task-focused .active-task > .task-card {
+    margin-block: auto;
+  }
+}

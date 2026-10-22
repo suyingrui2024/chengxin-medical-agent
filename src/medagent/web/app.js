@@ -425,6 +425,9 @@ function navigate(view) {
     loadEvents().catch((error) => toast(error.message));
   }
   history.replaceState(null, "", `#${view}`);
+  // Task focus belongs to the consultation view only; re-evaluate on every
+  // navigation so leaving mid-task (hash change, back button) restores the shell.
+  syncTaskFocus();
   if (!$("#toast").hidden) positionToast();
 }
 
@@ -700,6 +703,7 @@ function syncTaskFocus() {
   const task = state.reply?.task;
   const active = Boolean(
     task &&
+    state.view === "consultation" &&
     state.case?.active_task === task.id &&
     state.case?.phase !== "closed",
   );
@@ -2495,6 +2499,32 @@ document
   .forEach((node) =>
     node.addEventListener("click", () => navigate(node.dataset.view)),
   );
+// Settings rail scrollspy: highlight the section currently in view.
+(() => {
+  const links = [...document.querySelectorAll(".settings-rail a")];
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  const setActive = (id) =>
+    links.forEach((link) =>
+      link.classList.toggle("active", link.getAttribute("href") === `#${id}`),
+    );
+  setActive("settings-appearance");
+  links.forEach((link) =>
+    link.addEventListener("click", () =>
+      setActive(link.getAttribute("href").slice(1)),
+    ),
+  );
+  const spy = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      }),
+    { root: document.querySelector("main"), rootMargin: "-15% 0px -70% 0px" },
+  );
+  links.forEach((link) => {
+    const section = document.getElementById(link.getAttribute("href").slice(1));
+    if (section) spy.observe(section);
+  });
+})();
 $("#new-session").addEventListener("click", startSession);
 $("#workspace-mode").addEventListener("change", (event) =>
   setWorkspaceMode(event.target.value),

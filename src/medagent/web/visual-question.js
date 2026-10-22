@@ -535,6 +535,7 @@ export function renderQuestion(data, context) {
     const actionable =
       !context.readOnly && typeof context.onConfirmAnswer === "function";
     const update = () => {
+      display.dataset.empty = String(selected === null);
       display.textContent = selected === null ? "—" : `${selected} 分`;
       confirm.textContent =
         selected === null ? "先选择分数" : `确认 ${selected} 分`;
