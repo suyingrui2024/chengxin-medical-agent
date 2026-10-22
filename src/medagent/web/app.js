@@ -368,6 +368,7 @@ function navigate(view) {
       "inspect",
       "capabilities",
       "execution",
+      "settings",
     ].includes(view)
   )
     return;
@@ -401,6 +402,7 @@ function navigate(view) {
     inspect: "运行检查",
     capabilities: "能力与模板",
     execution: "执行工作台",
+    settings: "设置",
   }[view];
   $("#sidebar").classList.remove("open");
   if (view === "history")
@@ -2587,13 +2589,8 @@ $("#toggle-facts").addEventListener("click", () => {
   if (window.innerWidth <= 980 && $("#facts-panel").classList.contains("open"))
     $("#facts-panel").scrollIntoView({ behavior: "smooth" });
 });
-// The view switcher is a testing affordance, not patient UI: demote it to
-// the sidebar bottom (design: 视觉改版 §4.8) without removing the function.
-{
-  const switcher = $(".workspace-mode");
-  const bottom = $(".sidebar-bottom");
-  if (switcher && bottom) bottom.prepend(switcher);
-}
+// The view switcher lives in the settings view (界面与数据 section);
+// its markup sits there natively, so no relocation is needed here.
 const syncFactsScrim = () => {
   $("#facts-scrim").hidden = !$("#facts-panel").classList.contains("open");
 };

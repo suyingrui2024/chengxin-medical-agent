@@ -62,29 +62,13 @@
     });
   }
   document.addEventListener("DOMContentLoaded", () => {
-    const dialog = document.querySelector("#appearance-dialog");
-    const trigger = document.querySelector("#open-appearance");
+    // Appearance now lives in the full-area settings view
+    // (design: docs/设置视图改造方案.md); the controls stay in the DOM,
+    // so the wiring attaches to the view instead of a modal dialog.
+    const dialog = document.querySelector("#view-settings");
     const status = document.querySelector("#appearance-status");
-    if (!dialog || !trigger || !status) return;
-    trigger.addEventListener("click", () => {
-      sync();
-      dialog.showModal();
-      dialog.querySelector("input:checked")?.focus();
-    });
-    dialog.querySelector(".appearance-close").addEventListener("click", () => {
-      dialog.close();
-    });
-    dialog.addEventListener("click", (event) => {
-      if (event.target !== dialog) return;
-      const rect = dialog.getBoundingClientRect();
-      if (
-        event.clientX < rect.left ||
-        event.clientX > rect.right ||
-        event.clientY < rect.top ||
-        event.clientY > rect.bottom
-      )
-        dialog.close();
-    });
+    if (!dialog || !status) return;
+    sync();
     const syncFontScale = () => {
       document.querySelectorAll('[name="fontscale"]').forEach((input) => {
         input.checked = input.value === fontScale;
