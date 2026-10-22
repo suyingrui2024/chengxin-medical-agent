@@ -10,7 +10,10 @@
         "发热",
         "发烧",
         "喉咙",
-        "咽痛"
+        "咽痛",
+        "嗓子",
+        "流鼻涕",
+        "鼻塞"
       ],
       "hypotheses": [
         {
@@ -22,6 +25,7 @@
           ],
           "id": "uri",
           "label": "上呼吸道感染",
+          "patient_label": "上呼吸道感染（感冒、咽喉炎等）",
           "prior_band": "high",
           "red_flags": [],
           "refute": [
@@ -41,7 +45,8 @@
                 "喉咙",
                 "咽痛",
                 "鼻塞",
-                "流鼻涕"
+                "流鼻涕",
+                "嗓子"
               ],
               "fact_key": "chief_complaint"
             },
@@ -61,6 +66,7 @@
           ],
           "id": "lower_respiratory",
           "label": "下呼吸道感染/肺炎可能",
+          "patient_label": "肺部感染（肺炎等）",
           "prior_band": "medium",
           "red_flag_questions": [
             "resp_breathing"
@@ -107,6 +113,7 @@
           ],
           "id": "asthma_exacerbation",
           "label": "哮喘急性发作可能",
+          "patient_label": "哮喘急性发作",
           "prior_band": "low",
           "red_flag_questions": [
             "resp_breathing"
@@ -145,6 +152,7 @@
           ],
           "id": "influenza_like",
           "label": "流感样疾病",
+          "patient_label": "流感样疾病",
           "prior_band": "medium",
           "red_flags": [],
           "refute": [
@@ -192,6 +200,7 @@
           ],
           "id": "acs_possible",
           "label": "急性冠脉综合征可能（待排除）",
+          "patient_label": "心脏供血的急性问题",
           "prior_band": "medium",
           "red_flag_questions": [
             "associated_symptoms",
@@ -241,6 +250,7 @@
           ],
           "id": "non_cardiac_chest",
           "label": "非心源性胸痛（胸壁/胃食管等）",
+          "patient_label": "非心脏原因的胸痛（胸壁、胃食管等）",
           "prior_band": "medium",
           "red_flags": [],
           "refute": [

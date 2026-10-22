@@ -2529,6 +2529,96 @@ h1 {
   font-size: 12.5px;
   line-height: 1.9;
 }
+.conclusion-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  margin: 0 0 3px 37px;
+  padding: 18px;
+}
+.conclusion-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin: 0;
+}
+.conclusion-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 18px 0 8px;
+}
+.conclusion-disposition {
+  padding: 12px;
+  background: var(--light);
+  border-radius: 7px;
+  margin-top: 10px;
+}
+.conclusion-disposition.urgent_today {
+  background: var(--warning-bg);
+}
+.conclusion-disposition-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.conclusion-disposition-text {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+.conclusion-direction-group {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 10px 0 6px;
+}
+.conclusion-direction {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.conclusion-direction.rule_out {
+  border-color: var(--danger-line);
+  background: var(--danger-bg);
+}
+.conclusion-direction-basis {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+.conclusion-abstain,
+.conclusion-handoff {
+  color: var(--ink);
+  line-height: 1.8;
+}
+.conclusion-gaps ul,
+.conclusion-care ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.conclusion-care-label {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 8px 0 4px;
+}
+.conclusion-outlook p {
+  color: var(--ink);
+  line-height: 1.8;
+  margin: 0 0 4px;
+}
+.conclusion-disclaimer {
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.7;
+  margin: 10px 0 0;
+}
 .followup-card {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -3420,7 +3510,8 @@ input[type="password"],
   }
   .task-card,
   .summary-card,
-  .followup-card {
+  .followup-card,
+  .conclusion-card {
     margin-left: 0;
   }
   .task-header {
@@ -4622,14 +4713,17 @@ input[type="password"],
 }
 .summary-focused
   #messages
-  > :not(.current-summary):not(.current-summary-message) {
+  > :not(.current-summary):not(.current-summary-message):not(
+    .current-outcome
+  ) {
   display: none;
 }
 .summary-focused #messages {
   padding-top: 6px;
 }
 .summary-focused .summary-card,
-.summary-focused .followup-card {
+.summary-focused .followup-card,
+.summary-focused .conclusion-card {
   margin: 0;
 }
 .summary-group {

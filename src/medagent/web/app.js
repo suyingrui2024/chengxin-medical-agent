@@ -489,11 +489,13 @@ function summaryContext(
   actionId = state.reply?.action_id,
   revisionAction = state.reply?.location_revision_action,
   reviewStatus = null,
+  conclusionPresent = false,
 ) {
   const sessionId = state.sessionId;
   return {
     readOnly,
     reviewStatus,
+    conclusionPresent,
     actionId,
     reviewFeedback:
       state.lastCorrection?.actionId === actionId ? state.lastCorrection : null,
@@ -641,7 +643,11 @@ function syncSummaryEdits() {
 function renderReply(reply, { replay = false } = {}) {
   if (!replay && state.lastCorrection?.actionId !== reply.action_id)
     state.lastCorrection = null;
-  for (const block of structuredUI.blocks(replyEnvelope(reply))) {
+  const replyBlocks = structuredUI.blocks(replyEnvelope(reply));
+  const conclusionPresent = replyBlocks.some(
+    (block) => block.type === "conclusion",
+  );
+  for (const block of replyBlocks) {
     if (
       ![
         "self_check",
@@ -659,6 +665,7 @@ function renderReply(reply, { replay = false } = {}) {
             reply.action_id,
             reply.location_revision_action,
             block.type === "summary" ? block.data.review_status : null,
+            conclusionPresent,
           ),
         ),
       );
@@ -755,6 +762,17 @@ function syncTaskFocus() {
     [...document.querySelectorAll("#messages .summary-card")]
       .at(-1)
       ?.classList.add("current-summary");
+  // The closed view's outcome blocks (conclusion sheet + follow-up card)
+  // belong to the focused surface, ahead of the record card; everything
+  // else stays in the collapsed transcript.
+  document
+    .querySelectorAll(".current-outcome")
+    .forEach((card) => card.classList.remove("current-outcome"));
+  if (summaryFocus && state.case?.phase === "closed")
+    for (const selector of [".conclusion-card", ".followup-card"])
+      [...document.querySelectorAll(`#messages ${selector}`)]
+        .at(-1)
+        ?.classList.add("current-outcome");
   document
     .querySelectorAll(".current-summary-message")
     .forEach((node) => node.classList.remove("current-summary-message"));

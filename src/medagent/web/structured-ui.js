@@ -400,6 +400,12 @@ export function replyEnvelope(reply) {
       type: "observation_series",
       data: reply.observation_result,
     });
+  if (reply.conclusion)
+    blocks.push({
+      id: `conclusion:${id}`,
+      type: "conclusion",
+      data: reply.conclusion,
+    });
   if (reply.summary)
     blocks.push(
       reply.kind === "emergency"
@@ -1322,38 +1328,42 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       }
       // The closing guidance leads the card: what to do next and which
       // changes need immediate help must not sit below the full fact list.
-      const riskLevel = ["emergency", "urgent", "routine"].includes(
-        data.risk_level,
-      )
-        ? data.risk_level
-        : "routine";
-      const route = el("section", `summary-route ${riskLevel}`);
-      route.setAttribute(
-        "aria-label",
-        riskLevel === "urgent" ? "尽快就医评估建议" : "下一步建议",
-      );
-      if (riskLevel === "urgent") route.setAttribute("role", "alert");
-      route.append(
-        el(
-          "p",
-          "summary-route-label",
-          riskLevel === "urgent" ? "尽快就医评估" : "下一步建议",
-        ),
-        el("p", "summary-route-action", data.care_route),
-      );
-      card.append(route);
-      if (data.return_now_if?.length) {
-        const safety = el("section", "summary-safety");
-        safety.setAttribute("aria-label", "出现以下变化请立即求助");
-        safety.append(
-          el("p", "summary-safety-label", "出现以下变化，请立即求助"),
+      // When a conclusion sheet is present it owns D1/D5, and this card
+      // renders in record mode (design: 结论单 §7 de-duplication).
+      if (!context.conclusionPresent) {
+        const riskLevel = ["emergency", "urgent", "routine"].includes(
+          data.risk_level,
+        )
+          ? data.risk_level
+          : "routine";
+        const route = el("section", `summary-route ${riskLevel}`);
+        route.setAttribute(
+          "aria-label",
+          riskLevel === "urgent" ? "尽快就医评估建议" : "下一步建议",
         );
-        const safetyList = el("ul", "summary-safety-list");
-        data.return_now_if.forEach((item) =>
-          safetyList.append(el("li", "", item)),
+        if (riskLevel === "urgent") route.setAttribute("role", "alert");
+        route.append(
+          el(
+            "p",
+            "summary-route-label",
+            riskLevel === "urgent" ? "尽快就医评估" : "下一步建议",
+          ),
+          el("p", "summary-route-action", data.care_route),
         );
-        safety.append(safetyList);
-        card.append(safety);
+        card.append(route);
+        if (data.return_now_if?.length) {
+          const safety = el("section", "summary-safety");
+          safety.setAttribute("aria-label", "出现以下变化请立即求助");
+          safety.append(
+            el("p", "summary-safety-label", "出现以下变化，请立即求助"),
+          );
+          const safetyList = el("ul", "summary-safety-list");
+          data.return_now_if.forEach((item) =>
+            safetyList.append(el("li", "", item)),
+          );
+          safety.append(safetyList);
+          card.append(safety);
+        }
       }
       const groups = [
         { title: "当前不适", icon: "activity", items: [] },
@@ -1608,6 +1618,179 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         );
         card.append(reasons);
       }
+      return card;
+    },
+  );
+
+  register(
+    "conclusion",
+    (data) => {
+      if (!["routine", "urgent"].includes(data.tier))
+        throw new Error("Invalid conclusion tier");
+      const disposition = data.disposition || {};
+      if (
+        !["urgent_today", "routine_visit", "self_care"].includes(
+          disposition.level,
+        )
+      )
+        throw new Error("Invalid disposition level");
+      text(disposition.text);
+      if (
+        disposition.window_hours !== undefined &&
+        disposition.window_hours !== null &&
+        !Number.isFinite(disposition.window_hours)
+      )
+        throw new Error("Invalid disposition window");
+      list(data.directions).forEach((item) => {
+        if (!["likely", "rule_out"].includes(item.group))
+          throw new Error("Invalid direction group");
+        if (
+          !["more_likely", "possible", "cannot_exclude"].includes(
+            item.certainty,
+          )
+        )
+          throw new Error("Invalid direction certainty");
+        if (item.patient_label !== null && item.patient_label !== undefined)
+          text(item.patient_label);
+        list(item.support_quotes).forEach(text);
+        if (item.against_note) text(item.against_note);
+      });
+      list(data.gaps).forEach((gap) => {
+        text(gap.label);
+        text(gap.impact);
+      });
+      const care = data.self_care || {};
+      list(care.do).forEach(text);
+      list(care.avoid).forEach(text);
+      list(care.measure).forEach(text);
+      list(data.return_now_if).forEach(text);
+      if (data.outlook) text(data.outlook);
+      if (data.abstain_text) text(data.abstain_text);
+    },
+    (data) => {
+      const card = el("article", "conclusion-card");
+      card.append(el("p", "conclusion-kicker", "问诊结论"));
+      const disposition = el(
+        "section",
+        `conclusion-disposition ${data.disposition.level}`,
+      );
+      if (data.tier === "urgent") disposition.setAttribute("role", "alert");
+      disposition.append(
+        el("p", "conclusion-disposition-label", "下一步"),
+        el("p", "conclusion-disposition-text", data.disposition.text),
+      );
+      card.append(disposition);
+      const you = data.subject_kind === "self" ? "你" : "您";
+      if (data.directions_visible) {
+        const directions = el("section", "conclusion-directions");
+        directions.append(el("h4", "", "可能的方向（不是确诊）"));
+        if (data.directions_abstained) {
+          directions.append(el("p", "conclusion-abstain", data.abstain_text));
+        } else {
+          const templates = {
+            more_likely: (label) => `更像是 ${label}`,
+            possible: (label) => `可能是 ${label}`,
+            cannot_exclude: (label) =>
+              `目前还不能排除 ${label}，这也是建议就诊的原因`,
+          };
+          for (const group of ["likely", "rule_out"]) {
+            const items = data.directions.filter(
+              (item) => item.group === group && item.patient_label,
+            );
+            if (!items.length) continue;
+            directions.append(
+              el(
+                "p",
+                "conclusion-direction-group",
+                group === "likely" ? "更可能的方向" : "需要排除的方向",
+              ),
+            );
+            for (const item of items) {
+              const box = el("div", `conclusion-direction ${group}`);
+              box.append(
+                el("strong", "", templates[item.certainty](item.patient_label)),
+              );
+              if (item.support_quotes?.length)
+                box.append(
+                  el(
+                    "p",
+                    "conclusion-direction-basis",
+                    `依据：${you}提到「${item.support_quotes.join("」、「")}」。`,
+                  ),
+                );
+              if (item.against_note)
+                box.append(
+                  el("p", "conclusion-direction-basis", item.against_note + "。"),
+                );
+              directions.append(box);
+            }
+          }
+        }
+        card.append(directions);
+      }
+      if (data.gaps?.length) {
+        const gaps = el("section", "conclusion-gaps");
+        gaps.append(el("h4", "", "还缺的信息"));
+        const listEl = el("ul");
+        data.gaps.forEach((gap) => {
+          const li = el("li");
+          li.append(el("strong", "", gap.label), `——${gap.impact}`);
+          listEl.append(li);
+        });
+        gaps.append(listEl);
+        card.append(gaps);
+      }
+      const care = data.self_care || {};
+      if (care.do?.length || care.avoid?.length || care.measure?.length) {
+        const careEl = el("section", "conclusion-care");
+        careEl.append(el("h4", "", "现在能做的事"));
+        const addList = (items, label) => {
+          if (!items?.length) return;
+          if (label) careEl.append(el("p", "conclusion-care-label", label));
+          const ul = el("ul");
+          items.forEach((item) => ul.append(el("li", "", item)));
+          careEl.append(ul);
+        };
+        addList(care.do);
+        addList(care.measure, "可以测一测");
+        addList(care.avoid, "不要做的事");
+        card.append(careEl);
+      }
+      if (data.return_now_if?.length) {
+        const safety = el("section", "summary-safety");
+        safety.setAttribute("aria-label", "出现以下变化请立即求助");
+        safety.append(
+          el("p", "summary-safety-label", "出现以下变化，请立即求助"),
+        );
+        const safetyList = el("ul", "summary-safety-list");
+        data.return_now_if.forEach((item) =>
+          safetyList.append(el("li", "", item)),
+        );
+        safety.append(safetyList);
+        card.append(safety);
+      }
+      if (data.outlook || data.follow_up) {
+        const outlook = el("section", "conclusion-outlook");
+        outlook.append(el("h4", "", "接下来"));
+        if (data.outlook) outlook.append(el("p", "", data.outlook + "。"));
+        if (data.follow_up?.due_in_hours)
+          outlook.append(
+            el(
+              "p",
+              "",
+              `如果到 ${data.follow_up.due_in_hours} 小时后还没有好转，或出现上面任何警示信号，请线下就医，不要等随访。`,
+            ),
+          );
+        card.append(outlook);
+      }
+      card.append(
+        el("p", "conclusion-handoff", "就诊时可把本次记录给医生看。"),
+        el(
+          "p",
+          "conclusion-disclaimer",
+          "以上是根据你提供的信息给出的分诊与健康建议，不替代医生面诊。",
+        ),
+      );
       return card;
     },
   );

@@ -1794,6 +1794,12 @@ class ConsultationEngine(
             "rule_ids": list(decision.rule_ids),
         }
         reply.developer_trace = trace
+        if (
+            decision.allowed
+            and reply.phase == Phase.CLOSED
+            and state.closed_reason in ("confirmed_by_user", "urgent_route")
+        ):
+            self._attach_conclusion(state, reply, turn_id)
         self.events.append(
             Event(
                 state.session_id,
@@ -1837,6 +1843,43 @@ class ConsultationEngine(
             state.transcript.append({"role": "assistant", "content": reply.message})
             self._latest_replies[state.session_id] = deepcopy(reply)
             self._session_conditions[state.session_id].notify_all()
+
+    def _attach_conclusion(self, state: CaseState, reply: AgentReply, turn_id: str) -> None:
+        """Compose the conclusion sheet at close (design: 结论单 §5).
+
+        Single choke point: _record_reply serves both engines and runs
+        before the turn.agent_reply event serializes the reply, so the
+        stored snapshot used for replay carries the sheet (invariant I5).
+        Fail-open (I3): any composer error leaves the close untouched.
+        """
+        try:
+            from .conclusion import compose_conclusion, sheet_mode
+
+            mode = sheet_mode()
+            if mode == "off":
+                return
+            sheet = compose_conclusion(state, summary=reply.summary)
+            if sheet is None:
+                return
+            state.conclusion = sheet
+            self.events.append(
+                Event(
+                    state.session_id,
+                    "conclusion.generated",
+                    {
+                        "tier": sheet["tier"],
+                        "revision": sheet["revision"],
+                        "directions_abstained": sheet["directions_abstained"],
+                        "directions_visible": sheet["directions_visible"],
+                        "content_versions": sheet["content_versions"],
+                    },
+                    turn_id=turn_id,
+                )
+            )
+            if mode == "on":
+                reply.conclusion = deepcopy(sheet)
+        except Exception:
+            return
 
     @staticmethod
     def _self_check_block_reason(state):

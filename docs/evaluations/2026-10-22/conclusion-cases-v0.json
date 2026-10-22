@@ -1,0 +1,175 @@
+{
+ "corpus": "conclusion-cases",
+ "corpus_version": "0.0.1",
+ "review_status": "unreviewed",
+ "cases": 16,
+ "passed": 16,
+ "disposition_agreement": 1.0,
+ "must_not_miss_recall": 1.0,
+ "harmful_cases": 0,
+ "gates": {
+  "disposition_agreement>=0.95": true,
+  "must_not_miss_recall==1.0": true,
+  "harmful==0": true
+ },
+ "gate_pass": true,
+ "results": [
+  {
+   "id": "resp-flu-typical",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [
+    "influenza_like"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "resp-uri-supported",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [
+    "uri"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "resp-pneumonia-must-not-miss",
+   "ok": true,
+   "failures": [],
+   "disposition": "routine_visit",
+   "directions": [
+    "lower_respiratory",
+    "influenza_like"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "resp-serious-refuted",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [
+    "uri"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "chest-acs-must-not-miss",
+   "ok": true,
+   "failures": [],
+   "disposition": "urgent_today",
+   "directions": [
+    "acs_possible"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "chest-noncardiac-stable",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [
+    "non_cardiac_chest"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "abstain-knee",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [],
+   "abstained": true
+  },
+  {
+   "id": "abstain-headache",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [],
+   "abstained": true
+  },
+  {
+   "id": "child-respiratory",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [
+    "influenza_like"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "resp-unknown-temp-gap",
+   "ok": true,
+   "failures": [],
+   "disposition": "routine_visit",
+   "directions": [
+    "influenza_like"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "asthma-history-rule-out",
+   "ok": true,
+   "failures": [],
+   "disposition": "routine_visit",
+   "directions": [
+    "lower_respiratory",
+    "asthma_exacerbation"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "abstain-back-pain",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [],
+   "abstained": true
+  },
+  {
+   "id": "resp-high-fever",
+   "ok": true,
+   "failures": [],
+   "disposition": "routine_visit",
+   "directions": [
+    "lower_respiratory",
+    "influenza_like"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "urgent-respiratory-worsening",
+   "ok": true,
+   "failures": [],
+   "disposition": "urgent_today",
+   "directions": [
+    "lower_respiratory",
+    "asthma_exacerbation",
+    "influenza_like"
+   ],
+   "abstained": false
+  },
+  {
+   "id": "abstain-stomach",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [],
+   "abstained": true
+  },
+  {
+   "id": "chest-routine-improving",
+   "ok": true,
+   "failures": [],
+   "disposition": "self_care",
+   "directions": [
+    "non_cardiac_chest"
+   ],
+   "abstained": false
+  }
+ ]
+}
