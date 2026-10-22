@@ -6158,6 +6158,7 @@ html[data-font-scale="small"] .fact-value {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   width: 100%;
 }
 .connection-alert {
