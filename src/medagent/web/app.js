@@ -2463,8 +2463,6 @@ async function deleteCurrentSession() {
   }
 }
 function updateMode() {
-  $("#patient-mode-label").textContent =
-    modeNames[state.settings.backend] || "模型辅助";
   $("#backend-pill").replaceChildren(
     document.createTextNode(modeNames[state.settings.backend] || "运行配置"),
     el("span", "", "⌄"),
@@ -2699,12 +2697,14 @@ async function init() {
       el("span", "status-dot"),
       document.createTextNode("本机服务已连接"),
     );
+    $("#connection-alert").hidden = true;
     await refreshSessions();
     renderLibrary();
     renderCapabilities();
     navigate(location.hash.slice(1) || "consultation");
   } catch (error) {
     $("#connection-status").textContent = "服务未连接";
+    $("#connection-alert").hidden = false;
     toast(`无法连接本机服务：${error.message}`);
   }
 }
