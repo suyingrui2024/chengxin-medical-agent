@@ -147,3 +147,10 @@
   --silhouette: #34455c;
   --anatomy-line: #91a3bb;
 }
+
+/* Night: task illustrations are light-background assets; dim them into
+   "instruction cards" instead of leaving a glaring bright block. */
+:root[data-theme="night"] .task-image,
+:root[data-theme="night"] .illustration-large {
+  filter: brightness(0.8) saturate(0.94);
+}

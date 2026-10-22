@@ -963,7 +963,7 @@ function updateComposer() {
     age: "例如 8 个月，或 32 岁",
     chief_complaint: "描述最困扰你的问题…",
     onset: "例如：两天前，逐渐出现",
-    severity: "也可以描述对吃饭、睡觉和活动的影响",
+    severity: "例如：5 分，主要影响睡眠",
     medications_taken: "药名、剂量、时间，或写没有",
     allergies: "过敏物质与反应；没有 / 不知道请区分",
   };

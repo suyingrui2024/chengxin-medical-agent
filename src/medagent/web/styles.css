@@ -6347,3 +6347,11 @@ body.task-focused .surface-actions {
     margin-block: auto;
   }
 }
+
+/* Round 2 (G3): inspect metrics share the full row instead of orphaning
+   the last card on a second row. */
+@media (min-width: 1201px) {
+  #inspect-metrics {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}

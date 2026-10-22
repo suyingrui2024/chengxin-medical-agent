@@ -664,9 +664,9 @@ const TREE = [
     title: "主题变体（逐个）",
     optional: true,
     run: async (p) => {
-      // 枚举外观主题单选，逐个应用并各拍一张（以设置页为画布）。
+      // 枚举外观主题单选（仅 name=appearance，排除字号单选），逐个应用并各拍一张。
       const labels = await p.evl(`(() => {
-        const inputs = [...document.querySelectorAll("#view-settings input[type='radio']")];
+        const inputs = [...document.querySelectorAll("#view-settings input[name='appearance']")];
         return inputs
           .map((i) => {
             const lab = document.querySelector('label[for="' + i.id + '"]') || i.closest("label");
@@ -674,7 +674,7 @@ const TREE = [
           })
           .filter(Boolean);
       })()`);
-      p._themes = [...new Set(labels)].slice(0, 5);
+      p._themes = [...new Set(labels)];
       if (!p._themes.length) throw new Error("未找到主题单选");
     },
     /* 主题枚举在 run 里完成：逐个应用并用 page.shotExtra 补拍。 */
@@ -682,7 +682,7 @@ const TREE = [
       const made = [];
       for (const theme of p._themes) {
         await p.evl(`(() => {
-          const inputs = [...document.querySelectorAll("#view-settings input[type='radio']")];
+          const inputs = [...document.querySelectorAll("#view-settings input[name='appearance']")];
           const input = inputs.find((i) => {
             const lab = document.querySelector('label[for="' + i.id + '"]') || i.closest("label");
             return (lab?.innerText || "").includes(${JSON.stringify(theme)});
@@ -693,6 +693,18 @@ const TREE = [
         await sleep(600);
         await p.shotExtra(theme);
         made.push(theme);
+        // 深色主题额外拍一张问诊落地页：对比度问题最容易藏在主表面上。
+        if (theme.includes("夜航")) {
+          await p.evl(
+            `document.querySelector('.nav-item[data-view="consultation"]')?.click()`,
+          );
+          await sleep(700);
+          await p.shotExtra("夜航-问诊");
+          await p.evl(
+            `document.querySelector('.nav-item[data-view="settings"]')?.click()`,
+          );
+          await sleep(500);
+        }
       }
       return made;
     },
@@ -729,7 +741,15 @@ const TREE = [
     optional: true,
     run: async (p) => {
       await p.clickSel('.nav-item[data-view="tasks"]');
-      await sleep(600);
+      // SVG 图资产无固有尺寸，隐藏→可见翻转后需要一拍完成最终布局，
+      // 否则截图会抓到未沉降的小图（曾误报为产品问题 F11a）。
+      await p
+        .waitFor(
+          `[...document.querySelectorAll(".library-image")].every((i) => i.complete && i.naturalWidth > 0)`,
+          "任务库图片加载",
+        )
+        .catch(() => {});
+      await sleep(900);
     },
   },
   {
