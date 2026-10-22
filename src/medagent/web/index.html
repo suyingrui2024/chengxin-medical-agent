@@ -409,7 +409,15 @@
               <aside id="facts-panel" class="facts-panel" aria-label="已记录的信息">
                 <div class="panel-heading">
                   <span>本次问诊</span
-                  ><span class="subtle-pill" id="phase-label">尚未开始</span>
+                  ><span class="subtle-pill" id="phase-label">尚未开始</span
+                  ><button
+                    id="facts-close"
+                    class="icon-button"
+                    type="button"
+                    aria-label="关闭已记录信息"
+                  >
+                    ✕
+                  </button>
                 </div>
                 <div class="current-activity" id="phase-track">
                   <p>当前这一步</p>
@@ -476,6 +484,7 @@
                   <svg class="icon"><use href="#i-arrow" /></svg>
                 </button>
               </aside>
+              <div id="facts-scrim" hidden></div>
             </div>
             <div class="page-footnote">
               <svg class="icon"><use href="#i-info" /></svg
@@ -1725,6 +1734,21 @@
           ><svg class="icon" aria-hidden="true">
             <use href="#i-appearance" /></svg
         ></label>
+      </fieldset>
+      <fieldset class="appearance-options fontscale-options">
+        <legend>字号大小</legend>
+        <label class="appearance-option fontscale-option">
+          <input type="radio" name="fontscale" value="small" />
+          <span class="theme-title"><strong>小</strong></span>
+        </label>
+        <label class="appearance-option fontscale-option">
+          <input type="radio" name="fontscale" value="standard" checked />
+          <span class="theme-title"><strong>标准</strong></span>
+        </label>
+        <label class="appearance-option fontscale-option">
+          <input type="radio" name="fontscale" value="large" />
+          <span class="theme-title"><strong>大</strong></span>
+        </label>
       </fieldset>
       <p id="appearance-status" class="appearance-status" role="status">
         外观偏好保存在当前浏览器中。

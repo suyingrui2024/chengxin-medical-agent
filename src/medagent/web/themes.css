@@ -2,13 +2,13 @@
 :root,
 [data-palette] {
   color-scheme: light;
-  --paper: #f5f6f2;
+  --paper: #fbfcfa;
   --surface: #ffffff;
-  --sidebar: #eef2ec;
-  --raised: #fafcf8;
-  --ink: #203c33;
-  --muted: #586b60;
-  --line: #dce5da;
+  --sidebar: #eff3ee;
+  --raised: #ffffff;
+  --ink: #1f2a24;
+  --muted: #5a6a60;
+  --line: #e4eae2;
   --line-strong: #728677;
   --primary: #235f4e;
   --primary-hover: #184b3d;
