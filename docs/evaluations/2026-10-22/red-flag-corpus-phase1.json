@@ -1,0 +1,704 @@
+{
+  "corpus": "red_flag_v0",
+  "corpus_version": "0.1.0",
+  "review_status": "unreviewed",
+  "samples": 51,
+  "positives": 37,
+  "negatives": 14,
+  "recall": 1.0,
+  "false_positive_rate": 0.0,
+  "misses": [],
+  "false_alarms": [],
+  "by_red_flag": {
+    "chest_pain": {
+      "pos": 7,
+      "miss": 0
+    },
+    "cyanosis": {
+      "pos": 4,
+      "miss": 0
+    },
+    "major_bleeding": {
+      "pos": 6,
+      "miss": 0
+    },
+    "seizure": {
+      "pos": 5,
+      "miss": 0
+    },
+    "severe_breathing": {
+      "pos": 8,
+      "miss": 0
+    },
+    "unresponsive": {
+      "pos": 7,
+      "miss": 0
+    }
+  },
+  "by_category": {
+    "benign": {
+      "n": 5,
+      "bad": 0
+    },
+    "combination": {
+      "n": 2,
+      "bad": 0
+    },
+    "negation": {
+      "n": 9,
+      "bad": 0
+    },
+    "paraphrase": {
+      "n": 16,
+      "bad": 0
+    },
+    "standard": {
+      "n": 18,
+      "bad": 0
+    },
+    "uncertain": {
+      "n": 1,
+      "bad": 0
+    }
+  },
+  "rows": [
+    {
+      "id": "unresp-std-1",
+      "category": "standard",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "我爸刚才突然叫不醒了"
+    },
+    {
+      "id": "unresp-std-2",
+      "category": "standard",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "患者失去意识了"
+    },
+    {
+      "id": "unresp-std-3",
+      "category": "standard",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "老人现在意识不清"
+    },
+    {
+      "id": "unresp-std-4",
+      "category": "standard",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "他已经昏迷了"
+    },
+    {
+      "id": "unresp-para-1",
+      "category": "paraphrase",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "我爸怎么喊都没反应，推他也不动"
+    },
+    {
+      "id": "unresp-para-2",
+      "category": "paraphrase",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "孩子刚才晕过去了，怎么叫都叫不醒"
+    },
+    {
+      "id": "unresp-para-3",
+      "category": "paraphrase",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "他突然倒下，人事不省"
+    },
+    {
+      "id": "unresp-neg-1",
+      "category": "negation",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "他没有失去意识，就是睡着了"
+    },
+    {
+      "id": "unresp-neg-2",
+      "category": "negation",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "不是昏迷，刚检查完说是睡着了"
+    },
+    {
+      "id": "seiz-std-1",
+      "category": "standard",
+      "red_flag_id": "seizure",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "抽搐"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "孩子正在抽搐"
+    },
+    {
+      "id": "seiz-std-2",
+      "category": "standard",
+      "red_flag_id": "seizure",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "抽搐"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "她持续抽搐好几分钟了"
+    },
+    {
+      "id": "seiz-std-3",
+      "category": "standard",
+      "red_flag_id": "seizure",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "抽搐"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "反复抽搐了好几次"
+    },
+    {
+      "id": "seiz-para-1",
+      "category": "paraphrase",
+      "red_flag_id": "seizure",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "抽搐"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "他全身发抖，停不下来，眼睛往上翻"
+    },
+    {
+      "id": "seiz-para-2",
+      "category": "paraphrase",
+      "red_flag_id": "seizure",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "抽搐"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "刚才抽风了，抽了大概一分钟"
+    },
+    {
+      "id": "seiz-neg-1",
+      "category": "negation",
+      "red_flag_id": "seizure",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "没有抽搐，就是有点发抖，可能是冷的"
+    },
+    {
+      "id": "cyan-std-1",
+      "category": "standard",
+      "red_flag_id": "cyanosis",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "口唇发紫"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "孩子嘴唇发紫"
+    },
+    {
+      "id": "cyan-std-2",
+      "category": "standard",
+      "red_flag_id": "cyanosis",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "口唇发紫"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "口唇发紫，脸色也不好"
+    },
+    {
+      "id": "cyan-para-1",
+      "category": "paraphrase",
+      "red_flag_id": "cyanosis",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "口唇发紫"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "嘴唇颜色有点发青，看着不对劲"
+    },
+    {
+      "id": "cyan-para-2",
+      "category": "paraphrase",
+      "red_flag_id": "cyanosis",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "口唇发紫"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "他嘴唇都紫了"
+    },
+    {
+      "id": "cyan-neg-1",
+      "category": "negation",
+      "red_flag_id": "cyanosis",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "嘴唇没有发紫，就是有点干"
+    },
+    {
+      "id": "breath-std-1",
+      "category": "standard",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "我喘不上气了"
+    },
+    {
+      "id": "breath-std-2",
+      "category": "standard",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "感觉不能呼吸"
+    },
+    {
+      "id": "breath-std-3",
+      "category": "standard",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "严重呼吸困难，需要吸氧"
+    },
+    {
+      "id": "breath-para-1",
+      "category": "paraphrase",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "呼吸特别费劲，感觉吸不进气"
+    },
+    {
+      "id": "breath-para-2",
+      "category": "paraphrase",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "她气短得说不出完整的话"
+    },
+    {
+      "id": "breath-para-3",
+      "category": "paraphrase",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难",
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "胸口闷，喘气喘得厉害"
+    },
+    {
+      "id": "breath-unc-1",
+      "category": "uncertain",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "好像有点喘不上气"
+    },
+    {
+      "id": "breath-neg-1",
+      "category": "negation",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "没有呼吸困难，就是有点鼻塞"
+    },
+    {
+      "id": "chest-std-1",
+      "category": "standard",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "持续胸痛十几分钟了"
+    },
+    {
+      "id": "chest-std-2",
+      "category": "standard",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "压榨样胸痛"
+    },
+    {
+      "id": "chest-std-3",
+      "category": "standard",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "胸痛大汗，坐不住"
+    },
+    {
+      "id": "chest-para-1",
+      "category": "paraphrase",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "胸口像压了块石头一样疼，还出冷汗"
+    },
+    {
+      "id": "chest-para-2",
+      "category": "paraphrase",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "心口窝疼得厉害，一阵一阵冒汗"
+    },
+    {
+      "id": "chest-para-3",
+      "category": "paraphrase",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "前胸疼，还往左胳膊窜"
+    },
+    {
+      "id": "chest-neg-1",
+      "category": "negation",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "没有胸痛，就是胃有点胀"
+    },
+    {
+      "id": "chest-neg-2",
+      "category": "negation",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "否认胸痛，心电图刚做完没事"
+    },
+    {
+      "id": "bleed-std-1",
+      "category": "standard",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "伤口大出血"
+    },
+    {
+      "id": "bleed-std-2",
+      "category": "standard",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "血止不住，一直在流"
+    },
+    {
+      "id": "bleed-std-3",
+      "category": "standard",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "刚才大量呕血"
+    },
+    {
+      "id": "bleed-para-1",
+      "category": "paraphrase",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "吐了好多血，吐了两回了"
+    },
+    {
+      "id": "bleed-para-2",
+      "category": "paraphrase",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "血流个不停，按都按不住"
+    },
+    {
+      "id": "bleed-para-3",
+      "category": "paraphrase",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "便血，便池里全是血"
+    },
+    {
+      "id": "bleed-neg-1",
+      "category": "negation",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "没有大出血，就是擦破点皮"
+    },
+    {
+      "id": "bleed-neg-2",
+      "category": "negation",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "血已经止住了，没有再流了"
+    },
+    {
+      "id": "combo-1",
+      "category": "combination",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难",
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "胸口疼，还喘不上气，出了一身汗"
+    },
+    {
+      "id": "combo-2",
+      "category": "combination",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常",
+        "口唇发紫"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "嘴唇发紫，人也叫不醒了"
+    },
+    {
+      "id": "benign-1",
+      "category": "benign",
+      "red_flag_id": null,
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "我最近有点失眠，想咨询一下"
+    },
+    {
+      "id": "benign-2",
+      "category": "benign",
+      "red_flag_id": null,
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "胃有点不舒服，可能是吃多了"
+    },
+    {
+      "id": "benign-3",
+      "category": "benign",
+      "red_flag_id": null,
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "孩子发烧38度，有点咳嗽流鼻涕"
+    },
+    {
+      "id": "benign-4",
+      "category": "benign",
+      "red_flag_id": null,
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "脚踝扭了一下，有点肿"
+    },
+    {
+      "id": "benign-5",
+      "category": "benign",
+      "red_flag_id": null,
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "最近总是掉头发，想查一下原因"
+    }
+  ]
+}

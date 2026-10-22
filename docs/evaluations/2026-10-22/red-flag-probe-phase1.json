@@ -1,0 +1,268 @@
+{
+  "corpus": "red_flag_probe_v1",
+  "corpus_version": "0.1.0",
+  "review_status": "unreviewed",
+  "samples": 18,
+  "positives": 12,
+  "negatives": 6,
+  "recall": 1.0,
+  "false_positive_rate": 0.0,
+  "misses": [],
+  "false_alarms": [],
+  "by_red_flag": {
+    "chest_pain": {
+      "pos": 2,
+      "miss": 0
+    },
+    "cyanosis": {
+      "pos": 1,
+      "miss": 0
+    },
+    "major_bleeding": {
+      "pos": 2,
+      "miss": 0
+    },
+    "seizure": {
+      "pos": 2,
+      "miss": 0
+    },
+    "severe_breathing": {
+      "pos": 2,
+      "miss": 0
+    },
+    "unresponsive": {
+      "pos": 3,
+      "miss": 0
+    }
+  },
+  "by_category": {
+    "probe": {
+      "n": 18,
+      "bad": 0
+    }
+  },
+  "rows": [
+    {
+      "id": "probe-unresp-1",
+      "category": "probe",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "我妈早上起来就发现我爸躺那儿，怎么推都醒不过来"
+    },
+    {
+      "id": "probe-unresp-2",
+      "category": "probe",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "老人在椅子上睡着了似的，喊了半天一点反应都没有"
+    },
+    {
+      "id": "probe-unresp-3",
+      "category": "probe",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "意识明显异常"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "他刚才在操场上直接晕倒了"
+    },
+    {
+      "id": "probe-seiz-1",
+      "category": "probe",
+      "red_flag_id": "seizure",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "抽搐"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "宝宝刚才全身抽动，眼珠子直往上翻"
+    },
+    {
+      "id": "probe-seiz-2",
+      "category": "probe",
+      "red_flag_id": "seizure",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "抽搐"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "她突然倒地抽风，嘴里还冒白沫"
+    },
+    {
+      "id": "probe-cyan-1",
+      "category": "probe",
+      "red_flag_id": "cyanosis",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "口唇发紫"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "孩子哭闹后嘴唇明显发青发紫"
+    },
+    {
+      "id": "probe-breath-1",
+      "category": "probe",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "爷爷现在呼吸很急促，躺平了更难受"
+    },
+    {
+      "id": "probe-breath-2",
+      "category": "probe",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "严重呼吸困难"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "她哮喘犯了，气都吸不到底"
+    },
+    {
+      "id": "probe-chest-1",
+      "category": "probe",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "我老公说胸口发紧，像有绳子勒着"
+    },
+    {
+      "id": "probe-chest-2",
+      "category": "probe",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "高风险胸痛描述"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "左胸那边一阵一阵地闷痛"
+    },
+    {
+      "id": "probe-bleed-1",
+      "category": "probe",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "术后伤口突然往外冒血，纱布全透了"
+    },
+    {
+      "id": "probe-bleed-2",
+      "category": "probe",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": true,
+      "got_trigger": true,
+      "triggers": [
+        "大量或无法控制的出血"
+      ],
+      "assess_level": "emergency",
+      "ok": true,
+      "text": "他咳出来好几口血"
+    },
+    {
+      "id": "probe-neg-1",
+      "category": "probe",
+      "red_flag_id": "unresponsive",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "意识很清楚，没有昏迷，就是头有点晕"
+    },
+    {
+      "id": "probe-neg-2",
+      "category": "probe",
+      "red_flag_id": "severe_breathing",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "呼吸平稳，没有呼吸困难的表现"
+    },
+    {
+      "id": "probe-neg-3",
+      "category": "probe",
+      "red_flag_id": "chest_pain",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "胸口不疼了，昨天就是岔气"
+    },
+    {
+      "id": "probe-neg-4",
+      "category": "probe",
+      "red_flag_id": "major_bleeding",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "血压有点高，120/85，胸围92"
+    },
+    {
+      "id": "probe-neg-5",
+      "category": "probe",
+      "red_flag_id": "seizure",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "手有点发抖，可能是没吃早饭低血糖"
+    },
+    {
+      "id": "probe-neg-6",
+      "category": "probe",
+      "red_flag_id": "cyanosis",
+      "expect_trigger": false,
+      "got_trigger": false,
+      "triggers": [],
+      "assess_level": "undetermined",
+      "ok": true,
+      "text": "嘴唇有点干裂，喝了水好多了"
+    }
+  ]
+}
