@@ -13,7 +13,7 @@ from .execution_capabilities import validate_binding, validate_receipt
 
 
 FORMAT = "execution-workspace/v1"
-DSH_VERSION = "0.2.0-rc.2"
+DSH_VERSION = "0.2.1-rc.2"
 STATUSES = {
     "created",
     "starting",

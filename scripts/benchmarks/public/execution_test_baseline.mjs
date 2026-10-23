@@ -101,7 +101,7 @@ async function configure(config) {
     },
   });
   await harness.start();
-  emit("ready", { version: "0.2.0-rc.2" });
+  emit("ready", { version: "0.2.1-rc.2" });
 }
 async function run(payload) {
   if (!harness || running || closing) throw new Error("Not ready");

@@ -510,7 +510,7 @@ def main():
         "kind": KIND,
         "synthetic_only": True,
         "model": settings["MEDAGENT_LLM_MODEL"],
-        "dsh_version": "0.2.0-rc.2",
+        "dsh_version": "0.2.1-rc.2",
         "repetitions": args.repetitions,
         "order_seed": args.order_seed,
         "maximum_calls": args.max_total_calls,

@@ -1113,7 +1113,7 @@ async function setup(payload) {
   watchTimer = setInterval(() => inspect().catch(() => {}), 700);
   emit("ready", {
     runtime: "dsh-sdk",
-    version: "0.2.0-rc.2",
+    version: "0.2.1-rc.2",
     isolation:
       process.platform === "win32"
         ? "windows-processcontainer"

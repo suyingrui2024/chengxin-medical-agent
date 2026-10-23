@@ -1281,7 +1281,7 @@ class ExecutionSession:
                 if self.project_path is not None
                 else "managed",
                 "runtime": "dsh-sdk",
-                "dsh_version": "0.2.0-rc.2",
+                "dsh_version": "0.2.1-rc.2",
                 "model": self.public_model,
                 "status": self.status,
                 "turn_id": self.turn_id,

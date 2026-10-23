@@ -63,7 +63,7 @@ def build_runtime(event_path: Optional[Path] = None, backend: Optional[str] = No
                          DshBackend(kwargs["events"], Path(__file__).resolve().parents[2], settings))
             engine = AdaptiveConsultationEngine(**kwargs, backend=transport)
         engine.runtime_descriptor = {"adapter": mode, "model": settings.get("MEDAGENT_LLM_MODEL", "") if mode != "demo" else "",
-                                     "dsh_version": "0.2.0-rc.2" if mode == "dsh" else None}
+                                     "dsh_version": "0.2.1-rc.2" if mode == "dsh" else None}
         return engine
 
     plugins = [

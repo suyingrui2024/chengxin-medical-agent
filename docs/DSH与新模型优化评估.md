@@ -48,43 +48,49 @@
    与官方前缀缓存机制天然对齐，缓存命中已在事件中观测；`deepseek-flash`
    预设与视觉回退仍指向现行模型（含视觉能力，与 Pro 无视觉的事实一致）。
 
-## 三、明确未做的两项（及理由）
+## 三、明确未做的一项（及理由）
 
 - **原生工具调用 / strict 模式 / Responses API 的 json_schema 强约束**：
   本仓的「单 JSON 决策信封 + Python 侧证据校验」是有意的约束设计
   （K 契约与审计链建立其上）。迁移属架构级变更，须先有设计文档与
   live 评测对照，不在本批范围。
-- **DSH 0.2.0-rc.2 → 0.2.1-rc.2 盲升**：见下节清单。本仓 README 的升级
-  纪律是「CLI/SDK/协议包/锁文件同升 + 重跑真实集成测试」；当前环境
-  （本 VM）无法完成该验证（见清单第 4 条），故不升。
 
-## 四、DSH 0.2.1 升级评估清单（待具备验证环境时执行）
+## 四、DSH 0.2.1 升级记录（2026-10-23 已执行，用户追问后实证推进）
 
-1. **依赖面**：三个直接依赖同升 0.2.1-rc.2 并重生成锁文件；注意 0.2 起
-   `dsh-sdk-client`/`dsh-sdk-protocol` 已非上游公开依赖——先核对 0.2.1 的
-   包结构再定本仓依赖声明形态。
-2. **未声明的传递依赖（最大隐患）**：以下 import 不在本仓 package.json
-   声明中、只靠 rc.2 依赖树 hoisting 解析，升级前逐项核对在 0.2.1 树中
-   是否仍存在/改名：`@deepseek-ai/dsh-tools`、`dsh-sdk-jsonrpc-server`、
-   `dsh-brand`、`dsh-web-search-deepseek`、`dsh-bash-sandbox`、
-   `dsh-bash-local`（execution-*.mjs、execution-sdk.mjs、powershell-executor）。
-3. **API 表面复核**：`DeepSeekHarness` 构造选项（bridge.mjs /
-   execution-worker.mjs 两处拼装）、`harness.run()` 返回形态
-   `{finalResponse, events}`、事件用量字段
-   （`assistant/message` 的 `data.usage.{inputTokens,cacheReadTokens,
-   cacheWriteTokens}` 为 backends.py 直接消费）、CLI 路径
-   `lib/bin.js` 与旗标 `--profile/--patch/--dump-config`、profile 名
-   `sdk-minimal`/`sdk` 与两份 patch.yml 的 schema。
-4. **验证环境要求**：`npm ci` 可完整执行的机器（本 VM 有 EPERM 已知问题）、
-   bubblewrap（Linux 隔离）或 Windows ProcessContainer、
-   `/opt/medical-agent` 部署布局；随后跑 `npm run dsh:check` +
-   `RUN_DSH_EXECUTION=1` 的执行集成测试全集 + 问诊 live 评测。
-5. **顺带收益**：0.2.1 适配 V4.1-Flash-1017（模型侧已为 Harness 专项
-   优化）、新增 DeepSeek Search/Fetch API 支持（注意 2026-11-01 起计费）、
-   alpha 线已出现每模型推理等级配置（与本仓桥的 reasoningEffort 透传
-   方向一致，升级后复核字段名是否变化）。
-6. **版本标注同步**：`runtime.py` 的 runtime_descriptor `dsh_version`
-   与 package.json 保持一致（当前同为 0.2.0-rc.2）。
+初版评估曾以「本 VM 无法完成真实集成验证」为由暂缓。复核后发现验证面
+其实可分层推进（注册表 → 隔离副本 → 基线对照），遂按下列路径完成升级：
+
+1. **注册表探针**：三个直接依赖与全部传递包在 npm 上均有 0.2.1-rc.2
+   （dist-tag `latest` 仍指 0.2.1-rc.2；`next` 已有 rc.3，未跟进未发布版）。
+2. **整树原子升级**：@deepseek-ai 树内包以精确版本互为 peer 依赖，增量
+   解析必然冲突（ERESOLVE 实测）；做法为全新解析生成锁文件——全树
+   dsh-* 统一落 0.2.1-rc.2，非 DSH 工具链（electron 44.7.2 /
+   @playwright/test 1.64.1 / prettier 3.9.10）版本未动，其余为 DSH 闭包
+   内的传递小版本漂移（80 包，以 @aws-sdk/@anthropic-ai/sdk 补丁号为主）。
+3. **未声明依赖已正式声明**：`@deepseek-ai/dsh-tools`、
+   `dsh-sdk-jsonrpc-server`、`dsh-brand`、`dsh-web-search-deepseek`、
+   `dsh-bash-sandbox`、`dsh-bash-local` 六个此前只靠 hoisting 解析的
+   import 已写入 package.json dependencies（同为 0.2.1-rc.2）。
+4. **唯一的行为适配——medical.patch.yml**：0.2.1 的 sdk-minimal 画像
+   新增了文件系统面（filesystem / attachment-local / tool-fs /
+   working-directory / tool-working-directory 五个插件默认启用），与医疗
+   桥「无宿主能力」契约冲突（dsh:check 的禁用断言首先抓到 tool-fs 与
+   tool-working-directory）。补丁已将五者全部禁用，恢复 0.2.0 的能力
+   姿态；0.2.1 同时移除了 invariants 插件族（上游画像变更，非补丁可控，
+   记录在案）。execution.patch.yml 语义经 check 全量断言未受影响。
+5. **版本标注同步**：runtime.py / execution.py / execution_store.py
+   （DSH_VERSION）/ execution-worker.mjs / 两个 benchmark 脚本与基线，
+   与 package.json 同步为 0.2.1-rc.2。
+6. **验证证据（本 VM 内可达的全部层级，基线对照）**：生产依赖树可完整
+   物化；`npm run dsh:check` 通过（0.2.0 基线同样通过，属真回归门）；
+   integrations 节点测试 60/60（与 0.2.0 基线一致）；桌面凭据测试 3/3；
+   全量 pytest 489 passed；发布门 PASS；8 个直接 import 说明符全部可
+   解析且 `DeepSeekHarness` 导出存在。
+7. **仍未验证（如实标注）**：① 带真实模型密钥的桥决策 E2E（本环境无
+   密钥）；② `RUN_DSH_EXECUTION=1` 执行集成套件（需 bubblewrap 或
+   Windows ProcessContainer 与 /opt/medical-agent 布局，本 VM 不具备；
+   该套件在 0.2.0 时代同样从未在此环境跑过）。这两项需在用户 Mac 或
+   后续 CI 改造中补跑，升级提交说明中已注明。
 
 ## 五、运营提示
 

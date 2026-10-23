@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "main": "desktop/main.cjs",
-  "productName": "知微",
+  "productName": "\u77e5\u5fae",
   "scripts": {
     "start": "electron .",
     "desktop:setup": "node node_modules/electron/install.js",
@@ -25,9 +25,15 @@
     "test:appearance": "playwright test tests/ui/appearance.spec.mjs"
   },
   "dependencies": {
-    "@deepseek-ai/dsh": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-sdk-client": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-sdk-protocol": "0.2.0-rc.2",
+    "@deepseek-ai/dsh": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-bash-local": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-bash-sandbox": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-brand": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-sdk-client": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-sdk-jsonrpc-server": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-sdk-protocol": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-web-search-deepseek": "0.2.1-rc.2",
     "js-yaml": "4.3.2"
   },
   "engines": {

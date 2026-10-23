@@ -22,3 +22,17 @@
     includeHarnessIdentity: false
     includeRuntimeContext: false
     personaPrefix: 'You are the medical-agent decision transport. Follow the enclosed medical coordinator instructions. Return exactly one JSON tool proposal, never execute host commands.'
+# SDK 0.2.1 added a filesystem surface to the sdk-minimal profile
+# (fs-local, attachment-local, tool-fs, working-directory). The medical
+# bridge contract is "no model-facing host capabilities" — disable the
+# whole surface and restore the 0.2.0 capability posture.
+- id: filesystem
+  disabled: true
+- id: attachment-local
+  disabled: true
+- id: tool-fs
+  disabled: true
+- id: working-directory
+  disabled: true
+- id: tool-working-directory
+  disabled: true
