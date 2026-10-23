@@ -17,7 +17,12 @@ ALLOWED = {
     "MEDAGENT_DSH_REVIEW_MODE",
     "MEDAGENT_WEB_TOOLS",
     "MEDAGENT_SUBAGENT_MODE",
-    "MEDAGENT_SUBAGENT_MODEL",
+    # 注意：故意没有 MEDAGENT_SUBAGENT_MODEL。子智能体经
+    # SubagentCoordinator 调用的是父引擎同一个已构造的 backend
+    # （decide_cancellable 无逐调用模型参数，模型在后端构造时由
+    # MEDAGENT_LLM_MODEL 定死），没有可单独覆盖的接缝；曾收录该
+    # 变量只会造成「设了却不生效」的假象，故移除。子智能体模型
+    # 随父后端，如需更换请改 MEDAGENT_LLM_MODEL。
     "MEDAGENT_SUBAGENT_WEB",
     "MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP",
 }

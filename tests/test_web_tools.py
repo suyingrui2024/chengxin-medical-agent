@@ -247,6 +247,26 @@ def test_daily_cap_blocks_third_call(monkeypatch):
     assert tools.fetch("https://www.who.int/a")["status"] == "daily_budget_exceeded"
 
 
+def test_daily_cap_claim_is_atomic_under_concurrency():
+    # 同一 WebTools 实例被教育层线程与子智能体线程池共用：并发 claim
+    # 时检查+自增必须原子，放行数恰好等于上限，多一个都不行。
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    tools = WebTools(EventStore(), daily_cap=50)
+    workers = 16
+    barrier = Barrier(workers)
+
+    def claim(_):
+        barrier.wait()  # 每波 16 个线程同时起跑，最大化争用
+        return tools._claim_daily("search")
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(claim, range(workers * 12)))
+    assert sum(results) == 50
+    assert tools._day_count == 50
+
+
 # ---------------------------------------------------------------------------
 # fetch（monkeypatch _http_get 与 getaddrinfo）
 # ---------------------------------------------------------------------------
@@ -296,6 +316,22 @@ def test_fetch_ok_extracts_text_title_and_sha(monkeypatch):
     completed = [e for e in events.for_session("web-tools") if e.event_type == "web.fetch_completed"]
     assert completed and completed[-1].payload["domain"] == "www.who.int"
     assert completed[-1].payload["tier"] == "T1"
+
+
+def test_fetch_completed_event_carries_caller(monkeypatch):
+    def http_get(url, timeout):
+        return 200, {"Content-Type": "text/plain"}, "正文".encode()
+
+    events = EventStore()
+    tools = _fetch_tools(monkeypatch, http_get, events=events)
+    tools.fetch("https://www.who.int/a")
+    tools.fetch("https://www.who.int/b", caller="subagent")
+    callers = [
+        e.payload.get("caller")
+        for e in events.for_session("web-tools")
+        if e.event_type == "web.fetch_completed"
+    ]
+    assert callers == ["education", "subagent"]
 
 
 def test_fetch_blocks_private_resolution_as_ssrf(monkeypatch):

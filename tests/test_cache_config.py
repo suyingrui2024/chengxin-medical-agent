@@ -85,6 +85,22 @@ class CacheConfigTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "MEDAGENT_DSH_REVIEW_MODE"):
                 read_env(path)
 
+    def test_env_ignores_removed_subagent_model_setting(self):
+        # 子智能体与父引擎共用同一个 backend，模型由 MEDAGENT_LLM_MODEL
+        # 在后端构造时定死，没有独立覆盖接缝；MEDAGENT_SUBAGENT_MODEL
+        # 已从 ALLOWED 移除，.env 里写了也只是被忽略，不得悄悄生效。
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / ".env"
+            path.write_text(
+                "MEDAGENT_LLM_BASE_URL=https://api.deepseek.com\n"
+                "MEDAGENT_LLM_MODEL=fixture\n"
+                "MEDAGENT_LLM_API_KEY=fixture-key\n"
+                "MEDAGENT_SUBAGENT_MODEL=some-other-model\n"
+            )
+            settings = read_env(path)
+            self.assertNotIn("MEDAGENT_SUBAGENT_MODEL", settings)
+            self.assertEqual(settings["MEDAGENT_LLM_MODEL"], "fixture")
+
     def test_dsh_counts_disjoint_cache_tokens_without_double_counting(self):
         usage = dsh_usage(
             [

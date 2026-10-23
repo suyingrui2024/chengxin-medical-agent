@@ -4,13 +4,16 @@ A stub backend scripts the sub-model's envelopes; timing is controlled
 through threading events, never sleeps.
 """
 import json
+import socket
 import unittest
+from unittest import mock
 
 from medagent.decision_wait import DecisionInterrupted
 from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.events import Event, EventStore
 from medagent.reasoning import Hypothesis, ReasoningWorkspace
 from medagent.subagents import KINDS, SubagentCoordinator, watermark
+from medagent.web_tools import WebTools
 
 
 CHIEF_EVIDENCE = "我咳嗽三天了，还有点嗓子疼"
@@ -438,6 +441,97 @@ class SubagentCoordinatorTests(unittest.TestCase):
         self.assertEqual(usage["output_tokens"], 20)
         self.assertEqual(usage["total_tokens"], 120)
         self.assertEqual(result["usage_total"]["total_tokens"], 120)
+
+    def test_web_tools_called_with_subagent_caller(self):
+        # 子智能体经 WebTools 联网时，遥测必须归因 caller="subagent"，
+        # 不能默认记成教育层的 "education"（search 与 fetch 两条路径）。
+        events = EventStore()
+        document = {
+            "content": [
+                {
+                    "type": "web_search_tool_result",
+                    "content": [
+                        {
+                            "type": "web_search_result",
+                            "url": "https://www.who.int/zh/fact",
+                            "title": "WHO 流感说明",
+                        }
+                    ],
+                }
+            ]
+        }
+
+        def transport(method, url, headers, body, timeout):
+            return (
+                200,
+                {"Content-Type": "application/json"},
+                json.dumps(document).encode(),
+            )
+
+        tools = WebTools(events, api_key="<redacted>", transport=transport)
+        tools._http_get = lambda url, timeout: (
+            200,
+            {"Content-Type": "text/plain; charset=utf-8"},
+            "流感防治要点：多休息、多喝水。".encode(),
+        )
+        steps = {"n": 0}
+
+        def handler(sid, messages, cancelled):
+            steps["n"] += 1
+            if steps["n"] == 1:
+                return {
+                    "tool": "web_search",
+                    "arguments": {"query": "流感 防治", "purpose": "guideline_check"},
+                }
+            if steps["n"] == 2:
+                return {
+                    "tool": "web_fetch",
+                    "arguments": {"url": "https://www.who.int/zh/fact"},
+                }
+            return report(
+                findings=[
+                    {
+                        "claim": "页面给出流感防治要点",
+                        "evidence": [
+                            {
+                                "source_type": "web",
+                                "quote": "流感防治要点",
+                                "ref": "https://www.who.int/zh/fact",
+                            }
+                        ],
+                        "confidence": "medium",
+                    }
+                ]
+            )
+
+        backend = StubBackend(handler)
+        coord = coordinator(
+            backend, events, web_enabled=True, web_tools=tools
+        )
+        state = make_state()
+        public_addr = [
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 443))
+        ]
+        with mock.patch.object(socket, "getaddrinfo", lambda *a, **k: public_addr):
+            result = coord.run_spawn(
+                state,
+                spawn_proposal(
+                    scope={"fact_keys": ["chief_complaint"]},
+                    tools=["web_search", "web_fetch"],
+                ),
+                session_id=state.session_id,
+            )
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["branches"][0]["status"], "completed")
+        web_events = events.for_session("web-tools")
+        for event_type in (
+            "web.search_requested",
+            "web.search_completed",
+            "web.fetch_completed",
+        ):
+            payloads = [e.payload for e in web_events if e.event_type == event_type]
+            self.assertTrue(payloads, event_type)
+            self.assertEqual(payloads[0].get("caller"), "subagent", event_type)
 
     def test_mode_off_is_disabled(self):
         events = EventStore()

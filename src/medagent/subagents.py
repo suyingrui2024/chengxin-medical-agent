@@ -1156,10 +1156,11 @@ class SubagentCoordinator:
                     value = self.web_tools.search(
                         str(arguments.get("query", "")),
                         purpose=str(arguments.get("purpose", "guideline_check")),
+                        caller="subagent",
                     )
                     return {"ok": True, "tool": tool, "result": value}
                 url = str(arguments.get("url", ""))
-                value = self.web_tools.fetch(url)
+                value = self.web_tools.fetch(url, caller="subagent")
                 text = (
                     value.get("content", "")
                     if isinstance(value, dict)

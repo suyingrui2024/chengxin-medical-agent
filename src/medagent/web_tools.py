@@ -28,6 +28,7 @@ import socket
 from datetime import datetime
 from html.parser import HTMLParser
 from importlib import resources
+from threading import Lock
 from time import perf_counter
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib import request
@@ -374,6 +375,9 @@ class WebTools:
         self._now = now or (lambda: datetime.now().astimezone())
         self._day_key: Optional[Any] = None
         self._day_count = 0
+        # 同一实例被教育层线程与子智能体线程池共用：日熔断的
+        # 检查+自增必须在锁内完成，否则并发下会超额放行。
+        self._daily_lock = Lock()
 
     # -- 内部工具 ------------------------------------------------------
 
@@ -383,15 +387,16 @@ class WebTools:
 
     def _claim_daily(self, op: str) -> bool:
         """日熔断（设计 §4.5）：search+fetch 合计，进程内按自然日计数。"""
-        today = self._now().date()
-        if today != self._day_key:
-            self._day_key = today
-            self._day_count = 0
-        if self._day_count >= self.daily_cap:
-            self._emit("web.blocked", {"reason": "daily_cap", "op": op})
-            return False
-        self._day_count += 1
-        return True
+        with self._daily_lock:
+            today = self._now().date()
+            if today != self._day_key:
+                self._day_key = today
+                self._day_count = 0
+            if self._day_count >= self.daily_cap:
+                self._emit("web.blocked", {"reason": "daily_cap", "op": op})
+                return False
+            self._day_count += 1
+            return True
 
     def _fetched_at(self) -> str:
         return self._now().isoformat(timespec="seconds")
@@ -551,7 +556,9 @@ class WebTools:
 
     # -- fetch ---------------------------------------------------------
 
-    def fetch(self, url: str, *, max_chars: int = 8000) -> Dict[str, Any]:
+    def fetch(
+        self, url: str, *, max_chars: int = 8000, caller: str = "education"
+    ) -> Dict[str, Any]:
         """自研抓取：全量安全校验（设计 §4.2/§6 红线 2），失败也落事件。"""
         result: Dict[str, Any] = {
             "url": url,
@@ -598,6 +605,7 @@ class WebTools:
                 "tier": result["tier"],
                 "injection_suspect": result["injection_suspect"],
                 "status": result["status"],
+                "caller": caller,
             },
         )
         return result
