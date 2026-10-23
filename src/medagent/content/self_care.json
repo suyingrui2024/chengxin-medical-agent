@@ -321,5 +321,51 @@
     }
   ],
   "note": "Self-care content for the conclusion sheet (docs/问诊结论单设计文档.md §5.5). Engineering v1: generic and respiratory/chest groups written against the same risk bar as the already-live care-route copy; every group carries review metadata and pathway-specific groups require clinician review before the directions layer opens to patients (phase B). Groups are matched by (match, tier): match is a pathway group key derived from the accepted hypothesis workspace, or 'generic'. Entries with empty reviewed_by are treated as absent at runtime.",
-  "version": "1.0"
+  "return_now_if": {
+    "reviewed_at": "2026-10-23",
+    "reviewed_by": "engineering-v1",
+    "by_pathway": {
+      "respiratory": [
+        "呼吸困难加重",
+        "嘴唇发紫",
+        "高热不退"
+      ],
+      "chest": [
+        "出冷汗",
+        "疼痛放射到下颌或手臂",
+        "呼吸困难"
+      ],
+      "abdominal": [
+        "腹痛迅速加重",
+        "高热",
+        "呕血或大便发黑"
+      ],
+      "headache": [
+        "意识改变",
+        "喷射样呕吐",
+        "肢体无力",
+        "突发有生以来最剧烈的头痛"
+      ],
+      "dizziness": [
+        "言语不清",
+        "肢体无力新出现",
+        "走路不稳明显加重"
+      ],
+      "back": [
+        "大小便异常",
+        "会阴麻木新出现或加重",
+        "下肢无力加重"
+      ],
+      "urinary": [
+        "腰痛伴高热",
+        "完全尿不出"
+      ],
+      "skin": [
+        "口唇或舌头肿",
+        "呼吸不畅",
+        "皮疹迅速扩散伴发热"
+      ]
+    }
+  },
+  "version": "1.1"
 }

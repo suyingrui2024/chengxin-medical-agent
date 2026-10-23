@@ -24,8 +24,10 @@ from .followups import build_follow_up_plan
 from .reasoning import RuleBasedProposer, validate_workspace
 
 # Same list as consultation._summary_payload's return_now_if; a drift-guard
-# test asserts the two never diverge (the summary remains the source the
-# composer prefers when a summary payload is at hand).
+# test asserts the two never diverge. It is the composer's fallback: when
+# the case has an active pathway, the pathway-specific list from
+# self_care.json (return_now_if.by_pathway) wins; then the summary
+# payload's list; then this constant.
 RETURN_NOW_IF = [
     "意识异常或抽搐",
     "严重呼吸困难或嘴唇发紫",
@@ -150,6 +152,51 @@ def _self_care_group(group_key: str, tier: str) -> Optional[Dict[str, Any]]:
             ):
                 return group
     return None
+
+
+# Detail fact key -> pathway group, for the safety-net fallback below.
+DETAIL_FACT_GROUPS = {
+    "resp_cough_details": "respiratory",
+    "resp_breathing": "respiratory",
+    "gi_details": "abdominal",
+    "head_details": "headache",
+    "dizzy_details": "dizziness",
+    "back_details": "back",
+    "urinary_details": "urinary",
+    "skin_details": "skin",
+}
+
+
+def _explored_pathway_group(state: CaseState) -> Optional[str]:
+    """Pathway group of the first detail fact actually collected.
+
+    When the sheet abstains on directions there is no hypothesis to key
+    the safety net on, but the consultation still explored a pathway —
+    its warning signs are the relevant ones (live-eval run3 case3: a
+    fatigue + abdominal case with empty directions was spoken the
+    generic neuro warnings). Fact insertion order follows collection
+    order, so the primary pathway's detail field normally comes first;
+    later screening probes of other pathways do not override it.
+    """
+    for key in state.facts:
+        group = DETAIL_FACT_GROUPS.get(key)
+        if group is not None:
+            return group
+    return None
+
+
+def _pathway_return_now_if(group_key: str) -> List[str]:
+    """Pathway-specific safety-net list from self_care.json.
+
+    Keyed by the same pathway group keys as PATHWAY_GROUPS / the
+    self-care groups. Like the groups themselves, the data counts as
+    absent unless it carries review metadata (content note convention).
+    """
+    data = _load_json("self_care.json").get("return_now_if") or {}
+    if not data.get("reviewed_by"):
+        return []
+    items = (data.get("by_pathway") or {}).get(group_key) or []
+    return [str(item) for item in items if str(item).strip()]
 
 
 def _certainty(hypothesis, group: str) -> str:
@@ -357,6 +404,12 @@ def compose_conclusion(
             group_key = PATHWAY_GROUPS[hid]
             break
     care = _self_care_group(group_key, tier) or {}
+    # The safety net keys on the explored pathway when directions abstain
+    # (self-care content deliberately does not: it stays generic rather
+    # than borrowing a non-displayed hypothesis's care group).
+    alert_group = group_key
+    if alert_group == "generic":
+        alert_group = _explored_pathway_group(state) or "generic"
     subject = state.facts.get("consult_for")
     previous = state.conclusion or {}
     sheet = {
@@ -377,7 +430,9 @@ def compose_conclusion(
             "measure": list(care.get("measure", [])),
         },
         "return_now_if": list(
-            (summary or {}).get("return_now_if") or RETURN_NOW_IF
+            _pathway_return_now_if(alert_group)
+            or (summary or {}).get("return_now_if")
+            or RETURN_NOW_IF
         ),
         "outlook": care.get("course"),
         "follow_up": (
@@ -401,3 +456,82 @@ def compose_conclusion(
     if any(phrase in rendered for phrase in BANNED_PHRASES):
         raise ValueError("conclusion sheet failed the banned-phrase lint")
     return sheet
+
+
+def spoken_close_line(conclusion: Optional[Dict[str, Any]]) -> str:
+    """One or two plain-language closing sentences derived from a sheet.
+
+    The sheet itself renders as a card; this line is what the closing
+    chat message can *say* out loud: the disposition first, then the
+    single most important return_now_if alert. Returns "" when there is
+    no usable sheet. Fail-closed: a banned phrase anywhere in the
+    assembled line voids it, same as the sheet lint.
+    """
+    if not conclusion:
+        return ""
+    disposition = conclusion.get("disposition") or {}
+    level = disposition.get("level")
+    if not level:
+        return ""
+    window = disposition.get("window_hours")
+    if level == "urgent_today":
+        main = "建议今天内到线下医疗机构当面评估，不要在家观察等待。"
+    elif level == "routine_visit" and window:
+        main = f"可以在家先观察；请在 {window} 小时内到线下医疗机构就诊评估。"
+    elif level == "routine_visit":
+        main = "可以在家先观察；请尽快到线下医疗机构就诊评估。"
+    elif level == "self_care":
+        main = "可以先在家观察，暂时不需要专门跑一趟医院。"
+    else:
+        text = str(disposition.get("text") or "").strip()
+        if not text:
+            return ""
+        main = text if text.endswith(("。", "！", "？")) else text + "。"
+    alerts = [
+        str(item).strip()
+        for item in (conclusion.get("return_now_if") or [])
+        if str(item).strip()
+    ]
+    line = main
+    if alerts:
+        line += f"如果出现{alerts[0]}，请及时就医；情况紧急时请拨打 120。"
+    if any(phrase in line for phrase in BANNED_PHRASES):
+        return ""
+    return line
+
+
+def emergency_explanation(triggers) -> str:
+    """Patient-facing explanation line for an emergency close.
+
+    ``triggers`` are the deterministic scanner's trigger names (plain
+    patient-facing strings, as stored on RiskAssessment.triggers); dicts
+    carrying a patient-facing label are also accepted defensively. The
+    line names the danger category, tells the patient to call 120 now,
+    and gives waiting guidance. Fail-closed on the banned-phrase lint:
+    if a trigger name somehow trips it, the names are dropped rather
+    than the whole explanation.
+    """
+    names: List[str] = []
+    for trigger in triggers or []:
+        text = ""
+        if isinstance(trigger, str):
+            text = trigger.strip()
+        elif isinstance(trigger, dict):
+            for key in ("patient_text", "label", "description", "name", "id"):
+                value = trigger.get(key)
+                if isinstance(value, str) and value.strip():
+                    text = value.strip()
+                    break
+        if text and text not in names:
+            names.append(text)
+    guidance = "请现在拨打 120，等待时保持安静休息，不要自行开车，有家人陪同更好。"
+    if names:
+        line = (
+            "你描述的情况包含需要立即处理的危险信号（"
+            + "、".join(names[:3])
+            + "）。"
+            + guidance
+        )
+        if not any(phrase in line for phrase in BANNED_PHRASES):
+            return line
+    return "你描述的情况包含需要立即处理的危险信号。" + guidance

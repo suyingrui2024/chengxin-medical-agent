@@ -3,11 +3,13 @@ serialization through both engines, emergency exclusion, abstention, and
 the return_now_if drift guard against the summary payload."""
 from __future__ import annotations
 
+import os
 import unittest
+from unittest import mock
 
 from medagent import conclusion as conclusion_module
 from medagent.agent import AdaptiveConsultationEngine
-from medagent.conclusion import compose_conclusion
+from medagent.conclusion import compose_conclusion, spoken_close_line
 from medagent.consultation import UserInput
 from medagent.domain import (
     Assertion,
@@ -207,6 +209,7 @@ class DeterministicConclusionTests(unittest.TestCase):
 
     def test_urgent_close_sheet_is_urgent_tier(self):
         self._answer("我自己", "self")
+        self._answer("男", "male")
         self._answer("32岁")
         self._answer("咳嗽发烧两天")
         self._answer("都没有", "no")
@@ -225,6 +228,63 @@ class DeterministicConclusionTests(unittest.TestCase):
         self.assertEqual(reply.kind, "emergency")
         self.assertIsNone(reply.conclusion)
         self.assertFalse(self.state.conclusion)
+
+    def test_confirmed_close_speaks_disposition_before_boilerplate(self):
+        self._to_summary()
+        final = self._answer("确认", "confirm_summary")
+        self.assertEqual(final.kind, "closed")
+        line = spoken_close_line(final.conclusion)
+        self.assertTrue(line)
+        # The spoken disposition (with its first safety-net alert) leads;
+        # the administrative boilerplate is preserved verbatim after it.
+        self.assertEqual(
+            final.message,
+            line + "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
+        )
+        sheet = final.conclusion
+        self.assertIn(f"{sheet['disposition']['window_hours']} 小时内", final.message)
+        self.assertIn(sheet["return_now_if"][0], final.message)
+        # The recorded transcript carries the spoken line too, so a replay
+        # of the chat shows the same closing the patient saw.
+        self.assertEqual(self.state.transcript[-1]["content"], final.message)
+
+    def test_confirmed_close_without_sheet_keeps_plain_boilerplate(self):
+        with mock.patch.dict(os.environ, {"MEDAGENT_CONCLUSION_SHEET": "off"}):
+            self._to_summary()
+            final = self._answer("确认", "confirm_summary")
+        self.assertEqual(final.kind, "closed")
+        self.assertIsNone(final.conclusion)
+        self.assertEqual(
+            final.message,
+            "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
+        )
+
+    def test_post_close_reply_does_not_repeat_spoken_line(self):
+        self._to_summary()
+        self._answer("确认", "confirm_summary")
+        guard = self._answer("还在吗")
+        self.assertEqual(guard.kind, "closed")
+        self.assertEqual(
+            guard.message,
+            "这次问诊已经结束。如情况有变化，请开始一次新的问诊；出现紧急情况请立即拨打 120。",
+        )
+
+    def test_emergency_close_names_signal_and_gives_waiting_guidance(self):
+        self._answer("我自己", "self")
+        reply = self._answer("他现在叫不醒")
+        self.assertEqual(reply.kind, "emergency")
+        self.assertTrue(self.state.risk.triggers)
+        for trigger in self.state.risk.triggers:
+            self.assertIn(trigger, reply.message)
+        self.assertIn("请现在拨打 120", reply.message)
+        self.assertEqual(reply.message.count("拨打 120"), 1)
+        self.assertIn("保持安静休息", reply.message)
+        self.assertIn("不要自行开车", reply.message)
+        self.assertIn("陪同", reply.message)
+        self.assertTrue(reply.message.endswith("不要继续等待本次对话。"))
+        self.assertEqual(
+            reply.summary["triggers"], sorted(set(self.state.risk.triggers))
+        )
 
 
 def _fact(key, value, evidence, assertion="present"):
