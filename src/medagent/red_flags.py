@@ -2,8 +2,10 @@
 
 Layer model (design doc §4.2):
 - ``rule_phrase``: exact phrase matching with the historical prefix-window
-  negation check. This is the deterministic floor and its behaviour is
-  preserved bit-for-bit from the original ``triage.py`` implementation.
+  negation check. This is the deterministic floor; its behaviour matches
+  the original ``triage.py`` implementation except that 、 (enumeration
+  comma) counts as a clause separator, so each item of a symptom list is
+  its own clause.
 - ``semantic_pattern``: curated paraphrase regexes per red flag, guarded by
   clause-scoped negation suppression.
 - ``semantic_combo``: location x signal co-occurrence within a window
@@ -27,12 +29,13 @@ from typing import List, Optional, Protocol, Tuple
 
 NEGATIONS = ("没有", "无", "否认", "不是", "未出现", "不伴")
 
-_SEPARATORS = re.compile(r"[，。！？；,;!?\n]|但是|但|不过|现在")
+_SEPARATORS = re.compile(r"[，。、！？；,;!?\n]|但是|但|不过|现在")
 
 
 def phrase_not_negated(text: str, start: int) -> bool:
     """Historical check: negation token in the last 6 chars of the clause
-    prefix immediately before ``start``. Preserved exactly."""
+    prefix immediately before ``start``. Preserved exactly (the clause
+    split now also treats 、 as a boundary; see module docstring)."""
     prefix = _SEPARATORS.split(text[:start])[-1][-6:]
     return not any(token in prefix for token in NEGATIONS)
 
@@ -50,6 +53,50 @@ def span_not_negated(text: str, start: int, end: int) -> bool:
     suppresses the hit (e.g. 嘴唇没有发紫, 否认胸痛)."""
     window = text[_clause_start(text, start):end]
     return not any(token in window for token in NEGATIONS)
+
+
+_SENTENCE_BREAK = re.compile(r"[。！？.!?\n；;]")
+
+# Trailing enumeration denial. Chinese symptom lists put the negation
+# *after* the items ("发烧、腰痛、呕吐、尿血这些都没有"), where neither
+# the prefix check nor the clause window (both look backwards) can see it.
+# A hit counts as denied when everything between the end of the hit and
+# the end of the sentence is only further list items (each led by 、 or
+# ，) plus the denial scaffold itself: optional 这些/那些/以上/这几项 +
+# optional 都/全都 + 没有/未出现/没/无 + optional 了/的. Deliberately
+# strict — any residual content word defeats the suppression, so true
+# positives such as 咳血，没有停 or 呕血没有止住 survive.
+#
+# Range-word exception: an item led by 其他/别的/其余/其它 scopes the
+# denial to symptoms *other than* the ones already stated, so it never
+# reaches back to an affirmed hit before it ("吐血，其他症状都没有"
+# affirms the bleeding and denies only the rest). Recall-first: any
+# range word in the trailing text defeats the suppression outright.
+_TRAILING_DENIAL = re.compile(
+    r"^(?:[、，][^，。；;、！？!?\n]{1,12}){0,6}"
+    r"[、，]?"
+    r"(?:这些|那些|以上|这几项|这几个|上述)?"
+    r"(?:都|全都|全)?"
+    r"(?:没有|未出现|没|无)"
+    r"(?:了|的)?"
+    r"[\s，。；;、！？!?]*$"
+)
+
+
+_RANGE_WORDS = ("其他", "别的", "其余", "其它")
+
+
+def span_trailing_denied(text: str, end: int) -> bool:
+    """True when a hit ending at ``end`` is denied by a trailing
+    enumeration denial later in the same sentence (see _TRAILING_DENIAL).
+    A range word （其他/别的/其余/其它） anywhere in the trailing text
+    scopes the denial away from this hit and defeats the suppression."""
+    rest = _SENTENCE_BREAK.split(text[end:], maxsplit=1)[0]
+    if not rest:
+        return False
+    if any(word in rest for word in _RANGE_WORDS):
+        return False
+    return _TRAILING_DENIAL.match(rest) is not None
 
 
 @dataclass(frozen=True)
@@ -144,7 +191,9 @@ class RedFlagScanner:
     def _phrase_hit(self, definition: RedFlagDefinition, text: str) -> Optional[FlagHit]:
         for phrase in definition.phrases:
             for match in re.finditer(re.escape(phrase), text):
-                if phrase_not_negated(text, match.start()):
+                if phrase_not_negated(text, match.start()) and not span_trailing_denied(
+                    text, match.end()
+                ):
                     return FlagHit(definition.id, definition.label, "rule_phrase", phrase)
         return None
 
@@ -156,10 +205,17 @@ class RedFlagScanner:
             for match in pattern.finditer(text):
                 if pattern.pattern in exempt:
                     # Negation inside the match is the symptom itself; only
-                    # a negation earlier in the clause suppresses.
+                    # a negation earlier in the clause suppresses — plus a
+                    # trailing enumeration denial after the match, which
+                    # denies the match from outside itself
+                    # (叫不醒、抽搐、…这些都没有).
                     if not phrase_not_negated(text, match.start()):
                         continue
-                elif not span_not_negated(text, match.start(), match.end()):
+                    if span_trailing_denied(text, match.end()):
+                        continue
+                elif not span_not_negated(
+                    text, match.start(), match.end()
+                ) or span_trailing_denied(text, match.end()):
                     continue
                 return FlagHit(
                     definition.id, definition.label, "semantic_pattern", match.group(0)
@@ -203,6 +259,8 @@ class RedFlagScanner:
         if best is None:
             return None
         if not span_not_negated(text, best[0], best[1]):
+            return None
+        if span_trailing_denied(text, best[1]):
             return None
         return FlagHit(definition.id, definition.label, "semantic_combo", text[best[0]:best[1]])
 
