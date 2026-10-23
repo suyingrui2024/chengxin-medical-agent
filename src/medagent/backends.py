@@ -1,16 +1,19 @@
 """Replaceable decision transports. No transport can mutate the clinical state."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
 import signal
+from http.client import HTTPException
 from threading import Lock
 from pathlib import Path
-from typing import Any, Dict, List, Protocol
+from typing import Any, Dict, List, Optional, Protocol
 from urllib import request
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
-from time import perf_counter, monotonic
+from time import perf_counter, monotonic, sleep
 from tempfile import TemporaryDirectory
 
 from .events import Event, EventStore
@@ -22,6 +25,64 @@ class DecisionBackend(Protocol):
 
     def decide(self, session_id: str, messages: List[Dict[str, str]]) -> Dict[str, Any]:
         ...
+
+
+def request_event_payload(
+    backend: str, model: Optional[str], messages: List[Dict[str, str]]
+) -> Dict[str, Any]:
+    """Metadata-only record of an outgoing model request.
+
+    The full prompt used to be persisted verbatim into the event log —
+    the static prefix plus the whole case context, duplicated on every
+    turn and kept forever. No consumer reads the text back: the
+    evaluations only count model.requested events, the subagent token
+    ledger reads model.responded usage, and session recovery replays
+    turn/fact events (older logs with the text still read fine — the
+    readers never assumed a payload shape). What reconciliation
+    actually needs is kept: backend/model, message count, per-message
+    and total character counts, and a sha256 of the canonical message
+    JSON so an externally captured request can be matched against the
+    event without storing its content.
+    """
+    canonical = json.dumps(
+        messages, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    message_chars = []
+    for message in messages:
+        content = message.get("content", "")
+        if not isinstance(content, str):
+            content = json.dumps(content, ensure_ascii=False)
+        message_chars.append(len(content))
+    return {
+        "backend": backend,
+        "model": model,
+        "message_count": len(messages),
+        "message_chars": message_chars,
+        "total_chars": sum(message_chars),
+        "content_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+
+
+def _transient_retry_reason(exc: BaseException) -> Optional[str]:
+    """Classify a transport failure for the one bounded retry.
+
+    HTTP 429 and 5xx are the provider saying "not now"; timeouts and
+    connection failures are the network saying the same. Other HTTP
+    errors (4xx) are deterministic — retrying them would fail twice —
+    and anything else is a programming or payload error, not a
+    transient.
+    """
+    if isinstance(exc, HTTPError):
+        if exc.code == 429:
+            return "http_429"
+        if 500 <= exc.code < 600:
+            return "http_5xx"
+        return None
+    if isinstance(exc, TimeoutError):
+        return "timeout"
+    if isinstance(exc, (URLError, ConnectionError, HTTPException)):
+        return "network_error"
+    return None
 
 
 def parse_decision(raw: str) -> Dict[str, Any]:
@@ -60,6 +121,14 @@ class CompatibleBackend:
             "max",
         }:
             raise ValueError("reasoning effort must be low, high or max")
+        # Backoff before the one bounded transient retry (see _decide);
+        # configurable so tests and latency-sensitive deployments can
+        # shrink it to zero.
+        self.retry_backoff_seconds = float(
+            settings.get("MEDAGENT_LLM_RETRY_BACKOFF_SECONDS", "0.5")
+        )
+        if not 0 <= self.retry_backoff_seconds <= 10:
+            raise ValueError("retry backoff must be between 0 and 10 seconds")
 
     def decide(self, session_id: str, messages: List[Dict[str, str]]) -> Dict[str, Any]:
         return self._decide(session_id, messages)
@@ -85,7 +154,7 @@ class CompatibleBackend:
             Event(
                 session_id,
                 "model.requested",
-                {"backend": self.name, "payload": payload},
+                request_event_payload(self.name, self.model, messages),
             )
         )
         req = request.Request(
@@ -99,14 +168,34 @@ class CompatibleBackend:
         started = perf_counter()
         if cancelled is not None and cancelled.is_set():
             raise DecisionInterrupted()
-        # The provider's JSON mode occasionally returns an empty content
-        # (a documented quirk); one bounded retry rescues the turn
-        # instead of failing the whole decision on a known transient.
+        # Two known transients get one bounded retry (two attempts
+        # total): the provider's JSON mode occasionally returns an
+        # empty content (a documented quirk), and the transport itself
+        # can fail with HTTP 429/5xx or a network timeout/connection
+        # error. Other HTTP errors are deterministic and surface
+        # immediately instead of failing twice.
         result = None
         raw = ""
         for attempt in (1, 2):
-            with request.urlopen(req, timeout=45) as response:
-                result = json.loads(response.read(256000).decode())
+            try:
+                with request.urlopen(req, timeout=45) as response:
+                    result = json.loads(response.read(256000).decode())
+            except Exception as exc:
+                reason = _transient_retry_reason(exc) if attempt == 1 else None
+                if reason is None:
+                    raise
+                self.events.append(
+                    Event(
+                        session_id,
+                        "model.retry",
+                        {"backend": self.name, "reason": reason},
+                    )
+                )
+                if cancelled is not None and cancelled.is_set():
+                    raise DecisionInterrupted()
+                if self.retry_backoff_seconds > 0:
+                    sleep(self.retry_backoff_seconds)
+                continue
             raw = result["choices"][0]["message"]["content"] or ""
             if raw.strip():
                 break
@@ -220,7 +309,9 @@ class DshBackend:
             Event(
                 session_id,
                 "model.requested",
-                {"backend": self.name, "messages": messages},
+                request_event_payload(
+                    self.name, self.config["MEDAGENT_LLM_MODEL"], messages
+                ),
             )
         )
         started = perf_counter()

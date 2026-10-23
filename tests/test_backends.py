@@ -210,3 +210,212 @@ class BridgeGenerationMappingTests(unittest.TestCase):
         self.assertEqual(map_effort("disabled", "max"), "off")
         self.assertEqual(map_effort("enabled", None), "high")
         self.assertEqual(map_effort("enabled", "low"), "low")
+
+
+class RequestEventMetadataTests(unittest.TestCase):
+    """model.requested events carry request metadata only — never the
+    prompt text (it used to persist the full messages every turn)."""
+
+    MESSAGES = [
+        {"role": "system", "content": "静态前缀-不应落盘"},
+        {"role": "user", "content": "患者原话-不应落盘，发烧两天"},
+    ]
+
+    def _assert_metadata_only(self, events, backend_name, model):
+        (requested,) = [
+            e for e in events.for_session("s") if e.event_type == "model.requested"
+        ]
+        payload = requested.payload
+        self.assertEqual(payload["backend"], backend_name)
+        self.assertEqual(payload["model"], model)
+        self.assertEqual(payload["message_count"], len(self.MESSAGES))
+        self.assertEqual(
+            payload["message_chars"], [len(m["content"]) for m in self.MESSAGES]
+        )
+        self.assertEqual(
+            payload["total_chars"],
+            sum(len(m["content"]) for m in self.MESSAGES),
+        )
+        canonical = json.dumps(
+            self.MESSAGES, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        )
+        import hashlib
+
+        self.assertEqual(
+            payload["content_sha256"],
+            hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+        )
+        self.assertNotIn("messages", payload)
+        self.assertNotIn("payload", payload)
+        encoded = json.dumps([e.to_dict() for e in events.for_session("s")])
+        self.assertNotIn("不应落盘", encoded)
+
+    @patch("medagent.backends.request.urlopen")
+    def test_compatible_request_event_is_metadata_only(self, urlopen):
+        command = {"tool": "inspect_case", "arguments": {}}
+        urlopen.return_value = Response(
+            {"choices": [{"message": {"content": json.dumps(command)}}]}
+        )
+        events = EventStore()
+        backend = CompatibleBackend(
+            events,
+            {
+                "MEDAGENT_LLM_BASE_URL": "https://fixture.invalid/v1",
+                "MEDAGENT_LLM_API_KEY": "secret-test-value",
+                "MEDAGENT_LLM_MODEL": "fixture-model",
+            },
+        )
+        backend.decide("s", self.MESSAGES)
+        self._assert_metadata_only(events, "compatible", "fixture-model")
+
+    def test_dsh_request_event_is_metadata_only(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch as mock_patch
+
+        from medagent.backends import DshBackend
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "integrations" / "dsh").mkdir(parents=True)
+            (root / "integrations" / "dsh" / "bridge.mjs").write_text("")
+            pkg = root / "node_modules" / "@deepseek-ai" / "dsh-sdk-client"
+            pkg.mkdir(parents=True)
+            (pkg / "package.json").write_text("{}")
+            events = EventStore()
+            backend = DshBackend(
+                events,
+                root,
+                config={
+                    "MEDAGENT_LLM_BASE_URL": "https://api.deepseek.com/anthropic",
+                    "MEDAGENT_LLM_API_KEY": "secret-test-value",
+                    "MEDAGENT_LLM_MODEL": "deepseek-flash",
+                },
+            )
+            command = {"tool": "inspect_case", "arguments": {}}
+            with mock_patch.object(
+                DshBackend, "_bridge_decision", return_value=command
+            ):
+                self.assertEqual(backend.decide("s", self.MESSAGES), command)
+            self._assert_metadata_only(events, "dsh", "deepseek-flash")
+
+
+class TransientRetryTests(unittest.TestCase):
+    """One bounded retry on transient transport failures (HTTP 429/5xx,
+    timeouts, connection errors); deterministic errors surface at once."""
+
+    def _backend(self, events, **extra):
+        config = {
+            "MEDAGENT_LLM_BASE_URL": "https://fixture.invalid/v1",
+            "MEDAGENT_LLM_API_KEY": "secret-test-value",
+            "MEDAGENT_LLM_MODEL": "fixture",
+            "MEDAGENT_LLM_RETRY_BACKOFF_SECONDS": "0",
+        }
+        config.update(extra)
+        return CompatibleBackend(events, config)
+
+    def _ok_response(self):
+        command = {"tool": "inspect_case", "arguments": {}}
+        return Response({"choices": [{"message": {"content": json.dumps(command)}}]}), command
+
+    def _retry_reasons(self, events):
+        return [
+            e.payload["reason"]
+            for e in events.for_session("s")
+            if e.event_type == "model.retry"
+        ]
+
+    @patch("medagent.backends.request.urlopen")
+    def test_http_429_retried_once(self, urlopen):
+        from urllib.error import HTTPError
+
+        ok, command = self._ok_response()
+        urlopen.side_effect = [
+            HTTPError("https://fixture.invalid/v1", 429, "rate limited", {}, None),
+            ok,
+        ]
+        events = EventStore()
+        backend = self._backend(events)
+        self.assertEqual(backend.decide("s", []), command)
+        self.assertEqual(urlopen.call_count, 2)
+        self.assertEqual(self._retry_reasons(events), ["http_429"])
+
+    @patch("medagent.backends.request.urlopen")
+    def test_http_5xx_retried_once(self, urlopen):
+        from urllib.error import HTTPError
+
+        ok, command = self._ok_response()
+        urlopen.side_effect = [
+            HTTPError("https://fixture.invalid/v1", 503, "unavailable", {}, None),
+            ok,
+        ]
+        events = EventStore()
+        backend = self._backend(events)
+        self.assertEqual(backend.decide("s", []), command)
+        self.assertEqual(urlopen.call_count, 2)
+        self.assertEqual(self._retry_reasons(events), ["http_5xx"])
+
+    @patch("medagent.backends.request.urlopen")
+    def test_network_error_retried_once(self, urlopen):
+        from urllib.error import URLError
+
+        ok, command = self._ok_response()
+        urlopen.side_effect = [URLError("connection reset"), ok]
+        events = EventStore()
+        backend = self._backend(events)
+        self.assertEqual(backend.decide("s", []), command)
+        self.assertEqual(urlopen.call_count, 2)
+        self.assertEqual(self._retry_reasons(events), ["network_error"])
+
+    @patch("medagent.backends.request.urlopen")
+    def test_timeout_retried_once(self, urlopen):
+        ok, command = self._ok_response()
+        urlopen.side_effect = [TimeoutError("timed out"), ok]
+        events = EventStore()
+        backend = self._backend(events)
+        self.assertEqual(backend.decide("s", []), command)
+        self.assertEqual(urlopen.call_count, 2)
+        self.assertEqual(self._retry_reasons(events), ["timeout"])
+
+    @patch("medagent.backends.request.urlopen")
+    def test_http_4xx_not_retried(self, urlopen):
+        from urllib.error import HTTPError
+
+        urlopen.side_effect = HTTPError(
+            "https://fixture.invalid/v1", 400, "bad request", {}, None
+        )
+        events = EventStore()
+        backend = self._backend(events)
+        with self.assertRaises(HTTPError):
+            backend.decide("s", [])
+        self.assertEqual(urlopen.call_count, 1)
+        self.assertEqual(self._retry_reasons(events), [])
+
+    @patch("medagent.backends.request.urlopen")
+    def test_transient_failure_bounded_at_two_attempts(self, urlopen):
+        from urllib.error import HTTPError
+
+        urlopen.side_effect = HTTPError(
+            "https://fixture.invalid/v1", 500, "server error", {}, None
+        )
+        events = EventStore()
+        backend = self._backend(events)
+        with self.assertRaises(HTTPError):
+            backend.decide("s", [])
+        self.assertEqual(urlopen.call_count, 2)
+        self.assertEqual(self._retry_reasons(events), ["http_5xx"])
+
+    def test_backoff_default_and_validation(self):
+        backend = self._backend(EventStore())
+        self.assertEqual(backend.retry_backoff_seconds, 0.0)
+        default = CompatibleBackend(
+            EventStore(),
+            {
+                "MEDAGENT_LLM_BASE_URL": "https://fixture.invalid/v1",
+                "MEDAGENT_LLM_API_KEY": "secret-test-value",
+                "MEDAGENT_LLM_MODEL": "fixture",
+            },
+        )
+        self.assertEqual(default.retry_backoff_seconds, 0.5)
+        with self.assertRaises(ValueError):
+            self._backend(EventStore(), MEDAGENT_LLM_RETRY_BACKOFF_SECONDS="99")

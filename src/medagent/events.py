@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from threading import Lock
@@ -39,20 +40,27 @@ class EventStore:
         self._lock = Lock()
         self._traces: Dict[str, Dict[str, str]] = {}
         self.skipped_corrupt = 0
+        self.append_failures = 0
         if path:
             path.parent.mkdir(parents=True, exist_ok=True)
             if path.exists():
                 self._events = list(self._read_file(path))
 
     def _read_file(self, path: Path) -> Iterable[Event]:
-        # A crash or power cut can truncate the final line mid-append.
-        # Skip (and count) damaged lines instead of bricking every
-        # future startup on one bad row — the same standard the
+        # A crash or power cut can truncate the final line mid-append —
+        # possibly in the middle of a multi-byte UTF-8 character. Read
+        # bytes and decode line by line: a whole-file UTF-8 decode would
+        # raise UnicodeDecodeError before the per-line tolerance below
+        # ever runs, bricking every future startup on one torn row.
+        # A line that fails to decode counts as corrupt, exactly like a
+        # line that fails to parse — skip (and count) damaged lines
+        # instead of bricking startup, the same standard the
         # SessionStore already applies to its files.
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if not line.strip():
+        for raw_line in path.read_bytes().splitlines():
+            if not raw_line.strip():
                 continue
             try:
+                line = raw_line.decode("utf-8")
                 raw = json.loads(line)
                 yield Event(**raw)
             except Exception:
@@ -71,8 +79,20 @@ class EventStore:
             encoded = json.dumps(event.to_dict(), ensure_ascii=False, separators=(",", ":"))
             self._events.append(event)
             if self._path:
-                with self._path.open("a", encoding="utf-8") as stream:
-                    stream.write(encoded + "\n")
+                try:
+                    with self._path.open("a", encoding="utf-8") as stream:
+                        stream.write(encoded + "\n")
+                except OSError as exc:
+                    # Fail-open, the same posture as the consultation
+                    # engine's _persist: a full disk or a vanished
+                    # directory must never take a consultation down.
+                    # The event stays in memory; count and log the loss.
+                    self.append_failures += 1
+                    print(
+                        f"EventStore: failed to persist {event.event_type} "
+                        f"event for session {event.session_id}: {exc}",
+                        file=sys.stderr,
+                    )
 
     def bind_trace(
         self,

@@ -174,6 +174,76 @@ class EventStoreCorruptionToleranceTests(unittest.TestCase):
             self.assertEqual(len(reopened.for_session("s1")), 1)
             self.assertEqual(reopened.skipped_corrupt, 1)
 
+    def test_torn_utf8_at_any_byte_offset_never_bricks_startup(self):
+        # Regression: _read_file used to decode the whole file as UTF-8
+        # before its per-line tolerance ran, so a final line torn
+        # mid–multi-byte character raised UnicodeDecodeError in the
+        # constructor and bricked every later startup.
+        import json
+        import tempfile
+        from pathlib import Path
+
+        from medagent.events import Event, EventStore
+
+        def line(event):
+            return json.dumps(event.to_dict(), ensure_ascii=False).encode()
+
+        first = line(Event("s1", "session.created", {"备注": "发烧"}))
+        second = line(Event("s1", "turn.user_message", {"text": "肚子疼，越来越厉害"}))
+        torn_source = line(
+            Event("s1", "turn.agent_reply", {"text": "请问疼痛持续多久了？"})
+        )
+        complete = first + b"\n" + second + b"\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "events.jsonl"
+            for offset in range(1, len(torn_source)):
+                path.write_bytes(complete + torn_source[:offset])
+                reopened = EventStore(path)  # must never raise
+                self.assertEqual(
+                    len(reopened.for_session("s1")), 2, f"offset {offset}"
+                )
+                self.assertEqual(reopened.skipped_corrupt, 1, f"offset {offset}")
+            # A torn line mid-file is also skipped; later lines survive.
+            path.write_bytes(first + b"\n" + torn_source[:7] + b"\n" + second + b"\n")
+            reopened = EventStore(path)
+            self.assertEqual(len(reopened.for_session("s1")), 2)
+            self.assertEqual(reopened.skipped_corrupt, 1)
+            # An untorn file round-trips with nothing skipped.
+            path.write_bytes(complete + torn_source + b"\n")
+            reopened = EventStore(path)
+            self.assertEqual(len(reopened.for_session("s1")), 3)
+            self.assertEqual(reopened.skipped_corrupt, 0)
+
+
+class EventStoreAppendFailureTests(unittest.TestCase):
+    """Append IO errors are fail-open (counted + logged), never raised
+    into the consultation path — the _persist posture."""
+
+    def test_append_io_error_is_counted_not_raised(self):
+        import contextlib
+        import io
+        import tempfile
+        from pathlib import Path
+
+        from medagent.events import Event, EventStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "events.jsonl"
+            store = EventStore(path)
+            store.append(Event("s1", "session.created", {}))
+            self.assertEqual(store.append_failures, 0)
+            # Replace the log file with a directory: opening it for
+            # append now raises IsADirectoryError (an OSError).
+            path.unlink()
+            path.mkdir()
+            stderr = io.StringIO()
+            with contextlib.redirect_stderr(stderr):
+                store.append(Event("s1", "turn.user_message", {"text": "你好"}))
+            self.assertEqual(store.append_failures, 1)
+            self.assertIn("EventStore", stderr.getvalue())
+            # The event survives in memory even though persistence failed.
+            self.assertEqual(len(store.for_session("s1")), 2)
+
 
 class SessionStoreIdSafetyTests(unittest.TestCase):
     """Audit S5/S6: session ids from restored files must not escape the
