@@ -15,7 +15,16 @@ from .events import Event
 MAX_ITEMS = 4
 MAX_ITEM_LENGTH = 180
 MAX_CONCURRENT_REVIEWS = 2
-REVIEW_DEADLINE_SECONDS = 8.0
+# Deadline calibration: a review only ever runs on the DSH backend
+# (see _enabled), whose bridge cold-starts a node process and then makes
+# one LLM round trip under a 55s subprocess hard timeout
+# (backends.py: child.communicate(timeout=55)). The original 8s
+# deadline expired before that path could ever answer, so in
+# production every review ended as a "deadline" failure. 40s gives a
+# cold start plus a round trip realistic room while still expiring
+# inside the backend's own cap, so the coordinator — not the
+# subprocess timeout — reports the failure.
+REVIEW_DEADLINE_SECONDS = 40.0
 REVIEW_MODES = {"shadow", "advisory"}
 MATERIAL_EVENT_TYPES = {
     "fact.recorded",
@@ -151,17 +160,12 @@ class BackgroundReviewCoordinator:
         if not self.enabled_for_process or not self._enabled(engine, state):
             return
         self.invalidate(state, "superseded_after_reply")
-        events = self.events.for_session(state.session_id)
-        turn_id = next(
-            (event.turn_id for event in reversed(events) if event.event_type == "turn.agent_reply"),
-            None,
+        turn_id, material = self._latest_turn(
+            self.events.for_session(state.session_id)
         )
         # The no-turn fallback keeps the coordinator independently testable;
         # production scheduling always runs after turn.agent_reply.
-        if turn_id is not None and not any(
-            event.turn_id == turn_id and event.event_type in MATERIAL_EVENT_TYPES
-            for event in events
-        ):
+        if turn_id is not None and not material:
             self.events.append(
                 Event(
                     state.session_id,
@@ -198,6 +202,44 @@ class BackgroundReviewCoordinator:
             )
         )
         Thread(target=self._run, args=(job,), name="medical-advisor", daemon=True).start()
+
+    @staticmethod
+    def _latest_turn(events) -> tuple[Optional[str], bool]:
+        """Latest turn's (turn_id, changed-the-case-materially?) in one
+        tail-bounded pass over the session's events.
+
+        A turn's events are appended together, so scanning backwards
+        from the newest event can stop at the first event belonging to
+        an older turn; the previous implementation found the turn id in
+        one full pass and then re-scanned the session's whole history
+        for a material event. Material events can sit on either side of
+        the reply (facts are recorded before it; a follow-up plan is
+        scheduled after it), so the whole tail segment of the latest
+        turn is collected before judging. (EventStore.for_session
+        itself still filters the entire in-memory store — giving it a
+        per-session index is the remaining cost, and it lives outside
+        this module.) A reply whose turn_id is None reads as "no turn",
+        matching the fallback the caller has always applied.
+        """
+        turn_id = None
+        tail = []
+        for event in reversed(events):
+            if turn_id is None:
+                tail.append(event)
+                if event.event_type == "turn.agent_reply":
+                    turn_id = event.turn_id
+                    if turn_id is None:
+                        return None, False
+                continue
+            if event.turn_id is not None and event.turn_id != turn_id:
+                break
+            tail.append(event)
+        material = any(
+            event.turn_id == turn_id
+            and event.event_type in MATERIAL_EVENT_TYPES
+            for event in tail
+        )
+        return turn_id, material
 
     def _snapshot(self, state, job: ReviewJob) -> Dict[str, Any]:
         facts = {
