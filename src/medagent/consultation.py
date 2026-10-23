@@ -28,6 +28,7 @@ from .self_checks import SelfCheckService
 from .triage import TriageService
 from .turn_context import TurnContext
 from .planner import RulePlanner
+from .session_store import SessionStore
 from .phase_graph import planning_rank
 from .followups import RETRIAGE_OUTCOMES, apply_outcome, build_follow_up_plan
 from .reasoner import QuestionRanker
@@ -113,6 +114,7 @@ class ConsultationEngine(
         self_checks: SelfCheckService,
         events: EventStore,
         ranker: QuestionRanker,
+        session_store: Optional[SessionStore] = None,
     ) -> None:
         self.content = content
         self.triage = triage
@@ -149,6 +151,29 @@ class ConsultationEngine(
         self._latest_replies = {}
         self._help_requests = {}
         self._sessions_lock = Lock()
+        # Durable store for closed sessions (follow-up plans must outlive
+        # the process). Restored sessions re-enter as read-only history:
+        # their facts, conclusion and follow-up plan keep working,
+        # including outcome recording and re-triage linkage.
+        self.session_store = session_store
+        self._persist_failures = 0
+        if session_store is not None:
+            for restored in session_store.load_closed():
+                self._sessions[restored.session_id] = restored
+                self._session_locks[restored.session_id] = RLock()
+                self._session_conditions[restored.session_id] = Condition(
+                    self._session_locks[restored.session_id]
+                )
+
+    def _persist(self, state: CaseState) -> None:
+        """Write-through snapshot; fail-open by design (a store error
+        must never break a consultation)."""
+        if self.session_store is None:
+            return
+        try:
+            self.session_store.save(state)
+        except Exception:
+            self._persist_failures += 1
 
     def create_session(
         self, request_id: Optional[str] = None
@@ -212,6 +237,11 @@ class ConsultationEngine(
                 self._session_conditions.pop(session_id, None)
                 self._latest_replies.pop(session_id, None)
                 self._help_requests.pop(session_id, None)
+            if self.session_store is not None:
+                try:
+                    self.session_store.delete(session_id)
+                except Exception:
+                    self._persist_failures += 1
 
     def submit(self, session_id: str, user_input: UserInput) -> AgentReply:
         state = self.state(session_id)
@@ -1798,6 +1828,9 @@ class ConsultationEngine(
                         {"new_session_id": new_state.session_id, "outcome": outcome},
                     )
                 )
+            # The outcome mutated this (possibly restored) closed case;
+            # write it back so the recorded outcome itself is durable.
+            self._persist(state)
             return result
 
     def _record_reply(
@@ -1869,6 +1902,7 @@ class ConsultationEngine(
             state.transcript.append({"role": "assistant", "content": reply.message})
             self._latest_replies[state.session_id] = deepcopy(reply)
             self._session_conditions[state.session_id].notify_all()
+        self._persist(state)
 
     def _attach_conclusion(self, state: CaseState, reply: AgentReply, turn_id: str) -> None:
         """Compose the conclusion sheet at close (design: 结论单 §5).

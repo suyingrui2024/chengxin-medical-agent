@@ -933,7 +933,9 @@
             </div>
             <div class="notice-strip">
               <svg class="icon"><use href="#i-info" /></svg
-              >当前记录仅在本次服务运行期间保留，关闭应用后会清除。
+              ><span id="history-retention-note"
+                >当前记录仅在本次服务运行期间保留，关闭应用后会清除。</span
+              >
             </div>
             <section id="followup-section" class="followup-section" hidden>
               <h2 class="followup-heading">待随访</h2>
@@ -1287,7 +1289,7 @@
                       >只显示患者使用的功能</small
                     >
                   </label>
-                  <p class="settings-hint">
+                  <p class="settings-hint" id="settings-retention-note">
                     本机数据：会谈仅保留到服务关闭，健康档案保存在本机。研究原型
                     · 能力协议
                     v1。请勿输入姓名、证件号等身份信息；紧急情况请立即拨打 120。

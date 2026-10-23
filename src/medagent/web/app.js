@@ -386,7 +386,9 @@ function navigate(view) {
       ? "文件与任务记录保存在本机"
       : view === "records"
         ? "健康档案保存在本机"
-        : "会谈仅保留到服务关闭";
+        : state.sessionPersistence
+          ? "已结束的会谈保存在本机"
+          : "会谈仅保留到服务关闭";
   document.querySelectorAll(".view").forEach((node) => {
     const active = node.id === `view-${view}`;
     node.hidden = !active;
@@ -430,6 +432,18 @@ function navigate(view) {
   // navigation so leaving mid-task (hash change, back button) restores the shell.
   syncTaskFocus();
   if (!$("#toast").hidden) positionToast();
+}
+
+function applyRetentionCopy() {
+  if (!state.sessionPersistence) return;
+  const historyNote = $("#history-retention-note");
+  if (historyNote)
+    historyNote.textContent =
+      "已结束的问诊与随访计划保存在本机，关闭应用后仍可查看；进行中的问诊请在本次完成。";
+  const settingsNote = $("#settings-retention-note");
+  if (settingsNote)
+    settingsNote.textContent =
+      "本机数据：已结束的会谈与健康档案保存在本机，进行中的问诊不跨重启。研究原型 · 能力协议 v1。请勿输入姓名、证件号等身份信息；紧急情况请立即拨打 120。";
 }
 
 function setWorkspaceMode(mode) {
@@ -2834,6 +2848,8 @@ async function init() {
       api("/api/capabilities"),
     ]);
     state.settings = settings;
+    state.sessionPersistence = settings.storage === "session_store";
+    applyRetentionCopy();
     executionUI.configure(health.execution_available);
     state.tasks = tasks.tasks;
     state.catalog = catalog;

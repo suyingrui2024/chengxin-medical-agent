@@ -26,7 +26,8 @@ class ServicePlugin:
 
 
 def build_runtime(event_path: Optional[Path] = None, backend: Optional[str] = None,
-                  config: Optional[dict] = None, events: Optional[EventStore] = None, registry=None) -> PluginHost:
+                  config: Optional[dict] = None, events: Optional[EventStore] = None, registry=None,
+                  session_dir: Optional[Path] = None) -> PluginHost:
     """Compose an explicit profile, equivalent to a small DSH bundle."""
     mode = backend or os.environ.get("MEDAGENT_BACKEND", "demo")
     settings = config if config is not None else dict(os.environ)
@@ -41,6 +42,20 @@ def build_runtime(event_path: Optional[Path] = None, backend: Optional[str] = No
         kwargs = dict(content=ctx.services.require("content"), triage=ctx.services.require("triage"),
                       self_checks=ctx.services.require("self_checks"), events=ctx.services.require("events"),
                       ranker=OrderedQuestionRanker())
+        # Session persistence: an explicit session_dir wins, then the
+        # MEDAGENT_SESSION_DATA_DIR env override, then a sibling of the
+        # event log. Without any of these, sessions stay process-memory.
+        store_dir = session_dir
+        if store_dir is None:
+            env_dir = os.environ.get("MEDAGENT_SESSION_DATA_DIR", "").strip()
+            if env_dir:
+                store_dir = Path(env_dir)
+            elif event_path is not None:
+                store_dir = Path(event_path).parent / "sessions"
+        if store_dir is not None:
+            from .session_store import SessionStore
+
+            kwargs["session_store"] = SessionStore(store_dir)
         if mode == "demo":
             engine = ConsultationEngine(**kwargs)
         else:

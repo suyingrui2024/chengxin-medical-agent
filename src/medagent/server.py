@@ -1317,7 +1317,13 @@ def serve(
         (host, port), Handler, engine, events, context.services.require("backend_mode")
     )
     print(f"问诊智能体研究原型运行于 http://{host}:{port}")
-    print("按 Ctrl+C 停止。默认不持久化会话；这不是已经验证的医疗服务。")
+    if getattr(engine, "session_store", None) is not None:
+        print(
+            "按 Ctrl+C 停止。已关闭的会话与随访计划会保存到本机并在重启后恢复；"
+            "进行中的问诊不跨重启。这不是已经验证的医疗服务。"
+        )
+    else:
+        print("按 Ctrl+C 停止。默认不持久化会话；这不是已经验证的医疗服务。")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

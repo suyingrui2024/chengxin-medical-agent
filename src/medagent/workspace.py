@@ -48,7 +48,11 @@ class Workspace:
                 "vision_model": self.settings["MEDAGENT_VISION_MODEL"],
                 "has_api_key": bool(self.settings["MEDAGENT_LLM_API_KEY"]),
                 "dsh_review_mode": os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow"),
-                "storage": "process_memory",
+                "storage": (
+                    "session_store"
+                    if getattr(self.engine, "session_store", None) is not None
+                    else "process_memory"
+                ),
             }
 
     def resolve(self, payload):

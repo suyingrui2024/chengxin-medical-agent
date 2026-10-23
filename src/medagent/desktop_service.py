@@ -6,6 +6,7 @@ import sys
 import threading
 import os
 
+from .patient_records import default_patient_data_root
 from .runtime import build_runtime
 from .server import Handler, MedicalAgentServer
 
@@ -31,7 +32,12 @@ def main():
     )
     if mode not in {"demo", "compatible", "dsh"}:
         raise ValueError("Invalid desktop backend")
-    runtime = build_runtime(backend=mode)
+    # The desktop app is the longitudinal product surface: closed
+    # sessions (and their follow-up plans) persist next to the patient
+    # records so a restart never loses a due follow-up.
+    runtime = build_runtime(
+        backend=mode, session_dir=default_patient_data_root() / "sessions"
+    )
     context = runtime.start()
     server = MedicalAgentServer(
         ("127.0.0.1", 0),
