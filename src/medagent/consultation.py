@@ -803,11 +803,14 @@ class ConsultationEngine(
             urgent_reply = self._correction_emergency(state, new_text)
             if urgent_reply:
                 return urgent_reply
-            if state.phase == Phase.CLOSED:
+            if state.phase == Phase.CLOSED and state.closed_reason != "emergency_route":
                 # Closed cases are read-only history (restored sessions
                 # doubly so): reopening one here would fork it from its
                 # conclusion sheet and, once persisted as non-CLOSED,
                 # make its follow-up plan vanish on the next restart.
+                # emergency_route is exempt: corrections there re-run
+                # triage and land back on the emergency reply — the
+                # route itself can never be retracted by an edit.
                 raise ValueError("会谈已结束，记录不能再更正")
             self._check_fact_version(state, fact_key, expected_fact_id)
             previous_task = state.active_task
@@ -878,7 +881,7 @@ class ConsultationEngine(
         """
         state = self.state(session_id)
         with self._lock_for(session_id):
-            if state.phase == Phase.CLOSED:
+            if state.phase == Phase.CLOSED and state.closed_reason != "emergency_route":
                 raise ValueError("会谈已结束，记录不能再更正")
             self._check_fact_version(state, fact_key, expected_fact_id)
             current = state.facts.get(fact_key)
