@@ -390,6 +390,14 @@ function navigate(view) {
   )
     view = "consultation";
   state.view = view;
+  // Keep the URL hash honest: init() deep-links from it, so navigation
+  // must write it back or a refresh lands on a stale view.
+  try {
+    if (location.hash.slice(1) !== view)
+      history.replaceState(null, "", `#${view}`);
+  } catch {
+    /* file:// or sandboxed contexts may refuse history writes */
+  }
   $("#workspace-storage-note").textContent =
     view === "execution"
       ? "文件与任务记录保存在本机"
@@ -1642,8 +1650,13 @@ async function resumeSession(id, force = false) {
     if (!wasBusy) setBusy(false);
   }
 }
+let sessionsGeneration = 0;
 async function refreshSessions() {
+  // Overlapping refreshes (send/start/delete/manual) can resolve out
+  // of order; only the newest generation may overwrite the list.
+  const generation = ++sessionsGeneration;
   const data = await api("/api/sessions");
+  if (generation !== sessionsGeneration) return;
   state.sessions = data.sessions;
   renderRecent();
   renderHistory();
@@ -2648,6 +2661,10 @@ document
   .forEach((node) =>
     node.addEventListener("click", () => navigate(node.dataset.view)),
   );
+window.addEventListener("hashchange", () => {
+  const view = location.hash.slice(1);
+  if (view && view !== state.view) navigate(view);
+});
 // Settings rail scrollspy: highlight the section currently in view.
 (() => {
   const links = [...document.querySelectorAll(".settings-rail a")];
@@ -2744,7 +2761,9 @@ const closeFactsPanel = () => $("#facts-panel").classList.remove("open");
 $("#facts-scrim").addEventListener("click", closeFactsPanel);
 $("#facts-close").addEventListener("click", closeFactsPanel);
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeFactsPanel();
+  if (event.key !== "Escape") return;
+  closeFactsPanel();
+  $("#sidebar").classList.remove("open");
 });
 $("#view-current-trace").addEventListener("click", () => navigate("inspect"));
 $("#refresh-history").addEventListener("click", () =>
@@ -2824,15 +2843,22 @@ document
   .forEach((node) =>
     node.addEventListener("click", () => node.closest("dialog").close()),
   );
+let followUpSubmitting = false;
 $("#followup-form").addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!followUpTarget) return;
+  if (!followUpTarget || followUpSubmitting) return;
   const outcome = new FormData(event.target).get("outcome");
   const feedback = $("#followup-feedback");
   if (!outcome) {
     feedback.textContent = "请先选择现在的近况。";
     return;
   }
+  // A worsened outcome spawns a re-triage session server-side; a
+  // double-click must not record the outcome (or spawn the session)
+  // twice while the first request is still in flight.
+  followUpSubmitting = true;
+  const submitButton = event.target.querySelector("[type=submit]");
+  if (submitButton) submitButton.disabled = true;
   try {
     const data = await api(
       `/api/sessions/${followUpTarget.session_id}/follow-up/outcome`,
@@ -2852,6 +2878,9 @@ $("#followup-form").addEventListener("submit", async (event) => {
     }
   } catch (error) {
     feedback.textContent = error.message;
+  } finally {
+    followUpSubmitting = false;
+    if (submitButton) submitButton.disabled = false;
   }
 });
 $("#followup-enter-retriage").addEventListener("click", () => {
@@ -2867,9 +2896,6 @@ $("#settings-dialog").addEventListener("close", () => {
 $("#mobile-menu").addEventListener("click", () =>
   $("#sidebar").classList.toggle("open"),
 );
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") $("#sidebar").classList.remove("open");
-});
 window.addEventListener("resize", () => {
   if (!$("#toast").hidden) positionToast();
 });
@@ -2881,6 +2907,7 @@ document.addEventListener("click", (event) => {
   )
     $("#sidebar").classList.remove("open");
 });
+$("#connection-retry")?.addEventListener("click", () => init());
 async function init() {
   // Static HTML is visible before module hydration; enable only after handlers exist.
   $("#workspace-mode").disabled = false;

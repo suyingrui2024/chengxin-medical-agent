@@ -6176,7 +6176,7 @@ html[data-font-scale="small"] .fact-value {
   border: 1px solid var(--warning-line, var(--line));
   border-radius: 10px;
   background: var(--warning-bg);
-  color: var(--warning-ink);
+  color: var(--warning-ink, #7a5410);
   font-size: 13.5px;
 }
 .connection-alert .status-dot {
