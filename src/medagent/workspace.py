@@ -1,10 +1,14 @@
 """Local review workspace: isolated backend configurations and in-process history."""
 from __future__ import annotations
 
+import json
 import os
-from threading import RLock
+from collections import OrderedDict
+from threading import RLock, Thread
 from urllib.parse import urlparse
 
+from .agent import AdaptiveConsultationEngine
+from .domain import utc_now
 from .events import EventStore
 from .consultation_subject import subject_profile
 from .backends import CompatibleBackend, DshBackend
@@ -29,10 +33,41 @@ class Workspace:
         self.hosts = []
         self.probes = set()
         self.closing = False
+        # Persistence coordinates of the startup composition. The desktop
+        # sidecar builds its first runtime with an explicit session_dir and
+        # event_path; a recomposition that forgets them produces an engine
+        # whose session_store is None, so every session created after a
+        # settings apply silently stops reaching disk. Derived from the
+        # startup engine/events so any host that composes a Workspace
+        # (server, desktop) keeps the same behaviour.
+        store = getattr(engine, "session_store", None)
+        self.session_dir = getattr(store, "root", None)
+        event_path = getattr(events, "_path", None)
+        self.event_path = Path(event_path) if event_path is not None else None
         # Subagent-drafted follow-up messages (followup_batch), keyed by
-        # session_id. In-memory only: a draft is never sent from here; the
-        # user confirms/edits it in the follow-up UI before anything sends.
-        self.follow_up_drafts = {}
+        # session_id. A draft is never sent from here; the user
+        # confirms/edits it in the follow-up UI before anything sends.
+        # Drafts persist to follow_up_drafts.json inside the session dir
+        # so the server process that generated (or loaded) them keeps
+        # serving them across restarts; without a session dir they stay
+        # process-memory, exactly like the sessions themselves.
+        self.follow_up_drafts = self._load_follow_up_drafts()
+        self._draft_batch_thread = None
+        # (session_id, due_at) pairs already attempted in this process.
+        # A case whose draft keeps failing the coordinator's lint would
+        # otherwise re-burn model calls on every follow-up list read; it
+        # is retried on the next process start or when a new plan (new
+        # due_at) replaces the old one.
+        self._draft_attempted = set()
+        # Set by the server once its SubagentCoordinator exists; _compose
+        # re-attaches it to each adaptive engine it builds (previously
+        # only the startup engine ever received it).
+        self.subagent_coordinator = None
+        self._current_host = None
+        # Bounded idempotency log for session creation: request_id -> the
+        # exact response already returned, so a retried POST /api/sessions
+        # hands back the session it created instead of minting a duplicate.
+        self._session_creations: "OrderedDict[str, dict]" = OrderedDict()
         self.lock = RLock()
         self.settings = {
             k: os.environ.get(k, "")
@@ -54,6 +89,8 @@ class Workspace:
                 "has_api_key": bool(self.settings["MEDAGENT_LLM_API_KEY"]),
                 "dsh_review_mode": os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow"),
                 "web_tools_mode": web_mode(),
+                "subagent_web": os.environ.get("MEDAGENT_SUBAGENT_WEB", "off")
+                == "on",
                 "subagents": {
                     "mode": os.environ.get("MEDAGENT_SUBAGENT_MODE", "off")
                 },
@@ -133,14 +170,72 @@ class Workspace:
             self.backend, self.settings = mode, config
             return self.public_settings()
 
+    def _attach_subagents(self, engine):
+        coordinator = getattr(self, "subagent_coordinator", None)
+        if coordinator is not None and isinstance(
+            engine, AdaptiveConsultationEngine
+        ):
+            engine.subagent_coordinator = coordinator
+
     def _compose(self, mode, config, registry):
         host = build_runtime(
-            backend=mode, config=config, events=self.events, registry=registry
+            backend=mode,
+            config=config,
+            events=self.events,
+            registry=registry,
+            session_dir=self.session_dir,
+            event_path=self.event_path,
         )
         context = host.start()
+        engine = context.services.require("consultation")
+        self._attach_subagents(engine)
+        replaced = self._current_host
         self.hosts.append(host)
-        self.engine = context.services.require("consultation")
-        self.engines.append(self.engine)
+        self._current_host = host
+        self.engine = engine
+        self.engines.append(engine)
+        if replaced is not None:
+            # The replaced engine stays in self.engines (its sessions are
+            # still reachable through engine_for), but its runtime host is
+            # stopped and dropped: hosts used to accumulate one live
+            # composition per apply/reconfigure until process shutdown.
+            self.hosts.remove(replaced)
+            try:
+                replaced.stop()
+            except Exception as exc:
+                # The new composition is already installed above; a
+                # failing teardown of the old host must not fail the
+                # apply/reconfigure that replaced it — the exception
+                # would otherwise leave backend/settings pointing at the
+                # old composition while self.engine already serves the
+                # new one. EventStore appends are fail-open, so
+                # recording the failure cannot raise either.
+                self.events.append(
+                    Event(
+                        "workspace",
+                        "composition.host_stop_failed",
+                        {"error_type": type(exc).__name__},
+                    )
+                )
+
+    def session_creation(self, request_id):
+        """Response already returned for this create ``request_id``, if any."""
+        if not request_id:
+            return None
+        with self.lock:
+            payload = self._session_creations.get(request_id)
+            if payload is not None:
+                self._session_creations.move_to_end(request_id)
+            return payload
+
+    def remember_session_creation(self, request_id, payload):
+        if not request_id:
+            return
+        with self.lock:
+            self._session_creations[request_id] = payload
+            self._session_creations.move_to_end(request_id)
+            while len(self._session_creations) > 128:
+                self._session_creations.popitem(last=False)
 
     def catalog(self):
         with self.lock:
@@ -274,6 +369,185 @@ class Workspace:
                     )
         return sorted(output, key=lambda s: s["created_at"], reverse=True)
 
+    # -- follow-up draft store + in-process batch trigger (§5.7.4) --
+
+    def _drafts_file(self):
+        if self.session_dir is None:
+            return None
+        return Path(self.session_dir) / "follow_up_drafts.json"
+
+    def _load_follow_up_drafts(self):
+        path = self._drafts_file()
+        if path is None:
+            return {}
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+        drafts = payload.get("drafts") if isinstance(payload, dict) else None
+        if not isinstance(drafts, dict):
+            return {}
+        return {
+            session_id: draft
+            for session_id, draft in drafts.items()
+            if isinstance(session_id, str) and isinstance(draft, dict)
+        }
+
+    def _persist_follow_up_drafts(self):
+        """Best-effort durable write; the caller holds ``self.lock``. A
+        failed write keeps the in-memory copy authoritative for this
+        process instead of breaking the follow-up list."""
+        path = self._drafts_file()
+        if path is None:
+            return
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_name(path.name + ".tmp")
+            tmp.write_text(
+                json.dumps(
+                    {"version": 1, "drafts": self.follow_up_drafts},
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            os.replace(tmp, path)
+        except Exception as exc:
+            # Not just OSError: a coordinator result carrying an
+            # unserializable value fails json.dumps with TypeError, and
+            # the offline batch script drives this same path with no
+            # outer catch to absorb it. Either way the in-memory copy
+            # stays authoritative for this process; the failure leaves
+            # an event trace instead of vanishing silently (or crashing
+            # the caller). EventStore appends are fail-open.
+            self.events.append(
+                Event(
+                    "workspace",
+                    "followup.drafts_persist_failed",
+                    {"error_type": type(exc).__name__},
+                )
+            )
+
+    def store_follow_up_drafts(self, results):
+        """Merge coordinator drafts into the durable store.
+
+        Idempotent by session_id: a session that already has a draft is
+        never re-drafted or overwritten, whether the existing draft came
+        from this process, a previous run of the batch script, or a
+        server restart that reloaded it from disk.
+        """
+        stored = 0
+        with self.lock:
+            for result in results or []:
+                if not isinstance(result, dict):
+                    continue
+                session_id = result.get("session_id")
+                if not session_id or session_id in self.follow_up_drafts:
+                    continue
+                if not result.get("draft_message"):
+                    continue
+                self.follow_up_drafts[session_id] = dict(result)
+                stored += 1
+            if stored:
+                self._persist_follow_up_drafts()
+                self.events.append(
+                    Event(
+                        "workspace",
+                        "followup.drafts_stored",
+                        {"count": stored},
+                    )
+                )
+        return stored
+
+    def follow_up_drafts_due(self):
+        """follow_ups() entries that are due, still scheduled and have
+        no draft yet — the batch's work list (design §5.7.4)."""
+        now = utc_now()
+        due = []
+        for item in self.follow_ups():
+            plan = item.get("plan") or {}
+            if plan.get("status") != "scheduled":
+                continue
+            if str(plan.get("due_at", "")) > now:
+                continue
+            if item["session_id"] in self.follow_up_drafts:
+                continue
+            attempt = (item["session_id"], str(plan.get("due_at", "")))
+            if attempt in self._draft_attempted:
+                continue
+            due.append(item)
+        return due
+
+    def maybe_schedule_followup_drafts(self) -> int:
+        """Queue in-process draft generation for due follow-ups.
+
+        Called on the follow-up list read path; generation runs on a
+        daemon thread so the response never waits on the model. Returns
+        how many cases were queued (0 when nothing ran).
+
+        Advisory-only surfacing: the coordinator's spawn wiring treats
+        shadow runs as telemetry (recorded, never shown), and the
+        offline batch script applies the same advisory gate, so a
+        shadow/off coordinator — or one without a cancellable backend —
+        leaves the list exactly as it was. Fail-open throughout.
+        """
+        try:
+            coordinator = getattr(self, "subagent_coordinator", None)
+            if (
+                coordinator is None
+                or getattr(coordinator, "mode", "off") != "advisory"
+            ):
+                return 0
+            backend = getattr(coordinator, "backend", None)
+            if not callable(getattr(backend, "decide_cancellable", None)):
+                return 0
+            due = self.follow_up_drafts_due()
+            if not due:
+                return 0
+            with self.lock:
+                thread = self._draft_batch_thread
+                if thread is not None and thread.is_alive():
+                    return 0
+                states = {}
+                for item in due:
+                    try:
+                        states[item["session_id"]] = self.engine_for(
+                            item["session_id"]
+                        ).state(item["session_id"])
+                    except KeyError:
+                        continue
+                due = [
+                    item for item in due if item["session_id"] in states
+                ]
+                if not due:
+                    return 0
+                for item in due:
+                    self._draft_attempted.add(
+                        (
+                            item["session_id"],
+                            str((item.get("plan") or {}).get("due_at", "")),
+                        )
+                    )
+                thread = Thread(
+                    target=self._run_followup_draft_batch,
+                    args=(coordinator, due, states),
+                    name="medical-followup-drafts",
+                    daemon=True,
+                )
+                self._draft_batch_thread = thread
+                thread.start()
+            return len(due)
+        except Exception:
+            return 0
+
+    def _run_followup_draft_batch(self, coordinator, items, states):
+        try:
+            results = coordinator.run_followup_batch(items, states)
+            self.store_follow_up_drafts(results)
+        except Exception:
+            # Drafts are an advisory cache; a generation failure must
+            # never surface on the follow-up list path.
+            pass
+
     def follow_ups(self):
         """All follow-up plans across engines, earliest due first.
 
@@ -310,6 +584,13 @@ class Workspace:
             engine = self.engine_for(session_id)
             engine.delete_session(session_id)
             self.events.discard_session(session_id)
+            if self.follow_up_drafts.pop(session_id, None) is not None:
+                self._persist_follow_up_drafts()
+            self._draft_attempted = {
+                attempt
+                for attempt in self._draft_attempted
+                if attempt[0] != session_id
+            }
 
     def close(self):
         with self.lock:

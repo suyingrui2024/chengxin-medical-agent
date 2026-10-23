@@ -9,9 +9,13 @@ The design suggests triggering the batch from the UI once >=3 cases are
 due; this offline entry point deliberately runs with >=1 due case so a
 single overdue follow-up is never held back by the batch threshold.
 
-Drafts are written only to the workspace's in-memory follow_up_drafts and
-printed to stdout. Nothing is sent anywhere: a human confirms/edits each
-draft in the follow-up UI before any message goes out.
+Drafts go through Workspace.store_follow_up_drafts — the same durable
+store the server process uses (follow_up_drafts.json inside the session
+dir, loaded by any Workspace composed over the same data) — and are
+printed to stdout. Point --event-log at the server's event log (or set
+MEDAGENT_SESSION_DATA_DIR) so both processes resolve the same session
+dir. Nothing is sent anywhere: a human confirms/edits each draft in the
+follow-up UI before any message goes out.
 
 Usage:
     PYTHONPATH=src python scripts/run_followup_batch.py [--event-log PATH]
@@ -72,9 +76,10 @@ def main() -> int:
         for item in workspace.follow_ups()
         if item["plan"].get("status") == "scheduled"
         and item["plan"].get("due_at", "") <= now
+        and item["session_id"] not in workspace.follow_up_drafts
     ]
     if not due:
-        print("没有已到期且待处理的随访计划。")
+        print("没有已到期且待处理、且尚无草稿的随访计划。")
         return 0
 
     states = {}
@@ -83,11 +88,11 @@ def main() -> int:
         states[session_id] = workspace.engine_for(session_id).state(session_id)
 
     results = coordinator.run_followup_batch(due, states)
+    stored = workspace.store_follow_up_drafts(results)
     for result in results:
         session_id = result.get("session_id")
         if session_id is None:
             continue
-        workspace.follow_up_drafts[session_id] = result
         print(
             {
                 "session_id": session_id,
@@ -95,7 +100,10 @@ def main() -> int:
                 "draft_message": result.get("draft_message"),
             }
         )
-    print(f"已生成 {len(results)} 份随访草稿（仅存内存，未发送）。")
+    print(
+        f"已生成 {len(results)} 份随访草稿，新存 {stored} 份"
+        "（已写入与服务端共享的草稿存储，未发送）。"
+    )
     return 0
 
 

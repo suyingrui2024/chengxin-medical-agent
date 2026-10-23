@@ -35,6 +35,7 @@ from .medical_images import (
     inspect_image,
     recognizer_from_settings,
 )
+from . import education as education_module
 from .patient_records import (
     PatientRecordConflict,
     PatientRecordError,
@@ -50,6 +51,20 @@ from .execution_files import DirectoryChanged
 
 MAX_BODY_BYTES = 64 * 1024
 MAX_IMAGE_BODY_BYTES = 6 * 1024 * 1024
+
+
+def _persist_engine_state(engine, state) -> None:
+    """Persist a state a route mutated directly, inside its session lock.
+
+    These routes bypass the engine's own write-through points, so
+    without this the change lives only in memory and a restart restores
+    the stale snapshot. The engine's ``persist_state`` is fail-open by
+    contract; the getattr guard only covers engines composed before the
+    method existed.
+    """
+    persist_state = getattr(engine, "persist_state", None)
+    if persist_state is not None:
+        persist_state(state)
 
 
 class MedicalAgentServer(ThreadingHTTPServer):
@@ -95,6 +110,10 @@ class MedicalAgentServer(ThreadingHTTPServer):
         )
         if isinstance(engine, AdaptiveConsultationEngine):
             engine.subagent_coordinator = self.subagents
+        # The workspace recomposes engines on settings apply / capability
+        # reconfigure; hand it the coordinator so every replacement
+        # adaptive engine is wired too, not just the startup one.
+        self.workspace.subagent_coordinator = self.subagents
 
     @property
     def patient_records(self) -> PatientRecordStore:
@@ -150,7 +169,115 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args: Any) -> None:
         print(f"[{self.log_date_time_string()}] {format % args}")
 
+    # Every verb funnels through an OSError guard: a disk failure inside
+    # any route (event append, session store, patient records) used to
+    # kill the handler thread with no response at all. The client now
+    # gets a structured 500 it can surface and retry against.
     def do_GET(self) -> None:
+        try:
+            self._do_GET()
+        except OSError:
+            self._io_error()
+
+    def do_POST(self) -> None:
+        try:
+            self._do_POST()
+        except OSError:
+            self._io_error()
+
+    def do_DELETE(self) -> None:
+        try:
+            self._do_DELETE()
+        except OSError:
+            self._io_error()
+
+    def do_PATCH(self) -> None:
+        try:
+            self._do_PATCH()
+        except OSError:
+            self._io_error()
+
+    def _io_error(self) -> None:
+        try:
+            self._error(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                "server_io_error",
+                "服务器读写文件时出错，请稍后重试",
+            )
+        except OSError:
+            # The connection itself is the casualty; nothing more can
+            # be delivered on it.
+            pass
+
+    def _persistence_health(self) -> Dict[str, int]:
+        """Durable-layer health for /api/health, read defensively: the
+        counters live on the event store and the engines, and a missing
+        counter reads as zero rather than breaking the health check."""
+        events = self.app.events
+        session_failures = 0
+        for engine in getattr(self.app.workspace, "engines", []):
+            value = getattr(engine, "_persist_failures", 0)
+            if isinstance(value, dict):
+                session_failures += sum(
+                    int(item)
+                    for item in value.values()
+                    if isinstance(item, (int, float))
+                )
+            elif isinstance(value, (int, float)):
+                session_failures += int(value)
+        return {
+            "event_append_failures": int(
+                getattr(events, "append_failures", 0) or 0
+            ),
+            "event_skipped_corrupt": int(
+                getattr(events, "skipped_corrupt", 0) or 0
+            ),
+            "session_persist_failures": session_failures,
+        }
+
+    def _maybe_schedule_education(self, engine, state) -> None:
+        """Re-check the education layer when a snapshot is read.
+
+        The enricher normally schedules at mutation time; a conclusion
+        that became enrichable through a path that never scheduled (or
+        a restart in between) would otherwise wait forever. The
+        predicate is supplied by the education module and may not exist
+        yet — its absence must never break a plain state read.
+        """
+        enricher = getattr(self.app, "enricher", None)
+        if enricher is None:
+            return
+        predicate = getattr(enricher, "needs_enrichment", None)
+        if predicate is None:
+            predicate = getattr(education_module, "needs_enrichment", None)
+        if predicate is None:
+            return
+        try:
+            needed = predicate(state)
+        except Exception:
+            return
+        if needed:
+            enricher.schedule(engine, state)
+
+    def _maybe_schedule_followup_drafts(self) -> None:
+        """Re-check the follow-up draft batch when the due list is read.
+
+        Drafts are generated inside this process by the workspace (the
+        offline batch script writes to the same durable store), on a
+        background thread, so the list response never waits on the
+        model. A workspace composed before the trigger existed — or any
+        failure inside it — must never break a plain list read.
+        """
+        workspace = getattr(self.app, "workspace", None)
+        schedule = getattr(workspace, "maybe_schedule_followup_drafts", None)
+        if schedule is None:
+            return
+        try:
+            schedule()
+        except Exception:
+            return
+
+    def _do_GET(self) -> None:
         path = urlparse(self.path).path
         if path == "/api/health":
             self._json(
@@ -160,6 +287,7 @@ class Handler(BaseHTTPRequestHandler):
                     "version": __version__,
                     "backend": self.app.workspace.backend,
                     "execution_available": self.app.access_token is not None,
+                    "persistence": self._persistence_health(),
                 }
             )
             return
@@ -185,6 +313,7 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"sessions": self.app.workspace.sessions()})
             return
         if path == "/api/follow-ups":
+            self._maybe_schedule_followup_drafts()
             self._json({"follow_ups": self.app.workspace.follow_ups()})
             return
         if path == "/api/tasks":
@@ -214,6 +343,7 @@ class Handler(BaseHTTPRequestHandler):
                 )
             elif len(parts) == 4 and parts[3] == "snapshot":
                 with engine._session_locks[state.session_id]:
+                    self._maybe_schedule_education(engine, state)
                     self._json(
                         {
                             "state": state.to_dict(),
@@ -228,13 +358,15 @@ class Handler(BaseHTTPRequestHandler):
             elif len(parts) == 4 and parts[3] == "handoff":
                 with engine._session_locks[state.session_id]:
                     self._json({"handoff": build_handoff(state)})
-            else:
+            elif len(parts) == 3:
                 with engine._session_locks[state.session_id]:
                     self._json({"state": state.to_dict()})
+            else:
+                self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
             return
         self._static(path)
 
-    def do_POST(self) -> None:
+    def _do_POST(self) -> None:
         if not self._same_origin():
             return
         path = urlparse(self.path).path
@@ -353,17 +485,23 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/sessions":
             with self.app.workspace.lock:
-                state, reply = self.app.workspace.engine.create_session(
-                    request_id=self.request_id
-                )
-            self._json(
-                {
-                    "session_id": state.session_id,
-                    "reply": reply.to_dict(),
-                    "state": state.to_dict(),
-                },
-                HTTPStatus.CREATED,
-            )
+                # Idempotent create: a retried request (same X-Request-ID)
+                # returns the session it already created instead of
+                # minting a duplicate consultation.
+                replay = self.app.workspace.session_creation(self.request_id)
+                if replay is None:
+                    state, reply = self.app.workspace.engine.create_session(
+                        request_id=self.request_id
+                    )
+                    replay = {
+                        "session_id": state.session_id,
+                        "reply": reply.to_dict(),
+                        "state": state.to_dict(),
+                    }
+                    self.app.workspace.remember_session_creation(
+                        self.request_id, replay
+                    )
+            self._json(replay, HTTPStatus.CREATED)
             return
 
         parts = path.strip("/").split("/")
@@ -502,6 +640,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.app.reviews.invalidate(state, "patient_record_attached")
                     self.app.reviews.schedule(engine, state)
                     self.app.enricher.schedule(engine, state)
+                    _persist_engine_state(engine, state)
                     response = {"items": attached, "state": state.to_dict()}
             except KeyError:
                 self._error(
@@ -571,6 +710,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.app.reviews.invalidate(state, "report_item_confirmed")
                     self.app.reviews.schedule(engine, state)
                     self.app.enricher.schedule(engine, state)
+                    _persist_engine_state(engine, state)
                     response = {"item": confirmed, "state": state.to_dict()}
             except KeyError:
                 self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
@@ -618,6 +758,7 @@ class Handler(BaseHTTPRequestHandler):
                             },
                         )
                     )
+                    _persist_engine_state(engine, state)
             except KeyError:
                 self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
                 return
@@ -691,7 +832,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
-    def do_DELETE(self) -> None:
+    def _do_DELETE(self) -> None:
         if not self._same_origin():
             return
         path = urlparse(self.path).path
@@ -726,6 +867,7 @@ class Handler(BaseHTTPRequestHandler):
                         Event(state.session_id, "report.item_removed", {"report_item_id": parts[4]})
                     )
                     self.app.reviews.invalidate(state, "report_item_removed")
+                    _persist_engine_state(engine, state)
                     response = {"deleted": True, "state": state.to_dict()}
             except KeyError:
                 self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
@@ -753,7 +895,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
-    def do_PATCH(self) -> None:
+    def _do_PATCH(self) -> None:
         if not self._same_origin():
             return
         path = urlparse(self.path).path
@@ -1141,6 +1283,7 @@ class Handler(BaseHTTPRequestHandler):
                                 {"entry_id": parts[2], "reason": "record_deleted"},
                             )
                         )
+                        _persist_engine_state(engine, state)
                 except KeyError:
                     continue
             self.app.events.append(
