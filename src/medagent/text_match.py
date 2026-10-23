@@ -15,7 +15,7 @@ fails to support gastroenteritis.
 """
 from __future__ import annotations
 
-NEGATION_CUES = ("没有", "没", "无", "未", "否认", "未见", "不伴")
+NEGATION_CUES = ("没有", "无", "未", "否认", "未见", "不伴")
 WINDOW = 6
 _CLAUSE_BREAKS = "，。；、！？,.;!?：:"
 
@@ -27,7 +27,13 @@ def _occurrence_negated(text: str, index: int) -> bool:
     cut = max((window.rfind(mark) for mark in _CLAUSE_BREAKS), default=-1)
     if cut >= 0:
         window = window[cut + 1 :]
-    return any(cue in window for cue in NEGATION_CUES)
+    if any(cue in window for cue in NEGATION_CUES):
+        return True
+    # A bare 没 is a negation only when it directly precedes the term
+    # ("没发热"). Otherwise it usually negates a verb further back —
+    # "没睡好胸口疼" has a real chest pain, and reading the 没 as
+    # negating 胸口 would silently kill the whole chest pathway.
+    return window.endswith("没")
 
 
 def find_unnegated(text: str, term: str) -> int:

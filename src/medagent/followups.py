@@ -45,9 +45,9 @@ def build_follow_up_plan(state: CaseState) -> Optional[Dict[str, Any]]:
     if state.closed_reason == "urgent_route" or state.risk.level == RiskLevel.URGENT:
         hours = 24
         kind = "urgent_checkin"
-        reason = "风险升级关闭，建议 24 小时内确认是否已获线下评估：" + "、".join(
-            state.risk.triggers
-        )
+        reason = "风险升级关闭，建议 24 小时内确认是否已获线下评估"
+        if state.risk.triggers:
+            reason += "：" + "、".join(state.risk.triggers)
     elif state.closed_reason == "confirmed_by_user":
         kind = "routine_checkin"
         has_unknowns = any(

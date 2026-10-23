@@ -26,6 +26,8 @@ LABELS = {
     "back_details": "腰背细节",
     "urinary_details": "排尿细节",
     "skin_details": "皮疹细节",
+    "emergency_screen": "急症筛查",
+    "patient_goal": "本次咨询目标",
 }
 
 

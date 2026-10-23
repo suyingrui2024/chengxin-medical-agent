@@ -143,7 +143,12 @@ def _condition_quote(state: CaseState, condition: Dict[str, Any]) -> Optional[st
     if "assertion" in condition:
         if fact.assertion.value != condition["assertion"]:
             return None
-        return str(fact.value) if not isinstance(fact.value, str) else fact.value
+        # Quote the patient's own words (the denial itself), never
+        # str(value): for an ABSENT fact value is None and the literal
+        # string "None" would enter the evidence chain as a fake quote.
+        if fact.evidence:
+            return fact.evidence
+        return str(fact.value) if isinstance(fact.value, str) else None
     if "contains_any" in condition:
         haystack = fact.value if isinstance(fact.value, str) else ""
         evidence = fact.evidence or ""
@@ -316,11 +321,13 @@ class DifferentialPlanner:
         self._proposer = proposer
 
     # weights from design doc §4.5 (v1 values; tune only with an eval report)
+    # v1 has no burden term: question burden is governed by phase order and
+    # the close conditions, not by score — a former W_BURDEN constant that
+    # was never wired into score() was removed so tuning notes don't lie.
     W_RED_FLAG = 3.0
     W_DISCRIMINATION = 2.0
     W_REQUIRED = 1.0
     W_FRESHNESS = 0.5
-    W_BURDEN = 0.5
 
     def _refresh_workspace(self, state: CaseState) -> Tuple[ReasoningWorkspace, set]:
         engine = self._engine

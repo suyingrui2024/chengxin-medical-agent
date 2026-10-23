@@ -224,6 +224,15 @@ class ConsultationEngine(
                 raise KeyError(session_id)
             return self._sessions[session_id]
 
+    def _lock_for(self, session_id: str):
+        """Fetch a session's lock atomically (a concurrent delete must
+        surface as the same KeyError as an unknown session, never as a
+        bare dict-index crash mid-request)."""
+        with self._sessions_lock:
+            if session_id not in self._session_locks:
+                raise KeyError(session_id)
+            return self._session_locks[session_id]
+
     def delete_session(self, session_id: str) -> None:
         """Forget one in-memory consultation and every controller-side reference."""
         with self._sessions_lock:
@@ -245,7 +254,7 @@ class ConsultationEngine(
 
     def submit(self, session_id: str, user_input: UserInput) -> AgentReply:
         state = self.state(session_id)
-        with self._session_locks[session_id]:
+        with self._lock_for(session_id):
             trace_id = str(uuid4())
             self.events.bind_trace(session_id, trace_id, user_input.request_id)
             try:
@@ -790,10 +799,16 @@ class ConsultationEngine(
         expected_fact_id: Optional[str] = None,
     ) -> AgentReply:
         state = self.state(session_id)
-        with self._session_locks[session_id]:
+        with self._lock_for(session_id):
             urgent_reply = self._correction_emergency(state, new_text)
             if urgent_reply:
                 return urgent_reply
+            if state.phase == Phase.CLOSED:
+                # Closed cases are read-only history (restored sessions
+                # doubly so): reopening one here would fork it from its
+                # conclusion sheet and, once persisted as non-CLOSED,
+                # make its follow-up plan vanish on the next restart.
+                raise ValueError("会谈已结束，记录不能再更正")
             self._check_fact_version(state, fact_key, expected_fact_id)
             previous_task = state.active_task
             question = next(
@@ -862,7 +877,9 @@ class ConsultationEngine(
         and the reversal.
         """
         state = self.state(session_id)
-        with self._session_locks[session_id]:
+        with self._lock_for(session_id):
+            if state.phase == Phase.CLOSED:
+                raise ValueError("会谈已结束，记录不能再更正")
             self._check_fact_version(state, fact_key, expected_fact_id)
             current = state.facts.get(fact_key)
             if current is None:
@@ -1767,6 +1784,13 @@ class ConsultationEngine(
 
     def _schedule_follow_up(self, state, reply=None, turn_id=None):
         """Design phase 4: derive, persist and announce a follow-up plan."""
+        if state.follow_up:
+            # Idempotent: the urgent path schedules at summary time and
+            # the confirm path calls again — rebuilding would drift the
+            # due clock and wipe an outcome recorded in between.
+            if reply is not None:
+                reply.follow_up = dict(state.follow_up)
+            return state.follow_up
         plan = build_follow_up_plan(state)
         if plan is None:
             return None
@@ -1784,7 +1808,7 @@ class ConsultationEngine(
         """Record a follow-up outcome; worsening reopens triage as a new
         session linked to this one (design phase 4 longitudinal loop)."""
         state = self.state(session_id)
-        with self._session_locks[session_id]:
+        with self._lock_for(session_id):
             plan = state.follow_up
             if not plan:
                 raise ValueError("该会话没有随访计划，无法记录结局")
@@ -1938,7 +1962,20 @@ class ConsultationEngine(
             )
             if mode == "on":
                 reply.conclusion = deepcopy(sheet)
-        except Exception:
+        except Exception as exc:
+            # Fail-open for the patient, but never silent: a missing
+            # conclusion sheet must be attributable from the event log.
+            try:
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "conclusion.failed",
+                        {"error": type(exc).__name__},
+                        turn_id=turn_id,
+                    )
+                )
+            except Exception:
+                pass
             return
 
     @staticmethod

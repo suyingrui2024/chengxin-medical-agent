@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+from copy import deepcopy
 from importlib import resources
 from typing import Any, Dict, List, Optional
 
@@ -228,7 +229,13 @@ def _select_directions(accepted) -> tuple[List[Dict[str, Any]], bool]:
             }
         )
     # A direction without a patient-facing label may not be shown to the
-    # patient (design §5.3.5); it still counted toward selection above.
+    # patient (design §5.3.5); it still counted toward selection above,
+    # but the entry itself is dropped here rather than leaking a null
+    # label to the renderer. If that empties the list, the sheet
+    # abstains instead of presenting an empty directions block.
+    directions = [d for d in directions if d["patient_label"]]
+    if not directions:
+        return [], True
     return directions, False
 
 
@@ -340,13 +347,14 @@ def compose_conclusion(
                 "department_hint": None,
             }
     group_key = "generic"
-    status_rank = {"supported": 0, "active": 1, "unlikely": 2, "refuted": 3}
-    for hypothesis in sorted(
-        accepted.hypotheses.values(),
-        key=lambda h: status_rank.get(h.status, 4),
-    ):
-        if hypothesis.id in PATHWAY_GROUPS:
-            group_key = PATHWAY_GROUPS[hypothesis.id]
+    # Self-care follows the directions actually chosen for the sheet —
+    # never a refuted hypothesis the patient will not see (previously a
+    # refuted pneumonia could supply the care group on an abstained
+    # sheet, contradicting the directions above it).
+    for direction in directions:
+        hid = direction.get("hypothesis_id")
+        if hid in PATHWAY_GROUPS:
+            group_key = PATHWAY_GROUPS[hid]
             break
     care = _self_care_group(group_key, tier) or {}
     subject = state.facts.get("consult_for")
@@ -383,7 +391,13 @@ def compose_conclusion(
             "self_care": _load_json("self_care.json").get("version"),
         },
     }
-    rendered = json.dumps(sheet, ensure_ascii=False)
+    # The banned-phrase lint guards *system* wording. Patient quotes
+    # (support_quotes) are the patient's own words — a patient writing
+    # "没事，就是咳" must not silently void the whole sheet.
+    lint_view = deepcopy(sheet)
+    for direction in lint_view.get("directions", []):
+        direction.pop("support_quotes", None)
+    rendered = json.dumps(lint_view, ensure_ascii=False)
     if any(phrase in rendered for phrase in BANNED_PHRASES):
         raise ValueError("conclusion sheet failed the banned-phrase lint")
     return sheet

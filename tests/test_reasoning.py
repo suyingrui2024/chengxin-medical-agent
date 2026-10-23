@@ -408,3 +408,17 @@ class NegationMatchingTests(unittest.TestCase):
     def test_negated_chief_does_not_activate_pathway(self):
         ws = self._workspace([("chief_complaint", "没有头痛，就是来开点药")])
         self.assertEqual(ws.hypotheses, {})
+
+
+class BareMeiNegationTests(unittest.TestCase):
+    """Audit E2: a bare 没 earlier in an unpunctuated sentence negates a
+    verb (没睡好), not the symptom that follows it."""
+
+    def test_mei_negates_only_when_adjacent(self):
+        from medagent.text_match import contains_unnegated
+
+        self.assertTrue(contains_unnegated("没睡好胸口疼", "胸口"))
+        self.assertTrue(contains_unnegated("昨晚没睡好头疼", "头疼"))
+        self.assertTrue(contains_unnegated("没休息好腰痛", "腰痛"))
+        self.assertFalse(contains_unnegated("没发热", "发热"))
+        self.assertFalse(contains_unnegated("我没呕吐", "呕吐"))

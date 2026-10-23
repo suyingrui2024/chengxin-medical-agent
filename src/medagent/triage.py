@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from threading import Lock
 from typing import Dict, Iterable, List, Tuple
 
 from .domain import Assertion, CaseState, RiskAssessment, RiskLevel, utc_now
@@ -64,6 +65,7 @@ class TriageService:
             scanner.provider = semantic_provider
         self._scanner = scanner
         self._scan_cache: Dict[str, Tuple[str, ...]] = {}
+        self._scan_cache_lock = Lock()
 
     @staticmethod
     def _not_negated(text: str, start: int) -> bool:
@@ -73,16 +75,21 @@ class TriageService:
         return self._scanner.scan(text)
 
     def scan_text(self, text: str) -> List[str]:
-        cached = self._scan_cache.get(text)
+        # The cache is shared across server threads; guard it with a
+        # small lock (worst case without one was a benign rescan, but
+        # the "memoized" contract should not rely on the GIL).
+        with self._scan_cache_lock:
+            cached = self._scan_cache.get(text)
         if cached is not None:
             return list(cached)
         labels: List[str] = []
         for hit in self._scanner.scan(text):
             if hit.label not in labels:
                 labels.append(hit.label)
-        if len(self._scan_cache) >= self._CACHE_LIMIT:
-            self._scan_cache.clear()
-        self._scan_cache[text] = tuple(labels)
+        with self._scan_cache_lock:
+            if len(self._scan_cache) >= self._CACHE_LIMIT:
+                self._scan_cache.clear()
+            self._scan_cache[text] = tuple(labels)
         return list(labels)
 
     def assess(
