@@ -1622,6 +1622,19 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
     },
   );
 
+  function isWebUrl(value) {
+    try {
+      const link = new URL(value);
+      return (
+        (link.protocol === "http:" || link.protocol === "https:") &&
+        !link.username &&
+        !link.password
+      );
+    } catch {
+      return false;
+    }
+  }
+
   register(
     "conclusion",
     (data) => {
@@ -1666,6 +1679,32 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       list(data.return_now_if).forEach(text);
       if (data.outlook) text(data.outlook);
       if (data.abstain_text) text(data.abstain_text);
+      const reading = data.further_reading;
+      if (reading) {
+        if (reading.status !== undefined) text(reading.status);
+        if (
+          reading.sheet_revision !== undefined &&
+          reading.sheet_revision !== null &&
+          !Number.isFinite(reading.sheet_revision)
+        )
+          throw new Error("Invalid further-reading revision");
+        if (
+          reading.sources_version !== undefined &&
+          reading.sources_version !== null
+        )
+          text(reading.sources_version);
+        if (reading.citations !== undefined)
+          list(reading.citations).forEach((citation) => {
+            text(citation.title);
+            text(citation.url);
+            text(citation.publisher);
+            if (citation.published_at) text(citation.published_at);
+            text(citation.fetched_at);
+            if (!["T1", "T2"].includes(citation.tier))
+              throw new Error("Invalid citation tier");
+            text(citation.quote);
+          });
+      }
     },
     (data) => {
       const card = el("article", "conclusion-card");
@@ -1786,6 +1825,43 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
             ),
           );
         card.append(outlook);
+      }
+      const citations = (data.further_reading?.citations || []).filter(
+        (citation) => isWebUrl(citation.url),
+      );
+      if (citations.length) {
+        const reading = el("section", "conclusion-reading");
+        reading.append(el("h4", "", "延伸阅读（来自权威来源）"));
+        reading.append(
+          el(
+            "p",
+            "conclusion-reading-note",
+            "以下内容来自网络公开资料，未经本系统临床评审，仅供了解参考。",
+          ),
+        );
+        const readingList = el("ul");
+        citations.forEach((citation) => {
+          const li = el("li");
+          const link = el("a", "", citation.title);
+          link.href = citation.url;
+          link.target = "_blank";
+          link.rel = "noopener";
+          li.append(link);
+          li.append(
+            el(
+              "p",
+              "conclusion-reading-source",
+              citation.published_at
+                ? `${citation.publisher} · ${citation.published_at}`
+                : `${citation.publisher} · 发布日期未标注`,
+            ),
+          );
+          if (citation.quote)
+            li.append(el("p", "conclusion-reading-quote", citation.quote));
+          readingList.append(li);
+        });
+        reading.append(readingList);
+        card.append(reading);
       }
       card.append(
         el("p", "conclusion-handoff", "就诊时可把本次记录给医生看。"),

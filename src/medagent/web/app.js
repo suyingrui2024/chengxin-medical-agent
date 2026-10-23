@@ -1889,7 +1889,14 @@ async function loadEvents() {
   if (data.events.length < state.events.length) return;
   const added = data.events.slice(state.events.length);
   state.events = data.events;
-  if (added.some((event) => event.event_type.startsWith("advisor."))) {
+  if (
+    added.some(
+      (event) =>
+        event.event_type.startsWith("advisor.") ||
+        event.event_type === "web.citation_attached" ||
+        event.event_type === "web.education_completed",
+    )
+  ) {
     const snapshot = await api(`/api/sessions/${id}/snapshot`);
     if (state.sessionId === id) renderCase(snapshot.state);
   }
@@ -2110,6 +2117,14 @@ const eventLabels = {
   "advisor.cancelled": "取消过期复核",
   "advisor.discarded": "丢弃过期复核结果",
   "advisor.unavailable": "后台复核暂不可用",
+  "web.search_requested": "发起网络检索",
+  "web.search_completed": "网络检索完成",
+  "web.fetch_completed": "网页抓取完成",
+  "web.blocked": "拦截不合规的联网请求",
+  "web.citation_attached": "延伸阅读已补充",
+  "web.education_completed": "延伸阅读生成完成",
+  "web.education_failed": "延伸阅读生成失败",
+  "web.conflict_detected": "网络资料与安全提示冲突（已拦截）",
   "self_check.offered": "展示图示任务",
   "self_check.completed": "记录任务反馈",
   "turn.rejected": "拒绝过期回答",
