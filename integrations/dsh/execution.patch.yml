@@ -5,6 +5,8 @@
       name: /opt/medical-agent/integrations/dsh/execution-control.mjs
     - id: chengxin-execution-search
       name: /opt/medical-agent/integrations/dsh/execution-search.mjs
+    - id: chengxin-execution-fetch
+      name: /opt/medical-agent/integrations/dsh/execution-fetch.mjs
     - id: chengxin-execution-sdk
       name: /opt/medical-agent/integrations/dsh/execution-sdk.mjs
     - id: chengxin-execution-capabilities
@@ -107,6 +109,8 @@
     model: !!js process.env.CHENGXIN_MODEL
     maxUses: 3
     maxTokens: 2048
+- id: web-fetch-http
+  disabled: true
 - id: tool-subagent
   config:
     provider: spawn

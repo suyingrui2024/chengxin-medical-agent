@@ -27,6 +27,16 @@
 
 完整执行工作台实际支持文件、终端、代码、联网及子智能体，不与医疗问诊路径的空工具配置混用。说明与测试见 [通用执行底座](../../docs/通用执行底座与能力评测设计.md)。
 
+## 执行工作台预算口径
+
+模型调用、联网与子智能体派生共享同一个预算池，不存在各自独立的额度：
+
+- **拦截点**：`execution-worker.mjs` 把 SDK 的模型端点改写为本机回环网关，一切模型流量（含子智能体后代、搜索的内层 LLM 请求）必经网关的 `/model/messages` 处理器；无主、已取消、过截止或超调用数一律返回 429，且先预留计数再放行，根与并发后代共享同一硬上限。运行时可经 `GET /model/budget` 自查剩余额度。
+- **回合与终身**：每回合模型调用上限 `max_calls` 默认 24、合法域 1–64（`src/medagent/execution.py`）；每回合时限默认 180 秒、上限 1800 秒（`src/medagent/execution_limits.py`）；worker 进程终身模型调用硬顶 200 次。注册能力（capabilities）另有独立预算：32 次/回合、256 次/进程终身。
+- **联网归因与上限**：搜索走 `execution-search.mjs` 注册的官方 `DeepSeekSearchProvider`——其内层 LLM 请求经网关的 `/sessions/<发起者会话>` 作用域路由发出（按会话归因、计入同一预算池），并由 `recordRequest` 把请求落为会话事件 `web/deepseek-search-llm-request`；抓取经 chengxin web 插件包装上游 fetch provider，同样归因到发起会话并落 session 事件。搜索 provider 的 `maxUses` 为 3（`execution-search.mjs` 与 `execution.patch.yml`）；此外 chengxin web 插件设每会话上限：同一会话内 search 与 fetch 合计不超过 30 次，超限抛 `WEB_SESSION_BUDGET_EXCEEDED` 并落 `web/budget-exceeded` 事件。
+- **子智能体**：`execution.patch.yml` 中 `tool-subagent`（spawn）与 `tool-subagent-fork`（fork）的 `maxDepth` 同为 2；后代不另设预算，其全部模型调用计入上述共享池。
+- **不在此口径内**：医疗决策桥（`bridge.mjs` + `medical.patch.yml`）是零工具面——无联网、无子智能体、无宿主工具，不适用本节预算；临床问诊的限额独立于执行工作台、另行规定。
+
 安装与检查：
 
 ```bash

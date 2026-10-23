@@ -93,6 +93,14 @@ try {
     !entry("chengxin-execution-search")?.name.endsWith(
       "/execution-search.mjs",
     ) ||
+    entry("web-fetch-http")?.disabled !== true ||
+    !entry("chengxin-execution-fetch")?.name.endsWith(
+      "/execution-fetch.mjs",
+    ) ||
+    entry("tool-subagent")?.config?.provider !== "spawn" ||
+    entry("tool-subagent")?.config?.maxDepth !== 2 ||
+    entry("tool-subagent-fork")?.config?.provider !== "fork" ||
+    entry("tool-subagent-fork")?.config?.maxDepth !== 2 ||
     entry("chengxin-execution-shell")?.config?.timeoutMs !== 10000 ||
     entry("chengxin-execution-shell")?.config?.maxTimeoutMs !== 30000 ||
     entry("tool-bash")?.config?.promoteOnTimeout !== true ||
@@ -117,6 +125,12 @@ try {
           maximum_wait_ms: 30000,
           maximum_job_wait_ms: 600000,
           background_handoff: true,
+          web: {
+            search: "chengxin-execution-search",
+            fetch: "chengxin-execution-fetch",
+            session_web_cap: 30,
+          },
+          subagent: { max_depth: 2 },
         },
       },
       null,
