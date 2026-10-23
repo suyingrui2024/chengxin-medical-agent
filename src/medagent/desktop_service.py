@@ -11,6 +11,19 @@ from .runtime import build_runtime
 from .server import Handler, MedicalAgentServer
 
 
+def _build_desktop_runtime(mode: str):
+    # The desktop app is the longitudinal product surface: closed
+    # sessions (and their follow-up plans) persist next to the patient
+    # records so a restart never loses a due follow-up, and the event
+    # log is file-backed too, so a restored case keeps its audit trail.
+    root = default_patient_data_root()
+    return build_runtime(
+        backend=mode,
+        session_dir=root / "sessions",
+        event_path=root / "events.jsonl",
+    )
+
+
 class DesktopHandler(Handler):
     def log_message(self, format, *args):
         # stdout is reserved for the parent control protocol.
@@ -32,12 +45,7 @@ def main():
     )
     if mode not in {"demo", "compatible", "dsh"}:
         raise ValueError("Invalid desktop backend")
-    # The desktop app is the longitudinal product surface: closed
-    # sessions (and their follow-up plans) persist next to the patient
-    # records so a restart never loses a due follow-up.
-    runtime = build_runtime(
-        backend=mode, session_dir=default_patient_data_root() / "sessions"
-    )
+    runtime = _build_desktop_runtime(mode)
     context = runtime.start()
     server = MedicalAgentServer(
         ("127.0.0.1", 0),

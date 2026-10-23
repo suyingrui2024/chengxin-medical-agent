@@ -1498,6 +1498,15 @@ svg.icon {
 .nav-item > .count {
   margin-left: auto;
 }
+.nav-item > .count.due {
+  margin-left: 6px;
+  padding: 0 7px;
+  border: 1px solid var(--warning-line);
+  border-radius: 999px;
+  background: var(--warning-bg);
+  color: inherit;
+  font-weight: 600;
+}
 .recent-head {
   display: flex;
   justify-content: space-between;

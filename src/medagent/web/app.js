@@ -363,6 +363,15 @@ function focusCurrentAction() {
 }
 function navigate(view) {
   if (
+    view === "history" &&
+    followUpDueCount() > 0 &&
+    "Notification" in window &&
+    Notification.permission === "default"
+  ) {
+    // Ask once, from a user gesture, so due follow-ups can notify.
+    Notification.requestPermission().catch(() => {});
+  }
+  if (
     ![
       "consultation",
       "records",
@@ -1725,6 +1734,40 @@ async function refreshFollowUps() {
   }
   renderFollowUps();
 }
+function followUpDueCount() {
+  const now = Date.now();
+  return (state.followUps || []).filter((item) => {
+    if (!item.plan || item.plan.status !== "scheduled") return false;
+    const dueAt = Date.parse(item.plan.due_at);
+    return Number.isFinite(dueAt) && dueAt <= now;
+  }).length;
+}
+function renderFollowUpBadge() {
+  const badge = $("#followup-due-count");
+  const due = followUpDueCount();
+  if (badge) {
+    badge.hidden = due === 0;
+    badge.textContent = String(due);
+    badge.title = due ? `${due} 个随访已到回访时间` : "";
+  }
+  // One desktop notification per page load when follow-ups are due —
+  // the follow-up window (24–72h) is exactly when patients forget.
+  if (
+    due > 0 &&
+    "Notification" in window &&
+    Notification.permission === "granted" &&
+    !window.__followUpNotified
+  ) {
+    window.__followUpNotified = true;
+    try {
+      new Notification("有随访到期", {
+        body: `${due} 个随访计划已到回访时间，打开「会谈记录」记录近况。`,
+      });
+    } catch {
+      /* notifications are best-effort */
+    }
+  }
+}
 function renderFollowUps() {
   const section = $("#followup-section");
   const list = $("#followup-list");
@@ -1732,6 +1775,7 @@ function renderFollowUps() {
   const pending = (state.followUps || []).filter(
     (item) => item.plan && item.plan.status === "scheduled",
   );
+  renderFollowUpBadge();
   list.replaceChildren();
   section.hidden = pending.length === 0;
   const now = Date.now();

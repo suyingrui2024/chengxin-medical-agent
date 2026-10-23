@@ -129,3 +129,24 @@ class SessionPersistenceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DesktopRuntimeWiringTests(unittest.TestCase):
+    def test_desktop_runtime_persists_sessions_and_events(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from medagent import desktop_service
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.object(
+                desktop_service, "default_patient_data_root", lambda: root
+            ):
+                runtime = desktop_service._build_desktop_runtime("demo")
+            context = runtime.start()
+            engine = context.services.require("consultation")
+            events = context.services.require("events")
+            self.assertIsNotNone(engine.session_store)
+            self.assertEqual(events._path, root / "events.jsonl")
