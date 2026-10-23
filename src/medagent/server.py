@@ -22,7 +22,11 @@ from .consultation import (
 )
 from .domain import utc_now
 from .events import Event, EventStore
+from .agent import AdaptiveConsultationEngine
 from .background_review import BackgroundReviewCoordinator
+from .education import EducationEnricher
+from .subagents import SubagentCoordinator
+from .web_tools import WebTools
 from .handoff import build_handoff
 from .medical_images import (
     MedicalImageError,
@@ -77,6 +81,20 @@ class MedicalAgentServer(ThreadingHTTPServer):
         self.reviews = BackgroundReviewCoordinator(
             events, mode=os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow")
         )
+        # Web/subagent advisory layer (docs/联网与子智能体工具设计.md):
+        # assembled alongside the review coordinator and gated by env modes
+        # that default to off, so stock deployments behave exactly as before.
+        self.web_tools = WebTools(events)
+        self.enricher = EducationEnricher(events, self.web_tools)
+        self.subagents = SubagentCoordinator(
+            events,
+            getattr(engine, "backend", None),
+            mode=os.environ.get("MEDAGENT_SUBAGENT_MODE", "off"),
+            web_enabled=os.environ.get("MEDAGENT_SUBAGENT_WEB", "off") == "on",
+            web_tools=self.web_tools,
+        )
+        if isinstance(engine, AdaptiveConsultationEngine):
+            engine.subagent_coordinator = self.subagents
 
     @property
     def patient_records(self) -> PatientRecordStore:
@@ -88,6 +106,9 @@ class MedicalAgentServer(ThreadingHTTPServer):
         reviews = getattr(self, "reviews", None)
         if reviews is not None:
             reviews.close()
+        subagents = getattr(self, "subagents", None)
+        if subagents is not None and hasattr(subagents, "close"):
+            subagents.close()
         execution = getattr(self, "execution", None)
         if execution is not None:
             execution.close()
@@ -480,6 +501,7 @@ class Handler(BaseHTTPRequestHandler):
                     )
                     self.app.reviews.invalidate(state, "patient_record_attached")
                     self.app.reviews.schedule(engine, state)
+                    self.app.enricher.schedule(engine, state)
                     response = {"items": attached, "state": state.to_dict()}
             except KeyError:
                 self._error(
@@ -548,6 +570,7 @@ class Handler(BaseHTTPRequestHandler):
                     )
                     self.app.reviews.invalidate(state, "report_item_confirmed")
                     self.app.reviews.schedule(engine, state)
+                    self.app.enricher.schedule(engine, state)
                     response = {"item": confirmed, "state": state.to_dict()}
             except KeyError:
                 self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
@@ -650,6 +673,7 @@ class Handler(BaseHTTPRequestHandler):
                         ),
                     )
                     self.app.reviews.schedule(engine, state)
+                    self.app.enricher.schedule(engine, state)
                     response = {
                         "reply": reply.to_dict(),
                         "state": engine.state(parts[2]).to_dict(),
@@ -758,6 +782,7 @@ class Handler(BaseHTTPRequestHandler):
                         parts[2], parts[4], expected_fact_id
                     )
                     self.app.reviews.schedule(engine, state)
+                    self.app.enricher.schedule(engine, state)
                     response = {
                         "reply": reply.to_dict(),
                         "state": engine.state(parts[2]).to_dict(),
@@ -803,6 +828,7 @@ class Handler(BaseHTTPRequestHandler):
                         parts[2], parts[4], text.strip(), expected_fact_id
                     )
                     self.app.reviews.schedule(engine, state)
+                    self.app.enricher.schedule(engine, state)
                     response = {
                         "reply": reply.to_dict(),
                         "state": engine.state(parts[2]).to_dict(),

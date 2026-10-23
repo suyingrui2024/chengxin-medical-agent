@@ -15,6 +15,11 @@ ALLOWED = {
     "MEDAGENT_LLM_REASONING_EFFORT",
     "MEDAGENT_VISION_MODEL",
     "MEDAGENT_DSH_REVIEW_MODE",
+    "MEDAGENT_WEB_TOOLS",
+    "MEDAGENT_SUBAGENT_MODE",
+    "MEDAGENT_SUBAGENT_MODEL",
+    "MEDAGENT_SUBAGENT_WEB",
+    "MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP",
 }
 
 
@@ -60,6 +65,29 @@ def read_env(path):
     if review_mode not in {"shadow", "advisory"}:
         raise ValueError("MEDAGENT_DSH_REVIEW_MODE must be shadow or advisory")
     settings["MEDAGENT_DSH_REVIEW_MODE"] = review_mode
+    web_tools = settings.get("MEDAGENT_WEB_TOOLS", "off")
+    if web_tools not in {"off", "education", "review", "all"}:
+        raise ValueError("MEDAGENT_WEB_TOOLS must be off, education, review or all")
+    settings["MEDAGENT_WEB_TOOLS"] = web_tools
+    subagent_mode = settings.get("MEDAGENT_SUBAGENT_MODE", "off")
+    if subagent_mode not in {"off", "shadow", "advisory"}:
+        raise ValueError("MEDAGENT_SUBAGENT_MODE must be off, shadow or advisory")
+    settings["MEDAGENT_SUBAGENT_MODE"] = subagent_mode
+    subagent_web = settings.get("MEDAGENT_SUBAGENT_WEB", "off")
+    if subagent_web not in {"on", "off"}:
+        raise ValueError("MEDAGENT_SUBAGENT_WEB must be on or off")
+    settings["MEDAGENT_SUBAGENT_WEB"] = subagent_web
+    daily_cap = settings.get("MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP")
+    if daily_cap is not None:
+        try:
+            parsed_cap = int(daily_cap)
+        except (TypeError, ValueError):
+            parsed_cap = 0
+        if parsed_cap <= 0:
+            raise ValueError(
+                "MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP must be a positive integer"
+            )
+        settings["MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP"] = str(parsed_cap)
     return settings
 
 

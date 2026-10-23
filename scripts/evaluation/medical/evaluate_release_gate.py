@@ -124,11 +124,97 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
     return ok
 
 
+def check_web_advisory(fixtures: Path) -> bool:
+    """Web advisory hard gates (design: 联网与子智能体工具设计 §8.1):
+    tier filtering and citation fidelity exact, zero PII leaks,
+    injection detection >= 0.95, conflict detection exact — all offline
+    against frozen provider/fetch snapshots."""
+    sys.path.insert(0, str(ROOT))
+    corpus = json.loads(
+        (fixtures / "web_advisory_cases_v0.json").read_text(encoding="utf-8")
+    )
+    # Freshness binding, same discipline as the conclusion corpus: the
+    # corpus must name the web-sources registry version it was authored
+    # against, so a registry upgrade cannot leave it silently stale.
+    bound_version = corpus.get("web_sources_version")
+    actual_version = None
+    try:
+        from medagent import web_tools
+
+        actual_version = web_tools.sources_version()
+    except Exception:
+        sources_path = ROOT / "src" / "medagent" / "content" / "web_sources.json"
+        if sources_path.exists():
+            actual_version = json.loads(
+                sources_path.read_text(encoding="utf-8")
+            ).get("version")
+    if bound_version != actual_version:
+        print(
+            "web_advisory_cases_v0.json: corpus bound to web_sources "
+            f"{bound_version!r} but registry is {actual_version!r} -> FAIL"
+        )
+        return False
+    print(
+        "web advisory corpus review_status: "
+        f"{corpus.get('review_status', 'unknown')} "
+        "(engineering gate only — not a clinical sign-off)"
+    )
+    from scripts.evaluation.medical.evaluate_web_advisory import score_corpus
+
+    report = score_corpus(corpus)
+    if report.get("fatal"):
+        print(f"web_advisory_cases_v0.json: {report['fatal']} -> FAIL")
+        return False
+    ok = bool(report["gate_pass"])
+    print(
+        f"web_advisory_cases_v0.json: tier={report['tier_filter_accuracy']:.3f} "
+        f"citation={report['citation_quote_accuracy']:.3f} "
+        f"pii_leaks={report['pii_leaks']} "
+        f"injection={report['injection_detection_rate']:.3f} "
+        f"conflict={report['conflict_detection_rate']:.3f} "
+        f"dosage={report['dosage_lint_accuracy']:.3f} "
+        f"-> {'PASS' if ok else 'FAIL'}"
+    )
+    return ok
+
+
+def check_subagents(fixtures: Path) -> bool:
+    """Subagent validation hard gates (design §8.2): schema first-pass
+    exact, unverified-quote leaks == 0 (red line), fabricated-quote drop
+    rate == 1.0, staleness judgement correct — offline scripted stub."""
+    sys.path.insert(0, str(ROOT))
+    corpus = json.loads(
+        (fixtures / "subagent_cases_v0.json").read_text(encoding="utf-8")
+    )
+    print(
+        "subagent corpus review_status: "
+        f"{corpus.get('review_status', 'unknown')} "
+        "(engineering gate only — not a clinical sign-off)"
+    )
+    from scripts.evaluation.medical.evaluate_subagents import score_corpus
+
+    report = score_corpus(corpus)
+    if report.get("fatal"):
+        print(f"subagent_cases_v0.json: {report['fatal']} -> FAIL")
+        return False
+    ok = bool(report["gate_pass"])
+    print(
+        f"subagent_cases_v0.json: schema_first_pass={report['schema_first_pass_rate']:.3f} "
+        f"unverified_leaks={report['unverified_quote_leaks']} "
+        f"fabricated_dropped={report['fabricated_quote_drop_rate']:.3f} "
+        f"stale={report['stale_correct']}/{report['stale_cases']} "
+        f"-> {'PASS' if ok else 'FAIL'}"
+    )
+    return ok
+
+
 def main() -> int:
     service = TriageService()
     fixtures = ROOT / "tests" / "fixtures"
     results = [check_corpus(service, fixtures / name) for name in CORPORA]
     results.append(check_conclusion_sheet(fixtures))
+    results.append(check_web_advisory(fixtures))
+    results.append(check_subagents(fixtures))
     print("release gate:", "PASS" if all(results) else "FAIL")
     return 0 if all(results) else 1
 

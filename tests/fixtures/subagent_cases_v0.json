@@ -1,0 +1,1650 @@
+{
+ "cases": [
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 2
+   },
+   "expected_disposition": [
+    "self_care",
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "发烧两天，咳嗽",
+     "key": "chief_complaint",
+     "value": "发烧两天，咳嗽"
+    },
+    {
+     "assertion": "present",
+     "evidence": "变化不大",
+     "key": "trajectory",
+     "value": "stable"
+    },
+    {
+     "assertion": "present",
+     "evidence": "3分",
+     "key": "severity",
+     "value": 3
+    },
+    {
+     "assertion": "absent",
+     "evidence": "没有呼吸困难",
+     "key": "resp_breathing",
+     "value": null
+    },
+    {
+     "assertion": "absent",
+     "evidence": "没有其他不舒服",
+     "key": "associated_symptoms",
+     "value": null
+    }
+   ],
+   "id": "so-flu-typical",
+   "objective": "独立复核该病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向居家护理或常规门诊",
+      "disposition_tendency": "routine_visit",
+      "findings": [
+       {
+        "claim": "发热咳嗽两天，病程稳定",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "发烧两天，咳嗽",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "无呼吸困难等警示表现",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "没有呼吸困难",
+          "ref": "resp_breathing",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 1,
+    "status": "partial",
+    "surviving_claims": 2
+   },
+   "expected_disposition": [
+    "urgent_today"
+   ],
+   "fabricated_quotes": [
+    "夜间不能平卧"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "胸口闷痛半小时",
+     "key": "chief_complaint",
+     "value": "胸口闷痛半小时"
+    },
+    {
+     "assertion": "present",
+     "evidence": "还出冷汗",
+     "key": "associated_symptoms",
+     "value": "出冷汗"
+    },
+    {
+     "assertion": "present",
+     "evidence": "8分",
+     "key": "severity",
+     "value": 8
+    },
+    {
+     "assertion": "present",
+     "evidence": "越来越重",
+     "key": "trajectory",
+     "value": "worsening"
+    }
+   ],
+   "id": "so-chest-urgent-one-fake",
+   "objective": "独立复核该胸痛病例的处置倾向",
+   "risk": "urgent",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向今日急诊评估",
+      "disposition_tendency": "urgent_today",
+      "findings": [
+       {
+        "claim": "胸口闷痛持续半小时",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "胸口闷痛半小时",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴出冷汗",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "还出冷汗",
+          "ref": "associated_symptoms",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "夜间不能平卧",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "夜间不能平卧",
+          "ref": "resp_breathing",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 2,
+    "status": "rejected_by_validation",
+    "surviving_claims": 0
+   },
+   "expected_disposition": [
+    "routine_visit"
+   ],
+   "fabricated_quotes": [
+    "右下腹一按就疼得厉害",
+    "烧到39度5还打寒战"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "肚子隐痛一天",
+     "key": "chief_complaint",
+     "value": "肚子隐痛一天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "不太疼，3分",
+     "key": "severity",
+     "value": 3
+    },
+    {
+     "assertion": "absent",
+     "evidence": "没有呕吐腹泻",
+     "key": "gi_details",
+     "value": null
+    }
+   ],
+   "id": "so-all-fabricated",
+   "objective": "独立复核该腹痛病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向常规门诊",
+      "disposition_tendency": "routine_visit",
+      "findings": [
+       {
+        "claim": "右下腹固定压痛明显",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "右下腹一按就疼得厉害",
+          "ref": "gi_details",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴有高热寒战",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "烧到39度5还打寒战",
+          "ref": "temperature",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 1,
+    "status": "partial",
+    "surviving_claims": 3
+   },
+   "expected_disposition": [
+    "urgent_today"
+   ],
+   "fabricated_quotes": [
+    "看东西有重影"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "头痛三天了",
+     "key": "chief_complaint",
+     "value": "头痛三天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "吐了两次",
+     "key": "associated_symptoms",
+     "value": "呕吐两次"
+    },
+    {
+     "assertion": "present",
+     "evidence": "脖子有点发僵",
+     "key": "head_details",
+     "value": "脖子发僵"
+    },
+    {
+     "assertion": "present",
+     "evidence": "7分",
+     "key": "severity",
+     "value": 7
+    }
+   ],
+   "id": "so-headache-urgent",
+   "objective": "独立复核该头痛病例的处置倾向",
+   "risk": "urgent",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向今日急诊评估",
+      "disposition_tendency": "urgent_today",
+      "findings": [
+       {
+        "claim": "头痛持续三天",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "头痛三天了",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴呕吐两次",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "吐了两次",
+          "ref": "associated_symptoms",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "颈项发僵",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "脖子有点发僵",
+          "ref": "head_details",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴视物重影",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "看东西有重影",
+          "ref": "head_details",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 1,
+    "status": "partial",
+    "surviving_claims": 1
+   },
+   "expected_disposition": [
+    "urgent_today"
+   ],
+   "fabricated_quotes": [
+    "一松手更疼"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "右下腹疼痛一天",
+     "key": "chief_complaint",
+     "value": "右下腹疼痛一天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "6分",
+     "key": "severity",
+     "value": 6
+    },
+    {
+     "assertion": "absent",
+     "evidence": "没有腹泻",
+     "key": "gi_details",
+     "value": null
+    }
+   ],
+   "id": "so-appendicitis-boundary",
+   "objective": "独立复核该腹痛病例的处置倾向",
+   "risk": "urgent",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向今日急诊评估",
+      "disposition_tendency": "urgent_today",
+      "findings": [
+       {
+        "claim": "右下腹持续疼痛",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "右下腹疼痛一天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴有反跳痛",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "一松手更疼",
+          "ref": "gi_details",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 2
+   },
+   "expected_disposition": [
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "尿频尿急两天",
+     "key": "chief_complaint",
+     "value": "尿频尿急两天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "尿尿有点痛",
+     "key": "urinary_details",
+     "value": "尿痛"
+    },
+    {
+     "assertion": "absent",
+     "evidence": "没有发烧",
+     "key": "temperature_note",
+     "value": null
+    }
+   ],
+   "id": "so-urinary-routine",
+   "objective": "独立复核该尿路症状病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向常规门诊",
+      "disposition_tendency": "routine_visit",
+      "findings": [
+       {
+        "claim": "尿频尿急两天",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "尿频尿急两天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴尿痛",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "尿尿有点痛",
+          "ref": "urinary_details",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 2,
+    "status": "partial",
+    "surviving_claims": 2
+   },
+   "expected_disposition": [
+    "urgent_today"
+   ],
+   "fabricated_quotes": [
+    "耳朵嗡嗡响听不清",
+    "左边胳膊没劲"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "头晕，站不稳",
+     "key": "chief_complaint",
+     "value": "头晕站不稳"
+    },
+    {
+     "assertion": "present",
+     "evidence": "走路往一边偏",
+     "key": "dizzy_details",
+     "value": "走路偏斜"
+    },
+    {
+     "assertion": "present",
+     "evidence": "挺严重，7分",
+     "key": "severity",
+     "value": 7
+    }
+   ],
+   "id": "so-dizziness-half-fake",
+   "objective": "独立复核该头晕病例的处置倾向",
+   "risk": "urgent",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向今日急诊评估",
+      "disposition_tendency": "urgent_today",
+      "findings": [
+       {
+        "claim": "头晕伴站立不稳",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "头晕，站不稳",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "行走偏斜",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "走路往一边偏",
+          "ref": "dizzy_details",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴耳鸣听力下降",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "耳朵嗡嗡响听不清",
+          "ref": "dizzy_details",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "伴肢体无力",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "左边胳膊没劲",
+          "ref": "associated_symptoms",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 1,
+    "status": "partial",
+    "surviving_claims": 1
+   },
+   "expected_disposition": [
+    "self_care",
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "腰痛两天",
+     "key": "chief_complaint",
+     "value": "腰痛两天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "弯腰的时候更疼",
+     "key": "back_details",
+     "value": "弯腰加重"
+    },
+    {
+     "assertion": "absent",
+     "evidence": "大小便正常",
+     "key": "back_red_flags",
+     "value": null
+    }
+   ],
+   "id": "so-back-no-evidence-claim",
+   "objective": "独立复核该腰痛病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向居家护理或常规门诊",
+      "disposition_tendency": "routine_visit",
+      "findings": [
+       {
+        "claim": "腰痛两天，弯腰加重",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "腰痛两天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "无大小便异常",
+        "confidence": "high",
+        "evidence": []
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 1
+   },
+   "expected_disposition": [
+    "self_care",
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "身上起疹子，很痒",
+     "key": "chief_complaint",
+     "value": "身上起疹子很痒"
+    },
+    {
+     "assertion": "present",
+     "evidence": "胳膊和身上都有",
+     "key": "skin_details",
+     "value": "手臂和躯干"
+    },
+    {
+     "assertion": "absent",
+     "evidence": "呼吸没问题",
+     "key": "resp_breathing",
+     "value": null
+    }
+   ],
+   "id": "so-skin-routine",
+   "objective": "独立复核该皮疹病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向居家护理",
+      "disposition_tendency": "self_care",
+      "findings": [
+       {
+        "claim": "皮疹伴瘙痒，分布于手臂躯干",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "胳膊和身上都有",
+          "ref": "skin_details",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "stale",
+    "surviving_claims": 0
+   },
+   "expected_disposition": [
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "拉肚子一天",
+     "key": "chief_complaint",
+     "value": "腹泻一天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "没什么变化",
+     "key": "trajectory",
+     "value": "stable"
+    },
+    {
+     "assertion": "present",
+     "evidence": "3分",
+     "key": "severity",
+     "value": 3
+    }
+   ],
+   "id": "so-stale-mutation",
+   "mutate_during_run": {
+    "assertion": "present",
+    "evidence": "越来越严重了",
+    "key": "trajectory",
+    "value": "worsening"
+   },
+   "objective": "独立复核该腹泻病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向常规门诊",
+      "disposition_tendency": "routine_visit",
+      "findings": [
+       {
+        "claim": "腹泻一天，病程平稳",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "拉肚子一天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "程度轻",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "3分",
+          "ref": "severity",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "exclude_from_schema_rate": true,
+   "expected": {
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 1
+   },
+   "expected_backend_calls": 2,
+   "expected_disposition": [
+    "self_care",
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "干咳三天",
+     "key": "chief_complaint",
+     "value": "干咳三天"
+    },
+    {
+     "assertion": "absent",
+     "evidence": "不喘",
+     "key": "resp_breathing",
+     "value": null
+    }
+   ],
+   "id": "so-schema-repair",
+   "objective": "独立复核该咳嗽病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    "我先看一下这个病例，再给你结论。",
+    {
+     "arguments": {
+      "conclusion": "倾向居家护理",
+      "disposition_tendency": "self_care",
+      "findings": [
+       {
+        "claim": "干咳三天，无气促",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "干咳三天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 3
+   },
+   "expected_disposition": [
+    "urgent_today"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "咳嗽一周，越来越重",
+     "key": "chief_complaint",
+     "value": "咳嗽一周加重"
+    },
+    {
+     "assertion": "present",
+     "evidence": "痰里有点血丝",
+     "key": "resp_cough_details",
+     "value": "痰中带血丝"
+    },
+    {
+     "assertion": "present",
+     "evidence": "走快了就喘",
+     "key": "resp_breathing",
+     "value": "活动后气短"
+    },
+    {
+     "assertion": "present",
+     "evidence": "7分",
+     "key": "severity",
+     "value": 7
+    }
+   ],
+   "id": "so-lower-resp-urgent",
+   "objective": "独立复核该咳嗽病例的处置倾向",
+   "risk": "urgent",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向今日急诊评估",
+      "disposition_tendency": "urgent_today",
+      "findings": [
+       {
+        "claim": "咳嗽一周且加重",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "咳嗽一周，越来越重",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "痰中带血丝",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "痰里有点血丝",
+          "ref": "resp_cough_details",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "活动后气短",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "走快了就喘",
+          "ref": "resp_breathing",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "digest_quotes": [
+     "感冒一周了还没好",
+     "白天干咳，晚上重",
+     "没量过体温"
+    ],
+    "status": "completed"
+   },
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "感冒一周了还没好",
+     "key": "chief_complaint",
+     "value": "感冒一周没好"
+    },
+    {
+     "assertion": "present",
+     "evidence": "白天干咳，晚上重",
+     "key": "resp_cough_details",
+     "value": "白天干咳晚上重"
+    },
+    {
+     "assertion": "present",
+     "evidence": "没量过体温",
+     "key": "temperature_note",
+     "value": "没量过体温"
+    }
+   ],
+   "id": "dg-long-cold",
+   "objective": "压缩长转录为已核实摘要",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "长病例摘要完成",
+      "digest": {
+       "confirmed_facts": [
+        {
+         "key": "chief_complaint",
+         "quote": "感冒一周了还没好"
+        },
+        {
+         "key": "resp_cough_details",
+         "quote": "白天干咳，晚上重"
+        },
+        {
+         "key": "temperature_note",
+         "quote": "没量过体温"
+        }
+       ],
+       "contradictions": [],
+       "prior_outcomes": [],
+       "timeline": [
+        "主诉感冒一周未愈"
+       ]
+      },
+      "findings": [],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "case_digest",
+   "transcript": [
+    {
+     "content": "我自己",
+     "role": "user"
+    },
+    {
+     "content": "您哪里不舒服？",
+     "role": "assistant"
+    },
+    {
+     "content": "感冒一周了还没好",
+     "role": "user"
+    },
+    {
+     "content": "主要是什么症状？",
+     "role": "assistant"
+    },
+    {
+     "content": "白天干咳，晚上重",
+     "role": "user"
+    },
+    {
+     "content": "有没有发烧？",
+     "role": "assistant"
+    },
+    {
+     "content": "没量过体温",
+     "role": "user"
+    },
+    {
+     "content": "有没有喘不上气？",
+     "role": "assistant"
+    },
+    {
+     "content": "没有喘",
+     "role": "user"
+    },
+    {
+     "content": "吃过什么药？",
+     "role": "assistant"
+    },
+    {
+     "content": "吃过感冒灵",
+     "role": "user"
+    },
+    {
+     "content": "效果怎么样？",
+     "role": "assistant"
+    },
+    {
+     "content": "没什么效果",
+     "role": "user"
+    },
+    {
+     "content": "睡眠受影响吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "夜里咳醒两次",
+     "role": "user"
+    },
+    {
+     "content": "家里有人感冒吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "孩子前阵子感冒",
+     "role": "user"
+    },
+    {
+     "content": "有药物过敏吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "没有过敏",
+     "role": "user"
+    },
+    {
+     "content": "以前有哮喘吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "没有哮喘",
+     "role": "user"
+    }
+   ]
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "digest_quotes": [
+     "上次胃痛又犯了",
+     "吃完饭就胀痛",
+     "在吃奥美拉唑"
+    ],
+    "status": "completed"
+   },
+   "fabricated_quotes": [
+    "做过胃部CT没问题"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "上次胃痛又犯了",
+     "key": "chief_complaint",
+     "value": "复诊看胃痛"
+    },
+    {
+     "assertion": "present",
+     "evidence": "吃完饭就胀痛",
+     "key": "gi_details",
+     "value": "饭后胀痛"
+    },
+    {
+     "assertion": "present",
+     "evidence": "在吃奥美拉唑",
+     "key": "medications_taken",
+     "value": "奥美拉唑"
+    }
+   ],
+   "id": "dg-review-with-fake-quote",
+   "objective": "压缩复诊长转录为已核实摘要",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "复诊摘要完成",
+      "digest": {
+       "confirmed_facts": [
+        {
+         "key": "chief_complaint",
+         "quote": "上次胃痛又犯了"
+        },
+        {
+         "key": "gi_details",
+         "quote": "吃完饭就胀痛"
+        },
+        {
+         "key": "medications_taken",
+         "quote": "在吃奥美拉唑"
+        },
+        {
+         "key": "gi_details",
+         "quote": "做过胃部CT没问题"
+        }
+       ],
+       "contradictions": [],
+       "prior_outcomes": [
+        "上次胃镜提示浅表性胃炎"
+       ],
+       "timeline": [
+        "复诊胃痛再发"
+       ]
+      },
+      "findings": [],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "case_digest",
+   "transcript": [
+    {
+     "content": "我自己",
+     "role": "user"
+    },
+    {
+     "content": "这次是什么问题？",
+     "role": "assistant"
+    },
+    {
+     "content": "上次胃痛又犯了",
+     "role": "user"
+    },
+    {
+     "content": "疼痛有什么规律？",
+     "role": "assistant"
+    },
+    {
+     "content": "吃完饭就胀痛",
+     "role": "user"
+    },
+    {
+     "content": "在吃什么药？",
+     "role": "assistant"
+    },
+    {
+     "content": "在吃奥美拉唑",
+     "role": "user"
+    },
+    {
+     "content": "上次检查做了什么？",
+     "role": "assistant"
+    },
+    {
+     "content": "做了胃镜",
+     "role": "user"
+    },
+    {
+     "content": "胃镜结果怎么样？",
+     "role": "assistant"
+    },
+    {
+     "content": "说是浅表性胃炎",
+     "role": "user"
+    },
+    {
+     "content": "最近饮食怎么样？",
+     "role": "assistant"
+    },
+    {
+     "content": "经常应酬喝酒",
+     "role": "user"
+    },
+    {
+     "content": "体重有变化吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "瘦了两斤",
+     "role": "user"
+    },
+    {
+     "content": "有黑便吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "没有黑便",
+     "role": "user"
+    },
+    {
+     "content": "睡眠怎么样？",
+     "role": "assistant"
+    },
+    {
+     "content": "睡得还行",
+     "role": "user"
+    }
+   ]
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "digest_quotes": [
+     "发烧两天",
+     "量了38度2"
+    ],
+    "min_contradictions": 1,
+    "status": "completed"
+   },
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "发烧两天",
+     "key": "chief_complaint",
+     "value": "发烧两天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "量了38度2",
+     "key": "temperature_c",
+     "value": 38.2
+    }
+   ],
+   "id": "dg-contradiction",
+   "objective": "压缩含矛盾陈述的转录",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "摘要完成，含一处矛盾",
+      "digest": {
+       "confirmed_facts": [
+        {
+         "key": "chief_complaint",
+         "quote": "发烧两天"
+        },
+        {
+         "key": "temperature_c",
+         "quote": "量了38度2"
+        }
+       ],
+       "contradictions": [
+        "先称不发烧，后又报告体温38度2，与主诉发烧两天矛盾"
+       ],
+       "prior_outcomes": [],
+       "timeline": [
+        "主诉发烧两天"
+       ]
+      },
+      "findings": [],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": [
+        "患者陈述存在矛盾"
+       ]
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "case_digest",
+   "transcript": [
+    {
+     "content": "我自己",
+     "role": "user"
+    },
+    {
+     "content": "哪里不舒服？",
+     "role": "assistant"
+    },
+    {
+     "content": "发烧两天",
+     "role": "user"
+    },
+    {
+     "content": "最高多少度？",
+     "role": "assistant"
+    },
+    {
+     "content": "没发烧，就是有点热",
+     "role": "user"
+    },
+    {
+     "content": "量过体温吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "量了38度2",
+     "role": "user"
+    },
+    {
+     "content": "有没有咳嗽？",
+     "role": "assistant"
+    },
+    {
+     "content": "有点咳嗽",
+     "role": "user"
+    },
+    {
+     "content": "咳嗽有痰吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "白痰",
+     "role": "user"
+    },
+    {
+     "content": "吃过退烧药吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "吃过布洛芬",
+     "role": "user"
+    },
+    {
+     "content": "吃完退烧了吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "退下去又升上来",
+     "role": "user"
+    },
+    {
+     "content": "有怕冷吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "有点发冷",
+     "role": "user"
+    },
+    {
+     "content": "家里人有生病的吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "没有",
+     "role": "user"
+    }
+   ]
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "digest_quotes": [
+     "嗓子疼三天",
+     "4分"
+    ],
+    "status": "completed"
+   },
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "嗓子疼三天",
+     "key": "chief_complaint",
+     "value": "嗓子疼三天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "4分",
+     "key": "severity",
+     "value": 4
+    }
+   ],
+   "id": "dg-minimal",
+   "objective": "压缩转录为已核实摘要",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "摘要完成",
+      "digest": {
+       "confirmed_facts": [
+        {
+         "key": "chief_complaint",
+         "quote": "嗓子疼三天"
+        },
+        {
+         "key": "severity",
+         "quote": "4分"
+        }
+       ],
+       "contradictions": [],
+       "prior_outcomes": [],
+       "timeline": [
+        "主诉嗓子疼三天"
+       ]
+      },
+      "findings": [],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "case_digest",
+   "transcript": [
+    {
+     "content": "我自己",
+     "role": "user"
+    },
+    {
+     "content": "哪里不舒服？",
+     "role": "assistant"
+    },
+    {
+     "content": "嗓子疼三天",
+     "role": "user"
+    },
+    {
+     "content": "疼得厉害吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "4分",
+     "role": "user"
+    },
+    {
+     "content": "发烧吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "不发烧",
+     "role": "user"
+    },
+    {
+     "content": "咳嗽吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "偶尔咳",
+     "role": "user"
+    },
+    {
+     "content": "吃过药吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "含了润喉糖",
+     "role": "user"
+    },
+    {
+     "content": "声音哑吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "有点哑",
+     "role": "user"
+    },
+    {
+     "content": "喝水吞咽疼吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "有点疼",
+     "role": "user"
+    },
+    {
+     "content": "家里有人嗓子疼吗？",
+     "role": "assistant"
+    },
+    {
+     "content": "没有",
+     "role": "user"
+    }
+   ]
+  }
+ ],
+ "corpus": "subagent-cases",
+ "note": "Engineering corpus for the Python SubagentCoordinator (design: 联网与子智能体工具设计 §8.2). All runs use a scripted stub backend offline; expected dispositions reuse the conclusion corpus口径 for isomorphic presentations (engineering annotation, not clinical ground truth). stub_script entries are subagent_report envelopes returned in order by the stub backend.",
+ "review_status": "unreviewed",
+ "version": "0"
+}

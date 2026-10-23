@@ -13,6 +13,7 @@ from pathlib import Path
 from .extensions.builtin import load_registry, templates
 from .events import Event
 from .medical_images import vision_configuration_status
+from .web_tools import web_mode
 
 
 class StaleCompositionError(ValueError):
@@ -28,6 +29,10 @@ class Workspace:
         self.hosts = []
         self.probes = set()
         self.closing = False
+        # Subagent-drafted follow-up messages (followup_batch), keyed by
+        # session_id. In-memory only: a draft is never sent from here; the
+        # user confirms/edits it in the follow-up UI before anything sends.
+        self.follow_up_drafts = {}
         self.lock = RLock()
         self.settings = {
             k: os.environ.get(k, "")
@@ -48,6 +53,10 @@ class Workspace:
                 "vision_model": self.settings["MEDAGENT_VISION_MODEL"],
                 "has_api_key": bool(self.settings["MEDAGENT_LLM_API_KEY"]),
                 "dsh_review_mode": os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow"),
+                "web_tools_mode": web_mode(),
+                "subagents": {
+                    "mode": os.environ.get("MEDAGENT_SUBAGENT_MODE", "off")
+                },
                 "storage": (
                     "session_store"
                     if getattr(self.engine, "session_store", None) is not None
@@ -280,18 +289,20 @@ class Workspace:
                     if not state.follow_up:
                         continue
                     plan = dict(state.follow_up)
-                    output.append(
-                        {
-                            "session_id": state.session_id,
-                            "title": str(
-                                state.get("chief_complaint", "新的问诊")
-                            ),
-                            "created_at": state.created_at,
-                            "closed_reason": state.closed_reason,
-                            "risk": state.risk.level.value,
-                            "plan": plan,
-                        }
-                    )
+                    item = {
+                        "session_id": state.session_id,
+                        "title": str(
+                            state.get("chief_complaint", "新的问诊")
+                        ),
+                        "created_at": state.created_at,
+                        "closed_reason": state.closed_reason,
+                        "risk": state.risk.level.value,
+                        "plan": plan,
+                    }
+                    draft = self.follow_up_drafts.get(state.session_id)
+                    if draft is not None:
+                        item["draft"] = draft
+                    output.append(item)
         return sorted(output, key=lambda item: item["plan"].get("due_at", ""))
 
     def delete_session(self, session_id):
