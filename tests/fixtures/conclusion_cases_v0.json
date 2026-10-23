@@ -1190,10 +1190,5161 @@
           "evidence": "4分"
         }
       ]
+    },
+    {
+      "id": "resp-child-uri",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "uri"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "孩子咳嗽流鼻涕",
+          "assertion": "present",
+          "evidence": "孩子咳嗽流鼻涕"
+        },
+        {
+          "key": "age",
+          "value": 6,
+          "assertion": "present",
+          "evidence": "6"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "有点低烧，胃口差一点",
+          "assertion": "present",
+          "evidence": "有点低烧，胃口差一点"
+        },
+        {
+          "key": "medications_taken",
+          "value": "没吃药",
+          "assertion": "present",
+          "evidence": "没吃药"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "干咳为主，晚上咳得厉害",
+          "assertion": "present",
+          "evidence": "干咳为主，晚上咳得厉害"
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有哮喘病史"
+        }
+      ]
+    },
+    {
+      "id": "resp-elderly-pneumonia",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "lower_respiratory",
+        "uri",
+        "asthma_exacerbation"
+      ],
+      "must_not_miss": [
+        "lower_respiratory"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "咳嗽气喘两天",
+          "assertion": "present",
+          "evidence": "咳嗽气喘两天"
+        },
+        {
+          "key": "age",
+          "value": 78,
+          "assertion": "present",
+          "evidence": "78"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "发烧三十八度五，浑身没劲",
+          "assertion": "present",
+          "evidence": "发烧三十八度五，浑身没劲"
+        },
+        {
+          "key": "temperature_c",
+          "value": 38.5,
+          "assertion": "present",
+          "evidence": "38.5"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "黄绿色痰，呼吸有点费劲",
+          "assertion": "present",
+          "evidence": "黄绿色痰，呼吸有点费劲"
+        },
+        {
+          "key": "resp_breathing",
+          "value": "有点费劲",
+          "assertion": "present",
+          "evidence": "有点费劲"
+        }
+      ]
+    },
+    {
+      "id": "resp-asthma-known",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "asthma_exacerbation",
+        "uri",
+        "lower_respiratory"
+      ],
+      "must_not_miss": [
+        "asthma_exacerbation"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "喘不上气",
+          "assertion": "present",
+          "evidence": "喘不上气"
+        },
+        {
+          "key": "age",
+          "value": 30,
+          "assertion": "present",
+          "evidence": "30"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "胸口发紧，呼气有哨音",
+          "assertion": "present",
+          "evidence": "胸口发紧，呼气有哨音"
+        },
+        {
+          "key": "relevant_history",
+          "value": "有哮喘病史",
+          "assertion": "present",
+          "evidence": "有哮喘病史"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "喘鸣明显，说话有点费劲",
+          "assertion": "present",
+          "evidence": "喘鸣明显，说话有点费劲"
+        },
+        {
+          "key": "resp_breathing",
+          "value": "有点费劲",
+          "assertion": "present",
+          "evidence": "有点费劲"
+        }
+      ]
+    },
+    {
+      "id": "resp-negated-breathing",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "uri"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "咳嗽三天",
+          "assertion": "present",
+          "evidence": "咳嗽三天"
+        },
+        {
+          "key": "age",
+          "value": 40,
+          "assertion": "present",
+          "evidence": "40"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "嗓子痒，没有发烧",
+          "assertion": "present",
+          "evidence": "嗓子痒，没有发烧"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "干咳，没有痰",
+          "assertion": "present",
+          "evidence": "干咳，没有痰"
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有哮喘病史"
+        }
+      ]
+    },
+    {
+      "id": "resp-child-fever",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "influenza_like",
+        "uri",
+        "lower_respiratory",
+        "asthma_exacerbation"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "孩子发烧咳嗽",
+          "assertion": "present",
+          "evidence": "孩子发烧咳嗽"
+        },
+        {
+          "key": "age",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "烧到三十九度，精神还行",
+          "assertion": "present",
+          "evidence": "烧到三十九度，精神还行"
+        },
+        {
+          "key": "temperature_c",
+          "value": 39.0,
+          "assertion": "present",
+          "evidence": "39.0"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "有点痰，呼吸不快",
+          "assertion": "present",
+          "evidence": "有点痰，呼吸不快"
+        }
+      ]
+    },
+    {
+      "id": "chest-gerd-like",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "acs_possible",
+        "non_cardiac_chest"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胸口烧灼感",
+          "assertion": "present",
+          "evidence": "胸口烧灼感"
+        },
+        {
+          "key": "age",
+          "value": 45,
+          "assertion": "present",
+          "evidence": "45"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "吃完饭更明显，反酸",
+          "assertion": "present",
+          "evidence": "吃完饭更明显，反酸"
+        },
+        {
+          "key": "chest_details",
+          "value": "烧心反酸，平躺更重",
+          "assertion": "present",
+          "evidence": "烧心反酸，平躺更重"
+        }
+      ]
+    },
+    {
+      "id": "chest-elderly-diabetic-acs",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "acs_possible",
+        "non_cardiac_chest"
+      ],
+      "must_not_miss": [
+        "acs_possible"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胸口闷",
+          "assertion": "present",
+          "evidence": "胸口闷"
+        },
+        {
+          "key": "age",
+          "value": 68,
+          "assertion": "present",
+          "evidence": "68"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "活动后出冷汗，有点恶心",
+          "assertion": "present",
+          "evidence": "活动后出冷汗，有点恶心"
+        },
+        {
+          "key": "relevant_history",
+          "value": "糖尿病十年",
+          "assertion": "present",
+          "evidence": "糖尿病十年"
+        },
+        {
+          "key": "chest_details",
+          "value": "压迫感，活动后出现，休息缓解",
+          "assertion": "present",
+          "evidence": "压迫感，活动后出现，休息缓解"
+        }
+      ]
+    },
+    {
+      "id": "chest-negated-acs",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "acs_possible",
+        "non_cardiac_chest"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胸口疼",
+          "assertion": "present",
+          "evidence": "胸口疼"
+        },
+        {
+          "key": "age",
+          "value": 29,
+          "assertion": "present",
+          "evidence": "29"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "没有出汗，没有恶心",
+          "assertion": "present",
+          "evidence": "没有出汗，没有恶心"
+        },
+        {
+          "key": "chest_details",
+          "value": "针扎一样疼，深呼吸和按压都更疼，没有压迫感",
+          "assertion": "present",
+          "evidence": "针扎一样疼，深呼吸和按压都更疼，没有压迫感"
+        }
+      ]
+    },
+    {
+      "id": "abdo-appendicitis-child",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "appendicitis",
+        "gastroenteritis"
+      ],
+      "must_not_miss": [
+        "appendicitis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "worsening"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "孩子肚子疼",
+          "assertion": "present",
+          "evidence": "孩子肚子疼"
+        },
+        {
+          "key": "age",
+          "value": 9,
+          "assertion": "present",
+          "evidence": "9"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "不想吃饭，有点低烧",
+          "assertion": "present",
+          "evidence": "不想吃饭，有点低烧"
+        },
+        {
+          "key": "gi_details",
+          "value": "右下腹疼，走路和跳的时候更疼",
+          "assertion": "present",
+          "evidence": "右下腹疼，走路和跳的时候更疼"
+        }
+      ]
+    },
+    {
+      "id": "abdo-appendicitis-elderly-vague",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "appendicitis",
+        "functional_dyspepsia"
+      ],
+      "must_not_miss": [
+        "appendicitis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "肚子不舒服",
+          "assertion": "present",
+          "evidence": "肚子不舒服"
+        },
+        {
+          "key": "age",
+          "value": 74,
+          "assertion": "present",
+          "evidence": "74"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "没什么胃口",
+          "assertion": "present",
+          "evidence": "没什么胃口"
+        },
+        {
+          "key": "gi_details",
+          "value": "右下腹隐隐作痛，按压疼",
+          "assertion": "present",
+          "evidence": "右下腹隐隐作痛，按压疼"
+        }
+      ]
+    },
+    {
+      "id": "abdo-gastro-child",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "gastroenteritis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "孩子拉肚子",
+          "assertion": "present",
+          "evidence": "孩子拉肚子"
+        },
+        {
+          "key": "age",
+          "value": 5,
+          "assertion": "present",
+          "evidence": "5"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "吐了两次，没精神",
+          "assertion": "present",
+          "evidence": "吐了两次，没精神"
+        },
+        {
+          "key": "gi_details",
+          "value": "腹泻，水样便，一天六七次，没有便血",
+          "assertion": "present",
+          "evidence": "腹泻，水样便，一天六七次，没有便血"
+        }
+      ]
+    },
+    {
+      "id": "abdo-gi-bleed",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "gi_bleed"
+      ],
+      "must_not_miss": [
+        "gi_bleed"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "拉黑便",
+          "assertion": "present",
+          "evidence": "拉黑便"
+        },
+        {
+          "key": "age",
+          "value": 60,
+          "assertion": "present",
+          "evidence": "60"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "头晕乏力",
+          "assertion": "present",
+          "evidence": "头晕乏力"
+        },
+        {
+          "key": "gi_details",
+          "value": "柏油样黑便两次，有点心慌",
+          "assertion": "present",
+          "evidence": "柏油样黑便两次，有点心慌"
+        }
+      ]
+    },
+    {
+      "id": "abdo-dyspepsia-chronic",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "functional_dyspepsia"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胃胀",
+          "assertion": "present",
+          "evidence": "胃胀"
+        },
+        {
+          "key": "age",
+          "value": 38,
+          "assertion": "present",
+          "evidence": "38"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "吃点就饱，打嗝",
+          "assertion": "present",
+          "evidence": "吃点就饱，打嗝"
+        },
+        {
+          "key": "gi_details",
+          "value": "上腹胀，餐后更明显，老嗳气",
+          "assertion": "present",
+          "evidence": "上腹胀，餐后更明显，老嗳气"
+        }
+      ]
+    },
+    {
+      "id": "abdo-appendicitis-negated-vomit",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "appendicitis"
+      ],
+      "must_not_miss": [
+        "appendicitis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "worsening"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "右下腹疼一天",
+          "assertion": "present",
+          "evidence": "右下腹疼一天"
+        },
+        {
+          "key": "age",
+          "value": 26,
+          "assertion": "present",
+          "evidence": "26"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "没有呕吐，没有腹泻，没胃口",
+          "assertion": "present",
+          "evidence": "没有呕吐，没有腹泻，没胃口"
+        },
+        {
+          "key": "gi_details",
+          "value": "右下腹疼得越来越重，咳嗽时更疼",
+          "assertion": "present",
+          "evidence": "右下腹疼得越来越重，咳嗽时更疼"
+        }
+      ]
+    },
+    {
+      "id": "abdo-constipation-abstain",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "便秘三天",
+          "assertion": "present",
+          "evidence": "便秘三天"
+        },
+        {
+          "key": "age",
+          "value": 33,
+          "assertion": "present",
+          "evidence": "33"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "肚子有点胀",
+          "assertion": "present",
+          "evidence": "肚子有点胀"
+        },
+        {
+          "key": "gi_details",
+          "value": "大便干硬，排便费力",
+          "assertion": "present",
+          "evidence": "大便干硬，排便费力"
+        }
+      ]
+    },
+    {
+      "id": "head-migraine-aura",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "migraine_tension"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头痛",
+          "assertion": "present",
+          "evidence": "头痛"
+        },
+        {
+          "key": "age",
+          "value": 27,
+          "assertion": "present",
+          "evidence": "27"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "眼前闪光，怕光",
+          "assertion": "present",
+          "evidence": "眼前闪光，怕光"
+        },
+        {
+          "key": "head_details",
+          "value": "一侧搏动性头痛，看东西有闪光",
+          "assertion": "present",
+          "evidence": "一侧搏动性头痛，看东西有闪光"
+        }
+      ]
+    },
+    {
+      "id": "head-tension-stress",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "migraine_tension"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头疼",
+          "assertion": "present",
+          "evidence": "头疼"
+        },
+        {
+          "key": "age",
+          "value": 35,
+          "assertion": "present",
+          "evidence": "35"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "最近熬夜多，肩膀僵",
+          "assertion": "present",
+          "evidence": "最近熬夜多，肩膀僵"
+        },
+        {
+          "key": "head_details",
+          "value": "整个头紧箍感，胀痛",
+          "assertion": "present",
+          "evidence": "整个头紧箍感，胀痛"
+        }
+      ]
+    },
+    {
+      "id": "head-meningitis-child",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "meningitis_possible",
+        "migraine_tension",
+        "lower_respiratory",
+        "asthma_exacerbation"
+      ],
+      "must_not_miss": [
+        "meningitis_possible"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "孩子头痛发烧",
+          "assertion": "present",
+          "evidence": "孩子头痛发烧"
+        },
+        {
+          "key": "age",
+          "value": 7,
+          "assertion": "present",
+          "evidence": "7"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "烧到三十九度五，脖子不敢动",
+          "assertion": "present",
+          "evidence": "烧到三十九度五，脖子不敢动"
+        },
+        {
+          "key": "temperature_c",
+          "value": 39.5,
+          "assertion": "present",
+          "evidence": "39.5"
+        },
+        {
+          "key": "head_details",
+          "value": "头痛得厉害，脖子僵硬，不敢低头",
+          "assertion": "present",
+          "evidence": "头痛得厉害，脖子僵硬，不敢低头"
+        }
+      ]
+    },
+    {
+      "id": "head-thunderclap",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "thunderclap_headache",
+        "migraine_tension"
+      ],
+      "must_not_miss": [
+        "thunderclap_headache"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 10,
+          "assertion": "present",
+          "evidence": "10"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "突然剧烈头痛",
+          "assertion": "present",
+          "evidence": "突然剧烈头痛"
+        },
+        {
+          "key": "age",
+          "value": 52,
+          "assertion": "present",
+          "evidence": "52"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "一下子就疼到最厉害",
+          "assertion": "present",
+          "evidence": "一下子就疼到最厉害"
+        },
+        {
+          "key": "head_details",
+          "value": "突发，有生以来最严重的头痛",
+          "assertion": "present",
+          "evidence": "突发，有生以来最严重的头痛"
+        }
+      ]
+    },
+    {
+      "id": "head-negated-meningitis",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "migraine_tension"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头痛一天",
+          "assertion": "present",
+          "evidence": "头痛一天"
+        },
+        {
+          "key": "age",
+          "value": 24,
+          "assertion": "present",
+          "evidence": "24"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "没有发烧，脖子活动正常",
+          "assertion": "present",
+          "evidence": "没有发烧，脖子活动正常"
+        },
+        {
+          "key": "head_details",
+          "value": "一侧头痛，有点恶心，没有脖子僵硬",
+          "assertion": "present",
+          "evidence": "一侧头痛，有点恶心，没有脖子僵硬"
+        }
+      ]
+    },
+    {
+      "id": "head-elderly-new-abstain",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "最近老是头痛",
+          "assertion": "present",
+          "evidence": "最近老是头痛"
+        },
+        {
+          "key": "age",
+          "value": 71,
+          "assertion": "present",
+          "evidence": "71"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "记性有点差",
+          "assertion": "present",
+          "evidence": "记性有点差"
+        },
+        {
+          "key": "head_details",
+          "value": "隐隐作痛，说不清哪边",
+          "assertion": "present",
+          "evidence": "隐隐作痛，说不清哪边"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-bppv-elderly",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "bppv"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "老人起床头晕",
+          "assertion": "present",
+          "evidence": "老人起床头晕"
+        },
+        {
+          "key": "age",
+          "value": 76,
+          "assertion": "present",
+          "evidence": "76"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "躺下翻身的时候晕得厉害",
+          "assertion": "present",
+          "evidence": "躺下翻身的时候晕得厉害"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "起床躺下时天旋地转，一阵就过去",
+          "assertion": "present",
+          "evidence": "起床躺下时天旋地转，一阵就过去"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-stroke-elderly-history",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "posterior_stroke",
+        "bppv"
+      ],
+      "must_not_miss": [
+        "posterior_stroke"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头晕站不稳",
+          "assertion": "present",
+          "evidence": "头晕站不稳"
+        },
+        {
+          "key": "age",
+          "value": 70,
+          "assertion": "present",
+          "evidence": "70"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "说话有点不清楚",
+          "assertion": "present",
+          "evidence": "说话有点不清楚"
+        },
+        {
+          "key": "relevant_history",
+          "value": "高血压，心房颤动",
+          "assertion": "present",
+          "evidence": "高血压，心房颤动"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "走路不稳，说话含糊，一条腿没劲",
+          "assertion": "present",
+          "evidence": "走路不稳，说话含糊，一条腿没劲"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-orthostatic-meds",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "orthostatic"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "站起来眼前发黑",
+          "assertion": "present",
+          "evidence": "站起来眼前发黑"
+        },
+        {
+          "key": "age",
+          "value": 66,
+          "assertion": "present",
+          "evidence": "66"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "蹲久了站起来就晕",
+          "assertion": "present",
+          "evidence": "蹲久了站起来就晕"
+        },
+        {
+          "key": "medications_taken",
+          "value": "在吃降压药",
+          "assertion": "present",
+          "evidence": "在吃降压药"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "站起来眼前发黑，坐一会就好",
+          "assertion": "present",
+          "evidence": "站起来眼前发黑，坐一会就好"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-anemia-history",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "orthostatic"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头晕乏力",
+          "assertion": "present",
+          "evidence": "头晕乏力"
+        },
+        {
+          "key": "age",
+          "value": 45,
+          "assertion": "present",
+          "evidence": "45"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "脸色苍白，爬楼喘",
+          "assertion": "present",
+          "evidence": "脸色苍白，爬楼喘"
+        },
+        {
+          "key": "relevant_history",
+          "value": "有贫血，月经量多",
+          "assertion": "present",
+          "evidence": "有贫血，月经量多"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "头昏沉沉的，眼前发黑",
+          "assertion": "present",
+          "evidence": "头昏沉沉的，眼前发黑"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-negated-focal",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "bppv"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头晕",
+          "assertion": "present",
+          "evidence": "头晕"
+        },
+        {
+          "key": "age",
+          "value": 58,
+          "assertion": "present",
+          "evidence": "58"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "没有手脚无力，说话清楚",
+          "assertion": "present",
+          "evidence": "没有手脚无力，说话清楚"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "翻身时天旋地转，没有肢体无力，没有说话含糊，走路稳",
+          "assertion": "present",
+          "evidence": "翻身时天旋地转，没有肢体无力，没有说话含糊，走路稳"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-vertigo-vomit",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "posterior_stroke",
+        "bppv"
+      ],
+      "must_not_miss": [
+        "posterior_stroke"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "天旋地转还吐",
+          "assertion": "present",
+          "evidence": "天旋地转还吐"
+        },
+        {
+          "key": "age",
+          "value": 63,
+          "assertion": "present",
+          "evidence": "63"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "恶心呕吐，不敢睁眼",
+          "assertion": "present",
+          "evidence": "恶心呕吐，不敢睁眼"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "持续天旋地转，走路不稳，需要扶",
+          "assertion": "present",
+          "evidence": "持续天旋地转，走路不稳，需要扶"
+        }
+      ]
+    },
+    {
+      "id": "back-mechanical-young",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "mechanical_back"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛",
+          "assertion": "present",
+          "evidence": "腰痛"
+        },
+        {
+          "key": "age",
+          "value": 28,
+          "assertion": "present",
+          "evidence": "28"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "昨天搬了重物",
+          "assertion": "present",
+          "evidence": "昨天搬了重物"
+        },
+        {
+          "key": "back_details",
+          "value": "腰部酸痛，弯腰更疼，活动后缓解",
+          "assertion": "present",
+          "evidence": "腰部酸痛，弯腰更疼，活动后缓解"
+        }
+      ]
+    },
+    {
+      "id": "back-radiculopathy",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "radiculopathy",
+        "mechanical_back"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛，腿也痛",
+          "assertion": "present",
+          "evidence": "腰痛，腿也痛"
+        },
+        {
+          "key": "age",
+          "value": 47,
+          "assertion": "present",
+          "evidence": "47"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "腿麻到脚背",
+          "assertion": "present",
+          "evidence": "腿麻到脚背"
+        },
+        {
+          "key": "back_details",
+          "value": "疼痛放射到小腿，腿麻",
+          "assertion": "present",
+          "evidence": "疼痛放射到小腿，腿麻"
+        }
+      ]
+    },
+    {
+      "id": "back-cauda-urinary",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cauda_serious",
+        "radiculopathy"
+      ],
+      "must_not_miss": [
+        "cauda_serious"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛得厉害",
+          "assertion": "present",
+          "evidence": "腰痛得厉害"
+        },
+        {
+          "key": "age",
+          "value": 55,
+          "assertion": "present",
+          "evidence": "55"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "大小便费劲",
+          "assertion": "present",
+          "evidence": "大小便费劲"
+        },
+        {
+          "key": "back_details",
+          "value": "会阴麻木，小便解不出，两条腿没劲",
+          "assertion": "present",
+          "evidence": "会阴麻木，小便解不出，两条腿没劲"
+        }
+      ]
+    },
+    {
+      "id": "back-trauma-fracture",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cauda_serious",
+        "mechanical_back"
+      ],
+      "must_not_miss": [
+        "cauda_serious"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "摔了一跤腰痛",
+          "assertion": "present",
+          "evidence": "摔了一跤腰痛"
+        },
+        {
+          "key": "age",
+          "value": 69,
+          "assertion": "present",
+          "evidence": "69"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "翻身都疼",
+          "assertion": "present",
+          "evidence": "翻身都疼"
+        },
+        {
+          "key": "back_details",
+          "value": "摔伤后腰痛，局部压痛明显",
+          "assertion": "present",
+          "evidence": "摔伤后腰痛，局部压痛明显"
+        }
+      ]
+    },
+    {
+      "id": "back-fever-infection",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cauda_serious",
+        "mechanical_back",
+        "lower_respiratory",
+        "asthma_exacerbation"
+      ],
+      "must_not_miss": [
+        "cauda_serious"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛还发烧",
+          "assertion": "present",
+          "evidence": "腰痛还发烧"
+        },
+        {
+          "key": "age",
+          "value": 50,
+          "assertion": "present",
+          "evidence": "50"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "发烧三十八度八，寒战",
+          "assertion": "present",
+          "evidence": "发烧三十八度八，寒战"
+        },
+        {
+          "key": "temperature_c",
+          "value": 38.8,
+          "assertion": "present",
+          "evidence": "38.8"
+        },
+        {
+          "key": "back_details",
+          "value": "腰背痛，伴发热",
+          "assertion": "present",
+          "evidence": "腰背痛，伴发热"
+        }
+      ]
+    },
+    {
+      "id": "back-negated-cauda",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "mechanical_back"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰酸背痛",
+          "assertion": "present",
+          "evidence": "腰酸背痛"
+        },
+        {
+          "key": "age",
+          "value": 41,
+          "assertion": "present",
+          "evidence": "41"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "大小便正常，腿不麻",
+          "assertion": "present",
+          "evidence": "大小便正常，腿不麻"
+        },
+        {
+          "key": "back_details",
+          "value": "腰背酸痛，没有腿麻，大小便正常，没有会阴麻木",
+          "assertion": "present",
+          "evidence": "腰背酸痛，没有腿麻，大小便正常，没有会阴麻木"
+        }
+      ]
+    },
+    {
+      "id": "uti-cystitis-female",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cystitis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "尿频尿急",
+          "assertion": "present",
+          "evidence": "尿频尿急"
+        },
+        {
+          "key": "age",
+          "value": 26,
+          "assertion": "present",
+          "evidence": "26"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "小便烧灼感",
+          "assertion": "present",
+          "evidence": "小便烧灼感"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿频尿急，尿痛，有烧灼感",
+          "assertion": "present",
+          "evidence": "尿频尿急，尿痛，有烧灼感"
+        }
+      ]
+    },
+    {
+      "id": "uti-negated-fever",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cystitis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "小便不舒服",
+          "assertion": "present",
+          "evidence": "小便不舒服"
+        },
+        {
+          "key": "age",
+          "value": 31,
+          "assertion": "present",
+          "evidence": "31"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "没有发烧，没有腰痛",
+          "assertion": "present",
+          "evidence": "没有发烧，没有腰痛"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿频，轻微尿痛，没有血尿",
+          "assertion": "present",
+          "evidence": "尿频，轻微尿痛，没有血尿"
+        }
+      ]
+    },
+    {
+      "id": "uti-pyelo-pregnant-age",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "pyelonephritis",
+        "cystitis",
+        "mechanical_back"
+      ],
+      "must_not_miss": [
+        "pyelonephritis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "尿痛还腰痛",
+          "assertion": "present",
+          "evidence": "尿痛还腰痛"
+        },
+        {
+          "key": "age",
+          "value": 29,
+          "assertion": "present",
+          "evidence": "29"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "发烧三十八度九，腰酸",
+          "assertion": "present",
+          "evidence": "发烧三十八度九，腰酸"
+        },
+        {
+          "key": "temperature_c",
+          "value": 38.9,
+          "assertion": "present",
+          "evidence": "38.9"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿频尿痛，腰痛，伴发热寒战",
+          "assertion": "present",
+          "evidence": "尿频尿痛，腰痛，伴发热寒战"
+        }
+      ]
+    },
+    {
+      "id": "uti-stone-male",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "urinary_stone",
+        "mechanical_back"
+      ],
+      "must_not_miss": [
+        "urinary_stone"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛一阵阵绞痛，小便发红",
+          "assertion": "present",
+          "evidence": "腰痛一阵阵绞痛，小便发红"
+        },
+        {
+          "key": "age",
+          "value": 44,
+          "assertion": "present",
+          "evidence": "44"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "疼得出汗，想吐",
+          "assertion": "present",
+          "evidence": "疼得出汗，想吐"
+        },
+        {
+          "key": "urinary_details",
+          "value": "一侧腰腹绞痛，血尿，放射到腹股沟",
+          "assertion": "present",
+          "evidence": "一侧腰腹绞痛，血尿，放射到腹股沟"
+        }
+      ]
+    },
+    {
+      "id": "uti-stone-negated-blood",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "urinary_stone",
+        "mechanical_back"
+      ],
+      "must_not_miss": [
+        "urinary_stone"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "侧腰痛一阵阵绞痛，小便不太顺畅",
+          "assertion": "present",
+          "evidence": "侧腰痛一阵阵绞痛，小便不太顺畅"
+        },
+        {
+          "key": "age",
+          "value": 39,
+          "assertion": "present",
+          "evidence": "39"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "疼的时候坐立不安",
+          "assertion": "present",
+          "evidence": "疼的时候坐立不安"
+        },
+        {
+          "key": "urinary_details",
+          "value": "绞痛放射到大腿根，没有血尿，没有发烧",
+          "assertion": "present",
+          "evidence": "绞痛放射到大腿根，没有血尿，没有发烧"
+        }
+      ]
+    },
+    {
+      "id": "uti-elderly-cystitis",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cystitis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "老人小便次数多",
+          "assertion": "present",
+          "evidence": "老人小便次数多"
+        },
+        {
+          "key": "age",
+          "value": 80,
+          "assertion": "present",
+          "evidence": "80"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "夜里起来好几次，有点尿急",
+          "assertion": "present",
+          "evidence": "夜里起来好几次，有点尿急"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿频尿急，尿量少",
+          "assertion": "present",
+          "evidence": "尿频尿急，尿量少"
+        }
+      ]
+    },
+    {
+      "id": "skin-urticaria-food",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "urticaria"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "吃了海鲜起疹子",
+          "assertion": "present",
+          "evidence": "吃了海鲜起疹子"
+        },
+        {
+          "key": "age",
+          "value": 23,
+          "assertion": "present",
+          "evidence": "23"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "痒得厉害，一片一片的",
+          "assertion": "present",
+          "evidence": "痒得厉害，一片一片的"
+        },
+        {
+          "key": "skin_details",
+          "value": "风团样皮疹，荨麻疹样，新吃了海鲜",
+          "assertion": "present",
+          "evidence": "风团样皮疹，荨麻疹样，新吃了海鲜"
+        }
+      ]
+    },
+    {
+      "id": "skin-dermatitis-cosmetics",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "dermatitis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "脸上起疹子",
+          "assertion": "present",
+          "evidence": "脸上起疹子"
+        },
+        {
+          "key": "age",
+          "value": 30,
+          "assertion": "present",
+          "evidence": "30"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "又红又痒",
+          "assertion": "present",
+          "evidence": "又红又痒"
+        },
+        {
+          "key": "skin_details",
+          "value": "红斑丘疹，换了新护肤品之后出现的",
+          "assertion": "present",
+          "evidence": "红斑丘疹，换了新护肤品之后出现的"
+        }
+      ]
+    },
+    {
+      "id": "skin-infection-spreading",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "skin_infection"
+      ],
+      "must_not_miss": [
+        "skin_infection"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腿上红肿越来越大",
+          "assertion": "present",
+          "evidence": "腿上红肿越来越大"
+        },
+        {
+          "key": "age",
+          "value": 52,
+          "assertion": "present",
+          "evidence": "52"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "有点发烧，腿发烫",
+          "assertion": "present",
+          "evidence": "有点发烧，腿发烫"
+        },
+        {
+          "key": "skin_details",
+          "value": "红肿热痛，红肿扩散，破溃流脓",
+          "assertion": "present",
+          "evidence": "红肿热痛，红肿扩散，破溃流脓"
+        }
+      ]
+    },
+    {
+      "id": "skin-zoster",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "skin_infection"
+      ],
+      "must_not_miss": [
+        "skin_infection"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰上一侧起水疱",
+          "assertion": "present",
+          "evidence": "腰上一侧起水疱"
+        },
+        {
+          "key": "age",
+          "value": 61,
+          "assertion": "present",
+          "evidence": "61"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "针扎一样疼",
+          "assertion": "present",
+          "evidence": "针扎一样疼"
+        },
+        {
+          "key": "skin_details",
+          "value": "一侧成簇水疱，伴疼痛，沿肋间分布",
+          "assertion": "present",
+          "evidence": "一侧成簇水疱，伴疼痛，沿肋间分布"
+        }
+      ]
+    },
+    {
+      "id": "skin-negated-vesicles",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "urticaria"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "身上起疹子，很痒",
+          "assertion": "present",
+          "evidence": "身上起疹子，很痒"
+        },
+        {
+          "key": "age",
+          "value": 35,
+          "assertion": "present",
+          "evidence": "35"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "时起时消",
+          "assertion": "present",
+          "evidence": "时起时消"
+        },
+        {
+          "key": "skin_details",
+          "value": "风团，没有水疱，没有破溃",
+          "assertion": "present",
+          "evidence": "风团，没有水疱，没有破溃"
+        }
+      ]
+    },
+    {
+      "id": "skin-drug-rash",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "dermatitis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "吃药后起皮疹",
+          "assertion": "present",
+          "evidence": "吃药后起皮疹"
+        },
+        {
+          "key": "age",
+          "value": 48,
+          "assertion": "present",
+          "evidence": "48"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "全身发红发痒",
+          "assertion": "present",
+          "evidence": "全身发红发痒"
+        },
+        {
+          "key": "medications_taken",
+          "value": "刚开始吃一种新药",
+          "assertion": "present",
+          "evidence": "刚开始吃一种新药"
+        },
+        {
+          "key": "skin_details",
+          "value": "躯干红斑，新药后出现",
+          "assertion": "present",
+          "evidence": "躯干红斑，新药后出现"
+        }
+      ]
+    },
+    {
+      "id": "unc-knee-sprain",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "膝盖扭伤了",
+          "assertion": "present",
+          "evidence": "膝盖扭伤了"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-finger-cut",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "手指划了个口子",
+          "assertion": "present",
+          "evidence": "手指划了个口子"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-dry-eyes",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "眼睛干涩",
+          "assertion": "present",
+          "evidence": "眼睛干涩"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-tinnitus",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "耳鸣好几天",
+          "assertion": "present",
+          "evidence": "耳鸣好几天"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-mouth-ulcer",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "口腔溃疡",
+          "assertion": "present",
+          "evidence": "口腔溃疡"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-insomnia",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "最近睡不着觉",
+          "assertion": "present",
+          "evidence": "最近睡不着觉"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-hair-loss",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "掉头发严重",
+          "assertion": "present",
+          "evidence": "掉头发严重"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-toothache",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "牙疼",
+          "assertion": "present",
+          "evidence": "牙疼"
+        },
+        {
+          "key": "age",
+          "value": 36,
+          "assertion": "present",
+          "evidence": "36"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "urg-resp-worsening",
+      "risk": "urgent",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "lower_respiratory",
+        "asthma_exacerbation",
+        "uri"
+      ],
+      "must_not_miss": [
+        "lower_respiratory"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "咳嗽喘不上气",
+          "assertion": "present",
+          "evidence": "咳嗽喘不上气"
+        },
+        {
+          "key": "age",
+          "value": 66,
+          "assertion": "present",
+          "evidence": "66"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "呼吸困难，嘴唇发紫",
+          "assertion": "present",
+          "evidence": "呼吸困难，嘴唇发紫"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "呼吸费劲，不能平躺",
+          "assertion": "present",
+          "evidence": "呼吸费劲，不能平躺"
+        },
+        {
+          "key": "resp_breathing",
+          "value": "明显费力",
+          "assertion": "present",
+          "evidence": "明显费力"
+        }
+      ]
+    },
+    {
+      "id": "urg-chest-pressure",
+      "risk": "urgent",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "acs_possible",
+        "non_cardiac_chest"
+      ],
+      "must_not_miss": [
+        "acs_possible"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胸口压着疼",
+          "assertion": "present",
+          "evidence": "胸口压着疼"
+        },
+        {
+          "key": "age",
+          "value": 58,
+          "assertion": "present",
+          "evidence": "58"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "出汗，喘不上气",
+          "assertion": "present",
+          "evidence": "出汗，喘不上气"
+        },
+        {
+          "key": "chest_details",
+          "value": "压迫感伴呼吸困难",
+          "assertion": "present",
+          "evidence": "压迫感伴呼吸困难"
+        }
+      ]
+    },
+    {
+      "id": "urg-appendicitis",
+      "risk": "urgent",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "appendicitis"
+      ],
+      "must_not_miss": [
+        "appendicitis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 9,
+          "assertion": "present",
+          "evidence": "9"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "右下腹剧痛",
+          "assertion": "present",
+          "evidence": "右下腹剧痛"
+        },
+        {
+          "key": "age",
+          "value": 33,
+          "assertion": "present",
+          "evidence": "33"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "疼得直不起腰",
+          "assertion": "present",
+          "evidence": "疼得直不起腰"
+        },
+        {
+          "key": "gi_details",
+          "value": "右下腹剧痛，腹肌紧张",
+          "assertion": "present",
+          "evidence": "右下腹剧痛，腹肌紧张"
+        }
+      ]
+    },
+    {
+      "id": "urg-meningitis",
+      "risk": "urgent",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "meningitis_possible",
+        "lower_respiratory",
+        "asthma_exacerbation"
+      ],
+      "must_not_miss": [
+        "meningitis_possible"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头痛发烧脖子硬",
+          "assertion": "present",
+          "evidence": "头痛发烧脖子硬"
+        },
+        {
+          "key": "age",
+          "value": 19,
+          "assertion": "present",
+          "evidence": "19"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "高烧四十度，怕光",
+          "assertion": "present",
+          "evidence": "高烧四十度，怕光"
+        },
+        {
+          "key": "temperature_c",
+          "value": 40.0,
+          "assertion": "present",
+          "evidence": "40.0"
+        },
+        {
+          "key": "head_details",
+          "value": "剧烈头痛，颈部僵硬，意识有点模糊",
+          "assertion": "present",
+          "evidence": "剧烈头痛，颈部僵硬，意识有点模糊"
+        }
+      ]
+    },
+    {
+      "id": "urg-pyelo-sepsis-ish",
+      "risk": "urgent",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "pyelonephritis",
+        "mechanical_back"
+      ],
+      "must_not_miss": [
+        "pyelonephritis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "尿痛腰痛，高烧寒战",
+          "assertion": "present",
+          "evidence": "尿痛腰痛，高烧寒战"
+        },
+        {
+          "key": "age",
+          "value": 57,
+          "assertion": "present",
+          "evidence": "57"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "烧到三十九度八，浑身发抖",
+          "assertion": "present",
+          "evidence": "烧到三十九度八，浑身发抖"
+        },
+        {
+          "key": "temperature_c",
+          "value": 39.8,
+          "assertion": "present",
+          "evidence": "39.8"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿痛，腰痛，伴高热寒战",
+          "assertion": "present",
+          "evidence": "尿痛，腰痛，伴高热寒战"
+        }
+      ]
+    },
+    {
+      "id": "urg-cauda",
+      "risk": "urgent",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cauda_serious"
+      ],
+      "must_not_miss": [
+        "cauda_serious"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "stable"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛腿软尿不出",
+          "assertion": "present",
+          "evidence": "腰痛腿软尿不出"
+        },
+        {
+          "key": "age",
+          "value": 49,
+          "assertion": "present",
+          "evidence": "49"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "两条腿没力气",
+          "assertion": "present",
+          "evidence": "两条腿没力气"
+        },
+        {
+          "key": "back_details",
+          "value": "双下肢无力，会阴麻木，小便解不出",
+          "assertion": "present",
+          "evidence": "双下肢无力，会阴麻木，小便解不出"
+        }
+      ]
+    },
+    {
+      "id": "resp-uri-throat",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "uri"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "嗓子疼两天",
+          "assertion": "present",
+          "evidence": "嗓子疼两天"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "有点鼻塞，低烧",
+          "assertion": "present",
+          "evidence": "有点鼻塞，低烧"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "咽痛，偶尔干咳",
+          "assertion": "present",
+          "evidence": "咽痛，偶尔干咳"
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        }
+      ]
+    },
+    {
+      "id": "resp-pneumonia-ruled-out",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "uri",
+        "influenza_like",
+        "lower_respiratory",
+        "asthma_exacerbation"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "咳嗽好转了",
+          "assertion": "present",
+          "evidence": "咳嗽好转了"
+        },
+        {
+          "key": "trajectory",
+          "value": "improving",
+          "assertion": "present",
+          "evidence": "improving"
+        },
+        {
+          "key": "resp_cough_details",
+          "value": "咳嗽明显少了",
+          "assertion": "present",
+          "evidence": "咳嗽明显少了"
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        }
+      ]
+    },
+    {
+      "id": "chest-acs-atypical",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "acs_possible",
+        "non_cardiac_chest"
+      ],
+      "must_not_miss": [
+        "acs_possible"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胸口不舒服",
+          "assertion": "present",
+          "evidence": "胸口不舒服"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "恶心，出冷汗，乏力",
+          "assertion": "present",
+          "evidence": "恶心，出冷汗，乏力"
+        },
+        {
+          "key": "chest_details",
+          "value": "闷闷的，说不清，活动后加重",
+          "assertion": "present",
+          "evidence": "闷闷的，说不清，活动后加重"
+        }
+      ]
+    },
+    {
+      "id": "chest-noncardiac-panic",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "non_cardiac_chest",
+        "acs_possible"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胸闷心慌",
+          "assertion": "present",
+          "evidence": "胸闷心慌"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "紧张的时候明显",
+          "assertion": "present",
+          "evidence": "紧张的时候明显"
+        },
+        {
+          "key": "chest_details",
+          "value": "刺痛，深呼吸更痛，按压也痛",
+          "assertion": "present",
+          "evidence": "刺痛，深呼吸更痛，按压也痛"
+        }
+      ]
+    },
+    {
+      "id": "abdo-gastro-food",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "gastroenteritis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "吃坏肚子了",
+          "assertion": "present",
+          "evidence": "吃坏肚子了"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "吐了三次",
+          "assertion": "present",
+          "evidence": "吐了三次"
+        },
+        {
+          "key": "gi_details",
+          "value": "腹泻，肚脐周围绞痛",
+          "assertion": "present",
+          "evidence": "腹泻，肚脐周围绞痛"
+        }
+      ]
+    },
+    {
+      "id": "abdo-appendicitis-female",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "appendicitis",
+        "gastroenteritis"
+      ],
+      "must_not_miss": [
+        "appendicitis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "肚子疼",
+          "assertion": "present",
+          "evidence": "肚子疼"
+        },
+        {
+          "key": "age",
+          "value": 29,
+          "assertion": "present",
+          "evidence": "29"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "低烧，没胃口",
+          "assertion": "present",
+          "evidence": "低烧，没胃口"
+        },
+        {
+          "key": "gi_details",
+          "value": "先是肚脐周围疼，后来转移到右下腹",
+          "assertion": "present",
+          "evidence": "先是肚脐周围疼，后来转移到右下腹"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "worsening"
+        }
+      ]
+    },
+    {
+      "id": "abdo-dyspepsia-reflux",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "functional_dyspepsia"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "胃里反酸",
+          "assertion": "present",
+          "evidence": "胃里反酸"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "烧心，胃胀",
+          "assertion": "present",
+          "evidence": "烧心，胃胀"
+        },
+        {
+          "key": "gi_details",
+          "value": "反酸烧心，餐后明显",
+          "assertion": "present",
+          "evidence": "反酸烧心，餐后明显"
+        }
+      ]
+    },
+    {
+      "id": "abdo-gi-bleed-elderly",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "gi_bleed"
+      ],
+      "must_not_miss": [
+        "gi_bleed"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "大便发黑",
+          "assertion": "present",
+          "evidence": "大便发黑"
+        },
+        {
+          "key": "age",
+          "value": 72,
+          "assertion": "present",
+          "evidence": "72"
+        },
+        {
+          "key": "relevant_history",
+          "value": "在吃抗凝药",
+          "assertion": "present",
+          "evidence": "在吃抗凝药"
+        },
+        {
+          "key": "gi_details",
+          "value": "黑便两次，柏油样",
+          "assertion": "present",
+          "evidence": "黑便两次，柏油样"
+        }
+      ]
+    },
+    {
+      "id": "head-migraine-child",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "migraine_tension"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "孩子头痛",
+          "assertion": "present",
+          "evidence": "孩子头痛"
+        },
+        {
+          "key": "age",
+          "value": 10,
+          "assertion": "present",
+          "evidence": "10"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "怕光，想睡觉",
+          "assertion": "present",
+          "evidence": "怕光，想睡觉"
+        },
+        {
+          "key": "head_details",
+          "value": "一侧头痛，搏动性",
+          "assertion": "present",
+          "evidence": "一侧头痛，搏动性"
+        }
+      ]
+    },
+    {
+      "id": "head-thunderclap-exertion",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "thunderclap_headache",
+        "migraine_tension"
+      ],
+      "must_not_miss": [
+        "thunderclap_headache"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "用力后突然头痛",
+          "assertion": "present",
+          "evidence": "用力后突然头痛"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "脖子发僵",
+          "assertion": "present",
+          "evidence": "脖子发僵"
+        },
+        {
+          "key": "head_details",
+          "value": "突发剧烈头痛，一下到顶",
+          "assertion": "present",
+          "evidence": "突发剧烈头痛，一下到顶"
+        },
+        {
+          "key": "severity",
+          "value": 10,
+          "assertion": "present",
+          "evidence": "10"
+        }
+      ]
+    },
+    {
+      "id": "head-tension-chronic",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "migraine_tension"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "天天头疼",
+          "assertion": "present",
+          "evidence": "天天头疼"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "压力大睡不好",
+          "assertion": "present",
+          "evidence": "压力大睡不好"
+        },
+        {
+          "key": "head_details",
+          "value": "紧箍感，胀痛，按摩后缓解",
+          "assertion": "present",
+          "evidence": "紧箍感，胀痛，按摩后缓解"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-bppv-recurrent",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "bppv"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头晕反复发作",
+          "assertion": "present",
+          "evidence": "头晕反复发作"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "每次不到一分钟",
+          "assertion": "present",
+          "evidence": "每次不到一分钟"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "转头和躺下时天旋地转",
+          "assertion": "present",
+          "evidence": "转头和躺下时天旋地转"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-orthostatic-dehydration",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "orthostatic"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头晕眼花",
+          "assertion": "present",
+          "evidence": "头晕眼花"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "昨天拉了一天肚子",
+          "assertion": "present",
+          "evidence": "昨天拉了一天肚子"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "站起来眼前发黑，头重脚轻",
+          "assertion": "present",
+          "evidence": "站起来眼前发黑，头重脚轻"
+        }
+      ]
+    },
+    {
+      "id": "back-mechanical-sprain",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "mechanical_back"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰扭了",
+          "assertion": "present",
+          "evidence": "腰扭了"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "转身困难",
+          "assertion": "present",
+          "evidence": "转身困难"
+        },
+        {
+          "key": "back_details",
+          "value": "扭到腰了，局部酸痛",
+          "assertion": "present",
+          "evidence": "扭到腰了，局部酸痛"
+        }
+      ]
+    },
+    {
+      "id": "back-radiculopathy-chronic",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "radiculopathy",
+        "mechanical_back"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛老不好",
+          "assertion": "present",
+          "evidence": "腰痛老不好"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "坐久了腿疼",
+          "assertion": "present",
+          "evidence": "坐久了腿疼"
+        },
+        {
+          "key": "back_details",
+          "value": "疼痛放射到腿，腿疼",
+          "assertion": "present",
+          "evidence": "疼痛放射到腿，腿疼"
+        }
+      ]
+    },
+    {
+      "id": "uti-cystitis-male",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cystitis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "尿痛",
+          "assertion": "present",
+          "evidence": "尿痛"
+        },
+        {
+          "key": "age",
+          "value": 52,
+          "assertion": "present",
+          "evidence": "52"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "尿不尽",
+          "assertion": "present",
+          "evidence": "尿不尽"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿痛，尿频，排尿费力",
+          "assertion": "present",
+          "evidence": "尿痛，尿频，排尿费力"
+        }
+      ]
+    },
+    {
+      "id": "uti-pyelo-diabetic",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "pyelonephritis",
+        "cystitis",
+        "mechanical_back",
+        "lower_respiratory",
+        "asthma_exacerbation"
+      ],
+      "must_not_miss": [
+        "pyelonephritis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "尿频尿痛还发烧",
+          "assertion": "present",
+          "evidence": "尿频尿痛还发烧"
+        },
+        {
+          "key": "age",
+          "value": 63,
+          "assertion": "present",
+          "evidence": "63"
+        },
+        {
+          "key": "relevant_history",
+          "value": "糖尿病",
+          "assertion": "present",
+          "evidence": "糖尿病"
+        },
+        {
+          "key": "temperature_c",
+          "value": 39.1,
+          "assertion": "present",
+          "evidence": "39.1"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿频尿痛，腰痛，发热寒战",
+          "assertion": "present",
+          "evidence": "尿频尿痛，腰痛，发热寒战"
+        }
+      ]
+    },
+    {
+      "id": "uti-stone-recurrent",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "urinary_stone",
+        "mechanical_back",
+        "cauda_serious"
+      ],
+      "must_not_miss": [
+        "urinary_stone"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛又犯了，还尿血",
+          "assertion": "present",
+          "evidence": "腰痛又犯了，还尿血"
+        },
+        {
+          "key": "age",
+          "value": 47,
+          "assertion": "present",
+          "evidence": "47"
+        },
+        {
+          "key": "relevant_history",
+          "value": "以前得过肾结石",
+          "assertion": "present",
+          "evidence": "以前得过肾结石"
+        },
+        {
+          "key": "severity",
+          "value": 8,
+          "assertion": "present",
+          "evidence": "8"
+        },
+        {
+          "key": "urinary_details",
+          "value": "绞痛一阵一阵，血尿",
+          "assertion": "present",
+          "evidence": "绞痛一阵一阵，血尿"
+        }
+      ]
+    },
+    {
+      "id": "skin-urticaria-child",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "urticaria"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "孩子起疹子",
+          "assertion": "present",
+          "evidence": "孩子起疹子"
+        },
+        {
+          "key": "age",
+          "value": 8,
+          "assertion": "present",
+          "evidence": "8"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "痒，抓个不停",
+          "assertion": "present",
+          "evidence": "痒，抓个不停"
+        },
+        {
+          "key": "skin_details",
+          "value": "风团样，一片一片",
+          "assertion": "present",
+          "evidence": "风团样，一片一片"
+        }
+      ]
+    },
+    {
+      "id": "skin-dermatitis-detergent",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "dermatitis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "手上起疹子",
+          "assertion": "present",
+          "evidence": "手上起疹子"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "手背发红发痒",
+          "assertion": "present",
+          "evidence": "手背发红发痒"
+        },
+        {
+          "key": "skin_details",
+          "value": "接触新换的洗涤剂后出现",
+          "assertion": "present",
+          "evidence": "接触新换的洗涤剂后出现"
+        }
+      ]
+    },
+    {
+      "id": "skin-infection-diabetic-foot",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "skin_infection"
+      ],
+      "must_not_miss": [
+        "skin_infection"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "脚上红肿",
+          "assertion": "present",
+          "evidence": "脚上红肿"
+        },
+        {
+          "key": "age",
+          "value": 66,
+          "assertion": "present",
+          "evidence": "66"
+        },
+        {
+          "key": "relevant_history",
+          "value": "糖尿病",
+          "assertion": "present",
+          "evidence": "糖尿病"
+        },
+        {
+          "key": "skin_details",
+          "value": "红肿扩散，疼痛，发热",
+          "assertion": "present",
+          "evidence": "红肿扩散，疼痛，发热"
+        }
+      ]
+    },
+    {
+      "id": "unc-nosebleed",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "流鼻血",
+          "assertion": "present",
+          "evidence": "流鼻血"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "其他还好",
+          "assertion": "present",
+          "evidence": "其他还好"
+        }
+      ]
+    },
+    {
+      "id": "unc-ankle-sprain",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "脚崴了",
+          "assertion": "present",
+          "evidence": "脚崴了"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "肿起来了",
+          "assertion": "present",
+          "evidence": "肿起来了"
+        }
+      ]
+    },
+    {
+      "id": "unc-checkup-question",
+      "risk": "routine",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "self_care"
+      ],
+      "expected_abstain": true,
+      "acceptable_directions": [],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "想咨询体检套餐",
+          "assertion": "present",
+          "evidence": "想咨询体检套餐"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "没有不舒服",
+          "assertion": "present",
+          "evidence": "没有不舒服"
+        }
+      ]
+    },
+    {
+      "id": "urg-stroke",
+      "risk": "urgent",
+      "closed_reason": "confirmed_by_user",
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "posterior_stroke"
+      ],
+      "must_not_miss": [
+        "posterior_stroke"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头晕，说话不清",
+          "assertion": "present",
+          "evidence": "头晕，说话不清"
+        },
+        {
+          "key": "age",
+          "value": 72,
+          "assertion": "present",
+          "evidence": "72"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "一边身子没劲",
+          "assertion": "present",
+          "evidence": "一边身子没劲"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "说话含糊，肢体无力，走路不稳",
+          "assertion": "present",
+          "evidence": "说话含糊，肢体无力，走路不稳"
+        }
+      ]
     }
   ],
   "corpus": "conclusion-cases",
   "note": "Engineering v0 case set for the conclusion-sheet composer (docs/问诊结论单设计文档.md §8). Fact-scripted cases: each builds a CaseState directly and drives compose_conclusion. NOT clinician-reviewed; phase-B gating requires a clinician-reviewed set (decision D4). Expectations encode the design's disposition/abstention/must-not-miss rules, not clinical ground truth. v1.1 (2026-10-23): +8 cases covering the six new differential pathways (abdominal/headache/dizziness/low-back/urinary/skin); still engineering-grade, clinician OSCE corpus pending (D4).",
   "review_status": "unreviewed",
-  "version": "0.0.1"
+  "version": "1.2.0"
 }
