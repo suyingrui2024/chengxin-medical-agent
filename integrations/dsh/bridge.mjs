@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 const require = createRequire(import.meta.url);
 const here = dirname(fileURLToPath(import.meta.url));
 
-export function launchOptions(scratch, endpoint, apiKey, model) {
+export function launchOptions(scratch, endpoint, apiKey, model, generation = {}) {
   const cliPackage = require.resolve('@deepseek-ai/dsh/package.json');
   const cli = join(dirname(cliPackage), 'lib/bin.js');
   const env = {};
@@ -26,19 +26,20 @@ export function launchOptions(scratch, endpoint, apiKey, model) {
     dshHome: join(scratch, 'home'), processCwd: scratch, env,
     requestTimeoutMs: 30000, initializeTimeoutMs: 10000,
     disposeEofGraceMs: 1000, disposeGraceMs: 1000,
-    cwd: scratch, provider: 'deepseek-official', model, maxTokens: 2048,
-    reasoningEffort: 'off',
+    cwd: scratch, provider: 'deepseek-official', model,
+    maxTokens: generation.maxTokens ?? 2048,
+    reasoningEffort: generation.reasoningEffort ?? 'off',
   };
 }
 
-export async function runDecision(messages, { endpoint, apiKey, model, deadlineMs = 35000 } = {}) {
+export async function runDecision(messages, { endpoint, apiKey, model, deadlineMs = 35000, maxTokens, reasoningEffort } = {}) {
   if (!endpoint || !apiKey || !model) throw new Error('DSH endpoint, API key and model are required');
   if (!Array.isArray(messages) || !messages.every(m => m && typeof m.content === 'string')) {
     throw new Error('messages must be text messages');
   }
   const scratch = await mkdtemp(join(tmpdir(), 'medical-dsh-'));
   await mkdir(join(scratch, 'home'));
-  const harness = new DeepSeekHarness(launchOptions(scratch, endpoint, apiKey, model));
+  const harness = new DeepSeekHarness(launchOptions(scratch, endpoint, apiKey, model, { maxTokens, reasoningEffort }));
   let timeout;
   try {
     const deadline = new Promise((_, reject) => {
@@ -64,7 +65,21 @@ async function main() {
     if (raw.length > 512000) throw new Error('bridge request too large');
   }
   const payload = JSON.parse(raw);
+  // Generation settings arrive in the envelope (Python owns the
+  // config); fall back to the historical constants when absent.
+  const maxTokens =
+    Number.isInteger(payload.max_tokens) && payload.max_tokens >= 128 && payload.max_tokens <= 8192
+      ? payload.max_tokens
+      : 2048;
+  const reasoningEffort =
+    payload.thinking === 'enabled'
+      ? ['low', 'high', 'max'].includes(payload.reasoning_effort)
+        ? payload.reasoning_effort
+        : 'high'
+      : 'off';
   const output = await runDecision(payload.messages, {
+    maxTokens,
+    reasoningEffort,
     endpoint: process.env.MEDAGENT_LLM_BASE_URL,
     apiKey: process.env.MEDAGENT_LLM_API_KEY,
     model: process.env.MEDAGENT_LLM_MODEL,

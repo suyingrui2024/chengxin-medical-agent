@@ -50,6 +50,16 @@ class CompatibleBackend:
         self.thinking = settings.get("MEDAGENT_LLM_THINKING", "disabled")
         if self.thinking not in {"enabled", "disabled"}:
             raise ValueError("thinking must be enabled or disabled")
+        # V4-generation models grade thinking as low/high/max
+        # (official guidance: simple tasks low, everyday agent work
+        # high, hardest cases max). Unset = do not send the parameter.
+        self.reasoning_effort = settings.get("MEDAGENT_LLM_REASONING_EFFORT") or None
+        if self.reasoning_effort is not None and self.reasoning_effort not in {
+            "low",
+            "high",
+            "max",
+        }:
+            raise ValueError("reasoning effort must be low, high or max")
 
     def decide(self, session_id: str, messages: List[Dict[str, str]]) -> Dict[str, Any]:
         return self._decide(session_id, messages)
@@ -69,6 +79,8 @@ class CompatibleBackend:
         }
         if urlparse(self.base_url).hostname == "api.deepseek.com":
             payload["thinking"] = {"type": self.thinking}
+            if self.thinking == "enabled" and self.reasoning_effort:
+                payload["reasoning_effort"] = self.reasoning_effort
         self.events.append(
             Event(
                 session_id,
@@ -87,9 +99,27 @@ class CompatibleBackend:
         started = perf_counter()
         if cancelled is not None and cancelled.is_set():
             raise DecisionInterrupted()
-        with request.urlopen(req, timeout=45) as response:
-            result = json.loads(response.read(256000).decode())
-        raw = result["choices"][0]["message"]["content"]
+        # The provider's JSON mode occasionally returns an empty content
+        # (a documented quirk); one bounded retry rescues the turn
+        # instead of failing the whole decision on a known transient.
+        result = None
+        raw = ""
+        for attempt in (1, 2):
+            with request.urlopen(req, timeout=45) as response:
+                result = json.loads(response.read(256000).decode())
+            raw = result["choices"][0]["message"]["content"] or ""
+            if raw.strip():
+                break
+            if attempt == 1:
+                self.events.append(
+                    Event(
+                        session_id,
+                        "model.retry",
+                        {"backend": self.name, "reason": "empty_content"},
+                    )
+                )
+                if cancelled is not None and cancelled.is_set():
+                    raise DecisionInterrupted()
         usage = result.get("usage") or {}
         metrics = {
             key: value
@@ -147,6 +177,23 @@ class DshBackend:
                 "MEDAGENT_LLM_MODEL",
             )
         }
+        # Generation settings ride the stdin envelope to the bridge;
+        # until now the bridge hardcoded maxTokens 2048 and
+        # reasoningEffort 'off', silently ignoring the deployment's
+        # MEDAGENT_LLM_MAX_TOKENS / MEDAGENT_LLM_THINKING entirely.
+        self.max_tokens = int(settings.get("MEDAGENT_LLM_MAX_TOKENS", "2048"))
+        if not 128 <= self.max_tokens <= 8192:
+            raise ValueError("max output tokens must be between 128 and 8192")
+        self.thinking = settings.get("MEDAGENT_LLM_THINKING", "disabled")
+        if self.thinking not in {"enabled", "disabled"}:
+            raise ValueError("thinking must be enabled or disabled")
+        self.reasoning_effort = settings.get("MEDAGENT_LLM_REASONING_EFFORT") or None
+        if self.reasoning_effort is not None and self.reasoning_effort not in {
+            "low",
+            "high",
+            "max",
+        }:
+            raise ValueError("reasoning effort must be low, high or max")
         self._process_lock = Lock()
         self._children = set()
         self._closed = False
@@ -209,7 +256,15 @@ class DshBackend:
             )
             self._children.add(child)
         try:
-            data = json.dumps({"messages": messages}, ensure_ascii=False)
+            data = json.dumps(
+                {
+                    "messages": messages,
+                    "max_tokens": self.max_tokens,
+                    "thinking": self.thinking,
+                    "reasoning_effort": self.reasoning_effort,
+                },
+                ensure_ascii=False,
+            )
             if cancelled is None:
                 stdout, _ = child.communicate(data, timeout=55)
             else:
