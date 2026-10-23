@@ -169,7 +169,17 @@ async function api(path, { method = "GET", body, signal } = {}) {
     headers: body ? { "Content-Type": "application/json" } : {},
     body: body ? JSON.stringify(body) : undefined,
   });
-  const payload = await response.json();
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    // A non-JSON body (proxy error page, truncated response) must not
+    // leak the raw parser error ("Unexpected end of JSON input") to
+    // the patient; report it as a retryable service problem instead.
+    throw new Error(
+      `服务返回了无法识别的响应（状态码 ${response.status}），请稍后重试`,
+    );
+  }
   if (!response.ok) {
     const error = new Error(payload.error?.message || "服务未能完成这一步");
     error.code = payload.error?.code;
@@ -291,14 +301,46 @@ function setBusy(busy) {
           : "核对记录 · 可以更正"
         : "当前这一步";
 }
+// Education enrichment lands seconds after a session closes, but the
+// poller normally stops with the session, so the completion events may
+// never be observed. Keep polling briefly for a closed session whose
+// conclusion is still waiting on further_reading — bounded, so a
+// session whose enrichment never runs (web tools off, directions
+// hidden) does not poll forever.
+const EDUCATION_POLL_LIMIT = 30;
+let educationWatchKey = null;
+let educationPollsLeft = 0;
+function educationPending() {
+  const conclusion = state.case?.conclusion;
+  if (state.case?.phase !== "closed" || !conclusion) return false;
+  return conclusion.further_reading?.status !== "ready";
+}
 function syncEventPolling() {
   clearInterval(pollTimer);
   pollTimer = null;
   const reviewActive = ["queued", "running"].includes(
     state.case?.background_review?.status,
   );
-  if (state.sessionId && (state.busy || reviewActive))
-    pollTimer = setInterval(() => loadEvents().catch(() => {}), 1100);
+  let educationActive = false;
+  if (educationPending()) {
+    const key = `${state.sessionId}:${state.case.conclusion.revision ?? ""}`;
+    if (educationWatchKey !== key) {
+      educationWatchKey = key;
+      educationPollsLeft = EDUCATION_POLL_LIMIT;
+    }
+    educationActive = educationPollsLeft > 0;
+  } else {
+    educationWatchKey = null;
+    educationPollsLeft = 0;
+  }
+  if (state.sessionId && (state.busy || reviewActive || educationActive))
+    pollTimer = setInterval(() => {
+      if (educationActive && !state.busy && !reviewActive) {
+        educationPollsLeft -= 1;
+        if (educationPollsLeft <= 0) syncEventPolling();
+      }
+      loadEvents().catch(() => {});
+    }, 1100);
 }
 function scrollBottom() {
   const scroll = $("#conversation-scroll");
@@ -389,6 +431,7 @@ function navigate(view) {
     ["tasks", "inspect", "capabilities", "execution"].includes(view)
   )
     view = "consultation";
+  const previousView = state.view;
   state.view = view;
   // Keep the URL hash honest: init() deep-links from it, so navigation
   // must write it back or a refresh lands on a stale view.
@@ -444,11 +487,23 @@ function navigate(view) {
     renderInspection();
     loadEvents().catch((error) => toast(error.message));
   }
-  history.replaceState(null, "", `#${view}`);
   // Task focus belongs to the consultation view only; re-evaluate on every
   // navigation so leaving mid-task (hash change, back button) restores the shell.
   syncTaskFocus();
   if (!$("#toast").hidden) positionToast();
+  // Move focus to the incoming view's heading on a real view change so
+  // keyboard and screen-reader users land on the new view instead of a
+  // control that just went hidden. (The breadcrumb title cannot serve
+  // as the target: the topbar is display:none at desktop widths.)
+  if (view !== previousView) {
+    const heading = document.querySelector(
+      `#view-${view} h1, #view-${view} h2`,
+    );
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }
 }
 
 function applyRetentionCopy() {
@@ -1640,6 +1695,11 @@ async function resumeSession(id, force = false) {
           structuredUI.render(block, summaryContext()),
         );
     }
+    // Replayed replies carry the conclusion as it was when the session
+    // closed; enrichment may have completed since, so overlay the
+    // current sheet (with further_reading) onto the replayed card.
+    if (data.state.phase === "closed")
+      refreshConclusionCard(data.state.conclusion);
     syncSummaryEdits();
     scrollBottom();
     const meta = state.sessions.find((item) => item.session_id === id);
@@ -1747,6 +1807,13 @@ async function refreshFollowUps() {
   }
   renderFollowUps();
 }
+async function refreshRecordsCount() {
+  // The badge in the nav is static 0 in the HTML and the records module
+  // only corrects it when the records view is opened; pull just the
+  // timeline up front so the first screen shows the real count.
+  const data = await api("/api/patient/timeline");
+  $("#records-count").textContent = String((data.entries || []).length);
+}
 function followUpDueCount() {
   const now = Date.now();
   return (state.followUps || []).filter((item) => {
@@ -1819,6 +1886,21 @@ function renderFollowUps() {
       openFollowUpDialog(item),
     );
     card.append(info, badge, action);
+    // A drafted follow-up message (workspace.follow_up_drafts, filled
+    // by the offline batch) is shown read-only for confirmation; it is
+    // never sent from here.
+    const draftText =
+      typeof item.draft === "string"
+        ? item.draft
+        : item.draft?.draft_message || item.draft?.text || "";
+    if (draftText) {
+      const draft = el("div", "followup-draft");
+      draft.append(
+        el("p", "followup-draft-label", "草稿，待确认"),
+        el("p", "followup-draft-text", draftText),
+      );
+      card.append(draft);
+    }
     list.append(card);
   }
 }
@@ -1881,6 +1963,41 @@ function renderLibrary() {
   }
 }
 
+function refreshConclusionCard(conclusion) {
+  // Education writes further_reading back onto the stored conclusion
+  // after the closing frame rendered the card, so the card sitting in
+  // the transcript is frozen with the pre-enrichment sheet. Re-render
+  // the existing card node from the current conclusion; sessions whose
+  // transcript has no conclusion card are left untouched.
+  if (!conclusion) return;
+  const cards = $("#messages").querySelectorAll(
+    '[data-block-type="conclusion"]',
+  );
+  if (!cards.length) return;
+  const latest = state.reply;
+  const block = (latest &&
+    structuredUI
+      .blocks(replyEnvelope(latest))
+      .find((item) => item.type === "conclusion")) || {
+    id: "conclusion:refresh",
+    type: "conclusion",
+  };
+  cards[cards.length - 1].replaceWith(
+    structuredUI.render(
+      { ...block, data: conclusion },
+      summaryContext(
+        true,
+        latest?.action_id,
+        latest?.location_revision_action,
+        null,
+        true,
+      ),
+    ),
+  );
+  // The replacement node needs its focused-outcome marking re-applied.
+  syncTaskFocus();
+}
+
 async function loadEvents() {
   const id = state.sessionId;
   if (!id) return;
@@ -1889,16 +2006,21 @@ async function loadEvents() {
   if (data.events.length < state.events.length) return;
   const added = data.events.slice(state.events.length);
   state.events = data.events;
+  const educationUpdated = added.some(
+    (event) =>
+      event.event_type === "web.citation_attached" ||
+      event.event_type === "web.education_completed",
+  );
   if (
     added.some(
-      (event) =>
-        event.event_type.startsWith("advisor.") ||
-        event.event_type === "web.citation_attached" ||
-        event.event_type === "web.education_completed",
+      (event) => event.event_type.startsWith("advisor.") || educationUpdated,
     )
   ) {
     const snapshot = await api(`/api/sessions/${id}/snapshot`);
-    if (state.sessionId === id) renderCase(snapshot.state);
+    if (state.sessionId === id) {
+      renderCase(snapshot.state);
+      if (educationUpdated) refreshConclusionCard(snapshot.state.conclusion);
+    }
   }
   renderInspection();
 }
@@ -2946,6 +3068,9 @@ async function init() {
     );
     $("#connection-alert").hidden = true;
     await refreshSessions();
+    // Best-effort: a failed count fetch leaves the badge at its
+    // placeholder and must not block startup.
+    refreshRecordsCount().catch(() => {});
     renderLibrary();
     renderCapabilities();
     navigate(location.hash.slice(1) || "consultation");

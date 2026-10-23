@@ -1329,7 +1329,9 @@ summary:focus-visible {
 #messages .current-summary h3:focus,
 #active-task h3:focus,
 .step-text:focus,
-#execution-focus-label:focus {
+#execution-focus-label:focus,
+.view h1[tabindex="-1"]:focus,
+.view h2[tabindex="-1"]:focus {
   outline: none;
 }
 [hidden] {
@@ -6412,12 +6414,28 @@ body.task-focused .surface-actions {
 }
 .followup-card {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
   padding: 18px 20px;
+}
+.followup-draft {
+  flex-basis: 100%;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+.followup-draft-label {
+  margin: 0 0 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.followup-draft-text {
+  margin: 0;
+  font-size: 13.5px;
+  white-space: pre-wrap;
 }
 .followup-badge {
   flex: none;
