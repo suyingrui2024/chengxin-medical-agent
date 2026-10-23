@@ -38,18 +38,25 @@ class EventStore:
         self._path = path
         self._lock = Lock()
         self._traces: Dict[str, Dict[str, str]] = {}
+        self.skipped_corrupt = 0
         if path:
             path.parent.mkdir(parents=True, exist_ok=True)
             if path.exists():
                 self._events = list(self._read_file(path))
 
-    @staticmethod
-    def _read_file(path: Path) -> Iterable[Event]:
+    def _read_file(self, path: Path) -> Iterable[Event]:
+        # A crash or power cut can truncate the final line mid-append.
+        # Skip (and count) damaged lines instead of bricking every
+        # future startup on one bad row — the same standard the
+        # SessionStore already applies to its files.
         for line in path.read_text(encoding="utf-8").splitlines():
             if not line.strip():
                 continue
-            raw = json.loads(line)
-            yield Event(**raw)
+            try:
+                raw = json.loads(line)
+                yield Event(**raw)
+            except Exception:
+                self.skipped_corrupt += 1
 
     def append(self, event: Event) -> None:
         with self._lock:

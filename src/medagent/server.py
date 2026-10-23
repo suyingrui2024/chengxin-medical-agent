@@ -98,6 +98,10 @@ class MedicalAgentServer(ThreadingHTTPServer):
 
 
 class Handler(BaseHTTPRequestHandler):
+    # Bound how long a connection may take to deliver its request;
+    # the threading server otherwise lets slow clients hold threads
+    # indefinitely (audit S7).
+    timeout = 30
     server_version = f"MedAgentPrototype/{__version__}"
 
     @property
@@ -210,6 +214,8 @@ class Handler(BaseHTTPRequestHandler):
         self._static(path)
 
     def do_POST(self) -> None:
+        if not self._same_origin():
+            return
         path = urlparse(self.path).path
         if path == "/api/patients":
             self._error(
@@ -250,8 +256,11 @@ class Handler(BaseHTTPRequestHandler):
             except StaleCompositionError as exc:
                 self._error(HTTPStatus.CONFLICT, "stale_composition", str(exc))
                 return
-            except (ValueError, TypeError) as exc:
+            except ValueError as exc:
                 self._error(HTTPStatus.BAD_REQUEST, "invalid_capability", str(exc))
+                return
+            except TypeError:
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_capability", "能力配置格式不正确")
                 return
             except Exception:
                 self._error(
@@ -274,8 +283,15 @@ class Handler(BaseHTTPRequestHandler):
                     if path.endswith("/test")
                     else self.app.workspace.apply(payload)
                 )
-            except (ValueError, RuntimeError) as exc:
+            except ValueError as exc:
                 self._error(HTTPStatus.BAD_REQUEST, "invalid_settings", str(exc))
+                return
+            except RuntimeError:
+                self._error(
+                    HTTPStatus.BAD_GATEWAY,
+                    "connection_failed",
+                    "连接未成功，请检查地址、协议、模型 ID 与密钥",
+                )
                 return
             except Exception:
                 self._error(
@@ -305,7 +321,7 @@ class Handler(BaseHTTPRequestHandler):
                 for session in self.app.workspace.sessions():
                     try:
                         engine = self.app.workspace.engine_for(session["session_id"])
-                        with engine._session_locks[session["session_id"]]:
+                        with engine._lock_for(session["session_id"]):
                             self.app.reviews.invalidate(
                                 engine.state(session["session_id"]), "disabled_by_user"
                             )
@@ -652,6 +668,8 @@ class Handler(BaseHTTPRequestHandler):
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
     def do_DELETE(self) -> None:
+        if not self._same_origin():
+            return
         path = urlparse(self.path).path
         if path.startswith("/api/entries/"):
             self._patient_delete(path)
@@ -712,6 +730,8 @@ class Handler(BaseHTTPRequestHandler):
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
     def do_PATCH(self) -> None:
+        if not self._same_origin():
+            return
         path = urlparse(self.path).path
         parts = path.strip("/").split("/")
         if (
@@ -1309,6 +1329,18 @@ def serve(
     event_log: Optional[Path] = None,
     backend: Optional[str] = None,
 ) -> None:
+    # The standalone server has no access token (only the desktop
+    # sidecar injects one). Binding a non-loopback interface would
+    # expose full consultation records to the network — refuse unless
+    # the operator explicitly accepts that with MEDAGENT_ALLOW_REMOTE=1.
+    if host not in {"127.0.0.1", "::1", "localhost"} and os.environ.get(
+        "MEDAGENT_ALLOW_REMOTE"
+    ) != "1":
+        raise SystemExit(
+            f"拒绝启动：--host {host} 不是回环地址，而独立服务没有访问令牌，"
+            "问诊记录会暴露给网络。如确需对外绑定，请设置环境变量 "
+            "MEDAGENT_ALLOW_REMOTE=1 并自行承担风险。"
+        )
     runtime = build_runtime(event_log, backend)
     context = runtime.start()
     engine = context.services.require("consultation")

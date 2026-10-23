@@ -152,3 +152,42 @@ class AssertionQuoteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EventStoreCorruptionToleranceTests(unittest.TestCase):
+    """Audit S1: one truncated JSONL line bricked every later startup
+    (the desktop event log is file-backed by default)."""
+
+    def test_truncated_last_line_is_skipped_and_counted(self):
+        import tempfile
+        from pathlib import Path
+
+        from medagent.events import Event, EventStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "events.jsonl"
+            store = EventStore(path)
+            store.append(Event("s1", "session.created", {}))
+            with path.open("a", encoding="utf-8") as stream:
+                stream.write('{"session_id": "s1", "event_type": "turn.agent_rep')
+            reopened = EventStore(path)
+            self.assertEqual(len(reopened.for_session("s1")), 1)
+            self.assertEqual(reopened.skipped_corrupt, 1)
+
+
+class SessionStoreIdSafetyTests(unittest.TestCase):
+    """Audit S5/S6: session ids from restored files must not escape the
+    store root; saves are fsynced via unique tmp files."""
+
+    def test_path_traversal_id_rejected(self):
+        import tempfile
+        from pathlib import Path
+
+        from medagent.session_store import SessionStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = SessionStore(Path(tmp))
+            with self.assertRaises(ValueError):
+                store._path("../escape")
+            with self.assertRaises(ValueError):
+                store._path("a/b")

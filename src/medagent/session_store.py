@@ -21,7 +21,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import fields
+from uuid import uuid4
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -128,15 +130,28 @@ class SessionStore:
         self.root.mkdir(parents=True, exist_ok=True)
         self.skipped_corrupt = 0
 
+    _ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]*$")
+
     def _path(self, session_id: str) -> Path:
+        # Session ids are uuid4 in practice, but a crafted state file
+        # restored from disk carries its own id — never let it walk out
+        # of the store root via "../" segments.
+        if not self._ID_PATTERN.match(session_id or ""):
+            raise ValueError(f"invalid session id for storage: {session_id!r}")
         return self.root / f"{session_id}.json"
 
     def save(self, state: CaseState) -> None:
         payload = serialize_state(state)
         text = json.dumps(payload, ensure_ascii=False)
         target = self._path(state.session_id)
-        tmp = target.with_suffix(".json.tmp")
-        tmp.write_text(text, encoding="utf-8")
+        # Unique tmp name (concurrent persists of one session must not
+        # share a tmp file) + fsync before replace (a power cut must
+        # not leave a torn file behind the rename).
+        tmp = target.with_suffix(f".{os.getpid()}.{uuid4().hex[:8]}.tmp")
+        with tmp.open("w", encoding="utf-8") as stream:
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
         os.replace(tmp, target)
 
     def delete(self, session_id: str) -> None:
