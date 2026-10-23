@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from .domain import Phase, QuickReply
 from .extensions.builtin import load_registry
+from .text_match import contains_unnegated
 
 
 @dataclass(frozen=True)
@@ -68,7 +69,7 @@ class ContentRepository:
         if not terms:
             return True
         value = chief_complaint.lower()
-        return any(term.lower() in value for term in terms)
+        return any(contains_unnegated(value, term.lower()) for term in terms)
 
     @property
     def versions(self) -> Dict[str, str]:

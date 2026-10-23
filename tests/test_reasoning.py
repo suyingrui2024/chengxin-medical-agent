@@ -350,3 +350,61 @@ class NewPathwayCoverageTests(unittest.TestCase):
         for chief in ("头痛一天", "胃疼两天", "摔了一跤，腰疼", "头晕一上午", "尿频一天", "起疹子了"):
             ws = self._workspace([("chief_complaint", chief, chief)])
             self.assertEqual(ws.hypotheses, {}, chief)
+
+
+class NegationMatchingTests(unittest.TestCase):
+    """Negated symptom mentions must never count as evidence (2026-10-23
+    reasoning-quality pass)."""
+
+    def test_text_match_windows_and_clauses(self):
+        from medagent.text_match import contains_unnegated
+
+        self.assertFalse(contains_unnegated("没有呕吐", "呕吐"))
+        self.assertFalse(contains_unnegated("无发热", "发热"))
+        self.assertFalse(contains_unnegated("没有肢体无力", "无力"))
+        self.assertTrue(contains_unnegated("有点恶心，没有呕吐", "恶心"))
+        self.assertFalse(contains_unnegated("有点恶心，没有呕吐", "呕吐"))
+        # A negation in a previous clause does not scope forward.
+        self.assertTrue(contains_unnegated("感冒没好，又发热了", "发热"))
+        self.assertTrue(contains_unnegated("右下腹绞痛", "右下腹"))
+
+    def _workspace(self, facts):
+        from medagent.domain import Assertion, Fact, Source
+
+        state = CaseState(session_id="negation-unit")
+        for key, value in facts:
+            state.record(
+                Fact(
+                    key=key,
+                    value=value,
+                    assertion=Assertion.PRESENT,
+                    source=Source.PATIENT,
+                    turn_id="t1",
+                    evidence=value,
+                )
+            )
+            state.transcript.append({"role": "user", "content": value})
+        return RuleBasedProposer().propose(state)
+
+    def test_negated_vomiting_does_not_support_gastroenteritis(self):
+        ws = self._workspace([
+            ("chief_complaint", "肚子疼半天"),
+            ("gi_details", "肚脐周围隐痛，没有呕吐，也没有腹泻"),
+        ])
+        gastro = ws.hypotheses.get("gastroenteritis")
+        self.assertTrue(gastro is None or not gastro.evidence_for)
+
+    def test_negated_blood_does_not_trigger_bleed_or_refute(self):
+        ws = self._workspace([
+            ("chief_complaint", "拉肚子一天"),
+            ("gi_details", "腹泻，水样便，没有便血"),
+            ("associated_symptoms", "有点恶心呕吐",),
+        ])
+        self.assertNotIn("gi_bleed", ws.hypotheses)
+        # And the earlier false refutation is gone: gastroenteritis is
+        # no longer "refuted" by a *denied* bleed.
+        self.assertNotEqual(ws.hypotheses["gastroenteritis"].status, "refuted")
+
+    def test_negated_chief_does_not_activate_pathway(self):
+        ws = self._workspace([("chief_complaint", "没有头痛，就是来开点药")])
+        self.assertEqual(ws.hypotheses, {})

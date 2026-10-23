@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from .domain import AgentReply, Assertion, CaseState, Phase
 from .events import Event
 from .phase_graph import planning_rank
+from .text_match import contains_unnegated
 
 ACTIVE_STATUSES = ("active", "supported")
 
@@ -147,7 +148,10 @@ def _condition_quote(state: CaseState, condition: Dict[str, Any]) -> Optional[st
         haystack = fact.value if isinstance(fact.value, str) else ""
         evidence = fact.evidence or ""
         for term in condition["contains_any"]:
-            if term in haystack or term in evidence:
+            # Negated mentions ("没有呕吐") never count as evidence.
+            if contains_unnegated(haystack, term) or contains_unnegated(
+                evidence, term
+            ):
                 return term
         return None
     if "equals" in condition:
@@ -178,7 +182,9 @@ class RuleBasedProposer:
         chief_fact = state.facts.get("chief_complaint")
         for pathway in self._pathways:
             terms = pathway.get("chief_complaint_contains_any", [])
-            matched_term = next((t for t in terms if t in chief), None)
+            matched_term = next(
+                (t for t in terms if contains_unnegated(chief, t)), None
+            )
             if matched_term is None:
                 continue
             for raw in pathway["hypotheses"]:
@@ -390,7 +396,7 @@ class DifferentialPlanner:
             return counts
         for pathway in self._proposer._pathways:
             terms = pathway.get("chief_complaint_contains_any", [])
-            if not any(term in chief for term in terms):
+            if not any(contains_unnegated(chief, term) for term in terms):
                 continue
             for raw in pathway.get("hypotheses", []):
                 for qid in raw.get("discriminating_questions", []):
