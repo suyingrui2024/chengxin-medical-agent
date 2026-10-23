@@ -12,9 +12,9 @@ from medagent.triage import TriageService
 from tests.test_agent import ScriptBackend, cmd, fact
 
 
-OPENING = "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
+OPENING = "我自己，男，32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。"
 DETAILS = (
-    "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
+    "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；自测体温38.25度；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。"
 )
 ROWS = [
     ("trajectory", "stable", "变化不大", "present"),
@@ -23,6 +23,7 @@ ROWS = [
     ("resp_breathing", "没有气促，能完整说话", "没有气促，能完整说话", "present"),
     ("resp_cough_details", "干咳，没有咳血", "干咳，没有咳血", "present"),
     ("resp_intake", "能正常喝水吃饭，排尿正常", "能正常喝水吃饭，排尿正常", "present"),
+    ("reported_temperature", "38.25度", "自测体温38.25度", "present"),
     ("medications_taken", None, "没有用药", "absent"),
     ("allergies", None, "过敏不知道", "unknown"),
     ("relevant_history", None, "没有相关既往病史", "absent"),
@@ -43,12 +44,13 @@ def measured_case(summary=False, caregiver=False):
     state, _ = engine.create_session()
     subject, age, text = "self", 32, OPENING
     if caregiver:
-        subject, age, text = "other_adult", 67, OPENING.replace("我自己32岁", "给母亲咨询，她67岁")
+        subject, age, text = "other_adult", 67, OPENING.replace("我自己，男，32岁", "给母亲咨询，她67岁")
     backend.commands = [
         cmd(
             "record_facts",
             facts=[
                 fact("consult_for", subject, "给母亲咨询" if caregiver else "我自己"),
+                fact("sex", "female" if caregiver else "male", "她" if caregiver else "男"),
                 fact("age_years", age, f"{age}岁"),
                 fact("chief_complaint", "咳嗽发烧", "咳嗽发烧"),
                 fact("onset", "两天", "两天"),

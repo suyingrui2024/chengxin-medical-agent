@@ -315,6 +315,7 @@ class LocationRevisionTests(unittest.TestCase):
             # questions precede onset/trajectory/severity).
             for text, choice in [
                 ("孩子", "child"),
+                ("男", "male"),
                 ("8岁", None),
                 ("头疼", None),
                 ("都没有", "no"),

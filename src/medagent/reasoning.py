@@ -23,6 +23,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from .domain import AgentReply, Assertion, CaseState, Phase
 from .events import Event
+from .knowledge import question_fact_gates_pass
 from .phase_graph import planning_rank
 from .text_match import contains_unnegated
 
@@ -458,8 +459,11 @@ class DifferentialPlanner:
             for question in engine.content.questions
             if question.fact_key not in state.facts
             and engine.content.question_applies(question, chief)
+            and question_fact_gates_pass(question, state.facts)
         ]
-        if candidates:
+        # Same parity rule as ConsultationEngine._plan_next: non-blocking
+        # questions stay askable but never gate the finish on their own.
+        if any(question.blocking for question in candidates):
             earliest_phase = min(planning_rank(item.phase) for item in candidates)
             same_phase = [
                 item for item in candidates if planning_rank(item.phase) == earliest_phase

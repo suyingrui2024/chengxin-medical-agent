@@ -2,13 +2,50 @@ from __future__ import annotations
 
 import json
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib import resources
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
-from .domain import Phase, QuickReply
+from .domain import Assertion, Fact, Phase, QuickReply
 from .extensions.builtin import load_registry
 from .text_match import contains_unnegated
+
+# Patient-facing age prompt for non-child subjects, shared by both engines.
+# The catalog text ("婴幼儿请尽量写清月龄…") is what the *model* sees in its
+# catalog; presenting it verbatim to a 32- or 65-year-old asking for
+# themselves reads as a template bug (live-eval cases 1/5/9). Child
+# consultations keep the catalog wording, where the months phrasing is
+# the point.
+ADULT_AGE_PROMPT = "患者多大？可直接写年龄，例如 32 岁。"
+
+
+def question_fact_gates_pass(question: "Question", facts: Mapping[str, Fact]) -> bool:
+    """Fact-dependent eligibility, evaluated at candidate-computation time.
+
+    A question drops out of the candidate set when a recorded fact
+    excludes it (``excludes_fact_equals``, e.g. pregnancy screening
+    once sex is recorded male) or when a known age falls outside its
+    ``age_between_when_known`` window. An unknown age keeps the
+    question eligible: the gate only fires on known facts. Shared by
+    the adaptive and deterministic engines so both apply identical
+    gating semantics.
+    """
+    for key, excluded in (question.excludes_fact_equals or {}).items():
+        fact = facts.get(key)
+        if fact is not None and fact.value in excluded:
+            return False
+    window = question.age_between_when_known
+    if window:
+        age = facts.get("age_years")
+        if (
+            age is not None
+            and age.assertion == Assertion.PRESENT
+            and isinstance(age.value, (int, float))
+            and not isinstance(age.value, bool)
+            and not window[0] <= age.value <= window[1]
+        ):
+            return False
+    return True
 
 
 @dataclass(frozen=True)
@@ -20,6 +57,14 @@ class Question:
     input: str
     options: List[QuickReply]
     applies_when: Dict[str, Any]
+    # Wave-2 gating metadata. ``blocking=False`` questions stay askable and
+    # recordable but never gate review_summary / controller auto-summary.
+    # ``excludes_fact_equals`` / ``age_between_when_known`` are evaluated
+    # against current facts at candidate-computation time; they are engine
+    # metadata and are never forwarded into the model's question catalog.
+    blocking: bool = True
+    excludes_fact_equals: Dict[str, List[Any]] = field(default_factory=dict)
+    age_between_when_known: Optional[List[float]] = None
 
 
 class ContentRepository:
@@ -42,6 +87,16 @@ class ContentRepository:
             input=raw["input"],
             options=[QuickReply(**item) for item in raw.get("options", [])],
             applies_when=dict(raw.get("applies_when", {})),
+            blocking=bool(raw.get("blocking", True)),
+            excludes_fact_equals={
+                str(key): list(values)
+                for key, values in dict(raw.get("excludes_fact_equals", {})).items()
+            },
+            age_between_when_known=(
+                list(raw["age_between_when_known"])
+                if raw.get("age_between_when_known")
+                else None
+            ),
         )
 
     def question(self, question_id: str) -> Question:

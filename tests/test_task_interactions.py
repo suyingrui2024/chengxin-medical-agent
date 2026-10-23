@@ -19,6 +19,7 @@ class TaskInteractionTests(unittest.TestCase):
     def task(self, complaint="头疼"):
         answers = {
             "consult_for": ("我自己", "self"),
+            "sex": ("男", "male"),
             "age": ("32岁", None),
             "chief_complaint": (complaint, None),
             "emergency_screen": ("都没有", "no"),
@@ -30,6 +31,7 @@ class TaskInteractionTests(unittest.TestCase):
             "resp_breathing": ("能正常呼吸", None),
             "resp_cough_details": ("干咳", None),
             "resp_intake": ("能正常喝水吃饭", None),
+            "reported_temperature": ("没量过", None),
             "medications_taken": ("没有", None),
             "allergies": ("没有", None),
             "relevant_history": ("没有", None),

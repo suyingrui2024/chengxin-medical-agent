@@ -22,6 +22,7 @@ class ConsultationTestCase(unittest.TestCase):
 
     def establish_adult_complaint(self, complaint="咳嗽发烧两天"):
         self.answer("我自己", "self")
+        self.answer("男", "male")
         self.answer("32岁")
         self.answer(complaint)
 
@@ -43,6 +44,7 @@ class ConsultationTestCase(unittest.TestCase):
 
     def test_invalid_age_is_not_recorded_as_a_fact(self):
         self.answer("我自己", "self")
+        self.answer("男", "male")
         reply = self.answer("很多岁")
         self.assertEqual(reply.kind, "clarification")
         self.assertNotIn("age_years", self.state.facts)
@@ -76,6 +78,7 @@ class ConsultationTestCase(unittest.TestCase):
 
     def test_caregiver_answers_are_tagged_with_caregiver_source(self):
         self.answer("孩子", "child")
+        self.answer("男", "male")
         self.answer("8个月")
         self.answer("发烧")
         self.assertEqual(self.state.facts["age_years"].source, Source.CAREGIVER)
@@ -92,6 +95,7 @@ class ConsultationTestCase(unittest.TestCase):
             ("没有", None),
             ("干咳，没有咳血", None),
             ("能正常喝水", None),
+            ("没量过", None),
         ]
         for text, choice in answers:
             reply = self.answer(text, choice)
@@ -147,6 +151,7 @@ class ConsultationTestCase(unittest.TestCase):
 
     def test_correction_rejects_invalid_age_without_overwrite(self):
         self.answer("我自己", "self")
+        self.answer("男", "male")
         self.answer("32岁")
         with self.assertRaises(ValueError):
             self.engine.correct_fact(self.state.session_id, "age_years", "年龄不详")
@@ -170,6 +175,8 @@ class ConsultationTestCase(unittest.TestCase):
     def test_complete_generic_consultation_produces_auditable_summary(self):
         answers = {
             "consult_for": ("我自己", "self"),
+            "sex": ("女", "female"),
+            "pregnancy_status": ("没有怀孕，月经没有推迟", "not_pregnant"),
             "age": ("32岁", None),
             "chief_complaint": ("腹痛两小时", None),
     "gi_details": ("肚脐周围隐痛", None),

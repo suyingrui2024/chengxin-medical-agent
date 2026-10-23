@@ -12,6 +12,8 @@ from medagent.runtime import build_runtime
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),
+    "sex": ("女", "female"),
+    "pregnancy_status": ("没有怀孕，月经没有推迟", "not_pregnant"),
     "age": ("32岁", None),
     "chief_complaint": ("腹痛两小时", None),
     "gi_details": ("肚脐周围隐痛", None),
@@ -70,6 +72,7 @@ class FollowUpFlowTests(unittest.TestCase):
 
     def test_urgent_trajectory_answer_closes_with_follow_up(self):
         self._answer("我自己", "self")
+        self._answer("男", "male")
         self._answer("32岁")
         self._answer("咳嗽发烧两天")
         self._answer("都没有", "no")

@@ -77,7 +77,11 @@ class AdaptiveAgentTests(unittest.TestCase):
         self.assertEqual(len(self.state.facts), 4)
         self.assertNotEqual(self.opening.action_id, reply.action_id)
 
-    def test_entire_batch_rejected_if_one_evidence_is_fabricated(self):
+    def test_batch_partially_records_valid_items_and_rejects_fabricated_evidence(self):
+        # Wave-2 partial recording: the verifiable item lands immediately,
+        # while the item whose evidence is fabricated (the patient never
+        # said it) is still rejected outright — partial landing never
+        # relaxes the per-item evidence contract.
         self.backend.commands = [
             cmd(
                 "record_facts",
@@ -86,16 +90,22 @@ class AdaptiveAgentTests(unittest.TestCase):
                     fact("allergies", None, "没有过敏", "absent"),
                 ],
             ),
-            cmd("ask_question", question_id="chief_complaint"),
+            cmd("ask_question", question_id="emergency_screen"),
         ]
         self.submit("咳嗽")
-        self.assertEqual(self.state.facts, {})
+        self.assertEqual(set(self.state.facts), {"chief_complaint"})
+        self.assertNotIn("allergies", self.state.facts)
         completed = [
             e
             for e in self.events.for_session(self.state.session_id)
             if e.event_type == "tool.completed"
         ]
-        self.assertFalse(completed[0].payload["result"]["ok"])
+        result = completed[0].payload["result"]
+        self.assertFalse(result["ok"])
+        self.assertTrue(result["partial"])
+        self.assertEqual(result["recorded"], ["chief_complaint"])
+        self.assertEqual([item["key"] for item in result["rejected"]], ["allergies"])
+        self.assertIn("guidance", result["rejected"][0])
 
     def test_unknown_and_absence_preserved_separately(self):
         self.backend.commands = [

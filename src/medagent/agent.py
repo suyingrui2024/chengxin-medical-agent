@@ -41,12 +41,22 @@ from .consultation_subject import (
     explicit_switch,
 )
 from .interpreter import Interpretation
+from .knowledge import Question, question_fact_gates_pass
+from .reasoning import RuleBasedProposer, load_pathways
+from .text_match import contains_unnegated
 from .adaptive_questions import (
     AdaptiveQuestionError,
     RISK_TAG_CUES,
     project_selected_answer,
     validate_adaptive_question,
 )
+
+
+# Screening fields whose incidental mention (recorded while a *different*
+# question was active) must not silently count as a completed screening.
+# The engine flags them in the model context instead (wave-2 spillover
+# signal); they still leave missing_required once recorded.
+SCREENING_FIELDS = frozenset({"associated_symptoms"})
 
 
 class AdaptiveConsultationEngine(ConsultationEngine):
@@ -62,8 +72,49 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         # it; other construction paths stay coordinator-free by default).
         self.subagent_coordinator = subagent_coordinator
         self._round_spawn_counts: Dict[str, int] = {}
+        # session_id -> screening fact keys recorded only incidentally
+        # (see SCREENING_FIELDS); advisory context signal, never persisted.
+        self._incidental_records: Dict[str, set] = {}
         self._active_turns = {}
         self._decision_waiter = DecisionWaiter()
+        # Pathway close-gate structures (live-eval case 3: a triggered
+        # chief-complaint pathway whose details were never probed must not
+        # be silently summarized away). Triggering reuses the reasoning
+        # core's own pathway definitions and proposer — no second keyword
+        # table. A pathway's detail facts are derived from the DSL: fact
+        # keys cited by the pathway's hypotheses in support/refute
+        # conditions that are collected by a chief-complaint-gated
+        # question (the *_details-style fields). Generic background fields
+        # (trajectory, severity, relevant_history…) are cited by many
+        # pathways and never count as "the pathway was probed".
+        self._pathways = load_pathways()
+        self._pathway_proposer = RuleBasedProposer(
+            pathways=self._pathways,
+            question_fact_keys={q.id: q.fact_key for q in self.content.questions},
+        )
+        self._questions_by_fact = {}
+        for question in self.content.questions:
+            self._questions_by_fact.setdefault(question.fact_key, question)
+        gated_fact_keys = {
+            q.fact_key
+            for q in self.content.questions
+            if q.applies_when.get("chief_complaint_contains_any")
+        }
+        self._pathway_detail_facts: Dict[str, Any] = {}
+        for pathway in self._pathways:
+            cited = {
+                condition["fact_key"]
+                for hypothesis in pathway.get("hypotheses", [])
+                for condition in [
+                    *hypothesis.get("support", []),
+                    *hypothesis.get("refute", []),
+                ]
+            }
+            self._pathway_detail_facts[pathway["id"]] = sorted(
+                fact_key
+                for fact_key in cited
+                if fact_key != "chief_complaint" and fact_key in gated_fact_keys
+            )
         self.prompt = (
             resources.files("medagent.content")
             .joinpath("agent_prompt.txt")
@@ -198,6 +249,28 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         finally:
             self.events.clear_trace(state.session_id)
         return state, reply
+
+    # Patient-facing age prompt for non-child subjects. The catalog text
+    # ("婴幼儿请尽量写清月龄…") is what the *model* sees in its catalog;
+    # presenting it verbatim to a 32- or 65-year-old asking for themselves
+    # reads as a template bug (live-eval cases 1/5/9). Child consultations
+    # keep the catalog wording, where the months phrasing is the point.
+    _ADULT_AGE_PROMPT = "患者多大？可直接写年龄，例如 32 岁。"
+
+    def _ask(self, state: CaseState, question: Question, reason: str) -> AgentReply:
+        reply = super()._ask(state, question, reason)
+        if question.fact_key == "age_years" and not self._subject_is_child(state):
+            reply.message = self._ADULT_AGE_PROMPT
+        return reply
+
+    @staticmethod
+    def _subject_is_child(state: CaseState) -> bool:
+        if state.get("consult_for") == "child":
+            return True
+        profile = subject_profile(state)
+        reference = (profile or {}).get("reference") or {}
+        attributes = reference.get("attributes") or []
+        return bool(attributes) and attributes[0] == "child"
 
     def _interrupt_or_reject(self, state, text, explicit_help=False):
         active = self._active_turns.get(state.session_id)
@@ -497,13 +570,165 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         except AdaptiveQuestionError as exc:
             raise StaleActionError(str(exc)) from exc
 
-    def _context(self, state: CaseState, text: str) -> Dict[str, Any]:
+    @staticmethod
+    def _fact_gates_pass(state: CaseState, question) -> bool:
+        """Fact-dependent eligibility, evaluated at candidate time.
+
+        Shared implementation: ``knowledge.question_fact_gates_pass``
+        (the deterministic engine applies the same gates). The gate
+        only fires on known facts — an unknown age keeps the question
+        eligible.
+        """
+        return question_fact_gates_pass(question, state.facts)
+
+    def _track_incidental(self, state: CaseState, proposal, active_before) -> None:
+        """Flag screening facts that were only mentioned in passing.
+
+        A screening field (SCREENING_FIELDS) recorded while a *different*
+        question was active — or none — was volunteered, not screened. The
+        fact still counts as recorded (it leaves missing_required), but the
+        context keeps flagging it via ``incidentally_recorded`` so the model
+        can still run the formal screen. Formally answering the field's own
+        question, or a deliberate correction, clears the flag.
+        """
+        key = proposal["key"]
+        if key not in SCREENING_FIELDS:
+            return
+        marks = self._incidental_records.setdefault(state.session_id, set())
+        if proposal.get("correction") or (
+            active_before is not None and active_before.fact_key == key
+        ):
+            marks.discard(key)
+        else:
+            marks.add(key)
+
+    def _pathway_exploration(self, state: CaseState):
+        """Per triggered pathway: were its details actually probed?
+
+        Triggering reuses the reasoning core's rule (chief complaint
+        contains an unnegated pathway term). A triggered pathway counts
+        as explored when any of these holds:
+        - one of its detail facts is recorded (any assertion — being
+          asked and answered "不知道" is a probe, same semantics as
+          missing_required), or its detail question was asked at all;
+        - every detail question is excluded by known facts (an age/sex
+          gate), so nothing askable remains;
+        - the rule proposer, run over current facts, holds at least one
+          evidence entry for one of the pathway's hypotheses that rests
+          on a fact other than the chief complaint itself (this is the
+          only signal for pathways with no dedicated detail field, e.g.
+          chest, and a backstop for evidence gathered via other fields).
+        """
         chief = str(state.get("chief_complaint", ""))
-        candidates = [
+        if not chief:
+            return []
+        workspace = self._pathway_proposer.propose(state)
+        exploration = []
+        for pathway in self._pathways:
+            terms = pathway.get("chief_complaint_contains_any", [])
+            if not any(contains_unnegated(chief, term) for term in terms):
+                continue
+            detail_facts = self._pathway_detail_facts.get(pathway["id"], [])
+            explored = any(
+                fact_key in state.facts
+                or self._questions_by_fact[fact_key].id in state.asked_questions
+                for fact_key in detail_facts
+            )
+            if not explored and detail_facts:
+                explored = all(
+                    not self._fact_gates_pass(
+                        state, self._questions_by_fact[fact_key]
+                    )
+                    for fact_key in detail_facts
+                )
+            if not explored:
+                explored = any(
+                    ref.fact_key != "chief_complaint"
+                    for raw in pathway.get("hypotheses", [])
+                    if (hypothesis := workspace.hypotheses.get(raw["id"]))
+                    is not None
+                    for ref in [
+                        *hypothesis.evidence_for,
+                        *hypothesis.evidence_against,
+                    ]
+                )
+            exploration.append(
+                {
+                    "pathway": pathway["id"],
+                    "detail_fields": detail_facts,
+                    "explored": explored,
+                }
+            )
+        return exploration
+
+    @staticmethod
+    def _unexplored_pathway_error(unexplored) -> ProposalError:
+        parts = []
+        for entry in unexplored:
+            if entry["detail_fields"]:
+                fields = "、".join(entry["detail_fields"])
+            else:
+                fields = "该通路无专属细节字段，需伴随症状、病史等鉴别证据落账"
+            parts.append(f"{entry['pathway']} 通路（细节字段：{fields}）")
+        return ProposalError(
+            "主诉通路尚未探明，不能直接核对摘要："
+            + "；".join(parts)
+            + "。请先用 ask_question/ask_patient 探明对应细节字段；"
+            "若临床上确不适用，重新调用 review_summary 并填写 abstain_reason 说明理由。"
+        )
+
+    def _pathway_gate_redirect(self, state: CaseState, turn_id: str):
+        """Controller close-gate for the host-driven auto-summary.
+
+        Mirrors the review_summary tool gate: instead of summarizing an
+        unexplored triggered pathway away, ask its first unrecorded,
+        still-eligible detail question directly. _ask registers the
+        question as asked, so a patient who cannot elaborate further is
+        not asked in a loop — the next close attempt sees the pathway as
+        attempted. Pathways without a detail field cannot be probed
+        deterministically here and are left to the tool gate and the
+        triage layers.
+        """
+        for entry in self._pathway_exploration(state):
+            if entry["explored"]:
+                continue
+            for fact_key in entry["detail_fields"]:
+                if fact_key in state.facts:
+                    continue
+                question = self._questions_by_fact[fact_key]
+                if not self._fact_gates_pass(state, question):
+                    continue
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "review.pathway_gate_redirect",
+                        {"pathway": entry["pathway"], "detail_field": fact_key},
+                        turn_id=turn_id,
+                    )
+                )
+                return self._ask(
+                    state,
+                    question,
+                    "主诉通路尚未探明，控制器在摘要前先补问其细节字段",
+                )
+        return None
+
+    def _candidate_questions(self, state: CaseState, chief: str):
+        return [
             q
             for q in self.content.questions
-            if q.fact_key not in state.facts and self.content.question_applies(q, chief)
+            if q.fact_key not in state.facts
+            and self.content.question_applies(q, chief)
+            and self._fact_gates_pass(state, q)
         ]
+
+    def _context(self, state: CaseState, text: str) -> Dict[str, Any]:
+        chief = str(state.get("chief_complaint", ""))
+        candidates = self._candidate_questions(state, chief)
+        active_question = next(
+            (q for q in self.content.questions if q.id == state.active_question),
+            None,
+        )
         recent = state.transcript[-16:]
         recent_user_texts = {
             item["content"] for item in recent if item["role"] == "user"
@@ -549,9 +774,31 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 else {}
             ),
             "missing_required": [
-                q.fact_key for q in candidates if q.id not in {"patient_goal"}
+                q.fact_key
+                for q in candidates
+                if q.id not in {"patient_goal"} and q.blocking
             ],
+            **(
+                {"pathway_exploration": exploration}
+                if (exploration := self._pathway_exploration(state))
+                else {}
+            ),
             "questions": [{"id": q.id, "field": q.fact_key} for q in candidates],
+            **(
+                {
+                    "incidentally_recorded": sorted(
+                        self._incidental_records.get(state.session_id, ())
+                    )
+                }
+                if self._incidental_records.get(state.session_id)
+                else {}
+            ),
+            **(
+                {"active_question_field_already_recorded": active_question.fact_key}
+                if active_question is not None
+                and active_question.fact_key in state.facts
+                else {}
+            ),
             "available_self_checks": [
                 {key: t[key] for key in ("id", "title", "result_key")}
                 for t in self.content.applicable_tasks(chief)
@@ -737,10 +984,9 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 result = self._execute(state, command, text, turn_id)
                 if command["tool"] == "record_facts":
                     writes += 1
-                    goal_answered = answering_goal and any(
-                        item["key"] == "patient_goal"
-                        for item in command["arguments"]["facts"]
-                    )
+                    # Judge by what actually landed: under partial recording
+                    # the patient_goal item itself may have been rejected.
+                    goal_answered = answering_goal and "patient_goal" in state.facts
             except SubjectBoundaryError as exc:
                 self.events.append(
                     Event(
@@ -791,11 +1037,21 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             if (
                 goal_answered
                 and not state.pending_self_checks
-                and not self._context(state, text)["questions"]
+                and not self._context(state, text)["missing_required"]
             ):
-                # All applicable fields, including the final patient-goal answer,
-                # are recorded. A projection of known facts needs no extra LLM
-                # request; the same summary gate and confirmation still apply.
+                # All blocking fields, including the final patient-goal answer,
+                # are recorded. Non-blocking candidates (sex, reported
+                # temperature) stay askable but never gate the summary. A
+                # projection of known facts needs no extra LLM request; the
+                # same summary gate and confirmation still apply. One
+                # exception: a triggered pathway whose details were never
+                # probed must not be silently summarized away — the
+                # controller asks its detail question first (the pathway
+                # term list is wider than the question catalog's, so this
+                # fires exactly where missing_required cannot see the gap).
+                redirect = self._pathway_gate_redirect(state, turn_id)
+                if redirect is not None:
+                    return self._deliver(state, redirect, turn_id)
                 reply = self._execute(
                     state, {"tool": "review_summary", "arguments": {}}, text, turn_id
                 )
@@ -997,14 +1253,39 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         if tool == "propose_self_check_result":
             return self._propose_task_result(state, args, text, turn_id)
         if tool == "record_facts":
-            proposals = validate_proposals(self.content, state, text, args.get("facts"))
+            rejected = []
+            try:
+                proposals = validate_proposals(
+                    self.content, state, text, args.get("facts")
+                )
+            except ProposalError as exc:
+                # Partial recording (wave-2 P2): items that passed validation
+                # land now, and only the failures go back to the model with
+                # per-item reasons and repair guidance — the model re-proposes
+                # just the fixed items instead of re-sending (and risking)
+                # the whole batch. All-or-nothing callers are unaffected:
+                # correct_fact pre-validates its single item before calling,
+                # and the controller's direct emergency-screen recording
+                # bypasses this tool entirely. A batch where nothing passed
+                # keeps the old atomic behaviour and raises unchanged.
+                accepted = getattr(exc, "accepted", None)
+                if not exc.verdicts or not accepted:
+                    raise
+                proposals = accepted
+                rejected = [v for v in exc.verdicts if not v["ok"]]
             self._guard_calculation_followup_updates(state, proposals)
-            # No mutation happens until the entire batch has validated.
+            # No mutation happens until the accepted set has validated per
+            # item and been dependency-checked as a set (_prepare_fact_updates
+            # still raises on a subject boundary before anything is recorded).
             incoming_subject = next(
                 (p["value"] for p in proposals if p["key"] == "consult_for"),
                 state.get("consult_for"),
             )
             self._prepare_fact_updates(state, proposals, turn_id)
+            active_before = next(
+                (q for q in self.content.questions if q.id == state.active_question),
+                None,
+            )
             for proposal in proposals:
                 source = (
                     Source.CAREGIVER
@@ -1028,6 +1309,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         turn_id=turn_id,
                     )
                 )
+                self._track_incidental(state, proposal, active_before)
                 if state.closed_reason != "emergency_route":
                     state.closed_reason = None
             self._sync_task_requests(state, text, turn_id)
@@ -1047,6 +1329,25 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     turn_id=turn_id,
                 )
             )
+            if rejected:
+                return {
+                    "ok": False,
+                    "partial": True,
+                    "recorded": [p["key"] for p in proposals],
+                    "rejected": [
+                        {
+                            "key": verdict["key"],
+                            "reason": verdict["reason"],
+                            "guidance": verdict["guidance"],
+                        }
+                        for verdict in rejected
+                    ],
+                    "next": (
+                        "已通过项已写入，不要重复提议；只需修正 rejected 中的"
+                        "字段后重新提议 record_facts（只含修正项）。"
+                    ),
+                    "case": self._context(state, text),
+                }
             return {"ok": True, "case": self._context(state, text)}
         if tool in {"inspect_case", "list_questions"}:
             return {"ok": True, "case": self._context(state, text)}
@@ -1064,6 +1365,8 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 question, str(state.get("chief_complaint", ""))
             ):
                 raise ProposalError("问题不适用于当前主诉")
+            if not self._fact_gates_pass(state, question):
+                raise ProposalError("该问题已被当前已知事实排除（如性别或年龄范围不适用）")
             return self._ask(state, question, "根据本轮证据与尚未处理的缺口选择下一问")
         if tool == "ask_patient":
             if state.self_check_conversation:
@@ -1083,12 +1386,18 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 for item in self.content.questions
                 if item.fact_key == spec["topic"]
             )
-            if question.fact_key in state.facts:
-                raise ProposalError("已记录这个字段；需要核实时使用clarify")
-            if not self.content.question_applies(
-                question, str(state.get("chief_complaint", ""))
-            ):
-                raise ProposalError("动态问题不适用于当前主诉")
+            # Topic legality is the registered field set, not the dynamic
+            # candidate list: a colloquial chief complaint may never have
+            # candidated the field that matters most (live-eval cases 3/6),
+            # and an already-recorded field may still need a targeted
+            # follow-up — its answer then lands via correction=true, which
+            # the context flags (active_question_field_already_recorded).
+            # Fact-dependent exclusions still apply: a field excluded by
+            # known facts (e.g. pregnancy once sex is male) is not askable.
+            if not self._fact_gates_pass(state, question):
+                raise ProposalError(
+                    "该字段已被当前已知事实排除（如性别或年龄范围不适用），请改问其他主题"
+                )
             state.phase = question.phase
             state.active_question = question.id
             state.active_question_is_clarification = False
@@ -1172,9 +1481,62 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         if tool == "review_summary":
             if state.self_check_conversation:
                 raise ProposalError("原图示任务尚未处理。可show_self_check接续，由患者完成或跳过；也可先澄清病史。")
+            abstain_reason = args.get("abstain_reason")
+            if abstain_reason is not None and (
+                not isinstance(abstain_reason, str)
+                or not abstain_reason.strip()
+                or len(abstain_reason.strip()) > 200
+            ):
+                raise ProposalError("abstain_reason 须为 1 到 200 字的字符串，说明主诉通路为何不适用探明")
             context = self._context(state, text)
-            if context["missing_required"]:
-                raise ProposalError("必要字段尚未尝试：" + ",".join(context["missing_required"]))
+            unexplored = [
+                entry
+                for entry in context.get("pathway_exploration", [])
+                if not entry["explored"]
+            ]
+            # The gate guards the first close decision only: re-summarizing
+            # a case that already reached the summary/closed stage (e.g. a
+            # fact correction replay) is not a silent close.
+            already_summarized = state.phase in {
+                Phase.SUMMARY,
+                Phase.CLOSED,
+            } or bool(state.conclusion)
+            if unexplored and not already_summarized and not abstain_reason:
+                raise self._unexplored_pathway_error(unexplored)
+            missing = context["missing_required"]
+            if unexplored and (already_summarized or abstain_reason):
+                # The abstention (or the earlier close, when re-summarizing)
+                # also excuses the unexplored pathways' own detail fields
+                # from the required-fields gate — the stated reason is
+                # precisely "this pathway's details will not be probed".
+                # Every other unattempted field still blocks as before.
+                excused = {
+                    fact_key
+                    for entry in unexplored
+                    for fact_key in entry["detail_fields"]
+                }
+                missing = [key for key in missing if key not in excused]
+            if missing:
+                raise ProposalError("必要字段尚未尝试：" + ",".join(missing))
+            if unexplored and not already_summarized and abstain_reason:
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "review.abstained",
+                        {
+                            "pathways": [entry["pathway"] for entry in unexplored],
+                            "detail_fields": sorted(
+                                {
+                                    fact_key
+                                    for entry in unexplored
+                                    for fact_key in entry["detail_fields"]
+                                }
+                            ),
+                            "reason": abstain_reason.strip(),
+                        },
+                        turn_id=turn_id,
+                    )
+                )
             reply = super()._finish(state)
             state.phase = Phase.SUMMARY
             state.closed_reason = None

@@ -23,7 +23,12 @@ from .events import Event, EventStore
 from .publication import ReplyPublicationGate
 from .state_transitions import commit_phase
 from .interpreter import Interpretation, Interpreter, ObservationInputError
-from .knowledge import ContentRepository, Question
+from .knowledge import (
+    ADULT_AGE_PROMPT,
+    ContentRepository,
+    Question,
+    question_fact_gates_pass,
+)
 from .self_checks import SelfCheckService
 from .triage import TriageService
 from .turn_context import TurnContext
@@ -1384,8 +1389,12 @@ class ConsultationEngine(
             for question in self.content.questions
             if question.fact_key not in state.facts
             and self.content.question_applies(question, chief)
+            and question_fact_gates_pass(question, state.facts)
         ]
-        if candidates:
+        # Parity with the adaptive engine: non-blocking questions (sex,
+        # reported_temperature) stay askable while any blocking field is
+        # outstanding, but they never gate the summary/close on their own.
+        if any(question.blocking for question in candidates):
             earliest_phase = min(self._phase_rank(item.phase) for item in candidates)
             same_phase = [
                 item
@@ -1573,6 +1582,17 @@ class ConsultationEngine(
                     )
                 )
 
+    @staticmethod
+    def _subject_is_child(state: CaseState) -> bool:
+        # Mirrors AdaptiveConsultationEngine._subject_is_child so both
+        # engines adapt the age prompt for the same subjects.
+        if state.get("consult_for") == "child":
+            return True
+        profile = subject_profile(state)
+        reference = (profile or {}).get("reference") or {}
+        attributes = reference.get("attributes") or []
+        return bool(attributes) and attributes[0] == "child"
+
     def _ask(self, state: CaseState, question: Question, reason: str) -> AgentReply:
         state.phase = question.phase
         state.active_question = question.id
@@ -1580,8 +1600,13 @@ class ConsultationEngine(
         state.active_task = None
         if question.id not in state.asked_questions:
             state.asked_questions.append(question.id)
+        prompt = question.prompt
+        if question.fact_key == "age_years" and not self._subject_is_child(state):
+            # Same adaptation as the adaptive engine: the catalog's
+            # infant-months wording is only presented for child subjects.
+            prompt = ADULT_AGE_PROMPT
         return AgentReply(
-            question.prompt,
+            prompt,
             question.phase,
             kind="question",
             question_id=question.id,
@@ -1604,14 +1629,22 @@ class ConsultationEngine(
         state.active_question = None
         state.active_question_is_clarification = False
         state.active_task = None
-        trigger_text = "、".join(sorted(set(triggers)))
-        introduction = (
-            "你已选择优先求助。本次问诊已停止。"
-            if requested_help
-            else f"你描述的情况包含需要立即处理的危险信号（{trigger_text}）。"
-        )
+        if requested_help:
+            message = (
+                "你已选择优先求助。本次问诊已停止。"
+                "请现在拨打 120，或让身边的人协助呼叫急救；不要自己驾车。不要继续等待本次对话。"
+            )
+        else:
+            # emergency_explanation already names the signals, gives the
+            # 120 instruction and adds waiting guidance (stay still, do
+            # not drive yourself, have someone accompany you); keep the
+            # standing "do not keep waiting for this chat" as the tail
+            # instead of stacking a second full instruction sentence.
+            from .conclusion import emergency_explanation
+
+            message = emergency_explanation(triggers) + "不要继续等待本次对话。"
         return AgentReply(
-            introduction + "请现在拨打 120，或让身边的人协助呼叫急救；不要自己驾车。不要继续等待本次对话。",
+            message,
             Phase.CLOSED,
             kind="emergency",
             summary={"care_route": "立即急救", "triggers": sorted(set(triggers))},
@@ -1898,6 +1931,11 @@ class ConsultationEngine(
         if transition_id:
             trace["transition_id"] = transition_id
             reply.developer_trace = trace
+            if reply.phase == Phase.CLOSED:
+                # Only the reply that actually closes the session in this
+                # turn speaks the disposition; the already-closed guard
+                # reply (no transition) must not repeat it every turn.
+                self._speak_close_line(state, reply)
         state.subject_candidate = None
         if reply.kind != "subject_change":
             if reply.kind != "service_error":
@@ -1980,6 +2018,33 @@ class ConsultationEngine(
             except Exception:
                 pass
             return
+
+    def _speak_close_line(self, state: CaseState, reply: AgentReply) -> None:
+        """Say the disposition out loud on a user-confirmed close.
+
+        The conclusion sheet renders as a card, but the closing chat
+        message itself used to be pure boilerplate, so a patient reading
+        only the chat stream never heard the disposition. The sheet only
+        exists after _attach_conclusion runs inside _record_reply, so the
+        line is attached at that choke point rather than in the close
+        handlers (both engines share it). Fail-open: no attached sheet
+        (sheet mode off/shadow, or a composer failure) leaves the
+        boilerplate untouched.
+        """
+        if (
+            reply.kind != "closed"
+            or state.closed_reason != "confirmed_by_user"
+            or reply.conclusion is None
+        ):
+            return
+        try:
+            from .conclusion import spoken_close_line
+
+            line = spoken_close_line(reply.conclusion)
+        except Exception:
+            return
+        if line:
+            reply.message = line + reply.message
 
     @staticmethod
     def _self_check_block_reason(state):

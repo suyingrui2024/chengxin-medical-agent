@@ -13,9 +13,10 @@ from medagent.triage import TriageService
 from tests.test_agent import ScriptBackend, cmd, fact
 
 
-RAW = "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+RAW = "我自己，男，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
 ROWS = [
     ("consult_for", "self", "我自己", "present"),
+    ("sex", "male", "男", "present"),
     ("age_years", 32, "32岁", "present"),
     ("chief_complaint", "手臂不舒服", "手臂不舒服", "present"),
     ("onset", "昨天", "从昨天开始", "present"),
@@ -49,11 +50,12 @@ def complete_report(caregiver=False):
     engine, backend = engine_with_backend()
     rows, raw = list(ROWS), RAW
     if caregiver:
-        rows[:2] = [
+        rows[:3] = [
             ("consult_for", "other_adult", "给母亲咨询", "present"),
+            ("sex", "female", "她", "present"),
             ("age_years", 67, "67岁", "present"),
         ]
-        raw = raw.replace("我自己，32岁", "给母亲咨询，她67岁")
+        raw = raw.replace("我自己，男，32岁", "给母亲咨询，她67岁")
     backend.commands = [
         cmd("record_facts", facts=[fact(k, v, e, a) for k, v, e, a in rows]),
         cmd("review_summary"),

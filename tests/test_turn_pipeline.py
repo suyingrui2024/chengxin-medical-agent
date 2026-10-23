@@ -61,7 +61,7 @@ class PipelineStructureTests(unittest.TestCase):
         reply = self.engine.submit(
             self.state.session_id, UserInput("我自己", "self")
         )
-        self.assertEqual(reply.question_id, "age")
+        self.assertEqual(reply.question_id, "sex")
         self.assertEqual(ctx_holder["ctx"].trace, EXPECTED_ORDER)
 
     def test_direct_emergency_bypasses_pipeline(self):

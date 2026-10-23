@@ -13,6 +13,8 @@ from medagent.session_store import SessionStore
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),
+    "sex": ("女", "female"),
+    "pregnancy_status": ("没有怀孕，月经没有推迟", "not_pregnant"),
     "age": ("32岁", None),
     "chief_complaint": ("腹痛两小时", None),
     "gi_details": ("肚脐周围隐痛", None),

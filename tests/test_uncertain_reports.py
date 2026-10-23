@@ -19,6 +19,7 @@ MEDICATION = "昨晚用过药物甲，用量不清楚"
 ALLERGY = "以前有过皮疹，是否药物过敏不确定"
 ANSWERS = {
     "consult_for": ("我自己", "self"),
+    "sex": ("男", "male"),
     "age": ("32岁", None),
     "chief_complaint": ("手臂疼痛", None),
     "emergency_screen": ("都没有", "no"),

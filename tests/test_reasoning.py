@@ -22,6 +22,7 @@ from medagent.triage_review import ReasoningReviewProvider
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),
+    "sex": ("男", "male"),
     "age": ("32岁", None),
     "chief_complaint": ("咳嗽发烧两天", None),
     "emergency_screen": ("都没有", "no"),
@@ -32,6 +33,7 @@ ANSWERS = {
     "resp_breathing": ("有点气短，活动后明显", None),
     "resp_cough_details": ("干咳为主", None),
     "resp_intake": ("能正常喝水吃饭", None),
+    "reported_temperature": ("没量过", None),
     "medications_taken": ("没有", None),
     "allergies": ("没有", None),
     "relevant_history": ("没有", None),
@@ -109,7 +111,7 @@ class DifferentialFlowTests(unittest.TestCase):
             reply = self.engine.submit(
                 self.state.session_id, UserInput(text, choice)
             )
-        history_questions = asked[4:]  # after consult_for/age/chief + screen
+        history_questions = asked[5:]  # after consult_for/sex/age/chief + screen
         # resp_breathing directly probes the severe_breathing red-flag
         # domain and discriminates three active hypotheses, so the
         # differential planner asks it first, ahead of bank order (onset).
@@ -135,7 +137,7 @@ class DifferentialFlowTests(unittest.TestCase):
             reply = self.engine.submit(
                 self.state.session_id, UserInput(text, choice)
             )
-        history_questions = asked[4:]
+        history_questions = asked[5:]
         self.assertEqual(history_questions[:3], ["onset", "trajectory", "severity"])
         self.assertEqual(self.state.reasoning, {})
 
@@ -147,6 +149,7 @@ class ValidatorTests(unittest.TestCase):
         engine = context.services.require("consultation")
         state, reply = engine.create_session()
         engine.submit(state.session_id, UserInput("我自己", "self"))
+        engine.submit(state.session_id, UserInput("男", "male"))
         engine.submit(state.session_id, UserInput("32岁"))
         engine.submit(state.session_id, UserInput("咳嗽发烧两天"))
         return host, engine, state
