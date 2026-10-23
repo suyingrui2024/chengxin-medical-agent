@@ -1774,6 +1774,21 @@ class ConsultationEngine(
             if outcome in RETRIAGE_OUTCOMES:
                 new_state, _opening = self.create_session()
                 new_state.runtime_snapshot["follow_up_of"] = session_id
+                # Longitudinal prior: the re-triage session carries a
+                # compact snapshot of the case it grew out of, so the
+                # patient, the banner and the clinician handoff all see
+                # what was concluded last time and what changed since.
+                prior_disposition = (state.conclusion or {}).get("disposition") or {}
+                new_state.runtime_snapshot["prior_case"] = {
+                    "session_id": session_id,
+                    "chief_complaint": str(state.get("chief_complaint", "")),
+                    "closed_reason": state.closed_reason,
+                    "disposition_level": prior_disposition.get("level"),
+                    "disposition_text": prior_disposition.get("text"),
+                    "outcome": outcome,
+                    "outcome_note": note,
+                    "outcome_recorded_at": plan.get("outcome_recorded_at"),
+                }
                 plan["retriage_session_id"] = new_state.session_id
                 result["new_session_id"] = new_state.session_id
                 self.events.append(

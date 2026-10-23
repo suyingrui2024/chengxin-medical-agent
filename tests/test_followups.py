@@ -113,6 +113,18 @@ class FollowUpFlowTests(unittest.TestCase):
         kinds = [e.event_type for e in self.events.for_session(self.state.session_id)]
         self.assertIn("followup.outcome_recorded", kinds)
         self.assertIn("followup.retriage_session_created", kinds)
+        # Longitudinal prior: the re-triage session carries the prior
+        # case's chief complaint, conclusion disposition and the outcome
+        # that triggered the return — and the handoff exposes it.
+        prior = new_state.runtime_snapshot["prior_case"]
+        self.assertEqual(prior["session_id"], self.state.session_id)
+        self.assertEqual(prior["chief_complaint"], "腹痛两小时")
+        self.assertEqual(prior["outcome"], "worsened")
+        self.assertEqual(prior["outcome_note"], "又烧起来了")
+        self.assertTrue(prior["disposition_level"])
+        from medagent.handoff import build_handoff
+
+        self.assertEqual(build_handoff(new_state)["prior_case"], prior)
 
     def test_invalid_outcome_rejected(self):
         self._drive_to_summary()

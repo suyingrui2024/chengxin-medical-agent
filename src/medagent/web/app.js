@@ -1014,7 +1014,18 @@ function renderCase(data) {
   }
   state.case = data;
   renderConversationSubtitle();
-  $("#retriage-banner").hidden = !data.runtime_snapshot?.follow_up_of;
+  const retriageBanner = $("#retriage-banner");
+  const priorCase = data.runtime_snapshot?.prior_case;
+  retriageBanner.hidden = !data.runtime_snapshot?.follow_up_of;
+  if (priorCase?.chief_complaint) {
+    const outcomeText =
+      { worsened: "加重了", hospitalized: "已经住院" }[priorCase.outcome] ||
+      "有变化";
+    const lastTime = priorCase.disposition_text
+      ? `上次的主要问题是「${priorCase.chief_complaint}」，当时的结论是：${priorCase.disposition_text}`
+      : `上次的主要问题是「${priorCase.chief_complaint}」`;
+    retriageBanner.textContent = `本次问诊由随访回流发起。${lastTime}你这次反馈情况${outcomeText}，下面重新分诊一次。`;
+  }
   $("#urgent-help").hidden = data.phase === "closed";
   document.body.classList.add("has-session");
   $("#delete-current-session").hidden = false;

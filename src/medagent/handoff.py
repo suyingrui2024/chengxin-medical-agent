@@ -17,6 +17,15 @@ LABELS = {
     "allergies": "过敏信息",
     "relevant_history": "相关病史",
     "temperature_c": "报告的腋温",
+    "resp_breathing": "呼吸情况",
+    "resp_cough_details": "咳嗽细节",
+    "resp_intake": "进食饮水与排尿",
+    "gi_details": "腹部细节",
+    "head_details": "头痛细节",
+    "dizzy_details": "头晕细节",
+    "back_details": "腰背细节",
+    "urinary_details": "排尿细节",
+    "skin_details": "皮疹细节",
 }
 
 
@@ -38,6 +47,7 @@ def build_handoff(state) -> dict[str, Any]:
         "title": "就诊交接摘要（患者核对版）",
         "limitations": "这是患者提供信息的整理，不构成诊断、治疗建议或临床检验复核。",
         "risk": state.risk.to_dict(),
+        "prior_case": (state.runtime_snapshot or {}).get("prior_case"),
         "facts": facts,
         "needs_confirmation": missing,
         "report_items": [
