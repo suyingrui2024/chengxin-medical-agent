@@ -131,6 +131,28 @@ TOOL_DEFINITIONS = [
             "evidence": "exact user request quote",
         },
     },
+    {
+        "name": "spawn_subagent",
+        "description": "把一个边界明确的子任务交给受控子智能体并行处理（证据检索或盲化二意见）。子智能体只读：只能查看 scope 声明的病例投影，不能写事实、不能与患者对话、不能再派生；其产出经宿主证据逐字校验后才以数据形式返回，未通过校验的内容会被丢弃。task_kind 只能是 evidence_lookup 或 second_opinion；每轮至多派生一次。",
+        "arguments": {
+            "task_kind": "evidence_lookup",
+            "objective": "...",
+            "branches": [
+                {
+                    "branch_id": "b1",
+                    "objective": "...",
+                    "scope": {
+                        "fact_keys": [],
+                        "hypotheses": [],
+                        "transcript": "none",
+                        "prior_case": False,
+                    },
+                }
+            ],
+            "tools": [],
+            "budget": {},
+        },
+    },
 ]
 
 
@@ -159,6 +181,7 @@ ARGUMENTS = {
     "request_self_check": {"task_id", "evidence"},
     "review_summary": set(),
     "run_capability": {"id", "input", "evidence"},
+    "spawn_subagent": {"task_kind", "objective", "branches"},
 }
 
 
@@ -177,6 +200,8 @@ def validate_command(command: Dict[str, Any]) -> None:
         if name == "ask_patient"
         else {"input", "input_evidence"}
         if name == "propose_self_check_result"
+        else {"tools", "budget"}
+        if name == "spawn_subagent"
         else set()
     )
     if not ARGUMENTS[name] <= set(args) or set(args) - ARGUMENTS[name] - optional:

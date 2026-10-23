@@ -119,6 +119,10 @@ class CaseState:
     subject_resume: Optional[Any] = None
     subject_candidate: Optional[Any] = None
     background_review: Optional[Dict[str, Any]] = None
+    # Controller-verified digest of out-of-window transcript turns
+    # (subagents.case_digest); empty until a coordinator stores one.
+    # The digest body never leaves the backend (see to_dict).
+    subagent_digest: Dict[str, Any] = field(default_factory=dict)
     report_drafts: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     report_items: List[Dict[str, Any]] = field(default_factory=list)
     committed_phase: Optional[Phase] = None
@@ -201,6 +205,16 @@ class CaseState:
                     ),
                 }
                 if self.background_review
+                else None
+            ),
+            "subagent_digest": (
+                {
+                    "status": self.subagent_digest.get("status"),
+                    "watermark_revision": (
+                        self.subagent_digest.get("watermark") or {}
+                    ).get("revision"),
+                }
+                if self.subagent_digest
                 else None
             ),
         }

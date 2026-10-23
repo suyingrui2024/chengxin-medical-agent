@@ -52,9 +52,16 @@ from .adaptive_questions import (
 class AdaptiveConsultationEngine(ConsultationEngine):
     """LLM proposes actions; evidence/type/eligibility gates own every effect."""
 
-    def __init__(self, *args, backend: DecisionBackend, **kwargs):
+    def __init__(
+        self, *args, backend: DecisionBackend, subagent_coordinator=None, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.backend = backend
+        # Optional medagent.subagents.SubagentCoordinator; None keeps the
+        # spawn_subagent tool unavailable (the server assembles and injects
+        # it; other construction paths stay coordinator-free by default).
+        self.subagent_coordinator = subagent_coordinator
+        self._round_spawn_counts: Dict[str, int] = {}
         self._active_turns = {}
         self._decision_waiter = DecisionWaiter()
         self.prompt = (
@@ -606,6 +613,15 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 and isinstance(state.background_review.get("advice"), dict)
                 else {}
             ),
+            **(
+                {"earlier_digest": state.subagent_digest["digest"]}
+                if state.subagent_digest
+                and state.subagent_digest.get("status") == "ready"
+                and (state.subagent_digest.get("watermark") or {}).get("revision")
+                == state.revision
+                and isinstance(state.subagent_digest.get("digest"), dict)
+                else {}
+            ),
         }
 
     def _messages(self, state, text):
@@ -624,6 +640,35 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.observation_feedback["forwarded"] = True
         turn = self._active_turns[state.session_id]
         turn.turn_id = turn_id
+        # Controller-triggered case digest (design §5.7 case_digest): once
+        # the transcript outgrows the context window, a coordinator-verified
+        # digest replaces out-of-window turns via _context. It consumes this
+        # round's single spawn allowance, so the model cannot also spawn.
+        spawns = 0
+        coordinator = self.subagent_coordinator
+        if (
+            coordinator is not None
+            and getattr(coordinator, "mode", None) == "advisory"
+            and len(state.transcript) > 16
+            and (
+                not state.subagent_digest
+                or (state.subagent_digest.get("watermark") or {}).get("revision")
+                != state.revision
+            )
+        ):
+            digest = coordinator.run_case_digest(
+                state, session_id=state.session_id, cancelled=turn.cancelled
+            )
+            if digest is not None:
+                from .subagents import watermark
+
+                state.subagent_digest = {
+                    "watermark": watermark(state),
+                    "digest": digest,
+                    "status": "ready",
+                }
+                spawns = 1
+        self._round_spawn_counts[state.session_id] = spawns
         messages = self._messages(state, text)
         writes = 0
         for step in range(6):
@@ -878,6 +923,77 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             return self.request_calculation(
                 state, args["id"], args["input"], args["evidence"], text, turn_id
             )
+        if tool == "spawn_subagent":
+            coordinator = self.subagent_coordinator
+            if coordinator is None:
+                return {"ok": False, "status": "unavailable"}
+            if self._round_spawn_counts.get(state.session_id, 0) >= 1:
+                return {"ok": False, "error": "每轮至多派生一次子智能体"}
+            self._round_spawn_counts[state.session_id] = (
+                self._round_spawn_counts.get(state.session_id, 0) + 1
+            )
+            turn = self._active_turns.get(state.session_id)
+            result = coordinator.run_spawn(
+                state,
+                args,
+                session_id=state.session_id,
+                cancelled=turn.cancelled if turn is not None else None,
+            )
+            if getattr(coordinator, "mode", None) != "advisory":
+                if isinstance(result, dict) and result.get("ok"):
+                    # Shadow: the run executed and is recorded as events
+                    # only; nothing a subagent produced enters the context.
+                    return {
+                        "ok": True,
+                        "spawn": {
+                            "status": "shadow_recorded",
+                            "spawn_id": result.get("spawn_id"),
+                        },
+                    }
+                # off / disabled / over the daily fuse / unavailable: the
+                # spawn did not run; report its real status, not shadow.
+                return {
+                    "ok": False,
+                    "status": (
+                        result.get("status")
+                        if isinstance(result, dict)
+                        else None
+                    )
+                    or "unavailable",
+                }
+            if isinstance(result, dict):
+                # Design §5.7.2: a blinded second opinion whose structured
+                # tendency disagrees with the case's current risk group is
+                # surfaced to the main model as a flag, never to the patient.
+                tendency_groups = {
+                    "self_care": "routine",
+                    "routine_visit": "routine",
+                    "urgent_today": "urgent",
+                    "emergency": "emergency",
+                }
+                current = (
+                    state.risk.level.value
+                    if getattr(state, "risk", None) is not None
+                    else None
+                )
+                for branch in result.get("branches") or []:
+                    if branch.get("task_kind") != "second_opinion" or (
+                        branch.get("status") not in {"completed", "partial"}
+                    ):
+                        continue
+                    tendency = branch.get("disposition_tendency")
+                    if (
+                        tendency in tendency_groups
+                        and current
+                        and tendency_groups[tendency] != current
+                    ):
+                        result = {
+                            **result,
+                            "second_opinion_disagreement": True,
+                            "second_opinion_tendency": tendency,
+                        }
+                        break
+            return {"ok": True, "spawn": result}
         if tool == "propose_self_check_result":
             return self._propose_task_result(state, args, text, turn_id)
         if tool == "record_facts":
