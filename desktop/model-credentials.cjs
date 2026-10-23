@@ -87,8 +87,24 @@ function createModelCredentialStore(safeStorage, directory, platform) {
     return { cleared: true };
   }
 
+  // Three states, because "no file" and "file exists but cannot be read"
+  // need different guidance: previously both collapsed into read() === null,
+  // so a saved config whose keyring became unavailable silently degraded to
+  // demo mode with no signal anywhere. "unreadable" covers a decrypt or
+  // parse failure as well as secure storage being unavailable while a file
+  // is present (in that state its contents cannot be verified either way).
+  function savedState() {
+    if (!fs.existsSync(target)) return "none";
+    return read() !== null ? "ok" : "unreadable";
+  }
+
   function status() {
-    return { available: available(), has_saved_config: read() !== null };
+    const state = savedState();
+    return {
+      available: available(),
+      has_saved_config: state === "ok",
+      saved_state: state,
+    };
   }
 
   return { read, save, clear, status, target };

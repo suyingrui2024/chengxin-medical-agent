@@ -4,7 +4,7 @@ __pycache__/
 .coverage
 .venv/
 dist/
-build/
+/build/
 *.egg-info/
 .env*
 !.env.example

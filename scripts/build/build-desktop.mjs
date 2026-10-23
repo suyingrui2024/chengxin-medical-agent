@@ -1,6 +1,8 @@
 import { packager } from "@electron/packager";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { generateWindowsIcon } from "./generate-windows-icon.mjs";
 import {
   access,
   readFile,
@@ -42,6 +44,12 @@ async function findCachedWindowsElectronZip() {
 if (!["linux", "win32"].includes(process.platform) || process.arch !== "x64") {
   throw new Error("当前打包目标为 Linux x64 或 Windows x64。");
 }
+
+// The Windows executable icon is generated from desktop/icon.png (the ICO
+// is committed; regenerate on demand so a fresh checkout still packages).
+const iconIco = path.join(root, "desktop", "icon.ico");
+if (!existsSync(iconIco))
+  generateWindowsIcon(path.join(root, "desktop", "icon.png"), iconIco);
 
 // Packager's pruning drops transitive peer dependencies in this DSH graph.
 // Let npm materialize the locked production graph, then package it unchanged.
@@ -110,6 +118,9 @@ try {
     executableName: "Chengxin",
     platform: process.platform,
     arch: "x64",
+    // Windows needs the multi-size ICO; without it the executable ships
+    // with the default Electron icon. Other platforms take the PNG.
+    icon: path.join(staging, "desktop", windows ? "icon.ico" : "icon.png"),
     out: path.join(root, "dist", "desktop"),
     overwrite: true,
     asar: false, // Python and DSH need real filesystem paths.

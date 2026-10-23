@@ -26,4 +26,46 @@ function saveAppearance(directory, value) {
   fs.renameSync(temporary, target);
 }
 
-module.exports = { readAppearance, saveAppearance, valid };
+// Builds up to 2026-10 stored userData under appData/chengxin-medagent-<version>,
+// so every upgrade silently reset the saved appearance and left the old
+// directory behind forever. Only appearance.json is carried over: credentials
+// and patient data never lived in the versioned directories (both already use
+// unversioned locations), and the legacy directories are deliberately left in
+// place rather than deleted. Best-effort: any failure leaves the default
+// appearance and must never block startup.
+function migrateLegacyAppearance(appDataDirectory, userDataDirectory) {
+  try {
+    const target = path.join(userDataDirectory, "appearance.json");
+    if (fs.existsSync(target)) return false;
+    let newest = null;
+    for (const entry of fs.readdirSync(appDataDirectory, {
+      withFileTypes: true,
+    })) {
+      if (!entry.isDirectory() || !/^chengxin-medagent-.+/.test(entry.name))
+        continue;
+      const candidate = path.join(
+        appDataDirectory,
+        entry.name,
+        "appearance.json",
+      );
+      try {
+        const { mtimeMs } = fs.statSync(candidate);
+        if (!newest || mtimeMs > newest.mtimeMs)
+          newest = { candidate, mtimeMs };
+      } catch {}
+    }
+    if (!newest) return false;
+    fs.mkdirSync(userDataDirectory, { recursive: true });
+    fs.copyFileSync(newest.candidate, target);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+module.exports = {
+  readAppearance,
+  saveAppearance,
+  valid,
+  migrateLegacyAppearance,
+};

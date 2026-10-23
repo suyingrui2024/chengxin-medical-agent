@@ -19,21 +19,26 @@ const {
   readAppearance,
   saveAppearance,
   valid: validAppearance,
+  migrateLegacyAppearance,
 } = require("./appearance.cjs");
 const { createModelCredentialStore } = require("./model-credentials.cjs");
 
 const projectRoot = path.resolve(__dirname, "..");
-const { version } = require("../package.json");
 app.setName("知微");
-app.setPath(
-  "userData",
+// userData deliberately carries no version suffix: credentials (created
+// below against the same directory) and patient data already avoid versioned
+// paths, and a versioned userData reset the saved appearance on every
+// upgrade. One appearance.json is migrated from the newest legacy versioned
+// directory; the old directories themselves are kept, not deleted.
+const userDataDirectory =
   process.env.MEDAGENT_DESKTOP_PROFILE ||
-    path.join(app.getPath("appData"), `chengxin-medagent-${version}`),
-);
+  path.join(app.getPath("appData"), "chengxin-medagent");
+app.setPath("userData", userDataDirectory);
+if (!process.env.MEDAGENT_DESKTOP_PROFILE)
+  migrateLegacyAppearance(app.getPath("appData"), userDataDirectory);
 const modelCredentials = createModelCredentialStore(
   safeStorage,
-  process.env.MEDAGENT_DESKTOP_PROFILE ||
-    path.join(app.getPath("appData"), "chengxin-medagent"),
+  userDataDirectory,
 );
 app.setAppUserModelId("org.medagent.chengxin");
 if (process.platform === "linux") {
@@ -138,6 +143,16 @@ function pythonCommand() {
       : "python3";
 }
 
+// Startup failures carry a coarse kind so the error dialog can give
+// actionable guidance per cause. The sidecar's stderr is never surfaced:
+// it can contain patient data or provider error details.
+class BackendStartupError extends Error {
+  constructor(kind, message) {
+    super(message);
+    this.kind = kind;
+  }
+}
+
 function startBackend(token) {
   return new Promise((resolve, reject) => {
     const runtimeEnv = { ...process.env };
@@ -191,7 +206,10 @@ function startBackend(token) {
         },
       },
     );
-    const timer = setTimeout(() => reject(new Error("启动超时")), 15000);
+    const timer = setTimeout(
+      () => reject(new BackendStartupError("ready_timeout", "启动超时")),
+      15000,
+    );
     const lines = readline.createInterface({ input: backend.stdout });
     let ready = false;
     lines.on("line", (line) => {
@@ -223,9 +241,16 @@ function startBackend(token) {
         // Sidecar stdout is a bounded startup protocol, never rendered as HTML.
       }
     });
-    backend.on("error", () => {
+    backend.on("error", (error) => {
       clearTimeout(timer);
-      reject(new Error("未能启动 Python"));
+      // ENOENT here means the interpreter itself could not be found (not
+      // installed, or removed after the environment check passed).
+      reject(
+        new BackendStartupError(
+          error?.code === "ENOENT" ? "interpreter_missing" : "spawn_error",
+          "未能启动 Python",
+        ),
+      );
     });
     backend.on("exit", () => {
       for (const pending of projectRequests.values()) {
@@ -234,7 +259,13 @@ function startBackend(token) {
       }
       projectRequests.clear();
       clearTimeout(timer);
-      if (!ready) reject(new Error("本地问诊服务未能启动"));
+      if (!ready)
+        reject(
+          new BackendStartupError(
+            "exited_before_ready",
+            "本地问诊服务未能启动",
+          ),
+        );
       else if (!stopping) {
         dialog.showErrorBox(
           "问诊服务已停止",
@@ -247,6 +278,26 @@ function startBackend(token) {
     backend.stderr.on("data", () => {}); // Do not write patient data or provider errors to desktop logs.
     backend.stdin.write(`${JSON.stringify({ token })}\n`);
   });
+}
+
+function startupFailureGuidance(error) {
+  const windows = process.platform === "win32";
+  switch (error?.kind) {
+    case "interpreter_missing":
+      return windows
+        ? "没有找到可用的 Python 运行时。请先把发行包完整解压到一个目录再运行，不要只复制其中的单个文件；也可运行 scripts/platform/windows/windows.ps1 -Mode Check 检查 Windows 运行环境。"
+        : "没有找到可用的 Python 解释器。请确认已安装 Python 3.10+ 并已加入 PATH，或设置 MEDAGENT_PYTHON 指向 Python 可执行文件后重新打开。";
+    case "exited_before_ready":
+      return windows
+        ? "本地问诊服务在启动完成前退出。请运行 scripts/platform/windows/windows.ps1 -Mode Check 检查 Windows 运行环境，并确认发行包目录完整、随包 Python 和 Node 未被安全软件删除或隔离。"
+        : "本地问诊服务在启动完成前退出。请确认已按项目说明安装 Python 依赖，并保留完整的应用目录后重新打开。";
+    case "ready_timeout":
+      return "本地问诊服务启动超时。可能被安全软件拦截或当前系统负载较高，请稍后重新打开；若反复出现，请确认安全软件允许本应用启动子进程并访问本机回环地址。";
+    default:
+      return windows
+        ? "请运行 scripts/platform/windows/windows.ps1 -Mode Check 检查 Windows 运行环境；使用发行包时请先解压整个目录，保留随包 Python 和 Node。"
+        : "请确认已安装 Python 3.10+，并保留完整的应用目录。可设置 MEDAGENT_PYTHON 指向 Python 可执行文件。模型依赖安装方法请查看项目说明。";
+  }
 }
 
 async function stopBackend() {
@@ -271,7 +322,12 @@ async function stopBackend() {
 }
 
 async function createWindow() {
-  const privateSession = session.fromPartition("chengxin-desktop");
+  // The persist: prefix is load-bearing: without it the partition is
+  // discarded when the app exits, taking localStorage (font size, web
+  // appearance choices) with it, while the settings page promises those
+  // choices are kept for the next launch. Nothing persistent is lost by
+  // switching — the old partition never survived a restart by definition.
+  const privateSession = session.fromPartition("persist:chengxin-desktop");
   const { createClipboardPermission } = require("./clipboard-permission.cjs");
   const allowClipboard = createClipboardPermission(
     () => window?.webContents,
@@ -435,14 +491,9 @@ if (!app.requestSingleInstanceLock()) {
     );
     try {
       await createWindow();
-    } catch {
+    } catch (error) {
       if (quitting || stopping) return;
-      dialog.showErrorBox(
-        "无法打开知微",
-        process.platform === "win32"
-          ? "请运行 scripts/platform/windows/windows.ps1 -Mode Check 检查 Windows 运行环境；使用发行包时请先解压整个目录，保留随包 Python 和 Node。"
-          : "请确认已安装 Python 3.10+，并保留完整的应用目录。可设置 MEDAGENT_PYTHON 指向 Python 可执行文件。模型依赖安装方法请查看项目说明。",
-      );
+      dialog.showErrorBox("无法打开知微", startupFailureGuidance(error));
       app.quit();
     }
   });
