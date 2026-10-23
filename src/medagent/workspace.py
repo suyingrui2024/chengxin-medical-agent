@@ -261,6 +261,35 @@ class Workspace:
                     )
         return sorted(output, key=lambda s: s["created_at"], reverse=True)
 
+    def follow_ups(self):
+        """All follow-up plans across engines, earliest due first.
+
+        The longitudinal loop's read side: plans live on their cases, so
+        this aggregates them for the due list / outcome-recording UI.
+        """
+        output = []
+        with self.lock:
+            for engine in self.engines:
+                with engine._sessions_lock:
+                    states = list(engine._sessions.values())
+                for state in states:
+                    if not state.follow_up:
+                        continue
+                    plan = dict(state.follow_up)
+                    output.append(
+                        {
+                            "session_id": state.session_id,
+                            "title": str(
+                                state.get("chief_complaint", "新的问诊")
+                            ),
+                            "created_at": state.created_at,
+                            "closed_reason": state.closed_reason,
+                            "risk": state.risk.level.value,
+                            "plan": plan,
+                        }
+                    )
+        return sorted(output, key=lambda item: item["plan"].get("due_at", ""))
+
     def delete_session(self, session_id):
         with self.lock:
             engine = self.engine_for(session_id)

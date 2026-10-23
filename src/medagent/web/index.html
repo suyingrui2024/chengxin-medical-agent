@@ -260,6 +260,10 @@
                     展开对话记录
                   </button>
                 </div>
+                <p id="retriage-banner" class="retriage-banner" hidden>
+                  本次问诊由上次随访记录发起：你反馈情况有变化，
+                  下面重新分诊一次。
+                </p>
                 <div
                   id="active-observation"
                   class="active-observation"
@@ -931,6 +935,14 @@
               <svg class="icon"><use href="#i-info" /></svg
               >当前记录仅在本次服务运行期间保留，关闭应用后会清除。
             </div>
+            <section id="followup-section" class="followup-section" hidden>
+              <h2 class="followup-heading">待随访</h2>
+              <p class="followup-hint">
+                上次问诊约定的回访时间到了，请记录现在的近况；如果加重，
+                系统会为你开启一次新的问诊。
+              </p>
+              <div id="followup-list" class="followup-list"></div>
+            </section>
             <div id="history-list" class="history-list"></div>
           </section>
 
@@ -1357,6 +1369,102 @@
             取消
           </button>
           <button class="primary-button" type="submit">归档并识别</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      id="followup-dialog"
+      class="small-dialog"
+      aria-labelledby="followup-title"
+    >
+      <form id="followup-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">FOLLOW-UP</p>
+            <h2 id="followup-title">记录随访近况</h2>
+          </div>
+          <button
+            class="icon-button close-dialog"
+            type="button"
+            aria-label="关闭"
+          >
+            <svg class="icon"><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <p class="dialog-description" id="followup-context"></p>
+        <fieldset class="field outcome-field">
+          <legend>现在感觉怎么样</legend>
+          <div class="outcome-options">
+            <label
+              ><input
+                type="radio"
+                name="outcome"
+                value="recovered"
+              />已痊愈</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="outcome"
+                value="improving"
+              />好转中</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="outcome"
+                value="unchanged"
+              />没有变化</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="outcome"
+                value="worsened"
+              />加重了</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="outcome"
+                value="sought_care"
+              />已经就医</label
+            >
+            <label
+              ><input
+                type="radio"
+                name="outcome"
+                value="hospitalized"
+              />已经住院</label
+            >
+          </div>
+        </fieldset>
+        <label class="field"
+          ><span>备注（可选）</span
+          ><input
+            id="followup-note"
+            maxlength="200"
+            placeholder="例如：昨晚又开始疼了"
+        /></label>
+        <p id="followup-feedback" class="form-feedback" role="status"></p>
+        <div id="followup-retriage" class="followup-retriage" hidden>
+          <p>
+            已记录。你反馈的情况需要重新分诊， 系统已经为你开启了一次新的问诊。
+          </p>
+          <button
+            id="followup-enter-retriage"
+            class="primary-button"
+            type="button"
+          >
+            进入新的问诊
+          </button>
+        </div>
+        <div class="dialog-footer">
+          <button class="secondary-button close-dialog" type="button">
+            取消
+          </button>
+          <button class="primary-button" type="submit">保存记录</button>
         </div>
       </form>
     </dialog>

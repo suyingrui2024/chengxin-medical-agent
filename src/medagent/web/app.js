@@ -79,6 +79,7 @@ const state = {
   reply: null,
   events: [],
   sessions: [],
+  followUps: [],
   tasks: [],
   settings: { backend: "demo" },
   modelCredentials: { available: false, has_saved_config: false },
@@ -1013,6 +1014,7 @@ function renderCase(data) {
   }
   state.case = data;
   renderConversationSubtitle();
+  $("#retriage-banner").hidden = !data.runtime_snapshot?.follow_up_of;
   $("#urgent-help").hidden = data.phase === "closed";
   document.body.classList.add("has-session");
   $("#delete-current-session").hidden = false;
@@ -1611,6 +1613,7 @@ async function refreshSessions() {
   state.sessions = data.sessions;
   renderRecent();
   renderHistory();
+  await refreshFollowUps();
 }
 function renderRecent() {
   $("#history-count").textContent = String(state.sessions.length);
@@ -1681,6 +1684,71 @@ function renderHistory() {
     card.disabled = state.busy;
     $("#history-list").append(card);
   }
+}
+const FOLLOW_UP_KIND_LABELS = {
+  urgent_checkin: "紧急确认",
+  routine_checkin: "例行回访",
+};
+let followUpTarget = null;
+let followUpRetriageId = null;
+async function refreshFollowUps() {
+  try {
+    const data = await api("/api/follow-ups");
+    state.followUps = data.follow_ups || [];
+  } catch {
+    state.followUps = [];
+  }
+  renderFollowUps();
+}
+function renderFollowUps() {
+  const section = $("#followup-section");
+  const list = $("#followup-list");
+  if (!section || !list) return;
+  const pending = (state.followUps || []).filter(
+    (item) => item.plan && item.plan.status === "scheduled",
+  );
+  list.replaceChildren();
+  section.hidden = pending.length === 0;
+  const now = Date.now();
+  for (const item of pending) {
+    const dueAt = Date.parse(item.plan.due_at);
+    const due = Number.isFinite(dueAt) && dueAt <= now;
+    const card = el("article", "followup-card");
+    const info = el("div", "history-info");
+    info.append(
+      el("strong", "", item.title || "上次问诊"),
+      el(
+        "small",
+        "",
+        `${FOLLOW_UP_KIND_LABELS[item.plan.kind] || "随访"} · ${item.plan.reason || ""}`,
+      ),
+      el(
+        "small",
+        "",
+        `约定回访时间 ${formatTime(item.plan.due_at, true)}${due ? " · 已到期" : ""}`,
+      ),
+    );
+    const badge = el(
+      "span",
+      due ? "followup-badge due" : "followup-badge",
+      due ? "已到期" : "待随访",
+    );
+    const action = button("记录近况", "primary-button", () =>
+      openFollowUpDialog(item),
+    );
+    card.append(info, badge, action);
+    list.append(card);
+  }
+}
+function openFollowUpDialog(item) {
+  followUpTarget = item;
+  followUpRetriageId = null;
+  $("#followup-context").textContent =
+    `${item.title || "上次问诊"} · ${FOLLOW_UP_KIND_LABELS[item.plan.kind] || "随访"}（约定 ${formatTime(item.plan.due_at, true)}）`;
+  $("#followup-form").reset();
+  $("#followup-feedback").textContent = "";
+  $("#followup-retriage").hidden = true;
+  $("#followup-dialog").showModal();
 }
 function renderLibrary() {
   $("#task-library").replaceChildren();
@@ -2687,6 +2755,41 @@ document
   .forEach((node) =>
     node.addEventListener("click", () => node.closest("dialog").close()),
   );
+$("#followup-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!followUpTarget) return;
+  const outcome = new FormData(event.target).get("outcome");
+  const feedback = $("#followup-feedback");
+  if (!outcome) {
+    feedback.textContent = "请先选择现在的近况。";
+    return;
+  }
+  try {
+    const data = await api(
+      `/api/sessions/${followUpTarget.session_id}/follow-up/outcome`,
+      {
+        method: "POST",
+        body: { outcome, note: $("#followup-note").value.trim() },
+      },
+    );
+    await refreshSessions();
+    if (data.requires_retriage && data.new_session_id) {
+      followUpRetriageId = data.new_session_id;
+      $("#followup-retriage").hidden = false;
+      feedback.textContent = "已记录近况：情况有变，需要重新分诊。";
+    } else {
+      $("#followup-dialog").close();
+      toast("随访近况已记录");
+    }
+  } catch (error) {
+    feedback.textContent = error.message;
+  }
+});
+$("#followup-enter-retriage").addEventListener("click", () => {
+  const id = followUpRetriageId;
+  $("#followup-dialog").close();
+  if (id) resumeSession(id).catch((error) => toast(error.message));
+});
 $("#settings-dialog").addEventListener("close", () => {
   $("#api-key").value = "";
   $("#model-data-consent-input").checked = false;

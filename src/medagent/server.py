@@ -159,6 +159,9 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/sessions":
             self._json({"sessions": self.app.workspace.sessions()})
             return
+        if path == "/api/follow-ups":
+            self._json({"follow_ups": self.app.workspace.follow_ups()})
+            return
         if path == "/api/tasks":
             self._json(
                 {
@@ -327,6 +330,44 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         parts = path.strip("/").split("/")
+        if (
+            len(parts) == 5
+            and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "follow-up"
+            and parts[4] == "outcome"
+        ):
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            payload = self._read_json()
+            if payload is None:
+                return
+            outcome = payload.get("outcome")
+            note = payload.get("note", "")
+            if not isinstance(outcome, str) or not isinstance(note, str):
+                self._error(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_follow_up_outcome",
+                    "随访结局参数无效",
+                )
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                result = engine.record_follow_up_outcome(parts[2], outcome, note)
+                state = engine.state(parts[2])
+            except KeyError:
+                self._error(
+                    HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话"
+                )
+                return
+            except ValueError as exc:
+                self._error(
+                    HTTPStatus.BAD_REQUEST, "invalid_follow_up_outcome", str(exc)
+                )
+                return
+            self._json({**result, "follow_up": dict(state.follow_up)})
+            return
         if (
             len(parts) == 6
             and parts[0:2] == ["api", "sessions"]
