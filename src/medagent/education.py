@@ -133,6 +133,33 @@ class _EnrichJob:
     created_at: float = field(default_factory=monotonic)
 
 
+def needs_enrichment(state) -> bool:
+    """Whether a case's finished sheet still lacks its further_reading.
+
+    Cheap snapshot predicate for read paths (e.g. a snapshot GET that
+    re-arms enrichment for sheets closed before the enricher was
+    attached): True only for a closed case whose conclusion exists,
+    whose directions are patient-visible, and which carries no
+    further_reading yet. Duck-typed on the state's shape (attribute
+    access, or a plain dict snapshot) so callers never need the domain
+    classes; deeper gating (mode, directions, revision freshness)
+    stays in EducationEnricher.schedule.
+    """
+    if isinstance(state, dict):
+        phase = state.get("phase")
+        conclusion = state.get("conclusion")
+    else:
+        phase = getattr(state, "phase", None)
+        conclusion = getattr(state, "conclusion", None)
+    if phase != Phase.CLOSED:
+        return False
+    if not isinstance(conclusion, dict) or not conclusion:
+        return False
+    if conclusion.get("directions_visible") is not True:
+        return False
+    return not conclusion.get("further_reading")
+
+
 class EducationEnricher:
     """Bounded, revision-bound post-conclusion web enrichment.
 
@@ -484,6 +511,15 @@ class EducationEnricher:
                     },
                 )
             )
+            # The write-back mutates a closed case outside the turn
+            # pipeline, so nothing else will save it: persist now, or
+            # the enrichment silently vanishes on the next restart.
+            # Engines without a persist hook (test doubles) skip.
+            persist = getattr(job.engine, "persist_state", None)
+            if persist is None:
+                persist = getattr(job.engine, "_persist", None)
+            if persist is not None:
+                persist(state)
 
     # -- review channel (telemetry only, never writes back) --
 

@@ -180,6 +180,14 @@ class ConsultationEngine(
         except Exception:
             self._persist_failures += 1
 
+    def persist_state(self, state: CaseState) -> None:
+        """Public write-through for callers that mutate a case outside
+        the turn pipeline — server routes editing a closed case in
+        place, post-conclusion enrichment writing back onto the sheet.
+        Same fail-open semantics as _persist: durability for those
+        mutations must not depend on a later turn happening to save."""
+        self._persist(state)
+
     def create_session(
         self, request_id: Optional[str] = None
     ) -> tuple[CaseState, AgentReply]:
@@ -1913,12 +1921,6 @@ class ConsultationEngine(
             "rule_ids": list(decision.rule_ids),
         }
         reply.developer_trace = trace
-        if (
-            decision.allowed
-            and reply.phase == Phase.CLOSED
-            and state.closed_reason in ("confirmed_by_user", "urgent_route")
-        ):
-            self._attach_conclusion(state, reply, turn_id)
         self.events.append(
             Event(
                 state.session_id,
@@ -1932,6 +1934,17 @@ class ConsultationEngine(
             trace["transition_id"] = transition_id
             reply.developer_trace = trace
             if reply.phase == Phase.CLOSED:
+                # Compose the sheet only on the turn that actually closes
+                # the session (same criterion as the spoken close line
+                # below). Guard replies on an already-closed case also
+                # carry phase CLOSED; re-composing for them bumped the
+                # sheet revision on every message and silently overwrote
+                # post-close enrichment such as further_reading.
+                if decision.allowed and state.closed_reason in (
+                    "confirmed_by_user",
+                    "urgent_route",
+                ):
+                    self._attach_conclusion(state, reply, turn_id)
                 # Only the reply that actually closes the session in this
                 # turn speaks the disposition; the already-closed guard
                 # reply (no transition) must not repeat it every turn.

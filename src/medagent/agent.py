@@ -122,6 +122,14 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         )
         # Immutable per-engine catalog precedes ALL case-specific data. This is
         # provider KV-prefix reuse, not a cache of patient answers or decisions.
+        # The base catalog always carries the full tool list; which tools
+        # are *advertised* to the model is resolved lazily at message-build
+        # time (see _effective_static_context): production assembly injects
+        # the subagent coordinator AFTER construction (server startup
+        # setattr, Workspace._attach_subagents on settings apply), so a
+        # tool list frozen here would advertise spawn_subagent exactly
+        # never in the real product — and would keep advertising it if
+        # the coordinator were later detached or switched off.
         self.static_context = {
             "tools": TOOL_DEFINITIONS,
             "fact_schema": [
@@ -186,12 +194,63 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             },
             "content_versions": self.content.versions,
         }
-        self.system_prompt = (
-            self.prompt
-            + "\n\n以下是本会谈固定的工具与内容目录（JSON）。动态输入中的候选范围优先。\n"
-            + self._json(self.static_context)
+        self._prompt_variants: Dict[bool, tuple] = {}
+        self.system_prompt, self.prefix_sha256 = self._current_prefix()
+
+    def _spawn_advertised(self) -> bool:
+        """Whether spawn_subagent may be advertised *right now*.
+
+        Advertise spawn_subagent only when a coordinator is actually
+        wired in and enabled. Listing an unavailable tool invites
+        proposals that can only fail closed at execution time (the
+        execution-side gate itself is unchanged).
+        """
+        coordinator = self.subagent_coordinator
+        return (
+            coordinator is not None
+            and getattr(coordinator, "mode", "off") != "off"
         )
-        self.prefix_sha256 = hashlib.sha256(self.system_prompt.encode()).hexdigest()
+
+    def _effective_static_context(self):
+        """The catalog actually serialized into the system prompt.
+
+        Identical to ``static_context`` except the tool list, which is
+        resolved against the live coordinator (see the __init__ note):
+        the base catalog is immutable content, the advertisement is not.
+        """
+        if self._spawn_advertised():
+            return self.static_context
+        context = dict(self.static_context)
+        context["tools"] = [
+            tool
+            for tool in self.static_context["tools"]
+            if tool.get("name") != "spawn_subagent"
+        ]
+        return context
+
+    def _current_prefix(self):
+        """(system_prompt, sha256) for the currently advertised catalog.
+
+        Exactly two variants exist per engine (spawn advertised or not);
+        each is built once and cached, so the prefix stays byte-stable
+        within a variant — the property provider KV-prefix reuse relies
+        on. ``system_prompt``/``prefix_sha256`` are refreshed to the live
+        variant on every call, so the agent.started event record and
+        offline evaluators reading those attributes see the prefix the
+        model is actually being sent, not the construction-time one.
+        """
+        advertised = self._spawn_advertised()
+        variant = self._prompt_variants.get(advertised)
+        if variant is None:
+            prompt = (
+                self.prompt
+                + "\n\n以下是本会谈固定的工具与内容目录（JSON）。动态输入中的候选范围优先。\n"
+                + self._json(self._effective_static_context())
+            )
+            variant = (prompt, hashlib.sha256(prompt.encode()).hexdigest())
+            self._prompt_variants[advertised] = variant
+        self.system_prompt, self.prefix_sha256 = variant
+        return variant
 
     @staticmethod
     def _json(value):
@@ -241,7 +300,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         "backend": self.backend.name,
                         "reply": reply.to_dict(),
                         "policy_version": "medical-tools-v0.11.17",
-                        "prompt_sha256": self.prefix_sha256,
+                        "prompt_sha256": self._current_prefix()[1],
                         "prompt_layout": "static-catalog-prefix/v1",
                     },
                 )
@@ -869,11 +928,29 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 and isinstance(state.subagent_digest.get("digest"), dict)
                 else {}
             ),
+            **(
+                {
+                    "prior_case": {
+                        key: prior.get(key)
+                        for key in (
+                            "chief_complaint",
+                            "disposition_level",
+                            "disposition_text",
+                            "outcome",
+                            "outcome_note",
+                        )
+                    }
+                }
+                if (
+                    prior := (state.runtime_snapshot or {}).get("prior_case")
+                )
+                else {}
+            ),
         }
 
     def _messages(self, state, text):
         return [
-            {"role": "system", "content": self.system_prompt},
+            {"role": "system", "content": self._current_prefix()[0]},
             {"role": "user", "content": self._json(self._context(state, text))},
         ]
 
@@ -1583,6 +1660,16 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             urgent_reply = self._correction_emergency(state, new_text)
             if urgent_reply:
                 return urgent_reply
+            if state.phase == Phase.CLOSED and state.closed_reason != "emergency_route":
+                # Same guard as the base engine (ConsultationEngine
+                # .correct_fact): closed cases are read-only history.
+                # Without it this override silently rewound CLOSED to
+                # HISTORY below, forking the case from its conclusion
+                # sheet and orphaning its follow-up plan on the next
+                # persisted restart. emergency_route stays exempt: a
+                # correction there re-runs triage and the route itself
+                # can never be retracted by an edit.
+                raise ValueError("会谈已结束，记录不能再更正")
             self._check_fact_version(state, fact_key, expected_fact_id)
             previous_question, previous_task, previous_phase = (
                 state.active_question,
