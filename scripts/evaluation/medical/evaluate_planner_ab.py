@@ -165,6 +165,32 @@ SCENARIOS = [
         },
     },
     {
+        "id": "multi-meningitis-febrile",
+        "key_question": "head_details",
+        "target": "meningitis_possible",
+        "answers": {
+            "chief_complaint": ("发烧头痛一天", None),
+            "head_details": ("整个头胀痛，脖子硬，低头困难", None),
+            "associated_symptoms": ("发烧三十九度五，呕吐一次", None),
+            "temperature": ("39.5", "39.5"),
+            "severity": ("7分", None),
+            "trajectory": ("在加重", "worsening"),
+        },
+    },
+    {
+        "id": "multi-appendicitis-febrile",
+        "key_question": "gi_details",
+        "target": "appendicitis",
+        "answers": {
+            "chief_complaint": ("腹痛发热一天", None),
+            "gi_details": ("右下腹疼痛，伴呕吐发热", None),
+            "associated_symptoms": ("呕吐两次，没胃口", None),
+            "temperature": ("38.6", "38.6"),
+            "severity": ("7分", None),
+            "trajectory": ("在加重", "worsening"),
+        },
+    },
+    {
         "id": "knee-uncovered",
         "key_question": None,
         "target": None,
@@ -179,6 +205,14 @@ SCENARIOS = [
 def run_scenario(scenario, use_differential: bool) -> dict:
     answers = dict(COMMON)
     answers.update(scenario["answers"])
+    # The engine picks its planner from the env at construction time —
+    # which happens lazily on start()/require(), so the env must stay
+    # set for the whole scenario (the differential default made the two
+    # arms silently identical after the 2026-10-23 switch).
+    import os
+
+    previous = os.environ.get("MEDAGENT_PLANNER")
+    os.environ["MEDAGENT_PLANNER"] = "differential" if use_differential else "rule"
     host = build_runtime()
     context = host.start()
     try:
@@ -218,6 +252,10 @@ def run_scenario(scenario, use_differential: bool) -> dict:
         }
     finally:
         host.stop()
+        if previous is None:
+            os.environ.pop("MEDAGENT_PLANNER", None)
+        else:
+            os.environ["MEDAGENT_PLANNER"] = previous
 
 
 def main() -> int:
