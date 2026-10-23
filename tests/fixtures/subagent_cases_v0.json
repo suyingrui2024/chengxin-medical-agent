@@ -1641,6 +1641,183 @@
      "role": "user"
     }
    ]
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "stale",
+    "surviving_claims": 0
+   },
+   "expected_disposition": [
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "发烧三天，咳嗽",
+     "key": "chief_complaint",
+     "value": "发烧三天，咳嗽"
+    },
+    {
+     "assertion": "present",
+     "evidence": "变化不大",
+     "key": "trajectory",
+     "value": "stable"
+    },
+    {
+     "assertion": "present",
+     "evidence": "3分",
+     "key": "severity",
+     "value": 3
+    },
+    {
+     "assertion": "absent",
+     "evidence": "没有呼吸困难",
+     "key": "resp_breathing",
+     "value": null
+    }
+   ],
+   "id": "so-stale-mutation-fever",
+   "mutate_during_run": {
+    "assertion": "present",
+    "evidence": "烧一直没退，还越来越难受",
+    "key": "trajectory",
+    "value": "worsening"
+   },
+   "objective": "独立复核该发热病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向常规门诊",
+      "disposition_tendency": "routine_visit",
+      "findings": [
+       {
+        "claim": "发热三天，病程平稳",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "发烧三天，咳嗽",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "程度轻",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "3分",
+          "ref": "severity",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "stale",
+    "surviving_claims": 0
+   },
+   "expected_disposition": [
+    "self_care",
+    "routine_visit"
+   ],
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "腰疼两天",
+     "key": "chief_complaint",
+     "value": "腰痛两天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "没什么变化",
+     "key": "trajectory",
+     "value": "stable"
+    },
+    {
+     "assertion": "present",
+     "evidence": "4分",
+     "key": "severity",
+     "value": 4
+    }
+   ],
+   "id": "so-stale-mutation-back",
+   "mutate_during_run": {
+    "assertion": "present",
+    "evidence": "疼得站不起来了",
+    "key": "severity",
+    "value": 9
+   },
+   "objective": "独立复核该腰痛病例的处置倾向",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "倾向常规门诊",
+      "disposition_tendency": "routine_visit",
+      "findings": [
+       {
+        "claim": "腰痛两天，病程平稳",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "腰疼两天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "程度中等",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "4分",
+          "ref": "severity",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "second_opinion"
   }
  ],
  "corpus": "subagent-cases",

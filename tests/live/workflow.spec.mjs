@@ -255,21 +255,42 @@ test("synthetic patient completes a native live consultation, emergency routing 
       result.question_counts = Object.fromEntries(counts);
       result.checks.no_age_requestion_after_explicit_edit =
         ageQuestionsAfterEdit === 0;
-      result.checks.earlier_report_retained_for_model =
-        traceBeforeEdit.events.some((event) => {
-          if (event.event_type !== "model.requested") return false;
-          const context = JSON.parse(event.payload.messages[1].content);
+      // model.requested events no longer persist the prompt text
+      // (metadata only: message count, char sizes, content sha256 —
+      // see medagent.backends.request_event_payload), so this check
+      // verifies the deterministic inputs the model context is built
+      // from instead of parsing the wire payload: the age fact holds
+      // the edited value, at least one model request was recorded,
+      // and the initial report is the provenance source turn of some
+      // fact under the same conditions consultation._fact_provenance
+      // uses to attach source-turn context (evidence a proper
+      // substring of the turn, patient/caregiver source). Whether the
+      // text then travels via the recent window or earlier_source_turns
+      // depends on turn distance; both paths carry it verbatim.
+      result.checks.earlier_report_retained_for_model = (() => {
+        const state = traceBeforeEdit.state;
+        if (state.facts.age_years?.value !== 40) return false;
+        const sourceTurns = new Map();
+        let modelRequests = 0;
+        for (const event of traceBeforeEdit.events) {
+          if (event.event_type === "turn.user_message")
+            sourceTurns.set(event.turn_id, event.payload?.text);
+          else if (event.event_type === "fact.correction_requested")
+            sourceTurns.set(event.turn_id, event.payload?.new_text);
+          else if (event.event_type === "model.requested") modelRequests += 1;
+        }
+        if (!modelRequests) return false;
+        return Object.values(state.facts).some((fact) => {
+          const text = sourceTurns.get(fact.turn_id);
           return (
-            context.facts.age_years?.value === 40 &&
-            context.earlier_source_turns?.some(
-              (source) =>
-                source.text === initialReport &&
-                Object.values(context.facts).some(
-                  (fact) => fact.source_context_id === source.id,
-                ),
-            )
+            text === initialReport &&
+            Boolean(fact.evidence) &&
+            text !== fact.evidence &&
+            text.includes(fact.evidence) &&
+            ["patient", "caregiver"].includes(fact.source)
           );
         });
+      })();
       const summary = current.reply.summary;
       const reportItem = [
         ...summary.known,

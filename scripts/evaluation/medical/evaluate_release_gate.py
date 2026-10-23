@@ -31,6 +31,20 @@ MIN_RECALL = 0.99
 MIN_PER_FLAG_RECALL = 0.95
 MAX_FPR = 0.05
 
+# Minimum corpus sizes (floor of 50% of each corpus as authored:
+# red_flag_corpus_v0 51 samples / 37 positive / 14 negative;
+# red_flag_probe_v1 18 / 12 / 6). Without them an empty or gutted
+# corpus passes vacuously — recall defaults to 1.0 with no positives
+# and the false-positive rate to 0.0 with no negatives.
+MIN_CORPUS_SAMPLES = {
+    "red_flag_corpus_v0.json": {"samples": 25, "positives": 18, "negatives": 7},
+    "red_flag_probe_v1.json": {"samples": 9, "positives": 6, "negatives": 3},
+}
+
+# Conclusion corpus: minimum return_now_if expectations the fixture
+# must carry (and meet) so the safety-net lists stay asserted.
+MIN_RETURN_NOW_IF_EXPECTATIONS = 2
+
 
 def check_corpus(service: TriageService, path: Path) -> bool:
     corpus = json.loads(path.read_text(encoding="utf-8"))
@@ -53,6 +67,20 @@ def check_corpus(service: TriageService, path: Path) -> bool:
     recall = tp / positives if positives else 1.0
     fpr = fp / negatives if negatives else 0.0
     ok = recall >= MIN_RECALL and fpr <= MAX_FPR
+    minimums = MIN_CORPUS_SAMPLES.get(path.name)
+    if minimums is not None:
+        size_ok = (
+            len(corpus["samples"]) >= minimums["samples"]
+            and positives >= minimums["positives"]
+            and negatives >= minimums["negatives"]
+        )
+        ok = ok and size_ok
+        print(
+            f"  corpus size: samples={len(corpus['samples'])} "
+            f"positives={positives} negatives={negatives} "
+            f"(minimums {minimums['samples']}/{minimums['positives']}/"
+            f"{minimums['negatives']}) -> {'PASS' if size_ok else 'FAIL'}"
+        )
     print(f"{path.name}: recall={recall:.3f} fpr={fpr:.3f} -> {'PASS' if ok else 'FAIL'}")
     for flag, (hits, total) in sorted(per_flag.items()):
         flag_recall = hits / total if total else 1.0
@@ -69,6 +97,8 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
     phase-B directions display gate)."""
     sys.path.insert(0, str(ROOT))
     from scripts.evaluation.medical.evaluate_conclusion_sheet import (
+        MIN_CASES,
+        MIN_MUST_NOT_MISS,
         build_state,
         score_case,
     )
@@ -92,12 +122,27 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
             f"{bound_version!r} but content is {differentials.get('version')!r} -> FAIL"
         )
         return False
+    # Same binding for the self-care content: the safety-net lists the
+    # corpus asserts (expected_return_now_if) come from self_care.json.
+    self_care = json.loads(
+        (ROOT / "src" / "medagent" / "content" / "self_care.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    bound_self_care = corpus.get("self_care_version")
+    if bound_self_care != self_care.get("version"):
+        print(
+            "conclusion_cases_v0.json: corpus bound to self_care "
+            f"{bound_self_care!r} but content is {self_care.get('version')!r} -> FAIL"
+        )
+        return False
     print(
         "conclusion corpus review_status: "
         f"{corpus.get('review_status', 'unknown')} "
         "(engineering gate only — not a clinical sign-off)"
     )
     total = disposition_hits = mnm_total = mnm_hits = harmful = 0
+    rni_total = rni_hits = 0
     for case in corpus["cases"]:
         state, summary = build_state(case)
         sheet = compose_conclusion(state, summary=summary)
@@ -114,12 +159,27 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
                 mnm_hits += 1
         if any(f.startswith("forbidden") for f in failures):
             harmful += 1
+        expected_rni = case.get("expected_return_now_if")
+        if expected_rni is not None:
+            rni_total += 1
+            if (sheet or {}).get("return_now_if") == list(expected_rni):
+                rni_hits += 1
     agreement = disposition_hits / total if total else 0.0
     recall = mnm_hits / mnm_total if mnm_total else 1.0
-    ok = agreement >= 0.95 and recall == 1.0 and harmful == 0
+    # Minimum-sample assertions: an empty or gutted corpus must fail,
+    # not pass on the vacuous defaults above (recall 1.0 with no
+    # must-not-miss expectations, agreement over a handful of cases).
+    size_ok = total >= MIN_CASES and mnm_total >= MIN_MUST_NOT_MISS
+    rni_ok = (
+        rni_total >= MIN_RETURN_NOW_IF_EXPECTATIONS and rni_hits == rni_total
+    )
+    ok = agreement >= 0.95 and recall == 1.0 and harmful == 0 and size_ok and rni_ok
     print(
         f"conclusion_cases_v0.json: disposition={agreement:.3f} "
-        f"must_not_miss={recall:.3f} harmful={harmful} -> {'PASS' if ok else 'FAIL'}"
+        f"must_not_miss={recall:.3f} harmful={harmful} "
+        f"cases={total} (min {MIN_CASES}) mnm={mnm_total} (min {MIN_MUST_NOT_MISS}) "
+        f"return_now_if={rni_hits}/{rni_total} "
+        f"-> {'PASS' if ok else 'FAIL'}"
     )
     return ok
 

@@ -39,6 +39,13 @@ from medagent.followups import build_follow_up_plan
 
 ROOT = Path(__file__).resolve().parents[3]
 
+# Minimum corpus sizes for a meaningful gate (floor of 50% of the
+# corpus as authored: 108 cases, 42 must-not-miss expectations).
+# Without them a gutted corpus could pass on vacuous rates — the
+# must-not-miss recall defaults to 1.0 when no case carries one.
+MIN_CASES = 54
+MIN_MUST_NOT_MISS = 21
+
 
 def build_state(case) -> CaseState:
     state = CaseState(session_id=f"case:{case['id']}")
@@ -104,6 +111,13 @@ def score_case(case, sheet):
     for gap_key in case.get("expected_gap_keys", []):
         if gap_key not in [g["fact_key"] for g in sheet["gaps"]]:
             failures.append(f"gap {gap_key} missing")
+    expected_rni = case.get("expected_return_now_if")
+    if expected_rni is not None and sheet.get("return_now_if") != list(
+        expected_rni
+    ):
+        failures.append(
+            f"return_now_if {sheet.get('return_now_if')} != {list(expected_rni)}"
+        )
     rendered = json.dumps(sheet, ensure_ascii=False)
     for phrase in case.get("forbidden", []):
         if phrase in rendered:
@@ -158,6 +172,13 @@ def main() -> int:
         "disposition_agreement>=0.95": disposition_rate >= 0.95,
         "must_not_miss_recall==1.0": mnm_rate == 1.0,
         "harmful==0": harmful == 0,
+        "corpus_min_cases": total >= MIN_CASES,
+        "corpus_min_must_not_miss": must_not_miss_total >= MIN_MUST_NOT_MISS,
+        "return_now_if_expectations_met": not any(
+            failure.startswith("return_now_if")
+            for result in results
+            for failure in result["failures"]
+        ),
     }
     report = {
         "corpus": corpus["corpus"],

@@ -34,6 +34,17 @@ ROOT = Path(__file__).resolve().parents[3]
 
 EXPECTED_KINDS = {"evidence_lookup", "second_opinion", "case_digest", "followup_batch"}
 
+# Minimum corpus sizes (floor of 50% of the corpus as authored:
+# 18 cases, 17 schema-scored, 8 fabricated quotes). Without them an
+# empty or gutted corpus passes on vacuous rates — the schema rate
+# and fabricated-quote drop rate both default to 1.0 over zero cases.
+# The stale minimum is held at the full authored count (3): a single
+# stale case cannot evidence the staleness judgement on its own.
+MIN_TOTAL_CASES = 9
+MIN_SCHEMA_CASES = 8
+MIN_FABRICATED_QUOTES = 4
+MIN_STALE_CASES = 3
+
 
 class SetupFailure(Exception):
     """The module under test is missing or shaped unexpectedly."""
@@ -308,6 +319,8 @@ def score_corpus(corpus) -> dict:
             "stale_cases": stale_total,
             "stale_correct": stale_correct,
             "stale_false_positives": stale_false_positives,
+            "schema_cases": schema_cases,
+            "fabricated_quotes": fabricated_total,
         }
     )
     report["gates"] = {
@@ -316,6 +329,10 @@ def score_corpus(corpus) -> dict:
         "unverified_quote_leaks==0": total_leaks == 0,
         "fabricated_quote_drop_rate==1.0": fabricated_drop_rate == 1.0,
         "stale_judgement_correct": stale_ok,
+        "corpus_min_cases": report["cases"] >= MIN_TOTAL_CASES,
+        "corpus_min_schema_cases": schema_cases >= MIN_SCHEMA_CASES,
+        "corpus_min_fabricated_quotes": fabricated_total >= MIN_FABRICATED_QUOTES,
+        "corpus_min_stale_cases": stale_total >= MIN_STALE_CASES,
     }
     report["gate_pass"] = all(report["gates"].values())
     return report

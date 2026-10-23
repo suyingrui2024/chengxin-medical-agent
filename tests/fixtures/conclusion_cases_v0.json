@@ -818,6 +818,11 @@
           "assertion": "present",
           "evidence": "呕吐两次"
         }
+      ],
+      "expected_return_now_if": [
+        "腹痛迅速加重",
+        "高热",
+        "呕血或大便发黑"
       ]
     },
     {
@@ -3061,6 +3066,11 @@
           "assertion": "present",
           "evidence": "疼痛放射到小腿，腿麻"
         }
+      ],
+      "expected_return_now_if": [
+        "大小便异常",
+        "会阴麻木新出现或加重",
+        "下肢无力加重"
       ]
     },
     {
@@ -3379,6 +3389,10 @@
           "assertion": "present",
           "evidence": "尿频尿急，尿痛，有烧灼感"
         }
+      ],
+      "expected_return_now_if": [
+        "腰痛伴高热",
+        "完全尿不出"
       ]
     },
     {
@@ -6347,5 +6361,6 @@
   "note": "Engineering v0 case set for the conclusion-sheet composer (docs/问诊结论单设计文档.md §8). Fact-scripted cases: each builds a CaseState directly and drives compose_conclusion. NOT clinician-reviewed; phase-B gating requires a clinician-reviewed set (decision D4). Expectations encode the design's disposition/abstention/must-not-miss rules, not clinical ground truth. v1.1 (2026-10-23): +8 cases covering the six new differential pathways (abdominal/headache/dizziness/low-back/urinary/skin); still engineering-grade, clinician OSCE corpus pending (D4).",
   "review_status": "unreviewed",
   "version": "1.2.0",
-  "differentials_version": "1.2.1"
+  "differentials_version": "1.2.1",
+  "self_care_version": "1.1"
 }
