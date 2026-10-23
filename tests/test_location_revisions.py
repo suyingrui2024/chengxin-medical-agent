@@ -310,15 +310,19 @@ class LocationRevisionTests(unittest.TestCase):
         base = offline.ConsultationTestCase()
         base.setUp()
         try:
+            # Answer order follows the differential planner's history
+            # phase for a headache chief (associated + targeted detail
+            # questions precede onset/trajectory/severity).
             for text, choice in [
                 ("孩子", "child"),
                 ("8岁", None),
                 ("头疼", None),
                 ("都没有", "no"),
+                ("没有其他不适", None),
+                ("后脑勺胀痛", None),
                 ("昨天开始", None),
                 ("变化不大", "stable"),
                 ("3分", None),
-                ("没有其他不适", None),
             ]:
                 base.answer(text, choice)
             self.assertEqual(base.reply.task["id"], "body_location")

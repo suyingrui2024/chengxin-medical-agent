@@ -8,10 +8,11 @@ only validated hypotheses are persisted on the case. The
 ``DifferentialPlanner`` then chooses the next question by red-flag
 coverage and discrimination value instead of bank order alone.
 
-Patient-visible behaviour is unchanged until an operator swaps the
-engine's planner (see ``enable_differential_planning``); the deterministic
-``RulePlanner`` remains the default, per the design's shadow-then-gray
-rollout rule.
+The ``DifferentialPlanner`` became the engine default on 2026-10-23
+after the planner A/B evaluation passed with no outcome regressions
+(scripts/evaluation/medical/evaluate_planner_ab.py); ``MEDAGENT_PLANNER=
+rule`` rolls back to the deterministic bank-order ``RulePlanner``, and
+``enable_differential_planning`` remains for tests and explicit opt-in.
 """
 from __future__ import annotations
 
@@ -372,13 +373,44 @@ class DifferentialPlanner:
             state.reasoning = accepted.to_dict()
         return accepted, changed_ids
 
-    def score(self, question, workspace: ReasoningWorkspace, changed_ids: set) -> float:
+    def _potential_discrimination(self, state: CaseState) -> Dict[str, int]:
+        """Discriminating-question counts from chief-matched pathways.
+
+        Hypotheses whose support conditions avoid the chief complaint
+        itself (the abstention-preserving content rule) cannot enter the
+        workspace until their detail question has been answered — a
+        chicken-and-egg problem for ordering. The pathway match on the
+        chief complaint alone is enough to know which questions *would*
+        discriminate, so ordering can use it without touching workspace
+        or abstention semantics.
+        """
+        chief = str(state.get("chief_complaint", ""))
+        counts: Dict[str, int] = {}
+        if not chief:
+            return counts
+        for pathway in self._proposer._pathways:
+            terms = pathway.get("chief_complaint_contains_any", [])
+            if not any(term in chief for term in terms):
+                continue
+            for raw in pathway.get("hypotheses", []):
+                for qid in raw.get("discriminating_questions", []):
+                    counts[qid] = counts.get(qid, 0) + 1
+        return counts
+
+    def score(
+        self,
+        question,
+        workspace: ReasoningWorkspace,
+        changed_ids: set,
+        potential_counts: Optional[Dict[str, int]] = None,
+    ) -> float:
         active = workspace.active()
         red_flag = any(
             question.id in h.red_flag_questions and h.red_flags for h in active
         )
         discrimination = (
             sum(1 for h in active if question.id in h.discriminating_questions) >= 2
+            or (potential_counts or {}).get(question.id, 0) >= 2
         )
         freshness = any(
             question.id in h.discriminating_questions
@@ -423,9 +455,13 @@ class DifferentialPlanner:
                 offered = engine._offer_task(state, chief)
                 if offered:
                     return offered
+            potential = self._potential_discrimination(state)
             best = max(
                 same_phase,
-                key=lambda q: (self.score(q, workspace, changed_ids), -same_phase.index(q)),
+                key=lambda q: (
+                    self.score(q, workspace, changed_ids, potential),
+                    -same_phase.index(q),
+                ),
             )
             return engine._ask(state, best, reason=self._reason(best, workspace))
 

@@ -116,6 +116,11 @@ class DifferentialFlowTests(unittest.TestCase):
         self.assertEqual(history_questions[0], "resp_breathing")
 
     def test_rule_planner_keeps_bank_order(self):
+        # The engine default is the differential planner since 2026-10-23;
+        # pin the rule planner explicitly for the bank-order contract.
+        from medagent.planner import RulePlanner
+
+        self.engine.planner = RulePlanner(self.engine)
         driver = _Driver(self.engine, self.state, self.reply)
         reply = driver.reply
         asked = []
@@ -259,3 +264,89 @@ class ReasoningReviewProviderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NewPathwayCoverageTests(unittest.TestCase):
+    """Phase: six added pathways (2026-10-23). Proposer-level checks that
+    each serious hypothesis reaches at least active/supported on its
+    canonical fact pattern, and that a chief-complaint-only case stays
+    empty (the abstention fixtures depend on it)."""
+
+    def _workspace(self, facts):
+        from medagent.domain import Assertion, Fact, Source
+
+        state = CaseState(session_id="pathway-unit")
+        for key, value, evidence in facts:
+            state.record(
+                Fact(
+                    key=key,
+                    value=value,
+                    assertion=Assertion.PRESENT,
+                    source=Source.PATIENT,
+                    turn_id="t1",
+                    evidence=evidence,
+                )
+            )
+            state.transcript.append({"role": "user", "content": evidence})
+        proposed = RuleBasedProposer().propose(state)
+        accepted, rejected = validate_workspace(state, proposed)
+        self.assertEqual(rejected, [])
+        return accepted
+
+    def test_appendicitis_supported_gastro_refuted_by_blood(self):
+        ws = self._workspace([
+            ("chief_complaint", "右下腹痛一天", "右下腹痛一天"),
+            ("gi_details", "右下腹绞痛，有便血", "右下腹绞痛，有便血"),
+            ("trajectory", "worsening", "在加重"),
+            ("severity", 7, "7分"),
+        ])
+        self.assertEqual(ws.hypotheses["appendicitis"].status, "supported")
+        self.assertEqual(ws.hypotheses["gastroenteritis"].status, "refuted")
+        self.assertIn("gi_bleed", ws.hypotheses)
+
+    def test_meningitis_supported_migraine_refuted_by_high_fever(self):
+        ws = self._workspace([
+            ("chief_complaint", "头痛发热一天", "头痛发热一天"),
+            ("head_details", "整个头胀痛，脖子硬，低头困难", "整个头胀痛，脖子硬，低头困难"),
+            ("temperature_c", 39.1, "39.1"),
+        ])
+        self.assertEqual(ws.hypotheses["meningitis_possible"].status, "supported")
+        self.assertEqual(ws.hypotheses["migraine_tension"].status, "refuted")
+
+    def test_posterior_stroke_supported(self):
+        ws = self._workspace([
+            ("chief_complaint", "头晕两小时", "头晕两小时"),
+            ("dizzy_details", "天旋地转，走路不稳", "天旋地转，走路不稳"),
+            ("relevant_history", "有高血压", "有高血压"),
+        ])
+        self.assertEqual(ws.hypotheses["posterior_stroke"].status, "supported")
+
+    def test_cauda_supported_mechanical_refuted(self):
+        ws = self._workspace([
+            ("chief_complaint", "腰痛两天", "腰痛两天"),
+            ("back_details", "腰痛剧烈，大小便困难，会阴麻木，还有点发热", "腰痛剧烈，大小便困难，会阴麻木，还有点发热"),
+            ("severity", 8, "8分"),
+        ])
+        self.assertEqual(ws.hypotheses["cauda_serious"].status, "supported")
+        self.assertEqual(ws.hypotheses["mechanical_back"].status, "refuted")
+
+    def test_pyelonephritis_supported_cystitis_refuted(self):
+        ws = self._workspace([
+            ("chief_complaint", "尿频尿痛两天", "尿频尿痛两天"),
+            ("urinary_details", "尿痛尿急，伴腰痛发热", "尿痛尿急，伴腰痛发热"),
+            ("temperature_c", 39.0, "39.0"),
+        ])
+        self.assertEqual(ws.hypotheses["pyelonephritis"].status, "supported")
+        self.assertEqual(ws.hypotheses["cystitis"].status, "refuted")
+
+    def test_urticaria_supported(self):
+        ws = self._workspace([
+            ("chief_complaint", "起疹子很痒", "起疹子很痒"),
+            ("skin_details", "身上一片片风团，很痒，此起彼伏", "身上一片片风团，很痒，此起彼伏"),
+        ])
+        self.assertEqual(ws.hypotheses["urticaria"].status, "supported")
+
+    def test_chief_only_cases_stay_empty_for_new_pathways(self):
+        for chief in ("头痛一天", "胃疼两天", "摔了一跤，腰疼", "头晕一上午", "尿频一天", "起疹子了"):
+            ws = self._workspace([("chief_complaint", chief, chief)])
+            self.assertEqual(ws.hypotheses, {}, chief)

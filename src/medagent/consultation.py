@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from copy import deepcopy
 from threading import Lock, RLock, Condition
@@ -120,7 +121,17 @@ class ConsultationEngine(
         self.ranker = ranker
         self.interpreter = Interpreter()
         self.publication_gate = ReplyPublicationGate()
-        self.planner = RulePlanner(self)
+        # Default planner: DifferentialPlanner (hypothesis-driven question
+        # order), promoted 2026-10-23 after the A/B evaluation showed no
+        # outcome regressions and earlier discriminating-question capture
+        # on every covered pathway (scripts/evaluation/medical/
+        # evaluate_planner_ab.py). MEDAGENT_PLANNER=rule is the rollback.
+        if os.environ.get("MEDAGENT_PLANNER", "differential").strip().lower() == "rule":
+            self.planner = RulePlanner(self)
+        else:
+            from .reasoning import DifferentialPlanner
+
+            self.planner = DifferentialPlanner(self)
         self._turn_pipeline = (
             ("location_revision", self._h_location_revision),
             ("closed_session", self._h_closed_session),

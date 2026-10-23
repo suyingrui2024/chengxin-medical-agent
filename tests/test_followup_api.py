@@ -20,6 +20,7 @@ ANSWERS = {
     "consult_for": ("我自己", "self"),
     "age": ("32岁", None),
     "chief_complaint": ("腹痛两小时", None),
+    "gi_details": ("肚脐周围隐痛", None),
     "emergency_screen": ("都没有", "no"),
     "onset": ("两小时前突然出现", None),
     "trajectory": ("变化不大", "stable"),

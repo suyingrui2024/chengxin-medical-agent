@@ -26,6 +26,7 @@ class TaskInteractionTests(unittest.TestCase):
             "trajectory": ("变化不大", "stable"),
             "severity": ("3分", None),
             "associated_symptoms": ("没有", None),
+            "head_details": ("后脑勺胀痛", None),
             "resp_breathing": ("能正常呼吸", None),
             "resp_cough_details": ("干咳", None),
             "resp_intake": ("能正常喝水吃饭", None),
