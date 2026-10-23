@@ -6346,5 +6346,6 @@
   "corpus": "conclusion-cases",
   "note": "Engineering v0 case set for the conclusion-sheet composer (docs/问诊结论单设计文档.md §8). Fact-scripted cases: each builds a CaseState directly and drives compose_conclusion. NOT clinician-reviewed; phase-B gating requires a clinician-reviewed set (decision D4). Expectations encode the design's disposition/abstention/must-not-miss rules, not clinical ground truth. v1.1 (2026-10-23): +8 cases covering the six new differential pathways (abdominal/headache/dizziness/low-back/urinary/skin); still engineering-grade, clinician OSCE corpus pending (D4).",
   "review_status": "unreviewed",
-  "version": "1.2.0"
+  "version": "1.2.0",
+  "differentials_version": "1.2.0"
 }

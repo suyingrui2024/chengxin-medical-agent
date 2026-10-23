@@ -233,6 +233,7 @@ def run_scenario(scenario, use_differential: bool) -> dict:
         # Confirm the summary closed where the flow offers it.
         if reply.kind == "summary":
             reply = engine.submit(state.session_id, UserInput("确认", "confirm"))
+        planner_name = type(engine.planner).__name__
         workspace = RuleBasedProposer().propose(state)
         target = scenario["target"]
         target_status = (
@@ -242,6 +243,7 @@ def run_scenario(scenario, use_differential: bool) -> dict:
         )
         key_q = scenario["key_question"]
         return {
+            "planner": planner_name,
             "final_kind": reply.kind,
             "risk": state.risk.level.value if state.risk else None,
             "questions": len(asked),
@@ -266,6 +268,17 @@ def main() -> int:
         diff = run_scenario(scenario, use_differential=True)
         row = {"id": scenario["id"], "rule": rule, "differential": diff}
         rows.append(row)
+        # Self-check: the two arms must actually run different
+        # planners (after the default switch they silently ran the
+        # same one once — parity from identical twins proves nothing).
+        if rule["planner"] != "RulePlanner" or diff["planner"] != "DifferentialPlanner":
+            regressions.append(
+                f"{scenario['id']}: arm planners are {rule['planner']}/{diff['planner']}"
+            )
+        if diff["questions"] > rule["questions"] + 2:
+            regressions.append(
+                f"{scenario['id']}: differential asks {diff['questions']} vs rule {rule['questions']}"
+            )
         if (rule["final_kind"], rule["risk"]) != (diff["final_kind"], diff["risk"]):
             regressions.append(f"{scenario['id']}: outcome differs")
         if rule["target_status"] != diff["target_status"]:

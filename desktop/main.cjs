@@ -238,7 +238,7 @@ function startBackend(token) {
       else if (!stopping) {
         dialog.showErrorBox(
           "问诊服务已停止",
-          "请关闭应用后重新打开。内存会谈无法跨进程恢复。",
+          "请关闭应用后重新打开。已结束的会谈与随访已保存在本机，进行中的问诊无法跨进程恢复。",
         );
         app.quit();
       }

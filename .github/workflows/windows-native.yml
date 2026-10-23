@@ -10,8 +10,6 @@ on:
         description: Upload the portable ZIP and installer after a full manual acceptance run
         type: boolean
         default: true
-  push:
-    branches: [windows-native]
 permissions:
   contents: read
 jobs:

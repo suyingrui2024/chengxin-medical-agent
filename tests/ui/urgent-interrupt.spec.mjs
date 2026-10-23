@@ -51,9 +51,7 @@ for (const late of ["response", "error"]) {
       });
       if (late === "error") {
         await page.locator("#new-session").click();
-        await expect(page.locator("#phase-label")).toHaveText(
-          "明确问题",
-        );
+        await expect(page.locator("#phase-label")).toHaveText("明确问题");
       }
       const completed = page.waitForEvent(
         late === "error" ? "requestfailed" : "requestfinished",

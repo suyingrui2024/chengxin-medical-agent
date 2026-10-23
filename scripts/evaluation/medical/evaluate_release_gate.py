@@ -77,6 +77,26 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
     corpus = json.loads(
         (fixtures / "conclusion_cases_v0.json").read_text(encoding="utf-8")
     )
+    # Freshness binding: the corpus must name the differentials version
+    # it was validated against, so a content upgrade cannot leave the
+    # evaluation silently stale behind a green gate.
+    differentials = json.loads(
+        (ROOT / "src" / "medagent" / "content" / "differentials.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    bound_version = corpus.get("differentials_version")
+    if bound_version != differentials.get("version"):
+        print(
+            "conclusion_cases_v0.json: corpus bound to differentials "
+            f"{bound_version!r} but content is {differentials.get('version')!r} -> FAIL"
+        )
+        return False
+    print(
+        "conclusion corpus review_status: "
+        f"{corpus.get('review_status', 'unknown')} "
+        "(engineering gate only — not a clinical sign-off)"
+    )
     total = disposition_hits = mnm_total = mnm_hits = harmful = 0
     for case in corpus["cases"]:
         state, summary = build_state(case)
