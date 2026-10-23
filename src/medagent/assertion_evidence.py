@@ -59,6 +59,52 @@ _NON_ABSENCE = re.compile(
 )
 
 
+def absence_error_guidance(error: str) -> str:
+    """Actionable repair guidance matching each absence_evidence_error reason.
+
+    Every suggestion here satisfies the same checks that produced the error;
+    none of them relaxes the verbatim-quote or assertion contract.
+    """
+    if "不确定的原话不能记为明确否认" in error:
+        return (
+            "修复：把引文扩大到包含完整限定词的患者原话，并改用 assertion=unknown、value=null；"
+            "或先向患者澄清，得到明确否认后再记 absent。"
+        )
+    if "疑问表达不能作为明确否认" in error:
+        return (
+            "修复：引文必须是患者的实际回答而不是问题句；请引用患者回答中的原话，"
+            "患者尚未回答时先提问、不要记录。"
+        )
+    if "否定针对必要性" in error:
+        return (
+            "修复：这类否定不表示「没有该项」，不要记 absent；患者若另有明确否认的原话请改引那一句，"
+            "否则该字段保持缺失或记 unknown。"
+        )
+    if "阴性事实缺少明确否定证据" in error:
+        return (
+            "修复：扩大引文，纳入患者原话中完整的明确否认表达（须含「没有…」「没吃/没用…」「未…」"
+            "「从未…」「否认…」或带具体对象的「无…」等可识别否定，更正既有事实时可引用其原始记录"
+            "轮次的原话）；若患者原话里根本没有明确否认，不要记 absent——叙述型字段可改记 present，"
+            "value 直接原样保留患者这段叙述、不要改写成「没有…」式的否认结论（那样 present 同样会被拒）。"
+        )
+    if "引文所在分句含不确定限定" in error:
+        return (
+            "修复：引文所在分句自带不确定限定，请连同限定一起引用并改记 unknown/null，"
+            "或改引患者另一句明确否认的原话记 absent。"
+        )
+    if "引文所在分句含疑问或否定范围限制" in error:
+        return (
+            "修复：请引用不含疑问或范围限定的完整回答原话；否定范围不清时先澄清，"
+            "不要截取其中的否定词记 absent。"
+        )
+    if "原话紧邻不确定限定" in error:
+        return (
+            "修复：把相邻的限定分句一并纳入引文并改记 unknown/null，"
+            "或先向患者澄清、确认后再记 absent。"
+        )
+    return "修复：请按上方原因调整引文或 assertion 后重提；引文必须逐字出自患者原话。"
+
+
 def has_uncertainty(text: str) -> bool:
     return any(term in text for term in UNCERTAIN_TERMS)
 

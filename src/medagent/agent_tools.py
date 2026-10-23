@@ -6,13 +6,18 @@ from typing import Any, Dict, List
 from .domain import Assertion, CaseState
 from .knowledge import ContentRepository
 from .interpreter import Interpreter
-from .assertion_evidence import absence_evidence_error, has_absence_cue, has_uncertainty
+from .assertion_evidence import (
+    absence_error_guidance,
+    absence_evidence_error,
+    has_absence_cue,
+    has_uncertainty,
+)
 
 
 TOOL_DEFINITIONS = [
     {
         "name": "record_facts",
-        "description": "从本轮原文提议fact_schema中的问诊事实。原子校验整批；每个事实必须附本轮原文的连续引文。体温、部位等observation_fields_read_only由宿主图示处理，不得通过此工具写入。",
+        "description": "从患者原话提议fact_schema中的问诊事实。逐条校验：通过项先写入，未通过项不写入并逐条返回原因与修复指引；只需修正未通过项后单独重提，已写入项不要重复提议（再次提议须correction=true）。每个事实必须附患者原话的连续逐字引文——本轮输入；更正既有事实时也可引用该事实原始记录所在轮次的原话。体温、部位等observation_fields_read_only由宿主图示处理，不得通过此工具写入。",
         "arguments": {
             "facts": [
                 {
@@ -119,8 +124,8 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "review_summary",
-        "description": "展示可核对的事实摘要，询问是否准确。需先处理必要缺口。",
-        "arguments": {},
+        "description": "展示可核对的事实摘要，询问是否准确。需先处理必要缺口；主诉触发的鉴别通路若尚未探明（其细节字段未问/未记且无鉴别证据落账，见 context 的 pathway_exploration），调用会被拒绝：先探明对应细节字段，或确不适用时填写 abstain_reason 说明理由后重提。",
+        "arguments": {"abstain_reason": "optional string; only to close while a triggered pathway is unexplored"},
     },
     {
         "name": "run_capability",
@@ -157,7 +162,22 @@ TOOL_DEFINITIONS = [
 
 
 class ProposalError(ValueError):
-    pass
+    """Validation failure whose message is fed back to the model verbatim.
+
+    ``verdicts`` optionally carries the structured per-item results of a
+    record_facts batch ({"key", "ok", plus "reason"/"guidance"/"evidence"
+    for failures) for callers that want more than the message text.
+    ``accepted`` carries the normalized proposals that passed validation,
+    so a caller implementing partial recording can land exactly those
+    without re-validating (and without ever landing a rejected item).
+    """
+
+    def __init__(
+        self, message: str, verdicts: Any = None, accepted: Any = None
+    ) -> None:
+        super().__init__(message)
+        self.verdicts = verdicts
+        self.accepted = accepted
 
 
 ARGUMENTS = {
@@ -192,9 +212,13 @@ def validate_command(command: Dict[str, Any]) -> None:
         raise ProposalError("工具提议必须仅含 tool 和 arguments")
     name, args = command["tool"], command["arguments"]
     if name not in ARGUMENTS:
-        raise ProposalError("工具未注册，不能执行：" + str(name))
+        raise ProposalError(
+            "工具未注册，不能执行：" + str(name) + "；请只使用工具目录中注册的工具名"
+        )
     optional = (
-        {"answer_fields"}
+        {"abstain_reason"}
+        if name == "review_summary"
+        else {"answer_fields"}
         if name == "clarify"
         else {"other_label", "other_placeholder"}
         if name == "ask_patient"
@@ -205,7 +229,239 @@ def validate_command(command: Dict[str, Any]) -> None:
         else set()
     )
     if not ARGUMENTS[name] <= set(args) or set(args) - ARGUMENTS[name] - optional:
-        raise ProposalError("工具参数未满足注册定义")
+        missing = sorted(ARGUMENTS[name] - set(args))
+        extra = sorted(set(args) - ARGUMENTS[name] - optional)
+        detail = []
+        if missing:
+            detail.append("缺少参数：" + "、".join(missing))
+        if extra:
+            detail.append("未注册的参数：" + "、".join(extra))
+        raise ProposalError(
+            "工具参数未满足注册定义（" + "；".join(detail) + "），请按注册定义补齐后重提"
+        )
+
+
+class _ItemRejection(Exception):
+    """One proposal item's failure: a reason plus repair guidance."""
+
+    def __init__(self, reason: str, guidance: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
+        self.guidance = guidance
+
+
+def _evidence_sources(
+    state: CaseState, raw_text: str, key: str, correction: bool
+) -> List[str]:
+    """Texts a quote may verbatim come from, current turn first.
+
+    Verbatim-ness is never relaxed. The only widening is turn scope, and only
+    for a correction: besides the current input, the patient turn that
+    originally produced the fact being corrected (located via the recorded
+    evidence in the transcript, falling back to the recorded evidence
+    itself). Quotes from other turns stay invalid, so a superseded fact
+    cannot be resurrected by re-quoting its stale source turn.
+    """
+    sources = [raw_text]
+    if correction:
+        existing = state.facts.get(key)
+        if existing is not None and existing.evidence:
+            for entry in state.transcript or []:
+                if (
+                    isinstance(entry, dict)
+                    and entry.get("role") == "user"
+                    and isinstance(entry.get("content"), str)
+                    and existing.evidence in entry["content"]
+                    and entry["content"] not in sources
+                ):
+                    sources.append(entry["content"])
+            if existing.evidence not in sources:
+                sources.append(existing.evidence)
+    return sources
+
+
+def _validate_item(
+    fields: Dict[str, Any],
+    state: CaseState,
+    raw_text: str,
+    item: Any,
+    seen: set,
+) -> Dict[str, Any]:
+    """Validate one proposal item; raise _ItemRejection on its first failure."""
+    if not isinstance(item, dict):
+        raise _ItemRejection(
+            "事实项必须是包含 key/value/assertion/evidence 的对象",
+            "修复：把每一项写成 {key, value, assertion, evidence} 对象，不要用字符串或数组代替。",
+        )
+    extra = set(item) - {"key", "value", "assertion", "evidence", "correction"}
+    if extra:
+        raise _ItemRejection(
+            "事实包含未允许的属性：" + "、".join(sorted(extra)),
+            "修复：事实项只允许 key、value、assertion、evidence、correction 五个属性，请删掉多余属性后重提。",
+        )
+    key, value = item.get("key"), item.get("value")
+    if not isinstance(key, str) or key not in fields:
+        raise _ItemRejection(
+            "字段必须已注册：" + (key if isinstance(key, str) else repr(key)),
+            "修复：key 只能使用 fact_schema 中已注册的字段名，不要自创字段；不确定时先 inspect_case 查看已注册字段。",
+        )
+    if key in seen:
+        raise _ItemRejection(
+            "字段在本批次内重复提议",
+            "修复：同一批次内同一字段只能出现一次，请把该字段的信息合并成一项再提。",
+        )
+    seen.add(key)
+    correction = item.get("correction") is True
+    evidence = item.get("evidence")
+    source = None
+    if isinstance(evidence, str) and evidence.strip():
+        for candidate in _evidence_sources(state, raw_text, key, correction):
+            if evidence in candidate:
+                source = candidate
+                break
+    if source is None:
+        raise _ItemRejection(
+            "evidence 必须是本轮输入的连续原文，不能虚构引文",
+            "修复：从患者原话中逐字复制一段连续文字作为 evidence，不要改字、删字或跨句拼接；"
+            "更正既有事实时也可引用该事实原始记录所在轮次的患者原话（须 correction=true），"
+            "其他轮次的原话不能用作新事实的引文。",
+        )
+    try:
+        assertion = Assertion(item.get("assertion"))
+    except (ValueError, TypeError) as exc:
+        raise _ItemRejection(
+            "assertion 无效：" + repr(item.get("assertion")),
+            "修复：assertion 只能是 present、absent、unknown 之一。",
+        ) from exc
+    if assertion == Assertion.UNKNOWN and not has_uncertainty(evidence):
+        raise _ItemRejection(
+            "未知必须引用患者明确表示不知道或无法确认的原文；未提及的字段应保持缺失并继续询问",
+            "修复：患者明确说不知道、记不清时，引文须包含这类原话才可记 unknown；"
+            "患者根本没提到的字段不要提议该项，保持缺失并继续提问。",
+        )
+    if assertion == Assertion.ABSENT:
+        error = absence_evidence_error(source, evidence)
+        if error:
+            raise _ItemRejection(error, absence_error_guidance(error))
+    if fields[key].input == "yes_no_unknown":
+        uncertain = has_uncertainty(evidence)
+        negative = any(phrase in evidence for phrase in ("没有", "没", "无", "否认", "不"))
+        if uncertain and assertion != Assertion.UNKNOWN:
+            raise _ItemRejection(
+                "不确定的筛查不能写成阳性或阴性，请使用 unknown/null",
+                "修复：引文含不确定表达时只能记 unknown、value=null；要记阳性或阴性，先澄清得到明确回答。",
+            )
+        if assertion == Assertion.PRESENT and negative:
+            raise _ItemRejection(
+                "筛查引文含否定，不能作为阳性确认；请核对否定范围",
+                "修复：请核对否定词的范围——患者否认该筛查项时按阴性证据要求记 absent，范围不清时先澄清，不要记 present。",
+            )
+        if assertion == Assertion.ABSENT:
+            collective = evidence.strip(" 。！!，,") in {"没有", "无", "否认", "全无"} or any(
+                phrase in evidence
+                for phrase in (
+                    "都没有",
+                    "均没有",
+                    "均无",
+                    "全部没有",
+                    "没有上述",
+                    "没有这些",
+                    "没有危险信号",
+                    "没有紧急",
+                    "无上述",
+                    "否认上述",
+                    "否认这些",
+                    "没有以上",
+                )
+            )
+            if not collective:
+                raise _ItemRejection(
+                    "否认单项或其他事情不能视为全部急症筛查阴性，请澄清或保留未知",
+                    "修复：整个筛查记 absent 必须引用患者对全部筛查项目的整体否认原话（如「都没有」"
+                    "「没有这些」）；只否认单项时不要记整个筛查为 absent，可保留未知并逐项澄清。",
+                )
+    if key in state.facts and not correction:
+        raise _ItemRejection(
+            "覆盖已有事实必须显式声明 correction=true",
+            "修复：确认要覆盖该字段时，在该项加 correction=true，并给出支持新结论的引文"
+            "（可引用该事实原始记录轮次的原话）；不修改就不要重复提议该字段。",
+        )
+    if assertion != Assertion.PRESENT:
+        if value is not None:
+            raise _ItemRejection(
+                "unknown/absent 的 value 必须为 null",
+                "修复：absent/unknown 时把 value 改为 null；叙述内容请改记 present（并满足引文要求）或直接去掉该项。",
+            )
+        if assertion == Assertion.ABSENT and fields[key].input not in {
+            "text_or_absent",
+            "yes_no_unknown",
+        }:
+            raise _ItemRejection(
+                "该字段不支持阴性；无法确认时使用 unknown",
+                "修复：该字段只能记 present 或 unknown；无法确认时用 unknown/null，不要记 absent。",
+            )
+    else:
+        question = fields[key]
+        if question.input == "age":
+            if type(value) not in (int, float) or not 0 <= value <= 120:
+                raise _ItemRejection(
+                    "年龄必须是 0 到 120 的岁数值",
+                    "修复：value 填患者原话中的岁数数值（0–120），不要推算或换算。",
+                )
+            parsed = Interpreter().interpret(question, evidence).value
+            if type(parsed) not in (int, float) or abs(parsed - value) > 0.002:
+                raise _ItemRejection(
+                    "年龄数值与原文不一致",
+                    "修复：使 value 等于引文中出现的岁数，并确保引文包含该数字的患者原话。",
+                )
+        elif question.input == "severity" and type(value) in (int, float):
+            if not 0 <= value <= 10:
+                raise _ItemRejection(
+                    "评分必须在 0 到 10",
+                    "修复：严重度 value 必须是 0–10 之间的数值，按患者原话填写。",
+                )
+        elif question.input == "yes_no_unknown":
+            if value is not True:
+                raise _ItemRejection(
+                    "阳性急症筛查只能为 true；阴性用 absent/null",
+                    "修复：阳性时 value 只能为 true；阴性请改用 assertion=absent、value=null，不要用 false。",
+                )
+        elif question.input == "choice":
+            if not isinstance(value, str) or value not in {
+                o.value for o in question.options if o.value != "unknown"
+            }:
+                raise _ItemRejection(
+                    "枚举字段值未注册",
+                    "修复：value 必须是该字段的注册选项值之一，不要自创；不确定选哪项时改记 unknown 或先查看候选。",
+                )
+        elif not isinstance(value, str) or not value.strip() or len(value) > 2000:
+            raise _ItemRejection(
+                "文本字段必须是非空短文本",
+                "修复：value 须是基于患者原话的非空叙述（不超过 2000 字），不要留空或用数字代替。",
+            )
+        if question.input == "text_or_absent":
+            if has_uncertainty(evidence) and not has_uncertainty(value):
+                raise _ItemRejection(
+                    "文本叙述必须保留引文中的不确定限定，或使用 unknown/null；不能规范化为已确认结论。",
+                    "修复：把 value 改成保留原话限定词的叙述（原样带上「好像、应该、记不清」等限定），"
+                    "或改用 assertion=unknown、value=null；临床归纳时不要丢掉限定词。",
+                )
+            if has_absence_cue(value) and not has_uncertainty(value):
+                error = absence_evidence_error(source, evidence)
+                if error:
+                    raise _ItemRejection(
+                        "不能借 present 文本写入未确认的否认：" + error,
+                        "修复：二选一——①改记 absent（value=null），引文按阴性证据要求处理："
+                        + absence_error_guidance(error)
+                        + "②保留 present 时，从 value 中删去引文不支持的否认结论，只写引文明确肯定的内容。",
+                    )
+    return {
+        "key": key,
+        "value": value,
+        "assertion": assertion,
+        "evidence": evidence,
+        "correction": correction,
+    }
 
 
 def validate_proposals(
@@ -215,111 +471,43 @@ def validate_proposals(
         raise ProposalError("facts 必须是 1 到 20 项的数组")
     fields = {q.fact_key: q for q in content.questions}
     output = []
-    seen = set()
-    for item in proposals:
-        if not isinstance(item, dict) or set(item) - {
-            "key",
-            "value",
-            "assertion",
-            "evidence",
-            "correction",
-        }:
-            raise ProposalError("事实包含未允许的属性")
-        key, value = item.get("key"), item.get("value")
-        if not isinstance(key, str) or key not in fields or key in seen:
-            raise ProposalError("字段必须已注册且在本批次内唯一")
-        seen.add(key)
-        evidence = item.get("evidence")
-        if (
-            not isinstance(evidence, str)
-            or not evidence.strip()
-            or evidence not in raw_text
-        ):
-            raise ProposalError("evidence 必须是本轮输入的连续原文，不能虚构引文")
-        try:
-            assertion = Assertion(item.get("assertion"))
-        except (ValueError, TypeError) as exc:
-            raise ProposalError("assertion 无效") from exc
-        if assertion == Assertion.UNKNOWN and not has_uncertainty(evidence):
-            raise ProposalError("未知必须引用患者明确表示不知道或无法确认的原文；未提及的字段应保持缺失并继续询问")
-        if assertion == Assertion.ABSENT:
-            error = absence_evidence_error(raw_text, evidence)
-            if error:
-                raise ProposalError(error)
-        if fields[key].input == "yes_no_unknown":
-            uncertain = has_uncertainty(evidence)
-            negative = any(phrase in evidence for phrase in ("没有", "没", "无", "否认", "不"))
-            if uncertain and assertion != Assertion.UNKNOWN:
-                raise ProposalError("不确定的筛查不能写成阳性或阴性，请使用 unknown/null")
-            if assertion == Assertion.PRESENT and negative:
-                raise ProposalError("筛查引文含否定，不能作为阳性确认；请核对否定范围")
-            if assertion == Assertion.ABSENT:
-                collective = evidence.strip(" 。！!，,") in {"没有", "无", "否认", "全无"} or any(
-                    phrase in evidence
-                    for phrase in (
-                        "都没有",
-                        "均没有",
-                        "均无",
-                        "全部没有",
-                        "没有上述",
-                        "没有这些",
-                        "没有危险信号",
-                        "没有紧急",
-                        "无上述",
-                        "否认上述",
-                        "否认这些",
-                        "没有以上",
-                    )
-                )
-                if not collective:
-                    raise ProposalError("否认单项或其他事情不能视为全部急症筛查阴性，请澄清或保留未知")
-        if key in state.facts and item.get("correction") is not True:
-            raise ProposalError("覆盖已有事实必须显式声明 correction=true")
-        if assertion != Assertion.PRESENT:
-            if value is not None:
-                raise ProposalError("unknown/absent 的 value 必须为 null")
-            if assertion == Assertion.ABSENT and fields[key].input not in {
-                "text_or_absent",
-                "yes_no_unknown",
-            }:
-                raise ProposalError("该字段不支持阴性；无法确认时使用 unknown")
-        else:
-            question = fields[key]
-            if question.input == "age":
-                if type(value) not in (int, float) or not 0 <= value <= 120:
-                    raise ProposalError("年龄必须是 0 到 120 的岁数值")
-                parsed = Interpreter().interpret(question, evidence).value
-                if type(parsed) not in (int, float) or abs(parsed - value) > 0.002:
-                    raise ProposalError("年龄数值与原文不一致")
-            elif question.input == "severity" and type(value) in (int, float):
-                if not 0 <= value <= 10:
-                    raise ProposalError("评分必须在 0 到 10")
-            elif question.input == "yes_no_unknown":
-                if value is not True:
-                    raise ProposalError("阳性急症筛查只能为 true；阴性用 absent/null")
-            elif question.input == "choice":
-                if not isinstance(value, str) or value not in {
-                    o.value for o in question.options if o.value != "unknown"
-                }:
-                    raise ProposalError("枚举字段值未注册")
-            elif not isinstance(value, str) or not value.strip() or len(value) > 2000:
-                raise ProposalError("文本字段必须是非空短文本")
-            if question.input == "text_or_absent":
-                if has_uncertainty(evidence) and not has_uncertainty(value):
-                    raise ProposalError(
-                        "文本叙述必须保留引文中的不确定限定，或使用 unknown/null；不能规范化为已确认结论。"
-                    )
-                if has_absence_cue(value) and not has_uncertainty(value):
-                    error = absence_evidence_error(raw_text, evidence)
-                    if error:
-                        raise ProposalError("不能借 present 文本写入未确认的否认：" + error)
-        output.append(
-            {
-                "key": key,
-                "value": value,
-                "assertion": assertion,
-                "evidence": evidence,
-                "correction": item.get("correction") is True,
-            }
+    verdicts: List[Dict[str, Any]] = []
+    seen: set = set()
+    for index, item in enumerate(proposals):
+        label = (
+            item["key"]
+            if isinstance(item, dict) and isinstance(item.get("key"), str)
+            else f"第{index + 1}项"
         )
+        try:
+            output.append(_validate_item(fields, state, raw_text, item, seen))
+        except _ItemRejection as rejection:
+            verdicts.append(
+                {
+                    "key": label,
+                    "ok": False,
+                    "reason": rejection.reason,
+                    "guidance": rejection.guidance,
+                    "evidence": item.get("evidence") if isinstance(item, dict) else None,
+                }
+            )
+        else:
+            verdicts.append({"key": label, "ok": True})
+    failed = [verdict for verdict in verdicts if not verdict["ok"]]
+    if failed:
+        lines = [
+            f"record_facts 整批校验未通过（共 {len(verdicts)} 项：通过 {len(verdicts) - len(failed)} 项、"
+            f"未通过 {len(failed)} 项）。整批为原子校验，未通过项修正前一条都不会写入；"
+            "请按下述逐条指引修正后整批重提，已通过项保持原样一并重提。逐条结果："
+        ]
+        for verdict in verdicts:
+            if verdict["ok"]:
+                lines.append(f"- 「{verdict['key']}」✓ 通过")
+            else:
+                line = f"- 「{verdict['key']}」✗ 未通过：{verdict['reason']}"
+                if isinstance(verdict.get("evidence"), str) and verdict["evidence"]:
+                    line += f"（问题引文：「{verdict['evidence'][:80]}」）"
+                line += "。" + verdict["guidance"]
+                lines.append(line)
+        raise ProposalError("\n".join(lines), verdicts=verdicts, accepted=output)
     return output
