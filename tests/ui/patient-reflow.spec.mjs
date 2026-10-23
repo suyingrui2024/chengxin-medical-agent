@@ -115,8 +115,13 @@ test("severity choices and explicit confirmation retain their draft on a short s
   await expect(input).toHaveValue("这段原话还没有发送");
   expect(await degreeSnapshot(page, id)).toEqual(before);
   await page.getByRole("button", { name: "确认 3 分", exact: true }).click();
-  await expect(page.locator("#active-question h2")).toBeFocused();
-  const bounds = await page.locator("#active-question h2").boundingBox();
+  // Under the differential planner every history question may already
+  // be answered when severity confirms, so the next step can be the
+  // self-check task offer instead of another question; either way its
+  // heading takes focus inside the short screen.
+  const heading = page.locator("#active-question h2, #active-task h3").first();
+  await expect(heading).toBeFocused();
+  const bounds = await heading.boundingBox();
   expect(bounds.y).toBeGreaterThanOrEqual(-1);
   expect(bounds.y + bounds.height).toBeLessThanOrEqual(325);
 });

@@ -22,8 +22,41 @@ export async function reachDegree(page, { complaint = "头疼" } = {}) {
   await answer("32岁");
   await answer(complaint);
   await page.getByRole("button", { name: "都没有", exact: true }).click();
-  await answer("昨天逐渐出现");
-  await page.getByRole("button", { name: "变化不大", exact: true }).click();
+  // The differential planner orders the history phase by discrimination
+  // value, not bank order: answer whatever is asked until the severity
+  // scale appears, instead of assuming onset → trajectory → severity.
+  const textAnswers = {
+    onset: "昨天逐渐出现",
+    associated_symptoms: "没有其他不适",
+    head_details: "后脑勺胀痛",
+    resp_breathing: "呼吸正常",
+    resp_cough_details: "没有咳嗽",
+    resp_intake: "能正常喝水吃饭",
+    gi_details: "肚脐周围隐痛",
+    dizzy_details: "没有",
+    back_details: "没有",
+    urinary_details: "没有",
+    skin_details: "没有",
+  };
+  for (let step = 0; step < 12; step++) {
+    if (await page.locator("#active-question .severity-scale").isVisible())
+      break;
+    const snapshot = await degreeSnapshot(page, id);
+    const question = snapshot.events
+      .filter((e) => e.event_type === "turn.agent_reply")
+      .at(-1).payload.reply.question_id;
+    if (question === "severity") break;
+    if (question === "trajectory") {
+      await page.getByRole("button", { name: "变化不大", exact: true }).click();
+      await expect(page.locator("#send-button")).toBeEnabled();
+      continue;
+    }
+    expect(
+      textAnswers[question],
+      `Expected a known synthetic answer for ${question}`,
+    ).toBeDefined();
+    await answer(textAnswers[question]);
+  }
   await expect(page.locator("#active-question .severity-scale")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "先选择分数", exact: true }),

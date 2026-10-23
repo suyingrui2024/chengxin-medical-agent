@@ -6,13 +6,22 @@ export async function reachSelfCheck(page, complaint = "头疼") {
   const id = await reachDegree(page, { complaint });
   await page.getByRole("button", { name: "3 分", exact: true }).click();
   await page.getByRole("button", { name: "确认 3 分", exact: true }).click();
-  await page.getByRole("textbox", { name: "输入你的描述" }).fill("没有");
-  await page.getByRole("button", { name: "发送回答" }).click();
   await expect(page.locator("#send-button")).toBeEnabled();
+  // History-phase questions are answered inside reachDegree now; what
+  // remains before the task offer depends on the planner's ordering, so
+  // keep answering by question id until a task is offered.
   const answers = {
+    onset: "昨天逐渐出现",
     resp_breathing: "能正常呼吸",
     resp_cough_details: "干咳",
     resp_intake: "能正常喝水吃饭",
+    gi_details: "肚脐周围隐痛",
+    head_details: "后脑勺胀痛",
+    dizzy_details: "没有",
+    back_details: "没有",
+    urinary_details: "没有",
+    skin_details: "没有",
+    associated_symptoms: "没有",
     medications_taken: "没有",
     allergies: "没有",
     relevant_history: "没有",
@@ -27,6 +36,13 @@ export async function reachSelfCheck(page, complaint = "头疼") {
     const question = snapshot.events
       .filter((e) => e.event_type === "turn.agent_reply")
       .at(-1).payload.reply.question_id;
+    if (question === "trajectory") {
+      // Severity can now precede trajectory under the differential
+      // planner; trajectory is a choice question, answered by button.
+      await page.getByRole("button", { name: "变化不大", exact: true }).click();
+      await expect(page.locator("#send-button")).toBeEnabled();
+      continue;
+    }
     expect(
       answers[question],
       `Expected a known synthetic answer for ${question}`,
