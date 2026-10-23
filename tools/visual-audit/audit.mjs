@@ -308,6 +308,11 @@ const TREE = [
     run: async (p) => {
       await p.clickText("我自己", { exact: true });
       await p.waitFor(
+        `[...document.querySelectorAll("button")].some(b => b.innerText.trim() === "女")`,
+        "性别选项",
+      );
+      await p.clickText("女", { exact: true });
+      await p.waitFor(
         `document.querySelector("#message-input") && !document.querySelector("#message-input").disabled`,
         "年龄输入",
       );
@@ -347,11 +352,28 @@ const TREE = [
     },
   },
   {
+    id: "consult-associated",
+    branch: "问诊/进行问诊",
+    title: "伴随症状",
+    run: async (p) => {
+      await p.clickText("都没有");
+      await p.waitFor(
+        `(document.querySelector("#active-question") || {}).innerText?.includes("其他不舒服") || (document.querySelector("#active-question") || {}).innerText?.includes("伴随")`,
+        "伴随症状问题",
+      );
+    },
+    after: async (p) => {
+      await p.typeAndSend("没有");
+      await sleep(500);
+    },
+  },
+  {
     id: "consult-onset",
     branch: "问诊/进行问诊",
     title: "发病（视觉问答）",
     run: async (p) => {
-      await p.clickText("都没有");
+      // 伴随症状之后先是头痛定向细节题，答完才到发病步
+      await p.typeAndSend("前额胀痛，慢慢加重的，没有呕吐，没有怕光怕吵");
       await p.waitFor(
         `(document.querySelector("#active-question h2") || {}).innerText?.includes("什么时候开始")`,
         "发病问题",
@@ -396,21 +418,6 @@ const TREE = [
       })()`);
       await sleep(400);
       await p.clickText("确认", { scope: "#active-question" }).catch(() => {});
-      await sleep(500);
-    },
-  },
-  {
-    id: "consult-associated",
-    branch: "问诊/进行问诊",
-    title: "伴随症状",
-    run: async (p) => {
-      await p.waitFor(
-        `(document.querySelector("#active-question") || {}).innerText?.includes("其他不舒服") || (document.querySelector("#active-question") || {}).innerText?.includes("伴随")`,
-        "伴随症状问题",
-      );
-    },
-    after: async (p) => {
-      await p.typeAndSend("没有");
       await sleep(500);
     },
   },
@@ -566,6 +573,11 @@ const TREE = [
       );
       await p.clickSel("#start-consultation");
       await p.clickText("我自己", { exact: true });
+      await p.waitFor(
+        `[...document.querySelectorAll("button")].some(b => b.innerText.trim() === "女")`,
+        "性别选项",
+      );
+      await p.clickText("女", { exact: true });
       await p.waitFor(
         `document.querySelector("#message-input") && !document.querySelector("#message-input").disabled`,
         "年龄输入",
