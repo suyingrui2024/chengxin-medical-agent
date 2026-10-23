@@ -1,1 +1,325 @@
-{"groups":[{"avoid":["不要自行服用抗生素"],"course":null,"do":["多休息，避免劳累","适量喝水","把症状变化记下来，就诊时告诉医生"],"id":"generic_routine","match":"generic","measure":[],"reviewed_at":"2026-10-22","reviewed_by":"engineering-v1","tier":"routine"},{"avoid":["不要在家自行处理耽误就诊"],"course":null,"do":["尽快前往医疗机构当面评估"],"id":"generic_urgent","match":"generic","measure":[],"reviewed_at":"2026-10-22","reviewed_by":"engineering-v1","tier":"urgent"},{"avoid":["不要自行服用抗生素","不要叠加服用多种感冒药"],"course":"这类情况通常 3–5 天逐渐缓解","do":["多休息，多喝水","保持室内空气流通","把症状变化记下来，就诊时告诉医生"],"id":"respiratory_routine","match":"respiratory","measure":["今晚再测一次体温并记录"],"reviewed_at":"2026-10-22","reviewed_by":"engineering-v1","tier":"routine"},{"avoid":["不要在家自行处理耽误就诊"],"course":null,"do":["尽快前往医疗机构当面评估","保持安静休息，避免用力活动"],"id":"respiratory_urgent","match":"respiratory","measure":[],"reviewed_at":"2026-10-22","reviewed_by":"engineering-v1","tier":"urgent"},{"avoid":["不要在家自行处理耽误就诊","不要自行开车前往"],"course":null,"do":["保持安静休息，尽快前往医疗机构","尽量请他人陪同前往"],"id":"chest_urgent","match":"chest","measure":[],"reviewed_at":"2026-10-22","reviewed_by":"engineering-v1","tier":"urgent"},{"avoid":["不要自行服用抗生素","胸痛再次发作时不要忍着观察，立即就医"],"course":null,"do":["多休息，避免劳累","把胸痛发作的时间和诱因记下来，就诊时告诉医生"],"id":"chest_routine","match":"chest","measure":[],"reviewed_at":"2026-10-22","reviewed_by":"engineering-v1","tier":"routine"}],"note":"Self-care content for the conclusion sheet (docs/问诊结论单设计文档.md §5.5). Engineering v1: generic and respiratory/chest groups written against the same risk bar as the already-live care-route copy; every group carries review metadata and pathway-specific groups require clinician review before the directions layer opens to patients (phase B). Groups are matched by (match, tier): match is a pathway group key derived from the accepted hypothesis workspace, or 'generic'. Entries with empty reviewed_by are treated as absent at runtime.","version":"1.0"}
+{
+  "groups": [
+    {
+      "avoid": [
+        "不要自行服用抗生素"
+      ],
+      "course": null,
+      "do": [
+        "多休息，避免劳累",
+        "适量喝水",
+        "把症状变化记下来，就诊时告诉医生"
+      ],
+      "id": "generic_routine",
+      "match": "generic",
+      "measure": [],
+      "reviewed_at": "2026-10-22",
+      "reviewed_by": "engineering-v1",
+      "tier": "routine"
+    },
+    {
+      "avoid": [
+        "不要在家自行处理耽误就诊"
+      ],
+      "course": null,
+      "do": [
+        "尽快前往医疗机构当面评估"
+      ],
+      "id": "generic_urgent",
+      "match": "generic",
+      "measure": [],
+      "reviewed_at": "2026-10-22",
+      "reviewed_by": "engineering-v1",
+      "tier": "urgent"
+    },
+    {
+      "avoid": [
+        "不要自行服用抗生素",
+        "不要叠加服用多种感冒药"
+      ],
+      "course": "这类情况通常 3–5 天逐渐缓解",
+      "do": [
+        "多休息，多喝水",
+        "保持室内空气流通",
+        "把症状变化记下来，就诊时告诉医生"
+      ],
+      "id": "respiratory_routine",
+      "match": "respiratory",
+      "measure": [
+        "今晚再测一次体温并记录"
+      ],
+      "reviewed_at": "2026-10-22",
+      "reviewed_by": "engineering-v1",
+      "tier": "routine"
+    },
+    {
+      "avoid": [
+        "不要在家自行处理耽误就诊"
+      ],
+      "course": null,
+      "do": [
+        "尽快前往医疗机构当面评估",
+        "保持安静休息，避免用力活动"
+      ],
+      "id": "respiratory_urgent",
+      "match": "respiratory",
+      "measure": [],
+      "reviewed_at": "2026-10-22",
+      "reviewed_by": "engineering-v1",
+      "tier": "urgent"
+    },
+    {
+      "avoid": [
+        "不要在家自行处理耽误就诊",
+        "不要自行开车前往"
+      ],
+      "course": null,
+      "do": [
+        "保持安静休息，尽快前往医疗机构",
+        "尽量请他人陪同前往"
+      ],
+      "id": "chest_urgent",
+      "match": "chest",
+      "measure": [],
+      "reviewed_at": "2026-10-22",
+      "reviewed_by": "engineering-v1",
+      "tier": "urgent"
+    },
+    {
+      "avoid": [
+        "不要自行服用抗生素",
+        "胸痛再次发作时不要忍着观察，立即就医"
+      ],
+      "course": null,
+      "do": [
+        "多休息，避免劳累",
+        "把胸痛发作的时间和诱因记下来，就诊时告诉医生"
+      ],
+      "id": "chest_routine",
+      "match": "chest",
+      "measure": [],
+      "reviewed_at": "2026-10-22",
+      "reviewed_by": "engineering-v1",
+      "tier": "routine"
+    },
+    {
+      "id": "abdominal_routine",
+      "match": "abdominal",
+      "tier": "routine",
+      "do": [
+        "少量多次喝水，先吃清淡易消化的食物",
+        "把疼痛的部位、程度和变化记下来"
+      ],
+      "avoid": [
+        "不要自行服用抗生素",
+        "不要用止痛药掩盖症状后拖延观察"
+      ],
+      "measure": [
+        "留意体温、呕吐和排便情况，有变化随时记录"
+      ],
+      "course": "这类情况通常 1–2 天内会有变化，持续加重就不属于居家观察范围",
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "abdominal_urgent",
+      "match": "abdominal",
+      "tier": "urgent",
+      "do": [
+        "尽快前往医疗机构当面评估"
+      ],
+      "avoid": [
+        "不要在家自行处理耽误就诊",
+        "不要进食大量食物或饮水，等待医生评估"
+      ],
+      "measure": [
+        "记录疼痛从哪里开始、是否转移到右下腹"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "headache_routine",
+      "match": "headache",
+      "tier": "routine",
+      "do": [
+        "在安静、光线柔和的环境休息",
+        "适量喝水，避免熬夜和长时间看屏幕"
+      ],
+      "avoid": [
+        "不要叠加服用多种止痛药",
+        "不要自行长期服用止痛药"
+      ],
+      "measure": [
+        "记录头痛部位、程度和持续时间"
+      ],
+      "course": "这类头痛通常休息后可缓解；若发作方式和以前明显不同，需要当面评估",
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "headache_urgent",
+      "match": "headache",
+      "tier": "urgent",
+      "do": [
+        "尽快前往医疗机构当面评估"
+      ],
+      "avoid": [
+        "不要在家自行处理耽误就诊"
+      ],
+      "measure": [
+        "记录头痛开始的时间和达到最剧烈的时间"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "dizziness_routine",
+      "match": "dizziness",
+      "tier": "routine",
+      "do": [
+        "起身、转头时动作放慢，先扶稳再站立",
+        "记得喝水和正常进食，不要空腹久站"
+      ],
+      "avoid": [
+        "头晕未缓解前不要开车或登高",
+        "不要自行服用降压药调整剂量"
+      ],
+      "measure": [
+        "记录头晕和姿势变化的关系、每次持续多久"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "dizziness_urgent",
+      "match": "dizziness",
+      "tier": "urgent",
+      "do": [
+        "不要独处，尽快由家人陪同前往医疗机构"
+      ],
+      "avoid": [
+        "不要在家自行处理耽误就诊"
+      ],
+      "measure": [
+        "记录是否伴走路不稳、说话不清或肢体无力"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "back_routine",
+      "match": "back",
+      "tier": "routine",
+      "do": [
+        "保持适度活动，避免久卧不动",
+        "疼痛明显时可短时休息，避免搬重物和剧烈扭转"
+      ],
+      "avoid": [
+        "不要自行大力按摩或正骨",
+        "不要长期卧床"
+      ],
+      "measure": [
+        "记录疼痛是否窜到腿上、腿有没有麻木无力"
+      ],
+      "course": "这类腰痛多数在 1–2 周内逐渐缓解",
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "back_urgent",
+      "match": "back",
+      "tier": "urgent",
+      "do": [
+        "尽快前往医疗机构当面评估"
+      ],
+      "avoid": [
+        "不要在家自行处理耽误就诊"
+      ],
+      "measure": [
+        "记录大小便和会阴感觉有无异常"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "urinary_routine",
+      "match": "urinary",
+      "tier": "routine",
+      "do": [
+        "多喝水、勤排尿，不要憋尿",
+        "注意会阴清洁"
+      ],
+      "avoid": [
+        "不要自行服用抗生素",
+        "不要用偏方冲洗"
+      ],
+      "measure": [
+        "记录排尿次数、尿色和体温变化"
+      ],
+      "course": "这类情况通常需要化验尿常规确认，用药请遵医嘱",
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "urinary_urgent",
+      "match": "urinary",
+      "tier": "urgent",
+      "do": [
+        "尽快前往医疗机构当面评估"
+      ],
+      "avoid": [
+        "不要在家自行处理耽误就诊"
+      ],
+      "measure": [
+        "记录体温和腰痛出现的时间"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "skin_routine",
+      "match": "skin",
+      "tier": "routine",
+      "do": [
+        "保持患处清洁干燥，避免抓挠",
+        "回忆并避开最近新接触的药物、食物和用品"
+      ],
+      "avoid": [
+        "不要自行涂抹激素药膏或乱用偏方",
+        "不要抓破皮肤"
+      ],
+      "measure": [
+        "记录皮疹范围变化，可拍照留存对比"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "skin_urgent",
+      "match": "skin",
+      "tier": "urgent",
+      "do": [
+        "尽快前往医疗机构当面评估"
+      ],
+      "avoid": [
+        "不要在家自行处理耽误就诊"
+      ],
+      "measure": [
+        "记录皮疹扩散范围和是否出现水疱"
+      ],
+      "course": null,
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-23"
+    }
+  ],
+  "note": "Self-care content for the conclusion sheet (docs/问诊结论单设计文档.md §5.5). Engineering v1: generic and respiratory/chest groups written against the same risk bar as the already-live care-route copy; every group carries review metadata and pathway-specific groups require clinician review before the directions layer opens to patients (phase B). Groups are matched by (match, tier): match is a pathway group key derived from the accepted hypothesis workspace, or 'generic'. Entries with empty reviewed_by are treated as absent at runtime.",
+  "version": "1.0"
+}

@@ -62,6 +62,25 @@ PATHWAY_GROUPS = {
     "influenza_like": "respiratory",
     "acs_possible": "chest",
     "non_cardiac_chest": "chest",
+    "appendicitis": "abdominal",
+    "gastroenteritis": "abdominal",
+    "gi_bleed": "abdominal",
+    "functional_dyspepsia": "abdominal",
+    "meningitis_possible": "headache",
+    "thunderclap_headache": "headache",
+    "migraine_tension": "headache",
+    "bppv": "dizziness",
+    "posterior_stroke": "dizziness",
+    "orthostatic": "dizziness",
+    "mechanical_back": "back",
+    "radiculopathy": "back",
+    "cauda_serious": "back",
+    "cystitis": "urinary",
+    "pyelonephritis": "urinary",
+    "urinary_stone": "urinary",
+    "urticaria": "skin",
+    "dermatitis": "skin",
+    "skin_infection": "skin",
 }
 
 PRIOR_RANK = {"high": 3, "medium": 2, "low": 1}
@@ -71,6 +90,12 @@ GAP_IMPACTS = {
     "severity": "难受程度会影响对紧急程度的判断",
     "trajectory": "变化趋势会影响对病情走向的判断",
     "resp_breathing": "呼吸情况会影响对严重程度的判断",
+    "gi_details": "腹痛的部位和性质会影响对腹部急症的判断",
+    "head_details": "头痛的发作方式和伴随表现会影响对颅内急症的判断",
+    "dizzy_details": "头晕的类型和伴随表现会影响对脑部供血问题的判断",
+    "back_details": "腰痛是否影响腿部和大小便会影响对腰椎严重问题的判断",
+    "urinary_details": "排尿表现和尿色会影响对尿路感染部位的判断",
+    "skin_details": "皮疹的形态和诱因会影响对过敏与感染的判断",
 }
 DEFAULT_GAP_IMPACT = "这项信息会影响判断"
 
@@ -159,13 +184,23 @@ def _select_directions(accepted) -> tuple[List[Dict[str, Any]], bool]:
         and h.status == "unlikely"
         and h.evidence_for
     ]
+    # Supported rule-outs outrank merely-active ones, and red-flag linkage
+    # breaks ties — a strongly evidenced serious hypothesis must never be
+    # crowded out by weakly evidenced ones (febrile-headache case, 2026-10-23).
     rule_outs.sort(
-        key=lambda h: (0 if h.red_flags else 1, -PRIOR_RANK.get(h.prior_band, 0))
+        key=lambda h: (
+            0 if h.status == "supported" else 1,
+            0 if h.red_flags else 1,
+            -PRIOR_RANK.get(h.prior_band, 0),
+            -len(h.evidence_for),
+        )
     )
     likelies.sort(
         key=lambda h: (-PRIOR_RANK.get(h.prior_band, 0), -len(h.evidence_for))
     )
-    chosen = rule_outs[:2]
+    # I2: rule-out directions are never dropped by truncation. Common
+    # directions fill the remaining slots up to three total.
+    chosen = list(rule_outs)
     chosen += likelies[: max(0, 3 - len(chosen))]
     # Abstention (design §5.4, recalibrated in the phase-A report): with a
     # complete workup the DSL's evidence lists are thin by construction, so

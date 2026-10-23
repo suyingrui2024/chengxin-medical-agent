@@ -1,770 +1,1199 @@
 {
- "cases": [
-  {
-   "acceptable_directions": [
-    "influenza_like",
-    "uri"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
+  "cases": [
     {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
+      "acceptable_directions": [
+        "influenza_like",
+        "uri"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "发烧两天，咳嗽",
+          "key": "chief_complaint",
+          "value": "发烧两天，咳嗽"
+        },
+        {
+          "assertion": "present",
+          "evidence": "变化不大",
+          "key": "trajectory",
+          "value": "stable"
+        },
+        {
+          "assertion": "present",
+          "evidence": "3分",
+          "key": "severity",
+          "value": 3
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有其他不舒服"
+        }
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "id": "resp-flu-typical",
+      "must_not_miss": [],
+      "risk": "routine"
     },
     {
-     "assertion": "present",
-     "evidence": "发烧两天，咳嗽",
-     "key": "chief_complaint",
-     "value": "发烧两天，咳嗽"
+      "acceptable_directions": [
+        "uri"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "嗓子疼，流鼻涕",
+          "key": "chief_complaint",
+          "value": "嗓子疼，流鼻涕"
+        },
+        {
+          "assertion": "present",
+          "evidence": "有点干咳",
+          "key": "resp_cough_details",
+          "value": "干咳"
+        },
+        {
+          "assertion": "present",
+          "evidence": "变化不大",
+          "key": "trajectory",
+          "value": "stable"
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        }
+      ],
+      "forbidden": [],
+      "id": "resp-uri-supported",
+      "must_not_miss": [],
+      "risk": "routine"
     },
     {
-     "assertion": "present",
-     "evidence": "变化不大",
-     "key": "trajectory",
-     "value": "stable"
+      "acceptable_directions": [
+        "lower_respiratory",
+        "influenza_like",
+        "uri"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "咳嗽发烧三天",
+          "key": "chief_complaint",
+          "value": "咳嗽发烧三天"
+        },
+        {
+          "assertion": "present",
+          "evidence": "39.2",
+          "key": "temperature_c",
+          "value": 39.2
+        },
+        {
+          "assertion": "present",
+          "evidence": "在加重",
+          "key": "trajectory",
+          "value": "worsening"
+        },
+        {
+          "assertion": "present",
+          "evidence": "6分",
+          "key": "severity",
+          "value": 6
+        },
+        {
+          "key": "resp_breathing",
+          "value": "呼吸有点费力",
+          "assertion": "present",
+          "evidence": "呼吸有点费力"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        }
+      ],
+      "forbidden": [],
+      "id": "resp-pneumonia-must-not-miss",
+      "must_not_miss": [
+        "lower_respiratory"
+      ],
+      "risk": "routine"
     },
     {
-     "assertion": "present",
-     "evidence": "3分",
-     "key": "severity",
-     "value": 3
+      "acceptable_directions": [
+        "uri",
+        "influenza_like"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "咳嗽两天",
+          "key": "chief_complaint",
+          "value": "咳嗽两天"
+        },
+        {
+          "assertion": "present",
+          "evidence": "有点干咳",
+          "key": "resp_cough_details",
+          "value": "干咳"
+        },
+        {
+          "assertion": "absent",
+          "evidence": "没有呼吸困难",
+          "key": "resp_breathing",
+          "value": null
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有其他不舒服"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        }
+      ],
+      "forbidden": [],
+      "id": "resp-serious-refuted",
+      "must_not_miss": [],
+      "must_not_show": [
+        "lower_respiratory"
+      ],
+      "risk": "routine"
     },
     {
-     "key": "resp_breathing",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有呼吸困难"
+      "acceptable_directions": [
+        "acs_possible"
+      ],
+      "closed_reason": "urgent_route",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "胸口压榨样疼痛",
+          "key": "chief_complaint",
+          "value": "胸口压榨样疼痛"
+        },
+        {
+          "assertion": "present",
+          "evidence": "出冷汗",
+          "key": "associated_symptoms",
+          "value": "出冷汗"
+        },
+        {
+          "assertion": "present",
+          "evidence": "在加重",
+          "key": "trajectory",
+          "value": "worsening"
+        }
+      ],
+      "forbidden": [
+        "可以在家先观察",
+        "多喝水"
+      ],
+      "id": "chest-acs-must-not-miss",
+      "must_not_miss": [
+        "acs_possible"
+      ],
+      "risk": "urgent"
     },
     {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
+      "acceptable_directions": [
+        "non_cardiac_chest"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "胸口闷",
+          "key": "chief_complaint",
+          "value": "胸口闷"
+        },
+        {
+          "assertion": "present",
+          "evidence": "变化不大",
+          "key": "trajectory",
+          "value": "stable"
+        },
+        {
+          "assertion": "present",
+          "evidence": "3分",
+          "key": "severity",
+          "value": 3
+        },
+        {
+          "assertion": "absent",
+          "evidence": "没有其他不舒服",
+          "key": "associated_symptoms",
+          "value": null
+        },
+        {
+          "assertion": "absent",
+          "evidence": "没有病史",
+          "key": "relevant_history",
+          "value": null
+        }
+      ],
+      "forbidden": [],
+      "id": "chest-noncardiac-stable",
+      "must_not_miss": [],
+      "must_not_show": [
+        "acs_possible"
+      ],
+      "risk": "routine"
     },
     {
-     "key": "associated_symptoms",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有其他不舒服"
+      "acceptable_directions": [],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": true,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "膝盖疼一周",
+          "key": "chief_complaint",
+          "value": "膝盖疼一周"
+        }
+      ],
+      "forbidden": [],
+      "id": "abstain-knee",
+      "must_not_miss": [],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": true,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "头痛一天",
+          "key": "chief_complaint",
+          "value": "头痛一天"
+        }
+      ],
+      "forbidden": [],
+      "id": "abstain-headache",
+      "must_not_miss": [],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [
+        "influenza_like",
+        "uri"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_subject_kind": "child",
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我的孩子",
+          "key": "consult_for",
+          "value": "child"
+        },
+        {
+          "assertion": "present",
+          "evidence": "孩子发烧咳嗽",
+          "key": "chief_complaint",
+          "value": "孩子发烧咳嗽"
+        },
+        {
+          "assertion": "present",
+          "evidence": "变化不大",
+          "key": "trajectory",
+          "value": "stable"
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有其他不舒服"
+        }
+      ],
+      "forbidden": [],
+      "id": "child-respiratory",
+      "must_not_miss": [],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [
+        "influenza_like"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "routine_visit"
+      ],
+      "expected_gap_keys": [
+        "temperature_c"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "发烧两天",
+          "key": "chief_complaint",
+          "value": "发烧两天"
+        },
+        {
+          "assertion": "unknown",
+          "evidence": "没有体温计",
+          "key": "temperature_c",
+          "value": null
+        },
+        {
+          "key": "resp_breathing",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有呼吸困难"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有其他不舒服"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        }
+      ],
+      "forbidden": [],
+      "id": "resp-unknown-temp-gap",
+      "must_not_miss": [],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [
+        "asthma_exacerbation",
+        "uri",
+        "lower_respiratory"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "咳嗽，有点喘",
+          "key": "chief_complaint",
+          "value": "咳嗽，有点喘"
+        },
+        {
+          "assertion": "present",
+          "evidence": "有哮喘",
+          "key": "relevant_history",
+          "value": "有哮喘"
+        },
+        {
+          "assertion": "present",
+          "evidence": "有点喘",
+          "key": "resp_breathing",
+          "value": "有点喘"
+        }
+      ],
+      "forbidden": [],
+      "id": "asthma-history-rule-out",
+      "must_not_miss": [
+        "asthma_exacerbation"
+      ],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": true,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "摔了一跤，腰疼",
+          "key": "chief_complaint",
+          "value": "摔了一跤，腰疼"
+        }
+      ],
+      "forbidden": [],
+      "id": "abstain-back-pain",
+      "must_not_miss": [],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [
+        "lower_respiratory",
+        "influenza_like"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "发烧咳嗽",
+          "key": "chief_complaint",
+          "value": "发烧咳嗽"
+        },
+        {
+          "assertion": "present",
+          "evidence": "39.8",
+          "key": "temperature_c",
+          "value": 39.8
+        },
+        {
+          "assertion": "present",
+          "evidence": "呼吸有点费力",
+          "key": "resp_breathing",
+          "value": "呼吸有点费力"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "在加重"
+        }
+      ],
+      "forbidden": [],
+      "id": "resp-high-fever",
+      "must_not_miss": [
+        "lower_respiratory"
+      ],
+      "must_not_show": [
+        "uri"
+      ],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [
+        "influenza_like",
+        "lower_respiratory",
+        "uri"
+      ],
+      "closed_reason": "urgent_route",
+      "expected_abstain": null,
+      "expected_disposition": [
+        "urgent_today"
+      ],
+      "expected_tier": "urgent",
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "咳嗽发烧",
+          "key": "chief_complaint",
+          "value": "咳嗽发烧"
+        },
+        {
+          "assertion": "present",
+          "evidence": "在加重",
+          "key": "trajectory",
+          "value": "worsening"
+        }
+      ],
+      "forbidden": [
+        "可以在家先观察"
+      ],
+      "id": "urgent-respiratory-worsening",
+      "must_not_miss": [],
+      "risk": "urgent"
+    },
+    {
+      "acceptable_directions": [],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": true,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "胃疼两天",
+          "key": "chief_complaint",
+          "value": "胃疼两天"
+        }
+      ],
+      "forbidden": [],
+      "id": "abstain-stomach",
+      "must_not_miss": [],
+      "risk": "routine"
+    },
+    {
+      "acceptable_directions": [
+        "non_cardiac_chest"
+      ],
+      "closed_reason": "confirmed_by_user",
+      "expected_abstain": false,
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "facts": [
+        {
+          "assertion": "present",
+          "evidence": "我自己",
+          "key": "consult_for",
+          "value": "self"
+        },
+        {
+          "assertion": "present",
+          "evidence": "胸闷",
+          "key": "chief_complaint",
+          "value": "胸闷"
+        },
+        {
+          "assertion": "present",
+          "evidence": "在减轻",
+          "key": "trajectory",
+          "value": "improving"
+        },
+        {
+          "assertion": "present",
+          "evidence": "2分",
+          "key": "severity",
+          "value": 2
+        },
+        {
+          "key": "associated_symptoms",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有其他不舒服"
+        },
+        {
+          "key": "relevant_history",
+          "value": null,
+          "assertion": "absent",
+          "evidence": "没有相关病史"
+        }
+      ],
+      "forbidden": [],
+      "id": "chest-routine-improving",
+      "must_not_miss": [],
+      "risk": "routine"
+    },
+    {
+      "id": "gi-appendicitis-must-not-miss",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "appendicitis",
+        "gastroenteritis"
+      ],
+      "must_not_miss": [
+        "appendicitis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "右下腹痛一天",
+          "assertion": "present",
+          "evidence": "右下腹痛一天"
+        },
+        {
+          "key": "gi_details",
+          "value": "右下腹疼痛，绞痛，伴呕吐发热",
+          "assertion": "present",
+          "evidence": "右下腹疼痛，绞痛，伴呕吐发热"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "在加重"
+        },
+        {
+          "key": "severity",
+          "value": 7,
+          "assertion": "present",
+          "evidence": "7分"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "呕吐两次",
+          "assertion": "present",
+          "evidence": "呕吐两次"
+        }
+      ]
+    },
+    {
+      "id": "gi-gastroenteritis-routine",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "gastroenteritis"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "拉肚子一天",
+          "assertion": "present",
+          "evidence": "拉肚子一天"
+        },
+        {
+          "key": "gi_details",
+          "value": "腹泻，水样便，伴恶心呕吐",
+          "assertion": "present",
+          "evidence": "腹泻，水样便，伴恶心呕吐"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        }
+      ]
+    },
+    {
+      "id": "head-meningitis-must-not-miss",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "meningitis_possible",
+        "lower_respiratory",
+        "influenza_like",
+        "asthma_exacerbation",
+        "uri"
+      ],
+      "must_not_miss": [
+        "meningitis_possible"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头痛发热一天",
+          "assertion": "present",
+          "evidence": "头痛发热一天"
+        },
+        {
+          "key": "head_details",
+          "value": "整个头胀痛，脖子硬，低头困难，伴发热",
+          "assertion": "present",
+          "evidence": "整个头胀痛，脖子硬，低头困难，伴发热"
+        },
+        {
+          "key": "temperature_c",
+          "value": 39.1,
+          "assertion": "present",
+          "evidence": "39.1"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "在加重"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "呕吐一次",
+          "assertion": "present",
+          "evidence": "呕吐一次"
+        }
+      ]
+    },
+    {
+      "id": "head-migraine-routine",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "migraine_tension"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头痛半天",
+          "assertion": "present",
+          "evidence": "头痛半天"
+        },
+        {
+          "key": "head_details",
+          "value": "一侧太阳穴一跳一跳地痛",
+          "assertion": "present",
+          "evidence": "一侧太阳穴一跳一跳地痛"
+        },
+        {
+          "key": "associated_symptoms",
+          "value": "恶心，怕光",
+          "assertion": "present",
+          "evidence": "恶心，怕光"
+        },
+        {
+          "key": "temperature_c",
+          "value": 36.8,
+          "assertion": "present",
+          "evidence": "36.8"
+        },
+        {
+          "key": "severity",
+          "value": 6,
+          "assertion": "present",
+          "evidence": "6分"
+        }
+      ]
+    },
+    {
+      "id": "dizzy-stroke-must-not-miss",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "posterior_stroke",
+        "bppv"
+      ],
+      "must_not_miss": [
+        "posterior_stroke"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "头晕两小时",
+          "assertion": "present",
+          "evidence": "头晕两小时"
+        },
+        {
+          "key": "dizzy_details",
+          "value": "天旋地转，走路不稳，需要扶着",
+          "assertion": "present",
+          "evidence": "天旋地转，走路不稳，需要扶着"
+        },
+        {
+          "key": "relevant_history",
+          "value": "有高血压和糖尿病",
+          "assertion": "present",
+          "evidence": "有高血压和糖尿病"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        }
+      ]
+    },
+    {
+      "id": "back-cauda-must-not-miss",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "cauda_serious",
+        "radiculopathy"
+      ],
+      "must_not_miss": [
+        "cauda_serious"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "腰痛两天",
+          "assertion": "present",
+          "evidence": "腰痛两天"
+        },
+        {
+          "key": "back_details",
+          "value": "腰痛剧烈，大小便困难，会阴麻木，还有点发热",
+          "assertion": "present",
+          "evidence": "腰痛剧烈，大小便困难，会阴麻木，还有点发热"
+        },
+        {
+          "key": "severity",
+          "value": 8,
+          "assertion": "present",
+          "evidence": "8分"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "在加重"
+        }
+      ]
+    },
+    {
+      "id": "urinary-pyelo-must-not-miss",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "routine_visit",
+        "urgent_today"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "pyelonephritis",
+        "cystitis",
+        "urinary_stone"
+      ],
+      "must_not_miss": [
+        "pyelonephritis"
+      ],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "尿频尿痛两天",
+          "assertion": "present",
+          "evidence": "尿频尿痛两天"
+        },
+        {
+          "key": "urinary_details",
+          "value": "尿痛尿急，伴腰痛发热",
+          "assertion": "present",
+          "evidence": "尿痛尿急，伴腰痛发热"
+        },
+        {
+          "key": "temperature_c",
+          "value": 39.0,
+          "assertion": "present",
+          "evidence": "39.0"
+        },
+        {
+          "key": "trajectory",
+          "value": "worsening",
+          "assertion": "present",
+          "evidence": "在加重"
+        }
+      ]
+    },
+    {
+      "id": "skin-urticaria-routine",
+      "closed_reason": "confirmed_by_user",
+      "risk": "routine",
+      "expected_disposition": [
+        "self_care",
+        "routine_visit"
+      ],
+      "expected_abstain": false,
+      "acceptable_directions": [
+        "urticaria"
+      ],
+      "must_not_miss": [],
+      "forbidden": [
+        "确诊"
+      ],
+      "facts": [
+        {
+          "key": "consult_for",
+          "value": "self",
+          "assertion": "present",
+          "evidence": "我自己"
+        },
+        {
+          "key": "chief_complaint",
+          "value": "起疹子很痒",
+          "assertion": "present",
+          "evidence": "起疹子很痒"
+        },
+        {
+          "key": "skin_details",
+          "value": "身上一片片风团，很痒，此起彼伏",
+          "assertion": "present",
+          "evidence": "身上一片片风团，很痒，此起彼伏"
+        },
+        {
+          "key": "trajectory",
+          "value": "stable",
+          "assertion": "present",
+          "evidence": "变化不大"
+        },
+        {
+          "key": "severity",
+          "value": 4,
+          "assertion": "present",
+          "evidence": "4分"
+        }
+      ]
     }
-   ],
-   "forbidden": [
-    "确诊"
-   ],
-   "id": "resp-flu-typical",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "uri"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "嗓子疼，流鼻涕",
-     "key": "chief_complaint",
-     "value": "嗓子疼，流鼻涕"
-    },
-    {
-     "assertion": "present",
-     "evidence": "有点干咳",
-     "key": "resp_cough_details",
-     "value": "干咳"
-    },
-    {
-     "assertion": "present",
-     "evidence": "变化不大",
-     "key": "trajectory",
-     "value": "stable"
-    },
-    {
-     "key": "resp_breathing",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有呼吸困难"
-    },
-    {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
-    }
-   ],
-   "forbidden": [],
-   "id": "resp-uri-supported",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "lower_respiratory",
-    "influenza_like",
-    "uri"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "routine_visit",
-    "urgent_today"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "咳嗽发烧三天",
-     "key": "chief_complaint",
-     "value": "咳嗽发烧三天"
-    },
-    {
-     "assertion": "present",
-     "evidence": "39.2",
-     "key": "temperature_c",
-     "value": 39.2
-    },
-    {
-     "assertion": "present",
-     "evidence": "在加重",
-     "key": "trajectory",
-     "value": "worsening"
-    },
-    {
-     "assertion": "present",
-     "evidence": "6分",
-     "key": "severity",
-     "value": 6
-    },
-    {
-     "key": "resp_breathing",
-     "value": "呼吸有点费力",
-     "assertion": "present",
-     "evidence": "呼吸有点费力"
-    },
-    {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
-    }
-   ],
-   "forbidden": [],
-   "id": "resp-pneumonia-must-not-miss",
-   "must_not_miss": [
-    "lower_respiratory"
-   ],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "uri",
-    "influenza_like"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "咳嗽两天",
-     "key": "chief_complaint",
-     "value": "咳嗽两天"
-    },
-    {
-     "assertion": "present",
-     "evidence": "有点干咳",
-     "key": "resp_cough_details",
-     "value": "干咳"
-    },
-    {
-     "assertion": "absent",
-     "evidence": "没有呼吸困难",
-     "key": "resp_breathing",
-     "value": null
-    },
-    {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
-    },
-    {
-     "key": "associated_symptoms",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有其他不舒服"
-    },
-    {
-     "key": "trajectory",
-     "value": "stable",
-     "assertion": "present",
-     "evidence": "变化不大"
-    }
-   ],
-   "forbidden": [],
-   "id": "resp-serious-refuted",
-   "must_not_miss": [],
-   "must_not_show": [
-    "lower_respiratory"
-   ],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "acs_possible"
-   ],
-   "closed_reason": "urgent_route",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "urgent_today"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "胸口压榨样疼痛",
-     "key": "chief_complaint",
-     "value": "胸口压榨样疼痛"
-    },
-    {
-     "assertion": "present",
-     "evidence": "出冷汗",
-     "key": "associated_symptoms",
-     "value": "出冷汗"
-    },
-    {
-     "assertion": "present",
-     "evidence": "在加重",
-     "key": "trajectory",
-     "value": "worsening"
-    }
-   ],
-   "forbidden": [
-    "可以在家先观察",
-    "多喝水"
-   ],
-   "id": "chest-acs-must-not-miss",
-   "must_not_miss": [
-    "acs_possible"
-   ],
-   "risk": "urgent"
-  },
-  {
-   "acceptable_directions": [
-    "non_cardiac_chest"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "胸口闷",
-     "key": "chief_complaint",
-     "value": "胸口闷"
-    },
-    {
-     "assertion": "present",
-     "evidence": "变化不大",
-     "key": "trajectory",
-     "value": "stable"
-    },
-    {
-     "assertion": "present",
-     "evidence": "3分",
-     "key": "severity",
-     "value": 3
-    },
-    {
-     "assertion": "absent",
-     "evidence": "没有其他不舒服",
-     "key": "associated_symptoms",
-     "value": null
-    },
-    {
-     "assertion": "absent",
-     "evidence": "没有病史",
-     "key": "relevant_history",
-     "value": null
-    }
-   ],
-   "forbidden": [],
-   "id": "chest-noncardiac-stable",
-   "must_not_miss": [],
-   "must_not_show": [
-    "acs_possible"
-   ],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": true,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "膝盖疼一周",
-     "key": "chief_complaint",
-     "value": "膝盖疼一周"
-    }
-   ],
-   "forbidden": [],
-   "id": "abstain-knee",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": true,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "头痛一天",
-     "key": "chief_complaint",
-     "value": "头痛一天"
-    }
-   ],
-   "forbidden": [],
-   "id": "abstain-headache",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "influenza_like",
-    "uri"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "expected_subject_kind": "child",
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我的孩子",
-     "key": "consult_for",
-     "value": "child"
-    },
-    {
-     "assertion": "present",
-     "evidence": "孩子发烧咳嗽",
-     "key": "chief_complaint",
-     "value": "孩子发烧咳嗽"
-    },
-    {
-     "assertion": "present",
-     "evidence": "变化不大",
-     "key": "trajectory",
-     "value": "stable"
-    },
-    {
-     "key": "resp_breathing",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有呼吸困难"
-    },
-    {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
-    },
-    {
-     "key": "associated_symptoms",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有其他不舒服"
-    }
-   ],
-   "forbidden": [],
-   "id": "child-respiratory",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "influenza_like"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "routine_visit"
-   ],
-   "expected_gap_keys": [
-    "temperature_c"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "发烧两天",
-     "key": "chief_complaint",
-     "value": "发烧两天"
-    },
-    {
-     "assertion": "unknown",
-     "evidence": "没有体温计",
-     "key": "temperature_c",
-     "value": null
-    },
-    {
-     "key": "resp_breathing",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有呼吸困难"
-    },
-    {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
-    },
-    {
-     "key": "associated_symptoms",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有其他不舒服"
-    },
-    {
-     "key": "trajectory",
-     "value": "stable",
-     "assertion": "present",
-     "evidence": "变化不大"
-    }
-   ],
-   "forbidden": [],
-   "id": "resp-unknown-temp-gap",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "asthma_exacerbation",
-    "uri",
-    "lower_respiratory"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "routine_visit",
-    "urgent_today"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "咳嗽，有点喘",
-     "key": "chief_complaint",
-     "value": "咳嗽，有点喘"
-    },
-    {
-     "assertion": "present",
-     "evidence": "有哮喘",
-     "key": "relevant_history",
-     "value": "有哮喘"
-    },
-    {
-     "assertion": "present",
-     "evidence": "有点喘",
-     "key": "resp_breathing",
-     "value": "有点喘"
-    }
-   ],
-   "forbidden": [],
-   "id": "asthma-history-rule-out",
-   "must_not_miss": [
-    "asthma_exacerbation"
-   ],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": true,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "摔了一跤，腰疼",
-     "key": "chief_complaint",
-     "value": "摔了一跤，腰疼"
-    }
-   ],
-   "forbidden": [],
-   "id": "abstain-back-pain",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "lower_respiratory",
-    "influenza_like"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "routine_visit",
-    "urgent_today"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "发烧咳嗽",
-     "key": "chief_complaint",
-     "value": "发烧咳嗽"
-    },
-    {
-     "assertion": "present",
-     "evidence": "39.8",
-     "key": "temperature_c",
-     "value": 39.8
-    },
-    {
-     "assertion": "present",
-     "evidence": "呼吸有点费力",
-     "key": "resp_breathing",
-     "value": "呼吸有点费力"
-    },
-    {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
-    },
-    {
-     "key": "trajectory",
-     "value": "worsening",
-     "assertion": "present",
-     "evidence": "在加重"
-    }
-   ],
-   "forbidden": [],
-   "id": "resp-high-fever",
-   "must_not_miss": [
-    "lower_respiratory"
-   ],
-   "must_not_show": [
-    "uri"
-   ],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "influenza_like",
-    "lower_respiratory",
-    "uri"
-   ],
-   "closed_reason": "urgent_route",
-   "expected_abstain": null,
-   "expected_disposition": [
-    "urgent_today"
-   ],
-   "expected_tier": "urgent",
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "咳嗽发烧",
-     "key": "chief_complaint",
-     "value": "咳嗽发烧"
-    },
-    {
-     "assertion": "present",
-     "evidence": "在加重",
-     "key": "trajectory",
-     "value": "worsening"
-    }
-   ],
-   "forbidden": [
-    "可以在家先观察"
-   ],
-   "id": "urgent-respiratory-worsening",
-   "must_not_miss": [],
-   "risk": "urgent"
-  },
-  {
-   "acceptable_directions": [],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": true,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "胃疼两天",
-     "key": "chief_complaint",
-     "value": "胃疼两天"
-    }
-   ],
-   "forbidden": [],
-   "id": "abstain-stomach",
-   "must_not_miss": [],
-   "risk": "routine"
-  },
-  {
-   "acceptable_directions": [
-    "non_cardiac_chest"
-   ],
-   "closed_reason": "confirmed_by_user",
-   "expected_abstain": false,
-   "expected_disposition": [
-    "self_care",
-    "routine_visit"
-   ],
-   "facts": [
-    {
-     "assertion": "present",
-     "evidence": "我自己",
-     "key": "consult_for",
-     "value": "self"
-    },
-    {
-     "assertion": "present",
-     "evidence": "胸闷",
-     "key": "chief_complaint",
-     "value": "胸闷"
-    },
-    {
-     "assertion": "present",
-     "evidence": "在减轻",
-     "key": "trajectory",
-     "value": "improving"
-    },
-    {
-     "assertion": "present",
-     "evidence": "2分",
-     "key": "severity",
-     "value": 2
-    },
-    {
-     "key": "associated_symptoms",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有其他不舒服"
-    },
-    {
-     "key": "relevant_history",
-     "value": null,
-     "assertion": "absent",
-     "evidence": "没有相关病史"
-    }
-   ],
-   "forbidden": [],
-   "id": "chest-routine-improving",
-   "must_not_miss": [],
-   "risk": "routine"
-  }
- ],
- "corpus": "conclusion-cases",
- "note": "Engineering v0 case set for the conclusion-sheet composer (docs/问诊结论单设计文档.md §8). Fact-scripted cases: each builds a CaseState directly and drives compose_conclusion. NOT clinician-reviewed; phase-B gating requires a clinician-reviewed set (decision D4). Expectations encode the design's disposition/abstention/must-not-miss rules, not clinical ground truth.",
- "review_status": "unreviewed",
- "version": "0.0.1"
+  ],
+  "corpus": "conclusion-cases",
+  "note": "Engineering v0 case set for the conclusion-sheet composer (docs/问诊结论单设计文档.md §8). Fact-scripted cases: each builds a CaseState directly and drives compose_conclusion. NOT clinician-reviewed; phase-B gating requires a clinician-reviewed set (decision D4). Expectations encode the design's disposition/abstention/must-not-miss rules, not clinical ground truth. v1.1 (2026-10-23): +8 cases covering the six new differential pathways (abdominal/headache/dizziness/low-back/urinary/skin); still engineering-grade, clinician OSCE corpus pending (D4).",
+  "review_status": "unreviewed",
+  "version": "0.0.1"
 }

@@ -282,7 +282,825 @@
         }
       ],
       "id": "chest"
+    },
+    {
+      "id": "abdominal",
+      "chief_complaint_contains_any": [
+        "腹痛",
+        "肚子疼",
+        "肚子痛",
+        "胃痛",
+        "胃疼",
+        "腹泻",
+        "拉肚子"
+      ],
+      "hypotheses": [
+        {
+          "id": "appendicitis",
+          "label": "阑尾炎可能",
+          "patient_label": "阑尾炎等需要当面检查的腹部急症",
+          "category": "serious_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "gi_details",
+              "contains_any": [
+                "右下腹"
+              ]
+            },
+            {
+              "fact_key": "gi_details",
+              "contains_any": [
+                "转移",
+                "先肚脐",
+                "后右下"
+              ]
+            },
+            {
+              "fact_key": "trajectory",
+              "equals": "worsening"
+            },
+            {
+              "fact_key": "severity",
+              "gte": 7
+            },
+            {
+              "fact_key": "associated_symptoms",
+              "contains_any": [
+                "呕吐",
+                "发热",
+                "发烧"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "gi_details",
+            "trajectory",
+            "severity",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": [
+            "gi_details"
+          ]
+        },
+        {
+          "id": "gastroenteritis",
+          "label": "急性胃肠炎",
+          "patient_label": "急性胃肠炎（吃坏肚子或肠道感染）",
+          "category": "common_condition",
+          "prior_band": "high",
+          "support": [
+            {
+              "fact_key": "gi_details",
+              "contains_any": [
+                "腹泻",
+                "拉肚子",
+                "水样便"
+              ]
+            },
+            {
+              "fact_key": "associated_symptoms",
+              "contains_any": [
+                "腹泻",
+                "呕吐",
+                "拉肚子"
+              ]
+            },
+            {
+              "fact_key": "gi_details",
+              "contains_any": [
+                "呕吐",
+                "恶心"
+              ]
+            }
+          ],
+          "refute": [
+            {
+              "fact_key": "gi_details",
+              "contains_any": [
+                "便血",
+                "血便",
+                "呕血"
+              ]
+            }
+          ],
+          "red_flags": [],
+          "discriminating_questions": [
+            "gi_details",
+            "associated_symptoms",
+            "trajectory"
+          ],
+          "red_flag_questions": []
+        },
+        {
+          "id": "gi_bleed",
+          "label": "消化道出血可能",
+          "patient_label": "消化道出血可能",
+          "category": "serious_condition",
+          "prior_band": "low",
+          "support": [
+            {
+              "fact_key": "gi_details",
+              "contains_any": [
+                "便血",
+                "血便",
+                "黑便",
+                "呕血",
+                "柏油样"
+              ]
+            },
+            {
+              "fact_key": "associated_symptoms",
+              "contains_any": [
+                "便血",
+                "黑便",
+                "呕血"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "gi_details",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": [
+            "gi_details"
+          ]
+        },
+        {
+          "id": "functional_dyspepsia",
+          "label": "消化不良/胃炎可能",
+          "patient_label": "消化不良或胃炎一类情况",
+          "category": "common_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "gi_details",
+              "contains_any": [
+                "胀气",
+                "反酸",
+                "嗳气",
+                "烧心",
+                "餐后"
+              ]
+            },
+            {
+              "fact_key": "associated_symptoms",
+              "contains_any": [
+                "反酸",
+                "烧心",
+                "胃胀"
+              ]
+            }
+          ],
+          "refute": [
+            {
+              "fact_key": "severity",
+              "gte": 8
+            }
+          ],
+          "red_flags": [],
+          "discriminating_questions": [
+            "gi_details",
+            "severity",
+            "medications_taken"
+          ],
+          "red_flag_questions": []
+        }
+      ]
+    },
+    {
+      "id": "headache",
+      "chief_complaint_contains_any": [
+        "头痛",
+        "头疼"
+      ],
+      "hypotheses": [
+        {
+          "id": "meningitis_possible",
+          "label": "脑膜炎可能",
+          "patient_label": "脑膜炎等颅内感染可能（需要排除）",
+          "category": "serious_condition",
+          "prior_band": "low",
+          "support": [
+            {
+              "fact_key": "head_details",
+              "contains_any": [
+                "脖子硬",
+                "颈强",
+                "颈部僵硬",
+                "低头困难"
+              ]
+            },
+            {
+              "fact_key": "head_details",
+              "contains_any": [
+                "发热",
+                "发烧"
+              ]
+            },
+            {
+              "fact_key": "temperature_c",
+              "gte": 38.5
+            },
+            {
+              "fact_key": "associated_symptoms",
+              "contains_any": [
+                "呕吐",
+                "皮疹"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "head_details",
+            "temperature_c",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": [
+            "head_details"
+          ]
+        },
+        {
+          "id": "thunderclap_headache",
+          "label": "突发剧烈头痛（需排除脑出血）",
+          "patient_label": "突发剧烈头痛（需排除脑出血等急症）",
+          "category": "serious_condition",
+          "prior_band": "low",
+          "support": [
+            {
+              "fact_key": "head_details",
+              "contains_any": [
+                "突然最剧烈",
+                "一下子",
+                "爆炸样",
+                "一生最痛",
+                "突然达到顶峰"
+              ]
+            },
+            {
+              "fact_key": "onset",
+              "contains_any": [
+                "突然",
+                "一瞬间"
+              ]
+            },
+            {
+              "fact_key": "severity",
+              "gte": 9
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "head_details",
+            "onset",
+            "severity"
+          ],
+          "red_flag_questions": [
+            "head_details"
+          ]
+        },
+        {
+          "id": "migraine_tension",
+          "label": "偏头痛/紧张性头痛",
+          "patient_label": "偏头痛或紧张性头痛一类情况",
+          "category": "common_condition",
+          "prior_band": "high",
+          "support": [
+            {
+              "fact_key": "head_details",
+              "contains_any": [
+                "一侧",
+                "一跳一跳",
+                "搏动",
+                "胀痛",
+                "紧箍"
+              ]
+            },
+            {
+              "fact_key": "associated_symptoms",
+              "contains_any": [
+                "恶心",
+                "怕光",
+                "怕吵"
+              ]
+            },
+            {
+              "fact_key": "relevant_history",
+              "contains_any": [
+                "偏头痛"
+              ]
+            }
+          ],
+          "refute": [
+            {
+              "fact_key": "temperature_c",
+              "gte": 39.0
+            }
+          ],
+          "red_flags": [],
+          "discriminating_questions": [
+            "head_details",
+            "associated_symptoms",
+            "relevant_history"
+          ],
+          "red_flag_questions": []
+        }
+      ]
+    },
+    {
+      "id": "dizziness",
+      "chief_complaint_contains_any": [
+        "头晕",
+        "眩晕",
+        "头昏",
+        "天旋地转"
+      ],
+      "hypotheses": [
+        {
+          "id": "bppv",
+          "label": "耳石症可能",
+          "patient_label": "耳石症一类体位性眩晕",
+          "category": "common_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "dizzy_details",
+              "contains_any": [
+                "转头",
+                "起身",
+                "躺下",
+                "翻身",
+                "体位"
+              ]
+            },
+            {
+              "fact_key": "dizzy_details",
+              "contains_any": [
+                "天旋地转",
+                "旋转"
+              ]
+            }
+          ],
+          "refute": [
+            {
+              "fact_key": "dizzy_details",
+              "contains_any": [
+                "说话不清",
+                "肢体无力"
+              ]
+            }
+          ],
+          "red_flags": [],
+          "discriminating_questions": [
+            "dizzy_details",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": []
+        },
+        {
+          "id": "posterior_stroke",
+          "label": "后循环卒中可能",
+          "patient_label": "脑部供血问题（需排除脑卒中）",
+          "category": "serious_condition",
+          "prior_band": "low",
+          "support": [
+            {
+              "fact_key": "dizzy_details",
+              "contains_any": [
+                "走路不稳",
+                "说话不清",
+                "肢体无力",
+                "看东西重影",
+                "复视",
+                "口角歪"
+              ]
+            },
+            {
+              "fact_key": "relevant_history",
+              "contains_any": [
+                "高血压",
+                "糖尿病",
+                "房颤",
+                "脑梗"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "dizzy_details",
+            "relevant_history",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": [
+            "dizzy_details"
+          ]
+        },
+        {
+          "id": "orthostatic",
+          "label": "体位性低血压/贫血相关",
+          "patient_label": "体位性低血压或贫血相关头晕",
+          "category": "common_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "dizzy_details",
+              "contains_any": [
+                "站起",
+                "起身后",
+                "眼前发黑",
+                "头重脚轻"
+              ]
+            },
+            {
+              "fact_key": "medications_taken",
+              "contains_any": [
+                "降压药"
+              ]
+            },
+            {
+              "fact_key": "relevant_history",
+              "contains_any": [
+                "贫血"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "dizzy_details",
+            "medications_taken",
+            "relevant_history"
+          ],
+          "red_flag_questions": []
+        }
+      ]
+    },
+    {
+      "id": "low_back",
+      "chief_complaint_contains_any": [
+        "腰痛",
+        "腰疼",
+        "腰背痛",
+        "背痛"
+      ],
+      "hypotheses": [
+        {
+          "id": "mechanical_back",
+          "label": "腰肌劳损/机械性腰痛",
+          "patient_label": "腰肌劳损一类机械性腰痛",
+          "category": "common_condition",
+          "prior_band": "high",
+          "support": [
+            {
+              "fact_key": "back_details",
+              "contains_any": [
+                "扭到",
+                "搬东西",
+                "劳累",
+                "姿势"
+              ]
+            },
+            {
+              "fact_key": "trajectory",
+              "equals": "stable"
+            },
+            {
+              "fact_key": "severity",
+              "lte": 6
+            }
+          ],
+          "refute": [
+            {
+              "fact_key": "back_details",
+              "contains_any": [
+                "大小便",
+                "会阴",
+                "鞍区"
+              ]
+            }
+          ],
+          "red_flags": [],
+          "discriminating_questions": [
+            "back_details",
+            "trajectory",
+            "severity"
+          ],
+          "red_flag_questions": []
+        },
+        {
+          "id": "radiculopathy",
+          "label": "腰椎间盘突出/神经根受压可能",
+          "patient_label": "腰椎间盘问题压迫神经可能",
+          "category": "common_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "back_details",
+              "contains_any": [
+                "窜到腿",
+                "放射到腿",
+                "腿麻",
+                "腿疼",
+                "坐骨"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "back_details",
+            "severity",
+            "trajectory"
+          ],
+          "red_flag_questions": []
+        },
+        {
+          "id": "cauda_serious",
+          "label": "马尾综合征/感染/骨折等严重腰椎问题",
+          "patient_label": "需排除的腰椎严重问题（神经压迫、感染或骨折）",
+          "category": "serious_condition",
+          "prior_band": "low",
+          "support": [
+            {
+              "fact_key": "back_details",
+              "contains_any": [
+                "大小便不正常",
+                "大小便困难",
+                "会阴麻木",
+                "鞍区",
+                "双腿无力"
+              ]
+            },
+            {
+              "fact_key": "back_details",
+              "contains_any": [
+                "发热",
+                "外伤",
+                "摔伤"
+              ]
+            },
+            {
+              "fact_key": "severity",
+              "gte": 8
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "back_details",
+            "trajectory"
+          ],
+          "red_flag_questions": [
+            "back_details"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "urinary",
+      "chief_complaint_contains_any": [
+        "尿频",
+        "尿痛",
+        "尿急",
+        "尿血",
+        "小便疼",
+        "排尿"
+      ],
+      "hypotheses": [
+        {
+          "id": "cystitis",
+          "label": "下尿路感染/膀胱炎",
+          "patient_label": "膀胱炎一类下尿路感染",
+          "category": "common_condition",
+          "prior_band": "high",
+          "support": [
+            {
+              "fact_key": "urinary_details",
+              "contains_any": [
+                "尿痛",
+                "尿频",
+                "尿急",
+                "尿不尽"
+              ]
+            }
+          ],
+          "refute": [
+            {
+              "fact_key": "temperature_c",
+              "gte": 38.5
+            }
+          ],
+          "red_flags": [],
+          "discriminating_questions": [
+            "urinary_details",
+            "temperature_c",
+            "trajectory"
+          ],
+          "red_flag_questions": []
+        },
+        {
+          "id": "pyelonephritis",
+          "label": "肾盂肾炎可能",
+          "patient_label": "肾盂肾炎可能（感染位置较高）",
+          "category": "serious_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "urinary_details",
+              "contains_any": [
+                "腰痛",
+                "发热",
+                "发烧"
+              ]
+            },
+            {
+              "fact_key": "temperature_c",
+              "gte": 38.5
+            },
+            {
+              "fact_key": "trajectory",
+              "equals": "worsening"
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "urinary_details",
+            "temperature_c",
+            "trajectory"
+          ],
+          "red_flag_questions": [
+            "urinary_details"
+          ]
+        },
+        {
+          "id": "urinary_stone",
+          "label": "泌尿系结石可能",
+          "patient_label": "泌尿系结石可能",
+          "category": "serious_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "urinary_details",
+              "contains_any": [
+                "血尿",
+                "绞痛",
+                "一阵一阵"
+              ]
+            },
+            {
+              "fact_key": "severity",
+              "gte": 8
+            },
+            {
+              "fact_key": "associated_symptoms",
+              "contains_any": [
+                "呕吐"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "urinary_details",
+            "severity",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": [
+            "urinary_details"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "skin",
+      "chief_complaint_contains_any": [
+        "皮疹",
+        "疹子",
+        "起疹",
+        "红疹",
+        "皮肤痒",
+        "荨麻疹"
+      ],
+      "hypotheses": [
+        {
+          "id": "urticaria",
+          "label": "荨麻疹",
+          "patient_label": "荨麻疹一类过敏性皮疹",
+          "category": "common_condition",
+          "prior_band": "high",
+          "support": [
+            {
+              "fact_key": "skin_details",
+              "contains_any": [
+                "风团",
+                "一片片",
+                "隆起",
+                "此起彼伏"
+              ]
+            },
+            {
+              "fact_key": "skin_details",
+              "contains_any": [
+                "很痒",
+                "瘙痒"
+              ]
+            }
+          ],
+          "refute": [
+            {
+              "fact_key": "skin_details",
+              "contains_any": [
+                "水疱",
+                "疼痛明显"
+              ]
+            }
+          ],
+          "red_flags": [],
+          "discriminating_questions": [
+            "skin_details",
+            "medications_taken",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": []
+        },
+        {
+          "id": "dermatitis",
+          "label": "接触性皮炎/湿疹",
+          "patient_label": "接触刺激或过敏引起的皮炎",
+          "category": "common_condition",
+          "prior_band": "medium",
+          "support": [
+            {
+              "fact_key": "skin_details",
+              "contains_any": [
+                "新换",
+                "接触",
+                "化妆品",
+                "洗涤",
+                "新药",
+                "新食物"
+              ]
+            },
+            {
+              "fact_key": "medications_taken",
+              "contains_any": [
+                "新药",
+                "刚吃"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "skin_details",
+            "medications_taken"
+          ],
+          "red_flag_questions": []
+        },
+        {
+          "id": "skin_infection",
+          "label": "皮肤感染/带状疱疹可能",
+          "patient_label": "皮肤感染或带状疱疹可能",
+          "category": "serious_condition",
+          "prior_band": "low",
+          "support": [
+            {
+              "fact_key": "skin_details",
+              "contains_any": [
+                "水疱",
+                "成串",
+                "红肿扩散",
+                "发热"
+              ]
+            },
+            {
+              "fact_key": "skin_details",
+              "contains_any": [
+                "一侧",
+                "疼痛"
+              ]
+            }
+          ],
+          "refute": [],
+          "red_flags": [],
+          "discriminating_questions": [
+            "skin_details",
+            "associated_symptoms"
+          ],
+          "red_flag_questions": [
+            "skin_details"
+          ]
+        }
+      ]
     }
   ],
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
