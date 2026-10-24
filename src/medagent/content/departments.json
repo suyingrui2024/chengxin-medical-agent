@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "reviewed_by": "engineering-v1",
+  "reviewed_at": "2026-10-24",
+  "note": "工程版科室映射（engineering-v1），未经临床评审；结论单中的科室建议默认 shadow 不对患者展示，待临床评审通过（清单 C12）后开启。",
+  "urgent": {
+    "department": "急诊科",
+    "reason": "目前情况需要尽快当面评估，急诊科可以第一时间处理并安排进一步检查。"
+  },
+  "by_group": {
+    "generic": {
+      "department": "全科医疗科",
+      "reason": "目前还分不清属于哪个专科的问题，建议先到全科医疗科评估，由医生判断下一步是否需要转专科。"
+    },
+    "respiratory": {
+      "department": "呼吸内科",
+      "reason": "结合需要关注的{label}，建议到呼吸内科就诊，医生会当面听诊并安排需要的检查。"
+    },
+    "chest": {
+      "department": "心内科",
+      "reason": "胸痛需要先弄清和心脏有没有关系，结合需要关注的{label}，建议到心内科就诊评估。"
+    },
+    "abdominal": {
+      "department": "消化内科",
+      "reason": "症状主要在腹部，结合需要关注的{label}，建议到消化内科就诊，医生会当面触诊并安排检查。"
+    },
+    "headache": {
+      "department": "神经内科",
+      "reason": "头痛的原因需要当面评估，结合需要关注的{label}，建议到神经内科就诊。"
+    },
+    "dizziness": {
+      "department": "神经内科",
+      "reason": "头晕的原因较多，结合需要关注的{label}，建议先到神经内科就诊评估。"
+    },
+    "back": {
+      "department": "骨科",
+      "reason": "腰背问题多与肌肉、骨骼和神经受压有关，结合需要关注的{label}，建议到骨科就诊。"
+    },
+    "urinary": {
+      "department": "泌尿外科",
+      "reason": "症状主要在泌尿系统，结合需要关注的{label}，建议到泌尿外科就诊，并做尿液化验。"
+    },
+    "skin": {
+      "department": "皮肤科",
+      "reason": "皮肤问题需要医生当面查看皮疹形态，结合需要关注的{label}，建议到皮肤科就诊。"
+    }
+  },
+  "by_hypothesis": {
+    "appendicitis": {
+      "department": "普外科",
+      "reason": "结合需要关注的{label}，这类问题常需要外科医生当面触诊判断，建议到普外科就诊。"
+    },
+    "pyelonephritis": {
+      "department": "肾内科",
+      "reason": "结合需要关注的{label}，感染位置在肾脏，建议到肾内科就诊评估。"
+    },
+    "bppv": {
+      "department": "耳鼻喉科",
+      "reason": "结合需要关注的{label}，这类眩晕多与内耳的平衡器官有关，建议到耳鼻喉科就诊评估。"
+    }
+  }
+}

@@ -21,6 +21,7 @@ from typing import Any, Dict, List, Optional
 
 from .domain import Assertion, CaseState, Phase, RiskLevel
 from .followups import build_follow_up_plan
+from .handoff import LABELS as FACT_LABELS
 from .reasoning import RuleBasedProposer, validate_workspace
 
 # Same list as consultation._summary_payload's return_now_if; a drift-guard
@@ -121,6 +122,14 @@ def directions_visible() -> bool:
     return os.environ.get("MEDAGENT_CONCLUSION_DIRECTIONS", "off").strip().lower() == "on"
 
 
+def department_visible() -> bool:
+    """Department hints ship in shadow too (benchmark design §3.4/D2):
+    the composer always fills the hint from reviewed content, and this
+    flag tells the renderer whether it may be shown before the C12
+    clinical sign-off."""
+    return os.environ.get("MEDAGENT_CONCLUSION_DEPARTMENT", "off").strip().lower() == "on"
+
+
 def _load_json(name: str) -> Dict[str, Any]:
     if name not in _cache:
         raw = (
@@ -130,6 +139,18 @@ def _load_json(name: str) -> Dict[str, Any]:
         )
         _cache[name] = json.loads(raw)
     return _cache[name]
+
+
+def _load_json_optional(name: str) -> Dict[str, Any]:
+    """_load_json for assets that may legitimately be absent (narrative
+    templates, department map): a missing or corrupt file degrades the
+    feature to off instead of failing composition (fail-open, matching
+    the composer's I3 style)."""
+    try:
+        data = _load_json(name)
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
 
 
 def _patient_labels() -> Dict[str, str]:
@@ -211,7 +232,37 @@ def _certainty(hypothesis, group: str) -> str:
     return "possible"
 
 
-def _select_directions(accepted) -> tuple[List[Dict[str, Any]], bool]:
+# Patient-facing wording for a denied fact cited as counter-evidence
+# (benchmark design §3.5). Labels come from the handoff projection's
+# table so the two patient surfaces never drift; resp_breathing keeps
+# its bespoke symptom wording rather than the generic field label.
+_AGAINST_LABEL_OVERRIDES = {"resp_breathing": "呼吸困难等表现"}
+
+
+def _against_note(hypothesis, state: CaseState) -> Optional[str]:
+    """「你否认了X，这一点不支持它」for a direction whose first piece of
+    counter-evidence is a fact the patient explicitly denied (assertion
+    ABSENT). Anything else — a present fact arguing against the direction
+    (a low temperature, a worsening trajectory), a superseded fact, an
+    unlabelled fact key — yields no note: the sheet only narrates
+    denials, it does not paraphrase measurements."""
+    if not hypothesis.evidence_against:
+        return None
+    ref = hypothesis.evidence_against[0]
+    fact = state.facts.get(ref.fact_key)
+    if fact is None or fact.fact_id != ref.fact_id:
+        return None
+    if fact.assertion != Assertion.ABSENT:
+        return None
+    label = _AGAINST_LABEL_OVERRIDES.get(ref.fact_key) or FACT_LABELS.get(
+        ref.fact_key
+    )
+    if not label:
+        return None
+    return f"你否认了{label}，这一点不支持它"
+
+
+def _select_directions(accepted, state: CaseState) -> tuple[List[Dict[str, Any]], bool]:
     labels = _patient_labels()
     active = accepted.active()
     rule_outs = [
@@ -260,11 +311,7 @@ def _select_directions(accepted) -> tuple[List[Dict[str, Any]], bool]:
     directions: List[Dict[str, Any]] = []
     for hypothesis in chosen:
         group = "rule_out" if hypothesis in rule_outs else "likely"
-        against_note = None
-        if hypothesis.evidence_against:
-            ref = hypothesis.evidence_against[0]
-            if ref.fact_key == "resp_breathing":
-                against_note = "你否认了呼吸困难等表现，这一点不支持它"
+        against_note = _against_note(hypothesis, state)
         directions.append(
             {
                 "hypothesis_id": hypothesis.id,
@@ -353,6 +400,128 @@ def _disposition(state, tier, directions, due_hours, show_directions):
     }
 
 
+def _department_hint(
+    tier: str,
+    directions: List[Dict[str, Any]],
+    group_key: str,
+    data: Dict[str, Any],
+) -> Optional[Dict[str, str]]:
+    """Department suggestion from content/departments.json (benchmark
+    design §3.4). Priority: the urgent entry for urgent-tier sheets,
+    then the first selected direction with a per-hypothesis entry, then
+    the sheet pathway group's entry, then generic. Reasons may carry a
+    {label} placeholder, filled with the matched direction's patient
+    label. No usable entry anywhere -> None, the pre-P1 behavior."""
+    if not data:
+        return None
+
+    def entry_of(raw) -> Optional[Dict[str, str]]:
+        if not isinstance(raw, dict) or not raw.get("department"):
+            return None
+        return {
+            "department": str(raw["department"]),
+            "reason": str(raw.get("reason") or ""),
+        }
+
+    if tier == "urgent":
+        hint = entry_of(data.get("urgent"))
+        if hint is not None:
+            return hint
+    by_hypothesis = data.get("by_hypothesis") or {}
+    for direction in directions:
+        hint = entry_of(by_hypothesis.get(direction.get("hypothesis_id")))
+        if hint is not None:
+            hint["reason"] = hint["reason"].replace(
+                "{label}", direction.get("patient_label") or ""
+            )
+            return hint
+    by_group = data.get("by_group") or {}
+    for key in (group_key, "generic"):
+        hint = entry_of(by_group.get(key))
+        if hint is not None:
+            label = directions[0].get("patient_label") if directions else ""
+            hint["reason"] = hint["reason"].replace("{label}", label or "")
+            return hint
+    return None
+
+
+def _narrative_templates() -> Dict[str, Any]:
+    """Curated narrative templates (content/conclusion_narrative.json).
+    Like the self-care groups, the asset counts as absent unless it
+    carries review metadata; absent/corrupt -> {} and the sheet simply
+    carries narrative=None (fail-open)."""
+    data = _load_json_optional("conclusion_narrative.json")
+    return data if data.get("reviewed_by") else {}
+
+
+def _narrative_reasoning(
+    templates: Dict[str, Any],
+    directions: List[Dict[str, Any]],
+    gaps: List[Dict[str, Any]],
+) -> Optional[str]:
+    """The “why” paragraph: certainty sentences for the selected
+    directions plus the still-missing information. Only curated text —
+    patient labels and gap labels, never patient quotes. None when
+    there is nothing to explain (directions abstained/empty and no
+    gaps), per the narrative contract."""
+    sentences: List[str] = []
+    if directions:
+        rendered = [
+            CERTAINTY_TEMPLATES[d["certainty"]].format(label=d["patient_label"])
+            for d in directions
+            if d.get("patient_label") and d.get("certainty") in CERTAINTY_TEMPLATES
+        ]
+        if rendered:
+            intro = templates.get("directions_intro") or ""
+            separator = templates.get("separator") or "；"
+            sentences.append(intro + separator.join(rendered))
+    if gaps:
+        labels = [str(gap.get("label") or gap.get("fact_key")) for gap in gaps]
+        gap_text = (templates.get("gaps_template") or "{labels}").replace(
+            "{labels}", (templates.get("gaps_separator") or "、").join(labels)
+        )
+        if sentences:
+            sentences.append((templates.get("gaps_connector") or "") + gap_text)
+        else:
+            sentences.append((templates.get("gaps_only_intro") or "") + gap_text)
+    if not sentences:
+        return None
+    return "。".join(sentences) + "。"
+
+
+def _build_narrative(
+    templates: Dict[str, Any],
+    *,
+    tier: str,
+    level: str,
+    group_key: str,
+    directions: List[Dict[str, Any]],
+    gaps: List[Dict[str, Any]],
+) -> Optional[Dict[str, Any]]:
+    """Three-part narrative (benchmark design §3.1): framing （定性）,
+    reasoning （原理）, severity （大白话程度）. Framing and severity are
+    always present on a sheet when the asset is available; reasoning
+    may be None. Deterministic template assembly only."""
+    if not templates:
+        return None
+    framing_map = templates.get("framing") or {}
+    if tier == "urgent" and framing_map.get("urgent"):
+        framing_template = framing_map["urgent"]
+    else:
+        framing_template = framing_map.get(level)
+    severity_template = (templates.get("severity") or {}).get(level)
+    if not framing_template or not severity_template:
+        return None
+    group_label = (templates.get("group_labels") or {}).get(group_key, "身体")
+    return {
+        "framing": framing_template.replace("{group}", group_label),
+        "reasoning": _narrative_reasoning(
+            templates.get("reasoning") or {}, directions, gaps
+        ),
+        "severity": severity_template.replace("{group}", group_label),
+    }
+
+
 def compose_conclusion(
     state: CaseState, summary: Optional[Dict[str, Any]] = None
 ) -> Optional[Dict[str, Any]]:
@@ -378,7 +547,7 @@ def compose_conclusion(
     workspace = RuleBasedProposer().propose(state)
     accepted, _rejected = validate_workspace(state, workspace)
     show_directions = directions_visible()
-    directions, abstained = _select_directions(accepted)
+    directions, abstained = _select_directions(accepted, state)
     disposition = _disposition(state, tier, directions, due_hours, show_directions)
     gaps = _gaps(state, summary, accepted)
     if tier == "routine" and disposition["level"] == "self_care":
@@ -410,6 +579,18 @@ def compose_conclusion(
     alert_group = group_key
     if alert_group == "generic":
         alert_group = _explored_pathway_group(state) or "generic"
+    dept_data = _load_json_optional("departments.json")
+    disposition["department_hint"] = _department_hint(
+        tier, directions, group_key, dept_data
+    )
+    narrative = _build_narrative(
+        _narrative_templates(),
+        tier=tier,
+        level=disposition["level"],
+        group_key=alert_group,
+        directions=directions,
+        gaps=gaps,
+    )
     subject = state.facts.get("consult_for")
     previous = state.conclusion or {}
     sheet = {
@@ -422,7 +603,9 @@ def compose_conclusion(
         "directions": directions,
         "directions_abstained": abstained,
         "directions_visible": show_directions,
+        "department_visible": department_visible(),
         "abstain_text": ABSTAIN_TEXT if abstained else None,
+        "narrative": narrative,
         "gaps": gaps,
         "self_care": {
             "do": list(care.get("do", [])),
@@ -444,6 +627,8 @@ def compose_conclusion(
         "content_versions": {
             "differentials": _load_json("differentials.json").get("version"),
             "self_care": _load_json("self_care.json").get("version"),
+            "departments": dept_data.get("version"),
+            "conclusion_narrative": _narrative_templates().get("version"),
         },
     }
     # The banned-phrase lint guards *system* wording. Patient quotes
@@ -492,7 +677,16 @@ def spoken_close_line(conclusion: Optional[Dict[str, Any]]) -> str:
         for item in (conclusion.get("return_now_if") or [])
         if str(item).strip()
     ]
-    line = main
+    # The spoken line opens with the narrative's framing sentence for
+    # this disposition level (benchmark design §3.1), then the existing
+    # disposition + first alert + 120 elements, unchanged. The framing
+    # comes from the curated asset, not the sheet, so sheets composed
+    # before the narrative existed still speak with it; a missing asset
+    # simply drops the opener (fail-open).
+    framing = (
+        (_narrative_templates().get("spoken_framing") or {}).get(level) or ""
+    ).strip()
+    line = framing + main if framing else main
     if alerts:
         line += f"如果出现{alerts[0]}，请及时就医；情况紧急时请拨打 120。"
     if any(phrase in line for phrase in BANNED_PHRASES):
