@@ -197,18 +197,38 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         self._prompt_variants: Dict[bool, tuple] = {}
         self.system_prompt, self.prefix_sha256 = self._current_prefix()
 
+    def _subagent_mode_for(self, task_kind) -> str:
+        """Effective subagent mode for one task kind, resolved live.
+
+        Current coordinators resolve per-kind overrides through
+        ``mode_for()`` (an override wins; kinds without one fall back
+        to the coordinator's global mode). Older coordinators — and the
+        test doubles written against them — carry only the global
+        ``mode``, which is then the effective mode for every kind. No
+        coordinator at all reads as "off".
+        """
+        coordinator = self.subagent_coordinator
+        if coordinator is None:
+            return "off"
+        mode_for = getattr(coordinator, "mode_for", None)
+        if callable(mode_for):
+            return mode_for(task_kind)
+        return getattr(coordinator, "mode", "off")
+
     def _spawn_advertised(self) -> bool:
         """Whether spawn_subagent may be advertised *right now*.
 
         Advertise spawn_subagent only when a coordinator is actually
-        wired in and enabled. Listing an unavailable tool invites
-        proposals that can only fail closed at execution time (the
-        execution-side gate itself is unchanged).
+        wired in and at least one *model-proposed* kind is enabled:
+        evidence_lookup or second_opinion. case_digest is triggered by
+        the controller and followup_batch by the server, so enabling
+        only those must not put the tool in front of the model. Listing
+        an unavailable tool invites proposals that can only fail closed
+        at execution time (the execution-side gate itself is unchanged).
         """
-        coordinator = self.subagent_coordinator
         return (
-            coordinator is not None
-            and getattr(coordinator, "mode", "off") != "off"
+            self._subagent_mode_for("evidence_lookup") != "off"
+            or self._subagent_mode_for("second_opinion") != "off"
         )
 
     def _effective_static_context(self):
@@ -777,7 +797,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             q
             for q in self.content.questions
             if q.fact_key not in state.facts
-            and self.content.question_applies(q, chief)
+            and self.content.question_applies_in_state(q, state)
             and self._fact_gates_pass(state, q)
         ]
 
@@ -972,7 +992,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         coordinator = self.subagent_coordinator
         if (
             coordinator is not None
-            and getattr(coordinator, "mode", None) == "advisory"
+            and self._subagent_mode_for("case_digest") == "advisory"
             and len(state.transcript) > 16
             and (
                 not state.subagent_digest
@@ -1272,7 +1292,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 session_id=state.session_id,
                 cancelled=turn.cancelled if turn is not None else None,
             )
-            if getattr(coordinator, "mode", None) != "advisory":
+            if self._subagent_mode_for(args.get("task_kind")) != "advisory":
                 if isinstance(result, dict) and result.get("ok"):
                     # Shadow: the run executed and is recorded as events
                     # only; nothing a subagent produced enters the context.
@@ -1325,6 +1345,22 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                             "second_opinion_disagreement": True,
                             "second_opinion_tendency": tendency,
                         }
+                        # The flag above is per-turn model feedback; this
+                        # event is the durable record the metrics layer
+                        # aggregates disagreement rates from. Same firing
+                        # condition, no change to what is fed back.
+                        self.events.append(
+                            Event(
+                                state.session_id,
+                                "subagent.disagreement",
+                                {
+                                    "task_kind": "second_opinion",
+                                    "tendency": tendency,
+                                    "risk_group": current,
+                                },
+                                turn_id=turn_id,
+                            )
+                        )
                         break
             return {"ok": True, "spawn": result}
         if tool == "propose_self_check_result":
@@ -1438,9 +1474,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             question = self.content.question(args["question_id"])
             if question.fact_key in state.facts:
                 raise ProposalError("已记录这个字段；需要核实时使用 clarify")
-            if not self.content.question_applies(
-                question, str(state.get("chief_complaint", ""))
-            ):
+            if not self.content.question_applies_in_state(question, state):
                 raise ProposalError("问题不适用于当前主诉")
             if not self._fact_gates_pass(state, question):
                 raise ProposalError("该问题已被当前已知事实排除（如性别或年龄范围不适用）")
@@ -1761,9 +1795,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         previous.fact_key not in state.facts
                         or (was_clarification and previous.fact_key != fact_key)
                     )
-                    and self.content.question_applies(
-                        previous, str(state.get("chief_complaint", ""))
-                    )
+                    and self.content.question_applies_in_state(previous, state)
                 ):
                     reply = self._ask(state, previous, "更正已由控制器写入，继续此前未回答的问题")
                     state.active_question_is_clarification = was_clarification

@@ -1396,7 +1396,7 @@ class ConsultationEngine(
             question
             for question in self.content.questions
             if question.fact_key not in state.facts
-            and self.content.question_applies(question, chief)
+            and self.content.question_applies_in_state(question, state)
             and question_fact_gates_pass(question, state.facts)
         ]
         # Parity with the adaptive engine: non-blocking questions (sex,

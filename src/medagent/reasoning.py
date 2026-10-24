@@ -458,7 +458,7 @@ class DifferentialPlanner:
             question
             for question in engine.content.questions
             if question.fact_key not in state.facts
-            and engine.content.question_applies(question, chief)
+            and engine.content.question_applies_in_state(question, state)
             and question_fact_gates_pass(question, state.facts)
         ]
         # Same parity rule as ConsultationEngine._plan_next: non-blocking

@@ -209,9 +209,7 @@ class LocationRevisionMixin:
             question
             and old
             and old.question_id == question.id
-            and self.content.question_applies(
-                question, str(state.get("chief_complaint", ""))
-            )
+            and self.content.question_applies_in_state(question, state)
         ):
             current = state.facts.get(question.fact_key)
             if (current.fact_id if current else None) == resume["fact_ids"].get(

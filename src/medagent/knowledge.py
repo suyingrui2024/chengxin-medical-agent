@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from .domain import Assertion, Fact, Phase, QuickReply
 from .extensions.builtin import load_registry
-from .text_match import contains_unnegated
+from .text_match import find_unnegated
 
 # Patient-facing age prompt for non-child subjects, shared by both engines.
 # The catalog text ("婴幼儿请尽量写清月龄…") is what the *model* sees in its
@@ -17,6 +17,30 @@ from .text_match import contains_unnegated
 # consultations keep the catalog wording, where the months phrasing is
 # the point.
 ADULT_AGE_PROMPT = "患者多大？可直接写年龄，例如 32 岁。"
+
+
+def _applies_term_match(text: str, term: str) -> bool:
+    """Whether ``term`` is supported by one corpus text.
+
+    ``find_unnegated`` semantics (a negated mention never counts as
+    support), plus the explicit denial construction 「不是<term>…」:
+    a patient correcting themselves ("不是肚子不舒服，是胃胀") names
+    the term only to deny it. The negation-cue list in text_match does
+    not cover 不是 — there it would be wrong to add it globally, since
+    in evidence matching 「不是」 usually denies a *cause*, not the
+    symptom term that follows. For applies matching the immediate
+    「不是」+ term adjacency is exactly a denial of that term, so each
+    unnegated occurrence directly preceded by 不是 is skipped (masked)
+    and the search continues with the remaining occurrences.
+    """
+    working = text
+    while True:
+        index = find_unnegated(working, term)
+        if index < 0:
+            return False
+        if not (index >= 2 and working[index - 2 : index] == "不是"):
+            return True
+        working = working[:index] + "\x00" + working[index + 1 :]
 
 
 def question_fact_gates_pass(question: "Question", facts: Mapping[str, Fact]) -> bool:
@@ -124,7 +148,56 @@ class ContentRepository:
         if not terms:
             return True
         value = chief_complaint.lower()
-        return any(contains_unnegated(value, term.lower()) for term in terms)
+        return any(_applies_term_match(value, term.lower()) for term in terms)
+
+    @staticmethod
+    def chief_complaint_texts(state) -> List[str]:
+        """Corpus that ``question_applies`` should be evaluated against.
+
+        The recorded chief-complaint *value* is the model's normalized
+        restatement and can drift from what the patient actually said:
+        「肚子不舒服」 was once recorded as 「肚子时不时不舒服」, after
+        which the gi question's applies term 「肚子不舒服」 no longer
+        matched and the fixed question was wrongly rejected. The fact's
+        ``evidence`` is the verbatim patient utterance, validated as a
+        substring of the patient's message at record time in both
+        engines, so it joins the corpus alongside the value — as does
+        the evidence of superseded chief-complaint facts in the history
+        (a correction turn quotes the patient's own earlier words).
+        Superseded evidence only counts while a current chief-complaint
+        fact exists, so a wiped case never inherits a previous
+        subject's complaints. Matching stays negation-aware per text, so
+        adding texts can only widen, never narrow, applicability.
+        """
+        if state is None:
+            return []
+        current = state.facts.get("chief_complaint")
+        if current is None:
+            return []
+        texts = [str(current.value)]
+        if current.evidence:
+            texts.append(str(current.evidence))
+        for fact in state.history:
+            if fact.key == "chief_complaint" and fact.evidence:
+                texts.append(str(fact.evidence))
+        return texts
+
+    def question_applies_in_state(self, question: Question, state) -> bool:
+        """``question_applies`` over the state's full chief-complaint
+        corpus (recorded value + verbatim patient utterances). Every
+        candidate computation — adaptive engine, deterministic engine,
+        differential planner — goes through here so no path keeps the
+        old value-only behaviour."""
+        terms = question.applies_when.get("chief_complaint_contains_any", [])
+        if not terms:
+            return True
+        lowered_terms = [term.lower() for term in terms]
+        return any(
+            _applies_term_match(text.lower(), term)
+            for text in self.chief_complaint_texts(state)
+            if text
+            for term in lowered_terms
+        )
 
     @property
     def versions(self) -> Dict[str, str]:
