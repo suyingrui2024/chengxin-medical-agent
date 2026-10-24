@@ -5,8 +5,17 @@
   --sans:
     "Chengxin Sans SC", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
     "PingFang SC", "Microsoft YaHei", sans-serif;
+  /* themes.css defines --success (text) but no success surface pair; the
+     conclusion tier colors need one. Other palettes inherit these the
+     same way they inherit --danger-bg/--warning-bg. */
+  --success-bg: #eef6ee;
+  --success-line: #b9d6bf;
   font-family: var(--sans);
   font-size: 14px;
+}
+:root[data-theme="night"] {
+  --success-bg: #22352a;
+  --success-line: #476b58;
 }
 .execution-layout {
   display: grid;
@@ -2535,8 +2544,14 @@ h1 {
   border-radius: 7px;
   margin-top: 10px;
 }
-.conclusion-disposition.urgent_today {
+.conclusion-disposition.self_care {
+  background: var(--success-bg);
+}
+.conclusion-disposition.routine_visit {
   background: var(--warning-bg);
+}
+.conclusion-disposition.urgent_today {
+  background: var(--danger-bg);
 }
 .conclusion-disposition-label {
   margin: 0;
@@ -2548,6 +2563,58 @@ h1 {
   font-size: 15px;
   line-height: 1.8;
   color: var(--ink);
+}
+.conclusion-department {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.conclusion-narrative {
+  margin-top: 14px;
+}
+.conclusion-narrative-framing {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.conclusion-narrative-severity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.conclusion-level-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--success);
+}
+.conclusion-level-dot.routine_visit {
+  background: var(--orange);
+}
+.conclusion-level-dot.urgent_today {
+  background: var(--red);
+}
+.conclusion-narrative-reasoning {
+  margin-top: 8px;
+}
+.conclusion-narrative-reasoning-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.conclusion-narrative-reasoning-text {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.7;
 }
 .conclusion-direction-group {
   color: var(--muted);
@@ -4314,6 +4381,11 @@ input[type="password"],
   margin: 16px 0;
   overflow-wrap: anywhere;
 }
+.structured-notice.level-emergency {
+  color: var(--red);
+  background: var(--danger-bg);
+  border-color: var(--danger-line);
+}
 .structured-notice.level-urgent {
   color: var(--orange);
   background: var(--warning-bg);
@@ -6045,6 +6117,9 @@ html[data-font-scale="large"] .page-description {
 }
 html[data-font-scale="large"] .conclusion-disposition-text {
   font-size: 16.5px;
+}
+html[data-font-scale="large"] .conclusion-narrative-framing {
+  font-size: 17.5px;
 }
 html[data-font-scale="small"] .bubble,
 html[data-font-scale="small"] .composer textarea {

@@ -1654,6 +1654,32 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         !Number.isFinite(disposition.window_hours)
       )
         throw new Error("Invalid disposition window");
+      if (data.narrative !== undefined && data.narrative !== null) {
+        const narrative = data.narrative;
+        if (typeof narrative !== "object" || Array.isArray(narrative))
+          throw new Error("Invalid narrative");
+        text(narrative.framing);
+        if (!narrative.framing.length)
+          throw new Error("Invalid narrative framing");
+        text(narrative.severity);
+        if (!narrative.severity.length)
+          throw new Error("Invalid narrative severity");
+        if (narrative.reasoning !== undefined && narrative.reasoning !== null)
+          text(narrative.reasoning);
+      }
+      // The composer carries the hint inside disposition (its historic
+      // slot); a sheet-level copy is also accepted if one is present.
+      for (const hint of [disposition.department_hint, data.department_hint]) {
+        if (hint !== undefined && hint !== null) {
+          text(hint.department);
+          text(hint.reason);
+        }
+      }
+      if (
+        data.department_visible !== undefined &&
+        typeof data.department_visible !== "boolean"
+      )
+        throw new Error("Invalid department visibility");
       list(data.directions).forEach((item) => {
         if (!["likely", "rule_out"].includes(item.group))
           throw new Error("Invalid direction group");
@@ -1718,7 +1744,49 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         el("p", "conclusion-disposition-label", "下一步"),
         el("p", "conclusion-disposition-text", data.disposition.text),
       );
+      const departmentHint =
+        data.disposition.department_hint || data.department_hint;
+      if (data.department_visible && departmentHint)
+        disposition.append(
+          el(
+            "p",
+            "conclusion-department",
+            `建议科室：${departmentHint.department} —— ${departmentHint.reason}`,
+          ),
+        );
       card.append(disposition);
+      if (data.narrative) {
+        const narrative = el("section", "conclusion-narrative");
+        narrative.append(
+          el("p", "conclusion-narrative-framing", data.narrative.framing),
+        );
+        const severity = el(
+          "p",
+          `conclusion-narrative-severity ${data.disposition.level}`,
+        );
+        severity.append(
+          el("span", `conclusion-level-dot ${data.disposition.level}`),
+          data.narrative.severity,
+        );
+        narrative.append(severity);
+        // Reasoning quotes direction labels verbatim; directions stay
+        // shadow until clinical sign-off, so the reasoning paragraph is
+        // gated on the same visibility flag. Framing and severity are
+        // disposition-level text and always render.
+        if (data.narrative.reasoning && data.directions_visible) {
+          const reasoning = el("div", "conclusion-narrative-reasoning");
+          reasoning.append(
+            el("p", "conclusion-narrative-reasoning-label", "为什么这样判断"),
+            el(
+              "p",
+              "conclusion-narrative-reasoning-text",
+              data.narrative.reasoning,
+            ),
+          );
+          narrative.append(reasoning);
+        }
+        card.append(narrative);
+      }
       const you = data.subject_kind === "self" ? "你" : "您";
       if (data.directions_visible) {
         const directions = el("section", "conclusion-directions");
