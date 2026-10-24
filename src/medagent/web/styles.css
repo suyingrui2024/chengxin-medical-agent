@@ -2212,6 +2212,10 @@ h1 {
 .report-item-row span {
   color: var(--muted);
 }
+.report-item-row .report-item-note {
+  flex-basis: 100%;
+  color: var(--muted);
+}
 .report-item-row .fact-edit {
   margin-left: auto;
 }

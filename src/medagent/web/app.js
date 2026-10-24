@@ -9,6 +9,10 @@ import {
   createPatientRecordsUI,
 } from "./patient-records-ui.js";
 import { renderLocationChips } from "./location-answer-ui.js";
+import {
+  openHandoffPrintWindow,
+  downloadHandoffFile,
+} from "./handoff-print.js";
 
 const $ = (selector) => document.querySelector(selector);
 const taskProgress = new Map();
@@ -83,6 +87,7 @@ const state = {
   events: [],
   sessions: [],
   followUps: [],
+  dueReminders: [],
   tasks: [],
   settings: { backend: "demo" },
   subagentMetrics: null,
@@ -102,6 +107,7 @@ const state = {
   lastCorrection: null,
   shownCalculations: new Map(),
   handoffText: "",
+  handoff: null,
   reportDraft: null,
 };
 let pollTimer = null;
@@ -1284,6 +1290,8 @@ function renderReportItems(items) {
         : "";
     const label = [value, provenance].filter(Boolean).join(" · ");
     row.append(el("strong", "", item.name), el("span", "", label || "已确认"));
+    if (item.interpretation_note)
+      row.append(el("small", "report-item-note", item.interpretation_note));
     row.append(
       button("移除", "fact-edit", () => removeReportItem(item.report_item_id)),
     );
@@ -1303,7 +1311,10 @@ function reportItemText(item) {
       parts.push(item.record_title);
     if (item.measured_at) parts.push(formatTime(item.measured_at, true));
   }
-  return parts.join(" · ");
+  const text = parts.join(" · ");
+  return item.interpretation_note
+    ? `${text}（解读：${item.interpretation_note}）`
+    : text;
 }
 function renderReportDraft(draft) {
   const target = $("#report-draft-result");
@@ -1466,6 +1477,40 @@ async function openHandoff() {
   if (!state.sessionId) return;
   try {
     const data = await api(`/api/sessions/${state.sessionId}/handoff`);
+    // P4-D mapping (handoff.py itself is untouched): the v2 endpoint
+    // carries directions only when visible and no narrative at all,
+    // while handoff-print.js reads directions_visible + narrative.
+    // Derive directions_visible from the live sheet when available
+    // (falling back to "directions present"), and take the narrative
+    // from the live sheet, which the endpoint does not carry. The
+    // dialog rendering above still uses the raw endpoint object.
+    const sheet = state.case?.conclusion || null;
+    const rawConclusion = data.handoff?.conclusion || null;
+    // M2 纵深防御：narrative.reasoning 逐条含方向标签，shadow 下不
+    // 抄进 state.handoff（打印模块另有同门控，双重保险）；framing /
+    // severity 不含方向，可保留。
+    const visible = sheet
+      ? Boolean(sheet.directions_visible)
+      : rawConclusion?.directions != null;
+    const narrative = sheet?.narrative
+      ? {
+          framing: sheet.narrative.framing,
+          severity: sheet.narrative.severity,
+          ...(visible ? { reasoning: sheet.narrative.reasoning } : {}),
+        }
+      : undefined;
+    state.handoff = data.handoff
+      ? {
+          ...data.handoff,
+          conclusion: rawConclusion
+            ? {
+                ...rawConclusion,
+                directions_visible: visible,
+                narrative,
+              }
+            : null,
+        }
+      : null;
     renderHandoff(data.handoff);
     $("#handoff-dialog").showModal();
   } catch (error) {
@@ -1853,7 +1898,66 @@ async function refreshFollowUps() {
   } catch {
     state.followUps = [];
   }
+  try {
+    // Medication reminders (P4-B) share the due center; a failed fetch
+    // simply means "no reminders", never an error surface.
+    const data = await api("/api/medication-reminders");
+    state.dueReminders = Array.isArray(data.reminders)
+      ? data.reminders
+      : Array.isArray(data)
+        ? data
+        : [];
+  } catch {
+    state.dueReminders = [];
+  }
   renderFollowUps();
+}
+// Due rule shared with desktop/due-notifications.cjs (kept in sync by
+// hand; the desktop module is canonical). A reminder is due when it is
+// not completed and either its timestamped due time <= now, or — for
+// P4-B plan entries — today's local occurrence of a scheduled clock time
+// has passed. Returns distinct medication names. Names only — no dose
+// field is ever read here.
+function dueReminderNames() {
+  const now = new Date();
+  const names = new Set();
+  for (const item of state.dueReminders || []) {
+    if (!item || typeof item !== "object") continue;
+    const name = item.medication_name || item.name;
+    if (!name) continue;
+    const completed =
+      item.status === "completed" ||
+      item.status === "done" ||
+      item.done === true ||
+      item.outcome != null;
+    if (completed) continue;
+    if (Array.isArray(item.scheduled_times)) {
+      if (item.status !== "scheduled") continue;
+      for (const clock of item.scheduled_times) {
+        const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(
+          typeof clock === "string" ? clock.trim() : "",
+        );
+        if (!match) continue;
+        const occurrence = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          Number(match[1]),
+          Number(match[2]),
+        );
+        if (occurrence <= now) names.add(name);
+      }
+      continue;
+    }
+    const dueAt = Date.parse(
+      item.due_at || item.remind_at || item.scheduled_at || "",
+    );
+    if (Number.isFinite(dueAt) && dueAt <= now.getTime()) names.add(name);
+  }
+  return [...names];
+}
+function dueReminderCount() {
+  return dueReminderNames().length;
 }
 async function refreshRecordsCount() {
   // The badge in the nav is static 0 in the HTML and the records module
@@ -1872,13 +1976,22 @@ function followUpDueCount() {
 }
 function renderFollowUpBadge() {
   const badge = $("#followup-due-count");
+  // Due center: one badge aggregates due follow-ups AND due medication
+  // reminders, counted by the same due rule the desktop checker uses.
   const due = followUpDueCount();
+  const dueMeds = dueReminderCount();
+  const total = due + dueMeds;
   if (badge) {
-    badge.hidden = due === 0;
-    badge.textContent = String(due);
-    badge.title = due ? `${due} 个随访已到回访时间` : "";
+    badge.hidden = total === 0;
+    badge.textContent = String(total);
+    badge.title = [
+      due ? `${due} 个随访已到回访时间` : "",
+      dueMeds ? `${dueMeds} 个用药提醒已到时间` : "",
+    ]
+      .filter(Boolean)
+      .join("；");
   }
-  // One desktop notification per page load when follow-ups are due —
+  // One web notification per page load when follow-ups are due —
   // the follow-up window (24–72h) is exactly when patients forget.
   if (
     due > 0 &&
@@ -1895,17 +2008,61 @@ function renderFollowUpBadge() {
       /* notifications are best-effort */
     }
   }
+  // Medication reminders reuse the same per-load web channel; the body
+  // names medications only and never carries a dose.
+  if (
+    dueMeds > 0 &&
+    "Notification" in window &&
+    Notification.permission === "granted" &&
+    !window.__medicationNotified
+  ) {
+    window.__medicationNotified = true;
+    try {
+      const names = dueReminderNames();
+      const shown = names.slice(0, 3).join("、");
+      const rest = names.length > 3 ? `等 ${names.length} 种` : "";
+      new Notification("该吃药了", { body: `该吃${shown}${rest}了。` });
+    } catch {
+      /* notifications are best-effort */
+    }
+  }
+}
+// Desktop notification click-through: the main process focuses the window
+// and routes here; the due center lives in the history view (follow-up
+// section + badge), for follow-ups and medication reminders alike.
+if (window.chengxinDesktop?.dueNotifications?.onOpen) {
+  window.chengxinDesktop.dueNotifications.onOpen(() => {
+    navigate("history");
+    document
+      .getElementById("followup-section")
+      ?.scrollIntoView({ block: "start" });
+  });
 }
 function renderFollowUps() {
   const section = $("#followup-section");
   const list = $("#followup-list");
   if (!section || !list) return;
+  // Boundary, stated where the due items live: desktop notifications
+  // only arrive while the app is open. Closing the app never pushes;
+  // nothing is lost — due items stay aggregated here and in the badge.
+  // (No background service, no resident process, by design — D4.)
+  if (!$("#followup-boundary-note")) {
+    const note = el(
+      "p",
+      "followup-hint",
+      "桌面通知仅在应用打开时送达：关闭应用后不会推送，到期项仍会在这里和顶部徽标中汇总。",
+    );
+    note.id = "followup-boundary-note";
+    section.insertBefore(note, list);
+  }
   const pending = (state.followUps || []).filter(
     (item) => item.plan && item.plan.status === "scheduled",
   );
   renderFollowUpBadge();
   list.replaceChildren();
-  section.hidden = pending.length === 0;
+  $("#medication-reminder-schedule")?.remove();
+  const reminders = state.dueReminders || [];
+  section.hidden = pending.length === 0 && reminders.length === 0;
   const now = Date.now();
   for (const item of pending) {
     const dueAt = Date.parse(item.plan.due_at);
@@ -1950,6 +2107,67 @@ function renderFollowUps() {
       card.append(draft);
     }
     list.append(card);
+  }
+  // P4 medication-reminder scheduling (minimal): each reminder shows
+  // its name and a comma-separated HH:MM input; saving posts only the
+  // name and HH:MM times — never a dose — to the schedule route, then
+  // reloads. Multi-time input is deliberate: a single-time box used
+  // to silently drop a second saved time on the next save (N2).
+  if (reminders.length) {
+    const block = el("div", "medication-reminder-schedule");
+    block.id = "medication-reminder-schedule";
+    block.append(el("h3", "", "用药提醒时间"));
+    block.append(
+      el(
+        "p",
+        "followup-hint",
+        "只提醒“该吃药了”，不涉及剂量；多个时间用逗号分隔（如 08:00，20:00），未设定时间的药物显示“待设定”。",
+      ),
+    );
+    for (const item of reminders) {
+      const name = item.medication_name || item.name || "";
+      if (!name) continue;
+      const row = el("div", "medication-reminder-row");
+      const label = el(
+        "span",
+        "",
+        item.purpose ? `${name}（${item.purpose}）` : name,
+      );
+      const input = el("input");
+      input.type = "text";
+      input.placeholder = "如 08:00，20:00";
+      input.value = Array.isArray(item.scheduled_times)
+        ? item.scheduled_times.join("，")
+        : "";
+      input.setAttribute("aria-label", `${name}提醒时间`);
+      const feedback = el("span", "followup-hint", "");
+      const save = button("保存时间", "secondary-button", async () => {
+        const raw = input.value
+          .split(/[,，、]/)
+          .map((part) => part.trim())
+          .filter(Boolean);
+        const valid = raw.every(/^([01]\d|2[0-3]):[0-5]\d$/.test);
+        if (!valid) {
+          feedback.textContent =
+            "时间格式不对：请用 24 小时制的 HH:MM，多个时间用逗号分隔。";
+          return;
+        }
+        feedback.textContent = "";
+        try {
+          await api("/api/medication-reminders/schedule", {
+            method: "POST",
+            body: { medication_name: name, times: raw },
+          });
+          toast(`已保存${name}的提醒时间。`);
+          await refreshFollowUps();
+        } catch (error) {
+          feedback.textContent = error.message;
+        }
+      });
+      row.append(label, input, save, feedback);
+      block.append(row);
+    }
+    section.append(block);
   }
 }
 function openFollowUpDialog(item) {
@@ -3101,6 +3319,19 @@ $("#open-report-draft").addEventListener("click", openReportDraft);
 $("#open-handoff").addEventListener("click", openHandoff);
 $("#report-form").addEventListener("submit", submitReportDraft);
 $("#copy-handoff").addEventListener("click", copyHandoff);
+$("#print-handoff").addEventListener("click", () => {
+  if (!state.handoff) return;
+  const win = openHandoffPrintWindow(state.handoff);
+  if (win) win.print();
+});
+$("#export-handoff-md").addEventListener("click", () => {
+  if (!state.handoff) return;
+  downloadHandoffFile(state.handoff, "md");
+});
+$("#export-handoff-txt").addEventListener("click", () => {
+  if (!state.handoff) return;
+  downloadHandoffFile(state.handoff, "txt");
+});
 $("#settings-form").addEventListener("submit", (event) => {
   event.preventDefault();
   configure(false);

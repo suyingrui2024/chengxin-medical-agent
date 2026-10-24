@@ -303,6 +303,79 @@ def check_subagents(fixtures: Path) -> bool:
     return ok
 
 
+def check_report_interpretation(fixtures: Path) -> bool:
+    """P3 report-interpretation corpus (all_cases_pass discipline).
+
+    Every corpus case is graded by the real medagent.report_interpretation
+    module — the gate never re-implements grading, so it cannot pass
+    against itself. A single expected-grade mismatch flips the gate.
+    Unconfirmed observations must land in `excluded`, never in `items`.
+    """
+    from medagent.report_interpretation import build_interpretation
+
+    fixture = json.loads(
+        (fixtures / "report_interpretation_cases.json").read_text(encoding="utf-8")
+    )
+    ranges = json.loads(
+        (ROOT / "src" / "medagent" / "content" / "reference_ranges.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    cases = fixture["cases"]
+    confirmed = {"patient_confirmed", "patient_corrected"}
+    names = {key: entry["name"] for key, entry in ranges["items"].items()}
+    failures: list[str] = []
+    for case in cases:
+        observations = [
+            {
+                "observation_id": f"{case['id']}-{index}",
+                "current_revision_id": "r1",
+                "item_key": obs["item_key"],
+                "display_name": names.get(obs["item_key"], obs["item_key"]),
+                "value_text": str(obs["value"]),
+                "unit": obs["unit"],
+                "verification_status": obs["verification_status"],
+            }
+            for index, obs in enumerate(case["observations"])
+        ]
+        result = build_interpretation(f"gate-{case['id']}", observations, ranges)
+        grades = {
+            entry["item_key"]: entry["grade"]
+            for entry in result["items"]
+            if entry.get("item_key") is not None
+        }
+        none_grades = [
+            entry["grade"]
+            for entry in result["items"]
+            if entry.get("item_key") is None
+        ]
+        excluded_refs = {
+            entry.get("observation_ref") for entry in result.get("excluded", [])
+        }
+        for index, obs in enumerate(case["observations"]):
+            expected = obs["expected_grade"]
+            if obs["verification_status"] not in confirmed:
+                if obs["item_key"] in grades or (
+                    f"{case['id']}-{index}" not in excluded_refs
+                ):
+                    failures.append(f"{case['id']}:{obs['item_key']} unconfirmed")
+            elif obs["item_key"] not in ranges["items"]:
+                if expected != "无法判断" or "无法判断" not in none_grades:
+                    failures.append(f"{case['id']}:{obs['item_key']} no-range")
+            elif grades.get(obs["item_key"]) != expected:
+                failures.append(
+                    f"{case['id']}:{obs['item_key']} "
+                    f"got={grades.get(obs['item_key'])} expected={expected}"
+                )
+    ok = len(cases) >= 20 and not failures
+    print(
+        f"report_interpretation_cases.json: {len(cases)} cases "
+        f"mismatches={len(failures)} "
+        f"{'; '.join(failures[:5])} -> {'PASS' if ok else 'FAIL'}"
+    )
+    return ok
+
+
 def main() -> int:
     service = TriageService()
     fixtures = ROOT / "tests" / "fixtures"
@@ -310,6 +383,7 @@ def main() -> int:
     results.append(check_conclusion_sheet(fixtures))
     results.append(check_web_advisory(fixtures))
     results.append(check_subagents(fixtures))
+    results.append(check_report_interpretation(fixtures))
     print("release gate:", "PASS" if all(results) else "FAIL")
     return 0 if all(results) else 1
 

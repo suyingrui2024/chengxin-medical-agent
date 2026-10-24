@@ -7,6 +7,8 @@ import copy
 import unittest
 
 from medagent.consultation import UserInput
+from medagent.domain import Assertion, CaseState, Fact, Source
+from medagent.followups import build_follow_up_plan, routine_hours_for
 from medagent.flywheel import build_candidate, merge_candidates
 from medagent.runtime import build_runtime
 
@@ -184,6 +186,87 @@ class FlywheelTests(unittest.TestCase):
         self.assertEqual(report["rejected"], ["c3"])
         self.assertEqual(len(merged["samples"]), 2)
         self.assertEqual(corpus, original)
+
+
+class FollowUpWindowsTests(unittest.TestCase):
+    """Design §6.2: routine windows come from followup_windows.json."""
+
+    def _fact(self, key, value="有", assertion=Assertion.PRESENT):
+        return Fact(
+            key=key, value=value, assertion=assertion,
+            source=Source.PATIENT, turn_id="t1",
+        )
+
+    def _state(self, facts, closed_reason="confirmed_by_user"):
+        return CaseState(
+            session_id="t",
+            closed_reason=closed_reason,
+            updated_at="2026-10-24T00:00:00+00:00",
+            facts={fact.key: fact for fact in facts},
+        )
+
+    def test_routine_window_per_pathway_group(self):
+        cases = [
+            ("resp_cough_details", 72),
+            ("gi_details", 48),
+            ("head_details", 72),
+            ("dizzy_details", 72),
+            ("back_details", 120),
+            ("urinary_details", 72),
+            ("skin_details", 168),
+        ]
+        for fact_key, expected in cases:
+            with self.subTest(fact_key=fact_key):
+                plan = build_follow_up_plan(self._state([self._fact(fact_key)]))
+                self.assertEqual(plan["kind"], "routine_checkin")
+                self.assertEqual(plan["due_in_hours"], expected)
+
+    def test_chest_group_via_chief_complaint_terms(self):
+        # Chest has no dedicated detail fact; the chief-complaint
+        # trigger terms are its only signal.
+        plan = build_follow_up_plan(
+            self._state([self._fact("chief_complaint", "胸痛两小时")])
+        )
+        self.assertEqual(plan["due_in_hours"], 48)
+
+    def test_unknown_group_falls_back_to_generic(self):
+        self.assertEqual(routine_hours_for("not_a_group"), 72)
+        self.assertEqual(routine_hours_for(""), 72)
+        plan = build_follow_up_plan(self._state([]))
+        self.assertEqual(plan["due_in_hours"], 72)
+
+    def test_unknown_facts_cap_the_window_at_48h(self):
+        # Back routine is 120h and skin routine is 168h, but an unknown
+        # fact must never let an uncertain case wait that long.
+        for fact_key in ("back_details", "skin_details"):
+            with self.subTest(fact_key=fact_key):
+                plan = build_follow_up_plan(
+                    self._state([
+                        self._fact(fact_key),
+                        self._fact("allergies", None, Assertion.UNKNOWN),
+                    ])
+                )
+                self.assertEqual(plan["due_in_hours"], 48)
+
+    def test_urgent_stays_24h(self):
+        plan = build_follow_up_plan(
+            self._state(
+                [self._fact("back_details")], closed_reason="urgent_route"
+            )
+        )
+        self.assertEqual(plan["kind"], "urgent_checkin")
+        self.assertEqual(plan["due_in_hours"], 24)
+
+    def test_plan_structure_unchanged(self):
+        plan = build_follow_up_plan(self._state([self._fact("gi_details")]))
+        self.assertEqual(
+            set(plan.keys()),
+            {
+                "kind", "status", "scheduled_at", "due_at", "due_in_hours",
+                "reason", "outcome", "outcome_note", "outcome_recorded_at",
+                "retriage_session_id",
+            },
+        )
 
 
 if __name__ == "__main__":

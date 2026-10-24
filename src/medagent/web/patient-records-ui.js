@@ -86,6 +86,110 @@ const verification = {
 };
 
 /*
+ * P3a 报告解读（设计 §5.1，产出合同 report-interpretation/v1）。
+ * 分级只做呈现：绿/黄/红/无法判断；无法识别的分级一律按「无法判断」
+ * （灰点）呈现，不升级、不猜测。固定声明必须原样展示。
+ */
+const INTERPRETATION_DISCLAIMER =
+  "由 AI 生成，未经医生审核；分级依据为工程版参考区间";
+
+const INTERPRETATION_GRADES = {
+  green: { label: "绿", dot: "interp-dot--green" },
+  yellow: { label: "黄", dot: "interp-dot--yellow" },
+  red: { label: "红", dot: "interp-dot--red" },
+  unknown: { label: "无法判断", dot: "interp-dot--unknown" },
+};
+
+function normalizeInterpretationGrade(raw) {
+  const text = String(raw ?? "").trim();
+  const map = {
+    绿: "green",
+    green: "green",
+    黄: "yellow",
+    yellow: "yellow",
+    红: "red",
+    red: "red",
+    无法判断: "unknown",
+    unknown: "unknown",
+  };
+  return map[text] || "unknown";
+}
+
+/*
+ * P3c 识别轮询（设计 §5.3）：每 2 秒查一次条目状态，最多 45 次
+ * （90 秒上限，覆盖后端 45 秒识别超时 + 余量）；到上限仍未完成时
+ * 停止轮询并如实提示，不无限轮询、不伪造完成。
+ */
+export const RECOGNITION_POLL = { intervalMs: 2000, maxAttempts: 45 };
+
+/*
+ * 纯渲染：由一份解读数据建出「解读」节 DOM（不发请求、不碰状态），
+ * 供条目详情与 UI 用例共用。字段名做宽容映射（后端字段名以
+ * P3-A 接线说明为准；未知字段不丢弃整项，只按「无法判断」呈现）。
+ */
+export function createInterpretationSection(interpretation) {
+  const section = node("section", "record-interpretation");
+  section.append(node("h3", "", "解读"));
+  const data = interpretation || {};
+  const items = data.items || data.results || data.entries || [];
+  // 后端 report-interpretation/v1 的 summary 是对象（text 在内），
+  // 字符串 summary 亦接受；对象无 text 时不渲染 “[object Object]”。
+  const summaryText =
+    typeof data.summary === "string"
+      ? data.summary
+      : data.summary?.text || data.overall || "";
+  if (summaryText) section.append(node("p", "", summaryText));
+  if (items.length) {
+    const list = node("div", "record-interpretation-list");
+    for (const item of items) {
+      const gradeKey = normalizeInterpretationGrade(item.grade ?? item.level);
+      const grade = INTERPRETATION_GRADES[gradeKey];
+      const row = node("div", "record-interpretation-item");
+      const head = node("div", "record-interpretation-head");
+      const dot = node("span", `interp-dot ${grade.dot}`);
+      dot.setAttribute("aria-label", `分级${grade.label}`);
+      head.append(
+        dot,
+        node(
+          "strong",
+          "",
+          item.display_name ||
+            item.common_name ||
+            item.name ||
+            item.observation_ref ||
+            "未命名项目",
+        ),
+        node(
+          "span",
+          "",
+          item.result_text ||
+            item.value_text ||
+            [item.value, item.unit].filter(Boolean).join(" ") ||
+            "",
+        ),
+        node("span", "interp-grade", grade.label),
+      );
+      row.append(head);
+      const explanation =
+        item.explanation || item.plain_language || item.description || "";
+      if (explanation) row.append(node("p", "", explanation));
+      const action = item.action || item.action_advice || item.recommendation;
+      if (action) row.append(node("span", "subtle-pill", `建议：${action}`));
+      list.append(row);
+    }
+    section.append(list);
+  }
+  section.append(
+    node(
+      "p",
+      "record-interpretation-disclaimer",
+      data.disclaimer || INTERPRETATION_DISCLAIMER,
+    ),
+  );
+  return section;
+}
+
+/*
  * P2 前端接口（均已落地，见 tests/test_patient_records_api.py）：
  *   GET    /api/patients                       → { patients: [...] }（含 archived）
  *   POST   /api/patients                       { display_name, ...基线字段 }
@@ -97,9 +201,23 @@ const verification = {
  *   GET    /api/patient/trends/{slug}          → 与血糖趋势相同的 shape
  *   GET    /api/patients/{id}/timeline         → 与默认时间线相同的 shape
  *   POST   /api/sessions/{id}/bind-patient     → { patient_id }，{ patient, state }
- * 注意：测量写入与趋势接口恒绑默认（本人）档案——查看非默认成员时
- * 前端禁用“记录测量”并隐藏趋势区（M2），不把成员数据记到本人名下。
+ *   POST   /api/patients/{id}/measurements/{slug} → 与默认路由同 shape，写该成员名下
+ *   GET    /api/patients/{id}/trends/{slug}    → 与默认路由同 shape，读该成员
+ * 注意：默认路由仍恒绑本人档案；查看成员时前端走成员路由（见
+ * measurementApiBase），不再禁用、不再隐藏趋势区。
  * 任何接口返回 404 时前端只提示、不伪造成功。
+ *
+ * P3 前端接口（设计 §5.1/§5.3，均已落地）：
+ *   GET    /api/patients/entries/{id}/interpretation
+ *          → { interpretation: { summary, items: [...] } }，无解读时 404
+ *   POST   /api/patients/entries/{id}/interpretations
+ *          → { interpretation }；接口未就绪时只提示、不伪造解读
+ *   时间线条目徽标以后端标志为准：has_interpretation === true
+ *         （亦接受 interpreted === true 或 interpretation_status 为
+ *          ready/completed）；无标志时不加徽标、不猜测。
+ *   识别轮询：条目 status 为 recognizing 时 renderDetail 自动轮询
+ *          GET /api/entries/{id}（RECOGNITION_POLL），识别完成或失败
+ *          后自动刷新；POST recognitions 返回 202/recognizing 时同理。
  */
 const BASELINE_FIELDS = [
   "birth_year",
@@ -207,6 +325,11 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     measurementTrends: {},
   };
 
+  // P3c 识别轮询状态（单条目、单定时器；上限见 RECOGNITION_POLL）。
+  let recognitionPollTimer = null;
+  let recognitionPollEntryId = null;
+  let recognitionPollAttempts = 0;
+
   function setFormBusy(form, busy) {
     for (const control of form.elements) control.disabled = busy;
   }
@@ -313,7 +436,7 @@ export function createPatientRecordsUI(api, toast, options = {}) {
         );
       }
       const status = node("span", "record-state");
-      status.append(
+      const statusChildren = [
         node(
           "span",
           `subtle-pill ${item.review_count ? "record-pending" : ""}`,
@@ -323,8 +446,17 @@ export function createPatientRecordsUI(api, toast, options = {}) {
               ? `${item.review_count} 项待确认`
               : statuses[item.status] || item.status,
         ),
-        icon("arrow"),
-      );
+      ];
+      // P3a：只有后端明确给出已解读标志时才加徽标，无标志不猜测。
+      if (
+        item.has_interpretation === true ||
+        item.interpreted === true ||
+        item.interpretation_status === "ready" ||
+        item.interpretation_status === "completed"
+      )
+        statusChildren.push(node("span", "subtle-pill", "已解读"));
+      statusChildren.push(icon("arrow"));
+      status.append(...statusChildren);
       card.append(dateNode, main, status);
       target.append(card);
     }
@@ -395,9 +527,9 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     );
   }
 
-  // M2: measurement writes and trend reads are hard-bound to the
-  // default (self) profile server-side, so they are only meaningful
-  // while the default member is the one being viewed.
+  // P2 follow-up: member routes exist now, so this helper only
+  // answers "is the viewed member the default profile" (used for
+  // legacy default-route selection in measurementApiBase).
   function viewingDefaultMember() {
     const member = activeMember();
     return Boolean(
@@ -407,27 +539,24 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     );
   }
 
+  // P2 follow-up (P3/P4 batch): measurement and trend routes are
+  // per-member now. The default member keeps the legacy /api/patient
+  // routes; any other viewed member uses /api/patients/{id}/... with
+  // the same body shapes, so writes land under the viewed member.
+  function measurementApiBase() {
+    const member = activeMember();
+    if (!member || member.patient_id === state.defaultPatient?.patient_id)
+      return "/api/patient";
+    return `/api/patients/${member.patient_id}`;
+  }
+
   function syncMeasurementAvailability() {
+    // Measurements are available for every viewed member (per-member
+    // routes above); the button is never disabled for being a member.
     const button = $("#add-measurement");
-    const isDefault = viewingDefaultMember();
     if (button) {
-      button.disabled = !isDefault;
-      button.title = isDefault ? "" : "测量记录目前只支持本人档案";
-    }
-    if (!isDefault) {
-      // Hide the self profile's trends rather than showing them under
-      // a member's name; the member-list notice (renderMembers) says
-      // so explicitly, so the absence is explained, not silent.
-      const glucose = $("#records-trend");
-      if (glucose) glucose.hidden = true;
-      const trends = $("#records-measurement-trends");
-      if (trends) trends.hidden = true;
-    } else {
-      // Switching back re-renders from the cached trends; refresh()
-      // already rendered them, so this is only a no-op safety net
-      // for the member-switch path, which does not reload trends.
-      renderGlucoseTrend();
-      renderMeasurementTrends();
+      button.disabled = false;
+      button.title = "";
     }
   }
 
@@ -889,15 +1018,6 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       card.append(controls);
       target.append(card);
     }
-    if (!viewingDefaultMember()) {
-      target.append(
-        node(
-          "p",
-          "notice-strip",
-          "测量记录与趋势目前只支持本人档案；当前查看的是成员档案，趋势区已隐藏。",
-        ),
-      );
-    }
     if (!state.membersReady) {
       target.append(
         node("p", "notice-strip", "未能加载成员列表，目前仅显示本人。"),
@@ -1001,6 +1121,18 @@ export function createPatientRecordsUI(api, toast, options = {}) {
   async function refreshTimelineForActiveMember() {
     state.timeline = await loadTimeline();
     renderTimeline();
+    // Member switch must also move the trends off the default
+    // profile; otherwise a member view would keep showing self data.
+    try {
+      state.glucoseTrend = await api(
+        `${measurementApiBase()}/trends/blood-glucose`,
+      );
+      renderGlucoseTrend();
+    } catch {
+      /* trends stay as they were; the timeline above is authoritative */
+    }
+    await loadMeasurementTrends().catch(() => {});
+    syncMeasurementAvailability();
   }
 
   function renderMeasurementValues(kindDef) {
@@ -1150,10 +1282,6 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     event.preventDefault();
     const form = event.currentTarget;
     const feedback = $("#measurement-record-feedback");
-    if (!viewingDefaultMember()) {
-      feedback.textContent = "测量记录目前只支持本人档案";
-      return;
-    }
     const kindValue = $("#measurement-record-kind").value;
     const kindDef =
       MEASUREMENT_KINDS.find((item) => item.kind === kindValue) ||
@@ -1175,9 +1303,7 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       if (kindDef.kind === "blood_glucose")
         body.measurement_context = $("#measurement-record-context").value;
     }
-    const endpoint = kindDef.legacy
-      ? "/api/patient/measurements/blood-glucose"
-      : `/api/patient/measurements/${kindDef.slug}`;
+    const endpoint = `${measurementApiBase()}/measurements/${kindDef.slug}`;
     setFormBusy(form, true);
     try {
       await api(endpoint, { method: "POST", body });
@@ -1223,13 +1349,11 @@ export function createPatientRecordsUI(api, toast, options = {}) {
   }
 
   async function loadMeasurementTrends() {
+    const base = measurementApiBase();
     const entries = await Promise.all(
       MEASUREMENT_KINDS.filter((item) => !item.legacy).map(async (kindDef) => {
         try {
-          return [
-            kindDef.kind,
-            await api(`/api/patient/trends/${kindDef.slug}`),
-          ];
+          return [kindDef.kind, await api(`${base}/trends/${kindDef.slug}`)];
         } catch {
           return [kindDef.kind, null];
         }
@@ -1243,7 +1367,7 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     if (!state.initialized) await ensurePatient();
     [state.timeline, state.glucoseTrend] = await Promise.all([
       loadTimeline(),
-      api("/api/patient/trends/blood-glucose"),
+      api(`${measurementApiBase()}/trends/blood-glucose`),
     ]);
     renderTimeline();
     renderGlucoseTrend();
@@ -1553,6 +1677,111 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     return panel;
   }
 
+  function stopRecognitionPoll() {
+    if (recognitionPollTimer !== null) {
+      clearTimeout(recognitionPollTimer);
+      recognitionPollTimer = null;
+    }
+    recognitionPollEntryId = null;
+    recognitionPollAttempts = 0;
+  }
+
+  // P3c：轮询一条 recognizing 条目，直到状态离开 recognizing、
+  // 失败或达到上限；完成时刷新时间线并重绘详情（对话框已关闭时
+  // 只刷新时间线）。同一条目不重复起轮询。
+  function startRecognitionPoll(entryId) {
+    if (recognitionPollEntryId === entryId && recognitionPollTimer !== null)
+      return;
+    stopRecognitionPoll();
+    recognitionPollEntryId = entryId;
+    const tick = async () => {
+      recognitionPollTimer = null;
+      recognitionPollAttempts += 1;
+      try {
+        const fresh = await api(`/api/entries/${entryId}`);
+        if (fresh.entry?.status !== "recognizing") {
+          stopRecognitionPoll();
+          await refresh().catch(() => {});
+          if ($("#record-detail-dialog")?.open) renderDetail(fresh);
+          return;
+        }
+      } catch (error) {
+        stopRecognitionPoll();
+        toast(error.message);
+        return;
+      }
+      if (recognitionPollAttempts >= RECOGNITION_POLL.maxAttempts) {
+        stopRecognitionPoll();
+        toast("识别仍在进行中，稍后可在档案时间线中查看。");
+        return;
+      }
+      recognitionPollTimer = setTimeout(tick, RECOGNITION_POLL.intervalMs);
+    };
+    recognitionPollTimer = setTimeout(tick, RECOGNITION_POLL.intervalMs);
+  }
+
+  async function loadInterpretation(entryId) {
+    try {
+      const data = await api(`/api/patients/entries/${entryId}/interpretation`);
+      if (!data) return null;
+      return data.interpretation ?? (data.items || data.summary ? data : null);
+    } catch {
+      // 无解读（404）与接口未就绪都先按“无解读”呈现；
+      // 开始解读按钮的 POST 失败会如实提示，不伪造解读。
+      return null;
+    }
+  }
+
+  // P3a：往详情里填「解读」节。已有解读则完整呈现；无解读时
+  // 显示“尚未解读”，仅当有已确认观测时才给“开始解读”按钮
+  // （设计 §5.1：未确认值不进解读）；POST 失败只提示、不伪造。
+  async function loadInterpretationInto(section, detail) {
+    const entry = detail.entry;
+    const loading = node("p", "", "正在加载解读…");
+    section.append(loading);
+    const interpretation = await loadInterpretation(entry.entry_id);
+    loading.remove();
+    if (interpretation) {
+      const built = createInterpretationSection(interpretation);
+      section.replaceChildren(...built.childNodes);
+      return;
+    }
+    section.append(node("p", "", "尚未解读"));
+    const confirmed = (detail.observations || []).some(
+      (item) =>
+        item.verification_status === "patient_confirmed" ||
+        item.verification_status === "patient_corrected",
+    );
+    if (!confirmed) {
+      section.append(
+        node("p", "notice-strip", "请先确认转录数值，确认后才可生成解读。"),
+      );
+      return;
+    }
+    const button = action("开始解读", "secondary-button", async (event) => {
+      const trigger = event.currentTarget;
+      trigger.disabled = true;
+      trigger.textContent = "正在生成解读…";
+      try {
+        const data = await api(
+          `/api/patients/entries/${entry.entry_id}/interpretations`,
+          { method: "POST", body: {} },
+        );
+        const created =
+          data?.interpretation ?? (data?.items || data?.summary ? data : null);
+        if (!created) throw new Error("解读接口尚未返回解读结果，请稍后再试。");
+        const built = createInterpretationSection(created);
+        section.replaceChildren(...built.childNodes);
+        await refresh().catch(() => {});
+      } catch (error) {
+        toast(error.message || "解读功能尚未就绪，请稍后再试。");
+        trigger.disabled = false;
+        trigger.textContent = "开始解读";
+      }
+    });
+    section.append(button);
+  }
+
   function renderDetail(detail) {
     const entry = detail.entry;
     $("#record-detail-title").textContent = entry.title;
@@ -1579,6 +1808,15 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       node("span", "", statuses[entry.status] || entry.status),
     );
     target.append(meta);
+    // P3c：识别中状态明示并轮询；已完成/失败时停掉轮询。
+    if (entry.status === "recognizing") {
+      target.append(
+        node("p", "notice-strip", "识别中，完成后会自动刷新本页。"),
+      );
+      startRecognitionPoll(entry.entry_id);
+    } else {
+      stopRecognitionPoll();
+    }
     const recognition = [...detail.recognitions]
       .reverse()
       .find((item) => item.status === "succeeded");
@@ -1615,6 +1853,12 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       section.append(list);
       target.append(section);
     }
+    // P3a：解读节与转录观测分区呈现；内容由 loadInterpretationInto
+    // 异步填入（已有解读 / 尚未解读 / 开始解读三种状态）。
+    const interpretationSection = node("section", "record-interpretation");
+    interpretationSection.append(node("h3", "", "解读"));
+    target.append(interpretationSection);
+    void loadInterpretationInto(interpretationSection, detail);
     target.append(consultationPanel(detail));
     const actions = node("div", "record-detail-actions");
     if (
@@ -1635,7 +1879,13 @@ export function createPatientRecordsUI(api, toast, options = {}) {
               },
             );
             await refresh();
-            renderDetail(updated);
+            // P3d async: POST now returns 202 {run_id, entry_id},
+            // not the old 201 detail. Re-open by entry id so the
+            // detail view's recognizing poll (GET /api/entries/{id},
+            // unchanged address) starts tracking the job.
+            if (updated?.entry) renderDetail(updated);
+            else if (updated?.entry_id) await openDetail(updated.entry_id);
+            else await openDetail(entry.entry_id);
           } catch (error) {
             toast(error.message);
             trigger.disabled = false;
@@ -1716,7 +1966,14 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       form.reset();
       $("#medical-image-preview").hidden = true;
       await refresh();
-      if (detail.entry) await openDetail(detail.entry.entry_id);
+      // P3d async: the 202 response carries entry_id, not a detail
+      // body; open by id so the recognizing poll starts. The upload
+      // response itself still carries entry as a fallback.
+      const targetEntryId =
+        detail?.entry?.entry_id ||
+        detail?.entry_id ||
+        uploaded?.entry?.entry_id;
+      if (targetEntryId) await openDetail(targetEntryId);
     } catch (error) {
       $("#medical-image-feedback").textContent = error.message;
     } finally {

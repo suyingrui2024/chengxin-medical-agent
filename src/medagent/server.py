@@ -37,6 +37,14 @@ from .medical_images import (
 )
 from . import education as education_module
 from .baseline_projection import build_baseline_projection
+from .medication_reminders import build_medication_reminders
+from .recognition_jobs import (
+    RecognitionJobError,
+    RecognitionJobStore,
+    get_job,
+    submit_job,
+)
+from .report_interpretation import build_interpretation, interpretation_summary
 from .measurement_kinds import (
     MeasurementKindError,
     normalize_measurement,
@@ -131,6 +139,56 @@ def _consultation_patient_id(state, default_patient_id):
     return None
 
 
+# P4 medication-reminder schedules: patient-set clock times only, kept
+# in the patient data root next to patients.sqlite3 (never in a session
+# dir, so they survive restarts). Keyed by normalized medication name;
+# no dose, no frequency advice, no interaction data is ever stored here.
+_MEDICATION_SCHEDULES_FILENAME = "medication_schedules.json"
+_TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+
+
+def _medication_schedules_path(store) -> Path:
+    return store.root / _MEDICATION_SCHEDULES_FILENAME
+
+
+def _load_medication_schedules(store) -> dict:
+    """{normalized_name: {"name": original, "times": [HH:MM]}}.
+
+    Corrupt or missing files read as empty (fail-open: reminders just
+    fall back to pending_setup); the file is never auto-repaired on read.
+    """
+    path = _medication_schedules_path(store)
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(raw, dict):
+        return {}
+    cleaned = {}
+    for key, entry in raw.items():
+        if not isinstance(entry, dict):
+            continue
+        times = [
+            item
+            for item in (entry.get("times") or [])
+            if isinstance(item, str) and _TIME_RE.match(item)
+        ]
+        name = entry.get("name") if isinstance(entry.get("name"), str) else ""
+        if key and name:
+            cleaned[key] = {"name": name, "times": times}
+    return cleaned
+
+
+def _save_medication_schedules(store, schedules: dict) -> None:
+    path = _medication_schedules_path(store)
+    tmp = path.with_suffix(".json.tmp")
+    with store.lock:
+        tmp.write_text(
+            json.dumps(schedules, ensure_ascii=False), encoding="utf-8"
+        )
+        tmp.replace(path)
+
+
 def _persist_engine_state(engine, state) -> None:
     """Persist a state a route mutated directly, inside its session lock.
 
@@ -171,6 +229,11 @@ class MedicalAgentServer(ThreadingHTTPServer):
         self.execution = ExecutionManager()
         self._patient_store = patient_store
         self.image_recognizer = image_recognizer
+        # P3d: one process-wide recognition job registry. Jobs are
+        # in-memory by design; durable state lives in the store's
+        # recognition_runs rows and entry statuses, so a restart loses
+        # only the pollable job records (see the reset route).
+        self.recognition_jobs = RecognitionJobStore()
         self.reviews = BackgroundReviewCoordinator(
             events, mode=os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow")
         )
@@ -402,6 +465,9 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/sessions":
             self._json({"sessions": self.app.workspace.sessions()})
             return
+        if path == "/api/medication-reminders":
+            self._json({"reminders": self._medication_reminders()})
+            return
         if path == "/api/follow-ups":
             self._maybe_schedule_followup_drafts()
             self._json({"follow_ups": self.app.workspace.follow_ups()})
@@ -568,6 +634,52 @@ class Handler(BaseHTTPRequestHandler):
                         continue
             self.app.reviews.set_enabled_for_process(enabled)
             self._json({"enabled": enabled})
+            return
+        if path == "/api/medication-reminders/schedule":
+            # P4: patient-set reminder times only. Times must all be
+            # HH:MM; anything else is a 400, never silently dropped.
+            # An empty list clears the schedule for that medication.
+            # No dose is accepted, stored or returned anywhere here.
+            payload = self._read_json()
+            if payload is None:
+                return
+            name = payload.get("medication_name")
+            times = payload.get("times")
+            if (
+                not isinstance(name, str)
+                or not name.strip()
+                or not isinstance(times, list)
+                or any(
+                    not isinstance(item, str) or not _TIME_RE.match(item.strip())
+                    for item in times
+                )
+                or set(payload) - {"medication_name", "times"}
+            ):
+                self._error(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_medication_schedule",
+                    "用药提醒时间须为 HH:MM 格式的时间列表",
+                )
+                return
+            cleaned = []
+            for item in times:
+                item = item.strip()
+                if item not in cleaned:
+                    cleaned.append(item)
+            store = self.app.patient_records
+            schedules = _load_medication_schedules(store)
+            schedules[name.strip().casefold()] = {
+                "name": name.strip(),
+                "times": cleaned,
+            }
+            _save_medication_schedules(store, schedules)
+            self._json(
+                {
+                    "medication_name": name.strip(),
+                    "scheduled_times": cleaned,
+                    "status": "scheduled" if cleaned else "pending_setup",
+                }
+            )
             return
         if path == "/api/sessions":
             with self.app.workspace.lock:
@@ -819,6 +931,23 @@ class Handler(BaseHTTPRequestHandler):
                         if item.get("source_observation_id") not in observation_ids
                     ]
                     entry = shared["entry"]
+                    # P3a attach extension: when the entry has a ready
+                    # interpretation, its summary rides along as a
+                    # comment only. It never overwrites reported_value
+                    # or unit, and the grade never becomes an observation.
+                    interpretation_note = None
+                    try:
+                        latest_sheet = (
+                            self.app.patient_records.latest_interpretation(
+                                entry["entry_id"]
+                            )
+                        )
+                        if latest_sheet is not None and latest_sheet.get("result"):
+                            interpretation_note = interpretation_summary(
+                                latest_sheet["result"]
+                            )
+                    except Exception:
+                        interpretation_note = None
                     attached = []
                     for observation in observations:
                         confirmed = {
@@ -839,6 +968,8 @@ class Handler(BaseHTTPRequestHandler):
                             "measured_at": observation["measured_at"]
                             or entry["measured_at"],
                         }
+                        if interpretation_note:
+                            confirmed["interpretation_note"] = interpretation_note
                         state.report_items.append(confirmed)
                         attached.append(confirmed)
                     state.revision += 1
@@ -1284,6 +1415,47 @@ class Handler(BaseHTTPRequestHandler):
                 dict(self.app.workspace.settings), self.app.workspace.backend
             )
 
+    def _medication_reminders(self) -> list:
+        """Reminder plan for the default profile (P4).
+
+        Sources, deduplicated by normalized name inside
+        build_medication_reminders: the default profile's baseline
+        medications plus medications_taken from closed sessions. Times
+        come only from medication_schedules.json (patient-set); a
+        medication with no set time is pending_setup, never invented.
+        No dose or interaction judgement is produced anywhere here.
+        """
+        store = self.app.patient_records
+        default = store.ensure_default_patient()
+        consultation_medications = []
+        for summary in self.app.workspace.sessions():
+            if summary.get("phase") != "closed":
+                continue
+            try:
+                engine = self.app.workspace.engine_for(summary["session_id"])
+                state = engine.state(summary["session_id"])
+            except KeyError:
+                continue
+            value = state.get("medications_taken")
+            if isinstance(value, str) and value:
+                consultation_medications.append(value)
+        schedules = _load_medication_schedules(store)
+        scheduled_times: dict[str, list[str]] = {}
+        candidates = [entry.get("name", "") for entry in default.get("medications", [])]
+        candidates.extend(consultation_medications)
+        for name in candidates:
+            if not isinstance(name, str) or not name.strip():
+                continue
+            key = name.strip().casefold()
+            entry = schedules.get(key)
+            if entry is not None:
+                scheduled_times[name] = list(entry["times"])
+        return build_medication_reminders(
+            default.get("medications", []),
+            consultation_medications,
+            scheduled_times,
+        )
+
     def _patient_get(self, path: str) -> None:
         try:
             parts = path.strip("/").split("/")
@@ -1319,6 +1491,87 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(self.app.patient_records.timeline(parts[2]))
                 return
             if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "patients"]
+                and parts[3] == "trends"
+            ):
+                # P2 follow-up (P3/P4 batch): per-member trends, the
+                # server-side root fix for the M2 residual. The default
+                # route below keeps its legacy glucose shape untouched.
+                kind = MEASUREMENT_SLUGS.get(parts[4])
+                if kind is None:
+                    self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
+                    return
+                patient = self.app.patient_records.patient(parts[2])
+                if kind == "blood_glucose":
+                    self._json(
+                        self.app.patient_records.glucose_trend(patient["patient_id"])
+                    )
+                else:
+                    self._json(
+                        self.app.patient_records.measurement_trend(
+                            kind, patient["patient_id"]
+                        )
+                    )
+                return
+            if (
+                len(parts) == 6
+                and parts[0:2] == ["api", "patients"]
+                and parts[3] == "entries"
+                and parts[5] == "interpretation"
+            ):
+                # P3a canonical: latest ready sheet for one entry.
+                self.app.patient_records.patient(parts[2])
+                detail = self.app.patient_records.entry(parts[4])
+                if detail["entry"]["patient_id"] != parts[2]:
+                    raise PatientRecordError("该条目不属于该患者档案")
+                sheet = self.app.patient_records.latest_interpretation(parts[4])
+                if sheet is None or sheet.get("result") is None:
+                    self._error(
+                        HTTPStatus.NOT_FOUND,
+                        "interpretation_not_found",
+                        "该条目还没有解读",
+                    )
+                    return
+                self._json(
+                    {
+                        "analysis_id": sheet["analysis_id"],
+                        "status": sheet["status"],
+                        "model": sheet.get("model"),
+                        "model_version": sheet.get("model_version"),
+                        "interpretation": sheet["result"],
+                    }
+                )
+                return
+            if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "patients"]
+                and parts[2] == "entries"
+                and parts[4] == "interpretation"
+            ):
+                # P3a frontend alias (patient-records-ui.js): same
+                # sheet, addressed by entry alone.
+                entry_id = parts[3]
+                self.app.patient_records.entry(entry_id)
+                sheet = self.app.patient_records.latest_interpretation(entry_id)
+                if sheet is None or sheet.get("result") is None:
+                    self._error(
+                        HTTPStatus.NOT_FOUND,
+                        "interpretation_not_found",
+                        "该条目还没有解读",
+                    )
+                    return
+                self._json(
+                    {
+                        "analysis_id": sheet["analysis_id"],
+                        "status": sheet["status"],
+                        "model": sheet.get("model"),
+                        "model_version": sheet.get("model_version"),
+                        "interpretation": sheet["result"],
+                    }
+                )
+                return
+            if (
                 len(parts) == 4
                 and parts[0:2] == ["api", "patient"]
                 and parts[2] == "trends"
@@ -1344,6 +1597,24 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(self.app.patient_records.entry(parts[2]))
                 return
             if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "assets"]
+                and parts[3] == "recognitions"
+            ):
+                # P3d: poll one async recognition job. The job must
+                # belong to this asset, otherwise it is a 404, not a
+                # leak of another asset's job record.
+                try:
+                    job = get_job(self.app.recognition_jobs, parts[4])
+                except KeyError:
+                    self._error(HTTPStatus.NOT_FOUND, "not_found", "识别任务不存在")
+                    return
+                if job.get("asset_id") != parts[2]:
+                    self._error(HTTPStatus.NOT_FOUND, "not_found", "识别任务不存在")
+                    return
+                self._json({"job": job})
+                return
+            if (
                 len(parts) == 4
                 and parts[0:2] == ["api", "assets"]
                 and parts[3] == "content"
@@ -1361,6 +1632,64 @@ class Handler(BaseHTTPRequestHandler):
             self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
         except PatientRecordError as exc:
             self._error(HTTPStatus.NOT_FOUND, "record_not_found", str(exc))
+
+    def _create_measurement(self, patient_id: str, kind: str, payload: dict) -> dict:
+        """Validate one measurement body and persist it (P2b shapes).
+
+        Shared by the default-member route and the per-member route
+        (P2 follow-up): both enforce exactly the same body rules, so
+        a member write can never slip past a check the default write
+        would catch. Raises PatientRecordError on any shape problem.
+        """
+        if kind == "blood_glucose":
+            allowed = {"value_text", "unit", "measured_at", "measurement_context"}
+            if set(payload) != allowed:
+                raise PatientRecordError("血糖记录参数不完整")
+            measurement_payload = dict(payload)
+        elif kind == "blood_pressure":
+            if not {"systolic", "diastolic", "unit", "measured_at"}.issubset(
+                payload
+            ) or set(payload) - {
+                "systolic",
+                "diastolic",
+                "unit",
+                "measured_at",
+                "measurement_context",
+            }:
+                raise PatientRecordError("血压记录参数不完整")
+            measurement_payload = {
+                "value_text": f"{payload['systolic']}/{payload['diastolic']}",
+                "unit": payload["unit"],
+                "measured_at": payload["measured_at"],
+                "measurement_context": payload.get("measurement_context", "unknown"),
+            }
+        else:
+            if not {"value_text", "unit", "measured_at"}.issubset(
+                payload
+            ) or set(payload) - {
+                "value_text",
+                "unit",
+                "measured_at",
+                "measurement_context",
+            }:
+                raise PatientRecordError("测量记录参数不完整")
+            measurement_payload = {
+                "value_text": payload["value_text"],
+                "unit": payload["unit"],
+                "measured_at": payload["measured_at"],
+                "measurement_context": payload.get("measurement_context", "unknown"),
+            }
+        detail = self.app.patient_records.add_measurement(
+            patient_id, kind=kind, **measurement_payload
+        )
+        self.app.events.append(
+            Event(
+                "patient-records",
+                "patient.measurement_recorded",
+                {"entry_id": detail["entry"]["entry_id"], "kind": kind},
+            )
+        )
+        return detail
 
     def _patient_post(self, path: str) -> None:
         if not self._same_origin():
@@ -1461,6 +1790,73 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(detail, HTTPStatus.CREATED)
                 return
             if (
+                (
+                    len(parts) == 6
+                    and parts[0:2] == ["api", "patients"]
+                    and parts[3] == "entries"
+                    and parts[5] == "interpretation"
+                )
+                or (
+                    len(parts) == 5
+                    and parts[0:2] == ["api", "patients"]
+                    and parts[2] == "entries"
+                    and parts[4] == "interpretations"
+                )
+            ):
+                # P3a: grade one entry's confirmed observations only.
+                # Canonical route carries the patient id; the frontend
+                # alias (patient-records-ui.js) addresses the entry
+                # alone and posts to the plural form. Both share this
+                # handler so the sheet can never differ by address.
+                # Explanations are the module's fixed templates: no new
+                # model channel is opened for interpretation drafts.
+                if payload:
+                    raise PatientRecordError("解读请求不接受额外参数")
+                if len(parts) == 6:
+                    patient_id, entry_id = parts[2], parts[4]
+                    self.app.patient_records.patient(patient_id)
+                else:
+                    entry_id = parts[3]
+                    entry_owner = self.app.patient_records.entry(entry_id)
+                    patient_id = entry_owner["entry"]["patient_id"]
+                detail = self.app.patient_records.entry(entry_id)
+                if detail["entry"]["patient_id"] != patient_id:
+                    raise PatientRecordError("该条目不属于该患者档案")
+                confirmed = [
+                    item
+                    for item in detail["observations"]
+                    if item.get("kind") != "document_content"
+                    and item.get("verification_status")
+                    in ("patient_confirmed", "patient_corrected")
+                    and item.get("value_text")
+                ]
+                if not confirmed:
+                    raise PatientRecordError(
+                        "该条目还没有经你确认的数值，确认后才可生成解读"
+                    )
+                sheet = build_interpretation(entry_id, confirmed)
+                saved = self.app.patient_records.save_interpretation(
+                    patient_id,
+                    entry_id,
+                    "template",
+                    sheet.get("ranges_version") or "1.0",
+                    [
+                        item.get("current_revision_id")
+                        for item in confirmed
+                        if item.get("current_revision_id")
+                    ],
+                    sheet,
+                )
+                self._json(
+                    {
+                        "analysis_id": saved["analysis_id"],
+                        "status": saved["status"],
+                        "interpretation": sheet,
+                    },
+                    HTTPStatus.CREATED,
+                )
+                return
+            if (
                 len(parts) == 4
                 and parts[0:2] == ["api", "patient"]
                 and parts[2:] == ["measurements", "from-observation"]
@@ -1482,6 +1878,14 @@ class Handler(BaseHTTPRequestHandler):
                 if "unit" in payload and not isinstance(payload["unit"], str):
                     raise PatientRecordError("另存为测量参数不完整")
                 detail = self.app.patient_records.entry(entry_id)
+                # N3: match the manual per-member measurement route —
+                # archived members cannot take new measurements, even
+                # via a confirmed transcription.
+                owner = self.app.patient_records.patient(
+                    detail["entry"]["patient_id"]
+                )
+                if owner.get("archived"):
+                    raise PatientRecordError("已归档成员不能新增测量")
                 observation = next(
                     (
                         item
@@ -1577,76 +1981,79 @@ class Handler(BaseHTTPRequestHandler):
                 if kind is None:
                     self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
                     return
-                if kind == "blood_glucose":
-                    allowed = {
-                        "value_text",
-                        "unit",
-                        "measured_at",
-                        "measurement_context",
-                    }
-                    if set(payload) != allowed:
-                        raise PatientRecordError("血糖记录参数不完整")
-                    measurement_payload = dict(payload)
-                elif kind == "blood_pressure":
-                    if not {"systolic", "diastolic", "unit", "measured_at"}.issubset(
-                        payload
-                    ) or set(payload) - {
-                        "systolic",
-                        "diastolic",
-                        "unit",
-                        "measured_at",
-                        "measurement_context",
-                    }:
-                        raise PatientRecordError("血压记录参数不完整")
-                    measurement_payload = {
-                        "value_text": (
-                            f"{payload['systolic']}/{payload['diastolic']}"
-                        ),
-                        "unit": payload["unit"],
-                        "measured_at": payload["measured_at"],
-                        "measurement_context": payload.get(
-                            "measurement_context", "unknown"
-                        ),
-                    }
-                else:
-                    if not {"value_text", "unit", "measured_at"}.issubset(
-                        payload
-                    ) or set(payload) - {
-                        "value_text",
-                        "unit",
-                        "measured_at",
-                        "measurement_context",
-                    }:
-                        raise PatientRecordError("测量记录参数不完整")
-                    measurement_payload = {
-                        "value_text": payload["value_text"],
-                        "unit": payload["unit"],
-                        "measured_at": payload["measured_at"],
-                        "measurement_context": payload.get(
-                            "measurement_context", "unknown"
-                        ),
-                    }
                 patient = self.app.patient_records.ensure_default_patient()
-                detail = self.app.patient_records.add_measurement(
-                    patient["patient_id"], kind=kind, **measurement_payload
-                )
-                self.app.events.append(
-                    Event(
-                        "patient-records",
-                        "patient.measurement_recorded",
-                        {
-                            "entry_id": detail["entry"]["entry_id"],
-                            "kind": kind,
-                        },
-                    )
+                detail = self._create_measurement(
+                    patient["patient_id"], kind, payload
                 )
                 self._json(detail, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "patients"]
+                and parts[3] == "measurements"
+            ):
+                # P2 follow-up (P3/P4 batch): per-member measurements.
+                # Same body rules as the default route, via the shared
+                # helper; archived members cannot take new measurements.
+                kind = MEASUREMENT_SLUGS.get(parts[4])
+                if kind is None:
+                    self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
+                    return
+                try:
+                    patient = self.app.patient_records.patient(parts[2])
+                except PatientRecordError:
+                    self._error(
+                        HTTPStatus.NOT_FOUND, "record_not_found", "患者档案不存在"
+                    )
+                    return
+                if patient.get("archived"):
+                    raise PatientRecordError("已归档成员不能新增测量")
+                detail = self._create_measurement(
+                    patient["patient_id"], kind, payload
+                )
+                self._json(detail, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 5
+                and parts[0:2] == ["api", "assets"]
+                and parts[3] == "recognitions"
+                and parts[4] == "reset"
+            ):
+                # P3d restart recovery: only when no job for this
+                # entry is still active AND the entry is stuck in
+                # recognizing. An active job means the entry may still
+                # complete on its own, so reset is refused, not raced.
+                if payload:
+                    raise PatientRecordError("复位请求不接受额外参数")
+                entry_id = self.app.patient_records.entry_id_for_asset(parts[2])
+                active = [
+                    job
+                    for job in self.app.recognition_jobs.list_for_entry(entry_id)
+                    if job.get("status") in ("queued", "running")
+                ]
+                if active:
+                    self._error(
+                        HTTPStatus.CONFLICT,
+                        "recognition_in_progress",
+                        "该图片正在识别，暂不能复位",
+                    )
+                    return
+                self._json(
+                    self.app.patient_records.reset_recognition_orphan(parts[2])
+                )
                 return
             if (
                 len(parts) == 4
                 and parts[0:2] == ["api", "assets"]
                 and parts[3] == "recognitions"
             ):
+                # P3d async (the synchronous 201 path is retired):
+                # validate first, then submit and return 202 at once.
+                # Provider outcomes land on the job record, never as a
+                # thrown error here; the entry status stays authoritative.
+                # The old synchronous route is documented as superseded
+                # by this one (see recognition_jobs.py); no sync path
+                # remains in the server.
                 if payload:
                     raise PatientRecordError("识别请求不接受额外参数")
                 recognizer = self._configured_recognizer()
@@ -1659,37 +2066,49 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 raw, _ = self.app.patient_records.asset(parts[2])
                 image = inspect_image(raw)
-                recognition_id = self.app.patient_records.start_recognition(
-                    parts[2], "deepseek", recognizer.model
-                )
+                entry_id = self.app.patient_records.entry_id_for_asset(parts[2])
+
+                def _on_recognition_complete(job, asset_id=parts[2]):
+                    if job.get("status") != "succeeded":
+                        return
+                    self.app.events.append(
+                        Event(
+                            "patient-records",
+                            "patient.asset_recognized",
+                            {
+                                "entry_id": job.get("entry_id"),
+                                "asset_id": asset_id,
+                                "recognition_id": job.get("recognition_id"),
+                            },
+                        )
+                    )
+
                 try:
-                    result = recognizer.recognize(image)
-                    detail = self.app.patient_records.finish_recognition(
-                        recognition_id, result
+                    job = submit_job(
+                        self.app.recognition_jobs,
+                        self.app.patient_records,
+                        recognizer,
+                        entry_id=entry_id,
+                        asset_id=parts[2],
+                        image=image,
+                        on_complete=_on_recognition_complete,
                     )
-                except RecognitionError:
-                    self.app.patient_records.fail_recognition(
-                        recognition_id, "provider_failed"
+                except RecognitionJobError as exc:
+                    self._error(
+                        HTTPStatus.CONFLICT,
+                        "vision_unavailable",
+                        str(exc),
                     )
-                    raise
-                except Exception:
-                    self.app.patient_records.fail_recognition(
-                        recognition_id, "provider_failed"
-                    )
-                    raise RecognitionError("视觉模型没有完成有效识别") from None
-                self.app.events.append(
-                    Event(
-                        "patient-records",
-                        "patient.asset_recognized",
-                        {
-                            "entry_id": detail["entry"]["entry_id"],
-                            "asset_id": parts[2],
-                            "recognition_id": recognition_id,
-                            "observation_count": len(detail["observations"]),
-                        },
-                    )
+                    return
+                self._json(
+                    {
+                        "run_id": job["run_id"],
+                        "entry_id": job["entry_id"],
+                        "asset_id": job["asset_id"],
+                        "status": job["status"],
+                    },
+                    HTTPStatus.ACCEPTED,
                 )
-                self._json({"recognition_id": recognition_id, **detail}, HTTPStatus.CREATED)
                 return
             if (
                 len(parts) == 4

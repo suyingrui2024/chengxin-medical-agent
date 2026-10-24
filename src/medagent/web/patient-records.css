@@ -753,3 +753,86 @@
   font: inherit;
   cursor: pointer;
 }
+
+/* P3a 报告解读节：与转录观测分区呈现；分级色点只做标识，
+   等级文字始终同步出现，不只靠颜色传达。 */
+.record-interpretation {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 14px;
+  background: var(--surface);
+}
+
+.record-interpretation h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.record-interpretation > p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.record-interpretation-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.record-interpretation-item {
+  border-top: 1px solid var(--line);
+  padding-top: 9px;
+}
+
+.record-interpretation-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.record-interpretation-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  font-size: 11px;
+}
+
+.record-interpretation-head strong {
+  font-size: 12px;
+}
+
+.interp-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.interp-dot--green {
+  background: #3a9b4f;
+}
+
+.interp-dot--yellow {
+  background: #d9a400;
+}
+
+.interp-dot--red {
+  background: #c0392b;
+}
+
+.interp-dot--unknown {
+  background: #8a8f98;
+}
+
+.interp-grade {
+  color: var(--muted);
+}
+
+.record-interpretation-disclaimer {
+  border-top: 1px solid var(--line);
+  padding-top: 7px;
+}

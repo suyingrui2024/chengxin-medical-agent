@@ -79,6 +79,17 @@ class PatientRecordApiTests(unittest.TestCase):
         ) as response:
             return json.loads(response.read())
 
+    def request_status(self, path, method="GET", payload=None):
+        """Same as request(), but returns (status_code, body) so a
+        status code itself (e.g. async 202) can be pinned, not just
+        the body."""
+        data = json.dumps(payload).encode() if payload is not None else None
+        headers = {"Content-Type": "application/json"} if data is not None else {}
+        with urlopen(
+            Request(self.base + path, data=data, headers=headers, method=method), timeout=3
+        ) as response:
+            return response.status, json.loads(response.read())
+
     def test_member_crud_archive_and_default_stability(self):
         catalog = self.request("/api/patient")
         self.assertEqual(set(catalog), {"patient", "vision_available"})
@@ -280,7 +291,32 @@ class PatientRecordApiTests(unittest.TestCase):
         )
         entry_id = uploaded["entry"]["entry_id"]
         asset_id = uploaded["asset_id"]
-        result = self.request(f"/api/assets/{asset_id}/recognitions", "POST", {})
+        # P3d async: POST returns 202 + run_id at once; the entry
+        # itself is the authority, so poll its detail (the same
+        # address the frontend polls) until recognition lands. The
+        # transcription assertions below are unchanged, not weakened.
+        import time as _time
+
+        status, submitted = self.request_status(
+            f"/api/assets/{asset_id}/recognitions", "POST", {}
+        )
+        self.assertEqual(status, 202)
+        self.assertEqual(submitted["status"], "queued")
+        self.assertEqual(submitted["entry_id"], entry_id)
+        self.assertEqual(submitted["asset_id"], asset_id)
+        self.assertTrue(submitted["run_id"])
+        result = None
+        for _ in range(100):
+            result = self.request(f"/api/entries/{entry_id}")
+            # awaiting_recognition is the pre-thread-start state; both
+            # intermediate states must be waited out, not mistaken for
+            # a terminal one.
+            if result["entry"]["status"] not in (
+                "awaiting_recognition",
+                "recognizing",
+            ):
+                break
+            _time.sleep(0.05)
         self.assertEqual(result["entry"]["status"], "needs_confirmation")
         self.assertEqual(self.recognizer.calls, 1)
         unclear = next(item for item in result["observations"] if item["clarity"] == "unclear")
@@ -653,6 +689,89 @@ class PatientRecordApiTests(unittest.TestCase):
         saved = self.request(from_path, "POST", {**base, "unit": "℃"})
         self.assertEqual(saved["observations"][0]["kind"], "temperature")
         self.assertEqual(saved["observations"][0]["value_text"], "37.2")
+
+    def test_from_observation_rejects_archived_member(self):
+        # N3: match the manual per-member measurement route — an
+        # archived member's confirmed transcription must not gain a
+        # new measurement through the from-observation path.
+        self.request("/api/patient")
+        member = self.request(
+            "/api/patients", "POST", {"display_name": "家属"}
+        )["patient"]
+        store = self.server.patient_records
+        uploaded = store.create_image_entry(
+            member["patient_id"],
+            "体温计读数",
+            "2026-08-20T08:00:00+08:00",
+            None,
+            "temp.png",
+            inspect_image(png()),
+        )
+        run = store.start_recognition(uploaded["asset_id"], "deepseek", "fixture")
+        recognized = store.finish_recognition(
+            run,
+            {
+                "schema": "medical-image-recognition/v1",
+                "document_type": "laboratory_report",
+                "numbers": [
+                    {
+                        "number_id": "n-1",
+                        "value_text": "37.2",
+                        "context": "体温 37.2°C",
+                        "clarity": "clear",
+                        "alternatives": [],
+                        "uncertainty_reason": None,
+                        "page_index": 1,
+                    }
+                ],
+                "content": {
+                    "description": "体温计读数。",
+                    "clarity": "clear",
+                    "unclear_parts": [],
+                },
+                "warnings": [],
+            },
+        )
+        entry_id = recognized["entry"]["entry_id"]
+        observation = next(
+            item
+            for item in recognized["observations"]
+            if item["kind"] == "document_number"
+        )
+        self.request(
+            f"/api/observations/{observation['observation_id']}/revisions",
+            "POST",
+            {
+                "value_text": "37.2",
+                "unit": "",
+                "expected_revision_id": observation["current_revision_id"],
+                "reason": "confirmation",
+            },
+        )
+        self.request(
+            f"/api/patients/{member['patient_id']}/archive", "POST", {}
+        )
+        with self.assertRaises(HTTPError) as archived:
+            self.request(
+                "/api/patient/measurements/from-observation",
+                "POST",
+                {
+                    "entry_id": entry_id,
+                    "observation_id": observation["observation_id"],
+                    "unit": "°C",
+                },
+            )
+        self.assertEqual(archived.exception.code, 400)
+        # Nothing was saved for the archived member: the timeline
+        # still holds only the image entry, no measurement entry.
+        self.assertEqual(
+            len(
+                self.request(f"/api/patients/{member['patient_id']}/timeline")[
+                    "entries"
+                ]
+            ),
+            1,
+        )
 
     def test_p2d_member_timeline_and_p2c_baseline_reference_switch(self):
         member = self.request(

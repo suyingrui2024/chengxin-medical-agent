@@ -461,6 +461,25 @@ class PatientRecordStore:
                         connection.execute(
                             f"ALTER TABLE patient_profiles ADD COLUMN {column} {definition}"
                         )
+                # P3a forward migration: analysis_runs was created
+                # without the interpretation columns (entry/model/
+                # model_version); old libraries gain them without
+                # touching any existing run, entry or observation.
+                analysis_columns = {
+                    row[1]
+                    for row in connection.execute(
+                        "PRAGMA table_info(analysis_runs)"
+                    ).fetchall()
+                }
+                for column, definition in (
+                    ("entry_id", "TEXT"),
+                    ("model", "TEXT"),
+                    ("model_version", "TEXT"),
+                ):
+                    if column not in analysis_columns:
+                        connection.execute(
+                            f"ALTER TABLE analysis_runs ADD COLUMN {column} {definition}"
+                        )
                 connection.execute(
                     "UPDATE patient_profiles SET schema_version = ? "
                     "WHERE schema_version < ?",
@@ -1167,12 +1186,23 @@ class PatientRecordStore:
                    ORDER BY o.created_at, o.observation_id""",
                 (patient_id,),
             ).fetchall()
+            interpreted = {
+                row["entry_id"]
+                for row in connection.execute(
+                    "SELECT entry_id FROM analysis_runs "
+                    "WHERE patient_id = ? AND status = 'ready' GROUP BY entry_id",
+                    (patient_id,),
+                ).fetchall()
+            }
         highlights: dict[str, list[dict[str, Any]]] = {}
         for observation in observations:
             highlights.setdefault(observation["entry_id"], []).append(dict(observation))
         entries = []
         for row in rows:
             item = dict(row)
+            # P3a: timeline badge source of truth; the frontend only
+            # renders the badge when this flag is true, never guesses.
+            item["has_interpretation"] = item["entry_id"] in interpreted
             item["highlights"] = highlights.get(item["entry_id"], [])[:3]
             item["confirmed_count"] = sum(
                 observation["verification_status"]
@@ -1181,6 +1211,125 @@ class PatientRecordStore:
             )
             entries.append(item)
         return {"patient": patient, "entries": entries}
+
+    def entry_id_for_asset(self, asset_id: str) -> str:
+        """Return the entry owning an asset (P3d async recognition).
+
+        The recognitions route only carries the asset id; the job
+        store needs the entry id, and guessing it from anywhere else
+        would be wrong. Raises PatientRecordError for unknown assets.
+        """
+        with self._read() as connection:
+            row = self._asset_row(connection, asset_id)
+        return row["entry_id"]
+
+    def reset_recognition_orphan(self, asset_id: str) -> dict[str, Any]:
+        """Reset an entry stranded in ``recognizing`` (P3d restart recovery).
+
+        Only applies when the entry is actually stuck in recognizing
+        (e.g. the process died mid-job and its in-memory job record is
+        gone). Running recognition runs for the asset are marked
+        failed with ``orphan_reset``; entries in any other status are
+        left untouched and ``reset`` is False.
+        """
+        with self._transaction() as connection:
+            row = self._asset_row(connection, asset_id)
+            entry_id = row["entry_id"]
+            if row["entry_status"] != "recognizing":
+                return {"reset": False, "entry_id": entry_id}
+            connection.execute(
+                """UPDATE recognition_runs SET status = 'failed',
+                   completed_at = ?, error_code = 'orphan_reset'
+                   WHERE asset_id = ? AND status = 'running'""",
+                (utc_now(), asset_id),
+            )
+            connection.execute(
+                "UPDATE medical_entries SET status = 'recognition_failed' "
+                "WHERE entry_id = ?",
+                (entry_id,),
+            )
+            return {"reset": True, "entry_id": entry_id}
+
+    def save_interpretation(
+        self,
+        patient_id: str,
+        entry_id: str,
+        model: str,
+        model_version: str,
+        input_revision_ids: list[str],
+        result: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Persist one report-interpretation run (P3a).
+
+        Grading itself lives in report_interpretation.py; this only
+        stores the sheet. ``input_revision_ids`` are the current
+        revision ids the sheet was graded from, so a later revision
+        can never silently reuse a stale sheet.
+        """
+        from uuid import uuid4 as _uuid4
+
+        analysis_id = str(_uuid4())
+        now = utc_now()
+        with self._transaction() as connection:
+            self._require_patient(connection, patient_id)
+            version_row = connection.execute(
+                "SELECT version FROM patient_profiles WHERE patient_id = ?",
+                (patient_id,),
+            ).fetchone()
+            entry = self._require_entry(connection, entry_id)
+            if entry["patient_id"] != patient_id:
+                raise PatientRecordError("该条目不属于该患者档案")
+            connection.execute(
+                """INSERT INTO analysis_runs
+                   (analysis_id, patient_id, patient_version,
+                    input_observation_ids, calculation_receipts,
+                    review_mode, status, result_json, created_at,
+                    completed_at, entry_id, model, model_version)
+                   VALUES (?, ?, ?, ?, '[]', 'report_interpretation',
+                           'ready', ?, ?, ?, ?, ?, ?)""",
+                (
+                    analysis_id,
+                    patient_id,
+                    version_row["version"] if version_row is not None else 1,
+                    json.dumps(list(input_revision_ids), ensure_ascii=False),
+                    json.dumps(result, ensure_ascii=False),
+                    now,
+                    now,
+                    entry_id,
+                    model,
+                    model_version,
+                ),
+            )
+        return {"analysis_id": analysis_id, "status": "ready"}
+
+    def latest_interpretation(self, entry_id: str) -> dict[str, Any] | None:
+        """Return the newest ready interpretation sheet for an entry."""
+        with self._read() as connection:
+            self._require_entry(connection, entry_id)
+            row = connection.execute(
+                """SELECT * FROM analysis_runs
+                   WHERE entry_id = ? AND status = 'ready'
+                   ORDER BY created_at DESC, rowid DESC LIMIT 1""",
+                (entry_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        item = dict(row)
+        try:
+            item["input_observation_ids"] = json.loads(
+                item.get("input_observation_ids") or "[]"
+            )
+        except ValueError:
+            item["input_observation_ids"] = []
+        try:
+            item["result"] = (
+                json.loads(item["result_json"]) if item.get("result_json") else None
+            )
+        except ValueError:
+            item["result"] = None
+        item.pop("result_json", None)
+        item.pop("calculation_receipts", None)
+        return item
 
     def shareable_entry(self, entry_id: str) -> dict[str, Any]:
         """Return current patient-verified values that may enter a consultation."""

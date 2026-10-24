@@ -2,6 +2,7 @@ const {
   app,
   BrowserWindow,
   Menu,
+  Notification,
   dialog,
   session,
   ipcMain,
@@ -22,6 +23,11 @@ const {
   migrateLegacyAppearance,
 } = require("./appearance.cjs");
 const { createModelCredentialStore } = require("./model-credentials.cjs");
+const {
+  createDueChecker,
+  loadNotifiedState,
+  saveNotifiedState,
+} = require("./due-notifications.cjs");
 
 const projectRoot = path.resolve(__dirname, "..");
 app.setName("知微");
@@ -48,6 +54,7 @@ if (process.platform === "linux") {
 
 let window;
 let backend;
+let dueChecker = null;
 let stopping = false;
 let readyOrigin;
 let quitting = false;
@@ -302,6 +309,10 @@ function startupFailureGuidance(error) {
 
 async function stopBackend() {
   stopping = true;
+  if (dueChecker) {
+    dueChecker.stop();
+    dueChecker = null;
+  }
   const child = backend;
   if (!child || child.exitCode !== null || child.signalCode !== null) return;
   const finished = new Promise((resolve) => child.once("exit", resolve));
@@ -383,6 +394,46 @@ async function createWindow() {
     callback({ requestHeaders: headers });
   });
   await window.loadURL(readyOrigin);
+  // Due-center notifications (design §6.2, D4): while the app runs, the
+  // main process polls the same /api/follow-ups due rule the web badge
+  // uses and shows one system notification per changed due set (see
+  // due-notifications.cjs for the de-duplication rule). Clicking focuses
+  // the window and routes the renderer to the follow-up list. Nothing
+  // here runs when the app is closed: no background service, no resident
+  // process — that boundary is stated on the follow-up page itself.
+  dueChecker = createDueChecker({
+    fetchJson: async (url) => {
+      const response = await fetch(url, {
+        headers: { "X-MedAgent-Token": token },
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    },
+    notify: (item, onClick) => {
+      const notification = new Notification({
+        title: item.title,
+        body: item.body,
+      });
+      notification.on("click", onClick);
+      notification.show();
+    },
+    openTarget: (target) => {
+      if (!window || window.isDestroyed()) return;
+      if (window.isMinimized()) window.restore();
+      window.show();
+      window.focus();
+      // Both targets route to the history view, where the due center
+      // (follow-up section + badge) lives; the renderer ignores the
+      // distinction today and P4-B's reminder rendering lands there too.
+      window.webContents.send("due-notifications:open", target);
+    },
+    loadState: () => loadNotifiedState(app.getPath("userData")),
+    saveState: (state) => saveNotifiedState(app.getPath("userData"), state),
+    followUpsUrl: `${readyOrigin}/api/follow-ups`,
+    remindersUrl: `${readyOrigin}/api/medication-reminders`,
+  });
+  dueChecker.start();
+  window.on("focus", () => dueChecker && dueChecker.checkOnFocus());
 }
 
 ipcMain.handle("execution:open-project", async (event, ...args) => {

@@ -1,0 +1,1 @@
+{"note":"P4 常规随访窗（design §6.2）。常规（routine_checkin）按通路组查表；信息未确认的事实（unknown）存在时，随访窗封顶 48 小时，不因通路组而延后。urgent 一律 24 小时，由 followups.py 硬编码，不进表。窗值仅为工程版随访节奏，未经临床评审，不得用作病情判断。","routine_hours":{"abdominal":48,"back":120,"chest":48,"dizziness":72,"generic":72,"headache":72,"respiratory":72,"skin":168,"urinary":72},"unknown_hours_cap":48,"version":"engineering-v1"}

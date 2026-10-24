@@ -63,7 +63,7 @@ class ReportDraftTests(unittest.TestCase):
 
         handoff = build_handoff(state)
 
-        self.assertEqual(handoff["schema"], "patient-handoff/v1")
+        self.assertEqual(handoff["schema"], "patient-handoff/v2")
         self.assertEqual(
             {row["label"] for row in handoff["facts"]}, {"已报告用药与处理", "过敏信息"}
         )

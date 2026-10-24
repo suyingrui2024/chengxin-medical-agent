@@ -11,6 +11,7 @@ import binascii
 import json
 import re
 import struct
+import threading
 from dataclasses import dataclass
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -346,6 +347,82 @@ def vision_configuration_status(
             "message": "自定义服务需要填写图片模型 ID",
         }
     return {"status": "configured", "message": "已配置，首次识别时验证图片能力"}
+
+
+class BackgroundRecognition:
+    """One recognition attempt running in a daemon thread.
+
+    This is only a background-execution wrapper around the existing
+    synchronous ``recognizer.recognize`` path: it does not change the
+    prompt, the validation contract, or the offline demo semantics.
+    Callers that also need entry bookkeeping (queued/running/succeeded/
+    failed, failure rollback) should use ``medagent.recognition_jobs``
+    instead of driving this handle directly.
+
+    ``join()`` returns the validated recognition dict, or re-raises the
+    exception the worker thread captured (typically ``RecognitionError``).
+    If the worker never finishes within ``timeout``, ``join`` raises
+    ``TimeoutError`` and the attempt keeps running in the background.
+    """
+
+    def __init__(self, recognizer: Any, image: InspectedImage) -> None:
+        self._recognizer = recognizer
+        self._image = image
+        self._thread: threading.Thread | None = None
+        self._result: dict[str, Any] | None = None
+        self._error: BaseException | None = None
+        self._done = threading.Event()
+
+    def start(self) -> "BackgroundRecognition":
+        if self._thread is not None:
+            raise RuntimeError("识别任务已经启动")
+        self._thread = threading.Thread(
+            target=self._run, name="medical-recognition", daemon=True
+        )
+        self._thread.start()
+        return self
+
+    def _run(self) -> None:
+        try:
+            self._result = self._recognizer.recognize(self._image)
+        except BaseException as exc:  # captured; join() re-raises it
+            self._error = exc
+        finally:
+            self._done.set()
+
+    @property
+    def done(self) -> bool:
+        return self._done.is_set()
+
+    @property
+    def error(self) -> BaseException | None:
+        return self._error if self._done.is_set() else None
+
+    @property
+    def result(self) -> dict[str, Any] | None:
+        return self._result if self._done.is_set() else None
+
+    def join(self, timeout: float | None = None) -> dict[str, Any]:
+        if self._thread is None:
+            raise RuntimeError("识别任务尚未启动")
+        finished = self._done.wait(timeout)
+        if not finished:
+            raise TimeoutError("图片识别仍在进行")
+        if self._error is not None:
+            raise self._error
+        assert self._result is not None
+        return self._result
+
+
+def recognize_in_background(
+    recognizer: Any, image: InspectedImage
+) -> BackgroundRecognition:
+    """Start ``recognizer.recognize(image)`` in a daemon thread.
+
+    Returns the started handle; see ``BackgroundRecognition``. The
+    synchronous ``recognizer.recognize`` path is unchanged.
+    """
+    return BackgroundRecognition(recognizer, image).start()
 
 
 def recognizer_from_settings(settings: dict[str, str], backend_mode: str):
