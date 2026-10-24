@@ -36,6 +36,12 @@ from .medical_images import (
     recognizer_from_settings,
 )
 from . import education as education_module
+from .baseline_projection import build_baseline_projection
+from .measurement_kinds import (
+    MeasurementKindError,
+    normalize_measurement,
+    saveable_from_observation,
+)
 from .patient_records import (
     PatientRecordConflict,
     PatientRecordError,
@@ -51,6 +57,78 @@ from .execution_files import DirectoryChanged
 
 MAX_BODY_BYTES = 64 * 1024
 MAX_IMAGE_BODY_BYTES = 6 * 1024 * 1024
+
+
+# P2b: frontend measurement slugs (patient-records-ui.js MEASUREMENT_KINDS)
+# mapped to registry kinds. blood-glucose keeps its legacy route shape.
+MEASUREMENT_SLUGS = {
+    "blood-glucose": "blood_glucose",
+    "blood-pressure": "blood_pressure",
+    "temperature": "temperature",
+    "weight": "weight",
+    "blood-oxygen": "blood_oxygen",
+}
+
+
+def _default_baseline_projection(store) -> dict:
+    """Build the P2c projection for the default (self) profile.
+
+    Fail-open by contract: archive errors must never break session
+    creation, so any failure yields an empty projection.
+    """
+    try:
+        patient = store.ensure_default_patient()
+        recent = store.recent_confirmed_measurements(patient["patient_id"])
+        return build_baseline_projection(patient, recent)
+    except Exception:
+        return {}
+
+
+def _session_baseline_projection(store, state=None) -> dict:
+    """Build the P2c projection for a session's bound subject (P2d).
+
+    A session bound via POST /api/sessions/{id}/bind-patient projects
+    the bound member; an unbound session keeps the old semantics — the
+    default (self) profile. Only an explicit snapshot binding counts:
+    an unbound proxy session (consult_for != self, no binding) still
+    gets the default projection at creation, exactly as before, and
+    never an empty one via the attach-gate resolver. Fail-open like
+    _default_baseline_projection.
+    """
+    try:
+        bound = None
+        snapshot = getattr(state, "runtime_snapshot", None)
+        if isinstance(snapshot, dict):
+            candidate = snapshot.get("consultation_patient_id")
+            if isinstance(candidate, str) and candidate:
+                bound = candidate
+        if bound is not None:
+            patient = store.patient(bound)
+            recent = store.recent_confirmed_measurements(patient["patient_id"])
+            return build_baseline_projection(patient, recent)
+        return _default_baseline_projection(store)
+    except Exception:
+        return {}
+
+
+def _consultation_patient_id(state, default_patient_id):
+    """Resolve the archive owner for an attach gate (P2d).
+
+    A session bound to a member (runtime_snapshot key written by a
+    future member picker) resolves to that member; an unbound session
+    keeps the old semantics — self consultations use the default
+    profile, proxy consultations without a binding resolve to nothing
+    and therefore cannot attach (same rejection as before, with a
+    message that names the missing binding instead of demanding self).
+    """
+    snapshot = state.runtime_snapshot
+    if isinstance(snapshot, dict):
+        bound = snapshot.get("consultation_patient_id")
+        if isinstance(bound, str) and bound:
+            return bound
+    if state.get("consult_for") == "self":
+        return default_patient_id
+    return None
 
 
 def _persist_engine_state(engine, state) -> None:
@@ -294,6 +372,9 @@ class Handler(BaseHTTPRequestHandler):
                 }
             )
             return
+        if path == "/api/patients" or path.startswith("/api/patients/"):
+            self._patient_get(path)
+            return
         if path == "/api/patient" or path.startswith(
             ("/api/patient/", "/api/entries/", "/api/assets/")
         ):
@@ -379,12 +460,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self._same_origin():
             return
         path = urlparse(self.path).path
-        if path == "/api/patients":
-            self._error(
-                HTTPStatus.METHOD_NOT_ALLOWED,
-                "single_patient_only",
-                "健康档案仅保存本人数据，不支持创建家属档案",
-            )
+        if path == "/api/patients" or path.startswith("/api/patients/"):
+            self._patient_post(path)
             return
         if path.startswith(
             ("/api/patient/", "/api/assets/", "/api/clarifications/", "/api/observations/")
@@ -502,6 +579,17 @@ class Handler(BaseHTTPRequestHandler):
                     state, reply = self.app.workspace.engine.create_session(
                         request_id=self.request_id
                     )
+                    # P2c: snapshot the session subject's baseline once
+                    # at creation (fail-open: an archive failure leaves
+                    # an empty projection, never a failed session). At
+                    # creation no binding exists yet, so this is the
+                    # default member's baseline; a later bind rebuilds
+                    # it from the bound member (see bind-patient).
+                    state.profile_baseline = _session_baseline_projection(
+                        self.app.patient_records, state
+                    )
+                    state.baseline_reference_enabled = True
+                    _persist_engine_state(self.app.workspace.engine, state)
                     replay = {
                         "session_id": state.session_id,
                         "reply": reply.to_dict(),
@@ -511,6 +599,132 @@ class Handler(BaseHTTPRequestHandler):
                         self.request_id, replay
                     )
             self._json(replay, HTTPStatus.CREATED)
+            return
+        parts = path.strip("/").split("/")
+        if (
+            len(parts) == 4
+            and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "baseline-reference"
+        ):
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            payload = self._read_json()
+            if payload is None:
+                return
+            if set(payload) != {"enabled"} or not isinstance(payload["enabled"], bool):
+                self._error(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_baseline_reference",
+                    "档案引用开关格式错误",
+                )
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+                with engine._session_locks[parts[2]]:
+                    state = engine.state(parts[2])
+                    enabled = payload["enabled"]
+                    state.baseline_reference_enabled = enabled
+                    if enabled:
+                        # Rebuild from the session's subject, not always
+                        # the default: a bound member's session must not
+                        # silently revert to the self profile's baseline
+                        # on re-enable (same M2-class rebinding bug).
+                        state.profile_baseline = _session_baseline_projection(
+                            self.app.patient_records, state
+                        )
+                    else:
+                        # Closing the reference clears the projection
+                        # itself, so later state reads return nothing.
+                        state.profile_baseline = {}
+                        self.app.events.append(
+                            Event(
+                                state.session_id,
+                                "baseline.reference_disabled",
+                                {"session_id": state.session_id},
+                            )
+                        )
+                    _persist_engine_state(engine, state)
+                    response = {
+                        "baseline_reference_enabled": enabled,
+                        "state": state.to_dict(),
+                    }
+            except KeyError:
+                self._error(
+                    HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话"
+                )
+                return
+            self._json(response)
+            return
+
+        parts = path.strip("/").split("/")
+        if (
+            len(parts) == 4
+            and parts[0:2] == ["api", "sessions"]
+            and parts[3] == "bind-patient"
+        ):
+            # P2d minimal session binding (M4): the ONLY writer of the
+            # consultation_patient_id snapshot key. It does not create
+            # a second session concept and does not touch facts: the
+            # binding is a snapshot subject pointer (consumed by the
+            # attach gate and the baseline projection), never evidence.
+            origin = self.headers.get("Origin")
+            if origin and urlparse(origin).netloc != self.headers.get("Host"):
+                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
+                return
+            payload = self._read_json()
+            if payload is None:
+                return
+            if set(payload) != {"patient_id"} or not isinstance(
+                payload["patient_id"], str
+            ):
+                self._error(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_bind_patient",
+                    "绑定成员参数无效",
+                )
+                return
+            try:
+                engine = self.app.workspace.engine_for(parts[2])
+            except KeyError:
+                self._error(
+                    HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话"
+                )
+                return
+            try:
+                patient = self.app.patient_records.patient(payload["patient_id"])
+            except PatientRecordError:
+                self._error(
+                    HTTPStatus.NOT_FOUND, "record_not_found", "患者档案不存在"
+                )
+                return
+            if patient.get("archived"):
+                self._error(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_bind_patient",
+                    "已归档的成员不能设为本次问诊对象",
+                )
+                return
+            with engine._session_locks[parts[2]]:
+                state = engine.state(parts[2])
+                if not isinstance(state.runtime_snapshot, dict):
+                    state.runtime_snapshot = {}
+                state.runtime_snapshot["consultation_patient_id"] = patient[
+                    "patient_id"
+                ]
+                # Rebuild the baseline from the bound member; when the
+                # reference switch is off, keep the projection cleared
+                # (the switch still gates every consumer).
+                if state.baseline_reference_enabled:
+                    state.profile_baseline = _session_baseline_projection(
+                        self.app.patient_records, state
+                    )
+                else:
+                    state.profile_baseline = {}
+                _persist_engine_state(engine, state)
+                response = {"patient": patient, "state": state.to_dict()}
+            self._json(response)
             return
 
         parts = path.strip("/").split("/")
@@ -576,14 +790,21 @@ class Handler(BaseHTTPRequestHandler):
                 engine = self.app.workspace.engine_for(parts[2])
                 with engine._session_locks[parts[2]]:
                     state = engine.state(parts[2])
-                    if state.get("consult_for") != "self":
+                    # P2d: the gate is "entry owner == consultation
+                    # subject", resolved by _consultation_patient_id.
+                    # Unbound sessions keep the old semantics exactly:
+                    # self -> default profile, proxy -> rejected.
+                    default_patient = self.app.patient_records.ensure_default_patient()
+                    expected_patient_id = _consultation_patient_id(
+                        state, default_patient["patient_id"]
+                    )
+                    if expected_patient_id is None:
                         raise PatientRecordError(
-                            "请先在本次问诊中确认咨询对象为本人，再带入这份健康档案"
+                            "本次问诊对象还没有绑定家庭成员档案，暂不能带入他人记录"
                         )
                     shared = self.app.patient_records.shareable_entry(parts[4])
-                    default_patient = self.app.patient_records.ensure_default_patient()
-                    if shared["entry"]["patient_id"] != default_patient["patient_id"]:
-                        raise PatientRecordError("这条记录不属于本人的默认健康档案")
+                    if shared["entry"]["patient_id"] != expected_patient_id:
+                        raise PatientRecordError("这条记录不属于本次问诊对象的健康档案")
                     observations = shared["observations"]
                     if not observations:
                         raise PatientRecordError(
@@ -909,6 +1130,35 @@ class Handler(BaseHTTPRequestHandler):
             return
         path = urlparse(self.path).path
         parts = path.strip("/").split("/")
+        if len(parts) == 3 and parts[0:2] == ["api", "patients"]:
+            # Partial member baseline update (rename included). The
+            # store validates the whole patch before writing, so an
+            # invalid PATCH leaves stored data untouched.
+            payload = self._read_json()
+            if payload is None:
+                return
+            try:
+                self.app.patient_records.patient(parts[2])
+            except PatientRecordError:
+                self._error(HTTPStatus.NOT_FOUND, "record_not_found", "患者档案不存在")
+                return
+            try:
+                member = self.app.patient_records.update_patient(parts[2], payload)
+            except PatientRecordError as exc:
+                self._error(HTTPStatus.BAD_REQUEST, "invalid_patient_record", str(exc))
+                return
+            self.app.events.append(
+                Event(
+                    "patient-records",
+                    "patient.member_updated",
+                    {
+                        "patient_id": member["patient_id"],
+                        "display_name": member["display_name"],
+                    },
+                )
+            )
+            self._json({"patient": member})
+            return
         if (
             len(parts) == 6
             and parts[0:2] == ["api", "sessions"]
@@ -1037,6 +1287,12 @@ class Handler(BaseHTTPRequestHandler):
     def _patient_get(self, path: str) -> None:
         try:
             parts = path.strip("/").split("/")
+            if path == "/api/patients":
+                self._json({"patients": self.app.patient_records.list_patients()})
+                return
+            if len(parts) == 3 and parts[0:2] == ["api", "patients"]:
+                self._json({"patient": self.app.patient_records.patient(parts[2])})
+                return
             if path == "/api/patient":
                 default = self.app.patient_records.ensure_default_patient()
                 self._json(
@@ -1056,11 +1312,33 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if (
                 len(parts) == 4
-                and parts[0:2] == ["api", "patient"]
-                and parts[2:] == ["trends", "blood-glucose"]
+                and parts[0:2] == ["api", "patients"]
+                and parts[3] == "timeline"
             ):
+                # P2d frontend: per-member timeline for the members view.
+                self._json(self.app.patient_records.timeline(parts[2]))
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "patient"]
+                and parts[2] == "trends"
+            ):
+                kind = MEASUREMENT_SLUGS.get(parts[3])
+                if kind is None:
+                    self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
+                    return
                 patient = self.app.patient_records.ensure_default_patient()
-                self._json(self.app.patient_records.glucose_trend(patient["patient_id"]))
+                if kind == "blood_glucose":
+                    # Legacy route keeps its exact glucose-trend shape.
+                    self._json(
+                        self.app.patient_records.glucose_trend(patient["patient_id"])
+                    )
+                else:
+                    self._json(
+                        self.app.patient_records.measurement_trend(
+                            kind, patient["patient_id"]
+                        )
+                    )
                 return
             if len(parts) == 3 and parts[0:2] == ["api", "entries"]:
                 self._json(self.app.patient_records.entry(parts[2]))
@@ -1098,6 +1376,53 @@ class Handler(BaseHTTPRequestHandler):
         if payload is None:
             return
         try:
+            if path == "/api/patients":
+                # Create a member profile. Flat shape: display_name plus
+                # any baseline field (birth_year, sex, height_cm,
+                # weight_kg, chronic_conditions, allergies, medications,
+                # surgical_history, birth_year_month). Unknown keys and
+                # invalid values are rejected before any write.
+                display_name = payload.pop("display_name", "新成员")
+                member = self.app.patient_records.add_member(display_name, payload)
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.member_created",
+                        {
+                            "patient_id": member["patient_id"],
+                            "display_name": member["display_name"],
+                        },
+                    )
+                )
+                self._json({"patient": member}, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "patients"]
+                and parts[3] == "archive"
+            ):
+                if payload:
+                    raise PatientRecordError("归档请求不接受额外参数")
+                try:
+                    self.app.patient_records.patient(parts[2])
+                except PatientRecordError:
+                    self._error(
+                        HTTPStatus.NOT_FOUND, "record_not_found", "患者档案不存在"
+                    )
+                    return
+                member = self.app.patient_records.archive_patient(parts[2])
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.member_archived",
+                        {
+                            "patient_id": member["patient_id"],
+                            "display_name": member["display_name"],
+                        },
+                    )
+                )
+                self._json({"patient": member})
+                return
             if (
                 len(parts) == 4
                 and parts[0:2] == ["api", "patient"]
@@ -1138,14 +1463,172 @@ class Handler(BaseHTTPRequestHandler):
             if (
                 len(parts) == 4
                 and parts[0:2] == ["api", "patient"]
-                and parts[2:] == ["measurements", "blood-glucose"]
+                and parts[2:] == ["measurements", "from-observation"]
             ):
-                allowed = {"value_text", "unit", "measured_at", "measurement_context"}
-                if set(payload) != allowed:
-                    raise PatientRecordError("血糖记录参数不完整")
+                # P2b: save a confirmed transcription as a measurement.
+                # Never automatic: an inferred unit returns a
+                # requires_confirmation response WITHOUT saving; only a
+                # second call carrying an explicit unit persists. The
+                # source observation is never touched.
+                if (
+                    not {"entry_id", "observation_id"}.issubset(payload)
+                    or set(payload) - {"entry_id", "observation_id", "unit"}
+                ):
+                    raise PatientRecordError("另存为测量参数不完整")
+                entry_id = payload["entry_id"]
+                observation_id = payload["observation_id"]
+                if not isinstance(entry_id, str) or not isinstance(observation_id, str):
+                    raise PatientRecordError("另存为测量参数不完整")
+                if "unit" in payload and not isinstance(payload["unit"], str):
+                    raise PatientRecordError("另存为测量参数不完整")
+                detail = self.app.patient_records.entry(entry_id)
+                observation = next(
+                    (
+                        item
+                        for item in detail["observations"]
+                        if item["observation_id"] == observation_id
+                    ),
+                    None,
+                )
+                if observation is None:
+                    raise PatientRecordError("观测记录不存在或不属于该条目")
+                classification = saveable_from_observation(observation)
+                if not classification["saveable"]:
+                    raise PatientRecordError(
+                        classification["reason"] or "该数值暂不能另存为测量"
+                    )
+                kind = classification["kind"]
+                values = classification["values"]
+                # N4: when the transcription text already carries an
+                # explicit unit, a second submit carrying a different
+                # unit must not silently reinterpret the number (e.g.
+                # 37.2 °C resaved as °F). Aliases resolving to the same
+                # canonical unit still pass; an invalid unit is left
+                # for the normalize step below to reject as before.
+                if not classification["unit_inferred"] and payload.get("unit"):
+                    try:
+                        claimed = normalize_measurement(
+                            kind, values["reported_value"], payload["unit"]
+                        )
+                    except MeasurementKindError:
+                        claimed = None
+                    if (
+                        claimed is not None
+                        and claimed["reported_unit"] != classification["unit"]
+                    ):
+                        raise PatientRecordError(
+                            "转录文本已标明单位，与提交的单位不一致，请核对后再提交"
+                        )
+                if classification["unit_inferred"] and not payload.get("unit"):
+                    self._json(
+                        {
+                            "requires_confirmation": True,
+                            "kind": kind,
+                            "unit": classification["unit"],
+                            "unit_inferred": True,
+                            "extraction_rule": classification["extraction_rule"],
+                            "value_text": values["reported_value"],
+                            "entry_id": entry_id,
+                            "observation_id": observation_id,
+                        }
+                    )
+                    return
+                unit = payload.get("unit") or classification["unit"]
+                try:
+                    normalized = normalize_measurement(
+                        kind, values["reported_value"], unit
+                    )
+                except MeasurementKindError as exc:
+                    raise PatientRecordError(str(exc)) from None
+                measured_at = detail["entry"]["measured_at"] or utc_now()
+                saved = self.app.patient_records.add_measurement(
+                    detail["entry"]["patient_id"],
+                    kind=kind,
+                    value_text=normalized["reported_value"],
+                    unit=unit,
+                    measured_at=measured_at,
+                    measurement_context="unknown",
+                )
+                self.app.events.append(
+                    Event(
+                        "patient-records",
+                        "patient.measurement_saved_from_observation",
+                        {
+                            "entry_id": entry_id,
+                            "observation_id": observation_id,
+                            "kind": kind,
+                        },
+                    )
+                )
+                saved["from_observation"] = {
+                    "entry_id": entry_id,
+                    "observation_id": observation_id,
+                    "unit_inferred": bool(classification["unit_inferred"]),
+                    "unit": unit,
+                }
+                self._json(saved, HTTPStatus.CREATED)
+                return
+            if (
+                len(parts) == 4
+                and parts[0:2] == ["api", "patient"]
+                and parts[2] == "measurements"
+            ):
+                kind = MEASUREMENT_SLUGS.get(parts[3])
+                if kind is None:
+                    self._error(HTTPStatus.NOT_FOUND, "not_found", "档案接口不存在")
+                    return
+                if kind == "blood_glucose":
+                    allowed = {
+                        "value_text",
+                        "unit",
+                        "measured_at",
+                        "measurement_context",
+                    }
+                    if set(payload) != allowed:
+                        raise PatientRecordError("血糖记录参数不完整")
+                    measurement_payload = dict(payload)
+                elif kind == "blood_pressure":
+                    if not {"systolic", "diastolic", "unit", "measured_at"}.issubset(
+                        payload
+                    ) or set(payload) - {
+                        "systolic",
+                        "diastolic",
+                        "unit",
+                        "measured_at",
+                        "measurement_context",
+                    }:
+                        raise PatientRecordError("血压记录参数不完整")
+                    measurement_payload = {
+                        "value_text": (
+                            f"{payload['systolic']}/{payload['diastolic']}"
+                        ),
+                        "unit": payload["unit"],
+                        "measured_at": payload["measured_at"],
+                        "measurement_context": payload.get(
+                            "measurement_context", "unknown"
+                        ),
+                    }
+                else:
+                    if not {"value_text", "unit", "measured_at"}.issubset(
+                        payload
+                    ) or set(payload) - {
+                        "value_text",
+                        "unit",
+                        "measured_at",
+                        "measurement_context",
+                    }:
+                        raise PatientRecordError("测量记录参数不完整")
+                    measurement_payload = {
+                        "value_text": payload["value_text"],
+                        "unit": payload["unit"],
+                        "measured_at": payload["measured_at"],
+                        "measurement_context": payload.get(
+                            "measurement_context", "unknown"
+                        ),
+                    }
                 patient = self.app.patient_records.ensure_default_patient()
                 detail = self.app.patient_records.add_measurement(
-                    patient["patient_id"], kind="blood_glucose", **payload
+                    patient["patient_id"], kind=kind, **measurement_payload
                 )
                 self.app.events.append(
                     Event(
@@ -1153,7 +1636,7 @@ class Handler(BaseHTTPRequestHandler):
                         "patient.measurement_recorded",
                         {
                             "entry_id": detail["entry"]["entry_id"],
-                            "kind": "blood_glucose",
+                            "kind": kind,
                         },
                     )
                 )

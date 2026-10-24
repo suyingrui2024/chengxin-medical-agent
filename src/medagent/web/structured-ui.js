@@ -1865,6 +1865,12 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         addList(care.do);
         addList(care.measure, "可以测一测");
         addList(care.avoid, "不要做的事");
+        // P2c: the archive allergy hint is its own line below the
+        // avoid list, never merged into it.
+        if (care.allergy_hint)
+          careEl.append(
+            el("p", "conclusion-care-allergy-hint", care.allergy_hint),
+          );
         card.append(careEl);
       }
       if (data.return_now_if?.length) {

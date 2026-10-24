@@ -334,7 +334,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
     # presenting it verbatim to a 32- or 65-year-old asking for themselves
     # reads as a template bug (live-eval cases 1/5/9). Child consultations
     # keep the catalog wording, where the months phrasing is the point.
-    _ADULT_AGE_PROMPT = "患者多大？可直接写年龄，例如 32 岁。"
+    _ADULT_AGE_PROMPT = "你多大？可直接写年龄，例如 32 岁。"
 
     def _ask(self, state: CaseState, question: Question, reason: str) -> AgentReply:
         reply = super()._ask(state, question, reason)
@@ -930,6 +930,14 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 }
                 for item in state.report_items[-20:]
             ],
+            # P2c: archive reference sits next to the confirmed report
+            # items, gated by the same session switch. It is context
+            # only and never lands in state.facts.
+            **(
+                {"profile_baseline": dict(state.profile_baseline)}
+                if state.baseline_reference_enabled and state.profile_baseline
+                else {}
+            ),
             **(
                 {"background_review": state.background_review["advice"]}
                 if state.background_review

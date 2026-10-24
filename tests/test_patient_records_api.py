@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
+from medagent.medical_images import inspect_image
 from medagent.patient_records import PatientRecordStore
 from medagent.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
@@ -78,19 +79,189 @@ class PatientRecordApiTests(unittest.TestCase):
         ) as response:
             return json.loads(response.read())
 
-    def test_api_exposes_only_the_self_profile_and_rejects_family_profiles(self):
+    def test_member_crud_archive_and_default_stability(self):
         catalog = self.request("/api/patient")
         self.assertEqual(set(catalog), {"patient", "vision_available"})
         self.assertEqual(catalog["patient"]["display_name"], "我的健康档案")
+        default_id = catalog["patient"]["patient_id"]
+        created = self.request(
+            "/api/patients",
+            "POST",
+            {
+                "display_name": "家属档案",
+                "birth_year": 2018,
+                "birth_year_month": "2018-05",
+                "chronic_conditions": ["哮喘"],
+            },
+        )
+        member = created["patient"]
+        self.assertEqual(member["display_name"], "家属档案")
+        self.assertEqual(member["birth_year_month"], "2018-05")
+        self.assertEqual(member["chronic_conditions"], ["哮喘"])
+        self.assertNotEqual(member["patient_id"], default_id)
+        members = self.request("/api/patients")["patients"]
+        self.assertEqual(
+            [row["patient_id"] for row in members], [default_id, member["patient_id"]]
+        )
+        # The default (self) profile is unaffected by adding a member.
+        self.assertEqual(
+            self.request("/api/patient")["patient"]["patient_id"], default_id
+        )
+        self.assertEqual(
+            self.request(f"/api/patients/{member['patient_id']}")["patient"]["display_name"],
+            "家属档案",
+        )
+        updated = self.request(
+            f"/api/patients/{member['patient_id']}",
+            "PATCH",
+            {
+                "display_name": "孩子",
+                "allergies": [{"kind": "drug", "name": "青霉素"}],
+            },
+        )["patient"]
+        self.assertEqual(updated["display_name"], "孩子")
+        self.assertEqual(updated["allergies"], [{"kind": "drug", "name": "青霉素"}])
+        self.assertEqual(updated["birth_year"], 2018)  # untouched fields stay
+        # Invalid PATCHes are rejected with 400 and pollute nothing.
+        for bad in (
+            {"allergies": [{"kind": "smell", "name": "花粉"}]},
+            {"birth_year": "2018"},
+            {"unknown_field": 1},
+            {},
+        ):
+            with self.assertRaises(HTTPError) as blocked:
+                self.request(f"/api/patients/{member['patient_id']}", "PATCH", bad)
+            self.assertEqual(blocked.exception.code, 400)
+        unchanged = self.request(f"/api/patients/{member['patient_id']}")["patient"]
+        self.assertEqual(unchanged["display_name"], "孩子")
+        self.assertEqual(unchanged["allergies"], [{"kind": "drug", "name": "青霉素"}])
+        # Invalid creates are rejected and do not add a profile.
         with self.assertRaises(HTTPError) as blocked:
             self.request(
-                "/api/patients", "POST", {"display_name": "家属档案"}
+                "/api/patients", "POST", {"display_name": "坏数据", "birth_year": "2018"}
             )
-        self.assertEqual(blocked.exception.code, 405)
+        self.assertEqual(blocked.exception.code, 400)
+        self.assertEqual(len(self.request("/api/patients")["patients"]), 2)
+        archived = self.request(
+            f"/api/patients/{member['patient_id']}/archive", "POST", {}
+        )["patient"]
+        self.assertTrue(archived["archived"])
         self.assertEqual(
-            self.request("/api/patient")["patient"]["patient_id"],
-            catalog["patient"]["patient_id"],
+            self.request("/api/patient")["patient"]["patient_id"], default_id
         )
+        # Unknown member ids are 404, not 400.
+        with self.assertRaises(HTTPError) as missing:
+            self.request("/api/patients/no-such-id", "PATCH", {"display_name": "x"})
+        self.assertEqual(missing.exception.code, 404)
+        with self.assertRaises(HTTPError) as missing:
+            self.request("/api/patients/no-such-id/archive", "POST", {})
+        self.assertEqual(missing.exception.code, 404)
+
+    def test_archive_default_patient_is_refused_and_default_unchanged(self):
+        # M3: archiving the default must not promote a member to self.
+        default_id = self.request("/api/patient")["patient"]["patient_id"]
+        with self.assertRaises(HTTPError) as blocked:
+            self.request(f"/api/patients/{default_id}/archive", "POST", {})
+        self.assertEqual(blocked.exception.code, 400)
+        self.assertEqual(
+            self.request("/api/patient")["patient"]["patient_id"], default_id
+        )
+        # Archiving a member still works, and the default is untouched.
+        member = self.request("/api/patients", "POST", {"display_name": "孩子"})[
+            "patient"
+        ]
+        archived = self.request(
+            f"/api/patients/{member['patient_id']}/archive", "POST", {}
+        )["patient"]
+        self.assertTrue(archived["archived"])
+        self.assertEqual(
+            self.request("/api/patient")["patient"]["patient_id"], default_id
+        )
+
+    def test_bind_patient_rebuilds_baseline_and_gates_attach(self):
+        # M4: minimal binding — snapshot key + member baseline + attach gate.
+        store = self.server.patient_records
+        default = self.request("/api/patient")["patient"]
+        member = self.request("/api/patients", "POST", {"display_name": "孩子"})[
+            "patient"
+        ]
+        self.request(
+            f"/api/patients/{member['patient_id']}",
+            "PATCH",
+            {"chronic_conditions": ["哮喘"]},
+        )
+        member_entry = store.add_measurement(
+            member["patient_id"],
+            kind="blood_glucose",
+            value_text="5.9",
+            unit="mmol/L",
+            measured_at="2026-08-30T07:20:00+08:00",
+            measurement_context="fasting",
+        )
+        default_entry = self.request(
+            "/api/patient/measurements/blood-glucose",
+            "POST",
+            {
+                "value_text": "6.8",
+                "unit": "mmol/L",
+                "measured_at": "2026-08-30T07:20:00+08:00",
+                "measurement_context": "fasting",
+            },
+        )
+        session_id = self.request("/api/sessions", "POST", {})["session_id"]
+        bind_path = f"/api/sessions/{session_id}/bind-patient"
+        # Unknown session / unknown patient / bad payload / archived member.
+        with self.assertRaises(HTTPError) as missing_session:
+            self.request("/api/sessions/no-such/bind-patient", "POST", {"patient_id": member["patient_id"]})
+        self.assertEqual(missing_session.exception.code, 404)
+        with self.assertRaises(HTTPError) as missing_patient:
+            self.request(bind_path, "POST", {"patient_id": "no-such"})
+        self.assertEqual(missing_patient.exception.code, 404)
+        with self.assertRaises(HTTPError) as bad_payload:
+            self.request(bind_path, "POST", {})
+        self.assertEqual(bad_payload.exception.code, 400)
+        archived_member = self.request(
+            "/api/patients", "POST", {"display_name": "已归档成员"}
+        )["patient"]
+        self.request(
+            f"/api/patients/{archived_member['patient_id']}/archive", "POST", {}
+        )
+        with self.assertRaises(HTTPError) as archived_blocked:
+            self.request(bind_path, "POST", {"patient_id": archived_member["patient_id"]})
+        self.assertEqual(archived_blocked.exception.code, 400)
+        # Bind the member: snapshot key set, baseline rebuilt from the
+        # member (not the default), nothing written into facts.
+        bound = self.request(bind_path, "POST", {"patient_id": member["patient_id"]})
+        self.assertEqual(bound["patient"]["patient_id"], member["patient_id"])
+        bound_state = bound["state"]
+        self.assertEqual(
+            bound_state["runtime_snapshot"]["consultation_patient_id"],
+            member["patient_id"],
+        )
+        self.assertEqual(
+            bound_state["profile_baseline"]["chronic_conditions"], ["哮喘"]
+        )
+        self.assertNotIn("chronic_conditions", bound_state["facts"])
+        # The binding survives a fresh state read (persisted, not memory-only).
+        reread = self.request(f"/api/sessions/{session_id}")["state"]
+        self.assertEqual(
+            reread["runtime_snapshot"]["consultation_patient_id"],
+            member["patient_id"],
+        )
+        # Attach gate now follows the binding: member entry 200, self entry 400.
+        attached = self.request(
+            f"/api/sessions/{session_id}/patient-records/{member_entry['entry']['entry_id']}/attach",
+            "POST",
+            {},
+        )
+        self.assertEqual(len(attached["items"]), 1)
+        with self.assertRaises(HTTPError) as wrong_owner:
+            self.request(
+                f"/api/sessions/{session_id}/patient-records/{default_entry['entry']['entry_id']}/attach",
+                "POST",
+                {},
+            )
+        self.assertEqual(wrong_owner.exception.code, 400)
 
     def test_full_upload_recognition_confirmation_edit_and_delete_flow(self):
         catalog = self.request("/api/patient")
@@ -269,6 +440,264 @@ class PatientRecordApiTests(unittest.TestCase):
                 "report_items"
             ],
             [],
+        )
+
+    def test_p2b_measurement_routes_and_trends_follow_frontend_slugs(self):
+        pressure = self.request(
+            "/api/patient/measurements/blood-pressure",
+            "POST",
+            {
+                "systolic": "120",
+                "diastolic": "80",
+                "unit": "mmHg",
+                "measured_at": "2026-08-30T07:20:00+08:00",
+            },
+        )
+        self.assertEqual(pressure["entry"]["title"], "血压自测")
+        self.assertEqual(pressure["observations"][0]["value_text"], "120/80")
+        self.assertIsNone(pressure["observations"][0]["numeric_value"])
+        self.request(
+            "/api/patient/measurements/temperature",
+            "POST",
+            {
+                "value_text": "98.6",
+                "unit": "°F",
+                "measured_at": "2026-08-30T07:25:00+08:00",
+            },
+        )
+        trend = self.request("/api/patient/trends/blood-pressure")
+        self.assertEqual(trend["count"], 1)
+        self.assertEqual(trend["summary"]["systolic"]["average"], "120")
+        self.assertEqual(trend["summary"]["latest"]["reported_value"], "120/80")
+        temp_trend = self.request("/api/patient/trends/temperature")
+        self.assertEqual(temp_trend["summary"]["latest"]["normalized_value"], "37")
+        self.assertEqual(temp_trend["summary"]["unit"], "°C")
+        with self.assertRaises(HTTPError) as unknown:
+            self.request(
+                "/api/patient/measurements/steps",
+                "POST",
+                {
+                    "value_text": "1000",
+                    "unit": "步",
+                    "measured_at": "2026-08-30T07:20:00+08:00",
+                },
+            )
+        self.assertEqual(unknown.exception.code, 404)
+
+    def test_p2b_from_observation_never_autosaves_inferred_units(self):
+        store = self.server.patient_records
+        patient = store.ensure_default_patient()
+        uploaded = store.create_image_entry(
+            patient["patient_id"],
+            "体温计读数",
+            "2026-08-20T08:00:00+08:00",
+            None,
+            "temp.png",
+            inspect_image(png()),
+        )
+        run = store.start_recognition(uploaded["asset_id"], "deepseek", "fixture")
+        recognized = store.finish_recognition(
+            run,
+            {
+                "schema": "medical-image-recognition/v1",
+                "document_type": "laboratory_report",
+                "numbers": [
+                    {
+                        "number_id": "n-1",
+                        "value_text": "37.2",
+                        "context": "体温 37.2",
+                        "clarity": "clear",
+                        "alternatives": [],
+                        "uncertainty_reason": None,
+                        "page_index": 1,
+                    }
+                ],
+                "content": {
+                    "description": "体温计读数。",
+                    "clarity": "clear",
+                    "unclear_parts": [],
+                },
+                "warnings": [],
+            },
+        )
+        entry_id = recognized["entry"]["entry_id"]
+        observation = next(
+            item
+            for item in recognized["observations"]
+            if item["kind"] == "document_number"
+        )
+        from_path = "/api/patient/measurements/from-observation"
+        with self.assertRaises(HTTPError) as unconfirmed:
+            self.request(
+                from_path,
+                "POST",
+                {"entry_id": entry_id, "observation_id": observation["observation_id"]},
+            )
+        self.assertEqual(unconfirmed.exception.code, 400)
+        confirmed = self.request(
+            f"/api/observations/{observation['observation_id']}/revisions",
+            "POST",
+            {
+                "value_text": "37.2",
+                "unit": "",
+                "expected_revision_id": observation["current_revision_id"],
+                "reason": "confirmation",
+            },
+        )
+        self.assertEqual(
+            next(
+                item
+                for item in confirmed["observations"]
+                if item["observation_id"] == observation["observation_id"]
+            )["verification_status"],
+            "patient_confirmed",
+        )
+        preview = self.request(
+            from_path,
+            "POST",
+            {"entry_id": entry_id, "observation_id": observation["observation_id"]},
+        )
+        self.assertTrue(preview["requires_confirmation"])
+        self.assertTrue(preview["unit_inferred"])
+        self.assertEqual(preview["unit"], "°C")
+        self.assertEqual(preview["kind"], "temperature")
+        self.assertEqual(
+            len(self.request("/api/patient/timeline")["entries"]), 1
+        )
+        saved = self.request(
+            from_path,
+            "POST",
+            {
+                "entry_id": entry_id,
+                "observation_id": observation["observation_id"],
+                "unit": "°C",
+            },
+        )
+        self.assertEqual(saved["observations"][0]["kind"], "temperature")
+        self.assertEqual(saved["observations"][0]["value_text"], "37.2")
+        self.assertTrue(saved["from_observation"]["unit_inferred"])
+        original = self.request(f"/api/entries/{entry_id}")
+        kept = next(
+            item
+            for item in original["observations"]
+            if item["observation_id"] == observation["observation_id"]
+        )
+        self.assertEqual(kept["kind"], "document_number")
+        self.assertEqual(kept["value_text"], "37.2")
+        self.assertEqual(
+            len(self.request("/api/patient/timeline")["entries"]), 2
+        )
+
+    def test_p2b_from_observation_rejects_mismatched_explicit_unit(self):
+        # N4: transcription text carries an explicit °C; a second submit
+        # claiming °F must be refused (400) without saving, while the
+        # alias ℃ (same canonical unit) still saves.
+        store = self.server.patient_records
+        patient = store.ensure_default_patient()
+        uploaded = store.create_image_entry(
+            patient["patient_id"],
+            "体温计读数",
+            "2026-08-20T08:00:00+08:00",
+            None,
+            "temp.png",
+            inspect_image(png()),
+        )
+        run = store.start_recognition(uploaded["asset_id"], "deepseek", "fixture")
+        recognized = store.finish_recognition(
+            run,
+            {
+                "schema": "medical-image-recognition/v1",
+                "document_type": "laboratory_report",
+                "numbers": [
+                    {
+                        "number_id": "n-1",
+                        "value_text": "37.2",
+                        "context": "体温 37.2°C",
+                        "clarity": "clear",
+                        "alternatives": [],
+                        "uncertainty_reason": None,
+                        "page_index": 1,
+                    }
+                ],
+                "content": {
+                    "description": "体温计读数。",
+                    "clarity": "clear",
+                    "unclear_parts": [],
+                },
+                "warnings": [],
+            },
+        )
+        entry_id = recognized["entry"]["entry_id"]
+        observation = next(
+            item
+            for item in recognized["observations"]
+            if item["kind"] == "document_number"
+        )
+        self.request(
+            f"/api/observations/{observation['observation_id']}/revisions",
+            "POST",
+            {
+                "value_text": "37.2",
+                "unit": "",
+                "expected_revision_id": observation["current_revision_id"],
+                "reason": "confirmation",
+            },
+        )
+        from_path = "/api/patient/measurements/from-observation"
+        base = {"entry_id": entry_id, "observation_id": observation["observation_id"]}
+        with self.assertRaises(HTTPError) as mismatched:
+            self.request(from_path, "POST", {**base, "unit": "°F"})
+        self.assertEqual(mismatched.exception.code, 400)
+        # Nothing was saved by the refused submit: still one entry.
+        self.assertEqual(len(self.request("/api/patient/timeline")["entries"]), 1)
+        saved = self.request(from_path, "POST", {**base, "unit": "℃"})
+        self.assertEqual(saved["observations"][0]["kind"], "temperature")
+        self.assertEqual(saved["observations"][0]["value_text"], "37.2")
+
+    def test_p2d_member_timeline_and_p2c_baseline_reference_switch(self):
+        member = self.request(
+            "/api/patients", "POST", {"display_name": "孩子"}
+        )["patient"]
+        timeline = self.request(f"/api/patients/{member['patient_id']}/timeline")
+        self.assertEqual(timeline["patient"]["display_name"], "孩子")
+        self.assertEqual(timeline["entries"], [])
+        default = self.request("/api/patient")["patient"]
+        self.request(
+            f"/api/patients/{default['patient_id']}",
+            "PATCH",
+            {
+                "chronic_conditions": ["高血压"],
+                "allergies": [{"kind": "drug", "name": "青霉素"}],
+            },
+        )
+        created = self.request("/api/sessions", "POST", {})
+        state = created["state"]
+        self.assertTrue(state["baseline_reference_enabled"])
+        self.assertEqual(state["profile_baseline"]["chronic_conditions"], ["高血压"])
+        session_id = created["session_id"]
+        switched = self.request(
+            f"/api/sessions/{session_id}/baseline-reference",
+            "POST",
+            {"enabled": False},
+        )
+        self.assertFalse(switched["state"]["baseline_reference_enabled"])
+        self.assertEqual(switched["state"]["profile_baseline"], {})
+        events = self.request(f"/api/sessions/{session_id}/events")["events"]
+        self.assertTrue(
+            any(
+                event["event_type"] == "baseline.reference_disabled"
+                for event in events
+            )
+        )
+        reopened = self.request(
+            f"/api/sessions/{session_id}/baseline-reference",
+            "POST",
+            {"enabled": True},
+        )
+        self.assertTrue(reopened["state"]["baseline_reference_enabled"])
+        self.assertEqual(
+            reopened["state"]["profile_baseline"]["chronic_conditions"],
+            ["高血压"],
         )
 
 

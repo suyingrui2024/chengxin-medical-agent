@@ -1769,6 +1769,15 @@ class ConsultationEngine(
             "known": known,
             "unknown": unknown,
             "unknown_details": unknown_details,
+            # P2c: the deterministic engine has no _context to inject
+            # into, so the archive reference rides the summary payload
+            # as a read-only reference section. It never drives question
+            # selection, skipping, or prefilling (facts are untouched).
+            "profile_baseline": (
+                dict(state.profile_baseline)
+                if state.baseline_reference_enabled
+                else {}
+            ),
             "care_route": route,
             "risk_level": state.risk.level.value,
             "risk_triggers": state.risk.triggers,
@@ -1996,7 +2005,14 @@ class ConsultationEngine(
             mode = sheet_mode()
             if mode == "off":
                 return
-            sheet = compose_conclusion(state, summary=reply.summary)
+            allergies = None
+            if state.baseline_reference_enabled and isinstance(
+                state.profile_baseline, dict
+            ):
+                allergies = state.profile_baseline.get("allergies")
+            sheet = compose_conclusion(
+                state, summary=reply.summary, baseline_allergies=allergies
+            )
             if sheet is None:
                 return
             state.conclusion = sheet

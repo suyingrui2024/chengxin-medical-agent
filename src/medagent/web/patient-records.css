@@ -75,6 +75,222 @@
   gap: 12px;
 }
 
+/* P2 基线信息与家庭成员：与既有记录卡同视觉体系，桌面视口两列表单。 */
+.records-baseline,
+.records-members,
+.records-measurement-trends {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 17px 19px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface);
+}
+
+.records-baseline h2,
+.records-members h2,
+.records-measurement-trends h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.records-baseline-hint,
+.records-members-hint,
+.records-measurement-trends p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.baseline-summary {
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.baseline-summary:empty {
+  display: none;
+}
+
+.baseline-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+
+.baseline-form .field-label {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--ink);
+}
+
+.baseline-form .baseline-list {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+}
+
+.baseline-form > .secondary-button {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin-bottom: 14px;
+}
+
+.baseline-form > .primary-button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.baseline-row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.baseline-row select,
+.baseline-row input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.baseline-form textarea {
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.member-list {
+  display: grid;
+  gap: 10px;
+}
+
+.member-card {
+  display: grid;
+  gap: 10px;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--light);
+}
+
+.member-card.archived {
+  opacity: 0.55;
+}
+
+.member-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.member-actions,
+.member-rename {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.member-actions button {
+  min-height: 31px;
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
+.member-rename input {
+  min-width: 160px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.member-add-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.member-add-form .field {
+  margin-bottom: 0;
+}
+
+.measurement-trend-list {
+  display: grid;
+  gap: 10px;
+}
+
+.measurement-trend-card {
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--light);
+}
+
+.measurement-trend-card h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.measurement-trend-card p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* P2c 问诊页档案引用横幅：由协调者在问诊顶部挂载，见 patient-records-ui.js。 */
+.baseline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 15px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--light);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.baseline-banner[hidden] {
+  display: none;
+}
+
+.baseline-banner-close {
+  flex: 0 0 auto;
+}
+
 .records-trend {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -463,6 +679,23 @@
   .record-value-row,
   .record-inline-edit {
     grid-template-columns: 1fr;
+  }
+
+  .baseline-form {
+    grid-template-columns: 1fr;
+  }
+
+  .baseline-row {
+    grid-template-columns: 1fr;
+  }
+
+  .member-add-form {
+    grid-template-columns: 1fr;
+  }
+
+  .baseline-banner {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .record-consultation-panel {

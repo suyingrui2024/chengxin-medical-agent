@@ -136,6 +136,11 @@ class CaseState:
     # Patient-facing conclusion sheet (docs/问诊结论单设计文档.md),
     # serialized form; the composer lives in medagent.conclusion.
     conclusion: Dict[str, Any] = field(default_factory=dict)
+    # P2c archive reference (design §4.3): the whitelisted baseline
+    # projection built at session creation. Context only — it is NEVER
+    # written into facts, and the switch below gates every consumer.
+    profile_baseline: Dict[str, Any] = field(default_factory=dict)
+    baseline_reference_enabled: bool = True
 
     def record(self, fact: Fact) -> None:
         previous = self.facts.get(fact.key)
@@ -183,6 +188,8 @@ class CaseState:
             "closed_reason": self.closed_reason,
             "follow_up": dict(self.follow_up) if self.follow_up else None,
             "conclusion": dict(self.conclusion) if self.conclusion else None,
+            "profile_baseline": dict(self.profile_baseline),
+            "baseline_reference_enabled": bool(self.baseline_reference_enabled),
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "revision": self.revision,

@@ -16,7 +16,7 @@ from .text_match import find_unnegated
 # themselves reads as a template bug (live-eval cases 1/5/9). Child
 # consultations keep the catalog wording, where the months phrasing is
 # the point.
-ADULT_AGE_PROMPT = "患者多大？可直接写年龄，例如 32 岁。"
+ADULT_AGE_PROMPT = "你多大？可直接写年龄，例如 32 岁。"
 
 
 def _applies_term_match(text: str, term: str) -> bool:

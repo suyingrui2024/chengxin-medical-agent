@@ -19,6 +19,7 @@ from copy import deepcopy
 from importlib import resources
 from typing import Any, Dict, List, Optional
 
+from .baseline_projection import build_allergy_hint
 from .domain import Assertion, CaseState, Phase, RiskLevel
 from .followups import build_follow_up_plan
 from .handoff import LABELS as FACT_LABELS
@@ -523,10 +524,25 @@ def _build_narrative(
 
 
 def compose_conclusion(
-    state: CaseState, summary: Optional[Dict[str, Any]] = None
+    state: CaseState,
+    summary: Optional[Dict[str, Any]] = None,
+    baseline_allergies: Optional[List[Dict[str, Any]]] = None,
 ) -> Optional[Dict[str, Any]]:
     """Build the conclusion sheet for a just-closed session, or None when
-    no sheet should exist (not closed, emergency route, still open)."""
+    no sheet should exist (not closed, emergency route, still open).
+
+    ``baseline_allergies`` is the archive projection's allergy list
+    (P2c, from state.profile_baseline — never from facts). When it
+    yields a hint, the hint lands in its own self_care field; it is
+    never appended to the versioned ``avoid`` list and never derives
+    gaps.
+
+    DORMANT under self_care 1.2: no real avoid line mentions allergy,
+    so this hint cannot fire on real content today (pinned by
+    test_p2_integration's real-content count test). Enabling it needs
+    a content line plus clinical review — a content decision, not a
+    code change here; do not edit self_care wording to force it.
+    """
     if state.phase != Phase.CLOSED:
         return None
     if state.closed_reason not in ("confirmed_by_user", "urgent_route"):
@@ -573,6 +589,19 @@ def compose_conclusion(
             group_key = PATHWAY_GROUPS[hid]
             break
     care = _self_care_group(group_key, tier) or {}
+    # P2c allergy hint: its own field, never mixed into the versioned
+    # avoid list. A patient-entered allergy name containing a banned
+    # phrase must not void the whole sheet, so such a hint is dropped
+    # instead of reaching the lint below.
+    allergy_hint = (
+        build_allergy_hint(baseline_allergies, care.get("avoid", []))
+        if baseline_allergies
+        else None
+    )
+    if allergy_hint and any(
+        phrase in allergy_hint for phrase in BANNED_PHRASES
+    ):
+        allergy_hint = None
     # The safety net keys on the explored pathway when directions abstain
     # (self-care content deliberately does not: it stays generic rather
     # than borrowing a non-displayed hypothesis's care group).
@@ -611,6 +640,7 @@ def compose_conclusion(
             "do": list(care.get("do", [])),
             "avoid": list(care.get("avoid", [])),
             "measure": list(care.get("measure", [])),
+            **({"allergy_hint": allergy_hint} if allergy_hint else {}),
         },
         "return_now_if": list(
             _pathway_return_now_if(alert_group)

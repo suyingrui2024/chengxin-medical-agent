@@ -8,8 +8,8 @@ import re
 import sqlite3
 import sys
 from contextlib import contextmanager
-from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
 from threading import RLock
@@ -17,10 +17,34 @@ from typing import Any, Iterator
 from uuid import uuid4
 
 from .extensions.glucose import convert_glucose
+from .measurement_kinds import (
+    KNOWN_KINDS,
+    MeasurementKindError,
+    kind_spec,
+    normalize_measurement,
+    trend_summary,
+)
 from .medical_images import InspectedImage, validate_recognition
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+
+# Baseline profile fields (P2a/P2d). All patient-entered, editable, and
+# NEVER written back from consultation facts (see update_patient).
+BASELINE_FIELDS = (
+    "birth_year",
+    "sex",
+    "height_cm",
+    "weight_kg",
+    "chronic_conditions",
+    "allergies",
+    "medications",
+    "surgical_history",
+    "birth_year_month",
+)
+BASELINE_LIST_LIMIT = 20
+BASELINE_STRING_LIMIT = 200
+_ALLERGY_KINDS = ("drug", "food", "other")
 MEASUREMENT_CONTEXTS = {
     "fasting",
     "before_meal",
@@ -30,6 +54,26 @@ MEASUREMENT_CONTEXTS = {
     "random",
     "unknown",
 }
+# P2b: meal/bedtime scenarios are glucose-only; every kind accepts the
+# generic scenarios. Unknown contexts are rejected, never defaulted.
+GENERIC_MEASUREMENT_CONTEXTS = {"random", "unknown"}
+GLUCOSE_MEASUREMENT_CONTEXTS = MEASUREMENT_CONTEXTS
+_MEASUREMENT_CONTEXT_LABELS = {
+    "fasting": "空腹",
+    "before_meal": "餐前",
+    "after_meal_1h": "餐后 1 小时",
+    "after_meal_2h": "餐后 2 小时",
+    "bedtime": "睡前",
+    "random": "随机",
+    "unknown": "场景暂不确定",
+}
+
+
+def _render_decimal(value: Decimal) -> str:
+    """Receipt rendering shared with the glucose converter: <=4 decimals,
+    trailing zeros stripped. Used for non-glucose trend points."""
+    output = format(value.quantize(Decimal("0.0001")), "f")
+    return output.rstrip("0").rstrip(".")
 
 
 class PatientRecordError(ValueError):
@@ -78,6 +122,147 @@ def _time(value: Any, name: str, *, required: bool = False) -> str | None:
     if parsed.tzinfo is None:
         raise PatientRecordError(f"{name}必须包含时区")
     return parsed.isoformat().replace("+00:00", "Z")
+
+
+def _baseline_optional_text(value: Any, name: str, maximum: int = BASELINE_STRING_LIMIT) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise PatientRecordError(f"{name}格式错误")
+    text = " ".join(value.split())
+    if len(text) > maximum:
+        raise PatientRecordError(f"{name}格式错误")
+    return text or None
+
+
+def _baseline_number(value: Any, name: str, minimum: float, maximum: float) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise PatientRecordError(f"{name}格式错误")
+    number = float(value)
+    if number != number or number in {float("inf"), float("-inf")}:  # NaN / infinite
+        raise PatientRecordError(f"{name}格式错误")
+    if not minimum <= number <= maximum:
+        raise PatientRecordError(f"{name}格式错误")
+    return number
+
+
+def _baseline_string_list(value: Any, name: str) -> list[str]:
+    if not isinstance(value, list) or len(value) > BASELINE_LIST_LIMIT:
+        raise PatientRecordError(f"{name}格式错误")
+    items = []
+    for item in value:
+        if not isinstance(item, str):
+            raise PatientRecordError(f"{name}格式错误")
+        text = " ".join(item.split())
+        if not text or len(text) > BASELINE_STRING_LIMIT:
+            raise PatientRecordError(f"{name}格式错误")
+        items.append(text)
+    return items
+
+
+def _baseline_object_list(
+    value: Any, name: str, required: tuple[str, ...], optional: tuple[str, ...]
+) -> list[dict[str, Any]]:
+    if not isinstance(value, list) or len(value) > BASELINE_LIST_LIMIT:
+        raise PatientRecordError(f"{name}格式错误")
+    items = []
+    for entry in value:
+        if not isinstance(entry, dict):
+            raise PatientRecordError(f"{name}格式错误")
+        if set(entry) - set(required) - set(optional):
+            raise PatientRecordError(f"{name}格式错误")
+        cleaned: dict[str, Any] = {}
+        for key in required:
+            text = _baseline_optional_text(entry.get(key), name)
+            if text is None:
+                raise PatientRecordError(f"{name}格式错误")
+            cleaned[key] = text
+        for key in optional:
+            cleaned[key] = _baseline_optional_text(entry.get(key), name)
+        items.append(cleaned)
+    return items
+
+
+def validate_baseline_patch(patch: Any) -> dict[str, Any]:
+    """Validate a partial baseline update; unknown keys are rejected.
+
+    Returns only the normalized fields present in ``patch``. Raises
+    PatientRecordError before any write, so a rejected patch cannot
+    pollute stored data.
+    """
+    if not isinstance(patch, dict):
+        raise PatientRecordError("基线信息格式错误")
+    allowed = {"display_name"} | set(BASELINE_FIELDS)
+    if set(patch) - allowed:
+        raise PatientRecordError("基线信息格式错误")
+    normalized: dict[str, Any] = {}
+    if "display_name" in patch:
+        normalized["display_name"] = _clean_text(patch["display_name"], "档案名称", 80)
+    if "birth_year" in patch:
+        year = patch["birth_year"]
+        if year is None:
+            normalized["birth_year"] = None
+        elif isinstance(year, bool) or not isinstance(year, int):
+            raise PatientRecordError("出生年格式错误")
+        elif not 1900 <= year <= 2100:
+            raise PatientRecordError("出生年格式错误")
+        else:
+            normalized["birth_year"] = year
+    if "sex" in patch:
+        normalized["sex"] = _baseline_optional_text(patch["sex"], "性别")
+    if "height_cm" in patch:
+        normalized["height_cm"] = _baseline_number(patch["height_cm"], "身高", 20, 300)
+    if "weight_kg" in patch:
+        normalized["weight_kg"] = _baseline_number(patch["weight_kg"], "体重", 0.5, 1000)
+    if "chronic_conditions" in patch:
+        normalized["chronic_conditions"] = _baseline_string_list(
+            patch["chronic_conditions"], "慢病清单"
+        )
+    if "allergies" in patch:
+        allergies = _baseline_object_list(
+            patch["allergies"], "过敏史", ("name",), ("kind",)
+        )
+        for allergy in allergies:
+            kind = allergy.get("kind")
+            if kind is not None and kind not in _ALLERGY_KINDS:
+                raise PatientRecordError("过敏史格式错误")
+            allergy["kind"] = kind if kind is not None else "other"
+        normalized["allergies"] = allergies
+    if "medications" in patch:
+        normalized["medications"] = _baseline_object_list(
+            patch["medications"], "长期用药", ("name",), ("purpose",)
+        )
+    if "surgical_history" in patch:
+        normalized["surgical_history"] = _baseline_optional_text(
+            patch["surgical_history"], "手术史"
+        )
+    if "birth_year_month" in patch:
+        month = patch["birth_year_month"]
+        if month is None:
+            normalized["birth_year_month"] = None
+        elif not isinstance(month, str) or not re.fullmatch(
+            r"(19|20)\d\d-(0[1-9]|1[0-2])", month
+        ):
+            raise PatientRecordError("出生年月格式错误")
+        else:
+            normalized["birth_year_month"] = month
+    return normalized
+
+
+def _profile_dict(row: sqlite3.Row) -> dict[str, Any]:
+    profile = dict(row)
+    for key in ("chronic_conditions", "allergies", "medications"):
+        raw = profile.get(key)
+        try:
+            profile[key] = json.loads(raw) if raw else []
+        except (ValueError, TypeError):
+            profile[key] = []
+        if not isinstance(profile[key], list):
+            profile[key] = []
+    profile["archived"] = bool(profile.get("archived_at"))
+    return profile
 
 
 class PatientRecordStore:
@@ -137,6 +322,16 @@ class PatientRecordStore:
                         display_name TEXT NOT NULL,
                         version INTEGER NOT NULL DEFAULT 1,
                         schema_version INTEGER NOT NULL,
+                        birth_year INTEGER,
+                        sex TEXT,
+                        height_cm REAL,
+                        weight_kg REAL,
+                        chronic_conditions TEXT NOT NULL DEFAULT '[]',
+                        allergies TEXT NOT NULL DEFAULT '[]',
+                        medications TEXT NOT NULL DEFAULT '[]',
+                        surgical_history TEXT,
+                        birth_year_month TEXT,
+                        archived_at TEXT,
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL
                     );
@@ -239,6 +434,38 @@ class PatientRecordStore:
                     );
                     """
                 )
+                # Forward migration v1 -> v2: a database created by the
+                # single-profile release has the six-column table above
+                # without the baseline columns. ADD COLUMN is enough
+                # (new columns are all nullable or defaulted), so existing
+                # profiles, entries and observations are untouched.
+                existing_columns = {
+                    row[1]
+                    for row in connection.execute(
+                        "PRAGMA table_info(patient_profiles)"
+                    ).fetchall()
+                }
+                for column, definition in (
+                    ("birth_year", "INTEGER"),
+                    ("sex", "TEXT"),
+                    ("height_cm", "REAL"),
+                    ("weight_kg", "REAL"),
+                    ("chronic_conditions", "TEXT NOT NULL DEFAULT '[]'"),
+                    ("allergies", "TEXT NOT NULL DEFAULT '[]'"),
+                    ("medications", "TEXT NOT NULL DEFAULT '[]'"),
+                    ("surgical_history", "TEXT"),
+                    ("birth_year_month", "TEXT"),
+                    ("archived_at", "TEXT"),
+                ):
+                    if column not in existing_columns:
+                        connection.execute(
+                            f"ALTER TABLE patient_profiles ADD COLUMN {column} {definition}"
+                        )
+                connection.execute(
+                    "UPDATE patient_profiles SET schema_version = ? "
+                    "WHERE schema_version < ?",
+                    (SCHEMA_VERSION, SCHEMA_VERSION),
+                )
                 connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
                 connection.commit()
             finally:
@@ -252,28 +479,63 @@ class PatientRecordStore:
     def _dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
         return dict(row) if row is not None else None
 
-    def create_patient(self, display_name: str = "我的健康档案") -> dict[str, Any]:
-        name = _clean_text(display_name, "档案名称", 80)
+    def create_patient(
+        self, display_name: str = "我的健康档案", baseline: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Create a new profile. Multi-profile is intentional (P2d):
+        the first profile created is the self profile; later calls add
+        family members. Use ensure_default_patient() for the self one."""
+        fields = validate_baseline_patch({"display_name": display_name, **(baseline or {})})
         patient_id = str(uuid4())
         now = utc_now()
+        columns = ["patient_id", "display_name", "version", "schema_version"]
+        values: list[Any] = [patient_id, fields["display_name"], 1, SCHEMA_VERSION]
+        for key in BASELINE_FIELDS:
+            columns.append(key)
+            raw = fields.get(key)
+            values.append(
+                json.dumps(raw, ensure_ascii=False)
+                if key in {"chronic_conditions", "allergies", "medications"}
+                else raw
+            )
+        columns += ["created_at", "updated_at"]
+        values += [now, now]
+        placeholders = ", ".join("?" * len(columns))
         with self._transaction() as connection:
-            existing = connection.execute(
-                "SELECT * FROM patient_profiles ORDER BY created_at LIMIT 1"
-            ).fetchone()
-            if existing is not None:
-                return dict(existing)
             connection.execute(
-                "INSERT INTO patient_profiles VALUES (?, ?, 1, ?, ?, ?)",
-                (patient_id, name, SCHEMA_VERSION, now, now),
+                f"INSERT INTO patient_profiles ({', '.join(columns)}) "
+                f"VALUES ({placeholders})",
+                values,
             )
         return self.patient(patient_id)
 
+    def add_member(
+        self, display_name: str, baseline: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Add a family member profile; same baseline shape as self."""
+        return self.create_patient(display_name, baseline)
+
     def ensure_default_patient(self) -> dict[str, Any]:
+        """Return the self profile: the earliest non-archived profile.
+
+        Existing single-profile data is untouched: with one profile it
+        is that profile, so migration costs nothing.
+        """
         with self._read() as connection:
             row = connection.execute(
-                "SELECT * FROM patient_profiles ORDER BY created_at LIMIT 1"
+                "SELECT * FROM patient_profiles WHERE archived_at IS NULL "
+                "ORDER BY created_at LIMIT 1"
             ).fetchone()
-        return dict(row) if row else self.create_patient()
+        return _profile_dict(row) if row else self.create_patient()
+
+    def list_patients(self, include_archived: bool = True) -> list[dict[str, Any]]:
+        with self._read() as connection:
+            query = "SELECT * FROM patient_profiles"
+            if not include_archived:
+                query += " WHERE archived_at IS NULL"
+            query += " ORDER BY created_at"
+            rows = connection.execute(query).fetchall()
+        return [_profile_dict(row) for row in rows]
 
     def patient(self, patient_id: str) -> dict[str, Any]:
         with self._read() as connection:
@@ -282,7 +544,70 @@ class PatientRecordStore:
             ).fetchone()
         if row is None:
             raise PatientRecordError("患者档案不存在")
-        return dict(row)
+        return _profile_dict(row)
+
+    def update_patient(
+        self, patient_id: str, patch: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Partial baseline update, patient-entered only.
+
+        Validation runs before any write and the update is a single
+        transaction, so an invalid patch leaves stored data untouched.
+        Consultation facts are never written here: no caller passes
+        them in, and there is no fact-to-baseline path in this module.
+        """
+        fields = validate_baseline_patch(patch)
+        if not fields:
+            raise PatientRecordError("基线信息格式错误")
+        now = utc_now()
+        assignments = []
+        values: list[Any] = []
+        for key, raw in fields.items():
+            assignments.append(f"{key} = ?")
+            values.append(
+                json.dumps(raw, ensure_ascii=False)
+                if key in {"chronic_conditions", "allergies", "medications"}
+                else raw
+            )
+        assignments.append("version = version + 1")
+        assignments.append("updated_at = ?")
+        values += [now, patient_id]
+        with self._transaction() as connection:
+            self._require_patient(connection, patient_id)
+            connection.execute(
+                f"UPDATE patient_profiles SET {', '.join(assignments)} "
+                "WHERE patient_id = ?",
+                values,
+            )
+        return self.patient(patient_id)
+
+    def archive_patient(self, patient_id: str) -> dict[str, Any]:
+        """Soft-archive a member: flagged, never hard-deleted, and no
+        longer eligible as the default profile.
+
+        The current default (self) profile cannot be archived: archiving
+        it would let ensure_default_patient() silently promote a family
+        member to "self", rebinding every default-scoped read/write
+        (measurements, trends, uploads) to the wrong person. Refusing
+        here (400 at the API layer) keeps the default stable; a caller
+        that needs to retire the self profile must do so explicitly
+        through a different, deliberate path (none exists yet).
+        """
+        now = utc_now()
+        with self._transaction() as connection:
+            self._require_patient(connection, patient_id)
+            default = connection.execute(
+                "SELECT patient_id FROM patient_profiles "
+                "WHERE archived_at IS NULL ORDER BY created_at LIMIT 1"
+            ).fetchone()
+            if default is not None and default[0] == patient_id:
+                raise PatientRecordError("默认档案不能归档")
+            connection.execute(
+                "UPDATE patient_profiles SET archived_at = ?, version = version + 1, "
+                "updated_at = ? WHERE patient_id = ? AND archived_at IS NULL",
+                (now, now, patient_id),
+            )
+        return self.patient(patient_id)
 
     def _require_patient(self, connection: sqlite3.Connection, patient_id: str) -> None:
         if connection.execute(
@@ -616,40 +941,41 @@ class PatientRecordStore:
         measurement_context: Any,
     ) -> dict[str, Any]:
         measurement_kind = _clean_text(kind, "测量项目", 60)
-        if measurement_kind != "blood_glucose":
-            raise PatientRecordError("第一版只支持手动记录血糖")
-        value = _clean_text(value_text, "测量数值", 40)
         try:
-            numeric = Decimal(value)
-        except InvalidOperation:
-            raise PatientRecordError("血糖数值格式错误") from None
-        if not numeric.is_finite() or numeric < 0 or len(value) > 20:
-            raise PatientRecordError("血糖数值格式错误")
-        normalized_unit = _clean_text(unit, "血糖单位", 20)
-        if normalized_unit not in {"mmol/L", "mg/dL"}:
-            raise PatientRecordError("血糖单位只支持 mmol/L 或 mg/dL")
-        if measurement_context not in MEASUREMENT_CONTEXTS:
-            raise PatientRecordError("请选择有效的血糖测量场景")
+            spec = kind_spec(measurement_kind)
+            normalized = normalize_measurement(
+                measurement_kind, _clean_text(value_text, "测量数值", 40), unit
+            )
+        except MeasurementKindError as exc:
+            raise PatientRecordError(str(exc)) from None
+        if measurement_kind == "blood_glucose":
+            allowed_contexts = GLUCOSE_MEASUREMENT_CONTEXTS
+        else:
+            allowed_contexts = GENERIC_MEASUREMENT_CONTEXTS
+        if measurement_context not in allowed_contexts:
+            raise PatientRecordError("请选择有效的测量场景")
         measured = _time(measured_at, "测量时间", required=True)
         entry_id = str(uuid4())
         now = utc_now()
-        context_labels = {
-            "fasting": "空腹",
-            "before_meal": "餐前",
-            "after_meal_1h": "餐后 1 小时",
-            "after_meal_2h": "餐后 2 小时",
-            "bedtime": "睡前",
-            "random": "随机",
-            "unknown": "场景暂不确定",
-        }
+        # Store the reported value/unit verbatim (alias-resolved unit);
+        # canonical values are derived at read time, never written back
+        # over what the patient entered or confirmed.
+        value = normalized["reported_value"]
+        normalized_unit = normalized["reported_unit"]
+        if measurement_kind == "blood_pressure":
+            # Dual-value kinds have no single numeric column: the pair
+            # lives in value_text ("120/80") and numeric_value stays NULL.
+            numeric: str | None = None
+        else:
+            numeric = str(Decimal(value))
         with self._transaction() as connection:
             self._require_patient(connection, patient_id)
             connection.execute(
                 """INSERT INTO medical_entries
                    (entry_id, patient_id, entry_type, title, measured_at, reported_at,
                     uploaded_at, status, version, deleted_at)
-                   VALUES (?, ?, 'manual_measurement', '血糖自测', ?, NULL, ?, 'ready', 1, NULL)""",
-                (entry_id, patient_id, measured, now),
+                   VALUES (?, ?, 'manual_measurement', ?, ?, NULL, ?, 'ready', 1, NULL)""",
+                (entry_id, patient_id, f"{spec['display_name']}自测", measured, now),
             )
             entry = connection.execute(
                 "SELECT * FROM medical_entries WHERE entry_id = ?", (entry_id,)
@@ -658,11 +984,14 @@ class PatientRecordStore:
                 connection,
                 entry=entry,
                 kind=measurement_kind,
-                display_name="血糖",
+                display_name=spec["display_name"],
                 value_text=value,
                 unit=normalized_unit,
-                context=f"{context_labels[measurement_context]}血糖 {value} {normalized_unit}",
-                clarity="clear",
+                context=(
+                    f"{_MEASUREMENT_CONTEXT_LABELS[measurement_context]}"
+                    f"{spec['display_name']} {value} {normalized_unit}"
+                ),
+                clarity=normalized["clarity"],
                 verification_status="patient_confirmed",
                 source_type="patient_manual",
                 source_id=entry_id,
@@ -671,10 +1000,14 @@ class PatientRecordStore:
             connection.execute(
                 """UPDATE observations SET numeric_value = ?, measurement_context = ?
                    WHERE observation_id = ?""",
-                (str(numeric), measurement_context, observation_id),
+                (numeric, measurement_context, observation_id),
             )
             self._bump_patient(connection, patient_id, now)
-        return self.entry(entry_id)
+        detail = self.entry(entry_id)
+        # Out-of-range values are still saved; the warning travels with
+        # the receipt so the frontend can show it without blocking.
+        detail["warnings"] = list(normalized["warnings"])
+        return detail
 
     def _observation(self, connection: sqlite3.Connection, observation_id: str) -> sqlite3.Row:
         row = connection.execute(
@@ -725,24 +1058,31 @@ class PatientRecordStore:
                 ),
             )
             numeric = None
-            if current["kind"] == "blood_glucose":
+            clarity = "clear"
+            if current["kind"] in KNOWN_KINDS:
+                # Patient corrections of measurements re-validate through
+                # the kind registry (blood-pressure pairs included); other
+                # observation kinds keep their previous no-numeric path.
                 try:
-                    parsed = Decimal(value)
-                except InvalidOperation:
-                    raise PatientRecordError("血糖数值格式错误") from None
-                if not parsed.is_finite() or parsed < 0:
-                    raise PatientRecordError("血糖数值格式错误")
-                if normalized_unit not in {"mmol/L", "mg/dL"}:
-                    raise PatientRecordError("血糖单位只支持 mmol/L 或 mg/dL")
-                numeric = str(parsed)
+                    normalized = normalize_measurement(
+                        current["kind"], value, normalized_unit
+                    )
+                except MeasurementKindError as exc:
+                    raise PatientRecordError(str(exc)) from None
+                clarity = normalized["clarity"]
+                if current["kind"] != "blood_pressure":
+                    numeric = str(Decimal(normalized["reported_value"]))
+                value = normalized["reported_value"]
+                normalized_unit = normalized["reported_unit"]
             connection.execute(
                 """UPDATE observations SET value_text = ?, numeric_value = ?, unit = ?,
-                   clarity = 'clear', verification_status = ?, current_revision_id = ?, updated_at = ?
+                   clarity = ?, verification_status = ?, current_revision_id = ?, updated_at = ?
                    WHERE observation_id = ?""",
                 (
                     value,
                     numeric,
                     normalized_unit,
+                    clarity,
                     verification,
                     revision_id,
                     now,
@@ -947,6 +1287,223 @@ class PatientRecordStore:
             },
             "interpretation": "仅计算已确认读数的描述性变化；未判断高低、诊断或用药。",
         }
+
+    def measurement_trend(self, kind: str, patient_id: str) -> dict[str, Any]:
+        """Per-kind trend with the same shape as glucose_trend.
+
+        Scalar kinds mirror the glucose shape exactly (points with a
+        canonical normalized_value, summary with earliest/latest/
+        minimum/maximum/average/change_from_first). Blood pressure is
+        the one structural exception: its summary carries systolic and
+        diastolic sub-summaries instead of a single average, and its
+        points carry the "120/80" pair plus both components.
+        Unparseable stored rows are skipped, never fatal to the page.
+        """
+        try:
+            spec = kind_spec(kind)
+        except MeasurementKindError as exc:
+            raise PatientRecordError(str(exc)) from None
+        self.patient(patient_id)
+        with self._read() as connection:
+            rows = connection.execute(
+                """SELECT o.observation_id, o.value_text, o.unit, o.measured_at,
+                          o.measurement_context, o.current_revision_id
+                   FROM observations o
+                   JOIN medical_entries e ON e.entry_id = o.entry_id
+                   WHERE e.patient_id = ? AND e.deleted_at IS NULL
+                     AND o.kind = ?
+                     AND o.verification_status IN ('patient_confirmed', 'patient_corrected')
+                     AND o.measured_at IS NOT NULL
+                   ORDER BY o.measured_at, o.created_at""",
+                (patient_id, kind),
+            ).fetchall()
+        display = spec["display_name"]
+        canonical = spec["canonical_unit"]
+        if kind == "blood_pressure":
+            points = []
+            samples = []
+            for row in rows:
+                try:
+                    normalized = normalize_measurement(
+                        kind, row["value_text"], row["unit"]
+                    )
+                except MeasurementKindError:
+                    continue
+                samples.append(normalized)
+                points.append(
+                    {
+                        "observation_id": row["observation_id"],
+                        "revision_id": row["current_revision_id"],
+                        "measured_at": row["measured_at"],
+                        "measurement_context": row["measurement_context"],
+                        "reported_value": normalized["reported_value"],
+                        "reported_unit": normalized["reported_unit"],
+                        "systolic": _render_decimal(
+                            normalized["values"]["systolic"]
+                        ),
+                        "diastolic": _render_decimal(
+                            normalized["values"]["diastolic"]
+                        ),
+                        "normalized_unit": canonical,
+                    }
+                )
+            if not points:
+                return {
+                    "schema": f"{kind}-trend/v1",
+                    "patient_id": patient_id,
+                    "count": 0,
+                    "points": [],
+                    "summary": None,
+                    "interpretation": f"没有已确认的{display}自测数据。",
+                }
+            stats = trend_summary(kind, samples)
+            summary = {
+                "earliest": points[0],
+                "latest": points[-1],
+                "systolic": {
+                    "minimum": stats["series"]["systolic"]["minimum"],
+                    "maximum": stats["series"]["systolic"]["maximum"],
+                    "average": stats["series"]["systolic"]["mean"],
+                    "latest": stats["series"]["systolic"]["latest"],
+                },
+                "diastolic": {
+                    "minimum": stats["series"]["diastolic"]["minimum"],
+                    "maximum": stats["series"]["diastolic"]["maximum"],
+                    "average": stats["series"]["diastolic"]["mean"],
+                    "latest": stats["series"]["diastolic"]["latest"],
+                },
+                "unit": canonical,
+            }
+            return {
+                "schema": f"{kind}-trend/v1",
+                "patient_id": patient_id,
+                "count": len(points),
+                "points": points,
+                "summary": summary,
+                "interpretation": "仅计算已确认读数的描述性变化；未判断高低、诊断或用药。",
+            }
+        points = []
+        samples = []
+        for row in rows:
+            try:
+                normalized = normalize_measurement(
+                    kind, row["value_text"], row["unit"]
+                )
+            except MeasurementKindError:
+                continue
+            samples.append(normalized)
+            point: dict[str, Any] = {
+                "observation_id": row["observation_id"],
+                "revision_id": row["current_revision_id"],
+                "measured_at": row["measured_at"],
+                "measurement_context": row["measurement_context"],
+                "reported_value": row["value_text"],
+                "reported_unit": row["unit"],
+                "normalized_value": _render_decimal(normalized["values"]["value"]),
+                "normalized_unit": canonical,
+            }
+            if kind == "blood_glucose":
+                receipt = convert_glucose(
+                    {
+                        "value": row["value_text"],
+                        "from_unit": row["unit"],
+                        "to_unit": "mmol/L",
+                    }
+                )
+                point["normalized_value"] = receipt["value"]
+                point["conversion"] = {
+                    "capability": "calculate.glucose",
+                    "version": "0.1.0",
+                    "formula": receipt["formula"],
+                    "approximate": receipt["approximate"],
+                }
+            points.append(point)
+        if not points:
+            return {
+                "schema": f"{kind}-trend/v1",
+                "patient_id": patient_id,
+                "count": 0,
+                "points": [],
+                "summary": None,
+                "interpretation": f"没有已确认的{display}自测数据。",
+            }
+        values = [sample["values"]["value"] for sample in samples]
+        change = values[-1] - values[0] if len(values) > 1 else Decimal(0)
+        return {
+            "schema": f"{kind}-trend/v1",
+            "patient_id": patient_id,
+            "count": len(points),
+            "points": points,
+            "summary": {
+                "earliest": points[0],
+                "latest": points[-1],
+                "minimum": _render_decimal(min(values)),
+                "maximum": _render_decimal(max(values)),
+                "average": _render_decimal(sum(values) / Decimal(len(values))),
+                "change_from_first": _render_decimal(change),
+                "unit": canonical,
+            },
+            "interpretation": "仅计算已确认读数的描述性变化；未判断高低、诊断或用药。",
+        }
+
+    def recent_confirmed_measurements(
+        self, patient_id: str, days: int = 7
+    ) -> list[dict[str, Any]]:
+        """Confirmed scalar measurements inside the window, canonicalized.
+
+        Feed for build_baseline_projection: only patient-confirmed /
+        patient-corrected rows, only the last ``days`` days, values
+        already converted to the kind's canonical unit. Blood pressure
+        is skipped here — a slash pair cannot be summarized as one
+        float, and the projection's summarizer drops it anyway.
+        """
+        self.patient(patient_id)
+        now = datetime.now(timezone.utc)
+        cutoff = now - timedelta(days=days)
+        with self._read() as connection:
+            rows = connection.execute(
+                """SELECT o.kind, o.value_text, o.unit, o.measured_at,
+                          o.verification_status
+                   FROM observations o
+                   JOIN medical_entries e ON e.entry_id = o.entry_id
+                   WHERE e.patient_id = ? AND e.deleted_at IS NULL
+                     AND o.kind IN ('blood_glucose', 'blood_pressure', 'temperature',
+                                    'weight', 'blood_oxygen')
+                     AND o.verification_status IN ('patient_confirmed', 'patient_corrected')
+                     AND o.measured_at IS NOT NULL
+                   ORDER BY o.measured_at, o.created_at""",
+                (patient_id,),
+            ).fetchall()
+        results = []
+        for row in rows:
+            if row["kind"] == "blood_pressure":
+                continue
+            try:
+                measured_at = datetime.fromisoformat(
+                    row["measured_at"].replace("Z", "+00:00")
+                )
+            except ValueError:
+                continue
+            if measured_at.tzinfo is None:
+                measured_at = measured_at.replace(tzinfo=timezone.utc)
+            if measured_at < cutoff or measured_at > now:
+                continue
+            try:
+                normalized = normalize_measurement(
+                    row["kind"], row["value_text"], row["unit"]
+                )
+            except MeasurementKindError:
+                continue
+            results.append(
+                {
+                    "kind": row["kind"],
+                    "value": float(normalized["values"]["value"]),
+                    "unit": normalized["canonical_unit"],
+                    "measured_at": row["measured_at"],
+                    "verification_status": row["verification_status"],
+                }
+            )
+        return results
 
     def entry(self, entry_id: str) -> dict[str, Any]:
         with self._read() as connection:

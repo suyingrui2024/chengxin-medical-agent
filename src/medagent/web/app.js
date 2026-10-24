@@ -4,7 +4,10 @@ import {
   calculationEnvelope,
 } from "./structured-ui.js";
 import { createExecutionUI } from "./execution-ui.js";
-import { createPatientRecordsUI } from "./patient-records-ui.js";
+import {
+  createBaselineBanner,
+  createPatientRecordsUI,
+} from "./patient-records-ui.js";
 import { renderLocationChips } from "./location-answer-ui.js";
 
 const $ = (selector) => document.querySelector(selector);
@@ -108,6 +111,11 @@ const patientRecordsUI = createPatientRecordsUI(api, toast, {
   getConsultationContext: () => ({
     sessionId: state.sessionId,
     subject: state.case?.facts?.consult_for?.value || null,
+    // P2d binding pointer: already reaches the frontend inside
+    // state.case.runtime_snapshot (CaseState.to_dict), written only by
+    // POST /api/sessions/{id}/bind-patient; no new field is invented.
+    boundPatientId:
+      state.case?.runtime_snapshot?.consultation_patient_id || null,
     reportItems: state.case?.report_items || [],
   }),
   openConsultation: () => navigate("consultation"),
@@ -115,6 +123,9 @@ const patientRecordsUI = createPatientRecordsUI(api, toast, {
     renderCase(data.state);
     navigate("consultation");
     toast(`已将 ${data.items.length} 项确认数据用于本次问诊。`);
+  },
+  onBound: (data) => {
+    if (data?.state) renderCase(data.state);
   },
 });
 
@@ -1084,6 +1095,40 @@ function updateComposer() {
                   ? "请先核对摘要。你可以确认，也可以直接说需要更正的地方。"
                   : "可以按自己的话回答，也可以随时补充或更正。";
 }
+// P2c archive-reference banner: mounted at the top of the consultation
+// view only while the session carries a non-empty baseline projection
+// and the switch is on. Dismissing posts the switch off; the banner
+// itself hides immediately and the server state (cleared projection)
+// keeps it from remounting on the next render.
+function syncBaselineBanner(data) {
+  const existing = $("#chengxin-baseline-banner");
+  const show = Boolean(
+    data.profile_baseline &&
+    Object.keys(data.profile_baseline).length &&
+    data.baseline_reference_enabled,
+  );
+  if (!show) {
+    existing?.remove();
+    return;
+  }
+  if (existing) return;
+  const banner = createBaselineBanner({
+    onDismiss: async () => {
+      try {
+        const result = await api(
+          `/api/sessions/${data.session_id}/baseline-reference`,
+          { method: "POST", body: { enabled: false } },
+        );
+        if (result.state) renderCase(result.state);
+      } catch (error) {
+        banner.hidden = false;
+        toast(error.message);
+      }
+    },
+  });
+  $("#view-consultation")?.prepend(banner);
+}
+
 function renderCase(data) {
   if (
     state.case?.session_id === data.session_id &&
@@ -1102,6 +1147,7 @@ function renderCase(data) {
   }
   state.case = data;
   renderConversationSubtitle();
+  syncBaselineBanner(data);
   const retriageBanner = $("#retriage-banner");
   const priorCase = data.runtime_snapshot?.prior_case;
   retriageBanner.hidden = !data.runtime_snapshot?.follow_up_of;
