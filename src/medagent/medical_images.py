@@ -244,12 +244,23 @@ def validate_recognition(value: Any) -> dict[str, Any]:
     warnings = value["warnings"]
     if not isinstance(warnings, list) or len(warnings) > 20:
         raise MedicalImageError("图片识别提示数量无效")
+    description = _short_text(content["description"], 1600, allow_empty=True)
+    # P1-D-2: a "clear" result that transcribed nothing is a
+    # contradiction, not a success: no numbers, an empty description,
+    # and clarity=clear would otherwise land via finish_recognition as
+    # a ready entry with a single value_text=None observation. Reject
+    # exactly this combination. The same emptiness with clarity
+    # unreadable (or unclear) is an honest "could not read" report and
+    # stays accepted; non-empty numbers or a non-empty description
+    # with clarity=clear also stay accepted.
+    if not numbers and not description and content_clarity == "clear":
+        raise MedicalImageError("清晰识别结果缺少数值与整体描述")
     return {
         "schema": value["schema"],
         "document_type": document_type,
         "numbers": numbers,
         "content": {
-            "description": _short_text(content["description"], 1600, allow_empty=True),
+            "description": description,
             "clarity": content_clarity,
             "unclear_parts": [_short_text(item, 240) for item in unclear_parts],
         },
@@ -333,7 +344,16 @@ class DeepSeekVisionRecognizer:
         # retrying them cannot fix the response.
         import time as _time
 
+        # P1-D-1: reset all last-call telemetry at the start of every
+        # call, not just last_retried. Usage/duration used to be assigned
+        # only after a successful transport, so a transport/provider
+        # failure on a reused instance left the previous success's
+        # values in place and misattributed them to the failed call.
+        # Resetting here makes any failure leave None, and a later
+        # success re-assigns fresh values below.
         self.last_retried = False
+        self.last_usage = None
+        self.last_duration_ms = None
         started = _time.perf_counter()
         result = None
         for attempt in (1, 2):

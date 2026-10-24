@@ -1917,6 +1917,7 @@
     "status": "partial",
     "surviving_claims": 2
    },
+   "expected_backend_calls": 2,
    "fabricated_quotes": [
     "夜里咳得睡不着觉",
     "肺炎必须住院输液治疗"
@@ -1951,6 +1952,13 @@
    "objective": "为咳嗽加重病例整理下呼吸道方向的证据",
    "risk": "urgent",
    "stub_script": [
+    {
+     "tool": "knowledge_search",
+     "arguments": {
+      "query": "咳嗽 肺部感染",
+      "max_results": 3
+     }
+    },
     {
      "arguments": {
       "conclusion": "咳嗽加重伴痰中带血，需结合当面检查判断",

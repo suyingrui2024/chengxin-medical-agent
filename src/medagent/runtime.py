@@ -12,7 +12,11 @@ from .self_checks import SelfCheckService
 from .triage import TriageService
 from .reasoner import OrderedQuestionRanker
 from .agent import AdaptiveConsultationEngine
-from .backends import CompatibleBackend, DshBackend
+from .backends import (
+    CompatibleBackend,
+    DshBackend,
+    require_https_or_loopback_endpoint,
+)
 from .extensions.builtin import load_registry
 
 
@@ -37,6 +41,13 @@ def build_runtime(event_path: Optional[Path] = None, backend: Optional[str] = No
         for key in ("MEDAGENT_LLM_BASE_URL", "MEDAGENT_LLM_API_KEY", "MEDAGENT_LLM_MODEL"):
             if not settings.get(key, "").strip():
                 raise ValueError(f"{mode} backend requires {key}; demo is explicitly offline")
+        # Fail fast here (not only when the consultation service is
+        # first required and the backend is constructed): a plaintext
+        # non-loopback endpoint is rejected at build time. The backend
+        # constructors enforce the same rule for direct construction.
+        require_https_or_loopback_endpoint(
+            settings["MEDAGENT_LLM_BASE_URL"].rstrip("/")
+        )
 
     def create_engine(ctx):
         kwargs = dict(content=ctx.services.require("content"), triage=ctx.services.require("triage"),

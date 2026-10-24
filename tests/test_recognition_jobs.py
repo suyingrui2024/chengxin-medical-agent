@@ -17,10 +17,12 @@ from pathlib import Path
 
 from medagent.medical_images import (
     BackgroundRecognition,
+    MedicalImageError,
     RecognitionError,
     inspect_image,
     recognize_in_background,
     recognizer_from_settings,
+    validate_recognition,
     vision_configuration_status,
 )
 from medagent.patient_records import PatientRecordStore
@@ -81,6 +83,28 @@ def recognition_result(unclear=False):
             "description": "血常规报告",
             "clarity": "clear",
             "unclear_parts": [],
+        },
+        "warnings": [],
+    }
+
+
+def hollow_result(clarity):
+    """No numbers and an empty overall description.
+
+    With clarity="clear" this is the P1-D-2 contradiction (a "success"
+    that transcribed nothing); with clarity="unreadable" it is an
+    honest could-not-read report that must stay accepted.
+    """
+    return {
+        "schema": "medical-image-recognition/v1",
+        "document_type": "laboratory_report",
+        "numbers": [],
+        "content": {
+            "description": "",
+            "clarity": clarity,
+            "unclear_parts": (
+                [] if clarity == "clear" else ["整页模糊无法辨认"]
+            ),
         },
         "warnings": [],
     }
@@ -181,6 +205,59 @@ class RecognitionJobTests(unittest.TestCase):
         self.assertEqual(finished["status"], "failed")
         self.assertEqual(finished["error"], "provider_failed")
         self.assertEqual(self.entry_status(), "recognition_failed")
+
+    def test_hollow_clear_result_rejected_at_contract(self):
+        # P1-D-2: empty numbers + empty description + clear.
+        with self.assertRaises(MedicalImageError):
+            validate_recognition(hollow_result("clear"))
+        # Whitespace-only description normalizes to empty: same hole.
+        hollow = hollow_result("clear")
+        hollow["content"]["description"] = "   "
+        with self.assertRaises(MedicalImageError):
+            validate_recognition(hollow)
+
+    def test_hollow_unreadable_result_still_accepted(self):
+        # P1-D-2 scope guard: the same emptiness with unreadable
+        # overall clarity is an honest report, not a contradiction.
+        accepted = validate_recognition(hollow_result("unreadable"))
+        self.assertEqual(accepted["numbers"], [])
+        self.assertEqual(accepted["content"]["description"], "")
+
+    def test_hollow_clear_result_does_not_land_as_ready(self):
+        # P1-D-2 end to end: the hollow clear result is refused by
+        # finish_recognition's validation, so the job fails and the
+        # entry rolls back instead of landing as ready.
+        job = self.jobs.create(entry_id=self.entry_id, asset_id=self.asset_id)
+        finished = run_job(
+            self.jobs,
+            self.store,
+            FakeRecognizer(result=hollow_result("clear")),
+            job,
+            self.image,
+        )
+        self.assertEqual(finished["status"], "failed")
+        self.assertEqual(finished["error"], "provider_failed")
+        self.assertEqual(self.entry_status(), "recognition_failed")
+        self.assertEqual(self.store.entry(self.entry_id)["observations"], [])
+
+    def test_hollow_unreadable_result_still_lands(self):
+        # P1-D-2 scope guard end to end: unreadable emptiness is
+        # accepted, landing as needs_confirmation (not ready), with
+        # the single content observation honestly marked unreadable.
+        job = self.jobs.create(entry_id=self.entry_id, asset_id=self.asset_id)
+        finished = run_job(
+            self.jobs,
+            self.store,
+            FakeRecognizer(result=hollow_result("unreadable")),
+            job,
+            self.image,
+        )
+        self.assertEqual(finished["status"], "succeeded")
+        self.assertEqual(self.entry_status(), "needs_confirmation")
+        observations = self.store.entry(self.entry_id)["observations"]
+        self.assertEqual(len(observations), 1)
+        self.assertIsNone(observations[0]["value_text"])
+        self.assertEqual(observations[0]["clarity"], "unreadable")
 
     def test_invalid_contract_never_lands_as_observations(self):
         job = self.jobs.create(entry_id=self.entry_id, asset_id=self.asset_id)

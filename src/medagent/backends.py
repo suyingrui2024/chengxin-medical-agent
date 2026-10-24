@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import subprocess
 import signal
@@ -85,6 +86,58 @@ def _transient_retry_reason(exc: BaseException) -> Optional[str]:
     return None
 
 
+_LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
+
+
+def require_https_or_loopback_endpoint(base_url: str) -> None:
+    """Fail closed on a plaintext model endpoint.
+
+    Bearer keys must not travel over http to a non-local host, where any
+    hop can read them (and where a 302 could carry them further). https
+    is always allowed; http is allowed only for a loopback stub
+    (localhost / 127.0.0.1 / ::1), the channel the offline test servers
+    in this repo use. Anything else — missing scheme, non-loopback http,
+    a bare hostname — raises instead of sending.
+    """
+    parsed = urlparse(base_url)
+    scheme = (parsed.scheme or "").lower()
+    if scheme == "https" and parsed.hostname:
+        return
+    if scheme == "http" and (parsed.hostname or "").lower() in _LOOPBACK_HOSTS:
+        return
+    raise ValueError(
+        "model endpoint must be HTTPS, except http loopback "
+        "(localhost/127.0.0.1/::1) for local test stubs"
+    )
+
+
+class _NoRedirectHandler(request.HTTPRedirectHandler):
+    """Never follow a redirect from the model endpoint.
+
+    The default urllib opener follows 301/302/303 and re-sends the
+    request — including its Authorization header — to whatever host the
+    Location header names, so a compromised or malicious responder can
+    exfiltrate the API key with one redirect. API endpoints do not
+    legitimately redirect a chat-completions POST, so every redirect
+    code (301/302/303/307/308) surfaces as an explicit HTTPError
+    instead: no silent success, no silent key loss, no retry (3xx is
+    not transient). Mirrors web_tools._NoRedirectHandler.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D102
+        return None
+
+
+def _open_request(req, timeout):
+    """The single network exit for CompatibleBackend.
+
+    A per-call opener (rather than request.urlopen's shared default
+    opener) so the no-redirect handler above cannot be bypassed and
+    cannot leak into other urllib callers.
+    """
+    return request.build_opener(_NoRedirectHandler()).open(req, timeout=timeout)
+
+
 def parse_decision(raw: str) -> Dict[str, Any]:
     if not isinstance(raw, str) or len(raw) > 64000:
         raise ValueError("invalid decision size")
@@ -103,6 +156,7 @@ class CompatibleBackend:
         self.events = events
         settings = config if config is not None else os.environ
         self.base_url = settings["MEDAGENT_LLM_BASE_URL"].rstrip("/")
+        require_https_or_loopback_endpoint(self.base_url)
         self.api_key = settings["MEDAGENT_LLM_API_KEY"]
         self.model = settings["MEDAGENT_LLM_MODEL"]
         self.max_tokens = int(settings.get("MEDAGENT_LLM_MAX_TOKENS", "2048"))
@@ -178,7 +232,7 @@ class CompatibleBackend:
         raw = ""
         for attempt in (1, 2):
             try:
-                with request.urlopen(req, timeout=45) as response:
+                with _open_request(req, timeout=45) as response:
                     result = json.loads(response.read(256000).decode())
             except Exception as exc:
                 reason = _transient_retry_reason(exc) if attempt == 1 else None
@@ -266,6 +320,12 @@ class DshBackend:
                 "MEDAGENT_LLM_MODEL",
             )
         }
+        # Same plaintext-endpoint rule as CompatibleBackend: the bridge
+        # inherits this URL, so a direct DshBackend construction must
+        # not be the hole that CompatibleBackend's check closes.
+        require_https_or_loopback_endpoint(
+            self.config["MEDAGENT_LLM_BASE_URL"].rstrip("/")
+        )
         # Generation settings ride the stdin envelope to the bridge;
         # until now the bridge hardcoded maxTokens 2048 and
         # reasoningEffort 'off', silently ignoring the deployment's
@@ -391,19 +451,41 @@ class DshBackend:
                 "DSH failed; run npm run dsh:check for installation diagnostics"
             )
         envelope = json.loads(stdout)
+        if not isinstance(envelope, dict):
+            raise ValueError("DSH envelope must be an object")
         if not isinstance(envelope.get("final_response"), str):
             raise ValueError("DSH did not return a committed response")
+        # events is auxiliary (usage + diagnostics only): a malformed
+        # field must never drag down an otherwise valid proposal.
+        # Sanitize it, keep the valid proposal, and leave a trace of
+        # every dropped element on the model.responded event itself
+        # (plus a log line) instead of silently swallowing it. The
+        # decision_wait generic-Exception mitigation chain is untouched:
+        # a genuinely bad envelope/proposal still raises ValueError
+        # above and surfaces as a round error, never a crash or a
+        # wrong fact.
+        runtime_events, dropped_events = sanitize_dsh_events(
+            envelope.get("events", [])
+        )
+        responded_payload = {
+            "backend": self.name,
+            "content": envelope["final_response"],
+            "runtime_events": runtime_events,
+            "duration_ms": round((perf_counter() - started) * 1000),
+            "usage": dsh_usage(runtime_events),
+        }
+        if dropped_events:
+            responded_payload["dropped_runtime_events"] = dropped_events
+            logging.getLogger(__name__).warning(
+                "DSH dropped %d malformed runtime event(s): %s",
+                len(dropped_events),
+                dropped_events,
+            )
         self.events.append(
             Event(
                 session_id,
                 "model.responded",
-                {
-                    "backend": self.name,
-                    "content": envelope["final_response"],
-                    "runtime_events": envelope.get("events", []),
-                    "duration_ms": round((perf_counter() - started) * 1000),
-                    "usage": dsh_usage(envelope.get("events", [])),
-                },
+                responded_payload,
             )
         )
         return parse_decision(envelope["final_response"])
@@ -423,13 +505,73 @@ class DshBackend:
                 self._terminate(child)
 
 
+def sanitize_dsh_events(raw):
+    """Split a DSH ``events`` field into usable events and a drop trace.
+
+    Returns ``(events, dropped)`` where ``events`` is always a list of
+    dicts and ``dropped`` lists one trace entry per discarded item:
+    ``{"index": ..., "reason": ..., "type": ...}``. Trace entries carry
+    only the position, the reason and the Python type name — never the
+    raw value, which could be large or carry SDK internals. A
+    non-list field drops as a whole (index ``None``); a dict element
+    whose ``data`` is present but not an object is dropped too, because
+    its usage payload is unreadable and no consumer may assume a shape
+    for it. Missing ``events`` is not a drop: callers pass the default
+    ``[]`` for that case.
+    """
+    if not isinstance(raw, list):
+        return [], [
+            {"index": None, "reason": "events_not_list", "type": type(raw).__name__}
+        ]
+    events = []
+    dropped = []
+    for index, event in enumerate(raw):
+        if not isinstance(event, dict):
+            dropped.append(
+                {
+                    "index": index,
+                    "reason": "event_not_object",
+                    "type": type(event).__name__,
+                }
+            )
+            continue
+        if "data" in event and not isinstance(event["data"], dict):
+            dropped.append(
+                {
+                    "index": index,
+                    "reason": "event_data_not_object",
+                    "type": type(event["data"]).__name__,
+                }
+            )
+            continue
+        events.append(event)
+    return events, dropped
+
+
 def dsh_usage(events):
-    """DSH TokenUsage input/cache counts are disjoint, unlike prompt_tokens."""
+    """DSH TokenUsage input/cache counts are disjoint, unlike prompt_tokens.
+
+    ``events`` must be a list (anything else is a caller contract
+    violation and raises ValueError, matching parse_decision). Inside
+    the list, though, a malformed element is auxiliary usage data, not
+    a reason to lose the proposal: non-object elements and elements
+    whose ``data`` is not an object are skipped, exactly as a
+    non-dict ``usage`` already was. Callers that need an audit trail
+    for the skipped elements run sanitize_dsh_events first — the
+    backend does so before calling this.
+    """
+    if not isinstance(events, list):
+        raise ValueError("dsh events must be a list")
     totals = {}
     for event in events:
+        if not isinstance(event, dict):
+            continue
         if event.get("type") != "assistant/message":
             continue
-        usage = event.get("data", {}).get("usage")
+        data = event.get("data", {})
+        if not isinstance(data, dict):
+            continue
+        usage = data.get("usage")
         if not isinstance(usage, dict):
             continue
         values = {

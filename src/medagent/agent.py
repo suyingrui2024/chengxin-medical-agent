@@ -63,6 +63,54 @@ from .bridging import (
 # signal); they still leave missing_required once recorded.
 SCREENING_FIELDS = frozenset({"associated_symptoms"})
 
+# Task kinds the *model* may propose via spawn_subagent (the tool
+# description's contract). Controller-only kinds — case_digest (the
+# controller's own long-case digest) and followup_batch (server-triggered)
+# — are deliberately absent: the coordinator only checks ``kind in
+# KINDS``, which includes those, so it cannot backstop this layer
+# (healthcheck P1-A-D2). The decision layer enforces the whitelist
+# before any coordinator call or spawn-budget consumption.
+MODEL_SPAWN_TASK_KINDS = frozenset({"evidence_lookup", "second_opinion"})
+
+# Messages raised by backends.parse_decision (backends.py itself is
+# another lane's file and is not touched here). These mean the model's
+# own decision output was malformed, so the model can repair it —
+# unlike a transport failure, which it cannot. Matched verbatim so
+# unrelated backend ValueErrors (config errors, bridge envelope
+# errors, ...) keep the old service_error path.
+_DECISION_ENVELOPE_ERRORS = {
+    "invalid decision size": (
+        "决策输出超过长度上限或不是文本：请只输出一个简短的 "
+        "{tool, arguments} JSON 对象，不要附加解释或重复内容。"
+    ),
+    "decision must contain only tool and arguments": (
+        "决策 JSON 必须只含 tool 和 arguments 两个键：请删掉多余键、"
+        "补齐缺失键后按注册定义重提。"
+    ),
+    "invalid decision envelope": (
+        "决策信封无效：tool 必须是字符串、arguments 必须是对象，"
+        "请按工具目录的注册定义重提。"
+    ),
+}
+
+
+def _decision_envelope_guidance(exc: BaseException) -> Optional[str]:
+    """Repair guidance for a repairable decision-envelope error.
+
+    Returns None for anything else. Bad JSON surfaces as
+    ``json.JSONDecodeError`` (a ValueError subclass) from the same
+    parser, so it is repairable too; every other exception type or
+    message is a genuine backend failure, not a model output error.
+    """
+    if isinstance(exc, json.JSONDecodeError):
+        return (
+            "决策输出不是合法 JSON：请只输出一个 {tool, arguments} "
+            "JSON 对象，不要附加解释、代码围栏或多余文本。"
+        )
+    if isinstance(exc, ValueError):
+        return _DECISION_ENVELOPE_ERRORS.get(str(exc))
+    return None
+
 
 class AdaptiveConsultationEngine(ConsultationEngine):
     """LLM proposes actions; evidence/type/eligibility gates own every effect."""
@@ -229,11 +277,11 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         the controller and followup_batch by the server, so enabling
         only those must not put the tool in front of the model. Listing
         an unavailable tool invites proposals that can only fail closed
-        at execution time (the execution-side gate itself is unchanged).
+        at execution time (the _execute kind whitelist below).
         """
-        return (
-            self._subagent_mode_for("evidence_lookup") != "off"
-            or self._subagent_mode_for("second_opinion") != "off"
+        return any(
+            self._subagent_mode_for(kind) != "off"
+            for kind in MODEL_SPAWN_TASK_KINDS
         )
 
     def _effective_static_context(self):
@@ -857,10 +905,14 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 if earlier
                 else {}
             ),
+            # patient_goal is a blocking field like any other: the prompt
+            # requires it to be recorded before review_summary, and
+            # excluding it here let an abstained summary close with the
+            # patient's goal never recorded (healthcheck P1-A-D1). The
+            # controller auto-summary path only fires after the goal
+            # answer itself lands, so it still sees an empty list there.
             "missing_required": [
-                q.fact_key
-                for q in candidates
-                if q.id not in {"patient_goal"} and q.blocking
+                q.fact_key for q in candidates if q.blocking
             ],
             **(
                 {"pathway_exploration": exploration}
@@ -1028,6 +1080,14 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         self._round_spawn_counts[state.session_id] = spawns
         messages = self._messages(state, text)
         writes = 0
+        # Fact keys rejected by record_facts earlier in this round.
+        # A later call containing ONLY such keys is a correction retry
+        # of the rejected items (the prompt's "只需修正 rejected 项重提"),
+        # not a fresh write: it must not be starved by the two-write
+        # cap, and it does not consume fresh-write budget either
+        # (healthcheck P1-A-D4). Any call touching a new key is still
+        # capped exactly as before, so the cap itself is not relaxed.
+        rejected_keys = set()
         for step in range(6):
             if step:
                 pending_reply = self._offer_pending_self_check(state)
@@ -1052,6 +1112,37 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             except DecisionInterrupted:
                 return deepcopy(self._latest_replies[state.session_id])
             except Exception as exc:
+                # Repairable decision-envelope errors (healthcheck
+                # P1-A-D3) are the model's own malformed output, so
+                # they are fed back as a tool_result inside the same
+                # 6-step self-correction loop instead of ending the
+                # round with a blind service_error. The backend_failed
+                # event is still recorded for audit. Anything else
+                # keeps the old service_error semantics below, and
+                # the loop's exhaustion fallback still applies if the
+                # model keeps producing bad envelopes.
+                guidance = _decision_envelope_guidance(exc)
+                if guidance is not None:
+                    self.events.append(
+                        Event(
+                            state.session_id,
+                            "agent.backend_failed",
+                            {
+                                "error_type": type(exc).__name__,
+                                "repairable_envelope": True,
+                            },
+                            turn_id=turn_id,
+                        )
+                    )
+                    messages.append(
+                        {
+                            "role": "user",
+                            "content": self._json(
+                                {"tool_result": {"ok": False, "error": guidance}}
+                            ),
+                        }
+                    )
+                    continue
                 state.pending_input = text
                 self.events.append(
                     Event(
@@ -1087,13 +1178,52 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             )
             goal_answered = False
             try:
+                correction_only = False
                 if command["tool"] == "record_facts":
-                    if writes >= 2:
+                    # Peek at the proposed keys before executing: a
+                    # correction-only retry bypasses the cap below.
+                    # Malformed shapes fall through as non-correction
+                    # and are rejected by _execute's own validation.
+                    facts_arg = (
+                        command["arguments"].get("facts")
+                        if isinstance(command.get("arguments"), dict)
+                        else None
+                    )
+                    proposed_keys = None
+                    if isinstance(facts_arg, list) and facts_arg:
+                        proposed_keys = []
+                        for item in facts_arg:
+                            if not isinstance(item, dict) or not isinstance(
+                                item.get("key"), str
+                            ):
+                                proposed_keys = None
+                                break
+                            proposed_keys.append(item["key"])
+                    correction_only = (
+                        proposed_keys is not None
+                        and bool(proposed_keys)
+                        and set(proposed_keys) <= rejected_keys
+                    )
+                    if writes >= 2 and not correction_only:
                         raise ProposalError("本轮写入次数已达上限，请提问或核对摘要")
                 answering_goal = state.active_question == "patient_goal"
                 result = self._execute(state, command, text, turn_id)
                 if command["tool"] == "record_facts":
-                    writes += 1
+                    if not correction_only:
+                        writes += 1
+                    if isinstance(result, dict):
+                        for item in result.get("rejected") or []:
+                            if isinstance(item, dict) and isinstance(
+                                item.get("key"), str
+                            ):
+                                rejected_keys.add(item["key"])
+                    # A rejected key that has since landed (via a later
+                    # batch's accepted side) is no longer awaiting
+                    # correction; re-proposing it is a fresh overwrite
+                    # and must be capped normally.
+                    rejected_keys = {
+                        key for key in rejected_keys if key not in state.facts
+                    }
                     # Judge by what actually landed: under partial recording
                     # the patient_goal item itself may have been rejected.
                     goal_answered = answering_goal and "patient_goal" in state.facts
@@ -1115,6 +1245,20 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     turn_id,
                 )
             except (ValueError, KeyError, TypeError) as exc:
+                # A wholly rejected record_facts batch raises instead
+                # of returning a partial result, but its items are
+                # rejected all the same: seed them so a later
+                # correction-only retry is not starved either. (The
+                # guarded access matters: the failure itself may be a
+                # malformed command with no "tool" key.)
+                if isinstance(command, dict) and command.get("tool") == "record_facts":
+                    for verdict in getattr(exc, "verdicts", None) or []:
+                        if (
+                            isinstance(verdict, dict)
+                            and not verdict.get("ok")
+                            and isinstance(verdict.get("key"), str)
+                        ):
+                            rejected_keys.add(verdict["key"])
                 result = {"ok": False, "error": str(exc)}
             if isinstance(result, AgentReply):
                 self.events.append(
@@ -1290,6 +1434,22 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 state, args["id"], args["input"], args["evidence"], text, turn_id
             )
         if tool == "spawn_subagent":
+            # Decision-layer kind whitelist (healthcheck P1-A-D2): only
+            # the two model-proposed kinds may be spawned from here.
+            # Rejected before the coordinator is called and before the
+            # per-round spawn budget is consumed, so the model can
+            # retry in the same round with a legal kind.
+            task_kind = args.get("task_kind")
+            if not isinstance(task_kind, str) or task_kind not in MODEL_SPAWN_TASK_KINDS:
+                return {
+                    "ok": False,
+                    "error": (
+                        "task_kind 只能是 evidence_lookup 或 second_opinion；"
+                        f"「{task_kind}」不能由模型提议（控制器专属种类如 "
+                        "case_digest 不在模型可提议范围内），"
+                        "请改用 evidence_lookup 或 second_opinion 重提"
+                    ),
+                }
             coordinator = self.subagent_coordinator
             if coordinator is None:
                 return {"ok": False, "status": "unavailable"}

@@ -106,12 +106,17 @@ MAX_CONCLUSION_CHARS = 1000
 # already covers the certainty/diagnosis wording.
 _DISPOSITION_PATTERN = re.compile(
     r"(应立即就医|必须立即就医|立即就医|必须服用|立即服用|必须住院"
-    r"|立即停药|加量服用|减量服用|应尽快手术|必须手术)"
+    r"|立即停药|加量服用|减量服用|应尽快手术|必须手术"
+    r"|去急诊|看急诊|挂急诊|尽快就医)"
 )
 # Dosage figures are banned from follow-up drafts (design §4.3 rule
 # applied to generated drafts): a reminder may not carry dose numbers.
+# NOTE: no trailing \b — in CJK text a unit is almost always followed by
+# a Chinese character, which \b treats as a word character, so
+# "200mg每日两次" / "2片药" / "500毫克维生素" previously slipped through
+# while only punctuation-terminated forms ("200mg。") were caught.
 _DOSAGE_PATTERN = re.compile(
-    r"\d+(?:\.\d+)?\s*(mg|毫克|ml|毫升|片|粒|支|袋|iu|IU)\b"
+    r"\d+(?:\.\d+)?\s*(mg|毫克|ml|毫升|片|粒|支|袋|iu|IU)"
 )
 
 _ENVELOPE_HINT = """你只能返回一个 JSON 对象，格式恰好为 {"tool": ..., "arguments": {...}}，不得输出任何其他文字、解释或代码块标记。
@@ -189,8 +194,9 @@ def _content_index() -> Dict[str, Dict[str, str]]:
     """locator -> {title, text} over differentials + self_care content.
 
     Locators are hypothesis ids, pathway ids and self_care group ids;
-    the text is the entry's canonical JSON, which is what knowledge
-    quotes are verified against at validation time.
+    the text is the entry's canonical JSON. Knowledge quotes are NOT
+    verified against this full text at validation time — only against
+    the excerpts actually fed to the branch (see _validate_report).
     """
     global _content_index_cache
     if _content_index_cache is not None:
@@ -875,9 +881,6 @@ class SubagentCoordinator:
         view: Dict[str, Any] = {
             "case_ref": case_ref,
             "task_kind": kind,
-            "objective": str(
-                raw_branch.get("objective") or ""
-            )[:200],
             "facts": facts,
             "hypotheses": [
                 workspace.hypotheses[hypothesis_id].to_dict()
@@ -885,6 +888,17 @@ class SubagentCoordinator:
             ],
             "content_excerpts": self._content_excerpts(kept_hypotheses),
         }
+        # Blinding: a branch objective is free text written by the main
+        # flow — the very author being blinded — so it must never reach
+        # a second-opinion child, even when it carries no tendency on its
+        # face (e.g. "主流程倾向急诊，请确认是否急诊" would otherwise
+        # pass through verbatim). The structured task (task_kind, facts,
+        # hypotheses, excerpts) still describes the job, so legitimate
+        # task info survives.
+        if kind != "second_opinion":
+            view["objective"] = str(
+                raw_branch.get("objective") or ""
+            )[:200]
         if kind != "second_opinion":
             # Blinding is structural for second opinions: no conclusion,
             # no disposition-bearing fields ever enter their view.
@@ -904,11 +918,31 @@ class SubagentCoordinator:
         if want_prior:
             prior = state.runtime_snapshot.get("prior_case")
             if prior is not None:
+                prior = dict(prior) if isinstance(prior, dict) else prior
+                if kind == "second_opinion" and isinstance(prior, dict):
+                    # A prior disposition is the strongest tendency anchor
+                    # for the same patient; strip it from second-opinion
+                    # views and keep only the complaint/outcome facts.
+                    prior.pop("disposition_level", None)
+                    prior.pop("disposition_text", None)
                 view["prior_case"] = prior
         if view_extras:
             for key, value in view_extras.items():
                 if value is not None:
                     view[key] = value
+        if kind == "second_opinion":
+            # Re-assert blinding after the extras merge so no extra can
+            # re-inject an objective, a disposition anchor, or a
+            # structural conclusion field into a blinded view.
+            view.pop("objective", None)
+            for key in ("phase", "risk_level", "conclusion"):
+                view.pop(key, None)
+            prior = view.get("prior_case")
+            if isinstance(prior, dict):
+                prior = dict(prior)
+                prior.pop("disposition_level", None)
+                prior.pop("disposition_text", None)
+                view["prior_case"] = prior
         return view
 
     @staticmethod
@@ -1000,6 +1034,11 @@ class SubagentCoordinator:
         settle: Optional[str] = None
         error_type: Optional[str] = None
         web_pool: Dict[str, str] = {}
+        # Excerpts this branch was actually fed: the initial view's
+        # content_excerpts plus every knowledge_search result returned
+        # during the run. Knowledge quotes verify against this set only
+        # (see _validate_report) — never against entry full text.
+        knowledge_pool: Dict[str, str] = {}
         messages: List[Dict[str, str]] = [
             {"role": "system", "content": KIND_INSTRUCTIONS[kind]},
             {"role": "user", "content": json.dumps(branch["view"], ensure_ascii=False)},
@@ -1075,7 +1114,13 @@ class SubagentCoordinator:
                         )
                         continue
                     outcome = self._execute_tool(
-                        tool, arguments, branch, session_id, spawn_id, web_pool
+                        tool,
+                        arguments,
+                        branch,
+                        session_id,
+                        spawn_id,
+                        web_pool,
+                        knowledge_pool,
                     )
                     self._feed(messages, command, outcome)
                     usage = self._usage_for(sub_session, started)
@@ -1130,7 +1175,9 @@ class SubagentCoordinator:
             result = self._branch_shell(branch, settle or "failed", error_type)
             result["usage"] = usage
             return result
-        result = self._validate_report(state, branch, report, web_pool, session_id, spawn_id)
+        result = self._validate_report(
+            state, branch, report, web_pool, session_id, spawn_id, knowledge_pool
+        )
         result["usage"] = usage
         return result
 
@@ -1179,6 +1226,7 @@ class SubagentCoordinator:
         session_id: str,
         spawn_id: str,
         web_pool: Dict[str, str],
+        knowledge_pool: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         kind = branch["view"]["task_kind"]
         if tool == "case_view":
@@ -1187,6 +1235,9 @@ class SubagentCoordinator:
             results = _knowledge_search(
                 str(arguments.get("query", "")), arguments.get("max_results", 3)
             )
+            if knowledge_pool is not None:
+                for item in results:
+                    knowledge_pool[item["ref"]] = item["excerpt"]
             return {"ok": True, "tool": tool, "results": results}
         if tool in {"web_search", "web_fetch"}:
             allowed = (
@@ -1279,6 +1330,7 @@ class SubagentCoordinator:
         web_pool: Dict[str, str],
         session_id: str,
         spawn_id: str,
+        knowledge_pool: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         kind = branch["view"]["task_kind"]
         result = self._branch_shell(branch, "failed")
@@ -1300,9 +1352,23 @@ class SubagentCoordinator:
             if fact_view.get("value") is not None:
                 pool.append(str(fact_view["value"]))
             case_pool[key] = pool
-        knowledge_pool = {
-            ref: entry["text"] for ref, entry in _content_index().items()
-        }
+        # Knowledge quotes verify ONLY against excerpts this branch was
+        # actually fed — the initial view's content_excerpts plus the
+        # knowledge_search results returned during this run. Verifying
+        # against entry full text let a child "wash" an assertion with a
+        # passage it never saw (e.g. text past the 1200-char excerpt
+        # cut, quoted with no search at all).
+        fed_knowledge: Dict[str, str] = {}
+        for item in branch["view"].get("content_excerpts", []):
+            if (
+                isinstance(item, dict)
+                and isinstance(item.get("ref"), str)
+                and isinstance(item.get("excerpt"), str)
+            ):
+                fed_knowledge[item["ref"]] = item["excerpt"]
+        if knowledge_pool:
+            fed_knowledge.update(knowledge_pool)
+        knowledge_pool = fed_knowledge
 
         def evidence_ok(item: Any) -> bool:
             if not isinstance(item, dict):
@@ -1493,6 +1559,37 @@ class SubagentCoordinator:
             for item in state.transcript
             if item.get("role") == "user"
         )
+        # Anchor pool for timeline items: fact evidence/values plus the
+        # patient's own turns. A timeline item is kept only if it shares
+        # at least one 2-character substring with this pool — a
+        # paraphrase of something actually said/recorded ("主诉感冒一周
+        # 未愈" vs "感冒一周了还没好") survives, while an event that
+        # appears nowhere in the case ("上周做过胃镜结果正常") is
+        # dropped instead of entering the digest as verified content.
+        # This is a lexical anchor, not a semantic proof: an invented
+        # item sharing a common bigram with the transcript could still
+        # pass, and such items must not be read as quote-verified.
+        anchor_pool = [
+            str(part)
+            for fact in state.facts.values()
+            for part in (fact.evidence or "", fact.value)
+            if part is not None and str(part)
+        ] + [
+            item.get("content", "")
+            for item in state.transcript
+            if item.get("role") == "user"
+        ]
+
+        def anchored(text: str) -> bool:
+            for pool_text in anchor_pool:
+                if not pool_text:
+                    continue
+                if text in pool_text or pool_text in text:
+                    return True
+                bigrams = {text[i : i + 2] for i in range(len(text) - 1)}
+                if any(bigram in pool_text for bigram in bigrams):
+                    return True
+            return False
         confirmed: List[Dict[str, str]] = []
         raw_confirmed = digest.get("confirmed_facts")
         if isinstance(raw_confirmed, list):
@@ -1510,7 +1607,9 @@ class SubagentCoordinator:
                 if any(quote in part for part in pool) or quote in transcript_pool:
                     confirmed.append({"key": key, "quote": quote})
         validated = {
-            "timeline": clean(digest.get("timeline")),
+            "timeline": [
+                item for item in clean(digest.get("timeline")) if anchored(item)
+            ],
             "confirmed_facts": confirmed,
             "contradictions": clean(digest.get("contradictions")),
             "prior_outcomes": clean(digest.get("prior_outcomes")),

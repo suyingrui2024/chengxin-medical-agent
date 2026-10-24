@@ -12,7 +12,7 @@ from medagent.decision_wait import DecisionInterrupted
 from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.events import Event, EventStore
 from medagent.reasoning import Hypothesis, ReasoningWorkspace
-from medagent.subagents import KINDS, SubagentCoordinator, watermark
+from medagent.subagents import KINDS, SubagentCoordinator, _content_index, watermark
 from medagent.web_tools import WebTools
 
 
@@ -697,6 +697,246 @@ class SubagentCoordinatorTests(unittest.TestCase):
             and e.payload.get("scope") == "daily_tokens"
         ]
         self.assertEqual(len(exceeded), 1)
+
+
+class HealthcheckBRouteTests(unittest.TestCase):
+    """Pins for the 2026-10-24 API-healthcheck B-route fixes (P0-B-D01,
+    P1-B-D02..D06). Each fix is pinned on both sides where it has two:
+    the bad input is blocked AND the legitimate input still works."""
+
+    def test_second_opinion_view_omits_objective_but_keeps_task_info(self):
+        events = EventStore()
+        backend = StubBackend(
+            lambda sid, messages, cancelled: report(
+                findings=[case_finding("干咳为主", COUGH_EVIDENCE, "resp_cough_details")]
+            )
+        )
+        state = make_state()
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(
+                kind="second_opinion",
+                scope={"fact_keys": ["resp_cough_details"]},
+                objective="主流程倾向急诊，请确认是否急诊",
+            ),
+            session_id=state.session_id,
+        )
+        self.assertTrue(result["ok"])
+        view = next(iter(backend.views.values()))
+        # Tendency sentence must not reach the blinded child at all.
+        self.assertNotIn("objective", view)
+        self.assertNotIn(
+            "主流程倾向急诊", json.dumps(view, ensure_ascii=False)
+        )
+        # Legitimate task info is still usable by the child.
+        self.assertEqual(view["task_kind"], "second_opinion")
+        self.assertIn("resp_cough_details", view["facts"])
+        self.assertIn("content_excerpts", view)
+
+    def test_second_opinion_view_strips_prior_disposition(self):
+        events = EventStore()
+        backend = StubBackend(
+            lambda sid, messages, cancelled: report(
+                findings=[case_finding("干咳为主", COUGH_EVIDENCE, "resp_cough_details")]
+            )
+        )
+        state = make_state()
+        state.runtime_snapshot["prior_case"] = {
+            "chief_complaint": "上次咳嗽",
+            "disposition_level": "emergency",
+            "disposition_text": "建议急诊",
+            "outcome": "recovered",
+        }
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(
+                kind="second_opinion",
+                scope={"fact_keys": ["resp_cough_details"], "prior_case": True},
+            ),
+            session_id=state.session_id,
+        )
+        self.assertTrue(result["ok"])
+        view = next(iter(backend.views.values()))
+        prior = view["prior_case"]
+        self.assertEqual(prior["chief_complaint"], "上次咳嗽")
+        self.assertEqual(prior["outcome"], "recovered")
+        self.assertNotIn("disposition_level", prior)
+        self.assertNotIn("disposition_text", prior)
+        self.assertNotIn("emergency", json.dumps(view, ensure_ascii=False))
+
+    def test_other_kinds_still_carry_objective_and_prior_disposition(self):
+        events = EventStore()
+        backend = StubBackend(
+            lambda sid, messages, cancelled: report(
+                findings=[case_finding("咳嗽已持续三天", CHIEF_EVIDENCE)]
+            )
+        )
+        state = make_state()
+        state.runtime_snapshot["prior_case"] = {
+            "chief_complaint": "上次咳嗽",
+            "disposition_level": "emergency",
+            "disposition_text": "建议急诊",
+        }
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(
+                scope={
+                    "fact_keys": ["chief_complaint"],
+                    "prior_case": True,
+                },
+                objective="核对证据",
+            ),
+            session_id=state.session_id,
+        )
+        self.assertTrue(result["ok"])
+        view = next(iter(backend.views.values()))
+        self.assertEqual(view["objective"], "核对证据")
+        self.assertEqual(view["prior_case"]["disposition_level"], "emergency")
+
+    def test_knowledge_quote_beyond_fed_excerpt_is_dropped_without_search(self):
+        full = _content_index()["respiratory"]["text"]
+        self.assertGreater(len(full), 1300)
+        quote = full[1300:1330]
+        self.assertTrue(quote)
+        self.assertNotIn(quote, full[:1200])
+        events = EventStore()
+        backend = StubBackend(
+            lambda sid, messages, cancelled: report(
+                findings=[
+                    {
+                        "claim": "内容库尾部提到了该方向",
+                        "evidence": [
+                            {
+                                "source_type": "knowledge",
+                                "quote": quote,
+                                "ref": "respiratory",
+                            }
+                        ],
+                        "confidence": "high",
+                    }
+                ]
+            )
+        )
+        state = make_state()
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(scope={"fact_keys": ["chief_complaint"]}),
+            session_id=state.session_id,
+        )
+        branch = result["branches"][0]
+        self.assertEqual(branch["findings"], [])
+        self.assertEqual(branch["validation"]["dropped_claims"], 1)
+
+    def test_knowledge_quote_from_view_excerpt_survives_without_search(self):
+        excerpt = _content_index()["uri"]["text"][:1200]
+        quote = excerpt[5:25]
+        events = EventStore()
+        backend = StubBackend(
+            lambda sid, messages, cancelled: report(
+                findings=[
+                    {
+                        "claim": "视图摘录收录了该方向条目",
+                        "evidence": [
+                            {
+                                "source_type": "knowledge",
+                                "quote": quote,
+                                "ref": "uri",
+                            }
+                        ],
+                        "confidence": "high",
+                    }
+                ]
+            )
+        )
+        state = make_state()
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(
+                scope={"fact_keys": ["chief_complaint"], "hypotheses": ["uri"]}
+            ),
+            session_id=state.session_id,
+        )
+        branch = result["branches"][0]
+        self.assertEqual(branch["status"], "completed")
+        self.assertEqual(len(branch["findings"]), 1)
+
+    def test_followup_draft_lint_catches_chinese_dosage_forms(self):
+        for draft in (
+            "请按时服用布洛芬200mg每日两次，注意休息。",
+            "请每天吃2片药，观察症状变化。",
+            "请每天服用500毫克维生素，注意休息。",
+            "服用布洛芬200mg。",
+        ):
+            validation = {"notes": []}
+            self.assertIsNone(
+                SubagentCoordinator._validate_followup(
+                    {"priority": "routine", "reason": "例行", "draft_message": draft},
+                    validation,
+                ),
+                draft,
+            )
+        validation = {"notes": []}
+        kept = SubagentCoordinator._validate_followup(
+            {
+                "priority": "routine",
+                "reason": "例行",
+                "draft_message": "您好，来问问您这两天的情况好些了吗？",
+            },
+            validation,
+        )
+        self.assertIsNotNone(kept)
+
+    def test_followup_draft_lint_catches_emergency_instruction(self):
+        validation = {"notes": []}
+        self.assertIsNone(
+            SubagentCoordinator._validate_followup(
+                {
+                    "priority": "routine",
+                    "reason": "例行",
+                    "draft_message": "情况加重请立即去急诊，不要等待。",
+                },
+                validation,
+            )
+        )
+        # The pre-existing safety-net wording is NOT newly banned.
+        validation = {"notes": []}
+        kept = SubagentCoordinator._validate_followup(
+            {
+                "priority": "routine",
+                "reason": "例行",
+                "draft_message": "如果出现发烧、腰痛或尿血，请及时就医。",
+            },
+            validation,
+        )
+        self.assertIsNotNone(kept)
+
+    def test_digest_timeline_drops_unanchored_event(self):
+        events = EventStore()
+
+        def handler(sid, messages, cancelled):
+            return report(
+                conclusion="",
+                findings=[],
+                digest={
+                    "timeline": ["上周做过胃镜结果正常", "三天前开始咳嗽"],
+                    "confirmed_facts": [
+                        {"key": "chief_complaint", "quote": CHIEF_EVIDENCE},
+                    ],
+                    "contradictions": [],
+                    "prior_outcomes": [],
+                },
+            )
+
+        backend = StubBackend(handler)
+        state = make_state()
+        digest = coordinator(backend, events).run_case_digest(
+            state, session_id=state.session_id
+        )
+        self.assertIsNotNone(digest)
+        self.assertEqual(digest["timeline"], ["三天前开始咳嗽"])
+        self.assertNotIn(
+            "胃镜", json.dumps(digest, ensure_ascii=False)
+        )
 
 
 if __name__ == "__main__":

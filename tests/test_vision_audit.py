@@ -121,6 +121,67 @@ class VisionAuditTests(unittest.TestCase):
                 self.recognizer.recognize(self.image)
         self.assertEqual(urlopen.call_count, 2)
 
+    def test_stale_telemetry_cleared_after_transport_failure(self):
+        # P1-D-1: success, then a persistent transport failure on the
+        # same instance must not leave the previous success's usage
+        # or duration behind.
+        with mock.patch(
+            "medagent.medical_images.urlopen",
+            return_value=FakeResponse(recognition_payload()),
+        ):
+            self.recognizer.recognize(self.image)
+        self.assertEqual(self.recognizer.last_usage["total_tokens"], 1280)
+        with mock.patch(
+            "medagent.medical_images.urlopen", side_effect=URLError("down")
+        ) as urlopen:
+            with self.assertRaises(RecognitionError):
+                self.recognizer.recognize(self.image)
+        self.assertEqual(urlopen.call_count, 2)
+        self.assertTrue(self.recognizer.last_retried)
+        self.assertIsNone(self.recognizer.last_usage)
+        self.assertIsNone(self.recognizer.last_duration_ms)
+
+    def test_stale_telemetry_cleared_after_provider_error(self):
+        # P1-D-1, provider-error branch: same staleness, no retry.
+        with mock.patch(
+            "medagent.medical_images.urlopen",
+            return_value=FakeResponse(recognition_payload()),
+        ):
+            self.recognizer.recognize(self.image)
+        error = HTTPError("https://x", 500, "server error", {}, None)
+        with mock.patch(
+            "medagent.medical_images.urlopen", side_effect=error
+        ) as urlopen:
+            with self.assertRaises(RecognitionError):
+                self.recognizer.recognize(self.image)
+        self.assertEqual(urlopen.call_count, 1)
+        self.assertFalse(self.recognizer.last_retried)
+        self.assertIsNone(self.recognizer.last_usage)
+        self.assertIsNone(self.recognizer.last_duration_ms)
+
+    def test_success_after_success_updates_telemetry(self):
+        # Resetting at call start must not break the normal path: a
+        # second success re-assigns its own fresh values.
+        with mock.patch(
+            "medagent.medical_images.urlopen",
+            return_value=FakeResponse(recognition_payload()),
+        ):
+            self.recognizer.recognize(self.image)
+        second = recognition_payload()
+        second["usage"] = {
+            "prompt_tokens": 1900,
+            "completion_tokens": 100,
+            "total_tokens": 2000,
+        }
+        with mock.patch(
+            "medagent.medical_images.urlopen",
+            return_value=FakeResponse(second),
+        ):
+            self.recognizer.recognize(self.image)
+        self.assertEqual(self.recognizer.last_usage["total_tokens"], 2000)
+        self.assertFalse(self.recognizer.last_retried)
+        self.assertIsInstance(self.recognizer.last_duration_ms, int)
+
     def test_provider_error_is_not_retried(self):
         error = HTTPError("https://x", 429, "rate limited", {}, None)
         with mock.patch(
