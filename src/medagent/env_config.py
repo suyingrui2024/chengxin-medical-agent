@@ -25,7 +25,43 @@ ALLOWED = {
     # 随父后端，如需更换请改 MEDAGENT_LLM_MODEL。
     "MEDAGENT_SUBAGENT_WEB",
     "MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP",
+    # Per-kind subagent rollout overrides (see subagent_kind_modes):
+    # each kind may run at its own mode instead of MEDAGENT_SUBAGENT_MODE.
+    "MEDAGENT_SUBAGENT_MODE_CASE_DIGEST",
+    "MEDAGENT_SUBAGENT_MODE_EVIDENCE_LOOKUP",
+    "MEDAGENT_SUBAGENT_MODE_SECOND_OPINION",
+    "MEDAGENT_SUBAGENT_MODE_FOLLOWUP_BATCH",
 }
+
+# Task kind -> env key carrying its per-kind subagent mode override.
+SUBAGENT_KIND_MODE_KEYS = {
+    "case_digest": "MEDAGENT_SUBAGENT_MODE_CASE_DIGEST",
+    "evidence_lookup": "MEDAGENT_SUBAGENT_MODE_EVIDENCE_LOOKUP",
+    "second_opinion": "MEDAGENT_SUBAGENT_MODE_SECOND_OPINION",
+    "followup_batch": "MEDAGENT_SUBAGENT_MODE_FOLLOWUP_BATCH",
+}
+
+_SUBAGENT_MODES = {"off", "shadow", "advisory"}
+
+
+def subagent_kind_modes(source) -> dict:
+    """Per-kind subagent mode overrides explicitly set in ``source``.
+
+    ``source`` is a settings dict or an os.environ-style mapping. Only
+    kinds whose key is present (and valid) are returned, as
+    ``{task_kind: mode}`` ready for ``SubagentCoordinator(kind_modes=...)``
+    or ``set_kind_modes``. An explicitly set but invalid value raises
+    ValueError naming the offending key.
+    """
+    modes = {}
+    for kind, key in SUBAGENT_KIND_MODE_KEYS.items():
+        value = source.get(key)
+        if value is None:
+            continue
+        if value not in _SUBAGENT_MODES:
+            raise ValueError(f"{key} must be off, shadow or advisory")
+        modes[kind] = value
+    return modes
 
 
 def read_env(path):
@@ -78,6 +114,10 @@ def read_env(path):
     if subagent_mode not in {"off", "shadow", "advisory"}:
         raise ValueError("MEDAGENT_SUBAGENT_MODE must be off, shadow or advisory")
     settings["MEDAGENT_SUBAGENT_MODE"] = subagent_mode
+    # Per-kind overrides: validate any explicitly set key (raising names
+    # the key); the keys stay in settings only when explicitly set, and
+    # subagent_kind_modes(settings) extracts them at assembly time.
+    subagent_kind_modes(settings)
     subagent_web = settings.get("MEDAGENT_SUBAGENT_WEB", "off")
     if subagent_web not in {"on", "off"}:
         raise ValueError("MEDAGENT_SUBAGENT_WEB must be on or off")

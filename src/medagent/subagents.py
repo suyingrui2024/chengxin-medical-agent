@@ -268,6 +268,7 @@ class SubagentCoordinator:
         backend,
         *,
         mode: str = "off",
+        kind_modes: Optional[Dict[str, str]] = None,
         web_enabled: bool = False,
         web_tools=None,
         max_concurrent: int = 8,
@@ -280,6 +281,15 @@ class SubagentCoordinator:
         self.events = events
         self.backend = backend
         self.mode = mode
+        # Per-kind rollout overrides (design §5.7): each task kind may run
+        # at its own mode while the rest follow the global ``mode``. Only
+        # gating reads go through mode_for(); the run/validate pipeline
+        # itself is mode-agnostic — shadow vs advisory is decided by the
+        # consumer of the result, not here.
+        self.kind_modes: Dict[str, str] = {}
+        if kind_modes:
+            self._validate_kind_modes(kind_modes)
+            self.kind_modes.update(kind_modes)
         self.web_enabled = bool(web_enabled)
         self.web_tools = web_tools
         self._slots = BoundedSemaphore(max_concurrent)
@@ -301,6 +311,48 @@ class SubagentCoordinator:
         self._daily_lock = Lock()
         self._daily_date = date.today()
         self._daily_tokens = 0
+
+    # ------------------------------------------------------------------
+    # Per-kind mode resolution
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _validate_kind_modes(mapping: Dict[str, str]) -> None:
+        if not isinstance(mapping, dict):
+            raise ValueError("kind_modes must be a dict of task kind to mode")
+        for kind, kind_mode in mapping.items():
+            if kind not in KINDS:
+                raise ValueError(f"unknown subagent task kind: {kind!r}")
+            if kind_mode not in MODES:
+                raise ValueError(
+                    f"subagent mode for {kind} must be off, shadow or advisory"
+                )
+
+    def mode_for(self, task_kind) -> str:
+        """Effective mode for one task kind: override if set, else global.
+
+        Unknown kinds (including None, e.g. a malformed proposal) fall
+        back to the global mode.
+        """
+        if isinstance(task_kind, str) and task_kind in self.kind_modes:
+            return self.kind_modes[task_kind]
+        return self.mode
+
+    def set_kind_modes(self, mapping: Dict[str, str]) -> Dict[str, str]:
+        """Merge per-kind mode overrides and record the change.
+
+        Raises ValueError on an unknown kind or mode (nothing is merged
+        in that case). Appends a ``subagent.modes_changed`` event whose
+        payload carries every kind's *effective* mode, and returns that
+        same ``{kind: effective_mode}`` mapping.
+        """
+        self._validate_kind_modes(mapping)
+        self.kind_modes.update(mapping)
+        effective = {kind: self.mode_for(kind) for kind in KINDS}
+        self.events.append(
+            Event("", "subagent.modes_changed", {"kinds": effective})
+        )
+        return effective
 
     def _daily_usage(self) -> int:
         with self._daily_lock:
@@ -347,6 +399,8 @@ class SubagentCoordinator:
         Returns the validated digest dict, or None when the coordinator
         is disabled/unavailable or the run did not produce a valid one.
         """
+        if self.mode_for("case_digest") == "off":
+            return None
         try:
             proposal = {
                 "task_kind": "case_digest",
@@ -382,7 +436,7 @@ class SubagentCoordinator:
         session_id -> CaseState. Returns validated drafts only; a case
         whose draft fails the lint is dropped (and the drop is logged).
         """
-        if self.mode == "off" or not self._backend_available():
+        if self.mode_for("followup_batch") == "off" or not self._backend_available():
             return []
         output: List[Dict[str, Any]] = []
         batch_started = monotonic()
@@ -449,7 +503,9 @@ class SubagentCoordinator:
         cancelled,
         view_extras: Optional[Dict[str, Any]],
     ) -> Dict[str, Any]:
-        if self.mode == "off":
+        kind = proposal.get("task_kind") if isinstance(proposal, dict) else None
+        effective_mode = self.mode_for(kind)
+        if effective_mode == "off":
             return {"ok": False, "status": "disabled"}
         if not self._backend_available():
             return {"ok": False, "status": "unavailable"}
@@ -461,19 +517,18 @@ class SubagentCoordinator:
                     {
                         "scope": "daily_tokens",
                         "cap": self.daily_token_cap,
-                        "mode": self.mode,
+                        "mode": effective_mode,
                     },
                 )
             )
             return {"ok": False, "status": "daily_budget_exceeded"}
         if not isinstance(proposal, dict):
             return {"ok": False, "status": "invalid_proposal"}
-        kind = proposal.get("task_kind")
         self.events.append(
             Event(
                 session_id,
                 "subagent.proposed",
-                {"proposal": proposal, "mode": self.mode},
+                {"proposal": proposal, "mode": effective_mode},
             )
         )
         if kind not in KINDS:
@@ -558,7 +613,7 @@ class SubagentCoordinator:
                         "tools_clamped": branch["tools_clamped"],
                         "budget": branch["budget"],
                         "watermark": mark,
-                        "mode": self.mode,
+                        "mode": effective_mode,
                     },
                 )
             )
@@ -668,7 +723,7 @@ class SubagentCoordinator:
                     "settled": f"{settled}/{len(branches_out)}",
                     "usage_total": usage_total,
                     "wall_ms": wall_ms,
-                    "mode": self.mode,
+                    "mode": effective_mode,
                 },
             )
         )
@@ -676,7 +731,7 @@ class SubagentCoordinator:
         return {
             "ok": True,
             "spawn_id": spawn_id,
-            "mode": self.mode,
+            "mode": effective_mode,
             "task_kind": kind,
             "branches": branches_out,
             "usage_total": usage_total,
