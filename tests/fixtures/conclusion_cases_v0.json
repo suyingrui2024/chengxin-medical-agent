@@ -247,6 +247,7 @@
       ],
       "closed_reason": "urgent_route",
       "expected_abstain": false,
+      "expected_department": "急诊科",
       "expected_disposition": [
         "urgent_today"
       ],
@@ -346,6 +347,7 @@
       "acceptable_directions": [],
       "closed_reason": "confirmed_by_user",
       "expected_abstain": true,
+      "expected_department": "全科医疗科",
       "expected_disposition": [
         "self_care",
         "routine_visit"
@@ -651,6 +653,7 @@
       ],
       "closed_reason": "urgent_route",
       "expected_abstain": null,
+      "expected_department": "急诊科",
       "expected_disposition": [
         "urgent_today"
       ],
@@ -766,6 +769,7 @@
       "id": "gi-appendicitis-must-not-miss",
       "closed_reason": "confirmed_by_user",
       "risk": "routine",
+      "expected_department": "普外科",
       "expected_disposition": [
         "routine_visit",
         "urgent_today"
@@ -829,6 +833,7 @@
       "id": "gi-gastroenteritis-routine",
       "closed_reason": "confirmed_by_user",
       "risk": "routine",
+      "expected_department": "消化内科",
       "expected_disposition": [
         "self_care",
         "routine_visit"
@@ -1151,6 +1156,7 @@
       "id": "skin-urticaria-routine",
       "closed_reason": "confirmed_by_user",
       "risk": "routine",
+      "expected_department": "皮肤科",
       "expected_disposition": [
         "self_care",
         "routine_visit"
@@ -6362,5 +6368,5 @@
   "review_status": "unreviewed",
   "version": "1.2.0",
   "differentials_version": "1.2.1",
-  "self_care_version": "1.1"
+  "self_care_version": "1.2"
 }
