@@ -50,6 +50,11 @@ from .adaptive_questions import (
     project_selected_answer,
     validate_adaptive_question,
 )
+from .bridging import (
+    MODEL_BRIDGING_REPAIR_HINT,
+    has_anchorable_fact,
+    model_question_bridging_status,
+)
 
 
 # Screening fields whose incidental mention (recorded while a *different*
@@ -1500,6 +1505,16 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 args,
                 allowed_topics={question.fact_key for question in self.content.questions},
             )
+            # B route: a model-written question must carry its own bridging
+            # sentence plus a "why ask" half-sentence. Enforced only when an
+            # anchorable fact exists (an opening round has nothing to anchor
+            # on, and forcing it would loop the self-correction); the host
+            # A-route bridge is the fallback and never stacks on a question
+            # that already self-bridges (SELF_BRIDGED_OPENERS).
+            if has_anchorable_fact(state.facts):
+                has_bridge, has_why = model_question_bridging_status(spec["question"])
+                if not (has_bridge and has_why):
+                    raise ProposalError(MODEL_BRIDGING_REPAIR_HINT)
             question = next(
                 item
                 for item in self.content.questions
@@ -1555,6 +1570,13 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             prohibited = ("毫克", "mg", "服用", "确诊", "可以排除", "用力按", "屏住呼吸")
             if any(p in message for p in prohibited):
                 raise ProposalError("澄清不能生成处方、排除性结论或自查动作")
+            # B route, same discipline as ask_patient. The body-location
+            # task path is exempt: its messages are short task prompts
+            # (<=80 chars) where a bridging sentence would break the format.
+            if not location_topic and has_anchorable_fact(state.facts):
+                has_bridge, has_why = model_question_bridging_status(message)
+                if not (has_bridge and has_why):
+                    raise ProposalError(MODEL_BRIDGING_REPAIR_HINT)
             if location_topic:
                 if len(message) > 80:
                     raise ProposalError("定位补问最多80字，保持一个简短问题。")

@@ -272,6 +272,10 @@ class ObservationMixin:
                         QuickReply(**q) for q in old.get("quick_replies", [])
                     ],
                     adaptive_question=deepcopy(old.get("adaptive_question")),
+                    # The restored reply IS the earlier reply: keep its
+                    # developer_trace (including the bridging marker) so
+                    # _record_reply does not prefix it a second time.
+                    developer_trace=deepcopy(old.get("developer_trace")),
                 )
             else:
                 reply = self._plan_next(state)

@@ -38,6 +38,7 @@ from .phase_graph import planning_rank
 from .followups import RETRIAGE_OUTCOMES, apply_outcome, build_follow_up_plan
 from .reasoner import QuestionRanker
 from . import __version__
+from .bridging import build_bridging_sentence
 from .presentation import calculation_presentation
 from .task_intents import task_intent
 from .patient_calculations import request_draft, confirmed_parameters
@@ -457,6 +458,10 @@ class ConsultationEngine(
                     QuickReply(**item) for item in old.get("quick_replies", [])
                 ]
                 reply.adaptive_question = deepcopy(old.get("adaptive_question"))
+                # Same restore rule as the observation path: the restored
+                # reply keeps its developer_trace (including the bridging
+                # marker) so _record_reply does not prefix it a second time.
+                reply.developer_trace = deepcopy(old.get("developer_trace"))
                 state.active_question_is_clarification = bool(
                     resume.get("clarification")
                 )
@@ -1910,9 +1915,45 @@ class ConsultationEngine(
             self._persist(state)
             return result
 
+    def _apply_bridging(self, state: CaseState, reply: AgentReply) -> None:
+        """Prefix a host-side deterministic bridging sentence to questions.
+
+        Single insertion point for both engines: runs before the publication
+        gate so the gate sees the final patient-visible text, and a blocked
+        reply's fallback replaces the whole message (bridging included).
+        The developer_trace marker prevents a second pass over the same
+        reply object from stacking a second sentence.
+        """
+        if reply.kind != "question":
+            return
+        trace = dict(reply.developer_trace or {})
+        if isinstance(trace.get("bridging"), dict) and trace["bridging"].get("applied"):
+            return
+        fact_key = None
+        if reply.question_id:
+            try:
+                fact_key = self.content.question(reply.question_id).fact_key
+            except Exception:
+                fact_key = None
+        prior = [
+            turn.get("content", "")
+            for turn in state.transcript
+            if turn.get("role") == "assistant"
+        ]
+        sentence, kind = build_bridging_sentence(
+            state.facts, fact_key, reply.message, prior, len(prior)
+        )
+        if sentence is None:
+            trace["bridging"] = {"applied": False, "reason": kind}
+        else:
+            reply.message = sentence + reply.message
+            trace["bridging"] = {"applied": True, "kind": kind}
+        reply.developer_trace = trace
+
     def _record_reply(
         self, state: CaseState, reply: AgentReply, turn_id: str, reason: str
     ) -> None:
+        self._apply_bridging(state, reply)
         decision = self.publication_gate.validate(state, reply)
         if not decision.allowed:
             if state.risk.level == RiskLevel.EMERGENCY:

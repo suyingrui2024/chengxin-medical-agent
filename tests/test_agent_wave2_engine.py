@@ -250,7 +250,10 @@ class AskPatientWideningTests(unittest.TestCase):
                     fact("onset", "一天", "一天"),
                 ],
             ),
-            ask_patient_cmd("urinary_details", "小便方面有什么异常吗？"),
+            ask_patient_cmd(
+                "urinary_details",
+                "你说肚子疼一天了，为了确认有没有尿路方面的问题，想先确认一下：小便方面有什么异常吗？",
+            ),
         ]
         reply = self.submit("我自己，肚子疼一天了")
         self.assertEqual(reply.kind, "question")
@@ -271,7 +274,10 @@ class AskPatientWideningTests(unittest.TestCase):
         )
         reply = self.engine._execute(
             self.state,
-            ask_patient_cmd("urinary_details", "尿痛是每次都有，还是时有时无？"),
+            ask_patient_cmd(
+                "urinary_details",
+                "你说小便有点疼，为了确认疼痛规律，想先确认一下：尿痛是每次都有，还是时有时无？",
+            ),
             text,
             "t-follow",
         )
@@ -295,7 +301,10 @@ class AskPatientWideningTests(unittest.TestCase):
         with self.assertRaises(ProposalError) as caught:
             self.engine._execute(
                 self.state,
-                ask_patient_cmd("pregnancy_status"),
+                ask_patient_cmd(
+                    "pregnancy_status",
+                    "你说肚子疼，为了确认筛查适用，想先确认一下：请具体说说这方面的情况？",
+                ),
                 "肚子疼",
                 "t-excluded",
             )
