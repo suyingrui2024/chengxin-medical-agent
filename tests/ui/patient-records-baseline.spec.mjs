@@ -15,12 +15,10 @@ test("patient records render baseline, members and multi-kind measurements", asy
   await page.getByRole("button", { name: /健康档案/ }).click();
   await expect(page.getByRole("heading", { name: "健康档案" })).toBeVisible();
 
-  // 1. 基线信息区：表单字段齐全（字段名与后端约定一致）。
+  // 1. 基线信息区：默认收起（S3），展开后表单字段齐全（字段名与后端约定一致）。
   const baseline = page.locator("#records-baseline");
   await expect(baseline).toBeVisible();
-  await expect(
-    baseline.getByRole("heading", { name: "基线信息" }),
-  ).toBeVisible();
+  await baseline.getByRole("button", { name: /我的基线/ }).click();
   await baseline.getByLabel("出生年", { exact: true }).fill("1980");
   // 注：性别是包裹式 label + select，label 文本会含选项文本，
   // exact 匹配不到，改用 id 定位（与测量种类同理）。
@@ -39,9 +37,10 @@ test("patient records render baseline, members and multi-kind measurements", asy
     baseline.getByRole("button", { name: "添加长期用药" }),
   ).toBeVisible();
 
-  // 2. 成员区：本人分区展示（加载失败时仅显示本人，不伪造）。
+  // 2. 成员区：默认收起（S3），展开后本人分区展示（加载失败时仅显示本人，不伪造）。
   const members = page.locator("#records-members");
   await expect(members).toBeVisible();
+  await members.getByRole("button", { name: /家庭成员/ }).click();
   await expect(page.locator("#member-list")).toContainText("本人");
   await expect(members.getByRole("button", { name: "添加成员" })).toBeVisible();
 

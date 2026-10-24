@@ -191,9 +191,6 @@
           >
             <svg class="icon"><use href="#i-settings" /></svg>设置
           </button>
-          <div class="version-line">
-            <span>研究原型</span><span>能力协议 v1</span>
-          </div>
         </div>
       </aside>
 
@@ -223,14 +220,9 @@
           <section id="view-consultation" class="view active" aria-label="问诊">
             <div class="page-heading">
               <div>
-                <p class="eyebrow">A LITTLE CLARITY, ONE STEP AT A TIME</p>
                 <h1>先说说，哪里不舒服？</h1>
                 <p class="page-description">
                   从你的描述开始，一起把情况理清楚。
-                </p>
-                <p class="hero-note">
-                  研究原型用于信息采集与流程评审 ·
-                  请勿输入姓名、证件号等身份信息
                 </p>
               </div>
             </div>
@@ -248,6 +240,30 @@
                   <button id="toggle-facts" class="text-button" type="button">
                     <svg class="icon"><use href="#i-cards" /></svg>已记录信息
                     <span id="fact-count" class="count">0</span>
+                  </button>
+                  <button
+                    id="open-report-draft"
+                    class="text-button"
+                    type="button"
+                    hidden
+                  >
+                    添加报告内容
+                  </button>
+                  <button
+                    id="open-handoff"
+                    class="text-button"
+                    type="button"
+                    hidden
+                  >
+                    就诊交接摘要
+                  </button>
+                  <button
+                    id="view-current-trace"
+                    class="text-button inspect-link developer-only"
+                    type="button"
+                  >
+                    查看本次运行记录
+                    <svg class="icon"><use href="#i-arrow" /></svg>
                   </button>
                 </div>
                 <div id="task-focus-bar" class="task-focus-bar" hidden>
@@ -286,17 +302,6 @@
                 ></div>
                 <div id="conversation-scroll" class="conversation-scroll">
                   <div id="welcome" class="welcome">
-                    <div class="welcome-illustration" aria-hidden="true">
-                      <div class="orbit orbit-one"></div>
-                      <div class="orbit orbit-two"></div>
-                      <img src="brand.png" width="66" height="66" alt="" /><span
-                        class="mini-tag tag-a"
-                        >一步一步</span
-                      ><span class="mini-tag tag-b"
-                        ><svg class="icon"><use href="#i-check" /></svg
-                        >清楚一点</span
-                      >
-                    </div>
                     <h2>不用一次说完整。</h2>
                     <p>
                       你可以按自己的话描述。我们会逐步追问，<br />必要时用图示帮助你记录和观察。
@@ -308,24 +313,19 @@
                     >
                       开始问诊 <svg class="icon"><use href="#i-arrow" /></svg>
                     </button>
-                    <div class="welcome-divider">
-                      <span>也可以从一个问题开始</span>
-                    </div>
-                    <div class="starter-grid">
+                    <div class="starter-links">
                       <button
-                        class="starter-card"
+                        class="starter-link"
                         data-starter="最近有点咳嗽，想把情况整理清楚。"
                         type="button"
                       >
-                        <span>01</span><strong>最近有些不舒服</strong
-                        ><small>描述症状和变化 <span>↗</span></small></button
+                        最近有些不舒服 →</button
                       ><button
-                        class="starter-card"
+                        class="starter-link"
                         data-starter="我想替家人咨询，先记录一下目前的情况。"
                         type="button"
                       >
-                        <span>02</span><strong>替家人问一问</strong
-                        ><small>一起梳理现有信息 <span>↗</span></small>
+                        替家人问一问 →
                       </button>
                     </div>
                   </div>
@@ -371,7 +371,9 @@
                     </button>
                   </form>
                   <p class="composer-note">
-                    <span>Enter 发送 · Shift + Enter 换行</span
+                    <span
+                      >Enter 发送 · Shift + Enter 换行 ·
+                      请勿输入姓名、证件号等身份信息</span
                     ><span id="input-count">0 / 2000</span>
                   </p>
                 </div>
@@ -393,14 +395,6 @@
                     ✕
                   </button>
                 </div>
-                <div class="current-activity" id="phase-track">
-                  <p>当前这一步</p>
-                  <strong id="activity-title">先了解最困扰你的问题</strong>
-                  <p id="activity-reason">
-                    可以按自己的话说，我们会根据你的回答继续追问。
-                  </p>
-                  <small>你可以随时补充、更正，或回答不知道。</small>
-                </div>
                 <div class="facts-heading">
                   <h2>已记录的信息</h2>
                   <span id="facts-count-label">0 项</span>
@@ -411,52 +405,15 @@
                     <p>每一步的信息，会在这里<br />逐渐变得清晰。</p>
                   </div>
                 </div>
+                <p class="facts-footnote">
+                  图例：已提供 / 待确认 ·
+                  记录可以更正，没有提到的信息不会自动记为“没有”。
+                </p>
                 <div
                   id="report-items-summary"
                   class="report-items-summary"
                   hidden
                 ></div>
-                <div class="source-legend">
-                  <span><i class="legend-present"></i>已提供</span
-                  ><span><i class="legend-unknown"></i>待确认 / 未知</span>
-                </div>
-                <p class="records-hint">
-                  记录可以更正。没有提到的信息，不会自动记为“没有”。
-                </p>
-                <div class="record-actions">
-                  <button
-                    id="open-report-draft"
-                    class="text-button"
-                    type="button"
-                    hidden
-                  >
-                    添加报告内容
-                  </button>
-                  <button
-                    id="open-handoff"
-                    class="text-button"
-                    type="button"
-                    hidden
-                  >
-                    就诊交接摘要
-                  </button>
-                </div>
-                <button
-                  id="delete-current-session"
-                  class="text-button"
-                  type="button"
-                  hidden
-                >
-                  删除本次记录
-                </button>
-                <button
-                  id="view-current-trace"
-                  class="text-button inspect-link developer-only"
-                  type="button"
-                >
-                  查看本次运行记录
-                  <svg class="icon"><use href="#i-arrow" /></svg>
-                </button>
               </aside>
               <div id="facts-scrim" hidden></div>
             </div>
@@ -1114,7 +1071,6 @@
               <aside class="settings-rail" aria-label="设置分类">
                 <a href="#settings-appearance">外观</a>
                 <a href="#settings-model">模型服务</a>
-                <a href="#settings-subagents">子智能体</a>
                 <a href="#settings-data">界面与数据</a>
               </aside>
               <div class="settings-content">
@@ -1283,33 +1239,6 @@
                     >打开模型与运行配置
                   </button>
                 </section>
-                <section id="settings-subagents" class="settings-section">
-                  <h2>子智能体（按类）</h2>
-                  <p class="settings-hint">
-                    四类后台子任务各自独立控制：关闭＝不运行；影子＝只记录运行情况、不呈现结果；建议＝结果可以用于界面提示。随访草稿只生成待确认草稿，永不自动发送。修改后立即保存。
-                  </p>
-                  <p
-                    class="settings-hint"
-                    id="subagent-global-note"
-                    role="status"
-                    hidden
-                  >
-                    全局子智能体开关当前为关闭状态，按类设置暂不生效。
-                  </p>
-                  <div id="subagent-kind-rows"></div>
-                  <p
-                    class="subagent-feedback"
-                    id="subagent-panel-feedback"
-                    role="status"
-                  ></p>
-                  <button
-                    id="subagent-rollback"
-                    class="secondary-button"
-                    type="button"
-                  >
-                    全部回退到影子
-                  </button>
-                </section>
                 <section id="settings-data" class="settings-section">
                   <h2>界面与数据</h2>
                   <label class="workspace-mode" for="workspace-mode"
@@ -1328,6 +1257,48 @@
                     v1。请勿输入姓名、证件号等身份信息；紧急情况请立即拨打 120。
                   </p>
                 </section>
+                <div id="settings-advanced">
+                  <button
+                    id="settings-advanced-toggle"
+                    class="settings-advanced-toggle"
+                    type="button"
+                    aria-expanded="false"
+                  >
+                    高级
+                  </button>
+                  <section
+                    id="settings-subagents"
+                    class="settings-section"
+                    hidden
+                  >
+                    <h2>子智能体（按类）</h2>
+                    <p class="settings-hint">
+                      四类后台子任务各自独立控制：关闭＝不运行；影子＝只记录运行情况、不呈现结果；建议＝结果可以用于界面提示。随访草稿只生成待确认草稿，永不自动发送。修改后立即保存。
+                    </p>
+                    <p
+                      class="settings-hint"
+                      id="subagent-global-note"
+                      role="status"
+                      hidden
+                    >
+                      全局子智能体开关当前为关闭状态，按类设置暂不生效。
+                    </p>
+                    <div id="subagent-kind-rows"></div>
+                    <p
+                      class="subagent-feedback"
+                      id="subagent-panel-feedback"
+                      role="status"
+                    ></p>
+                    <button
+                      id="subagent-rollback"
+                      class="secondary-button"
+                      type="button"
+                    >
+                      全部回退到影子
+                    </button>
+                    <p class="settings-hint">研究原型 · 能力协议 v1</p>
+                  </section>
+                </div>
               </div>
             </div>
           </section>

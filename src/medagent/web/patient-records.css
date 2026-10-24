@@ -836,3 +836,20 @@
   border-top: 1px solid var(--line);
   padding-top: 7px;
 }
+
+/* S3 visualization simplification: records collapsible sections. */
+.records-collapse-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 10px 0;
+}
+.records-collapse-body {
+  padding-bottom: 4px;
+}

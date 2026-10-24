@@ -35,6 +35,8 @@ test("patient records keep dated measurements editable and archive images locall
   await expect(detail).toContainText("6.6 mmol/L");
   await expect(detail.getByText("2 个版本")).toBeVisible();
   await expect(detail).toContainText("只会带入你已经确认的数据");
+  // S3: 带入面板默认收起，先展开再点带入按钮。
+  await detail.getByRole("button", { name: "带入本次问诊" }).click();
   await detail.getByRole("button", { name: "带入 1 项数据" }).click();
   await expect(page.locator("#view-consultation")).toBeVisible();
   await expect(page.locator("#report-items-summary")).toContainText("6.6");

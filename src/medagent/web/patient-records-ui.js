@@ -14,6 +14,19 @@ function action(label, className, callback) {
   return value;
 }
 
+// S3 visualization simplification: a titled toggle + hidden body.
+// The toggle text can be refreshed later (counts / filled status).
+function collapsePair(label) {
+  const body = node("div", "records-collapse-body");
+  body.hidden = true;
+  const toggle = action(label, "records-collapse-toggle", () => {
+    body.hidden = !body.hidden;
+    toggle.setAttribute("aria-expanded", body.hidden ? "false" : "true");
+  });
+  toggle.setAttribute("aria-expanded", "false");
+  return { toggle, body };
+}
+
 function icon(name) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("class", "icon");
@@ -369,6 +382,16 @@ export function createPatientRecordsUI(api, toast, options = {}) {
   function renderTimeline() {
     const entries = state.timeline?.entries || [];
     $("#records-count").textContent = String(entries.length);
+    // S3: the notice strip only appears when something needs attention
+    // (unconfirmed items, unclear values, or a failed recognition).
+    const notice = $("#records-notice");
+    if (notice)
+      notice.hidden = !entries.some(
+        (item) =>
+          item.review_count > 0 ||
+          item.pending_count > 0 ||
+          ["awaiting_recognition", "recognition_failed"].includes(item.status),
+      );
     renderSummary(entries);
     const target = $("#records-timeline");
     target.replaceChildren();
@@ -516,7 +539,11 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       ),
     );
     visual.append(latest);
-    target.append(copy, visual);
+    const pair = collapsePair(
+      `近期血糖 · ${trend.count} 次已确认记录 · 最近 ${trend.summary.latest.normalized_value} mmol/L · ${formatTime(trend.summary.latest.measured_at)}`,
+    );
+    pair.body.append(copy, visual);
+    target.append(pair.toggle, pair.body);
     target.hidden = false;
   }
 
@@ -724,6 +751,14 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     baseline.lastChild.id = "baseline-feedback";
     baseline.lastChild.setAttribute("role", "status");
     view.insertBefore(baseline, summary);
+    // S3: baseline form folds into "我的基线"; the toggle status text is
+    // refreshed by renderBaselineSummary below.
+    const baselinePair = collapsePair("我的基线");
+    baselinePair.toggle.id = "baseline-collapse-toggle";
+    baseline.querySelector("h2")?.replaceWith(baselinePair.toggle);
+    while (baseline.children.length > 1)
+      baselinePair.body.append(baseline.children[1]);
+    baseline.append(baselinePair.body);
 
     const members = node("section", "records-members");
     members.id = "records-members";
@@ -755,6 +790,13 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     members.lastChild.id = "member-feedback";
     members.lastChild.setAttribute("role", "status");
     view.insertBefore(members, summary);
+    // S3: member list folds into "家庭成员 · N" (refreshed by renderMembers).
+    const membersPair = collapsePair("家庭成员");
+    membersPair.toggle.id = "members-collapse-toggle";
+    members.querySelector("h2")?.replaceWith(membersPair.toggle);
+    while (members.children.length > 1)
+      membersPair.body.append(members.children[1]);
+    members.append(membersPair.body);
 
     const trends = node("section", "records-measurement-trends");
     trends.id = "records-measurement-trends";
@@ -766,6 +808,13 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     );
     trends.lastChild.id = "measurement-trend-list";
     $("#records-trend").after(trends);
+    // S3: per-kind trend list folds into "自测趋势 · N 种".
+    const trendsPair = collapsePair("自测趋势");
+    trendsPair.toggle.id = "trends-collapse-toggle";
+    trends.querySelector("h2")?.replaceWith(trendsPair.toggle);
+    while (trends.children.length > 1)
+      trendsPair.body.append(trends.children[1]);
+    trends.append(trendsPair.body);
 
     const actions = view.querySelector(".records-actions");
     if (actions && !$("#add-measurement")) {
@@ -871,6 +920,13 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     target.textContent = parts.length
       ? parts.join("；")
       : "基线信息已保存，但慢病 / 过敏 / 用药均为空。";
+    const toggle = $("#baseline-collapse-toggle");
+    if (toggle)
+      toggle.textContent = !value
+        ? "我的基线 · 未填写"
+        : parts.length
+          ? "我的基线 · 已填写"
+          : "我的基线 · 已保存";
   }
 
   async function loadMembers() {
@@ -894,6 +950,8 @@ export function createPatientRecordsUI(api, toast, options = {}) {
   function renderMembers() {
     const target = $("#member-list");
     if (!target) return;
+    const toggle = $("#members-collapse-toggle");
+    if (toggle) toggle.textContent = `家庭成员 · ${state.members.length}`;
     target.replaceChildren();
     if (!state.members.length) {
       target.append(node("p", "", "暂无成员信息。"));
@@ -1331,8 +1389,13 @@ export function createPatientRecordsUI(api, toast, options = {}) {
       if (!trend?.summary) continue;
       shown += 1;
       const card = node("article", "measurement-trend-card");
-      card.append(
-        node("h3", "", `${kindDef.label}趋势 · ${trend.count} 次已确认记录`),
+      const latestText = kindDef.dual
+        ? `${trend.summary.latest.reported_value} ${kindDef.defaultUnit}`
+        : `${trend.summary.latest.normalized_value} ${kindDef.defaultUnit}`;
+      const pair = collapsePair(
+        `${kindDef.label}趋势 · ${trend.count} 次 · 最近 ${latestText} · ${formatTime(trend.summary.latest.measured_at)}`,
+      );
+      pair.body.append(
         node(
           "p",
           "",
@@ -1343,9 +1406,12 @@ export function createPatientRecordsUI(api, toast, options = {}) {
             : `平均 ${trend.summary.average}，范围 ${trend.summary.minimum}–${trend.summary.maximum} ${kindDef.defaultUnit}；最近一次 ${trend.summary.latest.normalized_value} ${kindDef.defaultUnit} · ${formatTime(trend.summary.latest.measured_at)}。仅展示描述性变化，不判断高低。`,
         ),
       );
+      card.append(pair.toggle, pair.body);
       list.append(card);
     }
     section.hidden = shown === 0;
+    const toggle = $("#trends-collapse-toggle");
+    if (toggle) toggle.textContent = `自测趋势 · ${shown} 种`;
   }
 
   async function loadMeasurementTrends() {
@@ -1599,6 +1665,8 @@ export function createPatientRecordsUI(api, toast, options = {}) {
 
   function consultationPanel(detail) {
     const panel = node("section", "record-consultation-panel");
+    const pair = collapsePair("带入本次问诊");
+    panel.append(pair.toggle, pair.body);
     const copy = node("div");
     copy.append(node("h3", "", "用于本次问诊"));
     const verified = detail.observations.filter(
@@ -1644,7 +1712,7 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     else if (!context.subject && !boundPatientId)
       message = "请先在问诊中确认咨询对象，再带入这份档案。";
     copy.append(node("p", "", message));
-    panel.append(copy);
+    pair.body.append(copy);
     if (verified.length && context.sessionId && entryMatchesSubject) {
       const attach = action(
         attached ? "更新本次问诊" : `带入 ${verified.length} 项数据`,
@@ -1665,9 +1733,9 @@ export function createPatientRecordsUI(api, toast, options = {}) {
           }
         },
       );
-      panel.append(attach);
+      pair.body.append(attach);
     } else if (options.openConsultation) {
-      panel.append(
+      pair.body.append(
         action("前往问诊", "secondary-button", () => {
           $("#record-detail-dialog").close();
           options.openConsultation();
@@ -1735,7 +1803,7 @@ export function createPatientRecordsUI(api, toast, options = {}) {
   // P3a：往详情里填「解读」节。已有解读则完整呈现；无解读时
   // 显示“尚未解读”，仅当有已确认观测时才给“开始解读”按钮
   // （设计 §5.1：未确认值不进解读）；POST 失败只提示、不伪造。
-  async function loadInterpretationInto(section, detail) {
+  async function loadInterpretationInto(section, detail, onInterpretation) {
     const entry = detail.entry;
     const loading = node("p", "", "正在加载解读…");
     section.append(loading);
@@ -1744,6 +1812,7 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     if (interpretation) {
       const built = createInterpretationSection(interpretation);
       section.replaceChildren(...built.childNodes);
+      onInterpretation?.(interpretation);
       return;
     }
     section.append(node("p", "", "尚未解读"));
@@ -1856,9 +1925,29 @@ export function createPatientRecordsUI(api, toast, options = {}) {
     // P3a：解读节与转录观测分区呈现；内容由 loadInterpretationInto
     // 异步填入（已有解读 / 尚未解读 / 开始解读三种状态）。
     const interpretationSection = node("section", "record-interpretation");
-    interpretationSection.append(node("h3", "", "解读"));
+    const interpretationPair = collapsePair("解读");
+    interpretationPair.toggle.classList.add("record-interpretation-toggle");
+    interpretationSection.append(
+      interpretationPair.toggle,
+      interpretationPair.body,
+    );
     target.append(interpretationSection);
-    void loadInterpretationInto(interpretationSection, detail);
+    void loadInterpretationInto(
+      interpretationPair.body,
+      detail,
+      (interpretation) => {
+        // S3: the collapsed title carries the worst grade, so the
+        // outcome is visible without expanding.
+        const order = { 红: 3, 黄: 2, 无法判断: 1, 绿: 0 };
+        let worst = null;
+        for (const item of interpretation.items || []) {
+          const grade = normalizeInterpretationGrade(item.grade);
+          if (worst === null || (order[grade] ?? 0) > (order[worst] ?? 0))
+            worst = grade;
+        }
+        if (worst) interpretationPair.toggle.textContent = `解读 · ${worst}`;
+      },
+    );
     target.append(consultationPanel(detail));
     const actions = node("div", "record-detail-actions");
     if (

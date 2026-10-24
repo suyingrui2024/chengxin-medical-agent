@@ -259,14 +259,13 @@ function setBusy(busy) {
   $("#start-consultation").disabled = busy;
   $("#message-input").disabled = busy;
   $("#urgent-help").disabled = state.priorityBusy || !state.sessionId;
-  $("#delete-current-session").disabled = busy || !state.sessionId;
   $("#open-report-draft").disabled = busy || !state.sessionId;
   $("#open-handoff").disabled = busy || !state.sessionId;
   $("#busy-indicator").hidden = !busy;
   $("#messages").setAttribute("aria-busy", String(busy));
   document
     .querySelectorAll(
-      ".quick-replies button,.fact-edit,.recent-item,.history-card,.starter-card",
+      ".quick-replies button,.fact-edit,.recent-item,.history-card,.starter-link",
     )
     .forEach((node) => {
       node.disabled = busy;
@@ -1106,6 +1105,21 @@ function updateComposer() {
 // and the switch is on. Dismissing posts the switch off; the banner
 // itself hides immediately and the server state (cleared projection)
 // keeps it from remounting on the next render.
+// S1 banner rule: at most one top banner is visible at a time, by
+// priority connection-alert > retriage-banner > baseline banner. Losers
+// are suppressed with a class (not the hidden attribute) so they return
+// when the higher-priority banner clears.
+function enforceBannerPriority() {
+  const connection = $("#connection-alert");
+  const retriage = $("#retriage-banner");
+  const baseline = $("#chengxin-baseline-banner");
+  const connectionOn = Boolean(connection && !connection.hidden);
+  const retriageOn = Boolean(retriage && !retriage.hidden);
+  if (retriage) retriage.classList.toggle("banner-suppressed", connectionOn);
+  if (baseline)
+    baseline.classList.toggle("banner-suppressed", connectionOn || retriageOn);
+}
+
 function syncBaselineBanner(data) {
   const existing = $("#chengxin-baseline-banner");
   const show = Boolean(
@@ -1117,7 +1131,10 @@ function syncBaselineBanner(data) {
     existing?.remove();
     return;
   }
-  if (existing) return;
+  if (existing) {
+    enforceBannerPriority();
+    return;
+  }
   const banner = createBaselineBanner({
     onDismiss: async () => {
       try {
@@ -1133,6 +1150,7 @@ function syncBaselineBanner(data) {
     },
   });
   $("#view-consultation")?.prepend(banner);
+  enforceBannerPriority();
 }
 
 function renderCase(data) {
@@ -1157,6 +1175,7 @@ function renderCase(data) {
   const retriageBanner = $("#retriage-banner");
   const priorCase = data.runtime_snapshot?.prior_case;
   retriageBanner.hidden = !data.runtime_snapshot?.follow_up_of;
+  enforceBannerPriority();
   if (priorCase?.chief_complaint) {
     const outcomeText =
       { worsened: "加重了", hospitalized: "已经住院" }[priorCase.outcome] ||
@@ -1168,10 +1187,11 @@ function renderCase(data) {
   }
   $("#urgent-help").hidden = data.phase === "closed";
   document.body.classList.add("has-session");
-  $("#delete-current-session").hidden = false;
   $("#open-report-draft").hidden = false;
   $("#open-handoff").hidden = false;
   $("#welcome").hidden = true;
+  // S1: the composer hint is shown once before a session starts only.
+  $("#composer-context").hidden = true;
   const phase = data.phase;
   const risk = data.risk?.level;
   const status =
@@ -1203,8 +1223,12 @@ function renderCase(data) {
   const activity = ["emergency", "urgent"].includes(risk)
     ? ["优先联系医疗帮助", "当前提示需要优先求助，不必等待信息全部补齐。"]
     : activities[phase] || activities.history;
-  $("#activity-title").textContent = activity[0];
-  $("#activity-reason").textContent = activity[1];
+  // The drawer no longer carries a current-step block (S1 simplification);
+  // the step is already shown in the conversation itself.
+  const activityTitle = $("#activity-title");
+  if (activityTitle) activityTitle.textContent = activity[0];
+  const activityReason = $("#activity-reason");
+  if (activityReason) activityReason.textContent = activity[1];
   const facts = Object.entries(data.facts);
   $("#fact-count").textContent = String(facts.length);
   $("#facts-count-label").textContent = `${facts.length} 项`;
@@ -1882,7 +1906,16 @@ function renderHistory() {
       icon("arrow"),
     );
     card.disabled = state.busy;
-    $("#history-list").append(card);
+    const row = el("div", "history-card-row");
+    const deleteButton = el("button", "text-button history-delete", "删除");
+    deleteButton.type = "button";
+    deleteButton.disabled = state.busy;
+    deleteButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      deleteSession(item.session_id).catch((error) => toast(error.message));
+    });
+    row.append(card, deleteButton);
+    $("#history-list").append(row);
   }
 }
 const FOLLOW_UP_KIND_LABELS = {
@@ -2114,10 +2147,28 @@ function renderFollowUps() {
   // reloads. Multi-time input is deliberate: a single-time box used
   // to silently drop a second saved time on the next save (N2).
   if (reminders.length) {
+    // S3: the schedule no longer sits as a standalone block after the
+    // follow-up list; it lives inside the list as one collapsed item.
     const block = el("div", "medication-reminder-schedule");
     block.id = "medication-reminder-schedule";
-    block.append(el("h3", "", "用药提醒时间"));
-    block.append(
+    const medToggle = el(
+      "button",
+      "conclusion-collapse-toggle",
+      `用药提醒时间 · ${reminders.length} 种药物`,
+    );
+    medToggle.type = "button";
+    medToggle.setAttribute("aria-expanded", "false");
+    const medBody = el("div", "conclusion-collapse-body");
+    medBody.hidden = true;
+    medToggle.addEventListener("click", () => {
+      medBody.hidden = !medBody.hidden;
+      medToggle.setAttribute(
+        "aria-expanded",
+        medBody.hidden ? "false" : "true",
+      );
+    });
+    block.append(medToggle, medBody);
+    medBody.append(
       el(
         "p",
         "followup-hint",
@@ -2165,9 +2216,9 @@ function renderFollowUps() {
         }
       });
       row.append(label, input, save, feedback);
-      block.append(row);
+      medBody.append(row);
     }
-    section.append(block);
+    list.append(block);
   }
 }
 function openFollowUpDialog(item) {
@@ -2869,9 +2920,13 @@ function subagentMetricsText(kind, metrics) {
     parts.push(`分歧 ${metrics.disagreements ?? 0}`);
   return parts.join(" · ");
 }
+// S4: the subagent panel only renders once the settings "高级" area is
+// opened; metrics text is not fetched for a collapsed panel either.
+let subagentAdvancedOpen = false;
+
 function renderSubagentPanel() {
   const container = $("#subagent-kind-rows");
-  if (!container) return;
+  if (!container || !subagentAdvancedOpen) return;
   container.replaceChildren();
   const metricsByKind = state.subagentMetrics?.kinds || {};
   for (const [kind, label] of SUBAGENT_KINDS) {
@@ -2938,9 +2993,13 @@ async function refreshSubagentPanel() {
   } catch {
     /* keep the last known settings */
   }
-  try {
-    state.subagentMetrics = await api("/api/subagents/metrics");
-  } catch {
+  if (subagentAdvancedOpen) {
+    try {
+      state.subagentMetrics = await api("/api/subagents/metrics");
+    } catch {
+      state.subagentMetrics = null;
+    }
+  } else {
     state.subagentMetrics = null;
   }
   renderSubagentPanel();
@@ -3104,8 +3163,7 @@ async function setBackgroundReviewEnabled(enabled) {
   }
 }
 
-async function deleteCurrentSession() {
-  const id = state.sessionId;
+async function deleteSession(id) {
   if (!id || state.busy) return;
   if (!window.confirm("删除后将清除本次会谈的记录和后台复核数据，且无法恢复。"))
     return;
@@ -3114,23 +3172,25 @@ async function deleteCurrentSession() {
     await api(`/api/sessions/${id}`, { method: "DELETE" });
     composerDrafts.delete(id);
     subjectDrafts.delete(id);
-    state.pendingMessages.clear();
-    state.sessionId = null;
-    state.case = null;
-    state.reply = null;
-    state.events = [];
-    state.lastCorrection = null;
-    state.reportDraft = null;
-    state.handoffText = "";
-    $("#messages").replaceChildren();
-    $("#welcome").hidden = false;
-    $("#delete-current-session").hidden = true;
-    $("#open-report-draft").hidden = true;
-    $("#open-handoff").hidden = true;
-    document.body.classList.remove("has-session");
-    renderInspection();
+    if (id === state.sessionId) {
+      state.pendingMessages.clear();
+      state.sessionId = null;
+      state.case = null;
+      state.reply = null;
+      state.events = [];
+      state.lastCorrection = null;
+      state.reportDraft = null;
+      state.handoffText = "";
+      $("#messages").replaceChildren();
+      $("#welcome").hidden = false;
+      $("#composer-context").hidden = false;
+      $("#open-report-draft").hidden = true;
+      $("#open-handoff").hidden = true;
+      document.body.classList.remove("has-session");
+      renderInspection();
+      navigate("consultation");
+    }
     await refreshSessions();
-    navigate("consultation");
     toast("本次会谈记录已删除。");
   } catch (error) {
     toast(`无法删除记录：${error.message}`);
@@ -3296,6 +3356,14 @@ $("#event-filter").addEventListener("change", (event) => {
 });
 $("#export-session").addEventListener("click", exportSession);
 $("#open-settings").addEventListener("click", openSettings);
+$("#settings-advanced-toggle").addEventListener("click", () => {
+  subagentAdvancedOpen = !subagentAdvancedOpen;
+  const toggle = $("#settings-advanced-toggle");
+  const section = $("#settings-subagents");
+  toggle.setAttribute("aria-expanded", subagentAdvancedOpen ? "true" : "false");
+  section.hidden = !subagentAdvancedOpen;
+  if (subagentAdvancedOpen) refreshSubagentPanel();
+});
 $("#subagent-rollback").addEventListener("click", (event) => {
   saveSubagentModes(
     {
@@ -3314,7 +3382,6 @@ $("#forget-saved-model").addEventListener("click", forgetSavedModel);
 $("#dsh-review-enabled").addEventListener("change", (event) =>
   setBackgroundReviewEnabled(event.target.checked),
 );
-$("#delete-current-session").addEventListener("click", deleteCurrentSession);
 $("#open-report-draft").addEventListener("click", openReportDraft);
 $("#open-handoff").addEventListener("click", openHandoff);
 $("#report-form").addEventListener("submit", submitReportDraft);
@@ -3476,6 +3543,7 @@ async function init() {
       document.createTextNode("本机服务已连接"),
     );
     $("#connection-alert").hidden = true;
+    enforceBannerPriority();
     await refreshSessions();
     // Best-effort: a failed count fetch leaves the badge at its
     // placeholder and must not block startup.
@@ -3486,6 +3554,7 @@ async function init() {
   } catch (error) {
     $("#connection-status").textContent = "服务未连接";
     $("#connection-alert").hidden = false;
+    enforceBannerPriority();
     toast(`无法连接本机服务：${error.message}`);
   }
 }

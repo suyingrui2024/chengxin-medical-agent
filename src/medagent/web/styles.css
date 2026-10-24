@@ -6621,3 +6621,72 @@ body.task-focused .surface-actions {
   margin: 0 0 10px;
   font-size: 13.5px;
 }
+
+/* S1 visualization simplification (2026-10-24): progressive disclosure. */
+.banner-suppressed {
+  display: none !important;
+}
+.starter-links {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 20px;
+}
+.starter-link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 15px;
+  padding: 4px 2px;
+}
+.facts-footnote {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+.history-card-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.history-card-row .history-card {
+  flex: 1;
+  min-width: 0;
+}
+.history-delete {
+  flex: none;
+}
+
+/* S2 visualization simplification: conclusion collapsible sections. */
+.conclusion-collapse-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 10px 0;
+}
+.conclusion-collapse-body {
+  padding-bottom: 4px;
+}
+
+/* S4 visualization simplification: settings advanced disclosure. */
+.settings-advanced-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 14px 0;
+}

@@ -1734,6 +1734,29 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
     },
     (data) => {
       const card = el("article", "conclusion-card");
+      // S2 visualization simplification: secondary sections collapse
+      // behind a titled toggle with a count. Expanded content is
+      // unchanged; only its disclosure state changes.
+      const collapse = (title, count, section, expanded) => {
+        const wrap = el("section", "conclusion-collapse");
+        const toggle = button(
+          count ? `${title} · ${count}` : title,
+          () => {
+            body.hidden = !body.hidden;
+            toggle.setAttribute(
+              "aria-expanded",
+              body.hidden ? "false" : "true",
+            );
+          },
+          "conclusion-collapse-toggle",
+        );
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        const body = el("div", "conclusion-collapse-body");
+        body.hidden = !expanded;
+        body.append(section);
+        wrap.append(toggle, body);
+        return wrap;
+      };
       card.append(el("p", "conclusion-kicker", "问诊结论"));
       const disposition = el(
         "section",
@@ -1837,7 +1860,12 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
             }
           }
         }
-        card.append(directions);
+        const directionCount = directions.querySelectorAll(
+          ".conclusion-direction",
+        ).length;
+        card.append(
+          collapse("可能的方向（不是确诊）", directionCount, directions, false),
+        );
       }
       if (data.gaps?.length) {
         const gaps = el("section", "conclusion-gaps");
@@ -1849,7 +1877,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           listEl.append(li);
         });
         gaps.append(listEl);
-        card.append(gaps);
+        card.append(collapse("还缺的信息", data.gaps.length, gaps, false));
       }
       const care = data.self_care || {};
       if (care.do?.length || care.avoid?.length || care.measure?.length) {
@@ -1871,7 +1899,11 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           careEl.append(
             el("p", "conclusion-care-allergy-hint", care.allergy_hint),
           );
-        card.append(careEl);
+        const careCount =
+          (care.do?.length || 0) +
+          (care.avoid?.length || 0) +
+          (care.measure?.length || 0);
+        card.append(collapse("现在能做的事", careCount, careEl, false));
       }
       if (data.return_now_if?.length) {
         const safety = el("section", "summary-safety");
@@ -1884,7 +1916,16 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           safetyList.append(el("li", "", item)),
         );
         safety.append(safetyList);
-        card.append(safety);
+        // Urgent dispositions keep the safety net expanded: there it is
+        // the primary action, not secondary information.
+        card.append(
+          collapse(
+            "出现以下变化，请立即求助",
+            data.return_now_if.length,
+            safety,
+            data.disposition.level === "urgent_today",
+          ),
+        );
       }
       if (data.outlook || data.follow_up) {
         const outlook = el("section", "conclusion-outlook");
@@ -1898,7 +1939,8 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
               `如果到 ${data.follow_up.due_in_hours} 小时后还没有好转，或出现上面任何警示信号，请线下就医，不要等随访。`,
             ),
           );
-        card.append(outlook);
+        const outlookCount = (data.outlook ? 1 : 0) + (data.follow_up ? 1 : 0);
+        card.append(collapse("接下来", outlookCount, outlook, false));
       }
       const citations = (data.further_reading?.citations || []).filter(
         (citation) => isWebUrl(citation.url),
@@ -1935,7 +1977,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           readingList.append(li);
         });
         reading.append(readingList);
-        card.append(reading);
+        card.append(collapse("延伸阅读", citations.length, reading, false));
       }
       card.append(
         el("p", "conclusion-handoff", "就诊时可把本次记录给医生看。"),

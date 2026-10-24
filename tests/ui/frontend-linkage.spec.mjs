@@ -134,6 +134,8 @@ test("subagent panel lists four kinds and survives metrics failure", async ({
   await expect(page.locator("#connection-status")).toHaveText("本机服务已连接");
   await page.locator('.nav-item[data-view="settings"]').click();
   await expect(page.locator("#view-settings")).toBeVisible();
+  // S4: 子智能体区默认收在“高级”后，展开后才渲染种类行。
+  await page.getByRole("button", { name: "高级", exact: true }).click();
   const rows = page.locator(".subagent-kind-row");
   await expect(rows).toHaveCount(4);
   await expect(rows.locator(".subagent-kind-name strong")).toHaveText([
@@ -324,6 +326,12 @@ test("education completion refreshes the conclusion card in place", async ({
   // event lands, the frozen card must gain the reading section.
   enrich = true;
   const reading = page.locator(".conclusion-card .conclusion-reading");
+  // S2: 延伸阅读默认收起，先展开再断言可见。
+  await page
+    .locator(".conclusion-card .conclusion-collapse-toggle", {
+      hasText: "延伸阅读",
+    })
+    .click();
   await expect(reading).toBeVisible({ timeout: 20000 });
   await expect(reading).toContainText("上肢不适自我护理要点");
 });
@@ -346,6 +354,12 @@ test("resuming a closed session overlays the enriched conclusion", async ({
   // The replayed replies carry the pre-enrichment sheet; the card must
   // still end up showing the reading section from the stored state.
   const reading = page.locator(".conclusion-card .conclusion-reading");
+  // S2: 延伸阅读默认收起，先展开再断言可见。
+  await page
+    .locator(".conclusion-card .conclusion-collapse-toggle", {
+      hasText: "延伸阅读",
+    })
+    .click();
   await expect(reading).toBeVisible({ timeout: 20000 });
   await expect(reading).toContainText("上肢不适自我护理要点");
 });
