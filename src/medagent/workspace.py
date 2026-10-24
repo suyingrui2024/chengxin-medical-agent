@@ -19,9 +19,100 @@ from .events import Event
 from .medical_images import vision_configuration_status
 from .web_tools import web_mode
 
+try:
+    from .env_config import subagent_kind_modes as _env_subagent_kind_modes
+except ImportError:  # the per-kind env helper has not landed yet
+    _env_subagent_kind_modes = None
+
 
 class StaleCompositionError(ValueError):
     pass
+
+
+# Per-kind subagent rollout (design §5.7): four fixed task kinds, each
+# with its own mode layered over the global MEDAGENT_SUBAGENT_MODE.
+SUBAGENT_KINDS = (
+    "case_digest",
+    "evidence_lookup",
+    "second_opinion",
+    "followup_batch",
+)
+SUBAGENT_MODES = frozenset({"off", "shadow", "advisory"})
+_SUBAGENT_KIND_ENV_KEYS = {
+    kind: f"MEDAGENT_SUBAGENT_MODE_{kind.upper()}" for kind in SUBAGENT_KINDS
+}
+
+
+def subagent_env_modes(environ=None):
+    """Effective ``{"mode", "kinds"}`` derived from the environment alone.
+
+    The global ``MEDAGENT_SUBAGENT_MODE`` plus one override key per task
+    kind (``MEDAGENT_SUBAGENT_MODE_<KIND>``). Values outside
+    off/shadow/advisory fall back to the global mode (and an invalid
+    global to "off"): read_env validates these strictly for evaluation
+    runs, but a settings/reporting surface must never raise.
+    """
+    source = os.environ if environ is None else environ
+    global_mode = source.get("MEDAGENT_SUBAGENT_MODE", "off")
+    if global_mode not in SUBAGENT_MODES:
+        global_mode = "off"
+    kinds = {}
+    for kind in SUBAGENT_KINDS:
+        override = source.get(_SUBAGENT_KIND_ENV_KEYS[kind])
+        kinds[kind] = override if override in SUBAGENT_MODES else global_mode
+    return {"mode": global_mode, "kinds": kinds}
+
+
+def subagent_env_kind_overrides(environ=None):
+    """Only the per-kind overrides explicitly present (and valid) in the
+    environment — the shape the coordinator's ``kind_modes`` kwarg takes."""
+    source = os.environ if environ is None else environ
+    overrides = {}
+    for kind in SUBAGENT_KINDS:
+        value = source.get(_SUBAGENT_KIND_ENV_KEYS[kind])
+        if value in SUBAGENT_MODES:
+            overrides[kind] = value
+    return overrides
+
+
+def subagent_kind_overrides(environ=None):
+    """``{kind: mode}`` overrides for coordinator assembly/reporting:
+    env_config's helper when it is available, else the env keys read
+    directly (same keys, same values — one derivation, two doors)."""
+    source = os.environ if environ is None else environ
+    if _env_subagent_kind_modes is not None:
+        derived = _env_subagent_kind_modes(source)
+        if isinstance(derived, dict):
+            if all(kind in SUBAGENT_KINDS for kind in derived):
+                return {
+                    kind: mode
+                    for kind, mode in derived.items()
+                    if mode in SUBAGENT_MODES
+                }
+            nested = derived.get("kinds")
+            if isinstance(nested, dict):
+                return {
+                    kind: mode
+                    for kind, mode in nested.items()
+                    if kind in SUBAGENT_KINDS and mode in SUBAGENT_MODES
+                }
+    return subagent_env_kind_overrides(source)
+
+
+def _validate_subagent_modes(mapping):
+    """Validate an apply() ``subagent_modes`` payload (partial allowed).
+
+    Raises ValueError before anything mutates, so a rejected switch
+    leaves both the LLM composition and the coordinator untouched.
+    """
+    if not isinstance(mapping, dict):
+        raise ValueError("子智能体模式必须是对象")
+    for kind, mode in mapping.items():
+        if kind not in SUBAGENT_KINDS:
+            raise ValueError(f"未知的子智能体任务类型：{kind}")
+        if mode not in SUBAGENT_MODES:
+            raise ValueError("子智能体模式必须是 off、shadow 或 advisory")
+    return dict(mapping)
 
 
 class Workspace:
@@ -63,6 +154,14 @@ class Workspace:
         # re-attaches it to each adaptive engine it builds (previously
         # only the startup engine ever received it).
         self.subagent_coordinator = None
+        # Per-kind mode overrides switched at runtime via apply(). They
+        # are pushed to the shared coordinator in place when one is
+        # attached; until then (or for a coordinator predating the
+        # per-kind API) they are parked here and replayed by
+        # _attach_subagents. _subagent_modes_coordinator remembers which
+        # coordinator instance already received the parked modes.
+        self._pending_subagent_modes = {}
+        self._subagent_modes_coordinator = None
         self._current_host = None
         # Bounded idempotency log for session creation: request_id -> the
         # exact response already returned, so a retried POST /api/sessions
@@ -91,15 +190,55 @@ class Workspace:
                 "web_tools_mode": web_mode(),
                 "subagent_web": os.environ.get("MEDAGENT_SUBAGENT_WEB", "off")
                 == "on",
-                "subagents": {
-                    "mode": os.environ.get("MEDAGENT_SUBAGENT_MODE", "off")
-                },
+                "subagents": self._subagent_settings(),
                 "storage": (
                     "session_store"
                     if getattr(self.engine, "session_store", None) is not None
                     else "process_memory"
                 ),
             }
+
+    def _subagent_settings(self):
+        """Subagent modes as reported to the settings surface.
+
+        Once a coordinator is attached its live state is authoritative
+        (the environment alone drifts from it as soon as apply()
+        switches a kind at runtime); without one, the modes are derived
+        from the environment with any parked runtime overrides merged
+        in. Returns the global mode plus every kind's effective mode.
+        """
+        coordinator = getattr(self, "subagent_coordinator", None)
+        mode_for = getattr(coordinator, "mode_for", None)
+        if callable(mode_for):
+            return {
+                "mode": getattr(coordinator, "mode", "off"),
+                "kinds": {kind: mode_for(kind) for kind in SUBAGENT_KINDS},
+            }
+        derived = subagent_env_modes()
+        kinds = dict(derived["kinds"])
+        kinds.update(self._pending_subagent_modes)
+        mode = derived["mode"]
+        global_mode = getattr(coordinator, "mode", None)
+        if isinstance(global_mode, str) and global_mode in SUBAGENT_MODES:
+            mode = global_mode
+        return {"mode": mode, "kinds": kinds}
+
+    def _set_subagent_modes(self, mapping):
+        """Push validated per-kind modes to the shared coordinator.
+
+        The coordinator is one shared object across engines, so the
+        switch lands in place — no recomposition. When no coordinator
+        is attached yet (or it predates set_kind_modes), the modes stay
+        parked in _pending_subagent_modes and _attach_subagents replays
+        them onto the first capable coordinator it wires in. Caller
+        holds self.lock.
+        """
+        self._pending_subagent_modes.update(mapping)
+        coordinator = getattr(self, "subagent_coordinator", None)
+        setter = getattr(coordinator, "set_kind_modes", None)
+        if callable(setter):
+            setter(mapping)
+            self._subagent_modes_coordinator = coordinator
 
     def resolve(self, payload):
         if set(payload) - {
@@ -165,9 +304,26 @@ class Workspace:
         with self.lock:
             if self.closing:
                 raise RuntimeError("工作台正在关闭")
-            mode, config = self.resolve(payload)
-            self._compose(mode, config, self.engine.content.registry)
-            self.backend, self.settings = mode, config
+            payload = dict(payload or {})
+            # subagent_modes is handled at this layer, never mixed into
+            # the LLM settings/config resolve() produces: it switches
+            # the shared coordinator in place and must not recompose
+            # engines. It is validated first, so an invalid switch
+            # leaves every piece of state untouched.
+            modes_payload = payload.pop("subagent_modes", None)
+            kind_modes = None
+            if modes_payload is not None:
+                kind_modes = _validate_subagent_modes(modes_payload)
+            if payload:
+                mode, config = self.resolve(payload)
+                self._compose(mode, config, self.engine.content.registry)
+                self.backend, self.settings = mode, config
+            elif kind_modes is None:
+                # Historical contract: an apply with nothing to apply
+                # is a client error (resolve raises), not a no-op.
+                self.resolve(payload)
+            if kind_modes is not None:
+                self._set_subagent_modes(kind_modes)
             return self.public_settings()
 
     def _attach_subagents(self, engine):
@@ -176,6 +332,18 @@ class Workspace:
             engine, AdaptiveConsultationEngine
         ):
             engine.subagent_coordinator = coordinator
+        # Replay runtime mode overrides that arrived before this
+        # coordinator was wired in; each coordinator instance receives
+        # the parked modes exactly once.
+        if (
+            self._pending_subagent_modes
+            and coordinator is not None
+            and self._subagent_modes_coordinator is not coordinator
+        ):
+            setter = getattr(coordinator, "set_kind_modes", None)
+            if callable(setter):
+                setter(dict(self._pending_subagent_modes))
+                self._subagent_modes_coordinator = coordinator
 
     def _compose(self, mode, config, registry):
         host = build_runtime(
@@ -369,6 +537,84 @@ class Workspace:
                     )
         return sorted(output, key=lambda s: s["created_at"], reverse=True)
 
+    def subagent_metrics(self):
+        """Aggregate subagent telemetry from the event store, per kind.
+
+        Sources are only the events the coordinator actually appends:
+        ``subagent.proposed`` (kind at payload.proposal.task_kind) for
+        proposed; branch-level ``subagent.finished`` for
+        completed/partial/failed (any other terminal branch status —
+        failed, timeout, cancelled, stale, budget_exhausted — folds
+        into failed); spawn-level ``subagent.finished``
+        (usage_total.total_tokens) for tokens; ``subagent.validated``
+        (dropped_claims) for dropped. ``subagent.disagreement`` events
+        (emitted by the adaptive engine at the §5.7.2 flag site, kind at
+        payload.task_kind) for disagreements. Unknown kinds and
+        malformed payloads are skipped; an empty store yields the
+        all-zero structure.
+        """
+        kinds = {
+            kind: {
+                "proposed": 0,
+                "completed": 0,
+                "partial": 0,
+                "failed": 0,
+                "dropped": 0,
+                "tokens": 0,
+                "disagreements": 0,
+            }
+            for kind in SUBAGENT_KINDS
+        }
+        for event in list(getattr(self.events, "_events", None) or []):
+            payload = event.payload if isinstance(event.payload, dict) else {}
+            event_type = event.event_type
+            if event_type == "subagent.proposed":
+                proposal = payload.get("proposal")
+                kind = (
+                    proposal.get("task_kind")
+                    if isinstance(proposal, dict)
+                    else None
+                )
+                if kind in kinds:
+                    kinds[kind]["proposed"] += 1
+            elif event_type == "subagent.finished":
+                kind = payload.get("task_kind")
+                if kind not in kinds:
+                    continue
+                level = payload.get("level")
+                if level == "spawn":
+                    usage = payload.get("usage_total")
+                    tokens = (
+                        usage.get("total_tokens")
+                        if isinstance(usage, dict)
+                        else None
+                    )
+                    if isinstance(tokens, (int, float)):
+                        kinds[kind]["tokens"] += int(tokens)
+                elif level == "branch":
+                    status = payload.get("status")
+                    if status == "completed":
+                        kinds[kind]["completed"] += 1
+                    elif status == "partial":
+                        kinds[kind]["partial"] += 1
+                    elif isinstance(status, str) and status:
+                        kinds[kind]["failed"] += 1
+            elif event_type == "subagent.validated":
+                kind = payload.get("task_kind")
+                if kind in kinds:
+                    dropped = payload.get("dropped_claims")
+                    if isinstance(dropped, (int, float)):
+                        kinds[kind]["dropped"] += int(dropped)
+            elif event_type == "subagent.disagreement":
+                kind = payload.get("task_kind")
+                if kind not in kinds:
+                    # The only disagreement that exists is the blinded
+                    # second opinion's (§5.7.2); an unlabelled event
+                    # belongs to it.
+                    kind = "second_opinion"
+                kinds[kind]["disagreements"] += 1
+        return {"kinds": kinds, "generated_at": utc_now()}
+
     # -- follow-up draft store + in-process batch trigger (§5.7.4) --
 
     def _drafts_file(self):
@@ -492,10 +738,17 @@ class Workspace:
         """
         try:
             coordinator = getattr(self, "subagent_coordinator", None)
-            if (
-                coordinator is None
-                or getattr(coordinator, "mode", "off") != "advisory"
-            ):
+            if coordinator is None:
+                return 0
+            # The gate is per-kind: followup_batch may be advisory while
+            # the global mode is still shadow (per-kind rollout, §5.7).
+            mode_for = getattr(coordinator, "mode_for", None)
+            gate_mode = (
+                mode_for("followup_batch")
+                if callable(mode_for)
+                else getattr(coordinator, "mode", "off")
+            )
+            if gate_mode != "advisory":
                 return 0
             backend = getattr(coordinator, "backend", None)
             if not callable(getattr(backend, "decide_cancellable", None)):

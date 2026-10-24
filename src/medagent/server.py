@@ -43,7 +43,7 @@ from .patient_records import (
 )
 from .report_drafts import parse_report_draft
 from .runtime import build_runtime
-from .workspace import Workspace, StaleCompositionError
+from .workspace import Workspace, StaleCompositionError, subagent_kind_overrides
 from . import __version__
 from .execution import ExecutionManager, ExecutionError, ExecutionBusy
 from .execution_files import DirectoryChanged
@@ -105,6 +105,9 @@ class MedicalAgentServer(ThreadingHTTPServer):
             events,
             getattr(engine, "backend", None),
             mode=os.environ.get("MEDAGENT_SUBAGENT_MODE", "off"),
+            # Per-kind rollout overrides from the MEDAGENT_SUBAGENT_MODE_
+            # <KIND> env keys (env_config's helper when available).
+            kind_modes=subagent_kind_overrides(os.environ),
             web_enabled=os.environ.get("MEDAGENT_SUBAGENT_WEB", "off") == "on",
             web_tools=self.web_tools,
         )
@@ -305,6 +308,12 @@ class Handler(BaseHTTPRequestHandler):
                 self.app.reviews.enabled_for_process
             )
             self._json(settings)
+            return
+        if path == "/api/subagents/metrics":
+            # Read-only telemetry aggregate over the event store; with
+            # no coordinator activity it is the all-zero structure,
+            # never an error.
+            self._json(self.app.workspace.subagent_metrics())
             return
         if path == "/api/capabilities":
             self._json(self.app.workspace.catalog())
