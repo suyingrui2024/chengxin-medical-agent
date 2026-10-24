@@ -13,7 +13,7 @@ import re
 import struct
 import threading
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -269,7 +269,13 @@ content 必须且只能是：description, clarity, unclear_parts。"""
 
 
 class DeepSeekVisionRecognizer:
-    def __init__(self, base_url: str, api_key: str, model: str = "deepseek-flash"):
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        model: str = "deepseek-flash",
+        retry_backoff_seconds: float = 0.5,
+    ):
         parsed = urlparse(base_url)
         if parsed.scheme not in {"http", "https"} or not parsed.hostname:
             raise ValueError("视觉模型地址无效")
@@ -277,12 +283,22 @@ class DeepSeekVisionRecognizer:
             raise ValueError("视觉模型地址不能包含凭据、查询参数或片段")
         if not api_key or not model:
             raise ValueError("视觉模型配置不完整")
+        if not 0 <= retry_backoff_seconds <= 10:
+            raise ValueError("视觉重试退避必须在 0–10 秒内")
         normalized = base_url.rstrip("/")
         if normalized.endswith("/anthropic"):
             normalized = normalized[: -len("/anthropic")]
         self.base_url = normalized
         self.api_key = api_key
         self.model = model
+        self.retry_backoff_seconds = retry_backoff_seconds
+        # Audit telemetry from the last call (model I/O audit, phase 3-D):
+        # provider usage + duration + whether the bounded retry fired.
+        # These are observation-only attributes; the return contract of
+        # recognize() is unchanged.
+        self.last_usage: Optional[Dict[str, Any]] = None
+        self.last_duration_ms: Optional[int] = None
+        self.last_retried: bool = False
 
     def recognize(self, image: InspectedImage) -> dict[str, Any]:
         encoded = base64.b64encode(image.data).decode("ascii")
@@ -308,24 +324,62 @@ class DeepSeekVisionRecognizer:
                 },
             ],
         }
-        request = Request(
-            f"{self.base_url}/chat/completions",
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-            },
-            method="POST",
-        )
+        # Bounded retry (audit phase 3-D): a single transient network
+        # failure used to fail the whole recognition and force the user
+        # to re-submit. Only transport failures (URLError/TimeoutError)
+        # are retried, exactly once, mirroring CompatibleBackend's
+        # bounded-retry discipline. Provider errors (HTTPError) and
+        # invalid contracts are deterministic and still fail at once —
+        # retrying them cannot fix the response.
+        import time as _time
+
+        self.last_retried = False
+        started = _time.perf_counter()
+        result = None
+        for attempt in (1, 2):
+            request = Request(
+                f"{self.base_url}/chat/completions",
+                data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                method="POST",
+            )
+            try:
+                with urlopen(request, timeout=45) as response:
+                    result = json.loads(response.read())
+                break
+            except HTTPError as exc:
+                raise RecognitionError(
+                    f"视觉模型请求失败（HTTP {exc.code}）"
+                ) from None
+            except (URLError, TimeoutError):
+                if attempt == 1:
+                    self.last_retried = True
+                    if self.retry_backoff_seconds > 0:
+                        _time.sleep(self.retry_backoff_seconds)
+                    continue
+                raise RecognitionError("视觉模型连接失败或超时") from None
+        usage = (result or {}).get("usage") or {}
+        self.last_usage = {
+            key: value
+            for key, value in usage.items()
+            if key
+            in {
+                "prompt_tokens",
+                "completion_tokens",
+                "total_tokens",
+                "prompt_cache_hit_tokens",
+                "prompt_cache_miss_tokens",
+            }
+            and type(value) is int
+            and value >= 0
+        }
+        self.last_duration_ms = round((_time.perf_counter() - started) * 1000)
         try:
-            with urlopen(request, timeout=45) as response:
-                result = json.loads(response.read())
             content = result["choices"][0]["message"]["content"]
             return validate_recognition(json.loads(content))
-        except HTTPError as exc:
-            raise RecognitionError(f"视觉模型请求失败（HTTP {exc.code}）") from None
-        except (URLError, TimeoutError):
-            raise RecognitionError("视觉模型连接失败或超时") from None
         except (KeyError, IndexError, TypeError, json.JSONDecodeError, MedicalImageError):
             raise RecognitionError("视觉模型没有返回有效的识别协议") from None
 
