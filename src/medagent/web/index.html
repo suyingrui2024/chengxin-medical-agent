@@ -1114,6 +1114,7 @@
               <aside class="settings-rail" aria-label="设置分类">
                 <a href="#settings-appearance">外观</a>
                 <a href="#settings-model">模型服务</a>
+                <a href="#settings-subagents">子智能体</a>
                 <a href="#settings-data">界面与数据</a>
               </aside>
               <div class="settings-content">
@@ -1280,6 +1281,33 @@
                   >
                     <svg class="icon"><use href="#i-settings" /></svg
                     >打开模型与运行配置
+                  </button>
+                </section>
+                <section id="settings-subagents" class="settings-section">
+                  <h2>子智能体（按类）</h2>
+                  <p class="settings-hint">
+                    四类后台子任务各自独立控制：关闭＝不运行；影子＝只记录运行情况、不呈现结果；建议＝结果可以用于界面提示。随访草稿只生成待确认草稿，永不自动发送。修改后立即保存。
+                  </p>
+                  <p
+                    class="settings-hint"
+                    id="subagent-global-note"
+                    role="status"
+                    hidden
+                  >
+                    全局子智能体开关当前为关闭状态，按类设置暂不生效。
+                  </p>
+                  <div id="subagent-kind-rows"></div>
+                  <p
+                    class="subagent-feedback"
+                    id="subagent-panel-feedback"
+                    role="status"
+                  ></p>
+                  <button
+                    id="subagent-rollback"
+                    class="secondary-button"
+                    type="button"
+                  >
+                    全部回退到影子
                   </button>
                 </section>
                 <section id="settings-data" class="settings-section">

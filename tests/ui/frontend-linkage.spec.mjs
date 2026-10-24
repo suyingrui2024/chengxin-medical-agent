@@ -95,6 +95,75 @@ test("follow-up cards render a stored draft read-only", async ({ page }) => {
   await expect(cards.nth(1).locator(".followup-draft")).toHaveCount(0);
 });
 
+test("subagent panel lists four kinds and survives metrics failure", async ({
+  page,
+}) => {
+  const kinds = {
+    case_digest: "advisory",
+    evidence_lookup: "off",
+    second_opinion: "shadow",
+    followup_batch: "shadow",
+  };
+  let savedModes = null;
+  await page.route("**/api/settings", async (route) => {
+    const request = route.request();
+    if (request.method() === "POST") {
+      const body = request.postDataJSON();
+      if (body?.subagent_modes) {
+        savedModes = body.subagent_modes;
+        Object.assign(kinds, body.subagent_modes);
+        await route.fulfill({
+          json: {
+            backend: "demo",
+            subagents: { mode: "shadow", kinds: { ...kinds } },
+          },
+        });
+        return;
+      }
+      await route.continue();
+      return;
+    }
+    const response = await route.fetch();
+    const json = await response.json();
+    json.subagents = { mode: "shadow", kinds: { ...kinds } };
+    await route.fulfill({ response, json });
+  });
+  // Metrics being down must not block or break the settings view.
+  await page.route("**/api/subagents/metrics", (route) => route.abort());
+  await page.goto("/");
+  await expect(page.locator("#connection-status")).toHaveText("本机服务已连接");
+  await page.locator('.nav-item[data-view="settings"]').click();
+  await expect(page.locator("#view-settings")).toBeVisible();
+  const rows = page.locator(".subagent-kind-row");
+  await expect(rows).toHaveCount(4);
+  await expect(rows.locator(".subagent-kind-name strong")).toHaveText([
+    "病例摘要",
+    "证据检索",
+    "第二意见",
+    "随访草稿",
+  ]);
+  // Server-provided modes are reflected; metrics fell back quietly.
+  await expect(rows.nth(0).locator("select")).toHaveValue("advisory");
+  await expect(rows.nth(1).locator("select")).toHaveValue("off");
+  await expect(rows.first().locator(".subagent-metrics")).toHaveText(
+    "暂无运行记录",
+  );
+  // The rollback posts all four kinds as shadow in one save.
+  await page.locator("#subagent-rollback").click();
+  await expect
+    .poll(() => savedModes)
+    .toEqual({
+      case_digest: "shadow",
+      evidence_lookup: "shadow",
+      second_opinion: "shadow",
+      followup_batch: "shadow",
+    });
+  await expect(rows.nth(0).locator("select")).toHaveValue("shadow");
+  await expect(page.locator("#subagent-panel-feedback")).toContainText(
+    "已保存",
+  );
+});
+
 // -- Scripted-model consultation that closes with a conclusion sheet --
 
 const modelInput =

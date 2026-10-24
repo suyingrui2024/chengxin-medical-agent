@@ -82,6 +82,7 @@ const state = {
   followUps: [],
   tasks: [],
   settings: { backend: "demo" },
+  subagentMetrics: null,
   modelCredentials: { available: false, has_saved_config: false },
   view: "consultation",
   busy: false,
@@ -475,6 +476,7 @@ function navigate(view) {
   if (view === "records")
     patientRecordsUI.refresh().catch((error) => toast(error.message));
   if (view === "tasks") renderLibrary();
+  if (view === "settings") refreshSubagentPanel();
   if (view === "execution") executionUI.refresh();
   if (view === "capabilities" && !state.capabilityBusy) {
     // A late catalog refresh must not replace a template the user just chose.
@@ -2553,13 +2555,131 @@ function renderCredentialOptions() {
   $("#remember-model-control").hidden = !status.available;
   $("#remember-model").checked = status.has_saved_config;
   $("#forget-saved-model").hidden = !status.has_saved_config;
-  $("#credential-storage-hint").textContent = status.available
-    ? status.has_saved_config
-      ? "这台设备已有一份由操作系统加密保存的模型配置。"
-      : "勾选后由操作系统安全凭据存储加密保存；应用无法从页面读取已保存密钥。"
-    : window.chengxinDesktop
-      ? "当前系统没有可用的安全凭据存储，密钥只能用于本次运行。"
-      : "浏览器模式不会保存密钥；关闭服务后配置失效。";
+  // "unreadable" (saved file present but the OS keyring cannot decrypt
+  // it) must not collapse into the generic no-config copy: the app has
+  // silently fallen back to demo mode, and only re-saving the key in
+  // this dialog restores the saved configuration.
+  $("#credential-storage-hint").textContent =
+    status.saved_state === "unreadable"
+      ? "这台设备上保存的模型配置当前无法读取（系统凭据存储不可用或解密失败），应用可能已回退到离线演示模式。请重新填写并保存密钥。"
+      : status.available
+        ? status.has_saved_config
+          ? "这台设备已有一份由操作系统加密保存的模型配置。"
+          : "勾选后由操作系统安全凭据存储加密保存；应用无法从页面读取已保存密钥。"
+        : window.chengxinDesktop
+          ? "当前系统没有可用的安全凭据存储，密钥只能用于本次运行。"
+          : "浏览器模式不会保存密钥；关闭服务后配置失效。";
+}
+// -- Subagent per-kind rollout panel (settings view) --
+// The settings view applies changes instantly (like the appearance
+// radios), so each select posts just its own kind through the shared
+// settings channel as {subagent_modes: {kind: mode}}; the server
+// answers with the full updated settings, which becomes the new truth.
+const SUBAGENT_KINDS = [
+  ["case_digest", "病例摘要"],
+  ["evidence_lookup", "证据检索"],
+  ["second_opinion", "第二意见"],
+  ["followup_batch", "随访草稿"],
+];
+const SUBAGENT_MODE_OPTIONS = [
+  ["off", "关闭"],
+  ["shadow", "影子"],
+  ["advisory", "建议"],
+];
+function subagentKindMode(kind) {
+  const subagents = state.settings?.subagents || {};
+  const value = subagents.kinds?.[kind] ?? subagents.mode ?? "off";
+  return SUBAGENT_MODE_OPTIONS.some(([mode]) => mode === value) ? value : "off";
+}
+function subagentMetricsText(kind, metrics) {
+  if (!metrics) return "暂无运行记录";
+  const parts = [
+    `已提议 ${metrics.proposed ?? 0}`,
+    `完成 ${metrics.completed ?? 0}`,
+  ];
+  if ((metrics.partial ?? 0) > 0) parts.push(`部分 ${metrics.partial}`);
+  if ((metrics.failed ?? 0) > 0) parts.push(`失败 ${metrics.failed}`);
+  if ((metrics.dropped ?? 0) > 0) parts.push(`丢弃 ${metrics.dropped}`);
+  // Only second_opinion branches can disagree with the parent engine.
+  if (kind === "second_opinion")
+    parts.push(`分歧 ${metrics.disagreements ?? 0}`);
+  return parts.join(" · ");
+}
+function renderSubagentPanel() {
+  const container = $("#subagent-kind-rows");
+  if (!container) return;
+  container.replaceChildren();
+  const metricsByKind = state.subagentMetrics?.kinds || {};
+  for (const [kind, label] of SUBAGENT_KINDS) {
+    const row = el("div", "subagent-kind-row");
+    row.dataset.kind = kind;
+    const name = el("div", "subagent-kind-name");
+    name.append(el("strong", "", label), el("small", "", kind));
+    const select = el("select", "subagent-mode-select");
+    select.setAttribute("aria-label", `${label}模式`);
+    for (const [value, text] of SUBAGENT_MODE_OPTIONS) {
+      const option = el("option", "", text);
+      option.value = value;
+      select.append(option);
+    }
+    select.value = subagentKindMode(kind);
+    select.addEventListener("change", () => {
+      saveSubagentModes({ [kind]: select.value }, select);
+    });
+    row.append(
+      name,
+      select,
+      el(
+        "span",
+        "subagent-metrics",
+        subagentMetricsText(kind, metricsByKind[kind]),
+      ),
+    );
+    container.append(row);
+  }
+  const note = $("#subagent-global-note");
+  if (note) note.hidden = state.settings?.subagents?.mode !== "off";
+}
+async function saveSubagentModes(modes, control) {
+  const feedback = $("#subagent-panel-feedback");
+  if (control) control.disabled = true;
+  try {
+    state.settings = await api("/api/settings", {
+      method: "POST",
+      body: { subagent_modes: modes },
+    });
+    if (feedback) {
+      feedback.classList.remove("error");
+      feedback.textContent = "子智能体设置已保存。";
+    }
+  } catch (error) {
+    // A failed save must never look successful: the panel re-renders
+    // from the last known server state (reverting the control) and the
+    // failure is surfaced both inline and as a toast.
+    if (feedback) {
+      feedback.classList.add("error");
+      feedback.textContent = `保存失败：${error.message}`;
+    }
+    toast(`子智能体设置保存失败：${error.message}`);
+  } finally {
+    if (control) control.disabled = false;
+    renderSubagentPanel();
+  }
+}
+async function refreshSubagentPanel() {
+  // Both fetches are best-effort: a metrics failure must never block
+  // the settings view, and a settings failure keeps the last values.
+  try {
+    state.settings = await api("/api/settings");
+  } catch {
+    /* keep the last known settings */
+  }
+  try {
+    state.subagentMetrics = await api("/api/subagents/metrics");
+  } catch {
+    state.subagentMetrics = null;
+  }
+  renderSubagentPanel();
 }
 async function openSettings() {
   try {
@@ -2912,6 +3032,17 @@ $("#event-filter").addEventListener("change", (event) => {
 });
 $("#export-session").addEventListener("click", exportSession);
 $("#open-settings").addEventListener("click", openSettings);
+$("#subagent-rollback").addEventListener("click", (event) => {
+  saveSubagentModes(
+    {
+      case_digest: "shadow",
+      evidence_lookup: "shadow",
+      second_opinion: "shadow",
+      followup_batch: "shadow",
+    },
+    event.currentTarget,
+  );
+});
 $("#backend-pill").addEventListener("click", openSettings);
 $("#settings-form").addEventListener("change", renderModeFields);
 $("#use-deepseek-preset").addEventListener("click", useDeepSeekPreset);
@@ -3058,6 +3189,7 @@ async function init() {
     state.settings = settings;
     state.sessionPersistence = settings.storage === "session_store";
     applyRetentionCopy();
+    renderSubagentPanel();
     executionUI.configure(health.execution_available);
     state.tasks = tasks.tasks;
     state.catalog = catalog;

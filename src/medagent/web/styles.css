@@ -6130,6 +6130,44 @@ html[data-font-scale="small"] .fact-value {
   margin: 0 0 20px;
   max-width: 640px;
 }
+.subagent-kind-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 640px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.subagent-kind-name {
+  display: grid;
+  gap: 2px;
+  min-width: 104px;
+  font-size: 14.5px;
+}
+.subagent-kind-name small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.subagent-mode-select {
+  font-size: 14px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--raised);
+}
+.subagent-metrics {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.subagent-feedback {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.7;
+  min-height: 23px;
+  margin: 10px 0 12px;
+}
+.subagent-feedback.error {
+  color: var(--red);
+}
 #view-settings .appearance-options {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 }
