@@ -1818,6 +1818,499 @@
     }
    ],
    "task_kind": "second_opinion"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 2
+   },
+   "expected_backend_calls": 2,
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "右下腹疼痛一天",
+     "key": "chief_complaint",
+     "value": "右下腹疼痛一天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "右下腹一按就疼",
+     "key": "gi_details",
+     "value": "右下腹压痛"
+    },
+    {
+     "assertion": "present",
+     "evidence": "变化不大",
+     "key": "trajectory",
+     "value": "stable"
+    },
+    {
+     "assertion": "present",
+     "evidence": "6分",
+     "key": "severity",
+     "value": 6
+    }
+   ],
+   "id": "el-appendicitis-knowledge",
+   "objective": "为右下腹痛病例整理阑尾炎方向的支持证据与缺口",
+   "risk": "urgent",
+   "stub_script": [
+    {
+     "arguments": {
+      "max_results": 3,
+      "query": "阑尾炎 右下腹"
+     },
+     "tool": "knowledge_search"
+    },
+    {
+     "arguments": {
+      "conclusion": "现有事实支持右下腹痛方向需当面检查确认，关键缺口为疼痛转移与发热情况",
+      "findings": [
+       {
+        "claim": "右下腹持续疼痛一天",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "右下腹疼痛一天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "内容库将该方向标注为需要当面检查的腹部急症",
+        "confidence": "medium",
+        "evidence": [
+         {
+          "quote": "阑尾炎等需要当面检查的腹部急症",
+          "ref": "appendicitis",
+          "source_type": "knowledge"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": [
+        "未记录疼痛转移与体温"
+       ]
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "evidence_lookup"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 2,
+    "status": "partial",
+    "surviving_claims": 2
+   },
+   "fabricated_quotes": [
+    "夜里咳得睡不着觉",
+    "肺炎必须住院输液治疗"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "咳嗽一周，越来越重",
+     "key": "chief_complaint",
+     "value": "咳嗽一周加重"
+    },
+    {
+     "assertion": "present",
+     "evidence": "痰里有点血丝",
+     "key": "resp_cough_details",
+     "value": "痰中带血丝"
+    },
+    {
+     "assertion": "present",
+     "evidence": "7分",
+     "key": "severity",
+     "value": 7
+    }
+   ],
+   "id": "el-fabricated-quotes-dropped",
+   "objective": "为咳嗽加重病例整理下呼吸道方向的证据",
+   "risk": "urgent",
+   "stub_script": [
+    {
+     "arguments": {
+      "conclusion": "咳嗽加重伴痰中带血，需结合当面检查判断",
+      "findings": [
+       {
+        "claim": "痰中带血丝",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "痰里有点血丝",
+          "ref": "resp_cough_details",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "内容库提示需考虑肺部感染方向",
+        "confidence": "medium",
+        "evidence": [
+         {
+          "quote": "肺部感染（肺炎等）",
+          "ref": "lower_respiratory",
+          "source_type": "knowledge"
+         }
+        ]
+       },
+       {
+        "claim": "夜间咳醒多次",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "夜里咳得睡不着觉",
+          "ref": "resp_cough_details",
+          "source_type": "case"
+         }
+        ]
+       },
+       {
+        "claim": "内容库要求一律住院输液",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "肺炎必须住院输液治疗",
+          "ref": "lower_respiratory",
+          "source_type": "knowledge"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "medium",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "evidence_lookup"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "dropped_claims": 1,
+    "status": "rejected_by_validation",
+    "surviving_claims": 0
+   },
+   "expected_backend_calls": 2,
+   "fabricated_quotes": [
+    "体位性头晕多与血压变化有关"
+   ],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "反复头晕一周",
+     "key": "chief_complaint",
+     "value": "反复头晕一周"
+    },
+    {
+     "assertion": "present",
+     "evidence": "站起来的时候晕得厉害",
+     "key": "dizzy_details",
+     "value": "起身时明显"
+    },
+    {
+     "assertion": "present",
+     "evidence": "5分",
+     "key": "severity",
+     "value": 5
+    }
+   ],
+   "id": "el-web-unavailable-degrades",
+   "objective": "为反复头晕病例检索外部指南证据",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "url": "https://example.org/dizziness-guide"
+     },
+     "tool": "web_fetch"
+    },
+    {
+     "arguments": {
+      "conclusion": "仅有未能核实的网页来源，不足以形成证据结论",
+      "findings": [
+       {
+        "claim": "外部指南提到体位性头晕的常见机制",
+        "confidence": "low",
+        "evidence": [
+         {
+          "quote": "体位性头晕多与血压变化有关",
+          "ref": "https://example.org/dizziness-guide",
+          "source_type": "web"
+         }
+        ]
+       }
+      ],
+      "uncertainty": {
+       "level": "high",
+       "reasons": [
+        "网页来源未能在本地核实"
+       ]
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "evidence_lookup"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "draft_message": "您好，来问问您这两天的情况：上次说的尿频尿急好些了吗？如果出现发烧、腰痛或尿血，请及时就医。",
+    "draft_priority": "routine",
+    "draft_produced": true,
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 1
+   },
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "尿频尿急两天",
+     "key": "chief_complaint",
+     "value": "尿频尿急两天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "尿尿有点痛",
+     "key": "urinary_details",
+     "value": "尿痛"
+    },
+    {
+     "assertion": "absent",
+     "evidence": "没有发烧",
+     "key": "temperature_note",
+     "value": null
+    }
+   ],
+   "followup_plan": {
+    "due_at": "2026-10-20T09:00:00+08:00",
+    "status": "scheduled",
+    "window_hours": 72
+   },
+   "followup_title": "尿路症状 72 小时随访",
+   "id": "fb-routine-draft",
+   "objective": "整理随访优先级并起草提醒",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "draft_message": "您好，来问问您这两天的情况：上次说的尿频尿急好些了吗？如果出现发烧、腰痛或尿血，请及时就医。",
+      "findings": [
+       {
+        "claim": "尿频尿急两天，无发热",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "尿频尿急两天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "priority": "routine",
+      "reason": "上次为常规门诊随访，症状轻且无发热",
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "followup_batch"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "draft_produced": false,
+    "dropped_claims": 0,
+    "status": "completed",
+    "surviving_claims": 1
+   },
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "腰痛三天",
+     "key": "chief_complaint",
+     "value": "腰痛三天"
+    },
+    {
+     "assertion": "present",
+     "evidence": "弯腰的时候更疼",
+     "key": "back_details",
+     "value": "弯腰加重"
+    },
+    {
+     "assertion": "present",
+     "evidence": "变化不大",
+     "key": "trajectory",
+     "value": "stable"
+    }
+   ],
+   "followup_plan": {
+    "due_at": "2026-10-20T09:00:00+08:00",
+    "status": "scheduled",
+    "window_hours": 72
+   },
+   "followup_title": "腰痛 72 小时随访",
+   "id": "fb-draft-lint-dropped",
+   "objective": "整理随访优先级并起草提醒",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "draft_message": "随访提醒：请继续服用布洛芬200mg每日两次，坚持吃肯定没事。",
+      "findings": [
+       {
+        "claim": "腰痛三天，弯腰加重",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "腰痛三天",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "priority": "routine",
+      "reason": "腰痛随访确认恢复情况",
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "followup_batch"
+  },
+  {
+   "closed_reason": "confirmed_by_user",
+   "expected": {
+    "draft_produced": false,
+    "dropped_claims": 0,
+    "status": "stale",
+    "surviving_claims": 0
+   },
+   "fabricated_quotes": [],
+   "facts": [
+    {
+     "assertion": "present",
+     "evidence": "我自己",
+     "key": "consult_for",
+     "value": "self"
+    },
+    {
+     "assertion": "present",
+     "evidence": "发烧两天，咳嗽",
+     "key": "chief_complaint",
+     "value": "发烧两天，咳嗽"
+    },
+    {
+     "assertion": "present",
+     "evidence": "变化不大",
+     "key": "trajectory",
+     "value": "stable"
+    },
+    {
+     "assertion": "present",
+     "evidence": "3分",
+     "key": "severity",
+     "value": 3
+    }
+   ],
+   "followup_plan": {
+    "due_at": "2026-10-20T09:00:00+08:00",
+    "status": "scheduled",
+    "window_hours": 48
+   },
+   "followup_title": "发热 48 小时随访",
+   "id": "fb-stale-plan-withheld",
+   "mutate_during_run": {
+    "assertion": "present",
+    "evidence": "患者已提前复诊，烧还没退",
+    "key": "trajectory",
+    "value": "worsening"
+   },
+   "objective": "整理随访优先级并起草提醒",
+   "risk": "routine",
+   "stub_script": [
+    {
+     "arguments": {
+      "draft_message": "您好，来问问您这两天发烧的情况好些了吗？如果烧一直不退或出现呼吸困难，请及时就医。",
+      "findings": [
+       {
+        "claim": "发热两天，病程平稳",
+        "confidence": "high",
+        "evidence": [
+         {
+          "quote": "发烧两天，咳嗽",
+          "ref": "chief_complaint",
+          "source_type": "case"
+         }
+        ]
+       }
+      ],
+      "priority": "routine",
+      "reason": "发热两天，病程平稳，按计划随访",
+      "uncertainty": {
+       "level": "low",
+       "reasons": []
+      }
+     },
+     "tool": "subagent_report"
+    }
+   ],
+   "task_kind": "followup_batch"
   }
  ],
  "corpus": "subagent-cases",

@@ -35,15 +35,19 @@ ROOT = Path(__file__).resolve().parents[3]
 EXPECTED_KINDS = {"evidence_lookup", "second_opinion", "case_digest", "followup_batch"}
 
 # Minimum corpus sizes (floor of 50% of the corpus as authored:
-# 18 cases, 17 schema-scored, 8 fabricated quotes). Without them an
+# 24 cases, 23 schema-scored, 11 fabricated quotes). Without them an
 # empty or gutted corpus passes on vacuous rates — the schema rate
 # and fabricated-quote drop rate both default to 1.0 over zero cases.
 # The stale minimum is held at the full authored count (3): a single
 # stale case cannot evidence the staleness judgement on its own.
+# The per-kind minimum keeps every task kind evidenced: a corpus
+# covering only some kinds must not pass a gate whose kinds_complete
+# check only inspects the coordinator's KINDS table.
 MIN_TOTAL_CASES = 9
 MIN_SCHEMA_CASES = 8
 MIN_FABRICATED_QUOTES = 4
 MIN_STALE_CASES = 3
+MIN_PER_KIND = 3
 
 
 class SetupFailure(Exception):
@@ -139,23 +143,28 @@ def _run_case(subagents, case):
     if case.get("transcript"):
         state.transcript = [dict(turn) for turn in case["transcript"]]
 
-    on_first_call = None
     mutation = case.get("mutate_during_run")
-    if mutation:
 
-        def on_first_call(state=state, mutation=mutation):
-            state.record(
-                Fact(
-                    key=mutation["key"],
-                    value=mutation["value"],
-                    assertion=Assertion(mutation["assertion"]),
-                    source=Source.PATIENT,
-                    turn_id="eval-stale",
-                    evidence=mutation["evidence"],
+    def fresh_backend(target_state):
+        """A scripted backend whose staleness hook mutates target_state."""
+        on_first_call = None
+        if mutation:
+
+            def on_first_call(target_state=target_state, mutation=mutation):
+                target_state.record(
+                    Fact(
+                        key=mutation["key"],
+                        value=mutation["value"],
+                        assertion=Assertion(mutation["assertion"]),
+                        source=Source.PATIENT,
+                        turn_id="eval-stale",
+                        evidence=mutation["evidence"],
+                    )
                 )
-            )
 
-    backend = ScriptedBackend(case["stub_script"], on_first_call=on_first_call)
+        return ScriptedBackend(case["stub_script"], on_first_call=on_first_call)
+
+    backend = fresh_backend(state)
     coordinator = subagents.SubagentCoordinator(
         EventStore(), backend, mode="advisory"
     )
@@ -231,6 +240,44 @@ def _run_case(subagents, case):
         if disposition_check == "mismatched":
             failures.append(f"disposition {disposition} outside expected set")
 
+    if kind == "followup_batch":
+        # run_spawn above exercises the shared validation pipeline, but
+        # the production entry for this kind is run_followup_batch: it
+        # builds the proposal itself (plan/conclusion view extras) and
+        # returns validated drafts only. Re-run on a fresh state with an
+        # identical scripted backend so the staleness hook, if any,
+        # fires the same way, and assert on the draft output itself.
+        fb_state, _fb_summary = build_state(case)
+        fb_coordinator = subagents.SubagentCoordinator(
+            EventStore(), fresh_backend(fb_state), mode="advisory"
+        )
+        item = {
+            "session_id": fb_state.session_id,
+            "title": case.get("followup_title", ""),
+            "plan": case.get("followup_plan"),
+        }
+        drafts = fb_coordinator.run_followup_batch(
+            [item], {fb_state.session_id: fb_state}
+        )
+        draft_produced = len(drafts) == 1
+        if "draft_produced" in expected and draft_produced != bool(
+            expected["draft_produced"]
+        ):
+            failures.append(
+                f"draft_produced {draft_produced} != {expected['draft_produced']}"
+            )
+        elif draft_produced:
+            if (
+                expected.get("draft_message") is not None
+                and drafts[0].get("draft_message") != expected["draft_message"]
+            ):
+                failures.append("draft_message mismatch")
+            if (
+                expected.get("draft_priority") is not None
+                and drafts[0].get("priority") != expected["draft_priority"]
+            ):
+                failures.append("draft_priority mismatch")
+
     expected_calls = case.get("expected_backend_calls", 1)
     return {
         "id": case.get("id"),
@@ -305,6 +352,13 @@ def score_corpus(corpus) -> dict:
             stale_false_positives += 1
     report["cases"] = len(report["results"])
     report["passed"] = sum(1 for item in report["results"] if item["ok"])
+    kind_counts = {
+        kind: sum(
+            1 for item in report["results"] if item.get("task_kind") == kind
+        )
+        for kind in sorted(EXPECTED_KINDS)
+    }
+    report["cases_per_kind"] = kind_counts
 
     schema_rate = schema_passed / schema_cases if schema_cases else 1.0
     fabricated_drop_rate = (
@@ -325,6 +379,12 @@ def score_corpus(corpus) -> dict:
     )
     report["gates"] = {
         "kinds_complete": kinds_ok,
+        # Every case must also meet its own expected block (status,
+        # surviving/dropped counts, digest quotes, draft production):
+        # the aggregate rates alone would let an expectation regression
+        # pass silently whenever it moves no rate.
+        "all_cases_pass": report["cases"] > 0
+        and report["passed"] == report["cases"],
         "schema_first_pass_rate==1.0": schema_rate == 1.0,
         "unverified_quote_leaks==0": total_leaks == 0,
         "fabricated_quote_drop_rate==1.0": fabricated_drop_rate == 1.0,
@@ -333,6 +393,9 @@ def score_corpus(corpus) -> dict:
         "corpus_min_schema_cases": schema_cases >= MIN_SCHEMA_CASES,
         "corpus_min_fabricated_quotes": fabricated_total >= MIN_FABRICATED_QUOTES,
         "corpus_min_stale_cases": stale_total >= MIN_STALE_CASES,
+        "corpus_min_per_kind": all(
+            count >= MIN_PER_KIND for count in kind_counts.values()
+        ),
     }
     report["gate_pass"] = all(report["gates"].values())
     return report

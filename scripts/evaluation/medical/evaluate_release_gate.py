@@ -263,6 +263,7 @@ def check_subagents(fixtures: Path) -> bool:
         f"unverified_leaks={report['unverified_quote_leaks']} "
         f"fabricated_dropped={report['fabricated_quote_drop_rate']:.3f} "
         f"stale={report['stale_correct']}/{report['stale_cases']} "
+        f"kinds={report.get('cases_per_kind')} "
         f"-> {'PASS' if ok else 'FAIL'}"
     )
     return ok
