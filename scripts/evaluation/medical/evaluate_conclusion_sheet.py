@@ -13,6 +13,11 @@ Usage:
 
 Exit code 0 iff every hard gate passes (design §8.2): disposition
 agreement >= 95%, must-not-miss recall == 100%, harmful content == 0.
+P1 (阿福对标 §3.1/§3.4) adds per-case narrative assertions — every
+sheet carries a narrative whose framing/severity are non-empty and
+whose text is free of the composer's BANNED_PHRASES — and optional
+per-case expected_department assertions on the department mapping
+itself (department_visible is a display gate, not evaluated here).
 """
 from __future__ import annotations
 
@@ -25,7 +30,7 @@ import argparse
 import json
 from pathlib import Path
 
-from medagent.conclusion import RETURN_NOW_IF, compose_conclusion
+from medagent.conclusion import BANNED_PHRASES, RETURN_NOW_IF, compose_conclusion
 from medagent.domain import (
     Assertion,
     CaseState,
@@ -118,6 +123,46 @@ def score_case(case, sheet):
         failures.append(
             f"return_now_if {sheet.get('return_now_if')} != {list(expected_rni)}"
         )
+    # Narrative (P1 §3.1): present on every sheet; framing/severity
+    # non-empty strings, reasoning a string or None; the narrative text
+    # must stay free of the composer's banned phrases (BANNED_PHRASES is
+    # imported from medagent.conclusion — the source table the composer
+    # lint itself uses, not a mirror).
+    narrative = sheet.get("narrative")
+    if not isinstance(narrative, dict):
+        failures.append("narrative missing")
+    else:
+        framing = narrative.get("framing")
+        reasoning = narrative.get("reasoning")
+        severity = narrative.get("severity")
+        if not (isinstance(framing, str) and framing.strip()):
+            failures.append("narrative framing empty")
+        if not (isinstance(severity, str) and severity.strip()):
+            failures.append("narrative severity empty")
+        if reasoning is not None and not isinstance(reasoning, str):
+            failures.append("narrative reasoning not a string")
+        narrative_text = "\n".join(
+            part
+            for part in (framing, reasoning, severity)
+            if isinstance(part, str)
+        )
+        for phrase in BANNED_PHRASES:
+            if phrase in narrative_text:
+                failures.append(f"forbidden content in narrative: {phrase}")
+    # Department mapping (P1 §3.4): a case may pin expected_department
+    # (a department name, or null when the mapping must yield no hint).
+    # The assertion is on the mapping itself; department_visible (the
+    # shadow display gate) does not change the evaluated value.
+    if "expected_department" in case:
+        expected_dept = case["expected_department"]
+        hint = sheet.get("disposition", {}).get("department_hint")
+        if expected_dept is None:
+            if hint is not None:
+                failures.append(f"department_hint {hint!r} expected None")
+        elif not isinstance(hint, dict) or hint.get("department") != expected_dept:
+            failures.append(
+                f"department {hint!r} != expected {expected_dept!r}"
+            )
     rendered = json.dumps(sheet, ensure_ascii=False)
     for phrase in case.get("forbidden", []):
         if phrase in rendered:
@@ -139,10 +184,13 @@ def main() -> int:
     must_not_miss_total = 0
     must_not_miss_hits = 0
     harmful = 0
+    department_total = 0
     for case in corpus["cases"]:
         state, summary = build_state(case)
         sheet = compose_conclusion(state, summary=summary)
         failures = score_case(case, sheet)
+        if "expected_department" in case:
+            department_total += 1
         shown = [d["hypothesis_id"] for d in (sheet or {}).get("directions", [])]
         level = (sheet or {}).get("disposition", {}).get("level")
         if level in case["expected_disposition"]:
@@ -179,6 +227,16 @@ def main() -> int:
             for result in results
             for failure in result["failures"]
         ),
+        "narrative_complete": not any(
+            failure.startswith("narrative")
+            for result in results
+            for failure in result["failures"]
+        ),
+        "department_expectations_met": not any(
+            failure.startswith("department")
+            for result in results
+            for failure in result["failures"]
+        ),
     }
     report = {
         "corpus": corpus["corpus"],
@@ -189,6 +247,7 @@ def main() -> int:
         "disposition_agreement": round(disposition_rate, 3),
         "must_not_miss_recall": round(mnm_rate, 3),
         "harmful_cases": harmful,
+        "department_expectations": department_total,
         "gates": gates,
         "gate_pass": all(gates.values()),
         "results": results,

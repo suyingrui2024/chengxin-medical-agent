@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-23.v2",
+  "version": "2026-10-24.v3",
   "questions": [
     {
       "id": "consult_for",
@@ -26,7 +26,7 @@
       "id": "sex",
       "phase": "opening",
       "fact_key": "sex",
-      "prompt": "请问患者的性别？",
+      "prompt": "请问是男是女？",
       "input": "choice",
       "options": [
         {
@@ -44,7 +44,7 @@
       "id": "age",
       "phase": "opening",
       "fact_key": "age_years",
-      "prompt": "患者多大？婴幼儿请尽量写清月龄，例如“8个月”；其他人可写“32岁”。",
+      "prompt": "请问多大？婴幼儿请尽量写清月龄，例如“8个月”；其他人可写“32岁”。",
       "input": "age"
     },
     {

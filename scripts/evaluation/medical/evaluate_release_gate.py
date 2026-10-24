@@ -141,8 +141,25 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
         f"{corpus.get('review_status', 'unknown')} "
         "(engineering gate only — not a clinical sign-off)"
     )
+    # Course coverage (P1 §3.3): every self-care group must carry a
+    # non-empty course text, or the conclusion sheet's outlook section
+    # silently disappears for that pathway. 100% coverage or FAIL,
+    # naming the groups that are missing text.
+    self_care_groups = self_care.get("groups", [])
+    missing_course = [
+        group.get("id")
+        for group in self_care_groups
+        if not str(group.get("course") or "").strip()
+    ]
+    course_ok = not missing_course
+    if not course_ok:
+        print(
+            "self_care.json: course empty for groups "
+            f"{missing_course} -> FAIL"
+        )
     total = disposition_hits = mnm_total = mnm_hits = harmful = 0
     rni_total = rni_hits = 0
+    narrative_failures = department_failures = 0
     for case in corpus["cases"]:
         state, summary = build_state(case)
         sheet = compose_conclusion(state, summary=summary)
@@ -159,6 +176,10 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
                 mnm_hits += 1
         if any(f.startswith("forbidden") for f in failures):
             harmful += 1
+        if any(f.startswith("narrative") for f in failures):
+            narrative_failures += 1
+        if any(f.startswith("department") for f in failures):
+            department_failures += 1
         expected_rni = case.get("expected_return_now_if")
         if expected_rni is not None:
             rni_total += 1
@@ -173,12 +194,25 @@ def check_conclusion_sheet(fixtures: Path) -> bool:
     rni_ok = (
         rni_total >= MIN_RETURN_NOW_IF_EXPECTATIONS and rni_hits == rni_total
     )
-    ok = agreement >= 0.95 and recall == 1.0 and harmful == 0 and size_ok and rni_ok
+    ok = (
+        agreement >= 0.95
+        and recall == 1.0
+        and harmful == 0
+        and size_ok
+        and rni_ok
+        and course_ok
+        and narrative_failures == 0
+        and department_failures == 0
+    )
     print(
         f"conclusion_cases_v0.json: disposition={agreement:.3f} "
         f"must_not_miss={recall:.3f} harmful={harmful} "
         f"cases={total} (min {MIN_CASES}) mnm={mnm_total} (min {MIN_MUST_NOT_MISS}) "
         f"return_now_if={rni_hits}/{rni_total} "
+        f"course_coverage={len(self_care_groups) - len(missing_course)}/"
+        f"{len(self_care_groups)} "
+        f"narrative_failures={narrative_failures} "
+        f"department_failures={department_failures} "
         f"-> {'PASS' if ok else 'FAIL'}"
     )
     return ok
