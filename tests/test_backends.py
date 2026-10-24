@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import patch
 
 from medagent.backends import (
+    BRIDGE_STDOUT_LIMIT_CHARS,
     CompatibleBackend,
     DshBackend,
     dsh_usage,
@@ -573,6 +574,203 @@ class DshEnvelopeGuardTests(unittest.TestCase):
         self.assertEqual(len(dropped), 1)
 
 
+class DshBridgeTransportP2Tests(unittest.TestCase):
+    """P2-F-D2/D3/D4: bridge child env whitelist, stderr diagnostic
+    retention, and bridge stdout cap.
+
+    D2: the bridge child must not inherit the whole parent env.
+    D3: a bridge failure must surface the bridge's safe diagnostic
+    (class + code) in the error, and must never surface stderr lines
+    that do not match the bridge's safe format. D4: bridge stdout
+    over the Compatible route's 256000 limit fails closed.
+    """
+
+    COMMAND = {"tool": "ask_question", "arguments": {"question_id": "onset"}}
+    ALLOWED_ENV_KEYS = {
+        "PATH",
+        "SystemRoot",
+        "WINDIR",
+        "LANG",
+        "MEDAGENT_LLM_BASE_URL",
+        "MEDAGENT_LLM_API_KEY",
+        "MEDAGENT_LLM_MODEL",
+        "TMPDIR",
+        "TMP",
+        "TEMP",
+    }
+
+    class _FakeChild:
+        def __init__(self, stdout, returncode=0, stderr=""):
+            self._stdout = stdout
+            self._stderr = stderr
+            self.returncode = returncode
+
+        def communicate(self, data=None, timeout=None):
+            return (self._stdout, self._stderr)
+
+    def _backend(self, events, tmp):
+        from pathlib import Path
+
+        root = Path(tmp)
+        (root / "integrations" / "dsh").mkdir(parents=True)
+        (root / "integrations" / "dsh" / "bridge.mjs").write_text("")
+        pkg = root / "node_modules" / "@deepseek-ai" / "dsh-sdk-client"
+        pkg.mkdir(parents=True)
+        (pkg / "package.json").write_text("{}")
+        return DshBackend(
+            events,
+            root,
+            config={
+                "MEDAGENT_LLM_BASE_URL": "https://api.deepseek.com/anthropic",
+                "MEDAGENT_LLM_API_KEY": "secret-test-value",
+                "MEDAGENT_LLM_MODEL": "deepseek-flash",
+            },
+        )
+
+    def _valid_stdout(self):
+        return json.dumps(
+            {"final_response": json.dumps(self.COMMAND), "events": []}
+        )
+
+    def _run_bridge(self, backend, child, extra_env=None):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as scratch, patch(
+            "medagent.processes.popen",
+            return_value=child,
+        ), patch("medagent.processes.release", return_value=None), patch.dict(
+            os.environ, extra_env or {}
+        ):
+            return backend._bridge_decision("s", [], None, 0.0, scratch)
+
+    def _run_capture_env(self, backend, child):
+        import tempfile
+
+        captured = {}
+
+        def fake_popen(*args, **kwargs):
+            captured.update(kwargs)
+            return child
+
+        with tempfile.TemporaryDirectory() as scratch, patch(
+            "medagent.processes.popen", side_effect=fake_popen
+        ), patch("medagent.processes.release", return_value=None), patch.dict(
+            os.environ, {"UNRELATED_SECRET_TEST": "must-not-inherit"}
+        ):
+            result = backend._bridge_decision("s", [], None, 0.0, scratch)
+        return result, captured.get("env", {}), scratch
+
+    def test_bridge_child_env_is_whitelisted(self):
+        import tempfile
+
+        events = EventStore()
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = self._backend(events, tmp)
+            result, env, scratch = self._run_capture_env(
+                backend, self._FakeChild(self._valid_stdout())
+            )
+            self.assertEqual(result, self.COMMAND)
+            self.assertTrue(
+                set(env) <= self.ALLOWED_ENV_KEYS, f"unexpected env keys: {set(env)}"
+            )
+            self.assertNotIn("UNRELATED_SECRET_TEST", env)
+            self.assertEqual(
+                env["MEDAGENT_LLM_API_KEY"], "secret-test-value"
+            )
+            self.assertEqual(env["TMPDIR"], scratch)
+            self.assertEqual(env["TMP"], scratch)
+            self.assertEqual(env["TEMP"], scratch)
+            self.assertEqual(env["PATH"], os.environ["PATH"])
+
+    def test_missing_path_refuses_to_spawn(self):
+        import tempfile
+
+        events = EventStore()
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = self._backend(events, tmp)
+            with tempfile.TemporaryDirectory() as scratch, patch.dict(
+                os.environ, {}, clear=True
+            ), patch("medagent.processes.popen") as popen, patch(
+                "medagent.processes.release", return_value=None
+            ):
+                with self.assertRaisesRegex(
+                    RuntimeError, "DSH bridge requires PATH"
+                ):
+                    backend._bridge_decision(
+                        "s", [], None, 0.0, scratch
+                    )
+                popen.assert_not_called()
+
+    def test_bridge_failure_keeps_safe_diagnostic(self):
+        import tempfile
+
+        events = EventStore()
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = self._backend(events, tmp)
+            child = self._FakeChild(
+                "",
+                returncode=1,
+                stderr="DSH bridge failed (SyntaxError: DSH_INVALID_JSON)\n",
+            )
+            with self.assertRaisesRegex(
+                RuntimeError, "bridge diagnostic: SyntaxError: DSH_INVALID_JSON"
+            ):
+                self._run_bridge(backend, child)
+            with self.assertRaisesRegex(
+                RuntimeError, "run npm run dsh:check"
+            ):
+                self._run_bridge(backend, child)
+
+    def test_bridge_failure_never_echoes_unshaped_stderr(self):
+        import tempfile
+
+        events = EventStore()
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = self._backend(events, tmp)
+            child = self._FakeChild(
+                "",
+                returncode=1,
+                stderr="leaked patient words here\nsecond line secret\n",
+            )
+            with self.assertRaises(RuntimeError) as ctx:
+                self._run_bridge(backend, child)
+            self.assertNotIn("leaked patient words", str(ctx.exception))
+            self.assertNotIn("second line secret", str(ctx.exception))
+            self.assertIn("not in expected format", str(ctx.exception))
+            child = self._FakeChild(
+                "",
+                returncode=1,
+                stderr="DSH bridge failed (Error)\nSECRET-SECOND-LINE\n",
+            )
+            with self.assertRaises(RuntimeError) as ctx:
+                self._run_bridge(backend, child)
+            self.assertIn("bridge diagnostic: Error", str(ctx.exception))
+            self.assertNotIn("SECRET-SECOND-LINE", str(ctx.exception))
+
+    def test_bridge_failure_without_stderr_stays_generic(self):
+        import tempfile
+
+        events = EventStore()
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = self._backend(events, tmp)
+            with self.assertRaisesRegex(
+                RuntimeError, r"DSH failed; run npm run dsh:check"
+            ):
+                self._run_bridge(
+                    backend, self._FakeChild("", returncode=1, stderr="")
+                )
+
+    def test_bridge_stdout_over_limit_fails_closed(self):
+        import tempfile
+
+        events = EventStore()
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = self._backend(events, tmp)
+            oversize = " " * (BRIDGE_STDOUT_LIMIT_CHARS + 1)
+            with self.assertRaisesRegex(ValueError, "exceeds 256000"):
+                self._run_bridge(backend, self._FakeChild(oversize))
+
+
 class TransportSecurityTests(unittest.TestCase):
     """P0-E-D1 (no redirect may carry the Bearer key) and P1-E-D2
     (no plaintext non-loopback endpoint). Redirect tests run against
@@ -789,4 +987,198 @@ class TransportSecurityTests(unittest.TestCase):
         build_runtime(
             backend="compatible",
             config={**config, "MEDAGENT_LLM_BASE_URL": "http://127.0.0.1:9/v1"},
+        )
+
+
+class CompatibleP2FixTests(unittest.TestCase):
+    """E-point P2 (healthcheck §3 E, 6 items). Item 5 needs no new
+    test: P0's TransportSecurityTests.test_redirect_never_followed_
+    and_key_never_leaves_origin already loops 301/302/303/307/308
+    against real servers; it is run with this file."""
+
+    def _backend(self, events, base_url="https://fixture.invalid/v1", **extra):
+        config = {
+            "MEDAGENT_LLM_BASE_URL": base_url,
+            "MEDAGENT_LLM_API_KEY": "secret-test-value",
+            "MEDAGENT_LLM_MODEL": "fixture",
+            "MEDAGENT_LLM_RETRY_BACKOFF_SECONDS": "0",
+        }
+        config.update(extra)
+        return CompatibleBackend(events, config)
+
+    def _event_types(self, events):
+        return [e.event_type for e in events.for_session("s")]
+
+    # -- E-P2-1: malformed envelope -> ValueError only, no responded --
+    @patch("medagent.backends._open_request")
+    def test_malformed_envelope_raises_value_error_only(self, urlopen):
+        command = {"tool": "inspect_case", "arguments": {}}
+        good = {"choices": [{"message": {"content": json.dumps(command)}}]}
+        cases = {
+            "top_level_list": [good],
+            "top_level_string": "oops",
+            "choices_missing": {"model": "fixture"},
+            "choices_empty": {"choices": []},
+            "choice_not_object": {"choices": ["x"]},
+            "message_missing": {"choices": [{}]},
+            "message_not_object": {"choices": [{"message": "x"}]},
+            "content_not_string": {"choices": [{"message": {"content": 42}}]},
+            "usage_not_object": {
+                "choices": [{"message": {"content": json.dumps(command)}}],
+                "usage": "oops",
+            },
+        }
+        for name, body in cases.items():
+            with self.subTest(name=name):
+                urlopen.return_value = Response(body)
+                events = EventStore()
+                backend = self._backend(events)
+                with self.assertRaises(ValueError):
+                    backend.decide("s", [])
+                self.assertEqual(urlopen.call_count, 1)
+                self.assertEqual(self._event_types(events), ["model.requested"])
+                urlopen.reset_mock()
+
+    # -- E-P2-2: total-length rejection (not a read window) --
+    def test_response_over_limit_rejected_even_when_prefix_parses(self):
+        class SizedResponse:
+            """read(n) honours n, like a real HTTPResponse."""
+
+            def __init__(self, body):
+                self.body = body
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self, n=None):
+                return self.body if n is None else self.body[:n]
+
+        command = {"tool": "inspect_case", "arguments": {}}
+        envelope = json.dumps(
+            {"choices": [{"message": {"content": json.dumps(command)}}]}
+        ).encode()
+        # Valid JSON plus trailing whitespace, padded past the limit:
+        # under the old read-window semantics this parsed and
+        # succeeded; under total-length rejection it must fail.
+        over = envelope + b" " * (256001 - len(envelope))
+        self.assertEqual(len(over), 256001)
+        exact = envelope + b" " * (256000 - len(envelope))
+        self.assertEqual(len(exact), 256000)
+        with patch("medagent.backends._open_request") as urlopen:
+            urlopen.return_value = SizedResponse(over)
+            events = EventStore()
+            backend = self._backend(events)
+            with self.assertRaisesRegex(ValueError, "exceeds 256000 bytes"):
+                backend.decide("s", [])
+            self.assertEqual(urlopen.call_count, 1)
+            self.assertEqual(self._event_types(events), ["model.requested"])
+        with patch("medagent.backends._open_request") as urlopen:
+            urlopen.return_value = SizedResponse(exact)
+            backend = self._backend(EventStore())
+            self.assertEqual(backend.decide("s", []), command)
+
+    # -- E-P2-3: non-deepseek thinking/effort drop is logged, not silent --
+    def test_non_deepseek_thinking_drop_logged_and_not_sent(self):
+        command = {"tool": "inspect_case", "arguments": {}}
+        with patch("medagent.backends._open_request") as urlopen:
+            urlopen.return_value = Response(
+                {"choices": [{"message": {"content": json.dumps(command)}}]}
+            )
+            with self.assertLogs("medagent.backends", level="WARNING") as logs:
+                events = EventStore()
+                backend = self._backend(
+                    events,
+                    MEDAGENT_LLM_THINKING="enabled",
+                    MEDAGENT_LLM_REASONING_EFFORT="high",
+                )
+            self.assertTrue(
+                any("not sent" in line for line in logs.output),
+                logs.output,
+            )
+            backend.decide("s", [])
+            payload = json.loads(urlopen.call_args.args[0].data)
+            self.assertNotIn("thinking", payload)
+            self.assertNotIn("reasoning_effort", payload)
+
+    def test_non_deepseek_effort_only_drop_logged(self):
+        with self.assertLogs("medagent.backends", level="WARNING"):
+            self._backend(EventStore(), MEDAGENT_LLM_REASONING_EFFORT="high")
+
+    def test_deepseek_thinking_drop_not_logged(self):
+        with self.assertNoLogs("medagent.backends", level="WARNING"):
+            self._backend(
+                EventStore(),
+                base_url="https://api.deepseek.com",
+                MEDAGENT_LLM_THINKING="enabled",
+                MEDAGENT_LLM_REASONING_EFFORT="high",
+            )
+
+    # -- E-P2-4: responded only after parse_decision passes --
+    @patch("medagent.backends._open_request")
+    def test_invalid_decision_records_no_responded(self, urlopen):
+        bad = {"tool": "ask_question", "arguments": {}, "extra": 1}
+        urlopen.return_value = Response(
+            {"choices": [{"message": {"content": json.dumps(bad)}}]}
+        )
+        events = EventStore()
+        backend = self._backend(events)
+        with self.assertRaises(ValueError):
+            backend.decide("s", [])
+        self.assertEqual(self._event_types(events), ["model.requested"])
+
+    @patch("medagent.backends._open_request")
+    def test_empty_content_twice_records_no_responded(self, urlopen):
+        urlopen.side_effect = [
+            Response({"choices": [{"message": {"content": ""}}]}),
+            Response({"choices": [{"message": {"content": "  "}}]}),
+        ]
+        events = EventStore()
+        backend = self._backend(events)
+        with self.assertRaises(ValueError):
+            backend.decide("s", [])
+        self.assertEqual(
+            self._event_types(events), ["model.requested", "model.retry"]
+        )
+
+    # -- E-P2-6: base_url query/userinfo rejected, loopback unaffected --
+    def test_base_url_query_and_userinfo_rejected(self):
+        for url in (
+            "https://provider.invalid/v1?next=/elsewhere",
+            "https://provider.invalid/v1?",
+            "https://user:secret@provider.invalid/v1",
+            "https://user@provider.invalid/v1",
+            "http://127.0.0.1:9/v1?debug=1",
+            "http://user@127.0.0.1:9/v1",
+        ):
+            with self.subTest(url=url):
+                with self.assertRaisesRegex(
+                    ValueError, "query string or embedded credentials"
+                ):
+                    self._backend(EventStore(), base_url=url)
+
+    def test_build_runtime_rejects_query_and_userinfo_up_front(self):
+        base = {
+            "MEDAGENT_LLM_API_KEY": "secret-test-value",
+            "MEDAGENT_LLM_MODEL": "fixture",
+        }
+        for url in (
+            "https://provider.invalid/v1?x=1",
+            "https://user@provider.invalid/v1",
+        ):
+            with self.subTest(url=url):
+                with self.assertRaises(ValueError):
+                    build_runtime(
+                        backend="compatible", config={**base, "MEDAGENT_LLM_BASE_URL": url}
+                    )
+        # Clean loopback / https endpoints still build.
+        build_runtime(
+            backend="compatible",
+            config={**base, "MEDAGENT_LLM_BASE_URL": "http://127.0.0.1:9/v1"},
+        )
+        build_runtime(
+            backend="compatible",
+            config={**base, "MEDAGENT_LLM_BASE_URL": "https://provider.invalid/v1"},
         )

@@ -939,5 +939,235 @@ class HealthcheckBRouteTests(unittest.TestCase):
         )
 
 
+class HealthcheckP2BTests(unittest.TestCase):
+    """Pins for the 2026-10-24 API-healthcheck B-route P2 items (D-07..D-10).
+
+    D-07 was already fixed in the P0 batch (extras merge followed by a
+    blinding re-assert in _build_view); what was missing was a test
+    driving extras into a second_opinion view, which is added here.
+    D-08..D-10 are fixed in this batch; each test pins both the bad
+    input blocked AND the legitimate input still working.
+    """
+
+    def test_second_opinion_extras_cannot_reinject_blinded_keys(self):
+        events = EventStore()
+        coord = coordinator(StubBackend(lambda sid, m, c: report()), events)
+        state = make_state()
+        workspace = ReasoningWorkspace.from_dict(state.reasoning)
+        extras = {
+            "phase": "closing",
+            "risk_level": "emergency",
+            "conclusion": {"disposition": "emergency"},
+            "objective": "主流程倾向急诊，请确认是否急诊",
+            "prior_case": {
+                "chief_complaint": "上次咳嗽",
+                "disposition_level": "emergency",
+                "disposition_text": "建议急诊",
+            },
+            "title": "良性附加",
+        }
+        view = coord._build_view(
+            state,
+            "second_opinion",
+            {"objective": "主流程倾向急诊，请确认是否急诊"},
+            "ref",
+            ["chief_complaint"],
+            [],
+            workspace,
+            "none",
+            False,
+            extras,
+        )
+        self.assertNotIn("objective", view)
+        self.assertNotIn("phase", view)
+        self.assertNotIn("risk_level", view)
+        self.assertNotIn("conclusion", view)
+        self.assertNotIn("disposition_level", view["prior_case"])
+        self.assertNotIn("disposition_text", view["prior_case"])
+        self.assertEqual(view["prior_case"]["chief_complaint"], "上次咳嗽")
+        self.assertNotIn("急诊", json.dumps(view, ensure_ascii=False))
+        # Benign extras still merge, and task info survives.
+        self.assertEqual(view["title"], "良性附加")
+        self.assertIn("chief_complaint", view["facts"])
+        # Control: the same extras merge freely for a non-blinded kind.
+        open_view = coord._build_view(
+            state,
+            "evidence_lookup",
+            {"objective": "核对证据"},
+            "ref",
+            ["chief_complaint"],
+            [],
+            workspace,
+            "none",
+            False,
+            extras,
+        )
+        self.assertEqual(open_view["phase"], "closing")
+        self.assertIn("conclusion", open_view)
+
+    def test_digest_confirmed_facts_filtered_by_branch_scope(self):
+        events = EventStore()
+
+        def handler(sid, messages, cancelled):
+            return report(
+                conclusion="",
+                findings=[],
+                digest={
+                    "timeline": [],
+                    "confirmed_facts": [
+                        {"key": "chief_complaint", "quote": CHIEF_EVIDENCE},
+                        {
+                            "key": "medications_taken",
+                            "quote": "吃过一片感冒药",
+                        },
+                    ],
+                    "contradictions": [],
+                    "prior_outcomes": [],
+                },
+            )
+
+        backend = StubBackend(handler)
+        state = make_state()
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(
+                kind="case_digest", scope={"fact_keys": ["chief_complaint"]}
+            ),
+            session_id=state.session_id,
+        )
+        branch = result["branches"][0]
+        self.assertEqual(
+            branch["digest"]["confirmed_facts"],
+            [{"key": "chief_complaint", "quote": CHIEF_EVIDENCE}],
+        )
+        # Reverse side: a digest whose only confirmed facts are
+        # out-of-scope yields no digest at all (not a pass).
+        events3 = EventStore()
+
+        def handler_out_only(sid, messages, cancelled):
+            return report(
+                conclusion="",
+                findings=[],
+                digest={
+                    "timeline": [],
+                    "confirmed_facts": [
+                        {"key": "medications_taken", "quote": "吃过一片感冒药"},
+                    ],
+                    "contradictions": [],
+                    "prior_outcomes": [],
+                },
+            )
+
+        backend3 = StubBackend(handler_out_only)
+        state3 = make_state()
+        result3 = coordinator(backend3, events3).run_spawn(
+            state3,
+            spawn_proposal(
+                kind="case_digest", scope={"fact_keys": ["chief_complaint"]}
+            ),
+            session_id=state3.session_id,
+        )
+        self.assertIsNone(result3["branches"][0]["digest"])
+
+    def test_quotes_verified_counts_only_surviving_claims(self):
+        events = EventStore()
+        backend = StubBackend(
+            lambda sid, messages, cancelled: report(
+                findings=[
+                    case_finding("患者确诊为上呼吸道感染", CHIEF_EVIDENCE),
+                    case_finding("咳嗽已持续三天", CHIEF_EVIDENCE),
+                ]
+            )
+        )
+        state = make_state()
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(scope={"fact_keys": ["chief_complaint"]}),
+            session_id=state.session_id,
+        )
+        branch = result["branches"][0]
+        self.assertEqual(branch["status"], "partial")
+        self.assertEqual(len(branch["findings"]), 1)
+        self.assertEqual(branch["validation"]["dropped_claims"], 1)
+        self.assertEqual(branch["validation"]["quotes_total"], 2)
+        # The banned claim's verified quote must not inflate the metric.
+        self.assertEqual(branch["validation"]["quotes_verified"], 1)
+
+    def test_token_fuse_fires_without_usage_events(self):
+        events = EventStore()
+        backend = StubBackend(
+            lambda sid, messages, cancelled: {
+                "tool": "knowledge_search",
+                "arguments": {"query": "上呼吸道感染"},
+            }
+        )
+        state = make_state()
+        proposal = spawn_proposal(
+            kind="second_opinion", scope={"fact_keys": ["chief_complaint"]}
+        )
+        proposal["budget"] = {"max_tokens": 10}
+        result = coordinator(backend, events).run_spawn(
+            state, proposal, session_id=state.session_id
+        )
+        branch = result["branches"][0]
+        self.assertEqual(branch["status"], "budget_exhausted")
+        # The fuse, not max_calls, stopped the run on the first call.
+        self.assertEqual(len(backend.calls), 1)
+        exceeded = [
+            e
+            for e in events.for_session(state.session_id)
+            if e.event_type == "budget.exceeded"
+            and e.payload.get("limit") == "max_tokens"
+        ]
+        self.assertEqual(len(exceeded), 1)
+        self.assertGreater(exceeded[0].payload["estimated_tokens"], 10)
+        self.assertGreater(branch["usage"]["estimated_tokens"], 10)
+
+    def test_token_fuse_keeps_event_path_when_metered(self):
+        events = EventStore()
+
+        def handler(sid, messages, cancelled):
+            events.append(
+                Event(
+                    sid,
+                    "model.responded",
+                    {
+                        "usage": {
+                            "prompt_tokens": 80,
+                            "completion_tokens": 20,
+                            "total_tokens": 100,
+                        }
+                    },
+                )
+            )
+            return {
+                "tool": "knowledge_search",
+                "arguments": {"query": "上呼吸道感染"},
+            }
+
+        backend = StubBackend(handler)
+        state = make_state()
+        result = coordinator(backend, events).run_spawn(
+            state,
+            spawn_proposal(
+                kind="second_opinion", scope={"fact_keys": ["chief_complaint"]}
+            ),
+            session_id=state.session_id,
+        )
+        branch = result["branches"][0]
+        self.assertEqual(branch["status"], "budget_exhausted")
+        # Metered runs still stop on max_calls, never on the estimate.
+        self.assertEqual(len(backend.calls), KINDS["second_opinion"]["max_calls"])
+        self.assertEqual(branch["usage"]["total_tokens"], 300)
+        self.assertNotIn("estimated_tokens", branch["usage"])
+        exceeded = [
+            e
+            for e in events.for_session(state.session_id)
+            if e.event_type == "budget.exceeded"
+            and e.payload.get("limit") == "max_tokens"
+        ]
+        self.assertEqual(exceeded, [])
+
+
 if __name__ == "__main__":
     unittest.main()

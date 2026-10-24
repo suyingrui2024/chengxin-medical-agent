@@ -160,6 +160,15 @@ def _conclusion_section(state: Any) -> dict[str, Any] | None:
     and the department hint on ``department_visible``; support quotes
     (patient verbatim evidence) are dropped -- the visit summary does
     not need them and they add nothing a doctor can act on.
+
+    Shape contract (P2-2): the ``directions`` key is always present in
+    this section; under shadow it is ``None``, never a leaked list and
+    never dropped. Consumers must judge by value (``is None`` /
+    falsiness -- ``handoff_lines`` uses ``.get("directions") or []`` and
+    the print module gates on ``directions_visible`` plus a null-tolerant
+    list coercion), never by key presence. Removing the key would break
+    the fixed v2 shape and the shadow test that pins ``directions is
+    None``; the ``None`` value itself is the gate working, not a leak.
     """
     sheet = getattr(state, "conclusion", None) or {}
     if not isinstance(sheet, dict) or not sheet:

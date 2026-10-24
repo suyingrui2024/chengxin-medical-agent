@@ -265,6 +265,29 @@ def _banned_hit(text: str) -> bool:
     return any(phrase in text for phrase in BANNED_PHRASES)
 
 
+def _estimate_roundtrip_tokens(messages: List[Dict[str, str]], raw_command: Any) -> int:
+    """Coarse token estimate for one backend round trip (P2-B-D10 fuse).
+
+    Roughly two characters per token for mixed Chinese/English text.
+    Deliberately coarse: this is a fuse for backends that emit no
+    ``model.responded`` usage events at all, not metering — it only
+    ever stands in for calls that produced no new usage event, so a
+    fully metered backend keeps exactly its event-driven behaviour.
+    """
+    prompt_chars = sum(
+        len(str(item.get("content", "")))
+        for item in messages
+        if isinstance(item, dict)
+    )
+    if isinstance(raw_command, str):
+        response_chars = len(raw_command)
+    elif isinstance(raw_command, dict):
+        response_chars = len(json.dumps(raw_command, ensure_ascii=False))
+    else:
+        response_chars = 0
+    return (prompt_chars + response_chars + 1) // 2
+
+
 class SubagentCoordinator:
     """Spawns, budgets and validates bounded subagent runs (design §5)."""
 
@@ -1034,6 +1057,16 @@ class SubagentCoordinator:
         settle: Optional[str] = None
         error_type: Optional[str] = None
         web_pool: Dict[str, str] = {}
+        # Token-fuse fallback (P2-B-D10): _usage_for only sees
+        # model.responded events, so a backend that never emits them
+        # would leave max_tokens unmetered. Estimates are accumulated
+        # only for calls that produced no new usage event (see the
+        # fuse check below); metered calls contribute nothing, so the
+        # event path is unchanged.
+        fallback_tokens = 0
+        metered_calls_seen = 0
+        last_call_estimate = 0
+        fallback_tripped_tokens: Optional[int] = None
         # Excerpts this branch was actually fed: the initial view's
         # content_excerpts plus every knowledge_search result returned
         # during the run. Knowledge quotes verify against this set only
@@ -1055,7 +1088,7 @@ class SubagentCoordinator:
                         break
                     steps += 1
                     try:
-                        command = self.backend.decide_cancellable(
+                        raw_command = self.backend.decide_cancellable(
                             sub_session, messages, cancel
                         )
                     except DecisionInterrupted:
@@ -1065,7 +1098,10 @@ class SubagentCoordinator:
                         settle = "failed"
                         error_type = type(exc).__name__
                         break
-                    command = self._normalize_command(command)
+                    last_call_estimate = _estimate_roundtrip_tokens(
+                        messages, raw_command
+                    )
+                    command = self._normalize_command(raw_command)
                     if command is None:
                         self._feed(
                             messages,
@@ -1124,20 +1160,30 @@ class SubagentCoordinator:
                     )
                     self._feed(messages, command, outcome)
                     usage = self._usage_for(sub_session, started)
-                    if usage["total_tokens"] > int(budget["max_tokens"]):
+                    if usage["model_calls"] == metered_calls_seen:
+                        # No new usage event for this call: without the
+                        # estimate its tokens would be invisible to the
+                        # fuse (P2-B-D10). Metered calls add nothing.
+                        fallback_tokens += last_call_estimate
+                    metered_calls_seen = usage["model_calls"]
+                    if (
+                        usage["total_tokens"] + fallback_tokens
+                        > int(budget["max_tokens"])
+                    ):
                         settle = "budget_exhausted"
+                        if fallback_tokens:
+                            fallback_tripped_tokens = fallback_tokens
+                        payload: Dict[str, Any] = {
+                            "spawn_id": spawn_id,
+                            "branch_id": branch["branch_id"],
+                            "task_kind": kind,
+                            "limit": "max_tokens",
+                            "max_tokens": budget["max_tokens"],
+                        }
+                        if fallback_tokens:
+                            payload["estimated_tokens"] = fallback_tokens
                         self.events.append(
-                            Event(
-                                session_id,
-                                "budget.exceeded",
-                                {
-                                    "spawn_id": spawn_id,
-                                    "branch_id": branch["branch_id"],
-                                    "task_kind": kind,
-                                    "limit": "max_tokens",
-                                    "max_tokens": budget["max_tokens"],
-                                },
-                            )
+                            Event(session_id, "budget.exceeded", payload)
                         )
                         break
                 else:
@@ -1159,6 +1205,10 @@ class SubagentCoordinator:
             done.set()
             watcher.join(timeout=1)
         usage = self._usage_for(sub_session, started)
+        if fallback_tripped_tokens is not None:
+            # Event-based totals stay authoritative (0 here); the fuse
+            # fired on the estimate, so record it alongside, not instead.
+            usage = {**usage, "estimated_tokens": fallback_tripped_tokens}
         if settle == "cancelled":
             self.events.append(
                 Event(
@@ -1415,13 +1465,16 @@ class SubagentCoordinator:
                 continue
             quotes_total += len(evidence)
             verified_here = sum(1 for item in evidence if evidence_ok(item))
-            quotes_verified += verified_here
             if _banned_hit(claim) or _DISPOSITION_PATTERN.search(claim):
                 dropped += 1
                 continue
             if verified_here != len(evidence):
                 dropped += 1
                 continue
+            # Only surviving claims contribute to quotes_verified: a
+            # dropped claim's verified quotes previously inflated the
+            # metric (P2-B-D09) even though its evidence never survives.
+            quotes_verified += verified_here
             kept.append(
                 {
                     "claim": claim,
@@ -1497,7 +1550,11 @@ class SubagentCoordinator:
         result["sources"] = sources
 
         if kind == "case_digest":
-            result["digest"] = self._validate_digest(state, report.get("digest"))
+            result["digest"] = self._validate_digest(
+                state,
+                report.get("digest"),
+                scope_keys=set(branch["scope_summary"]["fact_keys"]),
+            )
             if status is None:
                 status = (
                     "completed"
@@ -1534,7 +1591,12 @@ class SubagentCoordinator:
         )
         return result
 
-    def _validate_digest(self, state: CaseState, digest: Any) -> Optional[Dict[str, Any]]:
+    def _validate_digest(
+        self,
+        state: CaseState,
+        digest: Any,
+        scope_keys: Optional[set] = None,
+    ) -> Optional[Dict[str, Any]]:
         if not isinstance(digest, dict):
             return None
 
@@ -1600,6 +1662,12 @@ class SubagentCoordinator:
                 quote = item.get("quote")
                 fact = state.facts.get(key) if isinstance(key, str) else None
                 if fact is None or not isinstance(quote, str) or not quote:
+                    continue
+                if scope_keys is not None and key not in scope_keys:
+                    # Branch scope is the task boundary (P2-B-D08): an
+                    # out-of-scope fact, however well quoted, must not
+                    # enter the digest — it is skipped outright, so it
+                    # counts neither as a pass nor as a failure.
                     continue
                 pool = [part for part in (fact.evidence or "",) if part]
                 if fact.value is not None:

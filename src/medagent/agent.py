@@ -750,6 +750,14 @@ class AdaptiveConsultationEngine(ConsultationEngine):
           on a fact other than the chief complaint itself (this is the
           only signal for pathways with no dedicated detail field, e.g.
           chest, and a backstop for evidence gathered via other fields).
+
+        Testability note (healthcheck P2-A-D5): the chest gate is
+        submit-unreachable by design — a chest complaint is intercepted
+        by the emergency triage in _submit before _run ever sees it, and
+        that precedence must not be weakened. Its gate behaviour is
+        therefore verified by calling _execute(review_summary) directly
+        on a constructed state (see test_pathway_close_gate.py), never
+        by routing a chest complaint through submit().
         """
         chief = str(state.get("chief_complaint", ""))
         if not chief:

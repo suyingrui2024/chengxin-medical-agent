@@ -23,6 +23,22 @@ def repeat_intent(task, text):
 
 
 class ObservationMixin:
+    def _has_model_backend(self):
+        """True only for the adaptive engine type, never for a bare attribute.
+
+        The deterministic engine never carries a backend (its __init__ takes
+        none; only AdaptiveConsultationEngine sets one). The old
+        ``hasattr(self, "backend")`` switch let a stray ``engine.backend =
+        ...`` setattr on a deterministic engine silently divert it into the
+        model-backed branches below (task-conversation suspend, supplement
+        re-request). Judging by class makes "deterministic engine takes no
+        model path" structural instead of conventional. The import is lazy
+        because agent.py imports consultation.py, which owns this mixin.
+        """
+        from .agent import AdaptiveConsultationEngine
+
+        return isinstance(self, AdaptiveConsultationEngine)
+
     def _repeat_task(self, state, identity):
         task = next(
             (
@@ -192,7 +208,7 @@ class ObservationMixin:
             from .task_conversation import is_observation_entry
 
             if (
-                hasattr(self, "backend")
+                self._has_model_backend()
                 and not choice.startswith("confirm_observation:")
                 and task_intent(text, [], task.get("cancel_phrases", []))[0] != "cancel"
                 and not is_observation_entry(task, text, choice)
@@ -305,7 +321,7 @@ class ObservationMixin:
                             or report.uncertain
                             or not re.search(r"腋温|腋下", report.evidence)
                         )
-                        and hasattr(self, "backend")
+                        and self._has_model_backend()
                     ):
                         if not any(
                             item["task_id"] == task["id"]

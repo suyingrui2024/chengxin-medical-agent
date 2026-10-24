@@ -89,7 +89,12 @@ SELF_BRIDGED_OPENERS = (
 
 # "Why ask" markers for the B-route model-side discipline: an ask_patient /
 # clarify question must open with a bridging opener and carry one of these
-# before the question itself.
+# before the question itself. "先确认" and "好判断" are run7-era variants
+# of the same purpose half-sentence (healthcheck P2-A-D6: "先确认一下基本
+# 信息、好判断接下来哪些筛查适用" was rejected although it already says
+# why the question is asked, costing one extra self-correction round).
+# They are purpose clauses, not bare openers: a question that merely
+# opens with a bridging phrase and asks directly still carries no marker.
 WHY_MARKERS = (
     "为了确认",
     "为了区分",
@@ -97,6 +102,8 @@ WHY_MARKERS = (
     "想先确认",
     "想确认",
     "需要确认",
+    "先确认",
+    "好判断",
     "以便",
     "因为",
     "为了",
@@ -106,7 +113,7 @@ WHY_MARKERS = (
 # question lacks its own bridging sentence (B route).
 MODEL_BRIDGING_REPAIR_HINT = (
     "问题文本须自带承接句与‘为什么问’半句：先以‘你说/你提到’等呼应已记录事实开头，"
-    "再用‘为了…/想确认…’说明为什么问，然后只问这一件事；无可锚事实的开场轮次可直接提问。"
+    "再用‘为了…/想确认…/先确认…/好判断…’说明为什么问，然后只问这一件事；无可锚事实的开场轮次可直接提问。"
 )
 
 # Fact keys that must never serve as a bridging anchor on their own.

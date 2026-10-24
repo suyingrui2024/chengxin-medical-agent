@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import subprocess
 import signal
 from http.client import HTTPException
@@ -100,6 +101,19 @@ def require_https_or_loopback_endpoint(base_url: str) -> None:
     a bare hostname — raises instead of sending.
     """
     parsed = urlparse(base_url)
+    # E-P2-6: a query string or embedded userinfo on the base URL
+    # corrupts the "/chat/completions" join (the query would be
+    # carried or dropped unpredictably) and lets URL credentials sit
+    # next to the Bearer key. Reject both fail-fast, for every scheme
+    # and host — including loopback stubs, which never need them.
+    if (
+        "?" in base_url.split("#", 1)[0]
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        raise ValueError(
+            "model endpoint must not carry a query string or embedded credentials"
+        )
     scheme = (parsed.scheme or "").lower()
     if scheme == "https" and parsed.hostname:
         return
@@ -149,6 +163,65 @@ def parse_decision(raw: str) -> Dict[str, Any]:
     return parsed
 
 
+# E-P2-2: total-length rejection, not a read window. _decide consumes
+# the whole body in one read (there is no streaming consumer), so
+# reading one byte past the limit detects overflow at bounded cost
+# (256001 bytes, never the full body). A body longer than the limit
+# therefore fails with this distinct ValueError even when its first
+# 256000 bytes happen to parse (e.g. valid JSON plus trailing
+# whitespace) — previously such a body silently succeeded.
+_RESPONSE_SIZE_LIMIT = 256000
+
+
+def _extract_compatible_response(result: Any):
+    """Validate a Compatible HTTP envelope, raising ValueError only.
+
+    E-P2-1: before this helper the extraction below raised whatever
+    the shape happened to trigger — TypeError for a top-level list,
+    KeyError for a missing choices/message key, IndexError for empty
+    choices, AttributeError for a string usage or message — so a
+    caller catching ValueError (the repo's validation idiom, as in
+    parse_decision) mistook malformed envelopes for unexpected
+    crashes. Every malformed shape here is a ValueError with a
+    specific message; the whitelist usage filter itself is unchanged.
+    Returns (content, usage_metrics, model, finish_reason).
+    """
+    if not isinstance(result, dict):
+        raise ValueError("model response must be a JSON object")
+    choices = result.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise ValueError("model response must contain a non-empty choices list")
+    first = choices[0]
+    if not isinstance(first, dict):
+        raise ValueError("model response choice must be an object")
+    message = first.get("message")
+    if not isinstance(message, dict):
+        raise ValueError("model response choice must contain a message object")
+    content = message.get("content")
+    if content is None:
+        content = ""
+    if not isinstance(content, str):
+        raise ValueError("model response content must be a string")
+    usage = result.get("usage") or {}
+    if not isinstance(usage, dict):
+        raise ValueError("model response usage must be an object")
+    metrics = {
+        key: value
+        for key, value in usage.items()
+        if key
+        in {
+            "prompt_tokens",
+            "completion_tokens",
+            "total_tokens",
+            "prompt_cache_hit_tokens",
+            "prompt_cache_miss_tokens",
+        }
+        and type(value) is int
+        and value >= 0
+    }
+    return content, metrics, result.get("model"), first.get("finish_reason")
+
+
 class CompatibleBackend:
     name = "compatible"
 
@@ -175,6 +248,31 @@ class CompatibleBackend:
             "max",
         }:
             raise ValueError("reasoning effort must be low, high or max")
+        # E-P2-3: thinking/reasoning_effort are deepseek-only payload
+        # fields (see _decide). On any other host they are dropped —
+        # which is the correct wire behaviour for an incompatible
+        # provider — but dropping them silently made operators believe
+        # thinking was enabled. Chosen handling is explicit-ignore
+        # with a log trace, not construction rejection: rejecting
+        # would break deployments that share one config across
+        # providers, and the request itself still succeeds. The log
+        # fires once at construction, where the config is known, and
+        # the send decision below uses the same flag so the two
+        # cannot disagree.
+        self._is_deepseek_host = (
+            urlparse(self.base_url).hostname == "api.deepseek.com"
+        )
+        if not self._is_deepseek_host and (
+            self.thinking == "enabled" or self.reasoning_effort is not None
+        ):
+            logging.getLogger(__name__).warning(
+                "thinking/reasoning_effort configured but not sent: "
+                "these parameters are only sent to api.deepseek.com "
+                "(thinking=%s, reasoning_effort=%s, host=%s)",
+                self.thinking,
+                self.reasoning_effort,
+                urlparse(self.base_url).hostname,
+            )
         # Backoff before the one bounded transient retry (see _decide);
         # configurable so tests and latency-sensitive deployments can
         # shrink it to zero.
@@ -200,7 +298,7 @@ class CompatibleBackend:
             "response_format": {"type": "json_object"},
             "max_tokens": self.max_tokens,
         }
-        if urlparse(self.base_url).hostname == "api.deepseek.com":
+        if self._is_deepseek_host:
             payload["thinking"] = {"type": self.thinking}
             if self.thinking == "enabled" and self.reasoning_effort:
                 payload["reasoning_effort"] = self.reasoning_effort
@@ -230,10 +328,18 @@ class CompatibleBackend:
         # immediately instead of failing twice.
         result = None
         raw = ""
+        metrics: Dict[str, int] = {}
+        model_name = None
+        finish_reason = None
         for attempt in (1, 2):
             try:
                 with _open_request(req, timeout=45) as response:
-                    result = json.loads(response.read(256000).decode())
+                    body = response.read(_RESPONSE_SIZE_LIMIT + 1)
+                    if len(body) > _RESPONSE_SIZE_LIMIT:
+                        raise ValueError(
+                            "model response exceeds 256000 bytes"
+                        )
+                    result = json.loads(body.decode())
             except Exception as exc:
                 reason = _transient_retry_reason(exc) if attempt == 1 else None
                 if reason is None:
@@ -250,7 +356,9 @@ class CompatibleBackend:
                 if self.retry_backoff_seconds > 0:
                     sleep(self.retry_backoff_seconds)
                 continue
-            raw = result["choices"][0]["message"]["content"] or ""
+            raw, metrics, model_name, finish_reason = _extract_compatible_response(
+                result
+            )
             if raw.strip():
                 break
             if attempt == 1:
@@ -263,21 +371,16 @@ class CompatibleBackend:
                 )
                 if cancelled is not None and cancelled.is_set():
                     raise DecisionInterrupted()
-        usage = result.get("usage") or {}
-        metrics = {
-            key: value
-            for key, value in usage.items()
-            if key
-            in {
-                "prompt_tokens",
-                "completion_tokens",
-                "total_tokens",
-                "prompt_cache_hit_tokens",
-                "prompt_cache_miss_tokens",
-            }
-            and type(value) is int
-            and value >= 0
-        }
+        # E-P2-4: validate before recording responded. Previously
+        # model.responded was emitted here first and parse_decision
+        # ran after it, so an invalid decision (extra key, empty
+        # content twice) still counted as a responded turn. Now a
+        # validation failure raises with only model.requested (and
+        # any model.retry) on the log; responded means the decision
+        # passed validation. The cancelled check keeps its old place
+        # after responded, so a valid-but-interrupted turn still
+        # records responded exactly as before.
+        decision = parse_decision(raw)
         self.events.append(
             Event(
                 session_id,
@@ -287,14 +390,74 @@ class CompatibleBackend:
                     "content": raw,
                     "usage": metrics,
                     "duration_ms": round((perf_counter() - started) * 1000),
-                    "model": result.get("model"),
-                    "finish_reason": result["choices"][0].get("finish_reason"),
+                    "model": model_name,
+                    "finish_reason": finish_reason,
                 },
             )
         )
         if cancelled is not None and cancelled.is_set():
             raise DecisionInterrupted()
-        return parse_decision(raw)
+        return decision
+
+
+# Python -> bridge environment whitelist. Mirrors the bridge -> DSH
+# grandchild whitelist in integrations/dsh/bridge.mjs launchOptions
+# (PATH/SystemRoot/WINDIR/LANG, with TMPDIR/TMP/TEMP overridden to
+# the per-decision scratch dir below), plus the three MEDAGENT_* keys
+# the bridge main() reads. Nothing else from the parent process
+# environment reaches the bridge child: previously the whole parent
+# env (including unrelated secrets) was inherited. PATH is required:
+# without it neither `node` nor the DSH child can be located, and a
+# missing PATH must fail here with a named error rather than surface
+# later as an obscure spawn failure.
+BRIDGE_ENV_PASSTHROUGH = ("PATH", "SystemRoot", "WINDIR", "LANG")
+# Bridge stdout cap, in characters, mirroring the Compatible backend's
+# 256000 read limit. Oversize output fails closed (ValueError) instead
+# of being silently truncated or parsed unbounded.
+BRIDGE_STDOUT_LIMIT_CHARS = 256000
+_BRIDGE_DIAGNOSTIC_RE = re.compile(
+    r"^DSH bridge failed \(([A-Za-z0-9_.$: -]{1,120})\)$"
+)
+
+
+def bridge_env(config, scratch):
+    """Build the bridge child environment from the whitelist."""
+    env = {
+        key: os.environ[key]
+        for key in BRIDGE_ENV_PASSTHROUGH
+        if key in os.environ
+    }
+    if "PATH" not in env:
+        raise RuntimeError(
+            "DSH bridge requires PATH in the parent environment; "
+            "refusing to spawn the bridge without it"
+        )
+    env.update(config)
+    env.update({"TMPDIR": scratch, "TMP": scratch, "TEMP": scratch})
+    return env
+
+
+def bridge_stderr_summary(stderr):
+    """Extract the bridge's safe diagnostic line, or a placeholder.
+
+    The bridge writes exactly one line, `DSH bridge failed (<Class>[:
+    <code>])`, and never echoes messages, prompts or patient data.
+    Only a first line matching that shape is retained; anything else
+    (including any further line) is replaced by a placeholder, so a
+    misbehaving bridge cannot smuggle content into errors or logs
+    through stderr. Returns "" when the bridge wrote nothing.
+    """
+    if not stderr:
+        return ""
+    if isinstance(stderr, bytes):
+        stderr = stderr.decode("utf-8", "replace")
+    first = stderr.splitlines()[0].strip() if stderr else ""
+    if not first:
+        return ""
+    match = _BRIDGE_DIAGNOSTIC_RE.match(first)
+    if match is None:
+        return "bridge diagnostic not in expected format"
+    return match.group(1)
 
 
 class DshBackend:
@@ -397,15 +560,10 @@ class DshBackend:
                 stderr=subprocess.PIPE,
                 text=True,
                 cwd=self.root,
-                env={
-                    **os.environ,
-                    **self.config,
-                    "TMPDIR": scratch,
-                    "TMP": scratch,
-                    "TEMP": scratch,
-                },
+                env=bridge_env(self.config, scratch),
             )
             self._children.add(child)
+        stderr = ""
         try:
             data = json.dumps(
                 {
@@ -417,7 +575,7 @@ class DshBackend:
                 ensure_ascii=False,
             )
             if cancelled is None:
-                stdout, _ = child.communicate(data, timeout=55)
+                stdout, stderr = child.communicate(data, timeout=55)
             else:
                 deadline = monotonic() + 55
                 while True:
@@ -426,7 +584,7 @@ class DshBackend:
                         child.communicate()
                         raise DecisionInterrupted()
                     try:
-                        stdout, _ = child.communicate(
+                        stdout, stderr = child.communicate(
                             data, timeout=min(0.2, max(0.001, deadline - monotonic()))
                         )
                         break
@@ -447,8 +605,17 @@ class DshBackend:
         if cancelled is not None and cancelled.is_set():
             raise DecisionInterrupted()
         if child.returncode:
+            summary = bridge_stderr_summary(stderr)
+            detail = f"; bridge diagnostic: {summary}" if summary else ""
+            logging.getLogger(__name__).warning("DSH bridge failed%s", detail)
             raise RuntimeError(
-                "DSH failed; run npm run dsh:check for installation diagnostics"
+                "DSH failed" + detail
+                + "; run npm run dsh:check for installation diagnostics"
+            )
+        if len(stdout) > BRIDGE_STDOUT_LIMIT_CHARS:
+            raise ValueError(
+                "DSH bridge output exceeds 256000 characters; "
+                "refusing to parse unbounded bridge output"
             )
         envelope = json.loads(stdout)
         if not isinstance(envelope, dict):

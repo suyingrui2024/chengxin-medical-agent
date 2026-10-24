@@ -60,20 +60,35 @@ class ReviewJob:
     timed_out: CancelEvent = field(default_factory=CancelEvent)
 
 
-def _items(value: Any) -> list[str]:
+def _items_with_drops(value: Any) -> tuple[list[str], int]:
+    """Bounded items plus how many raw entries were dropped (D5 trace).
+
+    Every raw entry either lands in ``result`` or is counted once as
+    dropped: non-strings, blanks, over-long items, duplicates, and
+    anything past the per-list cap. The kept list is identical to the
+    old ``_items`` behaviour; only the drop count is new.
+    """
     if not isinstance(value, list):
-        return []
+        return [], 0
     result = []
+    dropped = 0
     for item in value:
+        if len(result) == MAX_ITEMS:
+            dropped += 1
+            continue
         if not isinstance(item, str):
+            dropped += 1
             continue
         text = " ".join(item.split())
         if not text or len(text) > MAX_ITEM_LENGTH or text in result:
+            dropped += 1
             continue
         result.append(text)
-        if len(result) == MAX_ITEMS:
-            break
-    return result
+    return result, dropped
+
+
+def _items(value: Any) -> list[str]:
+    return _items_with_drops(value)[0]
 
 
 def validate_review(command: Any) -> Dict[str, list[str]]:
@@ -90,10 +105,36 @@ def validate_review(command: Any) -> Dict[str, list[str]]:
         "suggested_questions",
     }:
         raise ValueError("review fields are invalid")
-    return {
-        key: _items(review.get(key, []))
-        for key in ("contradictions", "missing_information", "suggested_questions")
-    }
+    return validate_review_with_drops(command)[0]
+
+
+def validate_review_with_drops(
+    command: Any,
+) -> tuple[Dict[str, list[str]], Dict[str, int]]:
+    """Like ``validate_review`` but also reporting per-field drop counts.
+
+    ``validate_review`` keeps its old return shape (callers such as
+    background_review_evaluation depend on it); the coordinator uses
+    this variant so the completed event can leave a drop trace (D5)
+    instead of only showing the post-truncation counts.
+    """
+    if not isinstance(command, dict) or command.get("tool") != "inspect_case":
+        raise ValueError("review command must be inspect_case")
+    arguments = command.get("arguments")
+    if not isinstance(arguments, dict) or set(arguments) != {"review"}:
+        raise ValueError("review arguments are invalid")
+    review = arguments["review"]
+    if not isinstance(review, dict) or set(review) - {
+        "contradictions",
+        "missing_information",
+        "suggested_questions",
+    }:
+        raise ValueError("review fields are invalid")
+    kept: Dict[str, list[str]] = {}
+    dropped: Dict[str, int] = {}
+    for key in ("contradictions", "missing_information", "suggested_questions"):
+        kept[key], dropped[key] = _items_with_drops(review.get(key, []))
+    return kept, dropped
 
 
 class BackgroundReviewCoordinator:
@@ -279,7 +320,17 @@ class BackgroundReviewCoordinator:
                         "source",
                     )
                 }
-                for item in state.report_items[-20:]
+                # D1: the field name asserts "confirmed" — filter first,
+                # then take the last 20, so a draft item can neither be
+                # mislabelled as confirmed nor displace a confirmed one.
+                # Production append paths only write
+                # status="confirmed_by_patient" items (server.py), so this
+                # is defence-in-depth there, not a behaviour change there.
+                for item in [
+                    item
+                    for item in state.report_items
+                    if item.get("status") == "confirmed_by_patient"
+                ][-20:]
             ],
         }
 
@@ -331,12 +382,12 @@ class BackgroundReviewCoordinator:
                 return
             if job.cancelled.is_set():
                 return
-            review = validate_review(command)
+            review, dropped_counts = validate_review_with_drops(command)
         except Exception as exc:
             self._finish_failure(job, type(exc).__name__)
             return
         else:
-            self._finish_success(job, review)
+            self._finish_success(job, review, dropped_counts)
         finally:
             timer.cancel()
             self._slots.release()
@@ -351,6 +402,13 @@ class BackgroundReviewCoordinator:
             return not self._closed and self._jobs.get(job.session_id) is job
 
     def _finish_failure(self, job: ReviewJob, error_type: str) -> None:
+        # D3: a timeout is a timeout whatever the backend raised while
+        # being cancelled. The real DSH backend raises DecisionInterrupted
+        # when its poll sees the cancellation, so without this the
+        # deadline label (and any per-error_type metric) is systematically
+        # under-counted even though the failure semantics were right.
+        if job.timed_out.is_set():
+            error_type = "deadline"
         try:
             try:
                 state = job.engine.state(job.session_id)
@@ -386,26 +444,61 @@ class BackgroundReviewCoordinator:
                 if self._jobs.get(job.session_id) is job:
                     self._jobs.pop(job.session_id, None)
 
-    def _finish_success(self, job: ReviewJob, review: Dict[str, list[str]]) -> None:
+    def _finish_success(
+        self,
+        job: ReviewJob,
+        review: Dict[str, list[str]],
+        dropped_counts: Optional[Dict[str, int]] = None,
+    ) -> None:
         try:
             try:
                 state = job.engine.state(job.session_id)
             except KeyError:
                 return
             with job.engine._session_locks[job.session_id]:
+                # D4: re-check the schedule gate at completion time. A
+                # review that started while eligible must not land if
+                # the case has since closed or escalated to
+                # emergency/urgent — even at the same revision (risk or
+                # phase can move without a new submitted turn). This is
+                # an extra gate, not a replacement: the server still
+                # invalidates before every submit, and the revision
+                # check below is untouched. Note this is eligibility,
+                # not any-change equality — benign risk/phase movement
+                # that stays inside the gate does not discard a review.
+                gate_ok = self._enabled(job.engine, state)
                 if (
                     job.cancelled.is_set()
                     or not self._current(job)
                     or state.revision != job.revision
+                    or not gate_ok
                 ):
                     self.events.append(
                         Event(
                             job.session_id,
                             "advisor.discarded",
-                            {"source_revision": job.revision, "reason": "stale_case"},
+                            {
+                                "source_revision": job.revision,
+                                "reason": (
+                                    "phase_or_risk_changed"
+                                    if not gate_ok
+                                    else "stale_case"
+                                ),
+                            },
                             turn_id=job.turn_id,
                         )
                     )
+                    # D2: a discarded review must not leave a stale
+                    # "running" behind. Clear only this job's own state
+                    # (identity match) so a successor job's queued /
+                    # running state is never clobbered, and an already
+                    # invalidated (None) state stays None.
+                    current = state.background_review
+                    if (
+                        isinstance(current, dict)
+                        and current.get("identity") == job.identity
+                    ):
+                        state.background_review = None
                     return
                 self.events.append(
                     Event(
@@ -416,6 +509,19 @@ class BackgroundReviewCoordinator:
                             "mode": self.mode,
                             "duration_ms": self._duration_ms(job),
                             "counts": {key: len(value) for key, value in review.items()},
+                            # D5: post-truncation counts alone cannot
+                            # tell "model gave 4" from "model gave 8,
+                            # 4 dropped" — leave the drop trace here.
+                            "dropped_counts": dropped_counts
+                            if dropped_counts is not None
+                            else {
+                                key: 0
+                                for key in (
+                                    "contradictions",
+                                    "missing_information",
+                                    "suggested_questions",
+                                )
+                            },
                         },
                         turn_id=job.turn_id,
                     )

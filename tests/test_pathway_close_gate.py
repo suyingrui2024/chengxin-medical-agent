@@ -237,6 +237,78 @@ class PathwayGateTests(unittest.TestCase):
         )
 
 
+class ChestGateTestabilityTests(unittest.TestCase):
+    """Healthcheck P2-A-D5: the chest gate is submit-unreachable by
+    design (a chest complaint is emergency-intercepted in _submit
+    before _run), so its gate behaviour is pinned here through the
+    direct _execute(review_summary) path that bypasses triage — with
+    the emergency precedence itself pinned, not weakened, alongside.
+    """
+
+    def setUp(self):
+        self.engine, self.backend, self.events = make_engine()
+        self.state, _ = self.engine.create_session()
+
+    def test_chest_gate_refuses_summary_via_direct_execute(self):
+        # Full background, nothing missing: the chest gate is the only
+        # thing standing between this case and a silent close (the
+        # trajectory is only "unknown", so no differential evidence
+        # rests on any fact other than the chief complaint).
+        chief = "胸闷"
+        text = text_for(chief)
+        record(
+            self.engine,
+            self.state,
+            text,
+            background_facts(self.engine, chief),
+        )
+        context = self.engine._context(self.state, text)
+        self.assertEqual(context["missing_required"], [])
+        self.assertEqual(
+            context["pathway_exploration"],
+            [{"pathway": "chest", "detail_fields": [], "explored": False}],
+        )
+        with self.assertRaises(ProposalError) as caught:
+            self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+        message = str(caught.exception)
+        self.assertIn("主诉通路尚未探明", message)
+        self.assertIn("chest", message)
+        self.assertIn("无专属细节字段", message)
+        self.assertIn("abstain_reason", message)
+        self.assertNotEqual(self.state.phase, Phase.SUMMARY)
+
+    def test_chest_gate_passes_once_differential_evidence_on_file(self):
+        # Same background, but a stable trajectory is non-cardiac
+        # differential evidence on file: the gate passes and the
+        # summary proceeds normally through the same direct path.
+        chief = "胸闷"
+        text = text_for(chief) + "，变化不大"
+        facts = [
+            item
+            for item in background_facts(self.engine, chief)
+            if item["key"] != "trajectory"
+        ]
+        facts.append(fact("trajectory", "stable", "变化不大"))
+        record(self.engine, self.state, text, facts)
+        self.assertEqual(
+            self.engine._pathway_exploration(self.state),
+            [{"pathway": "chest", "detail_fields": [], "explored": True}],
+        )
+        reply = self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+        self.assertEqual(reply.kind, "summary")
+        self.assertEqual(self.state.phase, Phase.SUMMARY)
+
+    def test_submit_chest_complaint_is_still_emergency_intercepted(self):
+        # The safer route still precedes the gate: a chest complaint
+        # through submit() never reaches review_summary at all.
+        reply = self.engine.submit(
+            self.state.session_id, UserInput("胸闷")
+        )
+        self.assertEqual(reply.kind, "emergency")
+        self.assertEqual(self.state.closed_reason, "emergency_route")
+        self.assertNotEqual(self.state.phase, Phase.SUMMARY)
+
+
 class ControllerAutoCloseGateTests(unittest.TestCase):
     def test_auto_summary_asks_the_detail_question_first(self):
         # End to end through submit(): the model records the background

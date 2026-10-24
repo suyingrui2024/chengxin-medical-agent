@@ -1,7 +1,11 @@
 import unittest
 
 from medagent.agent import AdaptiveConsultationEngine
-from medagent.bridging import build_bridging_sentence, lint_bridging_sentence
+from medagent.bridging import (
+    build_bridging_sentence,
+    lint_bridging_sentence,
+    model_question_bridging_status,
+)
 from medagent.consultation import UserInput
 from medagent.domain import (
     AgentReply,
@@ -424,6 +428,41 @@ class ModelBridgingValidationTests(unittest.TestCase):
         question = "你说头痛两天了，为了确认进展，想先确认一下：什么时候开始的？"
         reply = self._ask_patient("onset", question)
         self.assertEqual(reply.message, question)
+
+    def test_run7_style_why_markers_pass(self):
+        # Healthcheck P2-A-D6: the run7 phrasing "先确认一下基本信息、
+        # 好判断接下来哪些筛查适用" already says why the question is
+        # asked, so it must pass the B-route check instead of burning
+        # one self-correction round.
+        from medagent.bridging import WHY_MARKERS
+
+        self.assertIn("先确认", WHY_MARKERS)
+        self.assertIn("好判断", WHY_MARKERS)
+        question = (
+            "你说最近总是累，先确认一下基本信息、"
+            "好判断接下来哪些筛查适用：请问是男是女？"
+        )
+        self.assertEqual(
+            model_question_bridging_status(question), (True, True)
+        )
+        self.state.facts["chief_complaint"] = fact("chief_complaint", "总是累")
+        reply = self._ask_patient("sex", question)
+        self.assertEqual(reply.message, question)
+
+    def test_bridged_question_without_why_semantics_still_rejected(self):
+        # The widened marker set must not become a free pass: a
+        # question that opens with a bridge but never says why it is
+        # asked is still rejected by both the status function and the
+        # ask_patient gate.
+        from medagent.agent_tools import ProposalError
+
+        question = "你说头痛两天了，请问什么时候开始的？"
+        self.assertEqual(
+            model_question_bridging_status(question), (True, False)
+        )
+        self.state.facts["chief_complaint"] = fact("chief_complaint", "头痛")
+        with self.assertRaises(ProposalError):
+            self._ask_patient("onset", question)
 
     def test_ask_patient_without_bridge_but_with_why_is_rejected(self):
         from medagent.agent_tools import ProposalError

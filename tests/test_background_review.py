@@ -6,7 +6,13 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from medagent.agent import AdaptiveConsultationEngine
-from medagent.background_review import BackgroundReviewCoordinator, validate_review
+from medagent.background_review import (
+    BackgroundReviewCoordinator,
+    ReviewJob,
+    validate_review,
+)
+from medagent.decision_wait import DecisionInterrupted
+from medagent.domain import RiskLevel
 from medagent.events import Event, EventStore
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker
@@ -39,6 +45,41 @@ class ReviewBackend:
         if self.pause:
             cancelled.wait(2)
         return self.command
+
+
+class ReleasableReviewBackend:
+    """A DSH-shaped backend the test releases by hand (D2/D4 probes)."""
+
+    name = "dsh"
+
+    def __init__(self, command=None):
+        self.command = command or {
+            "tool": "inspect_case",
+            "arguments": {
+                "review": {
+                    "contradictions": [],
+                    "missing_information": ["症状开始时间"],
+                    "suggested_questions": ["这种不适是何时开始的？"],
+                }
+            },
+        }
+        self.started = threading.Event()
+        self.release = threading.Event()
+
+    def decide_cancellable(self, session_id, messages, cancelled):
+        self.started.set()
+        self.release.wait(5)
+        return self.command
+
+
+class CancellingReviewBackend:
+    """Mimics the real DSH backend: cancellation surfaces as an error."""
+
+    name = "dsh"
+
+    def decide_cancellable(self, session_id, messages, cancelled):
+        cancelled.wait(5)
+        raise DecisionInterrupted()
 
 
 class IntegratedReviewBackend(ReviewBackend):
@@ -201,6 +242,186 @@ class BackgroundReviewTests(unittest.TestCase):
                 if event.event_type == "advisor.unavailable"
             ]
             self.assertEqual(unavailable[-1].payload["error_type"], "deadline")
+        finally:
+            coordinator.close()
+
+    def test_snapshot_only_includes_patient_confirmed_report_items(self):
+        # D1 (healthcheck C): a draft must neither be mislabelled as
+        # confirmed nor displace a confirmed item from the last-20 cut.
+        events = EventStore()
+        engine = review_engine(ReviewBackend(), events)
+        state, _ = engine.create_session()
+        state.report_items = [
+            {
+                "name": "血红蛋白",
+                "reported_value": "130",
+                "status": "confirmed_by_patient",
+            }
+        ] + [
+            {"name": f"草稿{i}", "reported_value": "1", "status": "draft"}
+            for i in range(20)
+        ]
+        state.report_items.append({"name": "无状态项", "reported_value": "2"})
+        coordinator = BackgroundReviewCoordinator(events)
+        try:
+            snapshot = coordinator._snapshot(
+                state,
+                ReviewJob("job-1", None, state.session_id, state.revision, None),
+            )
+        finally:
+            coordinator.close()
+        self.assertEqual(
+            [item["name"] for item in snapshot["patient_confirmed_report_items"]],
+            ["血红蛋白"],
+        )
+
+    def test_stale_success_discards_and_clears_running_state(self):
+        # D2 (healthcheck C, R05): a revision bump with no invalidate
+        # used to leave a stale "running" behind after the discard.
+        events = EventStore()
+        backend = ReleasableReviewBackend()
+        engine = review_engine(backend, events)
+        state, _ = engine.create_session()
+        coordinator = BackgroundReviewCoordinator(events)
+        try:
+            with engine._session_locks[state.session_id]:
+                schedule_material_review(coordinator, engine, events, state)
+            self.assertTrue(backend.started.wait(1))
+            with engine._session_locks[state.session_id]:
+                state.revision += 1
+            backend.release.set()
+            wait_for(lambda: state.background_review is None)
+            discarded = [
+                event
+                for event in events.for_session(state.session_id)
+                if event.event_type == "advisor.discarded"
+            ]
+            self.assertEqual(discarded[-1].payload["reason"], "stale_case")
+            self.assertFalse(
+                any(
+                    event.event_type == "advisor.completed"
+                    for event in events.for_session(state.session_id)
+                )
+            )
+        finally:
+            backend.release.set()
+            coordinator.close()
+
+    def test_timeout_raised_as_interruption_is_still_labelled_deadline(self):
+        # D3 (healthcheck C, R08a): the DSH backend raises
+        # DecisionInterrupted when cancelled; a timed-out job must
+        # still be reported as a deadline failure, not by exception name.
+        events = EventStore()
+        backend = CancellingReviewBackend()
+        engine = review_engine(backend, events)
+        state, _ = engine.create_session()
+        coordinator = BackgroundReviewCoordinator(events, deadline_seconds=0.02)
+        try:
+            with engine._session_locks[state.session_id]:
+                schedule_material_review(coordinator, engine, events, state)
+            wait_for(
+                lambda: state.background_review
+                and state.background_review["status"] == "unavailable"
+            )
+            unavailable = [
+                event
+                for event in events.for_session(state.session_id)
+                if event.event_type == "advisor.unavailable"
+            ]
+            self.assertEqual(unavailable[-1].payload["error_type"], "deadline")
+            self.assertNotIn("advice", state.background_review)
+        finally:
+            coordinator.close()
+
+    def test_completion_rechecks_phase_and_risk_before_landing(self):
+        # D4 (healthcheck C): escalation to urgent mid-review, at the
+        # same revision, must discard at completion — not land advice
+        # that the next turn could then serve.
+        events = EventStore()
+        backend = ReleasableReviewBackend()
+        engine = review_engine(backend, events)
+        state, _ = engine.create_session()
+        coordinator = BackgroundReviewCoordinator(events, mode="advisory")
+        try:
+            with engine._session_locks[state.session_id]:
+                schedule_material_review(coordinator, engine, events, state)
+            self.assertTrue(backend.started.wait(1))
+            with engine._session_locks[state.session_id]:
+                state.risk.level = RiskLevel.URGENT
+            backend.release.set()
+            wait_for(lambda: state.background_review is None)
+            discarded = [
+                event
+                for event in events.for_session(state.session_id)
+                if event.event_type == "advisor.discarded"
+            ]
+            self.assertEqual(
+                discarded[-1].payload["reason"], "phase_or_risk_changed"
+            )
+            self.assertFalse(
+                any(
+                    event.event_type == "advisor.completed"
+                    for event in events.for_session(state.session_id)
+                )
+            )
+            self.assertNotIn(
+                "background_review", engine._context(state, "下一条信息")
+            )
+        finally:
+            backend.release.set()
+            coordinator.close()
+
+    def test_completed_event_leaves_a_drop_trace(self):
+        # D5 (healthcheck C, R09): counts alone cannot tell "model
+        # gave 4" from "model gave 6, 2 dropped" — dropped_counts must.
+        events = EventStore()
+        backend = ReviewBackend(
+            command={
+                "tool": "inspect_case",
+                "arguments": {
+                    "review": {
+                        "contradictions": ["甲", "乙", "丙", "丁", "戊", "甲"],
+                        "missing_information": [123, ""],
+                        "suggested_questions": ["何时开始的？"],
+                    }
+                },
+            }
+        )
+        engine = review_engine(backend, events)
+        state, _ = engine.create_session()
+        coordinator = BackgroundReviewCoordinator(events)
+        try:
+            with engine._session_locks[state.session_id]:
+                schedule_material_review(coordinator, engine, events, state)
+            wait_for(
+                lambda: state.background_review
+                and state.background_review["status"] == "completed"
+            )
+            completed = [
+                event
+                for event in events.for_session(state.session_id)
+                if event.event_type == "advisor.completed"
+            ]
+            self.assertEqual(
+                completed[-1].payload["counts"],
+                {
+                    "contradictions": 4,
+                    "missing_information": 0,
+                    "suggested_questions": 1,
+                },
+            )
+            self.assertEqual(
+                completed[-1].payload["dropped_counts"],
+                {
+                    "contradictions": 2,
+                    "missing_information": 2,
+                    "suggested_questions": 0,
+                },
+            )
+            self.assertEqual(
+                state.background_review["advice"]["contradictions"],
+                ["甲", "乙", "丙", "丁"],
+            )
         finally:
             coordinator.close()
 

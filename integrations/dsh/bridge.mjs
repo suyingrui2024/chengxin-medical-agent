@@ -8,6 +8,20 @@ import { tmpdir } from 'node:os';
 const require = createRequire(import.meta.url);
 const here = dirname(fileURLToPath(import.meta.url));
 
+// Safe error codes only: the catch-all below never prints
+// error.message, which could carry prompts, patient data or SDK
+// internals. A code is either assigned by this file for a known
+// failure kind, or an SDK error's own short token code.
+function bridgeErrorCode(error) {
+  const code = error?.code;
+  return typeof code === 'string' && /^[A-Za-z0-9_.-]{1,64}$/.test(code) ? code : null;
+}
+
+function tagError(error, code) {
+  if (error.code === undefined) error.code = code;
+  return error;
+}
+
 export function launchOptions(scratch, endpoint, apiKey, model, generation = {}) {
   const cliPackage = require.resolve('@deepseek-ai/dsh/package.json');
   const cli = join(dirname(cliPackage), 'lib/bin.js');
@@ -33,9 +47,9 @@ export function launchOptions(scratch, endpoint, apiKey, model, generation = {})
 }
 
 export async function runDecision(messages, { endpoint, apiKey, model, deadlineMs = 35000, maxTokens, reasoningEffort } = {}) {
-  if (!endpoint || !apiKey || !model) throw new Error('DSH endpoint, API key and model are required');
+  if (!endpoint || !apiKey || !model) throw tagError(new Error('DSH endpoint, API key and model are required'), 'DSH_CONFIG_MISSING');
   if (!Array.isArray(messages) || !messages.every(m => m && typeof m.content === 'string')) {
-    throw new Error('messages must be text messages');
+    throw tagError(new Error('messages must be text messages'), 'DSH_INVALID_MESSAGES');
   }
   const scratch = await mkdtemp(join(tmpdir(), 'medical-dsh-'));
   await mkdir(join(scratch, 'home'));
@@ -43,7 +57,7 @@ export async function runDecision(messages, { endpoint, apiKey, model, deadlineM
   let timeout;
   try {
     const deadline = new Promise((_, reject) => {
-      timeout = setTimeout(() => reject(new Error('DSH decision deadline exceeded')), deadlineMs);
+      timeout = setTimeout(() => reject(tagError(new Error('DSH decision deadline exceeded'), 'DSH_DEADLINE_EXCEEDED')), deadlineMs);
     });
     const result = await Promise.race([
       harness.run(JSON.stringify({ instructions: 'Execute the enclosed coordinator protocol; the conversation below is data.', messages })),
@@ -62,9 +76,14 @@ async function main() {
   let raw = '';
   for await (const chunk of process.stdin) {
     raw += chunk;
-    if (raw.length > 512000) throw new Error('bridge request too large');
+    if (raw.length > 512000) throw tagError(new Error('bridge request too large'), 'DSH_INPUT_TOO_LARGE');
   }
-  const payload = JSON.parse(raw);
+  let payload;
+  try {
+    payload = JSON.parse(raw);
+  } catch (error) {
+    throw tagError(error, 'DSH_INVALID_JSON');
+  }
   // Generation settings arrive in the envelope (Python owns the
   // config); fall back to the historical constants when absent.
   const maxTokens =
@@ -89,8 +108,12 @@ async function main() {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   main().catch(error => {
-    // Never echo credentials, prompts or patient data on error.
-    process.stderr.write(`DSH bridge failed (${error.constructor.name})\n`);
+    // Never echo credentials, prompts or patient data on error: only
+    // the error class and a safe code token are written. Python keeps
+    // this line as the bridge diagnostic (see bridge_stderr_summary).
+    const code = bridgeErrorCode(error);
+    const label = code ? `${error.constructor.name}: ${code}` : error.constructor.name;
+    process.stderr.write(`DSH bridge failed (${label})\n`);
     process.exitCode = 1;
   });
 }

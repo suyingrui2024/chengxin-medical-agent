@@ -132,6 +132,16 @@ class CaseState:
     reasoning: Dict[str, Any] = field(default_factory=dict)
     # Post-consultation follow-up plan + recorded outcome (design phase
     # 4), serialized form; the model lives in medagent.followups.
+    # Contract (P2-3): an empty dict means "no plan" -- that includes
+    # emergency close, where build_follow_up_plan returns None but the
+    # stored field keeps its {} default. Consumers must judge by
+    # truthiness, never by ``is not None``: every in-repo reader already
+    # does (schedule/idempotence, outcome recording, workspace list,
+    # to_dict and handoff all treat {} as absent, and the reply-side
+    # field is already None). Do not "unify" this to a None default in
+    # isolation: session snapshots persist the raw {} and restore it
+    # verbatim, so a None default alone would split fresh states (None)
+    # from restored ones ({}) instead of unifying them.
     follow_up: Dict[str, Any] = field(default_factory=dict)
     # Patient-facing conclusion sheet (docs/问诊结论单设计文档.md),
     # serialized form; the composer lives in medagent.conclusion.

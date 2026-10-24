@@ -31,7 +31,18 @@ class MedicalImageError(ValueError):
 
 
 class RecognitionError(RuntimeError):
-    pass
+    """Provider/contract failure with a retained validation category.
+
+    The message stays the single patient-visible wording; ``validation_rule``
+    carries the original rule category (the ``MedicalImageError`` text, or
+    ``"识别结果解析失败"`` for a malformed envelope) for troubleshooting
+    and audit. It is never folded into the message, and never contains
+    provider raw text.
+    """
+
+    def __init__(self, message: str, *, validation_rule: str | None = None):
+        super().__init__(message)
+        self.validation_rule = validation_rule
 
 
 @dataclass(frozen=True)
@@ -47,6 +58,40 @@ def _png_dimensions(data: bytes) -> tuple[int, int] | None:
     if len(data) < 24 or not data.startswith(b"\x89PNG\r\n\x1a\n"):
         return None
     return struct.unpack(">II", data[16:24])
+
+
+def _png_is_complete(data: bytes) -> bool:
+    """Minimal PNG integrity check: chunk-length consistency + tail.
+
+    A file that only carries the IHDR dimension header (no IDAT, no
+    IEND) used to pass as a valid image. Walk every chunk, require each
+    declared length to fit inside the file (a chunk cut short fails),
+    require at least one IDAT, and require a zero-length IEND chunk as
+    the exact last chunk. This is a fail-closed length/tail check, not
+    a full decode: CRCs and pixel data are still the provider's job.
+    """
+    offset = 8
+    seen_idat = False
+    seen_iend = False
+    first = True
+    while offset + 8 <= len(data):
+        length = struct.unpack(">I", data[offset : offset + 4])[0]
+        kind = data[offset + 4 : offset + 8]
+        if offset + 8 + length + 4 > len(data):
+            return False
+        if first and (kind != b"IHDR" or length != 13):
+            return False
+        first = False
+        if kind == b"IDAT":
+            seen_idat = True
+        if kind == b"IEND":
+            if length != 0:
+                return False
+            seen_iend = True
+            offset += 8 + length + 4
+            break
+        offset += 8 + length + 4
+    return seen_idat and seen_iend and offset == len(data)
 
 
 def _jpeg_dimensions(data: bytes) -> tuple[int, int] | None:
@@ -125,6 +170,8 @@ def inspect_image(data: bytes) -> InspectedImage:
     if detected is None:
         raise MedicalImageError("只支持有效的 JPEG、PNG 或 WebP 图片")
     mime_type, extension, dimensions = detected
+    if mime_type == "image/png" and not _png_is_complete(data):
+        raise MedicalImageError("图片数据不完整")
     width, height = dimensions
     if (
         width < 32
@@ -215,7 +262,9 @@ def validate_recognition(value: Any) -> dict[str, Any]:
         if clarity != "clear" and not reason:
             raise MedicalImageError("模糊数值缺少原因")
         page_index = candidate["page_index"]
-        if not isinstance(page_index, int) or page_index != 1:
+        # bool is an int subclass, so isinstance(True, int) is True and
+        # True == 1; a JSON boolean must not pass as page 1.
+        if isinstance(page_index, bool) or not isinstance(page_index, int) or page_index != 1:
             raise MedicalImageError("第一版只支持单页图片")
         numbers.append(
             {
@@ -310,6 +359,12 @@ class DeepSeekVisionRecognizer:
         self.last_usage: Optional[Dict[str, Any]] = None
         self.last_duration_ms: Optional[int] = None
         self.last_retried: bool = False
+        # Original rule category of the last contract rejection, if any
+        # (see RecognitionError.validation_rule). Reset per call, like
+        # the other last-* telemetry, so a stale category is never
+        # attributed to a later call. Survives run_job swallowing the
+        # exception, so the jobs path keeps the category too.
+        self.last_validation_rule: str | None = None
 
     def recognize(self, image: InspectedImage) -> dict[str, Any]:
         encoded = base64.b64encode(image.data).decode("ascii")
@@ -354,6 +409,7 @@ class DeepSeekVisionRecognizer:
         self.last_retried = False
         self.last_usage = None
         self.last_duration_ms = None
+        self.last_validation_rule = None
         started = _time.perf_counter()
         result = None
         for attempt in (1, 2):
@@ -400,8 +456,22 @@ class DeepSeekVisionRecognizer:
         try:
             content = result["choices"][0]["message"]["content"]
             return validate_recognition(json.loads(content))
-        except (KeyError, IndexError, TypeError, json.JSONDecodeError, MedicalImageError):
-            raise RecognitionError("视觉模型没有返回有效的识别协议") from None
+        except MedicalImageError as exc:
+            # P2-D-3: keep the patient-visible wording exactly as before,
+            # but retain the original rule category on the exception and
+            # on the recognizer instead of folding every rejection into
+            # one indistinguishable sentence.
+            category = str(exc)
+            self.last_validation_rule = category
+            raise RecognitionError(
+                "视觉模型没有返回有效的识别协议", validation_rule=category
+            ) from None
+        except (KeyError, IndexError, TypeError, json.JSONDecodeError):
+            category = "识别结果解析失败"
+            self.last_validation_rule = category
+            raise RecognitionError(
+                "视觉模型没有返回有效的识别协议", validation_rule=category
+            ) from None
 
 
 def vision_configuration_status(
