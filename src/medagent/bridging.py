@@ -143,6 +143,61 @@ def _truncate_phrase(text: str) -> str:
     return cut
 
 
+# Batch C POLISH (S-07/P-10): a slot that already ends with sentence
+# punctuation must not gain another delimiter from the template
+# ("坐着也难受。" + "，" produced "难受。，"). Slots are stripped of
+# trailing punctuation at render time, so the template's own delimiter
+# is the only one that survives.
+_TRAILING_PUNCT = "。！!？?；;，,、 "
+
+
+def _strip_trailing_punct(text: str) -> str:
+    return text.rstrip(_TRAILING_PUNCT)
+
+
+def _normalize_bridging_sentence(sentence: str) -> str:
+    """Final safety net over a composed bridging sentence.
+
+    Slot-level stripping covers the usual case; this pass catches
+    punctuation or verb doubling that survives inside a slot value
+    itself (e.g. an onset slot that already contains "开始的开始").
+    """
+    fixed = sentence.replace("。，", "。").replace("，，", "，")
+    fixed = fixed.replace("开始的开始", "开始").replace("开始开始", "开始")
+    return fixed
+
+
+def _fragments(text: str) -> List[str]:
+    """Split a slot value into symptom fragments for overlap checks."""
+    parts = []
+    current = ""
+    for char in text:
+        if char in "、，；。":
+            if current.strip():
+                parts.append(current.strip())
+            current = ""
+        else:
+            current += char
+    if current.strip():
+        parts.append(current.strip())
+    return parts
+
+
+def _fragment_covered(fragment: str, text: str) -> bool:
+    """True when ``fragment`` already appears inside ``text``.
+
+    Particles ("也/都/还") are ignored on both sides: chief "说话也不清楚"
+    covers associated "说话不清楚", so the same symptom is never echoed
+    twice in one bridging sentence (batch C N-09).
+    """
+    norm = lambda s: s.replace("也", "").replace("都", "").replace("还", "")
+    return norm(fragment) in norm(text)
+
+
+def _uncovered_fragments(text: str, covered_by: str) -> List[str]:
+    return [part for part in _fragments(text) if not _fragment_covered(part, covered_by)]
+
+
 def _render_value(value: Any) -> Optional[str]:
     """Render a fact value as short patient-facing text, or None."""
     if value is None or isinstance(value, bool):
@@ -150,7 +205,7 @@ def _render_value(value: Any) -> Optional[str]:
     if isinstance(value, (int, float)):
         return str(value)
     if isinstance(value, str):
-        text = value.strip()
+        text = _strip_trailing_punct(value.strip())
         return _truncate_phrase(text) if text else None
     if isinstance(value, list):
         parts = [str(item).strip() for item in value[:2] if str(item).strip()]
@@ -191,9 +246,20 @@ def _strip_leading_verbs(text: str, verbs: Tuple[str, ...]) -> str:
 
 def _strip_trailing_start(text: str) -> str:
     """Drop a trailing "开始" so the onset template does not double it
-    (run7: "从一天半前开始开始到现在")."""
+    (run7: "从一天半前开始开始到现在").
+
+    Batch C POLISH (P-05/P-10): the same doubling hides in two more
+    shapes -- a slot that already ends in "开始的" ("从昨天开始的开始")
+    and a completed-state slot ("两天了" + "从…开始" gave
+    "从两天了开始到现在"). All three are stripped so the template's
+    own "开始" is the only one that survives.
+    """
+    if text.endswith("开始的"):
+        text = text[:-3]
     if text.endswith("开始"):
-        return text[:-2]
+        text = text[:-2]
+    if text.endswith("了"):
+        text = text[:-1]
     return text
 
 
@@ -285,13 +351,21 @@ def build_bridging_sentence(
             denied = _render_value(fact.value)
             if denied:
                 sentence = f"前面你说过没有{denied}，这里再确认一下相关的部分："
-                return (sentence, "denial") if lint_bridging_sentence(sentence) else (None, "lint_dropped")
+                return (
+                    (_normalize_bridging_sentence(sentence), "denial")
+                    if lint_bridging_sentence(sentence)
+                    else (None, "lint_dropped")
+                )
 
     # 3. Entry: first pathway-detail question, anchored on the chief complaint.
     chief = _present_text(facts, "chief_complaint")
     if fact_key in DETAIL_FACT_KEYS and fact_key not in facts and chief:
         sentence = f"你说{chief}，再细问一下这方面的情况："
-        return (sentence, "entry") if lint_bridging_sentence(sentence) else (None, "lint_dropped")
+        return (
+            (_normalize_bridging_sentence(sentence), "entry")
+            if lint_bridging_sentence(sentence)
+            else (None, "lint_dropped")
+        )
 
     # 4. Generic anchor, rotated over the recorded PRESENT facts so
     # consecutive rounds do not repeat the same wording.
@@ -308,7 +382,18 @@ def build_bridging_sentence(
         candidates.append(f"你说现在大约{severity}，再问一句：")
     associated = _present_text(facts, "associated_symptoms")
     if associated:
-        if chief:
+        # Batch C POLISH (N-09): fragments already inside the chief
+        # complaint are dropped from the associated echo, so one symptom
+        # never appears twice in the same bridging sentence. When every
+        # fragment is covered, the associated candidate is skipped
+        # outright and rotation falls through to the next anchor.
+        uncovered = _uncovered_fragments(associated, chief) if chief else None
+        if uncovered is not None:
+            if uncovered:
+                candidates.append(
+                    f"除了{chief}，你还提到{'、'.join(uncovered)}，再问一句："
+                )
+        elif chief:
             candidates.append(f"除了{chief}，你还提到{associated}，再问一句：")
         else:
             candidates.append(f"你还提到{associated}，再问一句：")
@@ -319,9 +404,16 @@ def build_bridging_sentence(
             candidates.append(f"你提到{history}，再问一句：")
     medications = _present_text(facts, "medications_taken")
     if medications:
-        medications = _strip_leading_verbs(medications, _MEDICATION_LEADING_VERBS)
-        if medications:
-            candidates.append(f"你说用过{medications}，再问一句：")
+        # Batch C POLISH (O-08): a denial slot ("没有用过药，热敷后稍好一点")
+        # is recorded as PRESENT text, so the "你说用过…" template used to
+        # produce the self-contradicting "你说用过没有用过药". A leading
+        # denial keeps its own wording and never gains the "用过" verb.
+        if medications.startswith(("没有", "没用", "未用", "否认")):
+            candidates.append(f"你说{medications}，再问一句：")
+        else:
+            medications = _strip_leading_verbs(medications, _MEDICATION_LEADING_VERBS)
+            if medications:
+                candidates.append(f"你说用过{medications}，再问一句：")
     goal = _present_text(facts, "patient_goal")
     if goal:
         candidates.append(f"你最担心的是{goal}，再问一句：")
@@ -330,17 +422,29 @@ def build_bridging_sentence(
     # first-time shrimp were never re-anchored). Detail anchors are appended
     # after the early-fact anchors so existing rotation order is preserved;
     # the fact currently being asked about never anchors its own question.
+    # Batch C POLISH (N-09): a detail fully covered by the chief complaint
+    # is skipped, for the same no-double-echo reason as associated above.
     for key in DETAIL_FACT_KEYS_ORDERED:
         if key == fact_key:
             continue
         detail = _present_text(facts, key)
         if detail:
+            if chief and not _uncovered_fragments(detail, chief):
+                continue
             candidates.append(f"你还提到{detail}，再问一句：")
     exposures = _present_text(facts, "recent_exposures")
     if exposures:
         candidates.append(f"你还提到{exposures}，再问一句：")
-    candidates = list(dict.fromkeys(candidates))
+    # Backstop (O-08): no candidate may affirm and deny the same use in
+    # one breath, whatever slot shape produced it.
+    candidates = [
+        item
+        for item in dict.fromkeys(candidates)
+        if "用过没有" not in item and "用过没" not in item
+    ]
     if not candidates:
         return None, "no_anchor"
-    sentence = candidates[question_turn_index % len(candidates)]
+    sentence = _normalize_bridging_sentence(
+        candidates[question_turn_index % len(candidates)]
+    )
     return (sentence, "anchor") if lint_bridging_sentence(sentence) else (None, "lint_dropped")

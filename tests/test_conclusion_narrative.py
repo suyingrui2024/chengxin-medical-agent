@@ -333,7 +333,10 @@ class SpokenFramingTests(unittest.TestCase):
     def test_self_care_line_opens_with_framing(self):
         line = spoken_close_line(self._sheet("self_care"))
         self.assertTrue(line.startswith("先说结论：这次的情况可以在家先观察处理。"))
-        self.assertIn("在家观察", line)
+        # Batch C rework (P-10): home observation is spoken once, in
+        # the framing opener; the main sentence no longer repeats it.
+        self.assertIn("在家先观察", line)
+        self.assertIn("暂时不需要专门跑一趟医院", line)
 
     def test_urgent_line_opens_with_framing(self):
         line = spoken_close_line(self._sheet("urgent_today", 24))

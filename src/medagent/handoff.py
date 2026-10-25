@@ -59,6 +59,8 @@ LABELS = {
     "back_details": "腰背细节",
     "urinary_details": "排尿细节",
     "skin_details": "皮疹细节",
+    "infant_observable_signs": "婴幼儿可观察表现",
+    "eye_warning_signs": "眼部警示表现",
     "emergency_screen": "急症筛查",
     "patient_goal": "本次咨询目标",
 }
@@ -85,6 +87,8 @@ REGISTERED_FACT_KEYS = frozenset(
         "urinary_details",
         "pregnancy_status",
         "skin_details",
+        "infant_observable_signs",
+        "eye_warning_signs",
         "recent_exposures",
         "resp_breathing",
         "resp_cough_details",

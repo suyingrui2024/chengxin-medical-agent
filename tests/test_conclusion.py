@@ -269,7 +269,11 @@ class DeterministicConclusionTests(unittest.TestCase):
             line + goal_response + "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
         )
         sheet = final.conclusion
-        self.assertIn(f"{sheet['disposition']['window_hours']} 小时内", final.message)
+        # Batch C rework (G-02/U-02): this fixture's sheet is the
+        # significant-gap upgrade variant, so the spoken line must
+        # carry the sheet's own "小时后还没有好转" sentence, not a
+        # rewritten "小时内" sentence with the opposite meaning.
+        self.assertIn(sheet["disposition"]["text"], final.message)
         self.assertIn(sheet["return_now_if"][0], final.message)
         # The recorded transcript carries the spoken line too, so a replay
         # of the chat shows the same closing the patient saw.

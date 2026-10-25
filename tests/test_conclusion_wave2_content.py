@@ -231,7 +231,10 @@ class SpokenCloseLineTests(unittest.TestCase):
 
     def test_self_care_line(self):
         line = spoken_close_line(self._sheet("self_care"))
-        self.assertIn("在家观察", line)
+        # Batch C rework (P-10): home observation is spoken once, in
+        # the framing opener; the main sentence no longer repeats it.
+        self.assertIn("在家先观察", line)
+        self.assertIn("暂时不需要专门跑一趟医院", line)
         self.assertIn("大小便异常", line)
 
     def test_urgent_line(self):

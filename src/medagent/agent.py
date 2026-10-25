@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import json
 import hashlib
+import re
 from copy import deepcopy
 from importlib import resources
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Mapping, Optional
 from uuid import uuid4
 
 from .agent_tools import (
@@ -25,6 +26,7 @@ from .consultation import (
     is_refusal_text,
     is_steady_not_improving_evidence,
     is_summary_confirmation_text,
+    merge_preserving_denials,
 )
 from .decision_wait import DecisionWaiter, DecisionTurn, DecisionInterrupted
 from .domain import (
@@ -55,7 +57,9 @@ from .adaptive_questions import (
     validate_adaptive_question,
 )
 from .bridging import (
+    DETAIL_FACT_KEYS,
     MODEL_BRIDGING_REPAIR_HINT,
+    SELF_BRIDGED_OPENERS,
     has_anchorable_fact,
     model_question_bridging_status,
 )
@@ -66,6 +70,116 @@ from .bridging import (
 # The engine flags them in the model context instead (wave-2 spillover
 # signal); they still leave missing_required once recorded.
 SCREENING_FIELDS = frozenset({"associated_symptoms"})
+
+# -- Batch C BURDEN ------------------------------------------------------
+# D-02: fluctuation wording must never book as "stable" (变化不大).
+# "旧的消了新的又起" describes waxing and waning, not steadiness; the
+# J-03 steady-not-improving guard next to this one covers the mirror
+# error (steady booked as worsening).
+FLUCTUATION_PHRASES = (
+    "此起彼伏",
+    "旧的消了新的又起",
+    "新的又起",
+    "消了又起",
+    "新旧交替",
+    "时起时伏",
+)
+
+# Purpose-clause markers that must not be stripped by the denied-item
+# filter: a "为什么问" half-sentence may itself contain "有没有".
+_PURPOSE_CLAUSE_MARKERS = ("为了", "想先确认", "想确认", "先确认", "好判断")
+
+# Denied-item synonyms for the composite-question filter (Y-10/P-02):
+# a recorded "没有发烧" denies a later "发热" item and vice versa.
+_DENIED_ITEM_SYNONYMS = {
+    "发热": ("发烧",),
+    "发烧": ("发热",),
+}
+
+
+def _recorded_denies_token(texts: List[str], token: str) -> bool:
+    """True when some recorded fact text explicitly denies ``token``."""
+    variants = (token,) + _DENIED_ITEM_SYNONYMS.get(token, ())
+    for variant in variants:
+        for prefix in ("没有", "无", "不", "没"):
+            needle = prefix + variant
+            if any(needle in text for text in texts):
+                return True
+    return False
+
+
+def _strip_denied_items(text: str, facts: Mapping[str, Any]) -> str:
+    """Drop already-denied items from a composite question (Y-10/P-02).
+
+    Only "有没有/有无 …？" clauses are filtered, and only tokens with
+    an explicit recorded denial ("没有发热" denies "发热"). A clause
+    that loses every token is dropped; the genuinely new remainder
+    stays askable. Purpose clauses ("为了确认有没有…") are never
+    touched. Recorded fact texts (values + evidence) are the denial
+    corpus; nothing here invents or rewords a clinical term.
+    """
+    recorded: List[str] = []
+    for fact in facts.values():
+        value = getattr(fact, "value", None)
+        if isinstance(value, str):
+            recorded.append(value)
+        evidence = getattr(fact, "evidence", None)
+        if isinstance(evidence, str):
+            recorded.append(evidence)
+    if not recorded:
+        return text
+    # A model question carries its bridging prefix in the same clause
+    # as the question ("你说…，想先确认一下：有没有…？"). The prefix's
+    # purpose half-sentence must not be mistaken for a question clause,
+    # so it is split off at the colon that follows the purpose marker
+    # and only the question body is filtered.
+    prefix, body = "", text
+    for opener in SELF_BRIDGED_OPENERS:
+        if not text.startswith(opener):
+            continue
+        for marker in _PURPOSE_CLAUSE_MARKERS:
+            marker_at = text.find(marker)
+            if marker_at < 0:
+                continue
+            colon_at = text.find("：", marker_at)
+            if colon_at >= 0:
+                prefix, body = text[: colon_at + 1], text[colon_at + 1 :]
+            break
+        break
+    filtered = _filter_question_clauses(body, recorded)
+    result = prefix + filtered
+    return result if result.strip() else text
+
+
+def _filter_question_clauses(text: str, recorded: List[str]) -> str:
+    clauses = re.split(r"(？|\?|；|;)", text)
+    out: List[str] = []
+    index = 0
+    while index < len(clauses):
+        clause = clauses[index]
+        delimiter = clauses[index + 1] if index + 1 < len(clauses) else ""
+        index += 2
+        match = re.search(r"(有没有|有无)", clause)
+        if match is None or any(
+            marker in clause for marker in _PURPOSE_CLAUSE_MARKERS
+        ):
+            out.append(clause + delimiter)
+            continue
+        head, tail = clause[: match.end()], clause[match.end() :]
+        tokens = [part for part in re.split(r"[、，,或]", tail) if part.strip()]
+        kept = [
+            token
+            for token in tokens
+            if not _recorded_denies_token(recorded, token.strip())
+        ]
+        if not kept:
+            continue
+        if len(kept) == len(tokens):
+            out.append(clause + delimiter)
+        else:
+            out.append(head + "、".join(token.strip() for token in kept) + delimiter)
+    result = "".join(out)
+    return result if result.strip() else text
 
 # Task kinds the *model* may propose via spawn_subagent (the tool
 # description's contract). Controller-only kinds — case_digest (the
@@ -397,7 +511,79 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         reply = super()._ask(state, question, reason)
         if question.fact_key == "age_years" and not self._subject_is_child(state):
             reply.message = self._ADULT_AGE_PROMPT
+        # Batch C BURDEN (Y-10): a fixed composite prompt must not
+        # re-list items the patient already denied. The filter runs
+        # only on pathway-detail composites: the emergency-screen list
+        # is a safety list and is never trimmed, whatever was denied.
+        if question.fact_key in DETAIL_FACT_KEYS:
+            reply.message = _strip_denied_items(reply.message, state.facts)
         return reply
+
+    def _screening_list_text(self) -> Optional[str]:
+        """The registered emergency-screen item list, from questions.json.
+
+        The list is read from the registered prompt at render time, never
+        restated from a second copy: O-06's list-less screening question
+        ("以下任一情况" with no items) is repaired by appending exactly
+        this registry text.
+        """
+        try:
+            prompt = self.content.question("emergency_screen").prompt
+        except Exception:
+            return None
+        if "：" in prompt:
+            items = prompt.split("：", 1)[1].strip().rstrip("？?")
+            return items or None
+        return None
+
+    def _ensure_screening_list(self, message: str) -> str:
+        """Append the screening item list when the text names none of it."""
+        items = self._screening_list_text()
+        if not items:
+            return message
+        alternatives: List[str] = []
+        for item in re.split(r"[、，,]", items):
+            alternatives.extend(part for part in item.split("或") if len(part) >= 2)
+        if any(alt in message for alt in alternatives):
+            return message
+        return message + f"（具体包括：{items}）"
+
+    def _completeness_gaps(self, state: CaseState) -> List[str]:
+        """Chief-complaint key items a recorded detail fact still lacks.
+
+        Batch C BURDEN (G-07): a constipation case whose gi_details was
+        recorded but never mentions straining effort or weight change
+        must not reach its first summary draft on the patient's own
+        correction. The check is a completeness gate, not a clinical
+        threshold: it only names which recorded-detail sub-items are
+        still missing so they can be asked first.
+        """
+        chief_texts = [
+            text for text in self.content.chief_complaint_texts(state) if text
+        ]
+        chief = " ".join(chief_texts)
+        if not any(
+            term in chief
+            for term in ("便秘", "排便困难", "大便干", "排便费力", "拉不出", "解不出")
+        ):
+            return []
+        detail = state.facts.get("gi_details")
+        if detail is None:
+            return []
+        text = ""
+        if isinstance(detail.value, str):
+            text += detail.value
+        if detail.evidence:
+            text += str(detail.evidence)
+        gaps: List[str] = []
+        if not any(term in text for term in ("费力", "费劲", "用力", "困难")):
+            gaps.append("排便费力程度")
+        if not any(
+            term in text
+            for term in ("体重", "瘦", "胖", "轻了", "重了", "没变", "不变", "下降", "增加")
+        ):
+            gaps.append("体重变化")
+        return gaps
 
     @staticmethod
     def _subject_is_child(state: CaseState) -> bool:
@@ -1865,9 +2051,83 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                             turn_id=turn_id,
                         )
                     )
+                elif (
+                    proposal["key"] == "trajectory"
+                    and proposal["value"] == "stable"
+                    and any(
+                        phrase in (proposal.get("evidence") or "")
+                        for phrase in FLUCTUATION_PHRASES
+                    )
+                ):
+                    # Batch C BURDEN (D-02): fluctuation wording
+                    # ("此起彼伏，旧的消了新的又起") is waxing and
+                    # waning, not steadiness. A free-text answer that
+                    # matches no single option must not be forced onto
+                    # the nearest one: reject with guidance to record
+                    # unknown or clarify with an open question instead.
+                    rejected.append(
+                        {
+                            "key": "trajectory",
+                            "ok": False,
+                            "reason": (
+                                "证据表述为波动交替，不得记为变化不大"
+                            ),
+                            "guidance": (
+                                "请记为说不清（unknown），或用开放式追问澄清总体"
+                                "趋势后再提议，不得把波动描述强行映射为稳定。"
+                            ),
+                        }
+                    )
+                    self.events.append(
+                        Event(
+                            state.session_id,
+                            "fact.trajectory_fluctuation_guard",
+                            {
+                                "key": "trajectory",
+                                "evidence": proposal.get("evidence"),
+                            },
+                            turn_id=turn_id,
+                        )
+                    )
                 else:
                     guarded_proposals.append(proposal)
             proposals = guarded_proposals
+            # Batch C BURDEN (O-06): an answer given while the screening
+            # question is active IS the screening answer. When the model
+            # files it elsewhere (associated_symptoms) instead, the host
+            # files the denial as the screening fact itself, so the
+            # screen is not left unanswered to be re-asked verbatim.
+            # This mirrors the deterministic engine, which interprets
+            # any reply against the active question; only denial replies
+            # are backstopped here (affirmations are triage-owned).
+            active_screen = next(
+                (
+                    q
+                    for q in self.content.questions
+                    if q.id == state.active_question
+                ),
+                None,
+            )
+            if (
+                active_screen is not None
+                and active_screen.fact_key == "emergency_screen"
+                and not any(
+                    item["key"] == "emergency_screen" for item in proposals
+                )
+                and (
+                    "都没有" in text
+                    or text.strip().startswith(("没有", "无", "都没", "否认"))
+                )
+            ):
+                proposals.append(
+                    {
+                        "key": "emergency_screen",
+                        "value": None,
+                        "assertion": Assertion.ABSENT,
+                        "evidence": text,
+                        "correction": False,
+                    }
+                )
             if not proposals and rejected:
                 return {
                     "ok": False,
@@ -1906,9 +2166,25 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     if incoming_subject in {"child", "other_adult"}
                     else Source.PATIENT
                 )
+                # Batch C BURDEN (O-12), same merge as the deterministic
+                # engine's _record_fact: a non-correction writeback must
+                # not drop earlier denial/unknown segments. (In practice
+                # validated non-correction proposals cannot target an
+                # already-recorded key, so this is a backstop; explicit
+                # corrections replace, as in correct_fact.)
+                value = proposal["value"]
+                if not proposal.get("correction"):
+                    previous = state.facts.get(proposal["key"])
+                    if previous is not None and isinstance(value, str):
+                        previous_text = (
+                            previous.value
+                            if isinstance(previous.value, str)
+                            else previous.evidence
+                        )
+                        value = merge_preserving_denials(previous_text, value)
                 fact = Fact(
                     key=proposal["key"],
-                    value=proposal["value"],
+                    value=value,
                     assertion=proposal["assertion"],
                     source=source,
                     turn_id=turn_id,
@@ -2030,6 +2306,24 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 raise ProposalError(
                     "该字段已被当前已知事实排除（如性别或年龄范围不适用），请改问其他主题"
                 )
+            # Batch C BURDEN (D-01/P-02): a topic whose fixed question
+            # was already asked AND whose fact is already recorded
+            # (including unknown) must not be re-asked as a fresh model
+            # question — that is the verbatim-repeat loop ("刚才说过了").
+            # Targeted follow-ups on merely recorded, never-asked topics
+            # stay allowed (pinned by
+            # test_recorded_topic_allows_targeted_follow_up), and a
+            # genuine re-ask stays possible through clarify, which is
+            # capped at two per topic.
+            if (
+                question.id in state.asked_questions
+                and spec["topic"] in state.facts
+            ):
+                raise ProposalError(
+                    "该主题已经问过且已有记录，不得原样重问；"
+                    "如需新信息请用 clarify，并先说明还不够区分什么，"
+                    "追问所得的否认项须落账进同一事实键。"
+                )
             state.phase = question.phase
             state.active_question = question.id
             state.active_question_is_clarification = False
@@ -2053,8 +2347,34 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     for phrase in ("不想说", "不说", "拒绝", "不方便")
                 )
             ]
+            # Batch C BURDEN render layer (Y-10/O-06/K-04): the delivered
+            # text, not just the decision, is what the patient reads.
+            # Detail composites drop already-denied items; a screening
+            # question gains the registered item list; and a
+            # multi-option question whose text points at "以下这些" but
+            # lists no option must list its options in the text, so the
+            # option set is visible somewhere (quick_replies or text)
+            # instead of dangling as K-04's empty quick_replies did.
+            display_question = spec["question"]
+            if spec["topic"] in DETAIL_FACT_KEYS:
+                display_question = _strip_denied_items(
+                    display_question, state.facts
+                )
+            if spec["topic"] == "emergency_screen":
+                display_question = self._ensure_screening_list(display_question)
+            labels = [
+                item["label"] for item in spec["options"] if item.get("label")
+            ]
+            if (
+                labels
+                and any(word in display_question for word in ("以下", "下列"))
+                and not any(label in display_question for label in labels)
+            ):
+                display_question = (
+                    display_question + "（选项：" + "、".join(labels) + "）"
+                )
             return AgentReply(
-                spec["question"],
+                display_question,
                 question.phase,
                 kind="question",
                 question_id=question.id,
@@ -2086,6 +2406,19 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             prohibited = ("毫克", "mg", "服用", "确诊", "可以排除", "用力按", "屏住呼吸")
             if any(p in message for p in prohibited):
                 raise ProposalError("澄清不能生成处方、排除性结论或自查动作")
+            # Batch C BURDEN (O-06): a completed screen is not re-asked
+            # verbatim. A supplement for uncovered items stays possible,
+            # but it must say so ("补问"/"新增") and ask only the new
+            # items — the render layer below still attaches the list.
+            if (
+                topic == "emergency_screen"
+                and topic in state.facts
+                and not any(word in message for word in ("补问", "新增"))
+            ):
+                raise ProposalError(
+                    "急症筛查已有记录，不得原样重问；"
+                    "补问未覆盖项目时请说明是补问并只问新增项目。"
+                )
             # B route, same discipline as ask_patient. The body-location
             # task path is exempt: its messages are short task prompts
             # (<=80 chars) where a bridging sentence would break the format.
@@ -2109,7 +2442,14 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 q.id for q in self.content.questions if q.fact_key == topic
             )
             state.phase = Phase.HISTORY
-            return AgentReply(message, state.phase, question_id=state.active_question)
+            display_message = message
+            if topic in DETAIL_FACT_KEYS:
+                display_message = _strip_denied_items(display_message, state.facts)
+            if topic == "emergency_screen":
+                display_message = self._ensure_screening_list(display_message)
+            return AgentReply(
+                display_message, state.phase, question_id=state.active_question
+            )
         if tool == "show_self_check":
             if state.self_check_conversation and state.self_check_conversation["task"][
                 "id"
@@ -2214,6 +2554,20 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     for key in missing
                 ]
                 raise ProposalError("必要字段尚未尝试：" + ",".join(labelled))
+            # Batch C BURDEN (G-07): completeness check before the first
+            # summary draft. A recorded detail fact can still lack the
+            # chief complaint's key items (constipation without straining
+            # effort or weight change); those are asked first instead of
+            # reaching the draft for the patient to correct. Abstention
+            # does not excuse this gate: it excuses unexplored pathways,
+            # not missing sub-items of a recorded detail fact.
+            gaps = self._completeness_gaps(state)
+            if gaps:
+                raise ProposalError(
+                    "摘要确认前完整性检查未通过：主诉关键项尚未记录："
+                    + "、".join(gaps)
+                    + "。请先追问这些项再出摘要首版，不得依赖患者主动更正。"
+                )
             if unexplored and not already_summarized and abstain_reason:
                 self.events.append(
                     Event(

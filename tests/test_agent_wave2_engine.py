@@ -516,7 +516,12 @@ class SpokenCloseVerificationTests(unittest.TestCase):
         self.assertNotEqual(line, "")
         self.assertTrue(final.message.startswith(line))
         self.assertEqual(final.message.count(line), 1)
-        self.assertTrue("小时内" in line or "在家观察" in line)
+        # Batch C rework (P-10): self_care home observation is now
+        # spoken once, in the framing opener ("在家先观察"), not in
+        # the repeated main sentence ("在家观察").
+        self.assertTrue(
+            "小时内" in line or "在家观察" in line or "在家先观察" in line
+        )
         # The already-closed guard reply must not repeat the line.
         guard = self.submit("还有个问题")
         self.assertNotIn(line, guard.message)

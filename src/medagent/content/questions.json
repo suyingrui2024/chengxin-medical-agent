@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-24.v3",
+  "version": "2026-10-25.v1",
   "questions": [
     {
       "id": "consult_for",
@@ -440,6 +440,54 @@
       },
       "blocking": false,
       "note": "患者自述体温（口头报告的读数），不是图示自查任务的测量结果；与宿主只读观察字段 temperature_c 区分，两者不得互相覆盖。伴随症状中提及发热时同样可问（applies_also_when）：主诉未提发热、但伴随症状已记录发热的，不再因只看主诉而不可请求；否认或未肯定发热的表述不触发。"
+    },
+    {
+      "id": "infant_observable_signs",
+      "phase": "history",
+      "fact_key": "infant_observable_signs",
+      "input": "text_or_absent",
+      "prompt": "请从家长能直接看到的情况说说：宝宝最近哭闹有没有比平时多、有没有拒食或吃奶变少、精神状态怎么样、小便次数和尿量有没有变少、排便性状（次数、稀、水样、有没有血）有没有变化？",
+      "applies_when": {
+        "chief_complaint_contains_any": [
+          "腹痛",
+          "肚子疼",
+          "肚子痛",
+          "腹泻",
+          "拉肚子",
+          "拉稀",
+          "便血",
+          "肚子不舒服",
+          "肚子难受",
+          "胃痛",
+          "胃疼"
+        ]
+      },
+      "age_between_when_known": [
+        0,
+        3
+      ]
+    },
+    {
+      "id": "eye_warning_signs",
+      "phase": "history",
+      "fact_key": "eye_warning_signs",
+      "input": "text_or_absent",
+      "prompt": "眼睛方面请逐项说说有没有：看东西变模糊或视力下降、眼睛剧烈疼痛、眼睛受过外伤或撞击、发烧？",
+      "applies_when": {
+        "chief_complaint_contains_any": [
+          "眼睛",
+          "眼红",
+          "眼痛",
+          "眼痒",
+          "眼皮",
+          "视力",
+          "结膜",
+          "眼睛红",
+          "眼睛疼",
+          "眼睛痒",
+          "眼肿"
+        ]
+      }
     },
     {
       "id": "medications_taken",

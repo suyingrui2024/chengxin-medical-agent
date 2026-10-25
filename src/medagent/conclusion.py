@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from copy import deepcopy
 from importlib import resources
 from typing import Any, Dict, List, Optional
@@ -599,25 +600,100 @@ def _gaps(state: CaseState, summary, accepted) -> List[Dict[str, Any]]:
     ]
 
 
+def format_window_text(disposition, window_hours=None) -> str:
+    """Single-source window/disposition sentence (batch C, G-02/U-02).
+
+    The conclusion sheet and the spoken close line must never carry
+    two competing meanings for the same window: the sheet's
+    disposition text is generated through this helper, and the close
+    layer (which owns ``spoken_close_line``) should call this helper
+    with the sheet's disposition dict instead of hard-coding its own
+    window sentence. One disposition instance therefore yields one
+    window sentence in both surfaces.
+
+    ``disposition`` may be a level string (``"routine_visit"``) or a
+    disposition dict (``level`` / ``window_hours`` / ``text``, plus
+    the optional generator keys ``window_kind`` and
+    ``rule_out_label``). A dict that already carries ``text`` is
+    canonicalised from that text, so a composed sheet round-trips
+    to its own sentence:
+
+    * ``window_kind == "after_if_not_improved"`` (or a text containing
+      “后还没有好转”) -> “可以在家先观察；把下方缺的信息补上，
+      如果 {window} 小时后还没有好转，请到线下医疗机构就诊。”
+      This is the significant-gap upgrade variant; it is NOT
+      rewritten into a “within” sentence, and no new threshold is
+      introduced — the sheet's own variant is preserved verbatim.
+    * any other ``routine_visit`` -> “请在 {window} 小时内…”
+      (with “排除 {label}” when a rule-out label is present).
+    * ``urgent_today`` -> today sentence; ``self_care`` -> the
+      sheet's observe sentence. Unknown levels fall back to the
+      dict's own text, or "" when there is none.
+    """
+    if isinstance(disposition, dict):
+        level = str(disposition.get("level") or "")
+        window = window_hours if window_hours is not None else disposition.get("window_hours")
+        text = str(disposition.get("text") or "")
+        rule_out_label = disposition.get("rule_out_label")
+        window_kind = disposition.get("window_kind")
+    elif isinstance(disposition, str):
+        level = disposition
+        window = window_hours
+        text = ""
+        rule_out_label = None
+        window_kind = None
+    else:
+        return ""
+    if level == "urgent_today":
+        return "建议今天内到线下医疗机构当面评估，不要在家观察等待。"
+    if level == "self_care":
+        return "可以先在家观察；如果提前加重或出现下方任何警示信号，请及时就医。"
+    if level == "routine_visit":
+        if window_kind == "after_if_not_improved" or "后还没有好转" in text:
+            if window is None:
+                return "可以在家先观察；把下方缺的信息补上，如果还没有好转，请到线下医疗机构就诊。"
+            return (
+                "可以在家先观察；把下方缺的信息补上，"
+                f"如果 {window} 小时后还没有好转，请到线下医疗机构就诊。"
+            )
+        if rule_out_label is None and "排除" in text:
+            match = re.search(r"排除(.+?)。", text)
+            if match and match.group(1).strip():
+                rule_out_label = match.group(1).strip()
+        if window is None:
+            return "可以在家先观察；请尽快到线下医疗机构就诊评估。"
+        if rule_out_label:
+            return (
+                f"可以在家先观察；请在 {window} 小时内到线下医疗机构就诊，"
+                f"排除 {rule_out_label}。"
+            )
+        return f"可以在家先观察；请在 {window} 小时内到线下医疗机构就诊评估。"
+    if text:
+        return text if text.endswith(("。", "！", "？")) else text + "。"
+    return ""
+
+
 def _disposition(state, tier, directions, due_hours, show_directions):
     if tier == "urgent":
         return {
             "level": "urgent_today",
             "window_hours": due_hours or 24,
-            "text": "建议今天内到线下医疗机构当面评估，不要在家观察等待。",
+            "text": format_window_text("urgent_today"),
             "department_hint": None,
         }
     rule_outs = [d for d in directions if d["group"] == "rule_out"]
     if rule_outs:
         window = due_hours or 48
         top = rule_outs[0]
-        if show_directions and top.get("patient_label"):
-            text = (
-                f"可以在家先观察；请在 {window} 小时内到线下医疗机构就诊，"
-                f"排除 {top['patient_label']}。"
-            )
-        else:
-            text = f"可以在家先观察；请在 {window} 小时内到线下医疗机构就诊评估。"
+        label = top.get("patient_label") if show_directions else None
+        text = format_window_text(
+            {
+                "level": "routine_visit",
+                "window_hours": window,
+                "rule_out_label": label,
+            },
+            window,
+        )
         return {
             "level": "routine_visit",
             "window_hours": window,
@@ -627,11 +703,260 @@ def _disposition(state, tier, directions, due_hours, show_directions):
     return {
         "level": "self_care",
         "window_hours": due_hours,
-        "text": (
-            "可以先在家观察；如果提前加重或出现下方任何警示信号，请及时就医。"
-        ),
+        "text": format_window_text("self_care"),
         "department_hint": None,
     }
+
+
+# Batch C assertion-state wording (T-04): outlook and safety-net text
+# must agree with the recorded assertion state. This is wording logic
+# only — it never decides which symptoms belong in the safety net
+# (no new clinical mapping is created here).
+_QUALIFIED_MARKERS = ("新出现", "突然出现", "明显加重", "迅速加重", "加重")
+_GENERIC_WORD_FRAGMENTS = {"症状", "出现", "感觉", "不适", "情况", "问题"}
+
+
+def _strip_qualifiers(item: str) -> str:
+    core = str(item or "")
+    for marker in ("新出现或加重", "新出现", "突然出现", "明显加重", "迅速加重", "或加重", "加重"):
+        core = core.replace(marker, "")
+    return core.strip(" ，、。；")
+
+
+def _denied_texts(state: CaseState) -> List[str]:
+    texts: List[str] = []
+    for fact in state.facts.values():
+        if fact.assertion != Assertion.ABSENT:
+            continue
+        if fact.value is not None:
+            texts.append(str(fact.value))
+        if fact.evidence:
+            texts.append(str(fact.evidence))
+    return texts
+
+
+def _adjust_assertion_wording(sheet: Dict[str, Any], state: CaseState) -> Dict[str, Any]:
+    """T-04: rewrite outlook / return_now_if by assertion state.
+
+    * Outlook: a symptom already PRESENT must not be listed under
+      “新出现” — it is removed from that enumeration (other tokens
+      stay); if the enumeration empties, the clause becomes an
+      “原有症状有没有加重” check.
+    * return_now_if: an item for a symptom the patient explicitly
+      denied is kept only with a “新出现” qualifier appended
+      (suffix style, matching the existing “肢体无力新出现” items).
+      Denial matching is verbatim first, then a shared 2-character
+      fragment with a denied text — qualifying on a loose match is
+      fail-safe here (it narrows the alert to a new occurrence
+      without removing it); items already qualified are untouched.
+    """
+    if not isinstance(sheet, dict):
+        return sheet
+    present_texts = ""
+    for fact in state.facts.values():
+        if fact.assertion != Assertion.PRESENT:
+            continue
+        if fact.value is not None:
+            present_texts += str(fact.value)
+        if fact.evidence:
+            present_texts += str(fact.evidence)
+    outlook = sheet.get("outlook")
+    if isinstance(outlook, str) and "新出现" in outlook:
+        def _rewrite(match: "re.Match[str]") -> str:
+            prefix = match.group(1) or ""
+            enumeration = match.group(2) or ""
+            tokens = [
+                token.strip()
+                for token in re.split(r"[、，或]", enumeration)
+                if token.strip()
+            ]
+            kept = [token for token in tokens if token not in present_texts]
+            if kept:
+                return f"{prefix}新出现{'、'.join(kept)}"
+            if prefix:
+                return "原有症状有没有加重"
+            return "原有症状加重"
+
+        sheet["outlook"] = re.sub(
+            r"(有没有)?新出现([^，。；]+)", _rewrite, outlook, count=1
+        )
+    denied = _denied_texts(state)
+    if denied and isinstance(sheet.get("return_now_if"), list):
+        adjusted: List[str] = []
+        for item in sheet["return_now_if"]:
+            text = str(item)
+            if any(marker in text for marker in _QUALIFIED_MARKERS):
+                adjusted.append(text)
+                continue
+            core = _strip_qualifiers(text)
+            denied_match = False
+            if core and any(core in denied_text for denied_text in denied):
+                denied_match = True
+            elif len(core) >= 2:
+                for start in range(len(core) - 1):
+                    fragment = core[start : start + 2]
+                    if fragment in _GENERIC_WORD_FRAGMENTS:
+                        continue
+                    if any(fragment in denied_text for denied_text in denied):
+                        denied_match = True
+                        break
+            adjusted.append(f"{text}新出现" if denied_match else text)
+        sheet["return_now_if"] = adjusted
+    return sheet
+
+
+_SHORT_TERM_OUTLOOK_MARKERS = ("数天内", "几天内", "1–2 天内", "3–5 天", "数天")
+_CHRONIC_OUTLOOK = (
+    "这类不适已持续一段时间，观察期间重点看整体状态是好转还是加重，"
+    "出现下方警示信号请及时就医。"
+)
+
+
+def _onset_is_chronic_gradual(state: CaseState) -> bool:
+    """E-04/U-09: a gradual onset at week/month/year scale.
+
+    Narrow on purpose: a gradual marker （逐渐/慢慢/渐渐） plus a
+    week-or-longer duration unit （周/月/年/长期）, or an explicit
+    “慢性”. A sudden onset, or a gradual onset measured only in days,
+    does not trigger this — those keep their existing outlook.
+    """
+    fact = state.facts.get("onset")
+    if fact is None or fact.assertion != Assertion.PRESENT:
+        return False
+    text = ""
+    if fact.value is not None:
+        text += str(fact.value)
+    if fact.evidence:
+        text += str(fact.evidence)
+    if "慢性" in text:
+        return True
+    gradual = any(marker in text for marker in ("逐渐", "慢慢", "渐渐"))
+    long_unit = any(unit in text for unit in ("周", "月", "年", "长期"))
+    return gradual and long_unit
+
+
+def _adjust_chronic_outlook(sheet: Dict[str, Any], state: CaseState) -> Dict[str, Any]:
+    """E-04/U-09: a chronic gradual course must not be paired with a
+    short-term relief template (“数天内缓解” class). Only the time
+    claim is replaced — by a duration-acknowledging observation
+    sentence with no relief-time prognosis — and only when the
+    current outlook actually carries such a claim; outlooks without
+    a time claim are left untouched."""
+    if not isinstance(sheet, dict):
+        return sheet
+    outlook = sheet.get("outlook")
+    if (
+        isinstance(outlook, str)
+        and outlook
+        and _onset_is_chronic_gradual(state)
+        and any(marker in outlook for marker in _SHORT_TERM_OUTLOOK_MARKERS)
+    ):
+        sheet["outlook"] = _CHRONIC_OUTLOOK
+    return sheet
+
+
+_INFANT_OBSERVABLE_DO = "把哭闹、拒食、精神、尿量和排便性状的变化记下来，就诊时告诉医生"
+_INFANT_OBSERVABLE_MEASURE = "记录哭闹、精神、小便和大便性状的变化"
+_INFANT_WORSENING = "哭闹明显加重、精神变差或尿量明显减少"
+
+
+def _is_infant_case(state: CaseState) -> bool:
+    """P-17: subject is a child who cannot be presumed to report pain.
+
+    Primary gate: consult_for == child with a recorded age <= 3
+    years (age_years is stored in years; < 2 displays as months).
+    Secondary gate, for cases where the age was not captured: the
+    subject is a child and a recorded fact says pain cannot be
+    described （说不清 + 疼/痛 in the same fact text, e.g. the P-17
+    “宝宝还小，说不清肚子疼” evidence). Older children keep the
+    existing adult wording — this never rewrites a self-reporting
+    child's sheet."""
+    subject = state.facts.get("consult_for")
+    if (
+        subject is None
+        or subject.assertion != Assertion.PRESENT
+        or str(subject.value) != "child"
+    ):
+        return False
+    age = state.facts.get("age_years")
+    if (
+        age is not None
+        and age.assertion == Assertion.PRESENT
+        and isinstance(age.value, (int, float))
+        and not isinstance(age.value, bool)
+        and age.value <= 3
+    ):
+        return True
+    for fact in state.facts.values():
+        text = ""
+        if fact.value is not None:
+            text += str(fact.value)
+        if fact.evidence:
+            text += str(fact.evidence)
+        if "说不清" in text and ("疼" in text or "痛" in text):
+            return True
+    return False
+
+
+def _apply_infant_observable(sheet: Dict[str, Any], state: CaseState) -> Dict[str, Any]:
+    """P-17 conclusion side: for an infant case, pain-reporting
+    self-care / warning items are replaced by caregiver-observable
+    ones (crying, refusal to eat, alertness, urine output, stool
+    character). Avoid items are untouched (medication wording is
+    not pain reporting)."""
+    if not isinstance(sheet, dict) or not _is_infant_case(state):
+        return sheet
+    care = sheet.get("self_care")
+    if isinstance(care, dict):
+        care["do"] = [
+            _INFANT_OBSERVABLE_DO
+            if ("疼痛" in item and ("记下来" in item or "记录" in item))
+            else item
+            for item in care.get("do", [])
+        ]
+        care["measure"] = [
+            _INFANT_OBSERVABLE_MEASURE if "疼痛" in item else item
+            for item in care.get("measure", [])
+        ]
+    if isinstance(sheet.get("return_now_if"), list):
+        sheet["return_now_if"] = [
+            _INFANT_WORSENING if "腹痛" in item else item
+            for item in sheet["return_now_if"]
+        ]
+    return sheet
+
+
+def _apply_eye_generic_worsening(sheet: Dict[str, Any], state: CaseState) -> Dict[str, Any]:
+    """Y-03 conclusion side, bounded by the batch-C brief: for a
+    red/itch eye chief (the Y-03 conjunctivitis shape), the safety
+    net is the generic four items plus one generic worsening item
+    anchored to the recorded domain （眼睛不适明显加重）. The
+    trigger is deliberately narrow — red/itch eye wording only —
+    so other eye presentations keep their pinned safety net
+    untouched (e.g. the sudden-vision sheet whose return_now_if is
+    pinned to exactly the generic four). No eye-specific clinical
+    warning items （视力下降 / 剧痛 / 外伤 / 发热 as safety-net
+    entries) are invented here — those need clinical sign-off and
+    are recorded as a residual; the eye-specific *questions* live
+    in questions.json instead."""
+    if not isinstance(sheet, dict):
+        return sheet
+    chief = state.facts.get("chief_complaint")
+    chief_text = ""
+    if chief is not None:
+        if chief.value is not None:
+            chief_text += str(chief.value)
+        if chief.evidence:
+            chief_text += str(chief.evidence)
+    if not any(
+        term in chief_text
+        for term in ("眼红", "眼睛红", "眼痒", "眼睛痒", "结膜")
+    ):
+        return sheet
+    if list(sheet.get("return_now_if") or []) != list(RETURN_NOW_IF):
+        return sheet
+    sheet["return_now_if"] = list(RETURN_NOW_IF) + ["眼睛不适明显加重"]
+    return sheet
 
 
 def _department_hint(
@@ -1020,9 +1345,13 @@ def compose_conclusion(
             disposition = {
                 "level": "routine_visit",
                 "window_hours": window,
-                "text": (
-                    "可以在家先观察；把下方缺的信息补上，"
-                    f"如果 {window} 小时后还没有好转，请到线下医疗机构就诊。"
+                "text": format_window_text(
+                    {
+                        "level": "routine_visit",
+                        "window_hours": window,
+                        "window_kind": "after_if_not_improved",
+                    },
+                    window,
                 ),
                 "department_hint": None,
             }
@@ -1147,19 +1476,43 @@ def compose_conclusion(
             "conclusion_narrative": _narrative_templates().get("version"),
         },
     }
-    # Off-pathway neutral fallback (batch A, W2): a direction-less sheet
-    # whose chief complaint triggers no pathway at all must not speak
-    # with a probed pathway's language. Applied before the lint so the
-    # neutral wording is linted like everything else. Pathway-matched
-    # abstained sheets keep the explored-pathway safety net (run3
-    # case3, pinned by test). A safety net the caller supplied via
-    # summary is the caller's explicit list and is restored after the
-    # fallback (pinned by test_summary_list_used_when_no_pathway).
+    # Off-pathway neutral fallback (batch A, W2, verified in batch
+    # C for E-02/K-09/Y-07): a direction-less sheet whose chief
+    # complaint triggers no pathway at all must not speak with a
+    # probed pathway's language. The batch-C check here is
+    # deliberately NOT generalised to non-abstained sheets: a
+    # direction that carries at least two distinct valid evidence
+    # tokens drives its group by the batch-B sheet_group rule
+    # (pinned by test_two_valid_quotes_drive_their_group), even
+    # when its group differs from the chief's pathway — changing
+    # that anchoring would be a reasoning-layer change, outside
+    # this narrative layer's scope. The round-1 E-02/K-09/Y-07
+    # patterns are all abstained or single-token (see the batch-C
+    # tests), so the batch-A fallback already covers them, and
+    # apply_neutral_fallback is reused as-is, never duplicated.
+    # Directions themselves, disposition, department hint, worry
+    # and goal are untouched by apply_neutral_fallback, so
+    # direction visibility still rests solely on the C3 gate.
+    # Pathway-matched abstained sheets keep the explored-pathway
+    # safety net (run3 case3, pinned by test). A safety net the
+    # caller supplied via summary is the caller's explicit list
+    # and is restored after the fallback (pinned by
+    # test_summary_list_used_when_no_pathway). Applied before the
+    # lint so the neutral wording is linted like everything else.
     if abstained and not chief_matches_pathway(str(state.get("chief_complaint") or "")):
         sheet = apply_neutral_fallback(sheet)
         summary_alerts = (summary or {}).get("return_now_if")
         if summary_alerts:
             sheet["return_now_if"] = list(summary_alerts)
+    # Batch C wording post-processing, in order: assertion-state
+    # wording (T-04), chronic-outlook consistency (E-04/U-09),
+    # infant-observable wording (P-17), eye-domain generic
+    # worsening (Y-03). None of these touch worry/goal slots,
+    # disposition level/window, or direction visibility.
+    sheet = _adjust_assertion_wording(sheet, state)
+    sheet = _adjust_chronic_outlook(sheet, state)
+    sheet = _apply_infant_observable(sheet, state)
+    sheet = _apply_eye_generic_worsening(sheet, state)
     # The banned-phrase lint guards *system* wording. Patient quotes
     # (support_quotes) are the patient's own words — a patient writing
     # "没事，就是咳" must not silently void the whole sheet.
@@ -1190,12 +1543,28 @@ def spoken_close_line(conclusion: Optional[Dict[str, Any]]) -> str:
     window = disposition.get("window_hours")
     if level == "urgent_today":
         main = "建议今天内到线下医疗机构当面评估，不要在家观察等待。"
-    elif level == "routine_visit" and window:
-        main = f"可以在家先观察；请在 {window} 小时内到线下医疗机构就诊评估。"
     elif level == "routine_visit":
-        main = "可以在家先观察；请尽快到线下医疗机构就诊评估。"
+        # Batch C rework (G-02/U-02): single-source the spoken window
+        # sentence from the sheet's own disposition dict via
+        # format_window_text, so the upgrade variant ("48 小时后还没
+        # 有好转") and a visible rule-out label ("排除 …") round-trip
+        # verbatim instead of being rewritten into a "within" sentence
+        # or dropped. window_kind is not stored on the composed dict,
+        # but the helper recovers both from the sheet text; a hidden
+        # label stays hidden because the sheet text carries no label.
+        # Fallback to the previous hard-coded sentences only if the
+        # helper returns "" (it does not for routine_visit today).
+        main = format_window_text(disposition) or (
+            f"可以在家先观察；请在 {window} 小时内到线下医疗机构就诊评估。"
+            if window
+            else "可以在家先观察；请尽快到线下医疗机构就诊评估。"
+        )
     elif level == "self_care":
-        main = "可以先在家观察，暂时不需要专门跑一趟医院。"
+        # Batch C rework (P-10): the framing opener already says the
+        # case "可以在家先观察处理", so the main sentence must not
+        # repeat the home-observation concept ("可以先在家观察，…").
+        # Keep only the no-visit clause; framing is untouched.
+        main = "暂时不需要专门跑一趟医院。"
     else:
         text = str(disposition.get("text") or "").strip()
         if not text:

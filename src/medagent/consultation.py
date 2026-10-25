@@ -169,6 +169,90 @@ def _normalize_free_text(text: str) -> str:
     return (text or "").strip().strip(" 。！!，,、；;？?～~").replace(" ", "")
 
 
+# -- Batch C BURDEN (O-12): fact writeback merges, never overwrites -----
+# A later short writeback for the same key used to drop denial and
+# unknown segments recorded earlier ("没有受过外伤", "漏尿没注意过"),
+# leaving the handoff with an incomplete fact. Merging keeps exactly
+# those denial/unknown segments: ordinary present segments may still be
+# superseded, but a recorded denial or unknown is only displaced by an
+# explicit correction (merge=False) or by a new value that affirms the
+# very term that was denied. This is a text heuristic, not a clinical
+# rule: it preserves what the patient already said, it never invents
+# a value.
+_DENIAL_SEGMENT_MARKERS = (
+    "没有",
+    "没",
+    "无",
+    "否认",
+    "不注意",
+    "没注意",
+    "不清楚",
+    "不知道",
+    "没留意",
+    "未注意",
+)
+
+
+def _denial_segments(text: str) -> List[str]:
+    segments: List[str] = []
+    current = ""
+    for char in text:
+        if char in "、，；。":
+            if current.strip():
+                segments.append(current.strip())
+            current = ""
+        else:
+            current += char
+    if current.strip():
+        segments.append(current.strip())
+    return [
+        segment
+        for segment in segments
+        if len(segment) >= 2
+        and any(marker in segment for marker in _DENIAL_SEGMENT_MARKERS)
+    ]
+
+
+def _denied_core(segment: str) -> str:
+    """The term a denial segment denies, for the supersede check."""
+    for marker in ("没有", "没", "无", "否认"):
+        index = segment.find(marker)
+        if index >= 0:
+            return segment[index + len(marker) :]
+    return ""
+
+
+def _preserved_segments(previous_text: Optional[str], new_value: str) -> List[str]:
+    """Denial/unknown segments of ``previous_text`` the new value drops."""
+    if not previous_text or not isinstance(new_value, str):
+        return []
+    appended: List[str] = []
+    for segment in _denial_segments(previous_text):
+        if segment in new_value:
+            continue
+        core = _denied_core(segment)
+        if core and core in new_value and ("没有" + core) not in new_value:
+            # The new value affirms the denied term ("发烧了" after
+            # "没有发烧"): the denial is superseded, not preserved.
+            continue
+        appended.append(segment)
+    return appended
+
+
+def merge_preserving_denials(previous_text: Optional[str], new_value: str) -> str:
+    """Merge a new string writeback over a previous one (O-12).
+
+    Denial/unknown segments from ``previous_text`` that are neither
+    already present in ``new_value`` nor affirmed-away by it are
+    appended, so a short second writeback cannot silently drop them.
+    Non-string values and empty previous texts pass through untouched.
+    """
+    appended = _preserved_segments(previous_text, new_value)
+    if not appended:
+        return new_value
+    return new_value.rstrip("。！；") + "；" + "、".join(appended)
+
+
 def is_summary_confirmation_text(text: str) -> bool:
     """Free-text confirmation equivalent to tapping confirm_summary.
 
@@ -1000,7 +1084,9 @@ class ConsultationEngine(
                     turn_id=turn_id,
                 )
             )
-            self._record_fact(state, fact_key, result, turn_id, new_text)
+            # An explicit correction replaces the fact: merging here
+            # would resurrect the very denial the patient corrected away.
+            self._record_fact(state, fact_key, result, turn_id, new_text, merge=False)
             state.active_question = None
             state.active_task = None
             state.risk = self.triage.assess(state, new_text)
@@ -1593,6 +1679,7 @@ class ConsultationEngine(
         turn_id: str,
         evidence: Optional[str] = None,
         structured_input: Optional[Dict[str, Any]] = None,
+        merge: bool = True,
     ) -> None:
         source = result.source
         if source == Source.PATIENT and state.get("consult_for") in {
@@ -1600,9 +1687,23 @@ class ConsultationEngine(
             "other_adult",
         }:
             source = Source.CAREGIVER
+        value = result.value
+        preserved: List[str] = []
+        if merge:
+            previous = state.facts.get(key)
+            if previous is not None and isinstance(value, str):
+                previous_text = (
+                    previous.value
+                    if isinstance(previous.value, str)
+                    else previous.evidence
+                )
+                merged = merge_preserving_denials(previous_text, value)
+                if merged != value:
+                    preserved = _preserved_segments(previous_text, value)
+                    value = merged
         fact = Fact(
             key=key,
-            value=result.value,
+            value=value,
             assertion=result.assertion,
             source=source,
             quality=result.quality,
@@ -1614,6 +1715,15 @@ class ConsultationEngine(
         self.events.append(
             Event(state.session_id, "fact.recorded", fact.to_dict(), turn_id=turn_id)
         )
+        if preserved:
+            self.events.append(
+                Event(
+                    state.session_id,
+                    "fact.writeback_merged",
+                    {"fact_key": key, "preserved": preserved},
+                    turn_id=turn_id,
+                )
+            )
 
     def _try_task_result(self, state, text, choice_value, turn_id):
         # D-03: free-text "跳过" (with or without punctuation) counts as
@@ -2409,6 +2519,131 @@ class ConsultationEngine(
                 )
         return items[:8]
 
+    # -- Batch C (CLOSE-COPY) close-copy helpers ----------------------
+    # Three slots for emergency/urgent closes: (1) a short soothing
+    # acknowledgement, (2) a restatement of PRESENT facts in the
+    # patient's own words (evidence, never a mapped signal name alone),
+    # (3) a direct destination answer keyed only to the disposition
+    # level (EMERGENCY -> call 120 now; urgent_today -> go to
+    # emergency assessment today). No department field is read or
+    # rendered here: the named-department part of the batch-C items
+    # stays residual until the C12 sign-off, and the destination
+    # answer below is level wording, not a department value. The one
+    # exception is the dental-emergency routing wording in
+    # _close_routing_text, which is keyed to the patient's own words
+    # (a tooth/oral complaint in the confirmed facts or user turns),
+    # never to a department field.
+    _CLOSE_SOOTHING = "我听到你说的这些了，先别慌，按下面的步骤来就可以。"
+
+    @staticmethod
+    def _close_facts_text(items: List[Dict[str, Any]]) -> str:
+        """Render confirmed facts with patient evidence preferred.
+
+        ``_confirmed_facts_summary`` (batch A) already restricts to
+        PRESENT facts; here the evidence quote wins over the mapped
+        display value, so the patient sees their own words (e.g.
+        "呼吸费劲、胸闷") rather than only the scanner's label
+        (e.g. "严重呼吸困难").
+        """
+        parts = []
+        for item in items:
+            evidence = (item.get("evidence") or "").strip()
+            text = evidence if evidence else str(item.get("value") or "").strip()
+            if text:
+                parts.append(f"{item.get('label')}：{text}")
+        return "；".join(parts)
+
+    @staticmethod
+    def _close_window_text(disposition: Dict[str, Any], window_hours) -> Optional[str]:
+        """Window wording from conclusion.py, when that worker lands it.
+
+        The conclusion worker provides
+        ``format_window_text(disposition, window_hours)`` as the single
+        source of window wording; this side must not invent its own
+        numeric window. On the pre-merge baseline that helper does not
+        exist yet, so this returns None and callers fall back to the
+        disposition-level wording ("今天内") that already matches the
+        urgent_today disposition text. The call is tolerant of the
+        helper taking a level string instead of a dict. This side
+        never reads any field of the disposition other than level;
+        only the returned window string is ever rendered.
+        """
+        try:
+            from .conclusion import format_window_text
+        except Exception:
+            return None
+        level = disposition.get("level") if isinstance(disposition, dict) else disposition
+        stripped = {"level": level, "window_hours": window_hours}
+        # Try the caller's disposition first (the signature the
+        # conclusion worker was briefed on), then the stripped
+        # level/window form, then a bare level string. This side
+        # never reads any other field of the passed disposition;
+        # only the returned window string is ever rendered.
+        candidates = []
+        if isinstance(disposition, dict):
+            candidates.append(disposition)
+        candidates.extend([stripped, level])
+        for arg in candidates:
+            try:
+                out = format_window_text(arg, window_hours)
+            except Exception:
+                continue
+            if isinstance(out, str) and out.strip():
+                return out.strip()
+        return None
+
+    def _close_direct_sentence(
+        self, window_hours, disposition=None
+    ) -> str:
+        """Direct answer to "要不要马上去急诊" for urgent_today.
+
+        Level wording only: go to emergency assessment today. It is
+        unconditional on the patient-goal fact, so cases where the
+        goal question was skipped before the urgent close (K-13/F-11
+        pattern) still get the answer in the visible close.
+        """
+        window_text = self._close_window_text(
+            disposition if disposition is not None else {"level": "urgent_today"},
+            window_hours,
+        )
+        if window_text:
+            if window_text.endswith(("。", "！", "？")):
+                # The helper's window sentence names the generic entry
+                # ("线下医疗机构"); the direct-answer slot must name
+                # the level destination itself ("急诊"), so that one
+                # entry wording is specialised here. The time wording
+                # ("今天内") and the rest of the sentence still come
+                # from the helper; the sheet's own disposition text
+                # elsewhere is untouched.
+                specialised = window_text.replace("线下医疗机构", "急诊", 1)
+                return f"要不要马上去急诊：要，{specialised}"
+            return f"要不要马上去急诊：要，{window_text}去急诊当面评估。"
+        return "要不要马上去急诊：要，今天内去急诊当面评估。"
+
+    @staticmethod
+    def _close_routing_text(state: CaseState, items: List[Dict[str, Any]]) -> str:
+        """Dental-emergency routing (K-15), keyed to patient words only.
+
+        A tooth/oral complaint in the confirmed facts or in a user
+        turn earns the item's routing wording "口腔急诊/急诊科".
+        Anything else earns no routing sentence here: the 120
+        instruction (emergency) or the level direct answer (urgent)
+        already carries the destination.
+        """
+        texts = []
+        for item in items:
+            texts.append(str(item.get("evidence") or ""))
+            texts.append(str(item.get("value") or ""))
+        texts.extend(
+            item.get("content", "")
+            for item in state.transcript
+            if item.get("role") == "user"
+        )
+        joined = " ".join(texts)
+        if any(word in joined for word in ("牙", "牙齿", "口腔")):
+            return "接诊指向：口腔急诊/急诊科，到了先说明是牙外伤出血。"
+        return ""
+
     def _emergency_reply(
         self, state: CaseState, triggers: List[str], requested_help=False, *, include_clarification=False
     ) -> AgentReply:
@@ -2423,11 +2658,19 @@ class ConsultationEngine(
         state.active_task = None
         original = list(dict.fromkeys(triggers or []))
         confirmed_facts = self._confirmed_facts_summary(state)
+        facts_text = self._close_facts_text(confirmed_facts)
+        routing_text = self._close_routing_text(state, confirmed_facts)
         if requested_help:
             message = (
-                "你已选择优先求助。本次问诊已停止。"
-                "请现在拨打 120，或让身边的人协助呼叫急救；不要自己驾车。不要继续等待本次对话。"
+                self._CLOSE_SOOTHING
+                + "你已选择优先求助。本次问诊已停止。"
+                "请现在拨打 120，或让身边的人协助呼叫急救；不要自己驾车。"
             )
+            if facts_text:
+                message += f"已确认的情况：{facts_text}。"
+            if routing_text:
+                message += routing_text
+            message += "不要继续等待本次对话。"
             summary = {
                 "care_route": "立即急救",
                 "triggers": original,
@@ -2452,12 +2695,11 @@ class ConsultationEngine(
                         {"original": original, "rendered": rendered},
                     )
                 )
-            message = emergency_explanation(rendered)
-            if confirmed_facts:
-                facts_text = "；".join(
-                    f"{item['label']}：{item['value']}" for item in confirmed_facts
-                )
+            message = self._CLOSE_SOOTHING + emergency_explanation(rendered)
+            if facts_text:
                 message += f"已确认的情况：{facts_text}。"
+            if routing_text:
+                message += routing_text
             message += "不要继续等待本次对话。"
             summary = {
                 "care_route": "立即急救",
@@ -2480,29 +2722,37 @@ class ConsultationEngine(
         reply = self._finish(state, risk_override=deepcopy(state.risk))
         reply.kind = "urgent"
         triggers = "、".join(state.risk.triggers)
-        # Batch C owns close copy; the minimal overlap here is only that
-        # the "下面是已采集的信息" promise must not stand without the
+        # Batch C close copy: soothing + direct destination answer +
+        # facts, on top of the batch-A promise rule. The
+        # "下面是已采集的信息" promise must not stand without the
         # information itself: list the collected facts inline when there
-        # are any, and drop the promise clause entirely when there are
-        # none (the structured summary still rides on the reply).
+        # are any (with the "已采集的信息：" lead-in, which is only
+        # ever used together with the list), and drop any such clause
+        # entirely when there are none (the structured summary still
+        # rides on the reply). The destination answer is keyed only to
+        # the urgent_today level via _close_direct_sentence; no
+        # department field is read here (C12 residual).
         items = self._confirmed_facts_summary(state)
+        facts_text = self._close_facts_text(items)
+        plan = state.follow_up or reply.follow_up or {}
+        direct = self._close_direct_sentence(plan.get("due_in_hours") or 24)
+        head = (
+            self._CLOSE_SOOTHING
+            + "目前有需要尽快就医评估的线索（"
+            + triggers
+            + "）。"
+            + direct
+            + "建议今天联系医疗机构；"
+        )
         if items:
-            facts_text = "；".join(
-                f"{item['label']}：{item['value']}" for item in items
-            )
             reply.message = (
-                "目前有需要尽快就医评估的线索（"
-                + triggers
-                + "）。建议今天联系医疗机构；已采集的信息："
+                head
+                + "已采集的信息："
                 + facts_text
                 + "，不必等问诊补齐再求助。"
             )
         else:
-            reply.message = (
-                "目前有需要尽快就医评估的线索（"
-                + triggers
-                + "）。建议今天联系医疗机构，不必等问诊补齐再求助。"
-            )
+            reply.message = head + "不必等问诊补齐再求助。"
         state.closed_reason = "urgent_route"
         return reply
 
@@ -3023,7 +3273,24 @@ class ConsultationEngine(
                         extra += piece
             except Exception:
                 extra = ""
-            reply.message = line + sentence + extra + reply.message
+            # Batch C (CLOSE-COPY): a confirmed close whose sheet is
+            # urgent_today also speaks the level direct answer, so the
+            # chat stream alone answers "要不要马上去急诊". This is
+            # inserted before the batch-A sentence and the batch-B
+            # worry/goal appends, whose relative order is untouched;
+            # self_care sheets (all batch-B tests) get no direct
+            # sentence and are byte-identical to before. Window
+            # wording inside the direct sentence comes from
+            # _close_direct_sentence (format_window_text when present,
+            # otherwise the urgent_today level wording); no new window
+            # is invented here.
+            direct = ""
+            if disposition.get("level") == "urgent_today":
+                direct = self._close_direct_sentence(
+                    disposition.get("window_hours") or 24,
+                    disposition=disposition,
+                )
+            reply.message = line + direct + sentence + extra + reply.message
 
     @staticmethod
     def _self_check_block_reason(state):
