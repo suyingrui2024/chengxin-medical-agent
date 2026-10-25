@@ -507,6 +507,11 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             )
         )
         state.transcript.append({"role": "user", "content": text})
+        # Batch B worry capture: the adaptive engine does not share the
+        # deterministic engine's _begin_turn, so its own _submit calls
+        # the same shared helper here, on the finalized turn text, with
+        # the same first-wins / never-patient_goal semantics.
+        self._capture_worry(state, text, turn_id)
 
         # Emergency evaluation precedes model invocation, including closed contexts.
         risk = self.triage.assess(

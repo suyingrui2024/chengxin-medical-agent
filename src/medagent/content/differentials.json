@@ -1,5 +1,5 @@
 {
-  "note": "Differential-diagnosis pathways for the reasoning core (design phase 3, rule-based proposer v1). Conditions are a small deterministic DSL over recorded facts: contains_any (substring on the fact value's text), assertion, equals, gte/lte (numeric). Every support/refute entry that fires becomes an EvidenceRef whose quote is the matched text, validated against the fact's recorded evidence before the hypothesis may enter the workspace. Clinical ownership: these pathways are engineering v1 content for the existing respiratory/chest scope and require clinician review before any clinical claim. discriminating_questions lists question ids, except temperature_c which names the measurement fact (no bank question exists; it arrives via the self-check task) — consumers must treat it as a fact-source check, not a question lookup.",
+  "note": "Differential-diagnosis pathways for the reasoning core (design phase 3, rule-based proposer v1). Conditions are a small deterministic DSL over recorded facts: contains_any (substring on the fact value's text), assertion, equals, gte/lte (numeric). Every support/refute entry that fires becomes an EvidenceRef whose quote is the matched text, validated against the fact's recorded evidence before the hypothesis may enter the workspace. Clinical ownership: these pathways are engineering v1 content for the existing respiratory/chest scope and require clinician review before any clinical claim. discriminating_questions lists question ids, except temperature_c which names the measurement fact (no bank question exists; it arrives via the self-check task) — consumers must treat it as a fact-source check, not a question lookup. Batch B rework synonym coverage only (version unchanged at 1.2.1): head_details adds 有生以来最严重 / 一下到顶 (thunderclap) and 脖子僵硬 / 不敢低头 (meningitis); resp_breathing adds 费劲 (lower_respiratory); back_details adds 放射到小腿 (radiculopathy) and 酸痛 (mechanical_back). No new thresholds, hypotheses, priors, categories, refutes, or direction/department visibility changes.",
   "pathways": [
     {
       "chief_complaint_contains_any": [
@@ -96,7 +96,8 @@
                 "气短",
                 "喘",
                 "困难",
-                "费力"
+                "费力",
+                "费劲"
               ],
               "fact_key": "resp_breathing"
             },
@@ -514,7 +515,9 @@
                 "脖子硬",
                 "颈强",
                 "颈部僵硬",
-                "低头困难"
+                "低头困难",
+                "脖子僵硬",
+                "不敢低头"
               ]
             },
             {
@@ -561,7 +564,9 @@
                 "一下子",
                 "爆炸样",
                 "一生最痛",
-                "突然达到顶峰"
+                "突然达到顶峰",
+                "有生以来最严重",
+                "一下到顶"
               ]
             },
             {
@@ -798,7 +803,8 @@
                 "扭到",
                 "搬东西",
                 "劳累",
-                "姿势"
+                "姿势",
+                "酸痛"
               ]
             },
             {
@@ -849,6 +855,7 @@
                 "往腿上窜",
                 "放射到腿",
                 "放射到大腿",
+                "放射到小腿",
                 "放射痛",
                 "过电",
                 "电击样",

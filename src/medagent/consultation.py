@@ -41,6 +41,8 @@ from .followups import RETRIAGE_OUTCOMES, apply_outcome, build_follow_up_plan
 from .reasoner import QuestionRanker
 from . import __version__
 from .bridging import build_bridging_sentence
+from .handoff import LABELS as HANDOFF_LABELS
+from .worry import extract_worry_object
 from .presentation import calculation_presentation
 from .task_intents import task_intent
 from .patient_calculations import request_draft, confirmed_parameters
@@ -1320,8 +1322,47 @@ class ConsultationEngine(
                 turn_id=turn_id,
             )
         )
+        self._capture_worry(state, text, turn_id)
         return TurnContext(
             turn_id=turn_id, text=text, prepared_location=prepared_location
+        )
+
+    def _capture_worry(self, state: CaseState, text: str, turn_id: str) -> None:
+        """Record the session's first patient-named worry (batch B, WORRY).
+
+        Deterministic and model-independent: the first worry sentence a
+        patient utters lands as its own patient_worry fact, never into
+        patient_goal (K-03: a worry sentence must not overwrite the
+        goal). First-wins: once recorded, later worries do not replace
+        it. This only records a fact — no triage, question-selection,
+        or disposition logic reads patient_worry, so no model or triage
+        decision can change because of it. Both engines call this
+        helper from their own user-turn entry (the deterministic engine
+        via _begin_turn, the adaptive engine via its own _submit), so
+        disease tests running the adaptive engine are covered too.
+        """
+        if not text or "patient_worry" in state.facts:
+            return
+        obj = extract_worry_object(text)
+        if not obj:
+            return
+        state.record(
+            Fact(
+                key="patient_worry",
+                value=obj,
+                assertion=Assertion.PRESENT,
+                source=Source.PATIENT,
+                turn_id=turn_id,
+                evidence=text.strip(),
+            )
+        )
+        self.events.append(
+            Event(
+                state.session_id,
+                "worry.captured",
+                {"object": obj},
+                turn_id=turn_id,
+            )
         )
 
     def _direct_emergency(self, state: CaseState, ctx: TurnContext):
@@ -2524,8 +2565,17 @@ class ConsultationEngine(
                 ),
                 {},
             )
-            label = FACT_LABELS.get(
-                key, task.get("result_label", task.get("title", key))
+            # Batch B label fallback: this file's table, then the
+            # handoff table (which carries keys this file lacks, e.g.
+            # sex -> 性别), then the task label, then the raw key.
+            # The handoff import is top-level because handoff imports
+            # no medagent module, so no import cycle is possible.
+            label = (
+                FACT_LABELS.get(key)
+                or HANDOFF_LABELS.get(key)
+                or task.get("result_label")
+                or task.get("title")
+                or key
             )
             detail = {
                 "key": key,
@@ -2947,7 +2997,33 @@ class ConsultationEngine(
                     "如果出现结论单安全网中列出的情况，或症状持续不缓解、"
                     f"加重，仍需线下评估，届时可凭本结论单到{entry}就诊。"
                 )
-            reply.message = line + sentence + reply.message
+            # Batch B (WORRY/GOAL): after the batch-A sentence, append
+            # the sheet's own worry response and goal response verbatim,
+            # in that order. These are the composer's words, already
+            # screened by the sheet lint; nothing is composed here, so
+            # no direction label or department name can leak in through
+            # this path (C3/C12 visibility stays with the sheet). The
+            # composer excludes batch-A exam-keyword goals from
+            # goal_response, so that goal class is still answered only
+            # by the batch-A sentence above, never twice. A missing or
+            # malformed worry/goal field degrades to no append, never
+            # to a broken close line.
+            extra = ""
+            try:
+                worry = sheet.get("worry") or {}
+                worry_response = (
+                    worry.get("response") if isinstance(worry, dict) else None
+                )
+                goal_response = sheet.get("goal_response")
+                for piece in (worry_response, goal_response):
+                    if isinstance(piece, str) and piece.strip():
+                        piece = piece.strip()
+                        if not piece.endswith(("。", "！", "？")):
+                            piece += "。"
+                        extra += piece
+            except Exception:
+                extra = ""
+            reply.message = line + sentence + extra + reply.message
 
     @staticmethod
     def _self_check_block_reason(state):

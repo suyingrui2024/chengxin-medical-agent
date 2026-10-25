@@ -92,7 +92,13 @@ class NarrativeTests(unittest.TestCase):
         self.assertIn("更像是", narrative["reasoning"])
 
     def test_routine_visit_narrative(self):
-        sheet = compose_conclusion(closed_state(chief="胸痛半小时"))
+        # Batch B sheet_group gate: the narrative group now needs a
+        # direction with >= 2 valid support quotes, so the fixture
+        # carries two affirmed clues (a pressing chest pain in the
+        # chief complaint, cold sweats as an associated symptom).
+        state = closed_state(chief="胸痛半小时，有压榨感")
+        add_fact(state, "associated_symptoms", "出冷汗")
+        sheet = compose_conclusion(state)
         self.assertEqual(sheet["disposition"]["level"], "routine_visit")
         narrative = sheet["narrative"]
         self.assertIn("胸部", narrative["framing"])
@@ -121,12 +127,17 @@ class NarrativeTests(unittest.TestCase):
         self.assertIsNone(narrative["reasoning"])
 
     def test_abstained_with_gaps_reasoning_comes_from_gaps(self):
+        # Batch B: the old template rendered every unknown gap as
+        # "还没有确认", conflating asked-and-unclear with never-asked.
+        # That wording is removed; an asked-unknown gap now renders as
+        # "你提到…还不清楚".
         summary = {"unknown_details": [{"key": "temperature_c", "label": "体温"}]}
         sheet = compose_conclusion(closed_state(chief="膝盖疼一周"), summary)
         reasoning = sheet["narrative"]["reasoning"]
         self.assertIsNotNone(reasoning)
         self.assertIn("体温", reasoning)
-        self.assertIn("还没有确认", reasoning)
+        self.assertIn("你提到体温还不清楚", reasoning)
+        self.assertNotIn("还没有确认", reasoning)
 
     def test_narrative_never_embeds_patient_quotes(self):
         sheet = compose_conclusion(closed_state())

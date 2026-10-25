@@ -96,14 +96,32 @@ class RadiculopathySurfacingTests(unittest.TestCase):
         sheet = compose_conclusion(state)
         ids = [d["hypothesis_id"] for d in sheet["directions"]]
         self.assertIn("radiculopathy", ids)
-        self.assertIn("mechanical_back", ids)
+        # Batch B citation gate: mechanical_back's only support in
+        # this fixture was the encoded trajectory value "stable", which
+        # must not pose as a patient quote — so that direction drops
+        # instead of being propped up by an encoding value.
+        self.assertNotIn("mechanical_back", ids)
 
 
 class PathwayReturnNowIfTests(unittest.TestCase):
     def test_back_case_gets_back_specific_safety_net(self):
+        # Batch B sheet_group gate: the old fixture's back directions
+        # each carried at most one valid quote, so the safety net now
+        # correctly falls back to generic. This fixture is a back case
+        # meeting the >= 2-valid-quotes gate (two affirmed cauda
+        # clues in the back details), so the back-specific list still
+        # applies; the single-evidence generic fallback is pinned by
+        # the batch-B sheet-group tests.
         state = closed_state(
             "腰痛三天，搬东西扭了一下",
-            [("back_details", CASE5_BACK_DETAILS), ("trajectory", "stable"), ("severity", 7)],
+            [
+                (
+                    "back_details",
+                    "疼会往腿上窜，大小便费劲，前几天摔伤过腰。",
+                ),
+                ("trajectory", "stable"),
+                ("severity", 7),
+            ],
         )
         sheet = compose_conclusion(state)
         self.assertEqual(
@@ -112,8 +130,12 @@ class PathwayReturnNowIfTests(unittest.TestCase):
         )
 
     def test_respiratory_case_gets_respiratory_safety_net(self):
+        # Batch B sheet_group gate: the fixture carries a second
+        # affirmed respiratory clue (sore throat in the chief
+        # complaint, alongside the cough details) so a respiratory
+        # direction reaches >= 2 valid quotes and drives the net.
         state = closed_state(
-            "发烧两天，咳嗽",
+            "发烧两天，咳嗽，嗓子疼",
             [("resp_cough_details", "干咳为主"), ("associated_symptoms", "全身酸痛、乏力")],
         )
         sheet = compose_conclusion(state)
@@ -126,7 +148,7 @@ class PathwayReturnNowIfTests(unittest.TestCase):
         # picture was warned about hematemesis/melena only).
         state = closed_state(
             "肚子疼，右下腹疼",
-            [("gi_details", "一开始肚脐周围，后转到右下腹，食欲差"), ("trajectory", "stable")],
+            [("gi_details", "一开始肚脐周围疼，后来转移到右下腹，食欲差"), ("trajectory", "stable")],
         )
         sheet = compose_conclusion(state)
         self.assertEqual(sheet["return_now_if"][0], "腹痛迅速加重")

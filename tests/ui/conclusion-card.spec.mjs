@@ -283,6 +283,86 @@ test("disposition level classes follow the sheet level", async ({
   }
 });
 
+test("worry and goal response render side by side on the conclusion card", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(120000);
+  const sessionId = await driveToClosedConclusion(page, request);
+  // Batch B R3: goal_response gets its own expanded section next to
+  // the worry section, quoting the sheet's response verbatim, with
+  // no visibility gate (it answers the patient's own goal, not a
+  // direction or a department hint).
+  const holder = {
+    sheet: makeSheet({
+      worry: {
+        object: "是不是阑尾炎",
+        response:
+          "你问到是不是阑尾炎：目前还不能仅凭这次问诊确定这一点，需要当面评估后决定。",
+      },
+      goal_response:
+        "你问到‘平时怎么护眼’：这次问诊的信息还不足以直接回答这一点，需要当面评估后决定；请按结论单的处置建议行动，出现警示信号及时就医。",
+    }),
+  };
+  await interceptSnapshot(page, holder);
+  await reopenSession(page, sessionId);
+  const card = page.locator(".conclusion-card");
+  const worry = card.locator(".conclusion-worry");
+  await expect(worry).toBeVisible();
+  await expect(worry.locator("h4")).toHaveText("你问过的担心");
+  await expect(worry.locator(".conclusion-worry-object")).toHaveText(
+    "你问过：是不是阑尾炎",
+  );
+  await expect(worry.locator(".conclusion-worry-response")).toContainText(
+    "目前还不能仅凭这次问诊确定这一点",
+  );
+  const goal = card.locator(".conclusion-goal");
+  await expect(goal).toBeVisible();
+  await expect(goal.locator("h4")).toHaveText("你问到的目标");
+  await expect(goal.locator(".conclusion-goal-response")).toHaveText(
+    "你问到‘平时怎么护眼’：这次问诊的信息还不足以直接回答这一点，需要当面评估后决定；请按结论单的处置建议行动，出现警示信号及时就医。",
+  );
+  // The two sections sit adjacent, worry first, with nothing between.
+  const order = await card.evaluate((root) => {
+    const sections = [...root.querySelectorAll(":scope > section")];
+    return [
+      sections.findIndex((section) =>
+        section.classList.contains("conclusion-worry"),
+      ),
+      sections.findIndex((section) =>
+        section.classList.contains("conclusion-goal"),
+      ),
+    ];
+  });
+  expect(order[1]).toBe(order[0] + 1);
+});
+
+test("empty goal response renders no goal section", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(120000);
+  const sessionId = await driveToClosedConclusion(page, request);
+  const worry = {
+    object: "是不是阑尾炎",
+    response:
+      "你问到是不是阑尾炎：目前还不能仅凭这次问诊确定这一点，需要当面评估后决定。",
+  };
+  const holder = { sheet: makeSheet({ worry, goal_response: "" }) };
+  await interceptSnapshot(page, holder);
+  await reopenSession(page, sessionId);
+  const card = page.locator(".conclusion-card");
+  // Empty string: no section, no empty shell; the worry section is
+  // unaffected.
+  await expect(card.locator(".conclusion-worry")).toBeVisible();
+  await expect(card.locator(".conclusion-goal")).toHaveCount(0);
+  // Missing field: same absence, still no shell.
+  holder.sheet = makeSheet({ worry });
+  await reopenSession(page, sessionId);
+  await expect(card.locator(".conclusion-worry")).toBeVisible();
+  await expect(card.locator(".conclusion-goal")).toHaveCount(0);
+});
+
 test("narrative reasoning is gated on directions visibility", async ({
   page,
   request,

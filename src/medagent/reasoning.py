@@ -25,7 +25,12 @@ from .domain import AgentReply, Assertion, CaseState, Phase, RiskLevel
 from .events import Event
 from .knowledge import question_fact_gates_pass
 from .phase_graph import planning_rank
-from .text_match import contains_unnegated
+from .text_match import (
+    NEGATION_CUES,
+    UNCERTAINTY_MARKERS,
+    contains_unnegated,
+    find_unnegated_certain,
+)
 
 ACTIVE_STATUSES = ("active", "supported")
 
@@ -137,6 +142,63 @@ def load_pathways() -> List[Dict[str, Any]]:
     return json.loads(raw)["pathways"]
 
 
+# Encoded fact values that must never pose as patient quotes. This
+# mirrors conclusion._ENCODING_QUOTES (conclusion cannot be imported
+# here — it imports this module); keep the two sets in sync.
+_ENCODING_VALUES = frozenset(
+    {
+        "worsening",
+        "improving",
+        "stable",
+        "unknown",
+        "present",
+        "absent",
+        "self",
+        "child",
+        "other_adult",
+    }
+)
+
+
+def _is_cjk(char: str) -> bool:
+    return "\u4e00" <= char <= "\u9fff"
+
+
+def _genuine_wording_quote(fact) -> Optional[str]:
+    """The fact's evidence as a quote for a fired equals/gte/lte
+    condition — but only when the evidence really is patient wording.
+
+    A structured fact (trajectory, severity, temperature) is recorded
+    with a coded value, and ``str(value)`` (``"stable"``, ``"10"``,
+    ``"38.5"``) is not something the patient said: the conclusion
+    composer's citation gate rightly rejects those as quotes, which
+    used to leave every encoding-only hypothesis quoteless. When the
+    same fact also carries the patient's own phrasing (trajectory
+    ``stable`` recorded as ``"变化不大"``), that phrasing IS quotable
+    and is returned instead. The bar is deliberately strict so a score
+    can never launder itself into wording: at least two CJK characters
+    (``"3分"`` has one, ``"38.5"``/``"10"``/``"stable"`` have none),
+    not an encoded value, no negation cue or uncertainty marker
+    anywhere in the text, and affirmed-and-certain under the shared
+    ``find_unnegated_certain`` semantics. Anything else falls back to
+    ``str(value)`` and stays subject to the composer's gate.
+    """
+    if fact is None or fact.assertion != Assertion.PRESENT:
+        return None
+    evidence = (fact.evidence or "").strip()
+    if len(evidence) < 2 or evidence in _ENCODING_VALUES:
+        return None
+    if sum(1 for char in evidence if _is_cjk(char)) < 2:
+        return None
+    if any(cue in evidence for cue in NEGATION_CUES):
+        return None
+    if any(marker in evidence for marker in UNCERTAINTY_MARKERS):
+        return None
+    if find_unnegated_certain(evidence, evidence) < 0:
+        return None
+    return evidence
+
+
 def _condition_quote(state: CaseState, condition: Dict[str, Any]) -> Optional[str]:
     fact = state.facts.get(condition["fact_key"])
     if fact is None or fact.assertion == Assertion.UNKNOWN:
@@ -161,13 +223,19 @@ def _condition_quote(state: CaseState, condition: Dict[str, Any]) -> Optional[st
                 return term
         return None
     if "equals" in condition:
-        return str(fact.value) if fact.value == condition["equals"] else None
+        if fact.value != condition["equals"]:
+            return None
+        return _genuine_wording_quote(fact) or str(fact.value)
     if "gte" in condition:
         ok = isinstance(fact.value, (int, float)) and fact.value >= condition["gte"]
-        return str(fact.value) if ok else None
+        if not ok:
+            return None
+        return _genuine_wording_quote(fact) or str(fact.value)
     if "lte" in condition:
         ok = isinstance(fact.value, (int, float)) and fact.value <= condition["lte"]
-        return str(fact.value) if ok else None
+        if not ok:
+            return None
+        return _genuine_wording_quote(fact) or str(fact.value)
     return None
 
 

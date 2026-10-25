@@ -1703,6 +1703,14 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       list(care.avoid).forEach(text);
       list(care.measure).forEach(text);
       list(data.return_now_if).forEach(text);
+      // Batch B: the worry slot and the goal response are validated
+      // with the same text() rule as directions and gaps.
+      if (data.worry !== undefined && data.worry !== null) {
+        text(data.worry.object);
+        text(data.worry.response);
+      }
+      if (data.goal_response !== undefined && data.goal_response !== null)
+        text(data.goal_response);
       if (data.outlook) text(data.outlook);
       if (data.abstain_text) text(data.abstain_text);
       const reading = data.further_reading;
@@ -1811,6 +1819,36 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         card.append(narrative);
       }
       const you = data.subject_kind === "self" ? "你" : "您";
+      // Batch B: when the sheet carries the patient's named worry,
+      // answer it in its own expanded section, quoting the sheet's
+      // response verbatim. The object is rendered as-is (no marker
+      // reconstructed around it); direction/department visibility
+      // gates do not apply here because this slot is the patient's
+      // own question, not a direction or a department hint.
+      if (data.worry) {
+        const worry = el("section", "conclusion-worry");
+        worry.append(
+          el("h4", "", "你问过的担心"),
+          el("p", "conclusion-worry-object", `你问过：${data.worry.object}`),
+          el("p", "conclusion-worry-response", data.worry.response),
+        );
+        card.append(worry);
+      }
+      // Batch B R3: the goal response gets its own expanded section
+      // beside the worry section, quoting the sheet's response
+      // verbatim. The response already quotes the goal itself, so no
+      // object line is reconstructed here. The same no-gate rule as
+      // worry applies: this answers the patient's own goal, not a
+      // direction or a department hint. An empty goal response
+      // renders nothing at all, not an empty shell.
+      if (data.goal_response) {
+        const goal = el("section", "conclusion-goal");
+        goal.append(
+          el("h4", "", "你问到的目标"),
+          el("p", "conclusion-goal-response", data.goal_response),
+        );
+        card.append(goal);
+      }
       if (data.directions_visible) {
         const directions = el("section", "conclusion-directions");
         directions.append(el("h4", "", "可能的方向（不是确诊）"));

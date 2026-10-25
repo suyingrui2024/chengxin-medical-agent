@@ -257,9 +257,16 @@ class DeterministicConclusionTests(unittest.TestCase):
         self.assertTrue(line)
         # The spoken disposition (with its first safety-net alert) leads;
         # the administrative boilerplate is preserved verbatim after it.
+        # Batch B interface: the fixture goal ("想整理信息去就医") is
+        # not a batch-A exam-keyword goal (it contains none of
+        # 检查/去医院/就诊/看医生), so the composer supplies a
+        # goal_response and the close worker appends it between the
+        # disposition line and the boilerplate.
+        goal_response = final.conclusion.get("goal_response")
+        self.assertTrue(goal_response)
         self.assertEqual(
             final.message,
-            line + "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
+            line + goal_response + "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
         )
         sheet = final.conclusion
         self.assertIn(f"{sheet['disposition']['window_hours']} 小时内", final.message)

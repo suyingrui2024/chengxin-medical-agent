@@ -24,7 +24,25 @@ from .domain import Assertion, CaseState, Phase, RiskLevel
 from .followups import build_follow_up_plan
 from .handoff import LABELS as FACT_LABELS
 from .reasoning import RuleBasedProposer, validate_workspace
-from .text_match import contains_unnegated
+from .text_match import contains_unnegated, find_unnegated_certain
+from .worry import extract_worry_object, is_worry_sentence
+
+# Batch B citation validation uses text_match's shared
+# ``find_unnegated_certain`` directly (imported above). An earlier
+# revision carried a local fallback (``_quote_affirmed_certain_local``)
+# for a time when those names were not in text_match yet; it was
+# deleted in the batch-B rework because its semantics diverged from
+# the shared implementation in three ways: it treated "、" as a clause
+# break, so later items of a denial list ("没有气短、喘" -> "喘")
+# read as affirmed; it missed the adjacent negations ("不是" /
+# "不敢" / bare "不"); and it rejected a quote for any uncertainty
+# marker anywhere in its clause, where the shared implementation
+# checks markers before the term in the same clause and within a
+# short window after it. Importing ``is_refusal_text`` from
+# consultation is deliberately NOT done here: consultation imports
+# bridging, which imports this module's BANNED_PHRASES, so a top-level
+# consultation import would be circular; the local refusal check in
+# ``_gaps`` covers the same evidence phrases the task prescribes.
 
 # Same list as consultation._summary_payload's return_now_if; a drift-guard
 # test asserts the two never diverge. It is the composer's fallback: when
@@ -305,13 +323,86 @@ def apply_neutral_fallback(sheet: Dict[str, Any]) -> Dict[str, Any]:
     return neutral
 
 
-def _certainty(hypothesis, group: str) -> str:
+# Batch B: a support quote is only usable when it is affirmed and
+# certain patient wording — not a denial, not an unknown, not a
+# truncated character, not a score, not an encoded value. The
+# affirmed-and-certain test is text_match.find_unnegated_certain
+# itself (imported at the top); there is deliberately no local copy
+# of its negation/uncertainty rules in this module.
+# Encoded fact values that must never pose as patient quotes. This
+# mirrors consultation.VALUE_LABELS keys (and reasoning._ENCODING_VALUES);
+# consultation itself cannot be imported here (circular via bridging,
+# see the import note above).
+_ENCODING_QUOTES = frozenset(
+    {
+        "worsening",
+        "improving",
+        "stable",
+        "unknown",
+        "present",
+        "absent",
+        "self",
+        "child",
+        "other_adult",
+    }
+)
+
+
+def _is_pure_number(quote: str) -> bool:
+    text = quote.strip()
+    if not text:
+        return False
+    try:
+        float(text)
+    except ValueError:
+        return False
+    return True
+
+
+def _valid_support_quote(state: CaseState, ref) -> bool:
+    """Batch B citation gate for one evidence_for reference. A quote is
+    usable only when: the fact is PRESENT; the quote is not a single
+    character (chief_complaint excepted — the pathway-entry vocabulary
+    is single-character by design); it is not a pure number or an
+    encoded value; it is a substring of the fact's evidence/value or a
+    user transcript turn; and that occurrence is affirmed and certain.
+    """
+    fact = state.facts.get(ref.fact_key)
+    if fact is None or fact.assertion != Assertion.PRESENT:
+        return False
+    quote = ref.quote or ""
+    if not quote:
+        return False
+    if len(quote) < 2 and ref.fact_key != "chief_complaint":
+        return False
+    if quote in _ENCODING_QUOTES or _is_pure_number(quote):
+        return False
+    sources: List[str] = []
+    if fact.evidence:
+        sources.append(fact.evidence)
+    if fact.value is not None:
+        sources.append(str(fact.value))
+    sources.extend(
+        item.get("content", "")
+        for item in state.transcript
+        if item.get("role") == "user" and item.get("content")
+    )
+    for source in sources:
+        if quote in source and find_unnegated_certain(source, quote) >= 0:
+            return True
+    return False
+
+
+def _certainty(hypothesis, group: str, valid_count: Optional[int] = None) -> str:
     if group == "rule_out":
         return "cannot_exclude"
+    count = (
+        len(hypothesis.evidence_for) if valid_count is None else valid_count
+    )
     if (
         hypothesis.status == "supported"
         and hypothesis.prior_band == "high"
-        and len(hypothesis.evidence_for) >= 2
+        and count >= 2
     ):
         return "more_likely"
     return "possible"
@@ -396,14 +487,30 @@ def _select_directions(accepted, state: CaseState) -> tuple[List[Dict[str, Any]]
     directions: List[Dict[str, Any]] = []
     for hypothesis in chosen:
         group = "rule_out" if hypothesis in rule_outs else "likely"
+        # Batch B citation gate: only affirmed, certain, verbatim
+        # quotes count. A direction left with no valid support is
+        # dropped here (and the sheet abstains if that empties the
+        # list); certainty is recomputed from the valid count, so a
+        # "supported" hypothesis kept alive by one denied quote and one
+        # real quote reads "possible", not "more_likely". The
+        # against_note is untouched by this gate — it only ever
+        # narrates ABSENT facts, so an affirmation check on it would
+        # be backwards.
+        valid_quotes = [
+            ref.quote
+            for ref in hypothesis.evidence_for
+            if _valid_support_quote(state, ref)
+        ]
+        if not valid_quotes:
+            continue
         against_note = _against_note(hypothesis, state)
         directions.append(
             {
                 "hypothesis_id": hypothesis.id,
                 "patient_label": labels.get(hypothesis.id),
                 "group": group,
-                "certainty": _certainty(hypothesis, group),
-                "support_quotes": [ref.quote for ref in hypothesis.evidence_for[:2]],
+                "certainty": _certainty(hypothesis, group, len(valid_quotes)),
+                "support_quotes": valid_quotes[:2],
                 "against_note": against_note,
             }
         )
@@ -418,8 +525,38 @@ def _select_directions(accepted, state: CaseState) -> tuple[List[Dict[str, Any]]
     return directions, False
 
 
+# Batch B gaps: a gap is either declined (the patient refused the
+# field) or asked_unknown (asked, answered "unclear"). The summary's
+# declined_details already carry consultation's full refusal test; the
+# local check below is the prescribed fallback for evidence that
+# reaches the composer without that list — it must stay local because
+# importing consultation here would be circular (see the import note).
+_REFUSAL_EVIDENCE_MARKERS = ("不想说", "不方便说", "拒绝提供")
+
+
+def _is_refusal_evidence(text: str) -> bool:
+    return bool(text) and any(marker in text for marker in _REFUSAL_EVIDENCE_MARKERS)
+
+
+def _gap_label(detail: Dict[str, Any], key: str) -> str:
+    """Label fallback chain: the summary detail's label, then the
+    handoff label table, then the raw key. A detail label that IS the
+    raw key (unlocalized, e.g. "sex") is treated as absent so the
+    table's localized label wins — raw keys must never reach the
+    patient-visible layer."""
+    label = detail.get("label")
+    if label and label != key:
+        return str(label)
+    return FACT_LABELS.get(key, key)
+
+
 def _gaps(state: CaseState, summary, accepted) -> List[Dict[str, Any]]:
     details = (summary or {}).get("unknown_details") or []
+    declined_keys = {
+        detail.get("key")
+        for detail in (summary or {}).get("declined_details") or []
+        if detail.get("key")
+    }
     discriminating_keys = set()
     for hypothesis in accepted.active():
         discriminating_keys.update(hypothesis.discriminating_questions)
@@ -437,7 +574,18 @@ def _gaps(state: CaseState, summary, accepted) -> List[Dict[str, Any]]:
             score += 2
         if key in discriminating_keys:
             score += 2
-        scored.append((score, key, detail.get("label") or key))
+        fact = state.facts.get(key)
+        declined = key in declined_keys or _is_refusal_evidence(
+            fact.evidence if fact is not None else ""
+        )
+        scored.append(
+            (
+                score,
+                key,
+                _gap_label(detail, key),
+                "declined" if declined else "asked_unknown",
+            )
+        )
     scored.sort(key=lambda item: -item[0])
     return [
         {
@@ -445,8 +593,9 @@ def _gaps(state: CaseState, summary, accepted) -> List[Dict[str, Any]]:
             "label": label,
             "impact": GAP_IMPACTS.get(key, DEFAULT_GAP_IMPACT),
             "significant": score >= 2,
+            "state": gap_state,
         }
-        for score, key, label in scored[:3]
+        for score, key, label, gap_state in scored[:3]
     ]
 
 
@@ -561,14 +710,47 @@ def _narrative_reasoning(
             separator = templates.get("separator") or "；"
             sentences.append(intro + separator.join(rendered))
     if gaps:
-        labels = [str(gap.get("label") or gap.get("fact_key")) for gap in gaps]
-        gap_text = (templates.get("gaps_template") or "{labels}").replace(
-            "{labels}", (templates.get("gaps_separator") or "、").join(labels)
-        )
-        if sentences:
-            sentences.append((templates.get("gaps_connector") or "") + gap_text)
-        else:
-            sentences.append((templates.get("gaps_only_intro") or "") + gap_text)
+        # Batch B three-state rendering: asked-unknown and declined gaps
+        # are rendered in separate clauses with their own wording.
+        # "还没有确认" must never appear here again — it conflated
+        # asked-and-unclear with never-asked. Gaps without a state
+        # (pre-batch-B callers) read as asked_unknown.
+        separator = templates.get("gaps_separator") or "、"
+        unknown_labels = [
+            str(gap.get("label") or gap.get("fact_key"))
+            for gap in gaps
+            if gap.get("state") != "declined"
+        ]
+        declined_labels = [
+            str(gap.get("label") or gap.get("fact_key"))
+            for gap in gaps
+            if gap.get("state") == "declined"
+        ]
+        parts: List[str] = []
+        if unknown_labels:
+            parts.append(
+                (
+                    templates.get("gaps_unknown_template")
+                    or "你提到{labels}还不清楚，这也会影响判断"
+                ).replace("{labels}", separator.join(unknown_labels))
+            )
+        if declined_labels:
+            parts.append(
+                (
+                    templates.get("gaps_declined_template")
+                    or "{labels}你表示暂不提供，这也会影响判断"
+                ).replace("{labels}", separator.join(declined_labels))
+            )
+        gap_text = "；".join(parts)
+        if gap_text:
+            if sentences:
+                sentences.append(
+                    (templates.get("gaps_connector") or "") + gap_text
+                )
+            else:
+                sentences.append(
+                    (templates.get("gaps_only_intro") or "") + gap_text
+                )
     if not sentences:
         return None
     return "。".join(sentences) + "。"
@@ -605,6 +787,188 @@ def _build_narrative(
         ),
         "severity": severity_template.replace("{group}", group_label),
     }
+
+
+# Batch B worry / goal responses. Both slots use only already-collected
+# facts and the sheet's own disposition wording: they must never name a
+# shadow direction label or a department hint, so the direction /
+# department visibility gates (C3 / C12) cannot be bypassed through
+# this channel. The worry response never mentions a hypothesis; the
+# goal response never mentions one either.
+_VISIT_GOAL_KEYWORDS = ("检查", "去医院", "就诊", "看医生")
+_WORRY_FALLBACK_OBJECT = "你问过的那个担心"
+
+
+def _contains_banned(text: str) -> bool:
+    return bool(text) and any(phrase in text for phrase in BANNED_PHRASES)
+
+
+def _worry_tail(chief: str, severity: Any, gap_labels: List[str]) -> str:
+    tail = f"已确认的是{chief}；" if chief else ""
+    if severity is not None:
+        tail += f"影响程度为 {severity} 分；"
+    if gap_labels:
+        tail += f"{'、'.join(gap_labels)}还不清楚；"
+    return tail
+
+
+def _build_worry(
+    state: CaseState, gaps: List[Dict[str, Any]], goal_value: Optional[str]
+) -> tuple[Optional[Dict[str, str]], bool]:
+    """Batch B worry slot. Source priority: state.facts["patient_worry"]
+    (PRESENT, value is the object) > a worry sentence recorded as the
+    patient goal (worry.is_worry_sentence / extract_worry_object). The
+    second source consumes the goal: it returns ``goal_consumed=True``
+    so the caller sets goal_line to None — a worry must never overwrite
+    a patient goal (K-03), and when the goal slot itself holds the
+    worry, the goal slot is emptied rather than duplicated.
+
+    Returns (worry_dict_or_None, goal_consumed). The response template
+    uses only the chief complaint, the severity score when collected,
+    and the gap labels — never a direction or department."""
+    worry_fact = state.facts.get("patient_worry")
+    obj: Optional[str] = None
+    goal_consumed = False
+    if (
+        worry_fact is not None
+        and worry_fact.assertion == Assertion.PRESENT
+        and str(worry_fact.value or "").strip()
+    ):
+        obj = str(worry_fact.value).strip()
+    elif goal_value and is_worry_sentence(goal_value):
+        obj = extract_worry_object(goal_value)
+        if obj:
+            goal_consumed = True
+    if not obj:
+        return None, False
+    chief_fact = state.facts.get("chief_complaint")
+    chief = (
+        str(chief_fact.value).strip()
+        if chief_fact is not None
+        and chief_fact.assertion == Assertion.PRESENT
+        and chief_fact.value is not None
+        else ""
+    )
+    severity_fact = state.facts.get("severity")
+    severity = (
+        severity_fact.value
+        if severity_fact is not None
+        and severity_fact.assertion == Assertion.PRESENT
+        else None
+    )
+    gap_labels = [
+        str(gap.get("label") or gap.get("fact_key")) for gap in (gaps or [])
+    ]
+    close = "建议按结论单的处置去做，出现下方警示信号请及时就医。"
+    response = (
+        f"你问过是不是‘{obj}’：目前还不能仅凭这次问诊确定这一点。"
+        f"{_worry_tail(chief, severity, gap_labels)}{close}"
+    )
+    if _contains_banned(obj) or _contains_banned(response):
+        # Degrade: the object becomes the generic fallback and the
+        # response drops the quoted object, keeping the other sentences.
+        # A banned phrase inside the chief complaint itself (patient
+        # wording) is replaced the same way so the sheet lint below
+        # still passes; gap labels are curated and severity is a score.
+        safe_chief = (
+            "你描述的主要问题" if _contains_banned(chief) else chief
+        )
+        response = (
+            f"{_WORRY_FALLBACK_OBJECT}，目前还不能仅凭这次问诊确定这一点。"
+            f"{_worry_tail(safe_chief, severity, gap_labels)}{close}"
+        )
+        obj = _WORRY_FALLBACK_OBJECT
+    return {"object": obj, "response": response}, goal_consumed
+
+
+def _build_goal_response(goal_line: Optional[str]) -> Optional[str]:
+    """Batch B goal slot. Only for a non-empty goal_line that is not a
+    visit-oriented goal: goals mentioning 检查 / 去医院 / 就诊 /
+    看医生 return None — batch A's _speak_close_line branch owns those
+    and this slot must not duplicate it. Over 60 chars, the quoted goal
+    is truncated. A banned phrase degrades the response to an
+    object-free form (the goal itself is still quoted nowhere)."""
+    if not goal_line:
+        return None
+    if any(keyword in goal_line for keyword in _VISIT_GOAL_KEYWORDS):
+        return None
+    display = goal_line if len(goal_line) <= 60 else goal_line[:60] + "…"
+    response = (
+        f"你问到‘{display}’：这次问诊的信息还不足以直接回答这一点，"
+        "需要当面评估后决定；请按结论单的处置建议行动，出现警示信号及时就医。"
+    )
+    if _contains_banned(goal_line) or _contains_banned(response):
+        response = (
+            "你问到的这一点，这次问诊的信息还不足以直接回答这一点，"
+            "需要当面评估后决定；请按结论单的处置建议行动，出现警示信号及时就医。"
+        )
+    return response
+
+
+def _hypothesis_support_terms(hypothesis_id: str) -> set:
+    """Every contains_any term of one hypothesis's support conditions
+    in differentials.json (its DSL vocabulary, across conditions)."""
+    terms = set()
+    for pathway in _load_json("differentials.json").get("pathways", []):
+        for hypothesis in pathway.get("hypotheses", []):
+            if hypothesis.get("id") == hypothesis_id:
+                for condition in hypothesis.get("support", []):
+                    terms.update(condition.get("contains_any") or [])
+    return terms
+
+
+def _sheet_evidence_count(accepted, state: CaseState, direction) -> int:
+    """Distinct valid evidence tokens backing one direction, for
+    sheet_group only. This is batch-B-rework option (b)-②: count
+    distinct tokens, not proposer refs.
+
+    The proposer records one ref per fired condition, so a
+    single-condition hypothesis whose detail fact genuinely names
+    several of its symptoms (cystitis: one urinary_details condition
+    matching 尿频 / 尿急 / 尿痛) arrived at sheet_group with one
+    quote and could never reach the old ">= 2 support_quotes" bar —
+    a structural defect in batch B's own rule, not a corpus gap.
+    The rejected alternative (b)-①, one ref per matched term, was
+    not taken: it would change evidence_for lengths, flipping
+    proposer status (active -> supported) and with it the certainty
+    recomputation, the abstention logic, and the planner's workspace
+    signature — a reasoning change smuggled in as a display fix.
+
+    The count here is the union of the direction's valid quotes with
+    the hypothesis's DSL terms attested — unnegated and certain under
+    the shared find_unnegated_certain — in the value/evidence of the
+    facts its evidence refs actually point at. A single token can
+    never drive sheet_group, so the K-12 shape (one respiratory quote
+    on a urinary chief complaint) still falls back to generic; two
+    distinct tokens drive their group whether they arrived as two
+    refs or as two terms inside one referenced fact. Certainty is
+    untouched: it still recomputes from the valid-quote count in
+    _select_directions, never from this count.
+    """
+    valid = set(direction.get("support_quotes") or [])
+    hypothesis = None
+    if accepted is not None:
+        hypothesis = accepted.hypotheses.get(direction.get("hypothesis_id"))
+    if hypothesis is None:
+        return len(valid)
+    terms = _hypothesis_support_terms(direction.get("hypothesis_id"))
+    if not terms:
+        return len(valid)
+    attested = set()
+    for ref in hypothesis.evidence_for:
+        fact = state.facts.get(ref.fact_key)
+        if fact is None or fact.assertion != Assertion.PRESENT:
+            continue
+        texts = []
+        if isinstance(fact.value, str):
+            texts.append(fact.value)
+        if fact.evidence:
+            texts.append(fact.evidence)
+        for text in texts:
+            for term in terms:
+                if find_unnegated_certain(text, term) >= 0:
+                    attested.add(term)
+    return len(valid | attested)
 
 
 def compose_conclusion(
@@ -672,7 +1036,24 @@ def compose_conclusion(
         if hid in PATHWAY_GROUPS:
             group_key = PATHWAY_GROUPS[hid]
             break
-    care = _self_care_group(group_key, tier) or {}
+    # Batch B sheet_group: the first direction (selection order) with
+    # at least two distinct valid evidence tokens (see
+    # _sheet_evidence_count). A single-token cross-system direction
+    # (K-12: one respiratory quote on a urinary chief complaint) must
+    # not drive outlook, self-care, narrative framing/severity, or
+    # the safety net — those take sheet_group and fall back to
+    # generic. Disposition, department_hint and the direction
+    # selection order itself are untouched (group_key above still
+    # feeds the department hint).
+    sheet_group = "generic"
+    for direction in directions:
+        hid = direction.get("hypothesis_id")
+        if hid in PATHWAY_GROUPS and _sheet_evidence_count(
+            accepted, state, direction
+        ) >= 2:
+            sheet_group = PATHWAY_GROUPS[hid]
+            break
+    care = _self_care_group(sheet_group, tier) or {}
     # P2c allergy hint: its own field, never mixed into the versioned
     # avoid list. A patient-entered allergy name containing a banned
     # phrase must not void the whole sheet, so such a hint is dropped
@@ -686,12 +1067,16 @@ def compose_conclusion(
         phrase in allergy_hint for phrase in BANNED_PHRASES
     ):
         allergy_hint = None
-    # The safety net keys on the explored pathway when directions abstain
-    # (self-care content deliberately does not: it stays generic rather
-    # than borrowing a non-displayed hypothesis's care group).
-    alert_group = group_key
-    if alert_group == "generic":
+    # Batch B safety net: when directions exist it keys on sheet_group
+    # (never the explored pathway — a probed-but-unselected pathway
+    # must not supply warnings); when sheet_group is generic the
+    # pathway lookup below yields nothing and the generic list wins.
+    # When directions abstain, the pre-batch-B explored-pathway
+    # fallback is kept verbatim (live-eval run3 case3 pin).
+    if abstained:
         alert_group = _explored_pathway_group(state) or "generic"
+    else:
+        alert_group = sheet_group
     dept_data = _load_json_optional("departments.json")
     disposition["department_hint"] = _department_hint(
         tier, directions, group_key, dept_data
@@ -706,13 +1091,20 @@ def compose_conclusion(
     )
     subject = state.facts.get("consult_for")
     goal_fact = state.facts.get("patient_goal")
-    goal_line = (
+    raw_goal = (
         str(goal_fact.value).strip()
         if goal_fact is not None
         and goal_fact.assertion == Assertion.PRESENT
         and str(goal_fact.value or "").strip()
         else None
     )
+    # Batch B: a worry sentence sitting in the goal slot is split out
+    # into the worry slot and the goal line is emptied (K-03); a
+    # genuine goal survives untouched. goal_response is derived from
+    # the post-split goal_line only.
+    worry, goal_consumed = _build_worry(state, gaps, raw_goal)
+    goal_line = None if goal_consumed else raw_goal
+    goal_response = _build_goal_response(goal_line)
     previous = state.conclusion or {}
     sheet = {
         "version": 1,
@@ -721,6 +1113,8 @@ def compose_conclusion(
         "subject_kind": subject.value if subject is not None else "self",
         "disposition": disposition,
         "goal_line": goal_line,
+        "worry": worry,
+        "goal_response": goal_response,
         "directions": directions,
         "directions_abstained": abstained,
         "directions_visible": show_directions,
