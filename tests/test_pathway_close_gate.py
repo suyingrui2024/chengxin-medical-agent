@@ -239,7 +239,7 @@ class PathwayGateTests(unittest.TestCase):
 
 class ChestGateTestabilityTests(unittest.TestCase):
     """Healthcheck P2-A-D5: the chest gate is submit-unreachable by
-    design (a chest complaint is emergency-intercepted in _submit
+    design (a chest complaint is emergency/clarification-intercepted in _submit
     before _run), so its gate behaviour is pinned here through the
     direct _execute(review_summary) path that bypasses triage — with
     the emergency precedence itself pinned, not weakened, alongside.
@@ -298,15 +298,37 @@ class ChestGateTestabilityTests(unittest.TestCase):
         self.assertEqual(reply.kind, "summary")
         self.assertEqual(self.state.phase, Phase.SUMMARY)
 
-    def test_submit_chest_complaint_is_still_emergency_intercepted(self):
-        # The safer route still precedes the gate: a chest complaint
-        # through submit() never reaches review_summary at all.
+    def test_submit_bare_chest_complaint_asks_clarification_first(self):
+        # Batch A: a bare chest complaint through submit() no longer
+        # closes as emergency at once; it asks a discriminating
+        # clarification first, and still never reaches review_summary.
         reply = self.engine.submit(
             self.state.session_id, UserInput("胸闷")
+        )
+        self.assertEqual(reply.kind, "clarification")
+        self.assertNotEqual(self.state.phase, Phase.SUMMARY)
+        self.assertNotEqual(self.state.closed_reason, "emergency_route")
+        values = [item.value for item in reply.quick_replies]
+        self.assertIn("confirm_emergency_clarification", values)
+        self.assertIn("deny_emergency_clarification", values)
+        # Confirming the clarification takes the emergency path.
+        reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("是的，我确实有胸部不适", "confirm_emergency_clarification"),
         )
         self.assertEqual(reply.kind, "emergency")
         self.assertEqual(self.state.closed_reason, "emergency_route")
         self.assertNotEqual(self.state.phase, Phase.SUMMARY)
+        # Denying it on a fresh session returns to the normal flow.
+        self.engine, self.backend, self.events = make_engine()
+        self.state, _ = self.engine.create_session()
+        self.engine.submit(self.state.session_id, UserInput("胸闷"))
+        reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("没有，我没有这种情况", "deny_emergency_clarification"),
+        )
+        self.assertNotEqual(reply.kind, "emergency")
+        self.assertNotEqual(self.state.phase, Phase.CLOSED)
 
 
 class ControllerAutoCloseGateTests(unittest.TestCase):

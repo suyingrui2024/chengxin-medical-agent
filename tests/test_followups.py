@@ -80,6 +80,25 @@ class FollowUpFlowTests(unittest.TestCase):
         self._answer("都没有", "no")
         self._answer("两天前开始")
         reply = self._answer("在加重", "worsening")
+        # Batch A: single-clue trajectory defers first; no follow-up
+        # plan is produced while the visit is still deferred.
+        self.assertEqual(reply.kind, "question")
+        self.assertEqual(self.state.follow_up, {})
+        kinds = [e.event_type for e in self.events.for_session(self.state.session_id)]
+        self.assertIn("triage.urgent_deferred", kinds)
+        # Once the minimum facts are on file, the deferred trigger closes
+        # urgently with the same follow-up values as before.
+        self._answer("4分")
+        self._answer("没有")
+        self._answer("两天前开始")
+        self._answer("没有")
+        self._answer("没有")
+        self._answer("没有")
+        self._answer("暂时跳过", "skip")
+        self._answer("没有")
+        self._answer("不知道")
+        self._answer("没有")
+        reply = self._answer("想整理信息去就医")
         self.assertEqual(reply.kind, "urgent")
         self.assertEqual(self.state.follow_up["kind"], "urgent_checkin")
         self.assertEqual(self.state.follow_up["due_in_hours"], 24)

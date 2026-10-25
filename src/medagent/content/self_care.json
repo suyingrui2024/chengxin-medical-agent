@@ -367,5 +367,10 @@
       ]
     }
   },
+  "neutral_fallback": {
+    "note": "通路外结论的中性回落（批 A，与批 C CONTENT 的自护文案工作重叠处以本条为准绳、不重复建组）：自护取 match=generic 的已评审组（不新建 neutral 组，避免与 generic 组漂移），安全网取通用四项（见 conclusion.RETURN_NOW_IF），叙事取 conclusion_narrative.json 的 neutral 块。由 conclusion.apply_neutral_fallback 使用。",
+    "return_now_if": "generic",
+    "self_care_group": "generic"
+  },
   "version": "1.2"
 }

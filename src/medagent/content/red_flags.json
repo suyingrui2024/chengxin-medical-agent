@@ -66,7 +66,8 @@
         "吸不到(气|底)",
         "呼吸.{0,5}(费劲|费力|急促|窘迫)",
         "气短.{0,6}(说不出|说不完整|说不了)",
-        "喘得.{0,3}(厉害|费劲|急)"
+        "喘得.{0,3}(厉害|费劲|急)",
+        "喘得.{0,8}(说不出|说不完整|说不了|说不完)"
       ],
       "phrases": [
         "喘不上气",
@@ -129,6 +130,6 @@
       ]
     }
   ],
-  "note": "Red-flag definitions for the deterministic + curated-pattern triage layers. Phrases are exact-match (layer: rule_phrase). Patterns are curated paraphrase regexes (layer: semantic_pattern); combo is a location x signal co-occurrence rule (layer: semantic_combo). All pattern/combo hits pass clause-scoped negation suppression. Changes to this file require a red-flag corpus evaluation report (see scripts/evaluation/medical/evaluate_red_flags.py).",
-  "version": "1.0.0"
+  "note": "Red-flag definitions for the deterministic + curated-pattern triage layers. Phrases are exact-match (layer: rule_phrase). Patterns are curated paraphrase regexes (layer: semantic_pattern); combo is a location x signal co-occurrence rule (layer: semantic_combo). All pattern/combo hits pass clause-scoped negation suppression. Changes to this file require a red-flag corpus evaluation report (see scripts/evaluation/medical/evaluate_red_flags.py). Batch A (2026-10-25): severe_breathing gained one same-signal paraphrase pattern (喘得 + speech interruption, parallel to the existing 气短 + speech interruption pattern); no new signal or threshold.",
+  "version": "1.0.1"
 }

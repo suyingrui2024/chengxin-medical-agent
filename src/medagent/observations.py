@@ -253,11 +253,31 @@ class ObservationMixin:
                 )
             )
             if state.risk.level == RiskLevel.EMERGENCY:
-                return self._emergency_reply(state, state.risk.triggers)
+                # Same clarification gate as a fresh turn: a bare
+                # co-occurrence signal is clarified first, and a
+                # confirmed clarification replays with its signal intact.
+                action = self._emergency_clarification_action(state, text, ())
+                if action == "clarify":
+                    return self._emergency_clarification_reply(
+                        state, text, turn_id
+                    )
+                if action == "confirmed":
+                    confirmed = self._confirm_emergency_clarification(
+                        state, turn_id
+                    )
+                    if confirmed is not None:
+                        return confirmed
+                return self._emergency_reply_with_clarification_memory(
+                    state, state.risk.triggers
+                )
             if state.risk.level == RiskLevel.URGENT:
                 # Reintroduce only to record cancellation of an interrupted form.
                 state.pending_calculation = resume.get("pending_calculation")
-                return self._urgent(state)
+                gated = self._urgent_or_defer(state, turn_id)
+                if gated is not None:
+                    return gated
+                # Deferred: fall through to the restored reply below and
+                # keep asking instead of closing on a single clue.
             state.phase = Phase(resume["phase"])
             state.pending_calculation = resume.get("pending_calculation")
             state.calculation_resume = resume.get("calculation_resume")

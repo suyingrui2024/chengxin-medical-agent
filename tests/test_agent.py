@@ -444,10 +444,26 @@ class AdaptiveAgentTests(unittest.TestCase):
         self.assertEqual(self.state.closed_reason, "confirmed_by_user")
 
     def test_urgent_score_interrupts_remaining_questions(self):
+        # Batch A: a single-clue severity score no longer closes urgently
+        # on its own; the controller defers and asks the remaining
+        # minimum-fact questions first.
         self.backend.commands = [cmd("record_facts", facts=[fact("severity", 9, "9分")])]
         reply = self.submit("难受程度9分")
+        self.assertNotEqual(reply.kind, "urgent")
+        kinds = [e.event_type for e in self.events.for_session(self.state.session_id)]
+        self.assertIn("triage.urgent_deferred", kinds)
+        # Once the minimum facts are on file, the same trigger closes urgently.
+        self.backend.commands = [
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("associated_symptoms", "咳嗽", "咳嗽"),
+                    fact("patient_goal", "想知道要不要紧", "想知道要不要紧"),
+                ],
+            )
+        ]
+        reply = self.submit("还有点咳嗽，想知道要不要紧")
         self.assertEqual(reply.kind, "urgent")
-        self.assertEqual(len(self.backend.calls), 1)
 
     def test_body_location_is_self_report_not_verified_physical_exam(self):
         self.backend.commands = [

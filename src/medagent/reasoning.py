@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from importlib import resources
 from typing import Any, Dict, List, Optional, Tuple
 
-from .domain import AgentReply, Assertion, CaseState, Phase
+from .domain import AgentReply, Assertion, CaseState, Phase, RiskLevel
 from .events import Event
 from .knowledge import question_fact_gates_pass
 from .phase_graph import planning_rank
@@ -496,6 +496,28 @@ class DifferentialPlanner:
             h for h in workspace.active() if h.red_flags and h.status == "active"
         ]
         if stuck and workspace.stagnation_turns >= 3:
+            # Never call _urgent directly on a downgraded risk: after
+            # a deferral stands the urgent close down (empty triggers),
+            # _urgent would emit a SUMMARY-phase reply of kind
+            # "urgent" -- a malformed combination. A still-URGENT risk
+            # goes through the minimum-fact gate; a downgraded risk
+            # (ROUTINE, or any risk level after a triage.urgent_deferred
+            # event) falls through to the normal finish, a summary for
+            # patient review rather than an urgent close on empty
+            # triggers. A never-assessed UNDETERMINED risk with no
+            # prior deferral keeps the standing abstention-urgent
+            # behaviour pinned by test_reasoning.py.
+            deferred = any(
+                event.event_type == "triage.urgent_deferred"
+                for event in engine.events.for_session(state.session_id)
+            )
+            if state.risk.level == RiskLevel.URGENT:
+                gated = engine._urgent_or_defer(state)
+                if gated is not None:
+                    return gated
+                return engine._finish(state)
+            if state.risk.level == RiskLevel.ROUTINE or deferred:
+                return engine._finish(state)
             return engine._urgent(state)
         return engine._finish(state)
 

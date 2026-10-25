@@ -89,6 +89,17 @@ class Question:
     blocking: bool = True
     excludes_fact_equals: Dict[str, List[Any]] = field(default_factory=dict)
     age_between_when_known: Optional[List[float]] = None
+    # Fact-keyed fallback applicability, evaluated only by
+    # ``question_applies_in_state`` (never by the chief-only
+    # ``question_applies``): {fact_key: [terms]}. A question applies
+    # when the named fact is recorded PRESENT and its value/evidence
+    # contains an unnegated term. Currently used by
+    # reported_temperature only: fever mentioned in associated
+    # symptoms (not just the chief complaint) makes the temperature
+    # question requestable (batch A, G-09 note). Denied or merely
+    # unconfirmed mentions never trigger it (negation-aware match +
+    # PRESENT assertion requirement).
+    applies_also_when: Dict[str, List[str]] = field(default_factory=dict)
 
 
 class ContentRepository:
@@ -121,6 +132,10 @@ class ContentRepository:
                 if raw.get("age_between_when_known")
                 else None
             ),
+            applies_also_when={
+                str(key): list(values)
+                for key, values in dict(raw.get("applies_also_when", {})).items()
+            },
         )
 
     def question(self, question_id: str) -> Question:
@@ -187,17 +202,39 @@ class ContentRepository:
         corpus (recorded value + verbatim patient utterances). Every
         candidate computation — adaptive engine, deterministic engine,
         differential planner — goes through here so no path keeps the
-        old value-only behaviour."""
+        old value-only behaviour. After the chief-corpus check, a
+        question's ``applies_also_when`` metadata is evaluated against
+        the named facts' values + evidence (PRESENT facts only,
+        negation-aware): this is how a fever recorded only under
+        associated_symptoms makes reported_temperature requestable."""
         terms = question.applies_when.get("chief_complaint_contains_any", [])
         if not terms:
             return True
         lowered_terms = [term.lower() for term in terms]
-        return any(
+        if any(
             _applies_term_match(text.lower(), term)
             for text in self.chief_complaint_texts(state)
             if text
             for term in lowered_terms
-        )
+        ):
+            return True
+        if state is None:
+            return False
+        for fact_key, extra_terms in (question.applies_also_when or {}).items():
+            fact = state.facts.get(fact_key)
+            if fact is None or fact.assertion != Assertion.PRESENT:
+                continue
+            texts = [str(fact.value)] + (
+                [str(fact.evidence)] if fact.evidence else []
+            )
+            if any(
+                _applies_term_match(text.lower(), term.lower())
+                for text in texts
+                if text
+                for term in extra_terms
+            ):
+                return True
+        return False
 
     @property
     def versions(self) -> Dict[str, str]:

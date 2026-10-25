@@ -215,6 +215,26 @@ class DeterministicConclusionTests(unittest.TestCase):
         self._answer("都没有", "no")
         self._answer("两天前开始")
         reply = self._answer("在加重", "worsening")
+        # Batch A: single-clue trajectory no longer closes urgently at
+        # once; the controller defers and asks the remaining questions.
+        self.assertEqual(reply.kind, "question")
+        self.assertIsNone(reply.conclusion)
+        kinds = [e.event_type for e in self.events.for_session(self.state.session_id)]
+        self.assertIn("triage.urgent_deferred", kinds)
+        # Drive the remaining minimum-fact questions; the deferred trigger
+        # closes urgently once severity, associated symptoms and the
+        # patient goal are on file, with the same final sheet values.
+        self._answer("4分")
+        self._answer("没有")
+        self._answer("两天前开始")
+        self._answer("没有")
+        self._answer("没有")
+        self._answer("没有")
+        self._answer("暂时跳过", "skip")
+        self._answer("没有")
+        self._answer("不知道")
+        self._answer("没有")
+        reply = self._answer("想整理信息去就医")
         self.assertEqual(reply.kind, "urgent")
         sheet = reply.conclusion
         self.assertIsNotNone(sheet)

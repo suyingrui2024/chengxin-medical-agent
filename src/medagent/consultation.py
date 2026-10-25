@@ -29,6 +29,8 @@ from .knowledge import (
     Question,
     question_fact_gates_pass,
 )
+from .adaptive_questions import DIRECT_EMERGENCY_TAGS
+from .red_flags import load_definitions
 from .self_checks import SelfCheckService
 from .triage import TriageService
 from .turn_context import TurnContext
@@ -82,6 +84,138 @@ VALUE_LABELS = {
     "improving": "减轻",
     "stable": "变化不大",
 }
+
+# -- Batch A controller gates (W3) -------------------------------------
+# Urgent close on a single clue (trajectory=worsening alone, or one
+# severity score alone) must wait for a minimum fact set: severity
+# collected, associated symptoms probed, patient goal recorded. Only
+# the two single-clue urgent triggers are gated; temperature/infant/
+# orofacial urgent triggers keep their immediacy, and the deterministic
+# emergency route is never gated by this.
+URGENT_SINGLE_CLUE_TRIGGERS = frozenset({"症状持续加重", "症状影响评分较高"})
+URGENT_MINIMUM_FACTS = ("severity", "associated_symptoms", "patient_goal")
+
+# A suspended self-check task that keeps being suspended without ever
+# completing is capped: after this many *consecutive* suspensions of the
+# same task occurrence it is cleared and the session returns to the main
+# flow instead of looping forever. "Consecutive" is per task occurrence
+# (task_id + interaction_id): a successful resume, a completion, a new
+# task offer, or a clear resets the run, so different occurrences each
+# suspended once never accumulate toward the cap.
+SELF_CHECK_SUSPEND_CAP = 3
+
+# Short patient-facing notice attached to the next reply when the cap
+# clears a suspended step, so the step is never silently dropped.
+SUSPEND_CAP_NOTICE = "这一步先跳过，回到主流程继续。"
+
+# Patient wording that refuses to disclose a field ("不想说"). A refusal
+# is a recordable state: it lands as an UNKNOWN fact carrying the
+# refusal quote, so the summary gate is satisfied without inventing a
+# value and without rewriting the refusal as "不知道".
+REFUSAL_PHRASES = (
+    "不想说",
+    "不太想说",
+    "不方便说",
+    "不愿说",
+    "不愿意说",
+    "拒绝说",
+    "拒绝回答",
+    "不想告诉",
+    "不方便告诉",
+    "不能说",
+    "不说这个",
+    "不想透露",
+)
+
+# Steady, not-improving wording ("一直没怎么好转") must not be booked as
+# worsening. An explicit worsening phrase in the same evidence wins over
+# the steady reading, except when it is itself negated ("没有加重").
+_STEADY_NOT_IMPROVING_PHRASES = (
+    "一直没怎么好转",
+    "没怎么好转",
+    "一直没有好转",
+    "没有好转",
+    "没好转",
+    "不见好转",
+    "不见好",
+    "没有变好",
+    "没见好",
+    "变化不大",
+    "没什么变化",
+    "一直这样",
+    "老样子",
+    "还是老样子",
+    "没有加重",
+    "没加重",
+)
+_WORSENING_PHRASES = (
+    "加重",
+    "更严重",
+    "越来越",
+    "恶化",
+    "更疼",
+    "更痛",
+    "更难受",
+    "变严重",
+)
+_NEGATED_WORSENING = ("没有加重", "没加重", "没有恶化", "没恶化")
+
+_SKIP_TEXTS = ("跳过", "暂时跳过", "跳过这一步", "先跳过", "跳过吧", "这步跳过")
+
+
+def _normalize_free_text(text: str) -> str:
+    return (text or "").strip().strip(" 。！!，,、；;？?～~").replace(" ", "")
+
+
+def is_summary_confirmation_text(text: str) -> bool:
+    """Free-text confirmation equivalent to tapping confirm_summary.
+
+    Deliberately narrow: only an unambiguous confirmation counts, so a
+    correction ("不对，年龄写错了") never closes the session. The
+    D-03 wording ("我看了，都对，没什么要改的") is covered.
+    """
+    normalized = _normalize_free_text(text)
+    if normalized in {
+        "都对",
+        "没什么要改的",
+        "没什么要改",
+        "没有要改的",
+        "确认",
+        "确认无误",
+        "没问题",
+        "可以",
+        "就这样",
+        "同意",
+        "我看了都对",
+        "我看了没问题",
+    }:
+        return True
+    return normalized.startswith("我看了") and (
+        "都对" in normalized
+        or "没什么要改" in normalized
+        or "没有要改" in normalized
+        or "确认无误" in normalized
+    )
+
+
+def is_refusal_text(text: str) -> bool:
+    return bool(text) and any(phrase in text for phrase in REFUSAL_PHRASES)
+
+
+def is_steady_not_improving_evidence(text: str) -> bool:
+    """True when the evidence reads as steady-not-improving, not worse."""
+    if not text:
+        return False
+    if not any(phrase in text for phrase in _STEADY_NOT_IMPROVING_PHRASES):
+        return False
+    unnegated = text
+    for phrase in _NEGATED_WORSENING:
+        unnegated = unnegated.replace(phrase, "")
+    return not any(phrase in unnegated for phrase in _WORSENING_PHRASES)
+
+
+def is_self_check_skip_text(text: str) -> bool:
+    return _normalize_free_text(text) in _SKIP_TEXTS
 
 
 @dataclass(frozen=True)
@@ -869,9 +1003,31 @@ class ConsultationEngine(
             state.active_task = None
             state.risk = self.triage.assess(state, new_text)
             if state.risk.level == RiskLevel.EMERGENCY:
-                reply = self._emergency_reply(state, state.risk.triggers)
+                action = self._emergency_clarification_action(state, new_text, ())
+                if action == "clarify":
+                    reply = self._emergency_clarification_reply(
+                        state, new_text, turn_id
+                    )
+                elif action == "confirmed":
+                    reply = self._emergency_reply(
+                        state, state.risk.triggers, include_clarification=True
+                    )
+                else:
+                    reply = self._emergency_reply(state, state.risk.triggers)
             elif state.risk.level == RiskLevel.URGENT:
-                reply = self._urgent(state)
+                gated = self._urgent_or_defer(state, turn_id)
+                if gated is not None:
+                    reply = gated
+                else:
+                    state.closed_reason = None
+                    resumed = (
+                        self._offer_task(
+                            state, str(state.get("chief_complaint", "")), previous_task
+                        )
+                        if previous_task
+                        else None
+                    )
+                    reply = resumed or self._plan_next(state)
             else:
                 state.closed_reason = None
                 resumed = (
@@ -955,9 +1111,54 @@ class ConsultationEngine(
             state.active_task = None
             state.risk = self.triage.assess(state)
             if state.risk.level == RiskLevel.EMERGENCY:
-                reply = self._emergency_reply(state, state.risk.triggers)
+                # A restoration replays the emergency route, so it must
+                # run the same clarification gate as a fresh turn: a
+                # bare co-occurrence signal is clarified, not closed on,
+                # unless the route was already issued (an issued route
+                # is never retracted by editing a field) or the patient
+                # already confirmed it (then the confirmed close replays
+                # with its signal intact, never filtered to empty).
+                texts = [
+                    event.payload.get("text")
+                    for event in self.events.for_session(session_id)
+                    if event.event_type == "turn.user_message"
+                    and isinstance(event.payload.get("text"), str)
+                    and event.payload.get("text")
+                ]
+                if not texts:
+                    texts = [
+                        item["content"]
+                        for item in state.transcript
+                        if item.get("role") == "user" and item.get("content")
+                    ]
+                signal_text = texts[-1] if texts else (restored.evidence or "")
+                action = self._emergency_clarification_action(
+                    state, signal_text, ()
+                )
+                if action == "confirmed":
+                    reply = self._confirm_emergency_clarification(
+                        state, turn_id
+                    ) or self._emergency_reply_with_clarification_memory(
+                        state, state.risk.triggers
+                    )
+                elif (
+                    action == "clarify"
+                    and state.closed_reason != "emergency_route"
+                ):
+                    reply = self._emergency_clarification_reply(
+                        state, signal_text, turn_id
+                    )
+                else:
+                    reply = self._emergency_reply_with_clarification_memory(
+                        state, state.risk.triggers
+                    )
             elif state.risk.level == RiskLevel.URGENT:
-                reply = self._urgent(state)
+                gated = self._urgent_or_defer(state, turn_id)
+                if gated is not None:
+                    reply = gated
+                else:
+                    state.closed_reason = None
+                    reply = self._plan_next(state)
             else:
                 state.closed_reason = None
                 reply = self._plan_next(state)
@@ -979,7 +1180,18 @@ class ConsultationEngine(
         )
         state.transcript.append({"role": "user", "content": text})
         state.risk = self.triage.assess(state, text)
-        reply = self._emergency_reply(state, state.risk.triggers)
+        action = self._emergency_clarification_action(state, text, ())
+        if action == "clarify":
+            reply = self._emergency_clarification_reply(state, text, turn_id)
+            state.pending_input = None
+            self._record_reply(state, reply, turn_id, "更正原文仅为裸共现，先鉴别澄清")
+            return reply
+        if action == "confirmed":
+            reply = self._emergency_reply(
+                state, state.risk.triggers, include_clarification=True
+            )
+        else:
+            reply = self._emergency_reply(state, state.risk.triggers)
         state.pending_input = None
         self._record_reply(state, reply, turn_id, "更正原文命中急症门，优先于字段和旧版本校验")
         return reply
@@ -1027,9 +1239,37 @@ class ConsultationEngine(
             return self._requested_emergency_help(state, user_input.text)
         self._guard_stale_action(state, user_input)
         ctx = self._begin_turn(state, user_input)
+        if user_input.choice_value == "confirm_emergency_clarification":
+            confirmed = self._confirm_emergency_clarification(state, ctx.turn_id)
+            if confirmed is not None:
+                self._record_reply(
+                    state, confirmed, ctx.turn_id, "鉴别澄清已确认，走急症路径"
+                )
+                return confirmed
+        if user_input.choice_value == "deny_emergency_clarification":
+            if self._emergency_clarification_pending(state) is not None:
+                state.runtime_snapshot.pop("emergency_clarification", None)
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "emergency.clarification_denied",
+                        {},
+                        turn_id=ctx.turn_id,
+                    )
+                )
         direct = self._direct_emergency(state, ctx)
         if direct is not None:
             return direct
+        # Deliberately outside the pipeline registry (whose handler
+        # order is pinned by test_turn_pipeline): a confirmed summary
+        # must reach the conclusion flow before any pipeline handler
+        # (observation, self-check intake) can re-suspend it.
+        confirmed = self._early_summary_confirm(state, user_input, ctx)
+        if confirmed is not None:
+            self._record_reply(
+                state, confirmed, ctx.turn_id, "摘要已确认，进入结论流程"
+            )
+            return confirmed
         for name, handler in self._turn_pipeline:
             ctx.trace.append(name)
             reply = handler(state, user_input, ctx)
@@ -1088,7 +1328,20 @@ class ConsultationEngine(
         direct_triggers = self.triage.scan_text(ctx.text)
         if not direct_triggers:
             return None
+        action = self._emergency_clarification_action(state, ctx.text, ())
+        if action == "clarify":
+            reply = self._emergency_clarification_reply(
+                state, ctx.text, ctx.turn_id
+            )
+            self._record_reply(state, reply, ctx.turn_id, "急症信号仅为裸共现，先鉴别澄清")
+            return reply
         state.risk = self.triage.assess(state, ctx.text)
+        if action == "confirmed":
+            reply = self._emergency_reply(
+                state, state.risk.triggers, include_clarification=True
+            )
+            self._record_reply(state, reply, ctx.turn_id, "鉴别澄清已确认，走急症路径")
+            return reply
         reply = self._emergency_reply(state, direct_triggers)
         self._record_reply(state, reply, ctx.turn_id, "原始输入命中确定性急症门")
         return reply
@@ -1142,26 +1395,52 @@ class ConsultationEngine(
             ctx.reply_reason = "重复观察及原问诊接续"
         return observation_reply
 
+    def _summary_confirm_reply(self, state, turn_id):
+        state.phase = Phase.CLOSED
+        state.closed_reason = "confirmed_by_user"
+        state.active_question = None
+        reply = AgentReply(
+            "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
+            Phase.CLOSED,
+            kind="closed",
+            summary=self._summary_payload(
+                state, review_status="confirmed_by_user"
+            ),
+        )
+        self._schedule_follow_up(state, reply, turn_id)
+        return reply
+
+    def _early_summary_confirm(self, state, user_input, ctx):
+        """Summary confirmation must not be hijacked by a self-check step.
+
+        Called from _submit before the pipeline: once the patient
+        confirms the summary (button or unambiguous free text, D-03),
+        the session enters the conclusion flow instead of being
+        re-suspended by a pending self-check conversation. Pending
+        observation/calculation feedback is a real blocker and still
+        falls through.
+        """
+        if state.phase != Phase.SUMMARY:
+            return None
+        if user_input.choice_value != "confirm_summary" and not (
+            is_summary_confirmation_text(ctx.text)
+        ):
+            return None
+        if state.observation_feedback or state.calculation_feedback:
+            return None
+        ctx.reply_reason = "用户核对摘要"
+        return self._summary_confirm_reply(state, ctx.turn_id)
+
     def _h_summary_review(self, state, user_input, ctx):
         if state.phase != Phase.SUMMARY:
             return None
-        if user_input.choice_value == "confirm_summary":
-            state.phase = Phase.CLOSED
-            state.closed_reason = "confirmed_by_user"
-            state.active_question = None
-            reply = AgentReply(
-                "你已确认本次摘要，会谈现已结束。可以回看记录；情况变化时请重新评估。",
-                Phase.CLOSED,
-                kind="closed",
-                summary=self._summary_payload(
-                    state, review_status="confirmed_by_user"
-                ),
-            )
+        if user_input.choice_value == "confirm_summary" or (
+            is_summary_confirmation_text(ctx.text)
+        ):
+            reply = self._summary_confirm_reply(state, ctx.turn_id)
         else:
             reply = self._finish(state)
             reply.message = "请点击摘要或右侧记录中的“更正”，修改对应信息后再核对。"
-        if user_input.choice_value == "confirm_summary":
-            self._schedule_follow_up(state, reply, ctx.turn_id)
         ctx.reply_reason = "用户核对摘要"
         return reply
 
@@ -1176,22 +1455,47 @@ class ConsultationEngine(
                 return failure
         elif state.active_question:
             question = self.content.question(state.active_question)
-            result = self.interpreter.interpret(question, text, user_input.choice_value)
-            if question.input == "age" and (
-                not isinstance(result.value, (int, float))
-                or not 0 <= result.value <= 120
-            ):
-                ctx.reply_reason = "年龄输入未通过校验"
-                return AgentReply(
-                    "我没能确认年龄。请写成“8个月”或“32岁”这样的格式。",
-                    question.phase,
-                    kind="clarification",
-                    question_id=question.id,
-                    developer_trace={"reason": "年龄格式或范围未通过确定性校验，原输入未写入年龄字段"},
+            if is_refusal_text(text):
+                # J-01 (deterministic engine): a refusal lands as a
+                # declined fact — recorded, gate-satisfying, value-free —
+                # instead of looping the question (age) or booking the
+                # refusal wording as the field's value (choice).
+                self._record_fact(
+                    state,
+                    question.fact_key,
+                    Interpretation(None, Assertion.UNKNOWN, Source.PATIENT),
+                    turn_id,
+                    text,
                 )
-            self._record_fact(state, question.fact_key, result, turn_id, text)
-            state.active_question = None
-            state.active_question_is_clarification = False
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "fact.declined",
+                        {"fact_key": question.fact_key, "evidence": text},
+                        turn_id=turn_id,
+                    )
+                )
+                state.active_question = None
+                state.active_question_is_clarification = False
+            else:
+                result = self.interpreter.interpret(
+                    question, text, user_input.choice_value
+                )
+                if question.input == "age" and (
+                    not isinstance(result.value, (int, float))
+                    or not 0 <= result.value <= 120
+                ):
+                    ctx.reply_reason = "年龄输入未通过校验"
+                    return AgentReply(
+                        "我没能确认年龄。请写成“8个月”或“32岁”这样的格式。",
+                        question.phase,
+                        kind="clarification",
+                        question_id=question.id,
+                        developer_trace={"reason": "年龄格式或范围未通过确定性校验，原输入未写入年龄字段"},
+                    )
+                self._record_fact(state, question.fact_key, result, turn_id, text)
+                state.active_question = None
+                state.active_question_is_clarification = False
         else:
             self._record_fact(
                 state,
@@ -1214,11 +1518,23 @@ class ConsultationEngine(
             )
         )
         if state.risk.level == RiskLevel.EMERGENCY:
+            action = self._emergency_clarification_action(state, text, ())
+            if action == "clarify":
+                ctx.reply_reason = "急症信号仅为裸共现，先鉴别澄清"
+                return self._emergency_clarification_reply(state, text, turn_id)
+            if action == "confirmed":
+                ctx.reply_reason = "鉴别澄清已确认，走急症路径"
+                return self._emergency_reply(
+                    state, state.risk.triggers, include_clarification=True
+                )
             ctx.reply_reason = "结构化急症门触发"
             return self._emergency_reply(state, state.risk.triggers)
         if state.risk.level == RiskLevel.URGENT:
-            ctx.reply_reason = "风险升级后优先求助"
-            return self._urgent(state)
+            deferred = self._urgent_or_defer(state, turn_id)
+            if deferred is not None:
+                ctx.reply_reason = "风险升级后优先求助"
+                return deferred
+            return None
         return None
 
     def _h_planning(self, state, user_input, ctx):
@@ -1259,6 +1575,10 @@ class ConsultationEngine(
         )
 
     def _try_task_result(self, state, text, choice_value, turn_id):
+        # D-03: free-text "跳过" (with or without punctuation) counts as
+        # one skip attempt, exactly like tapping the skip option.
+        if choice_value is None and is_self_check_skip_text(text):
+            choice_value = "skip"
         try:
             decoded = self.self_checks.interpret(state.active_task, text, choice_value)
         except Exception as exc:
@@ -1417,7 +1737,7 @@ class ConsultationEngine(
             if same_phase[0].phase == Phase.BACKGROUND:
                 offered = self._offer_task(state, chief)
                 if offered:
-                    return offered
+                    return self._attach_suspend_cap_notice(state, offered)
             selected_id = self.ranker.choose(state, same_phase)
             selected = next(
                 (item for item in same_phase if item.id == selected_id), same_phase[0]
@@ -1428,21 +1748,110 @@ class ConsultationEngine(
 
         offered = self._offer_task(state, chief)
         if offered:
-            return offered
-        return self._finish(state)
+            return self._attach_suspend_cap_notice(state, offered)
+        return self._attach_suspend_cap_notice(state, self._finish(state))
 
     @staticmethod
     def _phase_rank(phase: Phase) -> int:
         return planning_rank(phase)
 
+    def _self_check_suspend_count(
+        self,
+        state: CaseState,
+        task_id: str,
+        interaction_id: Optional[str] = None,
+    ) -> int:
+        """Consecutive suspensions of one task occurrence since its last
+        progress event.
+
+        Progress is a successful resume, a completion, a new task offer,
+        or a clear of the same occurrence (an event without an
+        interaction_id is treated as matching, since it cannot be shown
+        to belong to a different occurrence). Only a task occurrence
+        that keeps being suspended without any such progress is capped.
+        """
+        count = 0
+        for event in self.events.for_session(state.session_id):
+            payload = event.payload or {}
+            if payload.get("task_id") != task_id:
+                continue
+            event_interaction = payload.get("interaction_id")
+            if (
+                interaction_id is not None
+                and event_interaction is not None
+                and event_interaction != interaction_id
+            ):
+                continue
+            if event.event_type == "self_check.conversation_suspended":
+                count += 1
+            elif event.event_type in {
+                "self_check.conversation_resumed",
+                "self_check.completed",
+                "self_check.offered",
+                "self_check.conversation_cleared",
+                "self_check.result_confirmed",
+            }:
+                count = 0
+        return count
+
+    def _attach_suspend_cap_notice(self, state: CaseState, reply) -> Any:
+        """Prepend the cap notice to the next patient-facing reply once.
+
+        A ``self_check.suspend_cap_noticed`` event marks the notice as
+        delivered, so later replies in the session do not repeat it; a
+        second cap later in the session gets its own notice.
+        """
+        capped = False
+        noticed = False
+        for event in self.events.for_session(state.session_id):
+            if event.event_type == "self_check.suspend_cap_reached":
+                capped = True
+                noticed = False
+            elif event.event_type == "self_check.suspend_cap_noticed":
+                noticed = True
+        if not capped or noticed or not reply.message:
+            return reply
+        if reply.message.startswith(SUSPEND_CAP_NOTICE):
+            return reply
+        reply.message = SUSPEND_CAP_NOTICE + reply.message
+        self.events.append(
+            Event(
+                state.session_id,
+                "self_check.suspend_cap_noticed",
+                {},
+            )
+        )
+        return reply
+
     def _offer_task(
         self, state: CaseState, chief: str, task_id: Optional[str] = None
     ) -> Optional[AgentReply]:
         if state.self_check_conversation:
-            if (
-                task_id is None
-                or task_id == state.self_check_conversation["task"]["id"]
-            ):
+            frame_id = state.self_check_conversation["task"]["id"]
+            # D-04: a suspended task must not hang across turns forever.
+            # At the cap it is cleared and planning resumes (the caller
+            # falls through to the next question or the finish), instead
+            # of re-offering the same suspended step verbatim.
+            if self._self_check_suspend_count(
+                state,
+                frame_id,
+                state.self_check_conversation["task"].get("interaction_id"),
+            ) >= SELF_CHECK_SUSPEND_CAP:
+                self._clear_task_conversation(state, "suspend_cap_reached")
+                state.pending_self_checks = [
+                    item
+                    for item in state.pending_self_checks
+                    if item["task_id"] != frame_id
+                ]
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "self_check.suspend_cap_reached",
+                        {"task_id": frame_id},
+                    )
+                )
+                return None
+            if task_id is None or task_id == frame_id:
                 return self._resume_task_conversation(state)
             return None
         if self._self_check_block_reason(state):
@@ -1618,20 +2027,349 @@ class ConsultationEngine(
             # Same adaptation as the adaptive engine: the catalog's
             # infant-months wording is only presented for child subjects.
             prompt = ADULT_AGE_PROMPT
+        return self._attach_suspend_cap_notice(
+            state,
+            AgentReply(
+                prompt,
+                question.phase,
+                kind="question",
+                question_id=question.id,
+                quick_replies=question.options,
+                developer_trace={
+                    "reason": reason,
+                    "content_version": self.content.versions["questions"],
+                },
+            ),
+        )
+
+    # -- Batch A controller gates (W3) --------------------------------
+    def _urgent_gate_fact_satisfied(self, state: CaseState, key: str) -> bool:
+        """A minimum-set fact counts as satisfied when it is recorded,
+        was already asked, or cannot be asked for this case (inapplicable
+        or excluded by known facts). The last two keep the gate from
+        deadlocking on a question the planner can never pose.
+        """
+        if key in state.facts:
+            return True
+        question = next(
+            (item for item in self.content.questions if item.fact_key == key),
+            None,
+        )
+        if question is None:
+            return True
+        if question.id in state.asked_questions:
+            return True
+        if not self.content.question_applies_in_state(question, state):
+            return True
+        return not question_fact_gates_pass(question, state.facts)
+
+    def _urgent_gate_missing(self, state: CaseState) -> List[str]:
+        """Minimum facts still missing before a single-clue urgent close.
+
+        Empty when the urgent decision does not rest solely on the two
+        single-clue triggers (severity score / worsening trajectory), so
+        temperature, infant and orofacial urgent triggers — and every
+        deterministic emergency — are never delayed by this gate.
+        """
+        risk = state.risk
+        if risk is None or risk.level != RiskLevel.URGENT:
+            return []
+        triggers = list(risk.triggers or [])
+        if not triggers or any(
+            trigger not in URGENT_SINGLE_CLUE_TRIGGERS for trigger in triggers
+        ):
+            return []
+        return [
+            key
+            for key in URGENT_MINIMUM_FACTS
+            if not self._urgent_gate_fact_satisfied(state, key)
+        ]
+
+    def _deferred_risk(self, state: CaseState) -> RiskAssessment:
+        """Risk level while an urgent/emergency decision is deferred.
+
+        The publication gate only delivers controller-owned replies
+        while risk is URGENT/EMERGENCY, so "keep asking" is impossible
+        unless the not-yet-established escalation is stood down: the
+        single-clue triggers are held in the deferral/clarification
+        event, the underlying facts stay recorded, and the next
+        assessment re-derives URGENT/EMERGENCY the moment the gate
+        passes (or the patient confirms). The level mirrors triage
+        without the deferred triggers: ROUTINE once screening is
+        negative, UNDETERMINED otherwise. This never touches the
+        deterministic emergency route itself.
+        """
+        if state.assertion("emergency_screen") == Assertion.ABSENT:
+            return RiskAssessment(RiskLevel.ROUTINE, [])
+        return RiskAssessment(RiskLevel.UNDETERMINED, [])
+
+    def _urgent_or_defer(
+        self, state: CaseState, turn_id: Optional[str] = None
+    ) -> Optional[AgentReply]:
+        """Urgent reply when the gate passes; None (defer, keep asking)
+        when a single-clue urgent close would cut the session short."""
+        missing = self._urgent_gate_missing(state)
+        if not missing:
+            return self._urgent(state)
+        self.events.append(
+            Event(
+                state.session_id,
+                "triage.urgent_deferred",
+                {"missing": missing, "triggers": list(state.risk.triggers)},
+                turn_id=turn_id,
+            )
+        )
+        state.risk = self._deferred_risk(state)
+        return None
+
+    def _emergency_clarification_pending(self, state: CaseState) -> Optional[Dict[str, Any]]:
+        pending = state.runtime_snapshot.get("emergency_clarification")
+        return pending if isinstance(pending, dict) else None
+
+    def _emergency_clarification_action(
+        self, state: CaseState, text: str, risk_tags=()
+    ) -> str:
+        """Scan-layer clarification gate (W1) for the emergency path.
+
+        Returns "clarify" when — and only when — this turn's emergency
+        signal consists solely of ``requires_clarification`` hits (bare
+        location x signal co-occurrence, no definite hit, no confirmed
+        screening, no direct emergency risk tag, no emergency carryover);
+        "confirmed" when a pending clarification is answered by another
+        affirmative co-occurrence of the same signal; "none" otherwise.
+        ``scan_text``/``assess`` deliberately still contain combo labels,
+        so this gate must read ``scan_detailed`` — without it, C-01/C-04
+        behaviour is unchanged.
+        """
+        if state.closed_reason == "emergency_route":
+            return "none"
+        screen = state.facts.get("emergency_screen")
+        if (
+            screen is not None
+            and screen.assertion == Assertion.PRESENT
+            and screen.value is True
+        ):
+            return "none"
+        if set(risk_tags or ()) & DIRECT_EMERGENCY_TAGS:
+            return "none"
+        try:
+            hits = self.triage.scan_detailed(text)
+        except Exception:
+            return "none"
+        if not hits:
+            return "none"
+        if any(not hit.requires_clarification for hit in hits):
+            return "none"
+        pending = self._emergency_clarification_pending(state)
+        if pending and set(pending.get("labels") or ()) & {
+            hit.label for hit in hits
+        }:
+            return "confirmed"
+        return "clarify"
+
+    def _emergency_clarification_reply(
+        self, state: CaseState, text: str, turn_id: Optional[str] = None
+    ) -> AgentReply:
+        try:
+            hits = self.triage.scan_detailed(text)
+        except Exception:
+            hits = []
+        # Same publication-gate reason as _urgent_or_defer: a
+        # clarification question cannot be delivered while risk is
+        # EMERGENCY, so the not-yet-confirmed escalation is stood down
+        # (facts and the pending clarification record are untouched).
+        state.risk = self._deferred_risk(state)
+        labels = sorted({hit.label for hit in hits})
+        state.runtime_snapshot["emergency_clarification"] = {
+            "text": text,
+            "labels": labels,
+            "evidence": [hit.evidence for hit in hits],
+        }
+        self.events.append(
+            Event(
+                state.session_id,
+                "emergency.clarification_asked",
+                {"labels": labels},
+                turn_id=turn_id,
+            )
+        )
         return AgentReply(
-            prompt,
-            question.phase,
-            kind="question",
-            question_id=question.id,
-            quick_replies=question.options,
+            "想再确认一下你提到的情况，才能判断是否需要立即急救："
+            "这种不适具体是怎样的感觉（刺痛、压榨样闷痛还是其他感觉）？"
+            "有没有放射到手臂、背部或下颌？有没有出汗、呼吸困难？"
+            "是持续不缓解，还是间断出现、每次持续多久？"
+            "如果确实有这种情况可以直接确认；如果没有，也可以直接否认。",
+            state.phase,
+            kind="clarification",
+            quick_replies=[
+                QuickReply("是的，确实有这种情况", "confirm_emergency_clarification"),
+                QuickReply("没有，我没有这种情况", "deny_emergency_clarification"),
+            ],
             developer_trace={
-                "reason": reason,
-                "content_version": self.content.versions["questions"],
+                "reason": "急症信号仅为位置词与信号词裸共现，先鉴别澄清，患者确认后才走急症路径"
             },
         )
 
+    def _confirm_emergency_clarification(
+        self, state: CaseState, turn_id: Optional[str] = None
+    ) -> Optional[AgentReply]:
+        """Close as emergency after the patient confirmed clarification.
+
+        The stored labels are re-rendered through the scan layer's
+        helper with ``include_clarification=True`` — that flag is set
+        only here, after confirmation, never on the first co-occurrence
+        turn.
+        """
+        pending = self._emergency_clarification_pending(state)
+        if not pending:
+            return None
+        labels = list(pending.get("labels") or [])
+        state.runtime_snapshot.pop("emergency_clarification", None)
+        self.events.append(
+            Event(
+                state.session_id,
+                "emergency.clarification_confirmed",
+                {"labels": labels},
+                turn_id=turn_id,
+            )
+        )
+        state.risk = RiskAssessment(RiskLevel.EMERGENCY, labels)
+        return self._emergency_reply(state, labels, include_clarification=True)
+
+    def _emergency_scan_hits(self, state: CaseState):
+        """Scan hits over every user turn so far, de-duplicated.
+
+        The emergency reply renders from hits, not from the raw trigger
+        strings, so a replayed close (closed-session guard) still renders
+        the original turn's signals instead of the latest message's.
+        """
+        texts = []
+        for event in self.events.for_session(state.session_id):
+            if event.event_type == "turn.user_message":
+                text = event.payload.get("text")
+                if isinstance(text, str) and text:
+                    texts.append(text)
+        if not texts:
+            texts = [
+                item["content"]
+                for item in state.transcript
+                if item.get("role") == "user"
+            ]
+        hits = []
+        seen = set()
+        for text in texts:
+            try:
+                scanned = self.triage.scan_detailed(text)
+            except Exception:
+                continue
+            for hit in scanned:
+                key = (hit.flag_id, hit.label, hit.evidence)
+                if key not in seen:
+                    seen.add(key)
+                    hits.append(hit)
+        return hits
+
+    def _confirmed_emergency_labels(
+        self, state: CaseState, triggers, *, include_clarification=False
+    ) -> List[str]:
+        """Render triggers through the scan layer's helper (W1).
+
+        Scan-derived labels are governed by the helper: clarification
+        hits drop unless explicitly confirmed, denied evidence drops.
+        Labels the scanner cannot produce (screening confirmation,
+        risk-tag selection, user-requested help) are not scan labels and
+        pass through untouched. Empty-set semantics (W1 caveat): an
+        empty result is a rendering fact only — it must never be read
+        as "no emergency" when another route already fired, so callers
+        still close; they just name no signal.
+        """
+        hits = self._emergency_scan_hits(state)
+        try:
+            rendered = self.triage.confirmed_trigger_labels(
+                hits, state, include_clarification=include_clarification
+            )
+        except Exception:
+            rendered = []
+        definition_labels = {item.label for item in load_definitions()}
+        for trigger in triggers or []:
+            if trigger not in definition_labels and trigger not in rendered:
+                rendered.append(trigger)
+        return rendered
+
+    def _emergency_reply_with_clarification_memory(
+        self, state: CaseState, triggers
+    ) -> AgentReply:
+        """Emergency reply that does not filter out an already-confirmed
+        clarification signal on replay.
+
+        A confirmed clarification pops its pending record, so a later
+        replayed close (e.g. after a fact restoration on an
+        emergency-closed session) would otherwise render through
+        ``confirmed_trigger_labels`` with ``include_clarification=False``
+        and drop the combo label to an empty trigger list. A prior
+        ``emergency.clarification_confirmed`` event for one of the
+        current triggers is the standing proof of confirmation, so the
+        replay renders with the flag on.
+        """
+        confirmed = set()
+        for event in self.events.for_session(state.session_id):
+            if event.event_type == "emergency.clarification_confirmed":
+                confirmed.update(event.payload.get("labels") or [])
+        include = bool(confirmed & set(triggers or []))
+        return self._emergency_reply(
+            state, triggers, include_clarification=include
+        )
+
+    def _confirmed_facts_summary(self, state: CaseState) -> List[Dict[str, Any]]:
+        """Affirmed facts for the emergency/urgent handoff record.
+
+        Only PRESENT facts, never mapped signal names alone; the chief
+        complaint falls back to the first user turn when no fact has
+        landed yet (early emergency close, e.g. P-11/R-07/T-15).
+        """
+        items = []
+        for key, fact in state.facts.items():
+            if fact.assertion != Assertion.PRESENT or key == "emergency_screen":
+                continue
+            label = FACT_LABELS.get(key)
+            if label is None:
+                continue
+            value = fact.value
+            display = VALUE_LABELS.get(str(value), value)
+            if key == "age_years" and isinstance(value, (int, float)):
+                display = (
+                    f"{round(value * 12)} 个月" if value < 2 else f"{value} 岁"
+                )
+            items.append(
+                {
+                    "key": key,
+                    "label": label,
+                    "value": display,
+                    "evidence": fact.evidence or "",
+                }
+            )
+        if not items:
+            first_user = next(
+                (
+                    item["content"]
+                    for item in state.transcript
+                    if item.get("role") == "user"
+                ),
+                None,
+            )
+            if first_user:
+                items.append(
+                    {
+                        "key": "chief_complaint",
+                        "label": "主要问题",
+                        "value": first_user,
+                        "evidence": first_user,
+                    }
+                )
+        return items[:8]
+
     def _emergency_reply(
-        self, state: CaseState, triggers: List[str], requested_help=False
+        self, state: CaseState, triggers: List[str], requested_help=False, *, include_clarification=False
     ) -> AgentReply:
         state.subject_resume = state.subject_candidate = None
         self._clear_calculation(state, "emergency")
@@ -1642,11 +2380,18 @@ class ConsultationEngine(
         state.active_question = None
         state.active_question_is_clarification = False
         state.active_task = None
+        original = list(dict.fromkeys(triggers or []))
+        confirmed_facts = self._confirmed_facts_summary(state)
         if requested_help:
             message = (
                 "你已选择优先求助。本次问诊已停止。"
                 "请现在拨打 120，或让身边的人协助呼叫急救；不要自己驾车。不要继续等待本次对话。"
             )
+            summary = {
+                "care_route": "立即急救",
+                "triggers": original,
+                "confirmed_facts": confirmed_facts,
+            }
         else:
             # emergency_explanation already names the signals, gives the
             # 120 instruction and adds waiting guidance (stay still, do
@@ -1655,12 +2400,34 @@ class ConsultationEngine(
             # instead of stacking a second full instruction sentence.
             from .conclusion import emergency_explanation
 
-            message = emergency_explanation(triggers) + "不要继续等待本次对话。"
+            rendered = self._confirmed_emergency_labels(
+                state, original, include_clarification=include_clarification
+            )
+            if rendered != original:
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "emergency.triggers_filtered",
+                        {"original": original, "rendered": rendered},
+                    )
+                )
+            message = emergency_explanation(rendered)
+            if confirmed_facts:
+                facts_text = "；".join(
+                    f"{item['label']}：{item['value']}" for item in confirmed_facts
+                )
+                message += f"已确认的情况：{facts_text}。"
+            message += "不要继续等待本次对话。"
+            summary = {
+                "care_route": "立即急救",
+                "triggers": rendered,
+                "confirmed_facts": confirmed_facts,
+            }
         return AgentReply(
             message,
             Phase.CLOSED,
             kind="emergency",
-            summary={"care_route": "立即急救", "triggers": sorted(set(triggers))},
+            summary=summary,
             developer_trace={"reason": "确定性急症规则优先于后续问诊"},
         )
 
@@ -1671,11 +2438,30 @@ class ConsultationEngine(
         self._clear_task_conversation(state, "urgent")
         reply = self._finish(state, risk_override=deepcopy(state.risk))
         reply.kind = "urgent"
-        reply.message = (
-            "目前有需要尽快就医评估的线索（"
-            + "、".join(state.risk.triggers)
-            + "）。建议今天联系医疗机构；下面是已采集的信息，不必等问诊补齐再求助。"
-        )
+        triggers = "、".join(state.risk.triggers)
+        # Batch C owns close copy; the minimal overlap here is only that
+        # the "下面是已采集的信息" promise must not stand without the
+        # information itself: list the collected facts inline when there
+        # are any, and drop the promise clause entirely when there are
+        # none (the structured summary still rides on the reply).
+        items = self._confirmed_facts_summary(state)
+        if items:
+            facts_text = "；".join(
+                f"{item['label']}：{item['value']}" for item in items
+            )
+            reply.message = (
+                "目前有需要尽快就医评估的线索（"
+                + triggers
+                + "）。建议今天联系医疗机构；已采集的信息："
+                + facts_text
+                + "，不必等问诊补齐再求助。"
+            )
+        else:
+            reply.message = (
+                "目前有需要尽快就医评估的线索（"
+                + triggers
+                + "）。建议今天联系医疗机构，不必等问诊补齐再求助。"
+            )
         state.closed_reason = "urgent_route"
         return reply
 
@@ -1726,6 +2512,8 @@ class ConsultationEngine(
         known: List[Dict[str, Any]] = []
         unknown: List[str] = []
         unknown_details: List[Dict[str, Any]] = []
+        declined: List[str] = []
+        declined_details: List[Dict[str, Any]] = []
         source_turns = self._source_turns(state)
         for key, fact in state.facts.items():
             task = next(
@@ -1750,6 +2538,13 @@ class ConsultationEngine(
                 # Preserve its actual evidence without promoting it to a known
                 # value, splitting its meaning, or reusing superseded evidence.
                 unknown_details.append(detail)
+                # A refusal is not "unknown": it stays visible in the
+                # unknown list for existing renderers, and is additionally
+                # flagged as declined so new consumers do not mistake it
+                # for a field the patient could not answer.
+                if is_refusal_text(fact.evidence or ""):
+                    declined.append(label)
+                    declined_details.append({**detail, "declined": True})
                 continue
             if fact.assertion == Assertion.ABSENT:
                 display = "患者否认上述危险信号" if key == "emergency_screen" else "否认/没有"
@@ -1774,6 +2569,8 @@ class ConsultationEngine(
             "known": known,
             "unknown": unknown,
             "unknown_details": unknown_details,
+            "declined": declined,
+            "declined_details": declined_details,
             # P2c: the deterministic engine has no _context to inject
             # into, so the archive reference rides the summary payload
             # as a read-only reference section. It never drives question
@@ -2040,6 +2837,14 @@ class ConsultationEngine(
         stored snapshot used for replay carries the sheet (invariant I5).
         Fail-open (I3): any composer error leaves the close untouched.
         """
+        # Controller choke point for conclusion sheets. The vocab layer
+        # (W2) already applies apply_neutral_fallback inside
+        # compose_conclusion for direction-less, off-pathway sheets, so
+        # every controller close routes through it here; do NOT re-apply
+        # it after compose — that would overwrite the caller-supplied
+        # return_now_if list compose restores after the fallback. The
+        # neutral self-care group is the reviewed generic group (no
+        # second neutral group is created; batch C overlap noted).
         try:
             from .conclusion import compose_conclusion, sheet_mode
 
@@ -2114,7 +2919,35 @@ class ConsultationEngine(
         except Exception:
             return
         if line:
-            reply.message = line + reply.message
+            # C-02 (controller side, batch A minimum): when the patient
+            # asked whether they need an examination and the disposition
+            # is home observation, the close line must not end with only
+            # "暂时不需要跑一趟医院". Say when offline evaluation is still
+            # needed and which entry takes it — from the sheet's own
+            # safety net, never a new threshold. A department hint is
+            # named only when the sheet marks it visible (C12 sign-off
+            # owns department visibility); otherwise the generic entry
+            # wording is used. Broader close-template rework, if wanted,
+            # is batch B GOAL overlap, not done here.
+            sentence = ""
+            sheet = reply.conclusion or {}
+            disposition = sheet.get("disposition") or {}
+            goal_line = sheet.get("goal_line") or ""
+            if disposition.get("level") == "self_care" and any(
+                keyword in goal_line
+                for keyword in ("检查", "去医院", "就诊", "看医生")
+            ):
+                entry = (
+                    sheet.get("department_hint")
+                    if sheet.get("department_visible")
+                    else None
+                ) or "线下医疗机构"
+                sentence = (
+                    "你问到要不要去检查：目前的建议是先在家观察；"
+                    "如果出现结论单安全网中列出的情况，或症状持续不缓解、"
+                    f"加重，仍需线下评估，届时可凭本结论单到{entry}就诊。"
+                )
+            reply.message = line + sentence + reply.message
 
     @staticmethod
     def _self_check_block_reason(state):

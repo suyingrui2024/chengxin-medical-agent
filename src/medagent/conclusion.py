@@ -24,6 +24,7 @@ from .domain import Assertion, CaseState, Phase, RiskLevel
 from .followups import build_follow_up_plan
 from .handoff import LABELS as FACT_LABELS
 from .reasoning import RuleBasedProposer, validate_workspace
+from .text_match import contains_unnegated
 
 # Same list as consultation._summary_payload's return_now_if; a drift-guard
 # test asserts the two never diverge. It is the composer's fallback: when
@@ -219,6 +220,89 @@ def _pathway_return_now_if(group_key: str) -> List[str]:
         return []
     items = (data.get("by_pathway") or {}).get(group_key) or []
     return [str(item) for item in items if str(item).strip()]
+
+
+def chief_matches_pathway(chief_complaint: str) -> bool:
+    """Whether a chief complaint triggers any differential pathway.
+
+    Same matching semantics as the reasoning proposer (negation-aware
+    substring match against differentials.json pathway terms). Used to
+    decide whether a direction-less sheet is genuinely off-pathway:
+    a chief that triggers no pathway at all (sudden flashes/floaters,
+    sudden single-ear deafness, knee pain, gum bleeding once the bare
+    「红肿」 skin term was narrowed) must not borrow the nearest
+    probed pathway's language. A chief that does trigger a pathway
+    keeps the existing explored-pathway safety net (pinned by the
+    run3-case3 test), even when directions abstain.
+    """
+    chief = (chief_complaint or "").strip()
+    if not chief:
+        return False
+    for pathway in _load_json("differentials.json").get("pathways", []):
+        terms = pathway.get("chief_complaint_contains_any", [])
+        if any(contains_unnegated(chief, term) for term in terms):
+            return True
+    return False
+
+
+def apply_neutral_fallback(sheet: Dict[str, Any]) -> Dict[str, Any]:
+    """Neutral off-pathway rendering of a composed conclusion sheet.
+
+    Controller-callable (batch A, W2): pass any ``compose_conclusion``
+    sheet; returns a copy whose narrative, self-care, outlook and
+    safety net no longer borrow a nearest-pathway template — the
+    「泌尿不适」/「皮肤不适」/ skin-takeover shapes seen in round 1
+    (endocrine polyuria/polydipsia, gum bleeding, eyelid lump).
+    Neutral content: narrative ``neutral`` block from
+    conclusion_narrative.json, the reviewed ``generic`` self-care
+    group from self_care.json (no duplicate neutral group is created,
+    so the two cannot drift), and the generic four-item safety net.
+
+    Deliberately untouched: disposition level/window/text, directions
+    and their visibility flags, department hint and its visibility,
+    goal_line, and ``emergency_explanation`` (a separate function, not
+    a sheet field). Urgent-tier framing/severity are triage wording,
+    not pathway borrowing, so only self_care/routine_visit narrative
+    lines are replaced. Idempotent: applying it to an already-neutral
+    sheet returns an equal sheet (modulo the marker key). A sheet
+    without a narrative keeps ``narrative=None`` (fail-open, same as
+    the composer when the narrative asset is absent). The result still
+    has to pass the composer's banned-phrase lint when it goes through
+    ``compose_conclusion``; direct callers rendering the sheet should
+    run the same check.
+    """
+    if not isinstance(sheet, dict):
+        return sheet
+    neutral = deepcopy(sheet)
+    tier = "urgent" if neutral.get("tier") == "urgent" else "routine"
+    templates = _narrative_templates().get("neutral") or {}
+    narrative = neutral.get("narrative")
+    level = (neutral.get("disposition") or {}).get("level")
+    if isinstance(narrative, dict) and templates and level in ("self_care", "routine_visit"):
+        framing = (templates.get("framing") or {}).get(level)
+        if framing:
+            narrative["framing"] = framing
+        severity = (templates.get("severity") or {}).get(level)
+        if severity:
+            narrative["severity"] = severity
+    care = _self_care_group("generic", tier) or {}
+    if care:
+        previous_care = neutral.get("self_care") or {}
+        neutral["self_care"] = {
+            "do": list(care.get("do", [])),
+            "avoid": list(care.get("avoid", [])),
+            "measure": list(care.get("measure", [])),
+            **(
+                {"allergy_hint": previous_care["allergy_hint"]}
+                if previous_care.get("allergy_hint")
+                else {}
+            ),
+        }
+        if care.get("course"):
+            neutral["outlook"] = care["course"]
+    neutral["return_now_if"] = list(RETURN_NOW_IF)
+    neutral["neutral_fallback"] = True
+    return neutral
 
 
 def _certainty(hypothesis, group: str) -> str:
@@ -621,6 +705,14 @@ def compose_conclusion(
         gaps=gaps,
     )
     subject = state.facts.get("consult_for")
+    goal_fact = state.facts.get("patient_goal")
+    goal_line = (
+        str(goal_fact.value).strip()
+        if goal_fact is not None
+        and goal_fact.assertion == Assertion.PRESENT
+        and str(goal_fact.value or "").strip()
+        else None
+    )
     previous = state.conclusion or {}
     sheet = {
         "version": 1,
@@ -628,7 +720,7 @@ def compose_conclusion(
         "tier": tier,
         "subject_kind": subject.value if subject is not None else "self",
         "disposition": disposition,
-        "goal_line": None,
+        "goal_line": goal_line,
         "directions": directions,
         "directions_abstained": abstained,
         "directions_visible": show_directions,
@@ -661,6 +753,19 @@ def compose_conclusion(
             "conclusion_narrative": _narrative_templates().get("version"),
         },
     }
+    # Off-pathway neutral fallback (batch A, W2): a direction-less sheet
+    # whose chief complaint triggers no pathway at all must not speak
+    # with a probed pathway's language. Applied before the lint so the
+    # neutral wording is linted like everything else. Pathway-matched
+    # abstained sheets keep the explored-pathway safety net (run3
+    # case3, pinned by test). A safety net the caller supplied via
+    # summary is the caller's explicit list and is restored after the
+    # fallback (pinned by test_summary_list_used_when_no_pathway).
+    if abstained and not chief_matches_pathway(str(state.get("chief_complaint") or "")):
+        sheet = apply_neutral_fallback(sheet)
+        summary_alerts = (summary or {}).get("return_now_if")
+        if summary_alerts:
+            sheet["return_now_if"] = list(summary_alerts)
     # The banned-phrase lint guards *system* wording. Patient quotes
     # (support_quotes) are the patient's own words — a patient writing
     # "没事，就是咳" must not silently void the whole sheet.

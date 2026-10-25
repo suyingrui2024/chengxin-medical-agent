@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from threading import Lock
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Mapping, Tuple, Union
 
 from .domain import Assertion, CaseState, RiskAssessment, RiskLevel, utc_now
 from .adaptive_questions import DIRECT_EMERGENCY_TAGS
@@ -43,6 +43,88 @@ RISK_TAG_LABELS = {
 OROFACIAL_TERMS = ("牙", "牙齿", "牙龈", "下颌", "颌部", "口腔", "面部", "脸")
 
 
+def _fact_assertion(fact) -> str:
+    assertion = getattr(fact, "assertion", None)
+    if assertion is None and isinstance(fact, Mapping):
+        assertion = fact.get("assertion")
+    value = getattr(assertion, "value", assertion)
+    return str(value) if value is not None else ""
+
+
+def _fact_texts(fact) -> List[str]:
+    """Patient-wording texts carried by one fact (evidence, str value)."""
+    texts: List[str] = []
+    evidence = getattr(fact, "evidence", None)
+    if evidence is None and isinstance(fact, Mapping):
+        evidence = fact.get("evidence")
+    if isinstance(evidence, str) and evidence:
+        texts.append(evidence)
+    value = getattr(fact, "value", None)
+    if value is None and isinstance(fact, Mapping):
+        value = fact.get("value")
+    if isinstance(value, str) and value:
+        texts.append(value)
+    return texts
+
+
+def confirmed_trigger_labels(
+    hits: Iterable[FlagHit],
+    facts: Union[CaseState, Mapping, Iterable, None] = None,
+    *,
+    include_clarification: bool = False,
+) -> List[str]:
+    """Filter scan hits down to triggers safe to render to the patient.
+
+    A hit's label survives only when its evidence is affirmed patient
+    wording:
+    - ``requires_clarification`` hits (bare semantic_combo co-occurrence)
+      are dropped unless ``include_clarification`` is set -- the caller
+      sets it only *after* the patient has confirmed the clarified
+      symptom, never on the first co-occurrence turn;
+    - a hit whose evidence text appears inside any fact recorded with
+      assertion ABSENT (a denial, e.g. a screening answer that lists
+      denied items) is dropped, even if the scanner produced it -- this
+      is the F-12 consistency check: denied items must never be listed
+      as trigger signals in ``_emergency_reply`` rendering.
+
+    This is a denial filter, not an affirmation whitelist: a hit with no
+    denial record on file passes through, because the latest turn's text
+    may not be recorded as a fact yet when the controller renders. When
+    ``facts`` is a ``CaseState`` only its current ``facts`` snapshot is
+    consulted (superseded history is not re-applied); a plain mapping or
+    iterable of facts is used as given.
+
+    Caveat for the controller: this helper filters *rendering*, it does
+    not invent labels. If the scanner produced no hit for the affirmed
+    symptom itself (F-12's affirmed bleeding wording has no scan hit),
+    an empty result must not be read as "no emergency" when another route
+    (screening confirmation, risk tags) already fired.
+    """
+    if facts is None:
+        fact_list: List = []
+    elif isinstance(facts, CaseState):
+        fact_list = list(facts.facts.values())
+    elif isinstance(facts, Mapping):
+        fact_list = list(facts.values())
+    else:
+        fact_list = list(facts)
+    denied_texts: List[str] = []
+    for fact in fact_list:
+        if _fact_assertion(fact) == Assertion.ABSENT.value:
+            denied_texts.extend(_fact_texts(fact))
+    labels: List[str] = []
+    for hit in hits:
+        if hit.requires_clarification and not include_clarification:
+            continue
+        if hit.evidence and any(
+            hit.evidence in denied for denied in denied_texts
+        ):
+            continue
+        if hit.label not in labels:
+            labels.append(hit.label)
+    return labels
+
+
 class TriageService:
     """Layered deterministic-first safety gate.
 
@@ -72,7 +154,28 @@ class TriageService:
         return phrase_not_negated(text, start)
 
     def scan_detailed(self, text: str) -> List[FlagHit]:
+        """Full hits including ``FlagHit.requires_clarification``.
+
+        The controller's emergency gate must read this (not
+        ``scan_text``): a hit with ``requires_clarification=True`` is a
+        bare semantic_combo co-occurrence and must first go through a
+        discriminating clarification question; only hits with the flag
+        False, or clarification hits the patient has since confirmed,
+        may take the direct emergency path.
+        """
         return self._scanner.scan(text)
+
+    def confirmed_trigger_labels(
+        self,
+        hits: Iterable[FlagHit],
+        facts: Union[CaseState, Mapping, Iterable, None] = None,
+        *,
+        include_clarification: bool = False,
+    ) -> List[str]:
+        """Service wrapper around :func:`confirmed_trigger_labels`."""
+        return confirmed_trigger_labels(
+            hits, facts, include_clarification=include_clarification
+        )
 
     def scan_text(self, text: str) -> List[str]:
         # The cache is shared across server threads; guard it with a

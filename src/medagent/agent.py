@@ -16,11 +16,15 @@ from .agent_tools import (
 )
 from .backends import DecisionBackend
 from .consultation import (
+    SELF_CHECK_SUSPEND_CAP,
     ConsultationEngine,
     StaleActionError,
     SubjectBoundaryError,
     UserInput,
     ConsultationBusyError,
+    is_refusal_text,
+    is_steady_not_improving_evidence,
+    is_summary_confirmation_text,
 )
 from .decision_wait import DecisionWaiter, DecisionTurn, DecisionInterrupted
 from .domain import (
@@ -513,12 +517,57 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         if state.closed_reason == "emergency_route":
             risk = state.risk
         state.risk = risk
+        if user_input.choice_value == "confirm_emergency_clarification":
+            confirmed = self._confirm_emergency_clarification(state, turn_id)
+            if confirmed is not None:
+                return self._deliver(state, confirmed, turn_id)
+        if user_input.choice_value == "deny_emergency_clarification":
+            if self._emergency_clarification_pending(state) is not None:
+                state.runtime_snapshot.pop("emergency_clarification", None)
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "emergency.clarification_denied",
+                        {},
+                        turn_id=turn_id,
+                    )
+                )
+        # Single-clue urgent close is gated here, before any handler can
+        # fall through to question-asking: without the gate (and its risk
+        # stand-down) the publication gate would block every question
+        # while risk stays URGENT, so deferral must happen at this point
+        # rather than only on the pending-calculation/self-check branch.
+        if risk.level == RiskLevel.URGENT:
+            gated = self._urgent_or_defer(state, turn_id)
+            if gated is not None:
+                return self._deliver(state, gated, turn_id)
         if risk.level == RiskLevel.EMERGENCY:
+            action = self._emergency_clarification_action(
+                state,
+                text,
+                adaptive_answer["risk_tags"] if adaptive_answer else (),
+            )
+            if action == "clarify":
+                return self._deliver(
+                    state,
+                    self._emergency_clarification_reply(state, text, turn_id),
+                    turn_id,
+                )
+            if action == "confirmed":
+                return self._deliver(
+                    state,
+                    self._emergency_reply(
+                        state, risk.triggers, include_clarification=True
+                    ),
+                    turn_id,
+                )
             return self._deliver(
                 state, self._emergency_reply(state, risk.triggers), turn_id
             )
         if adaptive_answer and risk.level == RiskLevel.URGENT:
-            return self._deliver(state, self._urgent(state), turn_id)
+            gated = self._urgent_or_defer(state, turn_id)
+            if gated is not None:
+                return self._deliver(state, gated, turn_id)
         revision_reply = self._handle_location_revision_action(
             state, user_input, text, turn_id
         )
@@ -535,7 +584,9 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             or state.calculation_resume
             or state.self_check_conversation
         ):
-            return self._deliver(state, self._urgent(state), turn_id)
+            gated = self._urgent_or_defer(state, turn_id)
+            if gated is not None:
+                return self._deliver(state, gated, turn_id)
         subject_reply = self._subject_control(state, user_input, text, turn_id)
         if subject_reply is not None:
             return self._deliver(state, subject_reply, turn_id)
@@ -574,6 +625,22 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.calculation_feedback["processing"] = False
         if state.observation_feedback:
             state.observation_feedback = None
+        # D-03/D-04: a confirmed summary must enter the conclusion flow
+        # and must not be re-suspended by a self-check step. This early
+        # confirm runs before observation handling; the existing confirm
+        # branch below remains as the fallback when feedback is pending.
+        if (
+            state.phase == Phase.SUMMARY
+            and (
+                user_input.choice_value == "confirm_summary"
+                or is_summary_confirmation_text(text)
+            )
+            and not state.calculation_feedback
+            and not state.observation_feedback
+        ):
+            return self._deliver(
+                state, self._confirmed_summary_reply(state, turn_id), turn_id
+            )
         observation_reply = self._handle_observation_action(
             state, user_input, text, turn_id
         )
@@ -643,6 +710,21 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.active_question = None
             state.risk = self.triage.assess(state, text)
             if state.risk.level == RiskLevel.EMERGENCY:
+                action = self._emergency_clarification_action(state, text, ())
+                if action == "clarify":
+                    return self._deliver(
+                        state,
+                        self._emergency_clarification_reply(state, text, turn_id),
+                        turn_id,
+                    )
+                if action == "confirmed":
+                    return self._deliver(
+                        state,
+                        self._emergency_reply(
+                            state, state.risk.triggers, include_clarification=True
+                        ),
+                        turn_id,
+                    )
                 return self._deliver(
                     state, self._emergency_reply(state, state.risk.triggers), turn_id
                 )
@@ -652,25 +734,13 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 pending_reply = self._offer_pending_self_check(state)
                 if pending_reply:
                     return self._deliver(state, pending_reply, turn_id)
-        if (
-            state.phase == Phase.SUMMARY
-            and user_input.choice_value == "confirm_summary"
+        if state.phase == Phase.SUMMARY and (
+            user_input.choice_value == "confirm_summary"
+            or is_summary_confirmation_text(text)
         ):
-            state.phase = Phase.CLOSED
-            state.closed_reason = "confirmed_by_user"
-            state.active_question = None
-            reply = AgentReply(
-                "你已确认本次摘要，会谈现已结束。可以把它提供给接诊医生；情况有变化时请重新评估。",
-                Phase.CLOSED,
-                kind="closed",
-                summary=self._summary_payload(
-                    state, review_status="confirmed_by_user"
-                ),
+            return self._deliver(
+                state, self._confirmed_summary_reply(state, turn_id), turn_id
             )
-            # Parity with the deterministic pipeline's confirm handler:
-            # a user-confirmed close also derives the follow-up plan.
-            self._schedule_follow_up(state, reply, turn_id)
-            return self._deliver(state, reply, turn_id)
         if state.active_task:
             from .task_conversation import is_observation_entry
 
@@ -686,9 +756,56 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 self._suspend_task_conversation(state, turn_id)
             state.risk = self.triage.assess(state, text)
             if state.risk.level == RiskLevel.URGENT:
-                return self._deliver(state, self._urgent(state), turn_id)
+                gated = self._urgent_or_defer(state, turn_id)
+                if gated is not None:
+                    return self._deliver(state, gated, turn_id)
         state.pending_input = text
         return self._run(state, text, turn_id)
+
+    def _confirmed_summary_reply(self, state, turn_id):
+        """Shared user-confirmed summary close (button or free text)."""
+        state.phase = Phase.CLOSED
+        state.closed_reason = "confirmed_by_user"
+        state.active_question = None
+        reply = AgentReply(
+            "你已确认本次摘要，会谈现已结束。可以把它提供给接诊医生；情况有变化时请重新评估。",
+            Phase.CLOSED,
+            kind="closed",
+            summary=self._summary_payload(
+                state, review_status="confirmed_by_user"
+            ),
+        )
+        # Parity with the deterministic pipeline's confirm handler:
+        # a user-confirmed close also derives the follow-up plan.
+        self._schedule_follow_up(state, reply, turn_id)
+        return reply
+
+    @staticmethod
+    def _is_declined_proposal(state, text, item) -> bool:
+        """Whether a record_facts item is a refusal, not an unknown.
+
+        Narrow by construction: assertion unknown, value null, evidence a
+        verbatim refusal quote from this turn, and the field not already
+        recorded (unless an explicit correction). Anything else keeps
+        the validator's existing unknown rules.
+        """
+        key = item.get("key")
+        if not isinstance(key, str):
+            return False
+        if item.get("assertion") != "unknown":
+            return False
+        if item.get("value") is not None:
+            return False
+        evidence = item.get("evidence")
+        if not isinstance(evidence, str) or not evidence.strip():
+            return False
+        if evidence not in text:
+            return False
+        if not is_refusal_text(evidence):
+            return False
+        if key in state.facts and not item.get("correction"):
+            return False
+        return True
 
     def _prepare_adaptive_answer(self, state, user_input, text):
         choice = user_input.choice_value
@@ -852,6 +969,93 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     "主诉通路尚未探明，控制器在摘要前先补问其细节字段",
                 )
         return None
+
+    def _controller_summary(self, state, text, turn_id):
+        """Controller auto-summary with a fallback that never kills the
+        session (C-06/J-02).
+
+        The model-called review_summary path already survives a gate
+        rejection (the error returns as a tool result and the model can
+        abstain); the controller's own auto-summary used to let the
+        ProposalError propagate out of _run and strand the session with
+        no conclusion. Order: detail-question redirect, then the plain
+        summary, then one discrimination probe for detail-less pathways
+        (chest: associated symptoms / relevant history — no new chest
+        detail question is invented, per the batch A scope), then an
+        abstain re-call when probing is genuinely inapplicable, then a
+        last-resort return to planning. A ProposalError must never
+        reach the driver from here.
+        """
+        redirect = self._pathway_gate_redirect(state, turn_id)
+        if redirect is not None:
+            return redirect
+        try:
+            return self._execute(
+                state, {"tool": "review_summary", "arguments": {}}, text, turn_id
+            )
+        except ProposalError:
+            pass
+        for fact_key in ("associated_symptoms", "relevant_history"):
+            if fact_key in state.facts:
+                continue
+            question = self._questions_by_fact.get(fact_key)
+            if question is None or question.id in state.asked_questions:
+                continue
+            if not self.content.question_applies_in_state(question, state):
+                continue
+            if not self._fact_gates_pass(state, question):
+                continue
+            self.events.append(
+                Event(
+                    state.session_id,
+                    "review.pathway_discrimination_redirect",
+                    {"detail_field": fact_key},
+                    turn_id=turn_id,
+                )
+            )
+            return self._ask(
+                state,
+                question,
+                "主诉通路尚未探明，控制器在摘要前先补问鉴别字段",
+            )
+        try:
+            return self._execute(
+                state,
+                {
+                    "tool": "review_summary",
+                    "arguments": {
+                        "abstain_reason": (
+                            "该通路无专属细节字段，已记录的伴随症状、病史等"
+                            "鉴别证据不足以单独探明，摘要前不再追问该通路细节；"
+                            "结论与随访仍按已记录事实生成。"
+                        )
+                    },
+                },
+                text,
+                turn_id,
+            )
+        except ProposalError:
+            pass
+        if state.self_check_conversation:
+            try:
+                return self._resume_task_conversation(state)
+            except ValueError:
+                # A resume that fails (e.g. the task's basis changed and
+                # the frame was cleared by the resume itself) must fall
+                # back to planning, never escape to the driver. Note: a
+                # still-blocked frame can raise again inside _plan_next;
+                # that path keeps the block visible rather than silently
+                # dropping the suspended step.
+                pass
+        self.events.append(
+            Event(
+                state.session_id,
+                "review.controller_fallback_exhausted",
+                {},
+                turn_id=turn_id,
+            )
+        )
+        return self._plan_next(state)
 
     def _candidate_questions(self, state: CaseState, chief: str):
         return [
@@ -1291,11 +1495,28 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 {"role": "user", "content": self._json({"tool_result": result})}
             )
             if state.risk.level == RiskLevel.EMERGENCY:
+                action = self._emergency_clarification_action(state, text, ())
+                if action == "clarify":
+                    return self._deliver(
+                        state,
+                        self._emergency_clarification_reply(state, text, turn_id),
+                        turn_id,
+                    )
+                if action == "confirmed":
+                    return self._deliver(
+                        state,
+                        self._emergency_reply(
+                            state, state.risk.triggers, include_clarification=True
+                        ),
+                        turn_id,
+                    )
                 return self._deliver(
                     state, self._emergency_reply(state, state.risk.triggers), turn_id
                 )
             if state.risk.level == RiskLevel.URGENT:
-                return self._deliver(state, self._urgent(state), turn_id)
+                gated = self._urgent_or_defer(state, turn_id)
+                if gated is not None:
+                    return self._deliver(state, gated, turn_id)
             if (
                 goal_answered
                 and not state.pending_self_checks
@@ -1311,23 +1532,19 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 # controller asks its detail question first (the pathway
                 # term list is wider than the question catalog's, so this
                 # fires exactly where missing_required cannot see the gap).
-                redirect = self._pathway_gate_redirect(state, turn_id)
-                if redirect is not None:
-                    return self._deliver(state, redirect, turn_id)
-                reply = self._execute(
-                    state, {"tool": "review_summary", "arguments": {}}, text, turn_id
-                )
-                self.events.append(
-                    Event(
-                        state.session_id,
-                        "agent.summary_ready",
-                        {
-                            "origin": "controller",
-                            "reason": "all_fields_attempted_after_goal",
-                        },
-                        turn_id=turn_id,
+                reply = self._controller_summary(state, text, turn_id)
+                if reply.phase == Phase.SUMMARY:
+                    self.events.append(
+                        Event(
+                            state.session_id,
+                            "agent.summary_ready",
+                            {
+                                "origin": "controller",
+                                "reason": "all_fields_attempted_after_goal",
+                            },
+                            turn_id=turn_id,
+                        )
                     )
-                )
                 return self._deliver(state, reply, turn_id)
         state.pending_input = text
         return self._deliver(
@@ -1548,25 +1765,123 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             return self._propose_task_result(state, args, text, turn_id)
         if tool == "record_facts":
             rejected = []
-            try:
-                proposals = validate_proposals(
-                    self.content, state, text, args.get("facts")
-                )
-            except ProposalError as exc:
-                # Partial recording (wave-2 P2): items that passed validation
-                # land now, and only the failures go back to the model with
-                # per-item reasons and repair guidance — the model re-proposes
-                # just the fixed items instead of re-sending (and risking)
-                # the whole batch. All-or-nothing callers are unaffected:
-                # correct_fact pre-validates its single item before calling,
-                # and the controller's direct emergency-screen recording
-                # bypasses this tool entirely. A batch where nothing passed
-                # keeps the old atomic behaviour and raises unchanged.
-                accepted = getattr(exc, "accepted", None)
-                if not exc.verdicts or not accepted:
-                    raise
-                proposals = accepted
-                rejected = [v for v in exc.verdicts if not v["ok"]]
+            # J-01: a refusal proposal (unknown + a refusal quote from
+            # this turn) bypasses the unknown-evidence validator, which
+            # only accepts "不知道"-style quotes and would otherwise
+            # deadlock the summary gate. The refusal still lands as a
+            # recorded UNKNOWN fact with the verbatim quote — no value
+            # is invented, and the field leaves missing_required exactly
+            # like any other recorded field. Age and sex are treated
+            # identically: the gate is satisfied by recording, not by
+            # demoting either field to non-blocking.
+            declined_keys = set()
+            declined_proposals = []
+            kept_facts = None
+            raw_facts = args.get("facts") if isinstance(args, dict) else None
+            if isinstance(raw_facts, list):
+                kept_facts = []
+                for item in raw_facts:
+                    if isinstance(item, dict) and self._is_declined_proposal(
+                        state, text, item
+                    ):
+                        declined_keys.add(item["key"])
+                        declined_proposals.append(
+                            {
+                                "key": item["key"],
+                                "value": None,
+                                "assertion": Assertion.UNKNOWN,
+                                "evidence": item.get("evidence"),
+                                "correction": bool(item.get("correction")),
+                            }
+                        )
+                    else:
+                        kept_facts.append(item)
+            if kept_facts is not None and not kept_facts and declined_proposals:
+                proposals = []
+            else:
+                try:
+                    proposals = validate_proposals(
+                        self.content,
+                        state,
+                        text,
+                        kept_facts if kept_facts is not None else args.get("facts"),
+                    )
+                except ProposalError as exc:
+                    # Partial recording (wave-2 P2): items that passed validation
+                    # land now, and only the failures go back to the model with
+                    # per-item reasons and repair guidance — the model re-proposes
+                    # just the fixed items instead of re-sending (and risking)
+                    # the whole batch. All-or-nothing callers are unaffected:
+                    # correct_fact pre-validates its single item before calling,
+                    # and the controller's direct emergency-screen recording
+                    # bypasses this tool entirely. A batch where nothing passed
+                    # keeps the old atomic behaviour and raises unchanged.
+                    accepted = getattr(exc, "accepted", None)
+                    if not exc.verdicts or not accepted:
+                        raise
+                    proposals = accepted
+                    rejected = [v for v in exc.verdicts if not v["ok"]]
+            proposals = list(proposals) + declined_proposals
+            # J-03 trajectory evidence guard (host side): steady,
+            # not-improving wording must not book as worsening. The item
+            # is rejected with repair guidance (record stable, or clarify
+            # whether it truly worsened) instead of landing; the urgent
+            # single-clue gate is the backstop if a worsening value ever
+            # lands through another path.
+            guarded_proposals = []
+            for proposal in proposals:
+                if (
+                    proposal["key"] == "trajectory"
+                    and proposal["value"] == "worsening"
+                    and is_steady_not_improving_evidence(
+                        proposal.get("evidence") or ""
+                    )
+                ):
+                    rejected.append(
+                        {
+                            "key": "trajectory",
+                            "ok": False,
+                            "reason": (
+                                "证据表述为平稳未好转，不得记为加重"
+                            ),
+                            "guidance": (
+                                "请按变化不大/平稳落账，或先澄清是否确实加重后再提议。"
+                            ),
+                        }
+                    )
+                    self.events.append(
+                        Event(
+                            state.session_id,
+                            "fact.trajectory_guard",
+                            {
+                                "key": "trajectory",
+                                "evidence": proposal.get("evidence"),
+                            },
+                            turn_id=turn_id,
+                        )
+                    )
+                else:
+                    guarded_proposals.append(proposal)
+            proposals = guarded_proposals
+            if not proposals and rejected:
+                return {
+                    "ok": False,
+                    "partial": True,
+                    "recorded": [],
+                    "rejected": [
+                        {
+                            "key": verdict["key"],
+                            "reason": verdict["reason"],
+                            "guidance": verdict["guidance"],
+                        }
+                        for verdict in rejected
+                    ],
+                    "next": (
+                        "已通过项已写入，不要重复提议；只需修正 rejected 中的"
+                        "字段后重新提议 record_facts（只含修正项）。"
+                    ),
+                    "case": self._context(state, text),
+                }
             self._guard_calculation_followup_updates(state, proposals)
             # No mutation happens until the accepted set has validated per
             # item and been dependency-checked as a set (_prepare_fact_updates
@@ -1606,6 +1921,16 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 self._track_incidental(state, proposal, active_before)
                 if state.closed_reason != "emergency_route":
                     state.closed_reason = None
+            for key in declined_keys:
+                if key in state.facts:
+                    self.events.append(
+                        Event(
+                            state.session_id,
+                            "fact.declined",
+                            {"fact_key": key},
+                            turn_id=turn_id,
+                        )
+                    )
             self._sync_task_requests(state, text, turn_id)
             active = next(
                 (q for q in self.content.questions if q.id == state.active_question),
@@ -1706,12 +2031,30 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.active_task = None
             if question.id not in state.asked_questions:
                 state.asked_questions.append(question.id)
+            # J-01: a model-defined decline option must reach the patient
+            # view as a quick reply, not only inside adaptive_question
+            # (the live-eval patient view reads quick_replies). Only
+            # decline-like, single-mode, detail-free options are mirrored:
+            # mirroring every option would duplicate the question pane's
+            # adaptive choices in the composer; the decline button is the
+            # one that must never be unreachable.
+            decline_replies = [
+                QuickReply(item["label"], f"adaptive_single:{item['id']}")
+                for item in spec["options"]
+                if spec["selection_mode"] == "single"
+                and not item.get("requires_detail")
+                and any(
+                    phrase in item["label"]
+                    for phrase in ("不想说", "不说", "拒绝", "不方便")
+                )
+            ]
             return AgentReply(
                 spec["question"],
                 question.phase,
                 kind="question",
                 question_id=question.id,
                 adaptive_question=spec,
+                quick_replies=decline_replies,
                 developer_trace={
                     "reason": "模型根据当前病例生成可变数量的受控患者选项",
                     "content_version": self.content.versions["questions"],
@@ -1766,6 +2109,32 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             if state.self_check_conversation and state.self_check_conversation["task"][
                 "id"
             ] == args.get("task_id"):
+                frame_id = state.self_check_conversation["task"]["id"]
+                if (
+                    self._self_check_suspend_count(
+                        state,
+                        frame_id,
+                        state.self_check_conversation["task"].get(
+                            "interaction_id"
+                        ),
+                    )
+                    >= SELF_CHECK_SUSPEND_CAP
+                ):
+                    self._clear_task_conversation(state, "suspend_cap_reached")
+                    state.pending_self_checks = [
+                        item
+                        for item in state.pending_self_checks
+                        if item["task_id"] != frame_id
+                    ]
+                    self.events.append(
+                        Event(
+                            state.session_id,
+                            "self_check.suspend_cap_reached",
+                            {"task_id": frame_id},
+                            turn_id=turn_id,
+                        )
+                    )
+                    return self._plan_next(state)
                 return self._resume_task_conversation(state)
             if state.self_check_conversation:
                 raise ProposalError("先接续原图示任务或澄清病史，另一图示请求可以登记为待办。")
@@ -1826,7 +2195,20 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 }
                 missing = [key for key in missing if key not in excused]
             if missing:
-                raise ProposalError("必要字段尚未尝试：" + ",".join(missing))
+                # J-01: "尚未尝试" must not mislead the model into
+                # re-asking a field that was asked but never landed
+                # (e.g. a refused field whose recording was rejected).
+                # The prefix stays verbatim for existing assertions.
+                labelled = [
+                    (
+                        f"{key}（已提问但未落账）"
+                        if self._questions_by_fact[key].id
+                        in state.asked_questions
+                        else key
+                    )
+                    for key in missing
+                ]
+                raise ProposalError("必要字段尚未尝试：" + ",".join(labelled))
             if unexplored and not already_summarized and abstain_reason:
                 self.events.append(
                     Event(
@@ -1862,7 +2244,19 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         raise ProposalError("工具未注册，不能执行：" + str(tool))
 
     def _deliver(self, state: CaseState, reply: AgentReply, turn_id: str) -> AgentReply:
-        if state.self_check_conversation and reply.kind == "question":
+        # The resume affordance is not offered past the suspend cap:
+        # without the button, the stale-action check also rejects a
+        # fabricated resume choice for the capped frame.
+        if (
+            state.self_check_conversation
+            and reply.kind == "question"
+            and self._self_check_suspend_count(
+                state,
+                state.self_check_conversation["task"]["id"],
+                state.self_check_conversation["task"].get("interaction_id"),
+            )
+            < SELF_CHECK_SUSPEND_CAP
+        ):
             frame = state.self_check_conversation
             choice = f"resume_self_check:{frame['id']}"
             if not any(item.value == choice for item in reply.quick_replies):
@@ -1958,10 +2352,27 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.active_question = None
             state.phase = Phase.HISTORY
             if state.risk.level == RiskLevel.EMERGENCY:
+                action = self._emergency_clarification_action(state, new_text, ())
+                if action == "clarify":
+                    return self._deliver(
+                        state,
+                        self._emergency_clarification_reply(state, new_text, turn_id),
+                        turn_id,
+                    )
+                if action == "confirmed":
+                    return self._deliver(
+                        state,
+                        self._emergency_reply(
+                            state, state.risk.triggers, include_clarification=True
+                        ),
+                        turn_id,
+                    )
                 reply = self._emergency_reply(state, state.risk.triggers)
                 return self._deliver(state, reply, turn_id)
             if state.risk.level == RiskLevel.URGENT:
-                return self._deliver(state, self._urgent(state), turn_id)
+                gated = self._urgent_or_defer(state, turn_id)
+                if gated is not None:
+                    return self._deliver(state, gated, turn_id)
             pending_reply = self._offer_pending_self_check(state)
             if pending_reply:
                 return self._deliver(state, pending_reply, turn_id)
