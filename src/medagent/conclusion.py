@@ -770,6 +770,31 @@ def _strip_qualifiers(item: str) -> str:
     return core.strip(" ，、。；")
 
 
+def _denial_remainders(text: str) -> List[str]:
+    """Text after each negation marker, up to the sentence end.
+
+    Shared by the fact scan and the transcript scan in
+    _denied_texts so both use exactly one marker rule: an
+    enumeration under one marker ("没有A、B") keeps both items
+    (splitting on 、 would orphan B); a marker counts only at a
+    clause boundary (start or after ，/、/；/。/space, optionally
+    led by 也/还/并/且), so "说不清" (unknown, no marker) never
+    qualifies, and a bare "无" in 无法/无论 is excluded.
+    Qualifying on a loose match stays fail-safe here — it only
+    narrows an alert to a new occurrence, never removes it.
+    """
+    remainders: List[str] = []
+    for match in re.finditer(
+        r"(?:^|[，、；。\s])(?:也|还|并|且)?(没有|否认|无)([^。；]+)", text
+    ):
+        marker, remainder = match.group(1), match.group(2).strip()
+        if marker == "无" and remainder[:1] in ("法", "论"):
+            continue
+        if len(remainder) >= 2:
+            remainders.append(remainder)
+    return remainders
+
+
 def _denied_texts(state: CaseState) -> List[str]:
     texts: List[str] = []
     for fact in state.facts.values():
@@ -783,30 +808,31 @@ def _denied_texts(state: CaseState) -> List[str]:
     # its own ABSENT fact. The grouped emergency_screen ABSENT fact
     # carries no value or evidence, and the denial survives only
     # inside a PRESENT fact's evidence ("没有肢体无力、说话不清").
-    # Take the text after each negation marker up to the sentence
-    # end, so an enumeration under one marker ("没有A、B") keeps
-    # both items: splitting on 、 would orphan B. A marker counts
-    # only at a clause boundary (start or after ，/、/；/。/space,
-    # optionally led by 也/还/并/且), so "说不清" (unknown, no
-    # marker) never qualifies, and a bare "无" in 无法/无论 is
-    # excluded. Qualifying on a loose match stays fail-safe here
-    # — it only narrows an alert to a new occurrence, never
-    # removes it.
     for fact in state.facts.values():
         if fact.assertion == Assertion.ABSENT:
             continue
         for raw in (fact.value, fact.evidence):
             if raw is None:
                 continue
-            text = str(raw)
-            for match in re.finditer(
-                r"(?:^|[，、；。\s])(?:也|还|并|且)?(没有|否认|无)([^。；]+)", text
-            ):
-                marker, remainder = match.group(1), match.group(2).strip()
-                if marker == "无" and remainder[:1] in ("法", "论"):
-                    continue
-                if len(remainder) >= 2:
-                    texts.append(remainder)
+            texts.extend(_denial_remainders(str(raw)))
+    # N-12 round-4 shape: the denial survives in NEITHER fact form.
+    # The recording layer books only the affirmative part of an
+    # answer ("没有肢体无力说话不清" never reaches any fact's
+    # value/evidence), so the denial lives only in the raw patient
+    # answer text. Both engines write user turns to
+    # state.transcript (consultation.py, agent.py), so scan those
+    # turns with the same marker rule. Assistant turns are never
+    # scanned: the system's own wording must not narrow its own
+    # safety net. The denied set still only feeds
+    # _adjust_assertion_wording's "新出现" narrowing (its sole
+    # caller), so this cannot touch ordering, disposition, or
+    # direction evidence.
+    for turn in state.transcript or []:
+        if not isinstance(turn, dict) or turn.get("role") != "user":
+            continue
+        content = turn.get("content")
+        if content:
+            texts.extend(_denial_remainders(str(content)))
     return texts
 
 
@@ -1569,6 +1595,8 @@ def _visit_part_residual(part: str) -> str:
     if not core.startswith("去医院"):
         return ""
     suffix = core[len("去医院"):]
+    # J-09 filter (at the return below): a residual that is only
+    # visit wording or a meaningless verb fragment is not content.
     for keyword in _GOAL_VISIT_PART_KEYWORDS + ("急诊", "看病"):
         suffix = suffix.replace(keyword, "")
     suffix = suffix.strip(" ，、；。！？")
@@ -1576,6 +1604,29 @@ def _visit_part_residual(part: str) -> str:
         if suffix.startswith(prefix) and len(suffix) > len(prefix):
             suffix = suffix[len(prefix):]
     suffix = suffix.strip(" ，、；。！？")
+    # J-09: a residual with no substantive request is not a part.
+    # "去医院看看" leaves 看看 (a reduplicated verb with no
+    # object) and "去医院检查一下" leaves 一下 (a bare verbal
+    # complement); "去医院看一下" leaves 看一下 and "去医院
+    # 看一下病" leaves 看一下病 — all pure visit wording, and
+    # listing any of them as its own part produced the redundant
+    # fixed-sentence close ("关于‘看看’/‘一下’"). Strip the
+    # complement fragments, then drop a bare reduplicated verb
+    # (看看/瞧瞧/试试/问问 …) and the split visit form 看病.
+    # Length alone cannot do this — both observed defects are
+    # exactly 2 characters. Substantive residuals survive:
+    # 挑开/开药 contain no such fragment, and "挑开一下" keeps
+    # 挑开 after the complement is stripped.
+    for fragment in ("一下", "一遍", "一趟", "一看"):
+        suffix = suffix.replace(fragment, "")
+    suffix = suffix.strip(" ，、；。！？")
+    # Split visit forms left by the keyword pass: "看一看病" loses
+    # its trailing 看病 to that pass and leaves 看一; "看一看医生"
+    # leaves the same fragment. Both are visit wording, not content.
+    if suffix in ("", "看", "看病", "看一", "一看"):
+        return ""
+    if len(suffix) == 2 and suffix[0] == suffix[1]:
+        return ""
     return suffix if len(suffix) >= 2 else ""
 
 
