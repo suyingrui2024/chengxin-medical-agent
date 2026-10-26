@@ -146,7 +146,18 @@ def sheet_mode() -> str:
 
 def directions_visible() -> bool:
     """Phase A ships directions in shadow; phase B flips this after the
-    evaluation gate and clinician review (design §9)."""
+    evaluation gate and clinician review (design §9).
+
+    Rendering single source (modular-refactor design §4.4, frozen):
+    the composer is the ONLY place that computes visibility. The sheet
+    always carries the full ``directions`` list plus this bool; every
+    renderer (conclusion card, handoff endpoint, print module) consumes
+    the bool and never recomputes it, never falls back to "a direction
+    list is present, therefore visible", and treats a missing flag as
+    invisible (fail-closed). ``narrative.reasoning`` shares this gate
+    because each reasoning line quotes a direction label; ``worry`` /
+    ``goal_response`` are the patient's own words and are NOT gated.
+    """
     return os.environ.get("MEDAGENT_CONCLUSION_DIRECTIONS", "off").strip().lower() == "on"
 
 
@@ -154,7 +165,14 @@ def department_visible() -> bool:
     """Department hints ship in shadow too (benchmark design §3.4/D2):
     the composer always fills the hint from reviewed content, and this
     flag tells the renderer whether it may be shown before the C12
-    clinical sign-off."""
+    clinical sign-off.
+
+    Rendering single source (modular-refactor design §4.4, frozen):
+    same contract as :func:`directions_visible` — the composer is the
+    ONLY place that computes this bool, ``disposition.department_hint``
+    is always computed, and renderers show it only when this flag is
+    true (missing flag = invisible, fail-closed).
+    """
     return os.environ.get("MEDAGENT_CONCLUSION_DEPARTMENT", "off").strip().lower() == "on"
 
 
@@ -1806,6 +1824,16 @@ def compose_conclusion(
     test_p2_integration's real-content count test). Enabling it needs
     a content line plus clinical review — a content decision, not a
     code change here; do not edit self_care wording to force it.
+
+    Visibility contract (modular-refactor design §4.4, frozen — the
+    flag computation below is NOT to be "fixed" by renderers):
+    ``directions`` is always computed and always present, gated by
+    ``directions_visible``; ``narrative.reasoning`` shares that gate;
+    ``disposition.department_hint`` is always computed, gated by
+    ``department_visible``; ``narrative.framing`` / ``severity``,
+    ``disposition.text``, ``gaps``, ``self_care``, ``return_now_if``,
+    ``worry``, ``goal_response``, ``outlook`` and ``follow_up`` are
+    ungated and always renderable. Both flags default off.
     """
     if state.phase != Phase.CLOSED:
         return None

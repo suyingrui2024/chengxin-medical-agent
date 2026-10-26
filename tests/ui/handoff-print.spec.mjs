@@ -13,6 +13,9 @@ const v2Handoff = {
       department_hint: "呼吸内科",
     },
     directions_visible: true,
+    // 包 C 残留跟进（模块化重整 §4.4 fail-closed 门）：打印模块仅当
+    // department_visible === true 时输出建议科室，可见路径夹具须显式带旗。
+    department_visible: true,
     directions: [{ patient_label: "上呼吸道感染" }],
     narrative: {
       framing: "这次的不适值得当面让医生评估一次。",
@@ -103,6 +106,14 @@ test("handoff print markdown/text share section order and v1 renders safely", as
     const shadow = JSON.parse(JSON.stringify(handoff));
     shadow.conclusion.directions_visible = false;
     const shadowMarkdown = module.handoffPrintMarkdown(shadow);
+    // shadow 科室不得泄漏：department_visible 为 false 时不输出科室行；
+    // flag 缺失时按不可见处理（fail-closed），同样不输出。
+    const shadowDept = JSON.parse(JSON.stringify(handoff));
+    shadowDept.conclusion.department_visible = false;
+    const shadowDeptMarkdown = module.handoffPrintMarkdown(shadowDept);
+    const missingDept = JSON.parse(JSON.stringify(handoff));
+    delete missingDept.conclusion.department_visible;
+    const missingDeptMarkdown = module.handoffPrintMarkdown(missingDept);
     // v1 结构（无 conclusion/baseline）不崩溃，且仍有页脚声明。
     const v1 = {
       title: "就诊交接摘要（患者核对版）",
@@ -130,6 +141,8 @@ test("handoff print markdown/text share section order and v1 renders safely", as
       markdown,
       text,
       shadowHasDirection: shadowMarkdown.includes("可能方向"),
+      shadowDeptHasDepartment: shadowDeptMarkdown.includes("建议科室"),
+      missingDeptHasDepartment: missingDeptMarkdown.includes("建议科室"),
       v1Headings: [...v1Element.querySelectorAll("h2")].map((node) =>
         node.textContent.trim(),
       ),
@@ -164,6 +177,8 @@ test("handoff print markdown/text share section order and v1 renders safely", as
   expect(result.text).toContain("随访");
   expect(result.text).toContain("24 小时内");
   expect(result.shadowHasDirection).toBe(false);
+  expect(result.shadowDeptHasDepartment).toBe(false);
+  expect(result.missingDeptHasDepartment).toBe(false);
   expect(result.v1Headings).toEqual(["已记录"]);
   expect(result.v1HasDisclaimer).toBe(true);
   expect(result.mdName).toBe("就诊交接摘要.md");

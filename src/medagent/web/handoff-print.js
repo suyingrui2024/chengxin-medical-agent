@@ -12,6 +12,9 @@
 // 注意：directions 与 narrative.reasoning 只在
 // conclusion.directions_visible === true 时渲染，否则一律不输出——
 // shadow 中的方向不得经由打印/导出泄漏（reasoning 逐条含方向标签）。
+// 建议科室同理：仅 conclusion.department_visible === true 时渲染
+// disposition.department_hint（模块化重整 §4.4；flag 缺失即不可见，
+// 不得因“hint 在场”而输出，也不得信任上游端点已剥离）。
 
 export const PRINT_DISCLAIMER = "AI 整理、未经医生审核、供就诊参考";
 
@@ -101,7 +104,10 @@ export function handoffPrintSections(handoff) {
     if (disposition?.text) lines.push(`处置：${disposition.text}`);
     if (disposition?.window_hours)
       lines.push(`建议窗口：${disposition.window_hours} 小时内`);
-    if (disposition?.department_hint)
+    // 科室与方向同理，单源契约（模块化重整 §4.4）：仅
+    // department_visible === true 时输出；只凭“hint 在场”不输出，
+    // flag 缺失时按不可见处理（fail-closed）——不得信任上游已剥离。
+    if (conclusion.department_visible === true && disposition?.department_hint)
       lines.push(`建议科室：${disposition.department_hint}`);
     const narrative = conclusion.narrative || null;
     if (narrative?.framing) lines.push(`定性：${narrative.framing}`);
@@ -324,11 +330,14 @@ export function downloadHandoffFile(handoff, format) {
 // 本模块按以下 v2 结构读取，P4-A 落地 build_handoff v2 时请保持这些
 // 键名，或由集成工人在 openHandoff 处做一次映射，不要另起第二套：
 //   handoff.conclusion: { disposition: { text, window_hours,
-//     department_hint }, directions_visible: bool, directions:
+//     department_hint }, directions_visible: bool,
+//     department_visible: bool, directions:
 //     [{ patient_label | hypothesis_id }], narrative: { framing,
 //     reasoning, severity }, self_care: { do, avoid, measure,
 //     allergy_hint }, return_now_if: [str], follow_up: { kind,
 //     due_in_hours } }
+//   （department_visible 由交接端点透传；本模块按 === true 严格判断，
+//   缺失即不可见——见模块头注释的单源契约。）
 //   handoff.baseline: { display_name, chronic_conditions: [str],
 //     allergies: [{ kind: drug|food|other, name } | str], medications:
 //     [{ name, purpose } | str], surgical_history: str }

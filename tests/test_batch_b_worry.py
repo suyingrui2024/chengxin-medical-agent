@@ -25,6 +25,7 @@ after a routine close. Urgent-route closes skip background by design
 
 import unittest
 
+from medagent import closing
 from medagent.conclusion import compose_conclusion, spoken_close_line
 from medagent.consultation import UserInput
 from medagent.domain import (
@@ -217,7 +218,7 @@ class CloseLineUnitTests(unittest.TestCase):
             kind="closed",
             conclusion=sheet,
         )
-        self.engine._speak_close_line(state, reply)
+        closing.render_confirmed_close(state, reply)
         return reply.message
 
     def _sheet(self, **overrides):

@@ -1501,21 +1501,19 @@ async function openHandoff() {
   if (!state.sessionId) return;
   try {
     const data = await api(`/api/sessions/${state.sessionId}/handoff`);
-    // P4-D mapping (handoff.py itself is untouched): the v2 endpoint
-    // carries directions only when visible and no narrative at all,
-    // while handoff-print.js reads directions_visible + narrative.
-    // Derive directions_visible from the live sheet when available
-    // (falling back to "directions present"), and take the narrative
-    // from the live sheet, which the endpoint does not carry. The
-    // dialog rendering above still uses the raw endpoint object.
+    // 渲染单源（模块化重整 §4.4）：方向/科室可见性只消费交接端点
+    // 透传的 flag，不再从 live sheet 推导、不再补写 flag，更不再
+    // 回落为“无 live sheet 时有方向即视为可见”（该回落分支已删除）。
+    // 端点输出无方向即不可见；flag 缺失时按不可见处理
+    // （fail-closed，打印模块的 === true 判断兜底）。narrative 仍
+    // 取自 live sheet（端点不携带），但 reasoning 只按端点 flag 抄写。
+    // 对话框渲染仍用原始端点对象（见上）。
     const sheet = state.case?.conclusion || null;
     const rawConclusion = data.handoff?.conclusion || null;
     // M2 纵深防御：narrative.reasoning 逐条含方向标签，shadow 下不
     // 抄进 state.handoff（打印模块另有同门控，双重保险）；framing /
     // severity 不含方向，可保留。
-    const visible = sheet
-      ? Boolean(sheet.directions_visible)
-      : rawConclusion?.directions != null;
+    const visible = rawConclusion?.directions_visible === true;
     const narrative = sheet?.narrative
       ? {
           framing: sheet.narrative.framing,
@@ -1529,7 +1527,6 @@ async function openHandoff() {
           conclusion: rawConclusion
             ? {
                 ...rawConclusion,
-                directions_visible: visible,
                 narrative,
               }
             : null,

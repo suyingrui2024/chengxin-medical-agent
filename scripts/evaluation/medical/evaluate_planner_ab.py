@@ -30,6 +30,18 @@ from medagent.runtime import build_runtime  # noqa: E402
 
 COMMON = {
     "consult_for": ("我自己", "self"),
+    # 包 D 跟进（包 A 残留 4）：sex-first 题序下 rule 臂第 2 问即问 sex，
+    # 答案表缺此行导致 KeyError；答案惯例同 evaluate_live.py（"男", "male"）。
+    "sex": ("男", "male"),
+    # 同类缺口（补 sex 后重跑才暴露，非无关失败）：发热类主诉下
+    # reported_temperature 同为非阻塞可问提，答案表中性惯例为“没量过”
+    #（同 CI 三件套夹具补法）。
+    "reported_temperature": ("没量过", None),
+    # 同类缺口（探针枚举：13 场景 × 双臂仅此一处残留）：皮肤科主诉下
+    # recent_exposures（text_or_absent）被问起，中性答案“没有”。
+    # 以上两行与 sex 行同属“答案表对现行题序滞后”一类缺口，
+    # 若监督员认定本项仅含 sex，可单行 revert 这两行。
+    "recent_exposures": ("没有", None),
     "age": ("32岁", None),
     "emergency_screen": ("都没有", "no"),
     "onset": ("从昨天开始", None),

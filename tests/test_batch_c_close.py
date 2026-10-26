@@ -33,6 +33,7 @@ Hard constraints honoured here and in the implementation:
 import unittest
 
 import medagent.conclusion as conclusion_module
+from medagent import closing
 from medagent.consultation import ConsultationEngine
 from medagent.domain import (
     AgentReply,
@@ -382,7 +383,7 @@ class RequestedHelpAndSpokenLineTests(unittest.TestCase):
             kind="closed",
             conclusion=sheet,
         )
-        self.engine._speak_close_line(state, reply)
+        closing.render_confirmed_close(state, reply)
         return reply.message
 
     def test_speak_urgent_today_adds_direct_answer_after_line(self):

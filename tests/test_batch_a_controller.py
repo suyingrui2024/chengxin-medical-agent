@@ -27,6 +27,7 @@ emergency close, bare "下面是已采集的信息" promise).
 import unittest
 from copy import deepcopy
 
+from medagent import closing
 from medagent.agent_tools import ProposalError
 from medagent.consultation import UserInput
 from medagent.domain import (
@@ -716,7 +717,7 @@ class ConclusionCloseTests(unittest.TestCase):
             kind="closed",
             conclusion=sheet,
         )
-        self.engine._speak_close_line(self.state, reply)
+        closing.render_confirmed_close(self.state, reply)
         self.assertIn("线下评估", reply.message)
         self.assertNotIn("全科医疗科", reply.message)
 

@@ -173,6 +173,17 @@ def _conclusion_section(state: Any) -> dict[str, Any] | None:
     list coercion), never by key presence. Removing the key would break
     the fixed v2 shape and the shadow test that pins ``directions is
     None``; the ``None`` value itself is the gate working, not a leak.
+
+    Single-source contract (modular-refactor design §4.4): this
+    endpoint's job is transmission trimming ONLY -- it carries the
+    direction/department content only when the sheet's flag says so,
+    AND it passes both flag fields themselves through untouched, so
+    downstream renderers judge by the flag, never by "field present
+    therefore visible". The trimming is a transport optimization, not
+    a second gate: a renderer that receives a hint with a missing or
+    false flag must still hide it (fail-closed), and ``app.js`` must
+    not re-derive the flag from the live sheet or fall back to
+    "directions present".
     """
     sheet = getattr(state, "conclusion", None) or {}
     if not isinstance(sheet, dict) or not sheet:
@@ -185,6 +196,11 @@ def _conclusion_section(state: Any) -> dict[str, Any] | None:
             if disposition.get(key) is not None
         },
         "directions": None,
+        # Flags pass through verbatim (bool-coerced; a missing flag
+        # becomes False, i.e. invisible) so renderers consume the
+        # composer's single source instead of re-deriving visibility.
+        "directions_visible": bool(sheet.get("directions_visible")),
+        "department_visible": bool(sheet.get("department_visible")),
         "self_care": {},
         "return_now_if": list(sheet.get("return_now_if") or []),
     }

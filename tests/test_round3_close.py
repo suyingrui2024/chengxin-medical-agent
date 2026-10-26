@@ -35,6 +35,7 @@ wording — never invented clinical content:
 
 import unittest
 
+from medagent import closing
 from medagent.conclusion import (
     _CHRONIC_OUTLOOK,
     _adjust_chronic_outlook,
@@ -84,7 +85,7 @@ def _speak(engine, state, sheet):
     reply = AgentReply(
         "原收尾。", Phase.CLOSED, kind="closed", conclusion=sheet
     )
-    engine._speak_close_line(state, reply)
+    closing.render_confirmed_close(state, reply)
     return reply.message
 
 
@@ -144,7 +145,7 @@ class ContradictionSuppressionTests(unittest.TestCase):
             ),
         }
         reply = AgentReply("先说结论：这次的情况建议近期当面就诊评估一次。", Phase.CLOSED, kind="closed")
-        self.engine._append_sheet_worry_goal(reply, sheet)
+        closing._append_sheet_worry_goal(reply, sheet)
         self.assertIn("不足以直接回答", reply.message)
 
 
@@ -203,7 +204,7 @@ class UrgentWalkthroughTests(unittest.TestCase):
         self.assertIn("关于‘会不会留后遗症’：", reply.message)
 
     def test_echo_strip_helper_only_cuts_the_facts_list(self):
-        strip = self.engine._strip_close_facts_echo
+        strip = closing._strip_close_facts_echo
         self.assertEqual(strip("没有信息清单的文本。"), "没有信息清单的文本。")
         self.assertEqual(
             strip("头。已采集的信息：主要问题：腰疼；期望与担心：想知道要不要去医院，不必等问诊补齐再求助。尾。"),

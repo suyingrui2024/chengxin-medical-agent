@@ -47,6 +47,7 @@ no code change here; agent.py findings go to the coordinator):
 
 import unittest
 
+from medagent import closing
 from medagent.bridging import GROUP_BRIDGES, lint_group_bridge
 from medagent.conclusion import (
     UNCERTAINTY_NOTE,
@@ -133,7 +134,7 @@ def _speak(engine, state, sheet):
     reply = AgentReply(
         "原收尾。", Phase.CLOSED, kind="closed", conclusion=sheet
     )
-    engine._speak_close_line(state, reply)
+    closing.render_confirmed_close(state, reply)
     return reply.message
 
 

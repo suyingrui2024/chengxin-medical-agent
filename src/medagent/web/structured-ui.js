@@ -1775,6 +1775,12 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         el("p", "conclusion-disposition-label", "下一步"),
         el("p", "conclusion-disposition-text", data.disposition.text),
       );
+      // 渲染单源登记（模块化重整 §4.4 字段—门控表）：结论卡只消费
+      // composer 的 flag，不重算可见性。以下判定表达式原样保留，
+      // 作为回归锚点：科室行 ← department_visible，方向节与
+      // narrative.reasoning ← directions_visible，framing /
+      // severity / worry / goal_response 不走任何门（患者自己的
+      // 问题与处置级文本恒渲染）。
       const departmentHint =
         data.disposition.department_hint || data.department_hint;
       if (data.department_visible && departmentHint)
