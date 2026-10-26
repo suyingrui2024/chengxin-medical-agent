@@ -9,12 +9,16 @@
 // - 本模块不向后端发任何请求；挂载到 handoff 对话框的工作留给
 //   集成工人（挂载点与回调签名见模块底部注释）。
 //
-// 注意：directions 与 narrative.reasoning 只在
-// conclusion.directions_visible === true 时渲染，否则一律不输出——
-// shadow 中的方向不得经由打印/导出泄漏（reasoning 逐条含方向标签）。
+// 注意（设计 §13.6，渲染器只消费 flag、不重算可见性）：方向段按
+// conclusion.directions_mode 渲染——restricted：composer 顺序、
+// rule_out 组显著（“需要排除的方向”前缀）；on：既有行为；off：
+// 整体不渲染，哪怕 directions 列表在场也不输出（不得信任上游端点
+// 已剥离）。narrative.reasoning 仅 on 时渲染（逐条含方向标签）。
+// 无 mode 的旧 handoff 回落到 directions_visible === true（旧行为）。
 // 建议科室同理：仅 conclusion.department_visible === true 时渲染
 // disposition.department_hint（模块化重整 §4.4；flag 缺失即不可见，
 // 不得因“hint 在场”而输出，也不得信任上游端点已剥离）。
+// 就诊带话清单（visit_notes）有项才渲染，不受方向模式门控。
 
 export const PRINT_DISCLAIMER = "AI 整理、未经医生审核、供就诊参考";
 
@@ -111,21 +115,43 @@ export function handoffPrintSections(handoff) {
       lines.push(`建议科室：${disposition.department_hint}`);
     const narrative = conclusion.narrative || null;
     if (narrative?.framing) lines.push(`定性：${narrative.framing}`);
-    // reasoning 逐条含方向标签（见 conclusion._narrative_reasoning），
-    // 故与 directions 同门控：仅 directions_visible 时输出，shadow 下
-    // framing/severity 可保留（不含方向）。
-    if (conclusion.directions_visible === true && narrative?.reasoning)
+    // 模式门（设计 §13.6）：mode 在场时以 mode 为准——restricted/on
+    // 显示方向、仅 on 显示推理线；off 显示 neither；未知 mode 按不
+    // 可见处理（fail-closed）。mode 缺失的旧 handoff 回落到
+    // directions_visible === true（旧行为）。
+    const mode = conclusion.directions_mode;
+    const hasMode = typeof mode === "string" && mode !== "";
+    const directionsShown = hasMode
+      ? mode === "restricted" || mode === "on"
+      : conclusion.directions_visible === true;
+    const reasoningShown = hasMode
+      ? mode === "on"
+      : conclusion.directions_visible === true;
+    // reasoning 逐条含方向标签，故仅全量模式时输出；shadow /
+    // restricted 下 framing/severity 可保留（不含方向）。
+    if (reasoningShown && narrative?.reasoning)
       lines.push(`原理：${narrative.reasoning}`);
     if (narrative?.severity) lines.push(`程度：${narrative.severity}`);
-    // 仅可见时输出方向；shadow 方向不在此出现。
-    if (conclusion.directions_visible === true) {
+    // 仅可见时输出方向；shadow/off 方向不在此出现，哪怕列表在场。
+    // restricted 下保持 composer 顺序（不重排），rule_out 组以
+    // “需要排除的方向”显著前缀、与 likely 组区分。
+    if (directionsShown) {
       asList(conclusion.directions).forEach((direction) => {
-        const label =
-          direction?.patient_label || direction?.hypothesis_id || "";
-        if (label) lines.push(`可能方向：${label}`);
+        const label = direction?.patient_label || "";
+        if (!label) return;
+        if (mode === "restricted" && direction?.group === "rule_out")
+          lines.push(`需要排除的方向：${label}`);
+        else lines.push(`可能方向：${label}`);
       });
     }
     if (lines.length) sections.push({ heading: "结论", lines });
+    // 就诊带话清单（设计 §13.4）：读 sheet 已给的列表，不重算；
+    // 有项才渲染，不受方向模式门控（条目为患者/事实原话）。
+    const visitNotes = asList(conclusion.visit_notes).filter(
+      (item) => typeof item === "string" && item,
+    );
+    if (visitNotes.length)
+      sections.push({ heading: "就诊带话清单", lines: visitNotes });
   }
 
   const baseline = data.baseline || null;
@@ -330,12 +356,14 @@ export function downloadHandoffFile(handoff, format) {
 // 本模块按以下 v2 结构读取，P4-A 落地 build_handoff v2 时请保持这些
 // 键名，或由集成工人在 openHandoff 处做一次映射，不要另起第二套：
 //   handoff.conclusion: { disposition: { text, window_hours,
-//     department_hint }, directions_visible: bool,
-//     department_visible: bool, directions:
-//     [{ patient_label | hypothesis_id }], narrative: { framing,
-//     reasoning, severity }, self_care: { do, avoid, measure,
-//     allergy_hint }, return_now_if: [str], follow_up: { kind,
-//     due_in_hours } }
+//     department_hint }, directions_mode: off|restricted|on,
+//     directions_visible: bool, department_visible: bool, directions:
+//     [{ patient_label, group, certainty, against_note }],
+//     visit_notes: [str], narrative: { framing, reasoning, severity },
+//     self_care: { do, avoid, measure, allergy_hint },
+//     return_now_if: [str], follow_up: { kind, due_in_hours } }
+//   （directions_mode 缺失时回落 directions_visible；方向行只用
+//   patient_label，不输出假设 id。）
 //   （department_visible 由交接端点透传；本模块按 === true 严格判断，
 //   缺失即不可见——见模块头注释的单源契约。）
 //   handoff.baseline: { display_name, chronic_conditions: [str],

@@ -13,9 +13,15 @@ v1 -> v2 changes (v1 callers keep working: the entry point is still
   ``baseline`` (the P2 ``profile_baseline`` projection, whitelisted
   again here so no new field can leak through), and ``follow_up``
   (the stored follow-up plan set at close).
-- ``directions`` appear only when the sheet itself says
-  ``directions_visible``; ``department_hint`` only when the sheet says
-  ``department_visible``. Shadow content never leaks through the handoff.
+- ``directions`` appear only when the sheet's mode allows them
+  (design §13.6: ``directions_mode`` ``restricted`` or ``on``; a legacy
+  sheet without a mode falls back to ``directions_visible``);
+  ``department_hint`` only when the sheet says ``department_visible``.
+  Shadow/off content never leaks through the handoff.
+- ``directions_mode`` and ``visit_notes`` pass through the whitelist
+  verbatim (design §13.4); the visit-notes action list keeps its
+  evidence-verb quotes even though ``support_quotes`` are still dropped
+  from directions themselves.
 - ``handoff_lines`` is the single text assembly shared by the print
   page and the .md/.txt exports: do not write a second copy of this
   wording anywhere else (the frontend dialog renders the same sections
@@ -160,30 +166,39 @@ def _report_item_row(item: dict[str, Any]) -> dict[str, Any]:
 def _conclusion_section(state: Any) -> dict[str, Any] | None:
     """Core of the conclusion sheet, read-only. None when no sheet exists.
 
-    Directions are gated on the sheet's own ``directions_visible`` flag
-    and the department hint on ``department_visible``; support quotes
-    (patient verbatim evidence) are dropped -- the visit summary does
-    not need them and they add nothing a doctor can act on.
+    Directions are gated on the sheet's own ``directions_mode``
+    (design §13.6: ``restricted`` or ``on`` passes the list, ``off``
+    yields ``None``) and the department hint on ``department_visible``.
+    A legacy sheet without ``directions_mode`` falls back to the
+    phase-A ``directions_visible`` flag, so the old shape keeps its
+    old behaviour; a present-but-unknown mode is treated as not
+    allowed (fail-closed). Support quotes (patient verbatim evidence)
+    are dropped from directions -- the visit summary does not need
+    them and they add nothing a doctor can act on -- except inside
+    ``visit_notes``: that list IS the action checklist for the doctor,
+    so its evidence-verb entries are kept (design §13.6).
 
     Shape contract (P2-2): the ``directions`` key is always present in
-    this section; under shadow it is ``None``, never a leaked list and
-    never dropped. Consumers must judge by value (``is None`` /
-    falsiness -- ``handoff_lines`` uses ``.get("directions") or []`` and
-    the print module gates on ``directions_visible`` plus a null-tolerant
-    list coercion), never by key presence. Removing the key would break
-    the fixed v2 shape and the shadow test that pins ``directions is
-    None``; the ``None`` value itself is the gate working, not a leak.
+    this section; under shadow/off it is ``None``, never a leaked list
+    and never dropped. Consumers must judge by mode/flag (``handoff_lines``
+    gates on ``directions_mode`` with a legacy ``directions_visible``
+    fallback, and the print module gates on the mode plus a
+    null-tolerant list coercion), never by key presence. Removing the
+    key would break the fixed v2 shape and the shadow test that pins
+    ``directions is None``; the ``None`` value itself is the gate
+    working, not a leak. No hypothesis id is carried: directions keep
+    only their patient-facing fields.
 
     Single-source contract (modular-refactor design §4.4): this
     endpoint's job is transmission trimming ONLY -- it carries the
-    direction/department content only when the sheet's flag says so,
-    AND it passes both flag fields themselves through untouched, so
-    downstream renderers judge by the flag, never by "field present
-    therefore visible". The trimming is a transport optimization, not
-    a second gate: a renderer that receives a hint with a missing or
-    false flag must still hide it (fail-closed), and ``app.js`` must
-    not re-derive the flag from the live sheet or fall back to
-    "directions present".
+    direction/department content only when the sheet's mode/flag says
+    so, AND it passes the mode and both flag fields themselves through
+    untouched, so downstream renderers judge by the mode/flag, never by
+    "field present therefore visible". The trimming is a transport
+    optimization, not a second gate: a renderer that receives a hint
+    with a missing or false flag must still hide it (fail-closed), and
+    ``app.js`` must not re-derive the flag from the live sheet or fall
+    back to "directions present".
     """
     sheet = getattr(state, "conclusion", None) or {}
     if not isinstance(sheet, dict) or not sheet:
@@ -204,9 +219,27 @@ def _conclusion_section(state: Any) -> dict[str, Any] | None:
         "self_care": {},
         "return_now_if": list(sheet.get("return_now_if") or []),
     }
+    # v1.3 (§13.4/§13.6): the mode flag passes through verbatim, and
+    # the visit-notes action list passes through as strings only.
+    # Both are optional additive fields: absent on a legacy sheet means
+    # no mode key / no visit-notes section (old behaviour), never an
+    # invented value.
+    mode = sheet.get("directions_mode")
+    if isinstance(mode, str) and mode:
+        section["directions_mode"] = mode
+        directions_allowed = mode in ("restricted", "on")
+    else:
+        # Legacy sheet without a mode: the full-visibility flag is the
+        # gate (phase-A shape). A present-but-unknown mode stays not
+        # allowed via the branch above (fail-closed).
+        directions_allowed = bool(sheet.get("directions_visible"))
+    if isinstance(sheet.get("visit_notes"), list):
+        section["visit_notes"] = [
+            item for item in sheet["visit_notes"] if isinstance(item, str)
+        ]
     if sheet.get("department_visible") and disposition.get("department_hint"):
         section["disposition"]["department_hint"] = disposition["department_hint"]
-    if sheet.get("directions_visible"):
+    if directions_allowed:
         directions = []
         for item in sheet.get("directions") or []:
             if not isinstance(item, dict) or not item.get("patient_label"):
@@ -215,7 +248,6 @@ def _conclusion_section(state: Any) -> dict[str, Any] | None:
                 {
                     key: item[key]
                     for key in (
-                        "hypothesis_id",
                         "patient_label",
                         "group",
                         "certainty",
@@ -322,6 +354,16 @@ def handoff_lines(handoff: dict[str, Any]) -> list[str]:
     sections are omitted entirely (no dangling headers), so a sheetless
     or baseline-less handoff still reads cleanly. This is the one place
     the summary wording lives; exporters must call it, not re-derive.
+
+    Visibility is consumed, never recomputed and never inferred from
+    list presence (design §13.6): directions render only when the
+    handoff's ``directions_mode`` allows them (``restricted``/``on``),
+    falling back to ``directions_visible`` on legacy dicts without a
+    mode, and to list presence only on dicts with neither; the
+    department line likewise requires ``department_visible is True``
+    whenever that flag is present. The visit-notes list is read
+    as-is (it is already the sheet's list, §13.4) and rendered only
+    when non-empty.
     """
     lines = [handoff["title"]]
     conclusion = handoff.get("conclusion") or {}
@@ -330,11 +372,22 @@ def handoff_lines(handoff: dict[str, Any]) -> list[str]:
         disposition = conclusion.get("disposition") or {}
         if disposition.get("text"):
             lines.append(disposition["text"])
-        if disposition.get("department_hint"):
+        dept_flag = conclusion.get("department_visible")
+        dept_shown = (
+            dept_flag is True if "department_visible" in conclusion else True
+        )
+        if disposition.get("department_hint") and dept_shown:
             lines.append(
                 f"建议科室：{disposition['department_hint']}（仅供参考，以医生判断为准）"
             )
-        for direction in conclusion.get("directions") or []:
+        mode = conclusion.get("directions_mode")
+        if isinstance(mode, str) and mode:
+            directions_shown = mode in ("restricted", "on")
+        elif "directions_visible" in conclusion:
+            directions_shown = conclusion.get("directions_visible") is True
+        else:
+            directions_shown = True
+        for direction in (conclusion.get("directions") or []) if directions_shown else []:
             label = direction.get("patient_label") or ""
             certainty = direction.get("certainty") or ""
             lines.append(
@@ -342,6 +395,8 @@ def handoff_lines(handoff: dict[str, Any]) -> list[str]:
             )
             if direction.get("against_note"):
                 lines.append(f"  {direction['against_note']}")
+        for item in conclusion.get("visit_notes") or []:
+            lines.append(f"就诊带话：{item}")
         care = conclusion.get("self_care") or {}
         for key, heading in (
             ("do", "建议这样做"),

@@ -224,6 +224,88 @@ test("shadow narrative.reasoning with a direction label never leaks, visible rea
   );
 });
 
+test("v1.3 mode gating: restricted shows directions + visit notes without reasoning, off hides directions", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async (handoff) => {
+    const module = await import("/handoff-print.js");
+    // restricted: composer order (rule_out first), rule_out prominent,
+    // reasoning hidden, visit-notes section visible.
+    const restricted = JSON.parse(JSON.stringify(handoff));
+    restricted.conclusion.directions_mode = "restricted";
+    restricted.conclusion.directions_visible = false;
+    restricted.conclusion.directions = [
+      { patient_label: "需排除项", group: "rule_out" },
+      { patient_label: "更可能项", group: "likely" },
+    ];
+    restricted.conclusion.visit_notes = ["咳嗽三天", "担心是肺炎"];
+    const restrictedMarkdown = module.handoffPrintMarkdown(restricted);
+    // off: directions hidden even though the list is present (must not
+    // trust upstream stripping); visit notes are not direction-gated.
+    const off = JSON.parse(JSON.stringify(restricted));
+    off.conclusion.directions_mode = "off";
+    const offMarkdown = module.handoffPrintMarkdown(off);
+    // on: existing behaviour — directions + reasoning render.
+    const on = JSON.parse(JSON.stringify(restricted));
+    on.conclusion.directions_mode = "on";
+    on.conclusion.directions_visible = true;
+    const onMarkdown = module.handoffPrintMarkdown(on);
+    return {
+      restrictedMarkdown,
+      offMarkdown,
+      onMarkdown,
+    };
+  }, v2Handoff);
+  expect(result.restrictedMarkdown).toContain("需要排除的方向：需排除项");
+  expect(result.restrictedMarkdown).toContain("可能方向：更可能项");
+  expect(
+    result.restrictedMarkdown.indexOf("需要排除的方向：需排除项"),
+  ).toBeLessThan(result.restrictedMarkdown.indexOf("可能方向：更可能项"));
+  expect(result.restrictedMarkdown).not.toContain("原理：");
+  expect(result.restrictedMarkdown).toContain("就诊带话清单");
+  expect(result.restrictedMarkdown).toContain("咳嗽三天");
+  expect(result.offMarkdown).not.toContain("可能方向");
+  expect(result.offMarkdown).not.toContain("需要排除的方向");
+  expect(result.offMarkdown).not.toContain("原理：");
+  expect(result.offMarkdown).toContain("就诊带话清单");
+  expect(result.onMarkdown).toContain("可能方向：更可能项");
+  expect(result.onMarkdown).toContain("原理：");
+});
+
+test("v1.3 department gate under restricted mode: flag true only", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async (handoff) => {
+    const module = await import("/handoff-print.js");
+    const shown = JSON.parse(JSON.stringify(handoff));
+    shown.conclusion.directions_mode = "restricted";
+    shown.conclusion.department_visible = true;
+    const hidden = JSON.parse(JSON.stringify(handoff));
+    hidden.conclusion.directions_mode = "restricted";
+    hidden.conclusion.department_visible = false;
+    const missing = JSON.parse(JSON.stringify(handoff));
+    missing.conclusion.directions_mode = "restricted";
+    delete missing.conclusion.department_visible;
+    // Empty visit notes render no empty section.
+    const emptyNotes = JSON.parse(JSON.stringify(handoff));
+    emptyNotes.conclusion.visit_notes = [];
+    return {
+      shown: module.handoffPrintMarkdown(shown).includes("建议科室"),
+      hidden: module.handoffPrintMarkdown(hidden).includes("建议科室"),
+      missing: module.handoffPrintMarkdown(missing).includes("建议科室"),
+      emptyNotesHasSection: module
+        .handoffPrintMarkdown(emptyNotes)
+        .includes("就诊带话清单"),
+    };
+  }, v2Handoff);
+  expect(result.shown).toBe(true);
+  expect(result.hidden).toBe(false);
+  expect(result.missing).toBe(false);
+  expect(result.emptyNotesHasSection).toBe(false);
+});
+
 test("interpretation note on a report item renders in markdown and DOM", async ({
   page,
 }) => {

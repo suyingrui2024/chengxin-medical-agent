@@ -141,8 +141,9 @@ class WorryTests(unittest.TestCase):
         self.assertNotIn("影响程度", sheet["worry"]["response"])
 
     def test_worry_and_goal_responses_leak_no_direction_or_department(self):
-        # Directions are present but shadow (directions_visible
-        # defaults off); the department hint, if any, is shadow too.
+        # Directions are present; only the full gate (directions_visible)
+        # is off by default under v1.3 restricted visibility (§13.3),
+        # and the department hint follows the restricted default.
         # Neither may appear in the worry / goal responses.
         state = closed_state()
         add_fact(state, "patient_worry", "食物中毒")

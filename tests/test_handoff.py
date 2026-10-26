@@ -29,8 +29,14 @@ def _fact(key, value, assertion=Assertion.PRESENT):
     )
 
 
-def _sheet(*, directions_visible=True, department_visible=True):
-    return {
+def _sheet(
+    *,
+    directions_visible=True,
+    department_visible=True,
+    directions_mode=None,
+    visit_notes=None,
+):
+    sheet = {
         "disposition": {
             "level": "routine_visit",
             "text": "可以在家先观察；请在 72 小时内到线下医疗机构就诊评估。",
@@ -57,6 +63,13 @@ def _sheet(*, directions_visible=True, department_visible=True):
         },
         "return_now_if": ["呼吸困难加重"],
     }
+    # v1.3 additive fields: only present when the caller passes them,
+    # so legacy sheets (no mode) keep the phase-A shape untouched.
+    if directions_mode is not None:
+        sheet["directions_mode"] = directions_mode
+    if visit_notes is not None:
+        sheet["visit_notes"] = visit_notes
+    return sheet
 
 
 def _state(*, sheet=None, baseline=None, follow_up=None):
@@ -277,3 +290,117 @@ def test_interpretation_note_visible_in_handoff_lines():
 def test_no_interpretation_note_produces_no_empty_line():
     lines = handoff_lines(build_handoff(_state()))
     assert not any(line.strip().startswith("解读：") for line in lines)
+
+
+# --- v1.3 (§13.4/§13.6) mode + passthrough tests (new; no existing
+# gate assertion above is deleted or weakened) ---
+
+
+def test_restricted_mode_passes_directions_despite_full_flag_false():
+    # v1.3 composer shape: mode restricted, full flag false (only on
+    # is true per §13.3). The restricted list must still pass through.
+    handoff = build_handoff(
+        _state(
+            sheet=_sheet(
+                directions_visible=False,
+                department_visible=True,
+                directions_mode="restricted",
+            )
+        )
+    )
+    conclusion = handoff["conclusion"]
+    assert conclusion["directions_mode"] == "restricted"
+    assert conclusion["directions"][0]["patient_label"] == "普通感冒"
+    assert conclusion["disposition"]["department_hint"] == "呼吸内科"
+    assert any("普通感冒" in line for line in handoff_lines(handoff))
+
+
+def test_off_mode_never_leaks_directions():
+    handoff = build_handoff(
+        _state(
+            sheet=_sheet(
+                directions_visible=False,
+                department_visible=True,
+                directions_mode="off",
+            )
+        )
+    )
+    conclusion = handoff["conclusion"]
+    assert conclusion["directions_mode"] == "off"
+    assert conclusion["directions"] is None
+    lines = handoff_lines(handoff)
+    assert not any("普通感冒" in line for line in lines)
+    # The department hint is gated by its own flag, not by the mode.
+    assert any("呼吸内科" in line for line in lines)
+
+
+def test_on_mode_passes_directions():
+    handoff = build_handoff(
+        _state(
+            sheet=_sheet(
+                directions_visible=True,
+                department_visible=True,
+                directions_mode="on",
+            )
+        )
+    )
+    conclusion = handoff["conclusion"]
+    assert conclusion["directions_mode"] == "on"
+    assert conclusion["directions"][0]["patient_label"] == "普通感冒"
+    assert any("普通感冒" in line for line in handoff_lines(handoff))
+
+
+def test_visit_notes_passthrough_and_lines_keep_quotes():
+    # §13.6 exception: support_quotes are dropped from directions, but
+    # the visit-notes action list keeps its evidence-verb entries.
+    notes = ["咳嗽三天", "患者原话引用"]
+    handoff = build_handoff(
+        _state(
+            sheet=_sheet(
+                directions_visible=False,
+                directions_mode="restricted",
+                visit_notes=notes,
+            )
+        )
+    )
+    conclusion = handoff["conclusion"]
+    assert conclusion["visit_notes"] == notes
+    assert "support_quotes" not in conclusion["directions"][0]
+    assert "hypothesis_id" not in conclusion["directions"][0]
+    lines = handoff_lines(handoff)
+    assert any("就诊带话：咳嗽三天" in line for line in lines)
+    assert any("就诊带话：患者原话引用" in line for line in lines)
+
+
+def test_handoff_lines_mode_gate_does_not_trust_list_presence():
+    # A hand-built dict with a leaked list + off mode must still hide
+    # directions; a leaked hint + false department flag must hide too.
+    handoff = {
+        "title": "就诊摘要（预问诊版）",
+        "limitations": "仅供就诊时参考",
+        "conclusion": {
+            "disposition": {
+                "text": "可以在家先观察",
+                "department_hint": "呼吸内科",
+            },
+            "directions_mode": "off",
+            "directions_visible": False,
+            "department_visible": False,
+            "directions": [{"patient_label": "普通感冒"}],
+            "self_care": {},
+            "return_now_if": [],
+        },
+        "facts": [],
+        "needs_confirmation": [],
+        "report_items": [],
+    }
+    lines = handoff_lines(handoff)
+    assert not any("普通感冒" in line for line in lines)
+    assert not any("呼吸内科" in line for line in lines)
+    # Legacy dicts without a mode fall back to the flag (old behaviour).
+    handoff["conclusion"]["directions_visible"] = True
+    del handoff["conclusion"]["directions_mode"]
+    handoff["conclusion"]["department_visible"] = True
+    lines = handoff_lines(handoff)
+    assert any("普通感冒" in line for line in lines)
+    assert any("呼吸内科" in line for line in lines)

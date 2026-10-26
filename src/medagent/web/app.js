@@ -667,6 +667,11 @@ function summaryContext(
       )
         sendMessage("继续处理补充", `process_calculation_supplement:${id}`);
     },
+    // v1.3 §13.5(a) reminder wiring: the conclusion card's reminder
+    // button focuses the already-scheduled follow-up card. Focusing
+    // is navigation, not a mutation, so it is offered even for
+    // read-only (replayed/refresh) renders.
+    onFocusFollowUpCard: focusFollowUpCard,
     canRepeat: () =>
       Boolean(
         !state.busy &&
@@ -1502,34 +1507,60 @@ async function openHandoff() {
   try {
     const data = await api(`/api/sessions/${state.sessionId}/handoff`);
     // 渲染单源（模块化重整 §4.4）：方向/科室可见性只消费交接端点
-    // 透传的 flag，不再从 live sheet 推导、不再补写 flag，更不再
+    // 透传的 mode/flag，不再从 live sheet 推导、不再补写 flag，更不再
     // 回落为“无 live sheet 时有方向即视为可见”（该回落分支已删除）。
     // 端点输出无方向即不可见；flag 缺失时按不可见处理
     // （fail-closed，打印模块的 === true 判断兜底）。narrative 仍
-    // 取自 live sheet（端点不携带），但 reasoning 只按端点 flag 抄写。
+    // 取自 live sheet（端点不携带），但 reasoning 只按端点 mode 抄写。
     // 对话框渲染仍用原始端点对象（见上）。
     const sheet = state.case?.conclusion || null;
     const rawConclusion = data.handoff?.conclusion || null;
-    // M2 纵深防御：narrative.reasoning 逐条含方向标签，shadow 下不
+    // v1.3 §13.6：抄写层与结论卡同源，按端点透传的 directions_mode
+    // 门控（与打印模块同一判定；抄写层再收紧一道，不信任上游已
+    // 剥离）：restricted/on 方向可见、仅 on 推理线可见、off 方向
+    // 整体不抄（置 null，保持端点 off 形态）；mode 缺失的旧端点
+    // 回落到 directions_visible 的全量含义；未知 mode 按不可见
+    // 处理。科室 hint 仅当 department_visible === true 时抄写；
+    // 带话段原样透传（有项才渲染是打印层的规则）。
+    const handoffMode = rawConclusion?.directions_mode;
+    const hasHandoffMode =
+      typeof handoffMode === "string" && handoffMode !== "";
+    const directionsShown = hasHandoffMode
+      ? handoffMode === "restricted" || handoffMode === "on"
+      : rawConclusion?.directions_visible === true;
+    const reasoningShown = hasHandoffMode
+      ? handoffMode === "on"
+      : rawConclusion?.directions_visible === true;
+    // M2 纵深防御：narrative.reasoning 逐条含方向标签，仅全量模式
     // 抄进 state.handoff（打印模块另有同门控，双重保险）；framing /
     // severity 不含方向，可保留。
-    const visible = rawConclusion?.directions_visible === true;
     const narrative = sheet?.narrative
       ? {
           framing: sheet.narrative.framing,
           severity: sheet.narrative.severity,
-          ...(visible ? { reasoning: sheet.narrative.reasoning } : {}),
+          ...(reasoningShown ? { reasoning: sheet.narrative.reasoning } : {}),
         }
       : undefined;
+    let copiedConclusion = null;
+    if (rawConclusion) {
+      copiedConclusion = {
+        ...rawConclusion,
+        narrative,
+        directions: directionsShown ? rawConclusion.directions : null,
+      };
+      if (
+        rawConclusion.department_visible !== true &&
+        rawConclusion.disposition
+      ) {
+        const restDisposition = { ...rawConclusion.disposition };
+        delete restDisposition.department_hint;
+        copiedConclusion.disposition = restDisposition;
+      }
+    }
     state.handoff = data.handoff
       ? {
           ...data.handoff,
-          conclusion: rawConclusion
-            ? {
-                ...rawConclusion,
-                narrative,
-              }
-            : null,
+          conclusion: copiedConclusion,
         }
       : null;
     renderHandoff(data.handoff);
@@ -2067,6 +2098,29 @@ if (window.chengxinDesktop?.dueNotifications?.onOpen) {
       .getElementById("followup-section")
       ?.scrollIntoView({ block: "start" });
   });
+}
+// v1.3 §13.5(a): focus the existing follow-up card. The close flow
+// already scheduled the plan (consultation._schedule_follow_up) and
+// rendered its card into the transcript, so this button never creates
+// state — it scrolls to the last transcript follow-up card and gives
+// it keyboard focus. When the transcript holds no such card (e.g. a
+// reopened view), the fallback is the history follow-up section,
+// which aggregates the same scheduled plan — still a real action,
+// never a no-op.
+function focusFollowUpCard() {
+  const cards = document.querySelectorAll("#messages .followup-card");
+  const target = cards[cards.length - 1];
+  if (target) {
+    target.scrollIntoView({ block: "start" });
+    target.tabIndex = -1;
+    target.focus({ preventScroll: true });
+    return true;
+  }
+  navigate("history");
+  document
+    .getElementById("followup-section")
+    ?.scrollIntoView({ block: "start" });
+  return false;
 }
 function renderFollowUps() {
   const section = $("#followup-section");

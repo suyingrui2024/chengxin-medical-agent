@@ -318,6 +318,24 @@
       "course": "皮疹迅速扩散或伴有肿胀、发热时变化可能很快，需要尽快当面评估；途中请留意呼吸是否顺畅、口唇和舌头有没有肿胀。",
       "reviewed_by": "engineering-v1",
       "reviewed_at": "2026-10-23"
+    },
+    {
+      "id": "oral_routine",
+      "match": "oral",
+      "tier": "routine",
+      "do": [
+        "用温盐水漱口",
+        "换对侧咀嚼",
+        "睡觉时把枕头垫高",
+        "面部肿胀、张口困难或发热时立即就医"
+      ],
+      "avoid": [
+        "避免过冷、过热、过硬、过甜的食物"
+      ],
+      "measure": [],
+      "course": "这类口腔不适多数会在数天内逐渐缓解或出现明确变化，观察期间重点看面部肿胀、张口困难或发热有没有新出现或加重。",
+      "reviewed_by": "engineering-v1",
+      "reviewed_at": "2026-10-26"
     }
   ],
   "note": "Self-care content for the conclusion sheet (docs/问诊结论单设计文档.md §5.5). Engineering v1: generic and respiratory/chest groups written against the same risk bar as the already-live care-route copy; every group carries review metadata and pathway-specific groups require clinician review before the directions layer opens to patients (phase B). Groups are matched by (match, tier): match is a pathway group key derived from the accepted hypothesis workspace, or 'generic'. Entries with empty reviewed_by are treated as absent at runtime.",
@@ -372,5 +390,5 @@
     "return_now_if": "generic",
     "self_care_group": "generic"
   },
-  "version": "1.2"
+  "version": "1.3"
 }

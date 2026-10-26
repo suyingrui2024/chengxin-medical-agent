@@ -1680,6 +1680,32 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         typeof data.department_visible !== "boolean"
       )
         throw new Error("Invalid department visibility");
+      // v1.3 §13.4: the composer may add directions_mode (off |
+      // restricted | on) and visit_notes (string list). Both are
+      // optional — missing means pre-v1.3 behavior — but when present
+      // they must match their shapes; all other strictness is
+      // unchanged and unknown fields still fail elsewhere.
+      if (
+        data.directions_mode !== undefined &&
+        data.directions_mode !== null &&
+        !["off", "restricted", "on"].includes(data.directions_mode)
+      )
+        throw new Error("Invalid directions mode");
+      if (
+        data.directions_restricted_visible !== undefined &&
+        typeof data.directions_restricted_visible !== "boolean"
+      )
+        throw new Error("Invalid restricted directions visibility");
+      if (data.visit_notes !== undefined && data.visit_notes !== null)
+        list(data.visit_notes).forEach(text);
+      if (
+        data.follow_up !== undefined &&
+        data.follow_up !== null &&
+        data.follow_up.due_in_hours !== undefined &&
+        data.follow_up.due_in_hours !== null &&
+        !Number.isFinite(data.follow_up.due_in_hours)
+      )
+        throw new Error("Invalid follow-up window");
       list(data.directions).forEach((item) => {
         if (!["likely", "rule_out"].includes(item.group))
           throw new Error("Invalid direction group");
@@ -1740,7 +1766,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           });
       }
     },
-    (data) => {
+    (data, context = {}) => {
       const card = el("article", "conclusion-card");
       // S2 visualization simplification: secondary sections collapse
       // behind a titled toggle with a count. Expanded content is
@@ -1766,32 +1792,27 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         return wrap;
       };
       card.append(el("p", "conclusion-kicker", "问诊结论"));
-      const disposition = el(
-        "section",
-        `conclusion-disposition ${data.disposition.level}`,
-      );
-      if (data.tier === "urgent") disposition.setAttribute("role", "alert");
-      disposition.append(
-        el("p", "conclusion-disposition-label", "下一步"),
-        el("p", "conclusion-disposition-text", data.disposition.text),
-      );
-      // 渲染单源登记（模块化重整 §4.4 字段—门控表）：结论卡只消费
-      // composer 的 flag，不重算可见性。以下判定表达式原样保留，
-      // 作为回归锚点：科室行 ← department_visible，方向节与
-      // narrative.reasoning ← directions_visible，framing /
-      // severity / worry / goal_response 不走任何门（患者自己的
-      // 问题与处置级文本恒渲染）。
-      const departmentHint =
-        data.disposition.department_hint || data.department_hint;
-      if (data.department_visible && departmentHint)
-        disposition.append(
-          el(
-            "p",
-            "conclusion-department",
-            `建议科室：${departmentHint.department} —— ${departmentHint.reason}`,
-          ),
-        );
-      card.append(disposition);
+      // v1.3 §13.6 渲染单源契约：结论卡只消费 composer 的 flag，
+      // 不重算可见性，不以“字段在场”推断可见。方向模式取自
+      // composer 的 directions_mode；缺失该字段的旧 sheet 按
+      // composer 的 flag 语义回落：directions_visible 为真即全
+      // 量（其含义不变），否则 directions_restricted_visible
+      // 为真即受限，否则 off。科室行仅当 department_visible
+      // === true 时输出，缺失即不可见。framing / severity /
+      // worry / goal_response 不走任何门（患者自己的问题与
+      // 处置级文本恒渲染）。
+      const directionsMode =
+        data.directions_mode === "restricted" ||
+        data.directions_mode === "on" ||
+        data.directions_mode === "off"
+          ? data.directions_mode
+          : data.directions_visible === true
+            ? "on"
+            : data.directions_restricted_visible === true
+              ? "restricted"
+              : "off";
+      const you = data.subject_kind === "self" ? "你" : "您";
+      // §13.1 段 1：一句话判断（framing＋severity）。
       if (data.narrative) {
         const narrative = el("section", "conclusion-narrative");
         narrative.append(
@@ -1806,11 +1827,11 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
           data.narrative.severity,
         );
         narrative.append(severity);
-        // Reasoning quotes direction labels verbatim; directions stay
-        // shadow until clinical sign-off, so the reasoning paragraph is
-        // gated on the same visibility flag. Framing and severity are
-        // disposition-level text and always render.
-        if (data.narrative.reasoning && data.directions_visible) {
+        // Reasoning quotes direction labels verbatim, so the reasoning
+        // paragraph renders only in full mode (C3 sign-off gate); in
+        // restricted mode the direction labels stay out of the
+        // reasoning line even though framing/severity always render.
+        if (data.narrative.reasoning && directionsMode === "on") {
           const reasoning = el("div", "conclusion-narrative-reasoning");
           reasoning.append(
             el("p", "conclusion-narrative-reasoning-label", "为什么这样判断"),
@@ -1824,7 +1845,6 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         }
         card.append(narrative);
       }
-      const you = data.subject_kind === "self" ? "你" : "您";
       // Batch B: when the sheet carries the patient's named worry,
       // answer it in its own expanded section, quoting the sheet's
       // response verbatim. The object is rendered as-is (no marker
@@ -1855,20 +1875,48 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         );
         card.append(goal);
       }
-      if (data.directions_visible) {
+      // §13.1 段 3：可能方向。off 模式整段不渲染；全量模式保持
+      // 既有顺序与行为（likely 在前、弃权文案、折叠收起）；受限
+      // 模式按 composer 顺序渲染、rule_out 组在前且直接展开——
+      // 不得以“排序靠后”或“折叠默认收起”弱化需要排除的方向；
+      // 方向列表为空时整段不渲染（不渲染弃权文案、不渲染空壳）。
+      const directionTemplates = {
+        more_likely: (label) => `更像是 ${label}`,
+        possible: (label) => `可能是 ${label}`,
+        cannot_exclude: (label) =>
+          `目前还不能排除 ${label}，这也是建议就诊的原因`,
+      };
+      const renderDirectionBox = (directions, item) => {
+        const box = el("div", `conclusion-direction ${item.group}`);
+        box.append(
+          el(
+            "strong",
+            "",
+            directionTemplates[item.certainty](item.patient_label),
+          ),
+        );
+        if (item.support_quotes?.length)
+          box.append(
+            el(
+              "p",
+              "conclusion-direction-basis",
+              `依据：${you}提到「${item.support_quotes.join("」、「")}」。`,
+            ),
+          );
+        if (item.against_note)
+          box.append(
+            el("p", "conclusion-direction-basis", item.against_note + "。"),
+          );
+        directions.append(box);
+      };
+      if (directionsMode === "on") {
         const directions = el("section", "conclusion-directions");
         directions.append(el("h4", "", "可能的方向（不是确诊）"));
         if (data.directions_abstained) {
           directions.append(el("p", "conclusion-abstain", data.abstain_text));
         } else {
-          const templates = {
-            more_likely: (label) => `更像是 ${label}`,
-            possible: (label) => `可能是 ${label}`,
-            cannot_exclude: (label) =>
-              `目前还不能排除 ${label}，这也是建议就诊的原因`,
-          };
           for (const group of ["likely", "rule_out"]) {
-            const items = data.directions.filter(
+            const items = (data.directions || []).filter(
               (item) => item.group === group && item.patient_label,
             );
             if (!items.length) continue;
@@ -1879,29 +1927,7 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
                 group === "likely" ? "更可能的方向" : "需要排除的方向",
               ),
             );
-            for (const item of items) {
-              const box = el("div", `conclusion-direction ${group}`);
-              box.append(
-                el("strong", "", templates[item.certainty](item.patient_label)),
-              );
-              if (item.support_quotes?.length)
-                box.append(
-                  el(
-                    "p",
-                    "conclusion-direction-basis",
-                    `依据：${you}提到「${item.support_quotes.join("」、「")}」。`,
-                  ),
-                );
-              if (item.against_note)
-                box.append(
-                  el(
-                    "p",
-                    "conclusion-direction-basis",
-                    item.against_note + "。",
-                  ),
-                );
-              directions.append(box);
-            }
+            for (const item of items) renderDirectionBox(directions, item);
           }
         }
         const directionCount = directions.querySelectorAll(
@@ -1910,6 +1936,71 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         card.append(
           collapse("可能的方向（不是确诊）", directionCount, directions, false),
         );
+      } else if (directionsMode === "restricted") {
+        const items = (data.directions || []).filter(
+          (item) => item.patient_label,
+        );
+        if (items.length) {
+          const directions = el("section", "conclusion-directions");
+          directions.append(el("h4", "", "可能的方向（不是确诊）"));
+          for (const group of ["rule_out", "likely"]) {
+            const groupItems = items.filter((item) => item.group === group);
+            if (!groupItems.length) continue;
+            directions.append(
+              el(
+                "p",
+                "conclusion-direction-group",
+                group === "likely" ? "更可能的方向" : "需要排除的方向",
+              ),
+            );
+            for (const item of groupItems) renderDirectionBox(directions, item);
+          }
+          card.append(directions);
+        }
+      }
+      // §13.1 段 4：就医建议。disposition.text 本身已是单源窗口句
+      // （composer 的 format_window_text 把窗口写进文本），不再
+      // 另起一行写窗口，避免出现两份去向文本；科室行仅当
+      // department_visible === true 时输出。
+      const disposition = el(
+        "section",
+        `conclusion-disposition ${data.disposition.level}`,
+      );
+      if (data.tier === "urgent") disposition.setAttribute("role", "alert");
+      disposition.append(
+        el("p", "conclusion-disposition-label", "下一步"),
+        el("p", "conclusion-disposition-text", data.disposition.text),
+      );
+      const departmentHint =
+        data.disposition.department_hint || data.department_hint;
+      if (data.department_visible === true && departmentHint)
+        disposition.append(
+          el(
+            "p",
+            "conclusion-department",
+            `建议科室：${departmentHint.department} —— ${departmentHint.reason}`,
+          ),
+        );
+      card.append(disposition);
+      // §13.1 段 5：就诊带话清单。有项才渲染；段标题按
+      // subject_kind 适配（本人／家人）。
+      if (data.visit_notes?.length) {
+        const notes = el("section", "conclusion-visit-notes");
+        notes.append(
+          el(
+            "h4",
+            "",
+            data.subject_kind === "self"
+              ? "就诊时请告诉医生"
+              : "就诊时请帮家人告诉医生",
+          ),
+        );
+        const notesList = el("ul");
+        data.visit_notes.forEach((item) =>
+          notesList.append(el("li", "", item)),
+        );
+        notes.append(notesList);
+        card.append(notes);
       }
       if (data.gaps?.length) {
         const gaps = el("section", "conclusion-gaps");
@@ -1986,6 +2077,41 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
         const outlookCount = (data.outlook ? 1 : 0) + (data.follow_up ? 1 : 0);
         card.append(collapse("接下来", outlookCount, outlook, false));
       }
+      // §13.1 段 10：安抚收尾＋提醒约定。收尾句是 §13.5 静态
+      // 模板、按处置层级取用，恒渲染。提醒约定落到 §13.5(a)：
+      // 关闭时已自动排定可通知随访（sheet.follow_up 即该计划），
+      // 渲染信息行＋按钮；按钮经 context 回调聚焦既有随访卡，
+      // 是真实动作。无回调时不渲染按钮——绝不出现点击无实际
+      // 效果的按钮。无随访计划时不渲染提醒行、不编造约定。
+      const closing = el("section", "conclusion-closing");
+      closing.append(
+        el(
+          "p",
+          "conclusion-closing-line",
+          data.disposition.level === "urgent_today"
+            ? "请按上面的时间尽快就诊，不要等随访。"
+            : "先别太焦虑，按上面的安排来就好；有变化随时回来问。",
+        ),
+      );
+      const reminderHours = data.follow_up?.due_in_hours;
+      if (Number.isFinite(reminderHours) && reminderHours > 0) {
+        closing.append(
+          el(
+            "p",
+            "conclusion-reminder-info",
+            `我会在 ${reminderHours} 小时后来确认`,
+          ),
+        );
+        if (typeof context.onFocusFollowUpCard === "function")
+          closing.append(
+            button(
+              "查看随访安排",
+              () => context.onFocusFollowUpCard(),
+              "conclusion-reminder-action",
+            ),
+          );
+      }
+      card.append(closing);
       const citations = (data.further_reading?.citations || []).filter(
         (citation) => isWebUrl(citation.url),
       );

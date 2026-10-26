@@ -17,6 +17,7 @@ import json
 import os
 import re
 from copy import deepcopy
+from datetime import datetime
 from importlib import resources
 from typing import Any, Dict, List, Optional
 
@@ -144,9 +145,22 @@ def sheet_mode() -> str:
     return mode if mode in ("off", "shadow", "on") else "on"
 
 
+def directions_mode() -> str:
+    """off | restricted | on — env override, default restricted
+    (design §13.3: v1.3 flips the phase-A shadow default to restricted
+    visibility; an unrecognised value falls back to the default)."""
+    mode = (
+        os.environ.get("MEDAGENT_CONCLUSION_DIRECTIONS", "restricted")
+        .strip()
+        .lower()
+    )
+    return mode if mode in ("off", "restricted", "on") else "restricted"
+
+
 def directions_visible() -> bool:
-    """Phase A ships directions in shadow; phase B flips this after the
-    evaluation gate and clinician review (design §9).
+    """Full-visibility gate only: true exactly when the directions mode
+    is ``on`` (design §13.3 — this meaning is unchanged from phase A;
+    only the default mode moved from off to restricted).
 
     Rendering single source (modular-refactor design §4.4, frozen):
     the composer is the ONLY place that computes visibility. The sheet
@@ -158,14 +172,23 @@ def directions_visible() -> bool:
     because each reasoning line quotes a direction label; ``worry`` /
     ``goal_response`` are the patient's own words and are NOT gated.
     """
-    return os.environ.get("MEDAGENT_CONCLUSION_DIRECTIONS", "off").strip().lower() == "on"
+    return directions_mode() == "on"
+
+
+def directions_restricted_visible() -> bool:
+    """Restricted-or-full gate (design §13.2/§13.3): true when the
+    directions mode is ``restricted`` (the default) or ``on``. This is
+    the gate for the restricted directions section; the full reasoning
+    lines still require :func:`directions_visible`."""
+    return directions_mode() in ("restricted", "on")
 
 
 def department_visible() -> bool:
-    """Department hints ship in shadow too (benchmark design §3.4/D2):
-    the composer always fills the hint from reviewed content, and this
-    flag tells the renderer whether it may be shown before the C12
-    clinical sign-off.
+    """Department-hint gate (design §13.3): ``MEDAGENT_CONCLUSION_DEPARTMENT``
+    ``on`` always shows, ``off`` never shows (operator kill switch,
+    overriding the directions mode); when the variable is unset (or
+    unrecognised) the hint follows the directions mode — shown unless
+    the directions mode is ``off``.
 
     Rendering single source (modular-refactor design §4.4, frozen):
     same contract as :func:`directions_visible` — the composer is the
@@ -173,7 +196,12 @@ def department_visible() -> bool:
     is always computed, and renderers show it only when this flag is
     true (missing flag = invisible, fail-closed).
     """
-    return os.environ.get("MEDAGENT_CONCLUSION_DEPARTMENT", "off").strip().lower() == "on"
+    dept = os.environ.get("MEDAGENT_CONCLUSION_DEPARTMENT", "").strip().lower()
+    if dept == "on":
+        return True
+    if dept == "off":
+        return False
+    return directions_mode() != "off"
 
 
 def _load_json(name: str) -> Dict[str, Any]:
@@ -1856,6 +1884,88 @@ def _sheet_evidence_count(accepted, state: CaseState, direction) -> int:
     return len(valid | attested)
 
 
+# v1.3 oral self-care routing (design §13.7): content selection only.
+# These terms match the chief complaint's verbatim text; the route
+# changes NOTHING else — sheet_group, narrative group, safety-net
+# group and department group all still use sheet_group.
+ORAL_CHIEF_TERMS = ("牙痛", "牙疼", "牙齿", "牙龈", "口腔")
+
+
+def _self_care_group_key(sheet_group: str, chief_complaint: str) -> str:
+    """Self-care selection key for a sheet.
+
+    Only when the sheet group is ``generic`` and the chief complaint
+    verbatim contains an oral term does the self-care selection take
+    ``oral`` (whose ``oral`` group is defined in self_care.json).
+    Every other group variable
+    keeps ``sheet_group`` — callers must not reuse this key for the
+    narrative, safety net, department hint, or outlook's group logic
+    beyond the self-care group's own course (outlook reads the
+    selected self-care group's course, so it follows this key).
+    """
+    chief = chief_complaint or ""
+    if sheet_group == "generic" and any(term in chief for term in ORAL_CHIEF_TERMS):
+        return "oral"
+    return sheet_group
+
+
+VISIT_NOTES_CHIEF_MAX_CHARS = 80
+VISIT_NOTES_EVIDENCE_MAX = 3
+VISIT_NOTES_MAX = 8
+
+
+def _build_visit_notes(
+    state: CaseState,
+    directions: List[Dict[str, Any]],
+    abstained: bool,
+    worry: Optional[Dict[str, str]],
+) -> List[str]:
+    """Visit-notes checklist (design §13.4): already-recorded facts
+    only, in order — ① chief complaint verbatim (truncated to 80 chars
+    plus … when longer, never rewritten); ② worry object verbatim when
+    present; ③ age (birth year converted) and chronic-condition names
+    verbatim, only when a patient archive is bound
+    (``state.profile_baseline`` non-empty); ④ direction support quotes
+    deduplicated, at most 3 — omitted entirely when the sheet abstains
+    on directions. Unbound sessions carry only ①②④. Total cap 8
+    items; entries are patient/fact verbatim, so the sheet lint treats
+    them like support_quotes (see compose_conclusion)."""
+    notes: List[str] = []
+    chief = str(state.get("chief_complaint") or "").strip()
+    if chief:
+        if len(chief) > VISIT_NOTES_CHIEF_MAX_CHARS:
+            chief = chief[:VISIT_NOTES_CHIEF_MAX_CHARS] + "…"
+        notes.append(chief)
+    obj = worry.get("object") if isinstance(worry, dict) else None
+    if obj and str(obj).strip():
+        notes.append(str(obj).strip())
+    baseline = getattr(state, "profile_baseline", None) or {}
+    if isinstance(baseline, dict):
+        birth_year = baseline.get("birth_year")
+        if isinstance(birth_year, int) and not isinstance(birth_year, bool):
+            age = datetime.now().year - birth_year
+            if 0 <= age <= 120:
+                notes.append(f"年龄：{age}岁")
+        for name in baseline.get("chronic_conditions") or []:
+            if isinstance(name, str) and name.strip():
+                notes.append(name.strip())
+    if not abstained:
+        seen = set()
+        evidence: List[str] = []
+        for direction in directions or []:
+            for quote in direction.get("support_quotes") or []:
+                quote_text = str(quote).strip()
+                if quote_text and quote_text not in seen:
+                    seen.add(quote_text)
+                    evidence.append(quote_text)
+                    if len(evidence) >= VISIT_NOTES_EVIDENCE_MAX:
+                        break
+            if len(evidence) >= VISIT_NOTES_EVIDENCE_MAX:
+                break
+        notes.extend(evidence)
+    return notes[:VISIT_NOTES_MAX]
+
+
 def compose_conclusion(
     state: CaseState,
     summary: Optional[Dict[str, Any]] = None,
@@ -1879,12 +1989,20 @@ def compose_conclusion(
     Visibility contract (modular-refactor design §4.4, frozen — the
     flag computation below is NOT to be "fixed" by renderers):
     ``directions`` is always computed and always present, gated by
-    ``directions_visible``; ``narrative.reasoning`` shares that gate;
-    ``disposition.department_hint`` is always computed, gated by
-    ``department_visible``; ``narrative.framing`` / ``severity``,
-    ``disposition.text``, ``gaps``, ``self_care``, ``return_now_if``,
-    ``worry``, ``goal_response``, ``outlook`` and ``follow_up`` are
-    ungated and always renderable. Both flags default off.
+    ``directions_visible`` (full mode only) and
+    ``directions_restricted_visible`` (restricted or full); the sheet
+    records the mode in ``directions_mode`` (off | restricted | on,
+    default restricted, design §13.3); ``narrative.reasoning`` shares
+    the full gate only; ``disposition.department_hint`` is always
+    computed, gated by ``department_visible`` (department variable on
+    always shows, off never shows, unset follows the directions mode);
+    ``narrative.framing`` / ``severity``, ``disposition.text``,
+    ``gaps``, ``self_care``, ``return_now_if``, ``worry``,
+    ``goal_response``, ``outlook`` and ``follow_up`` are ungated and
+    always renderable. New additive fields (``directions_mode``,
+    ``visit_notes``) are optional: a missing flag still means
+    invisible (fail-closed), and a missing ``visit_notes`` means no
+    visit-notes section.
     """
     if state.phase != Phase.CLOSED:
         return None
@@ -1952,7 +2070,19 @@ def compose_conclusion(
         ) >= 2:
             sheet_group = PATHWAY_GROUPS[hid]
             break
-    care = _self_care_group(sheet_group, tier) or {}
+    # v1.3 oral routing (design §13.7): only the self-care selection
+    # key may become "oral"; sheet_group itself — and therefore the
+    # narrative group, safety-net group and department group below —
+    # is untouched.
+    care = (
+        _self_care_group(
+            _self_care_group_key(
+                sheet_group, str(state.get("chief_complaint") or "")
+            ),
+            tier,
+        )
+        or {}
+    )
     # P2c allergy hint: its own field, never mixed into the versioned
     # avoid list. A patient-entered allergy name containing a banned
     # phrase must not void the whole sheet, so such a hint is dropped
@@ -2018,7 +2148,9 @@ def compose_conclusion(
         "directions": directions,
         "directions_abstained": abstained,
         "directions_visible": show_directions,
+        "directions_mode": directions_mode(),
         "department_visible": department_visible(),
+        "visit_notes": _build_visit_notes(state, directions, abstained, worry),
         "abstain_text": ABSTAIN_TEXT if abstained else None,
         "narrative": narrative,
         "gaps": gaps,
@@ -2075,6 +2207,35 @@ def compose_conclusion(
         summary_alerts = (summary or {}).get("return_now_if")
         if summary_alerts:
             sheet["return_now_if"] = list(summary_alerts)
+        # D1 (v1.3): restore the oral self-care group after the
+        # fallback, under the same condition as the pre-fallback
+        # selection (reused helper, no second keyword list). The
+        # fallback guards against probed-pathway language, but oral
+        # self-care matches the chief complaint itself, not that
+        # failure mode — so only self-care and its course (outlook)
+        # are restored. The neutral narrative, the generic safety
+        # net, and every other field stay exactly as the fallback
+        # left them, including allergy_hint handling: the restored
+        # self-care carries over whatever allergy_hint the fallback
+        # result already has, and introduces none of its own.
+        if _self_care_group_key(
+            sheet_group, str(state.get("chief_complaint") or "")
+        ) == "oral":
+            oral_care = _self_care_group("oral", tier) or {}
+            if oral_care.get("match") == "oral":
+                previous_care = sheet.get("self_care") or {}
+                sheet["self_care"] = {
+                    "do": list(oral_care.get("do", [])),
+                    "avoid": list(oral_care.get("avoid", [])),
+                    "measure": list(oral_care.get("measure", [])),
+                    **(
+                        {"allergy_hint": previous_care["allergy_hint"]}
+                        if previous_care.get("allergy_hint")
+                        else {}
+                    ),
+                }
+                if oral_care.get("course"):
+                    sheet["outlook"] = oral_care["course"]
     # Batch C wording post-processing, in order: assertion-state
     # wording (T-04), chronic-outlook consistency (E-04/U-09),
     # infant-observable wording (P-17), eye-domain generic
@@ -2091,9 +2252,13 @@ def compose_conclusion(
     # The banned-phrase lint guards *system* wording. Patient quotes
     # (support_quotes) are the patient's own words — a patient writing
     # "没事，就是咳" must not silently void the whole sheet.
+    # visit_notes entries are patient/fact verbatim too (design §13.4)
+    # and are excluded the same way; section titles and other system
+    # wording still pass through the lint normally.
     lint_view = deepcopy(sheet)
     for direction in lint_view.get("directions", []):
         direction.pop("support_quotes", None)
+    lint_view.pop("visit_notes", None)
     rendered = json.dumps(lint_view, ensure_ascii=False)
     if any(phrase in rendered for phrase in BANNED_PHRASES):
         raise ValueError("conclusion sheet failed the banned-phrase lint")

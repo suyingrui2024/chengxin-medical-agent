@@ -103,8 +103,8 @@ class ConclusionAllergyHintTests(unittest.TestCase):
         # 通路测试（mock 文案）: the avoid line below is invented for
         # this test. It proves the wiring (hint field, not avoid list,
         # no gap leak) — it does NOT prove the hint fires on real
-        # self_care 1.2 content. The real-content test below pins that
-        # the hint is dormant on 1.2 (0 of 18 groups trigger).
+        # self_care 1.3 content. The real-content test below pins that
+        # the hint is dormant on 1.3 (0 of 19 groups trigger).
         state = _closed_state()
         fake_care = {
             "do": ["多休息"],
@@ -132,9 +132,9 @@ class ConclusionAllergyHintTests(unittest.TestCase):
             any("青霉素" in gap.get("label", "") for gap in sheet["gaps"])
         )
 
-    def test_real_self_care_1_2_triggers_zero_of_18_groups(self):
+    def test_real_self_care_1_3_triggers_zero_of_19_groups(self):
         # Real-content count (M1): run build_allergy_hint over every
-        # self_care 1.2 group's actual avoid list. 18 groups exist and
+        # self_care 1.3 group's actual avoid list. 19 groups exist and
         # several avoid lines mention medication, but none mentions
         # allergy, so the both-words trigger fires 0 times. If a future
         # content release adds an allergy line, this test must be
@@ -145,7 +145,7 @@ class ConclusionAllergyHintTests(unittest.TestCase):
 
         data = _load_json("self_care.json")
         groups = data.get("groups", [])
-        self.assertEqual(len(groups), 18)
+        self.assertEqual(len(groups), 19)
         allergies = [{"kind": "drug", "name": "青霉素"}]
         triggered = [
             group
@@ -161,7 +161,7 @@ class ConclusionAllergyHintTests(unittest.TestCase):
         self.assertEqual(triggered, [])
 
     def test_current_content_has_no_allergy_avoid_line_so_hint_stays_dormant(self):
-        # Honest pin: no self_care 1.2 avoid line mentions allergy, so
+        # Honest pin: no self_care 1.3 avoid line mentions allergy, so
         # build_allergy_hint's both-words trigger cannot fire on real
         # content today. The wiring above proves the path; this test
         # documents that the hint needs a future content line to fire.

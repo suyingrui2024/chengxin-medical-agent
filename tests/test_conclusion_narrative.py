@@ -219,12 +219,18 @@ class DepartmentHintTests(unittest.TestCase):
         self.assertIsNone(sheet["disposition"]["department_hint"])
         self.assertIsNone(sheet["content_versions"]["departments"])
 
-    def test_department_visible_defaults_off_and_env_on(self):
+    def test_department_visible_defaults_restricted_and_env_on(self):
+        # v1.3 (§13.3): the department variable defaults to unset, which
+        # follows the directions mode — and the directions mode defaults
+        # to restricted, so the department hint shows by default.
         with mock.patch.dict(os.environ, {}, clear=False):
             os.environ.pop("MEDAGENT_CONCLUSION_DEPARTMENT", None)
-            self.assertFalse(conclusion_module.department_visible())
+            os.environ.pop("MEDAGENT_CONCLUSION_DIRECTIONS", None)
+            self.assertEqual(conclusion_module.directions_mode(), "restricted")
+            self.assertTrue(conclusion_module.directions_restricted_visible())
+            self.assertTrue(conclusion_module.department_visible())
             sheet = compose_conclusion(closed_state())
-            self.assertFalse(sheet["department_visible"])
+            self.assertTrue(sheet["department_visible"])
         with mock.patch.dict(
             os.environ, {"MEDAGENT_CONCLUSION_DEPARTMENT": "on"}
         ):
