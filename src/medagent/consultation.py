@@ -1900,7 +1900,105 @@ class ConsultationEngine(
         offered = self._offer_task(state, chief)
         if offered:
             return self._attach_suspend_cap_notice(state, offered)
+        # G-12(d) (round 3): an UNDETERMINED close must not swallow
+        # still-owed discriminator questions. The gate sits strictly
+        # at the close decision — normal blocking planning still owns
+        # the question order while any blocking candidate remains —
+        # and the eventual close still flows through _finish and the
+        # _record_reply close rendering (including the W1 urgent
+        # walkthrough), untouched.
+        discriminator = self._undetermined_close_discriminator(state)
+        if discriminator is not None:
+            question, reask = discriminator
+            self.events.append(
+                Event(
+                    state.session_id,
+                    "close.undetermined_discriminator_asked",
+                    {"question_id": question.id, "reask": reask},
+                )
+            )
+            return self._attach_suspend_cap_notice(
+                state,
+                self._ask(
+                    state,
+                    question,
+                    reason=(
+                        "风险尚未确定，关闭前先追问鉴别点"
+                        if not reask
+                        else "风险尚未确定，关闭前再确认一次未问清的鉴别点"
+                    ),
+                ),
+            )
         return self._attach_suspend_cap_notice(state, self._finish(state))
+
+    def _undetermined_close_discriminator(self, state: CaseState):
+        """G-12(d): one discriminator question still owed before an
+        UNDETERMINED close, as ``(question, reask)`` — or None.
+
+        Fires only when a fresh triage assessment (the same
+        assessment _finish would use) is UNDETERMINED. No
+        disposition, risk mapping, or threshold is touched: a new
+        answer simply flows through the engine's normal reassessment.
+
+        Both layers are restricted to existing catalog questions (no
+        invented question, no catalog edit):
+        (a) never-asked discriminators, in order — emergency_screen
+        (a never-screened UNDETERMINED), gi_details (bleeding
+        frequency/detail free text), trajectory (trend, the closest
+        catalog proxy for still-ongoing/recurrent), dizzy_details
+        (dizziness episode duration, only when the chief complaint
+        makes it applicable);
+        (b) once-per-question re-asks of UNKNOWN-answered
+        discriminators — emergency_screen, then trajectory —
+        guarded by a session event so a repeated unknown answer
+        cannot loop the close forever. A PRESENT-answered detail
+        (gi_details in G4, which already carries "twice/once") is
+        never re-asked: repeating an answered question is its own
+        defect class. Severity is deliberately not a discriminator
+        here: it is not in the G-12 opinion's list (amount,
+        frequency, ongoing/recurrent, dizziness-palpitation
+        persistence).
+        """
+        if self.triage.assess(state).level != RiskLevel.UNDETERMINED:
+            return None
+        by_id = {item.id: item for item in self.content.questions}
+        for question_id in (
+            "emergency_screen",
+            "gi_details",
+            "trajectory",
+            "dizzy_details",
+        ):
+            question = by_id.get(question_id)
+            if question is None:
+                continue
+            if question.id in state.asked_questions:
+                continue
+            if question.fact_key in state.facts:
+                continue
+            if not self.content.question_applies_in_state(question, state):
+                continue
+            if not question_fact_gates_pass(question, state.facts):
+                continue
+            return question, False
+        reasked = {
+            (event.payload or {}).get("question_id")
+            for event in self.events.for_session(state.session_id)
+            if event.event_type == "close.undetermined_discriminator_asked"
+            and (event.payload or {}).get("reask") is True
+        }
+        for question_id in ("emergency_screen", "trajectory"):
+            question = by_id.get(question_id)
+            if question is None or question.id not in state.asked_questions:
+                continue
+            if question.id in reasked:
+                continue
+            fact = state.facts.get(question.fact_key)
+            if fact is None or fact.assertion != Assertion.UNKNOWN:
+                continue
+            if not self.content.question_applies_in_state(question, state):
+                continue
+            return question, True
+        return None
 
     @staticmethod
     def _phase_rank(phase: Phase) -> int:
@@ -3204,8 +3302,21 @@ class ConsultationEngine(
                 ):
                     visible = reply.message
                     self._append_sheet_worry_goal(reply, reply.conclusion)
+                    # O-19/D-14/D-15: the walk runs against the close
+                    # text with the collected-facts echo stripped —
+                    # an echo is not a response, and the echo's own
+                    # goal quotation must not mark a part addressed
+                    # (round-3 D3/D5 closes show exactly that: the
+                    # goal echo carried 护理/开药/后遗症, yet no part
+                    # sentence was ever rendered). The urgent walk
+                    # also covers examination parts (O-19 检查), which
+                    # the shared walk skips as visit parts.
                     self._append_unaddressed_goals(
-                        state, reply, reply.conclusion, visible
+                        state,
+                        reply,
+                        reply.conclusion,
+                        self._strip_close_facts_echo(visible),
+                        include_exam_parts=True,
                     )
                     self._append_uncertainty_note(reply, reply.conclusion)
                     # ④-4, second option (gate untouched): when the
@@ -3322,19 +3433,21 @@ class ConsultationEngine(
             return
 
     @staticmethod
-    def _sheet_worry_goal_text(sheet: Dict[str, Any]) -> str:
+    def _sheet_worry_goal_text(sheet: Dict[str, Any], include_goal: bool = True) -> str:
         """Single source of the worry/goal append rule (was inline in
         _speak_close_line): worry response first, goal response
         second, each stripped, given a terminal 。/！/？ when missing.
         A missing or malformed field degrades to no append, never to
-        a broken close line."""
+        a broken close line. include_goal=False drops only the goal
+        piece (N-11 urgent suppression); the default keeps the
+        long-standing confirmed-close layout byte-identical."""
         extra = ""
         try:
             worry = sheet.get("worry") or {}
             worry_response = (
                 worry.get("response") if isinstance(worry, dict) else None
             )
-            goal_response = sheet.get("goal_response")
+            goal_response = sheet.get("goal_response") if include_goal else None
             for piece in (worry_response, goal_response):
                 if isinstance(piece, str) and piece.strip():
                     piece = piece.strip()
@@ -3345,6 +3458,23 @@ class ConsultationEngine(
             extra = ""
         return extra
 
+    @staticmethod
+    def _strip_close_facts_echo(text: str) -> str:
+        """Cut the urgent head's collected-facts list out of a close
+        text before the goal-part addressed check. The list restates
+        recorded facts in the patient's words — including the goal
+        itself — so leaving it in makes every echoed part look
+        answered. The cut is delimited by the list's own lead-in and
+        tail; text without a facts list passes through untouched."""
+        start = text.find("已采集的信息：")
+        if start < 0:
+            return text
+        tail = "不必等问诊补齐再求助。"
+        end = text.find(tail, start)
+        if end < 0:
+            return text
+        return text[:start] + text[end + len(tail):]
+
     def _append_sheet_worry_goal(
         self, reply: AgentReply, sheet: Dict[str, Any]
     ) -> None:
@@ -3352,8 +3482,22 @@ class ConsultationEngine(
         goal response, verbatim, in that order. Used by the urgent
         close path in _record_reply; the confirmed close path uses
         _sheet_worry_goal_text for the same rule so its byte layout
-        (extra before the boilerplate) is unchanged."""
-        reply.message += self._sheet_worry_goal_text(sheet)
+        (extra before the boilerplate) is unchanged.
+
+        N-11/O-20/D-16/Y-17/K-18: the urgent head already gives the
+        graded destination answer ("要不要马上去急诊：要"), so the
+        goal_response fixed sentence ("不足以直接回答") next to it
+        contradicts it. Suppress only that goal_response piece when
+        the graded answer is already in the message; the worry
+        response still renders, and closes without a graded answer
+        (the O4 routine shape: mitigation only, no direct sentence)
+        keep the goal_response untouched."""
+        goal_response = sheet.get("goal_response") if isinstance(sheet, dict) else None
+        graded = "要不要马上去急诊：" in reply.message
+        mitigated = isinstance(goal_response, str) and "不足以直接回答" in goal_response
+        reply.message += self._sheet_worry_goal_text(
+            sheet, include_goal=not (graded and mitigated)
+        )
 
     def _append_unaddressed_goals(
         self,
@@ -3361,6 +3505,7 @@ class ConsultationEngine(
         reply: AgentReply,
         sheet: Dict[str, Any],
         visible_text: str,
+        include_exam_parts: bool = False,
     ) -> None:
         """P2 goal-part close append (mechanism ②): for each goal
         part with no handling in visible_text, append one sentence
@@ -3369,13 +3514,18 @@ class ConsultationEngine(
         sentence — never newly composed clinical content. Fail-open:
         any failure leaves the close untouched. Callers pass the
         close text *without* the goal_response quote (see
-        conclusion.unaddressed_goal_parts) or the check is vacuous."""
+        conclusion.unaddressed_goal_parts) or the check is vacuous.
+        include_exam_parts (urgent closes only) additionally walks
+        examination parts (O-19), which the shared walk skips as
+        visit parts."""
         try:
             from .conclusion import (
                 _GOAL_PART_FIXED_HANDLING,
+                _keyword_addressed,
                 _part_keywords,
                 goal_part_handling,
                 unaddressed_goal_parts,
+                unaddressed_urgent_goal_parts,
             )
 
             goal_line = sheet.get("goal_line") or ""
@@ -3386,7 +3536,12 @@ class ConsultationEngine(
                     chief_text += str(chief_fact.value)
                 if chief_fact.evidence:
                     chief_text += str(chief_fact.evidence)
-            for part in unaddressed_goal_parts(goal_line, visible_text):
+            list_parts = (
+                unaddressed_urgent_goal_parts
+                if include_exam_parts
+                else unaddressed_goal_parts
+            )
+            for part in list_parts(goal_line, visible_text):
                 handling = goal_part_handling(part, sheet, chief_text)
                 # N-S1-1 single-source dedup: the addressed check
                 # above deliberately excludes the worry/goal extra,
@@ -3402,8 +3557,15 @@ class ConsultationEngine(
                 # adds new information even when the target was
                 # quoted, and mechanism ② keeps its pinned cases
                 # (all goal_response-None visit goals, unaffected).
+                # The dedup text is echo-stripped and
+                # negation-aware, like the addressed check itself:
+                # a facts-list echo is not a rendering, and a
+                # negated mention ("不缓解") is not one either —
+                # a raw substring hit on either used to swallow
+                # the sentence (O-19/D-14/D-15/O-17).
+                dedup_text = self._strip_close_facts_echo(reply.message)
                 if handling == _GOAL_PART_FIXED_HANDLING and any(
-                    keyword in reply.message
+                    _keyword_addressed(keyword, dedup_text)
                     for keyword in _part_keywords(part)
                 ):
                     continue

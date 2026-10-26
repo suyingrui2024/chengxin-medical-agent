@@ -332,6 +332,116 @@ class BridgingDefectFixTests(unittest.TestCase):
         self.assertNotIn("怕光", sentence)
 
 
+class BridgingP23OnsetDedupTests(unittest.TestCase):
+    """Round 3 P-23: a completed-state onset slot must never be fitted
+    into the 从……开始到现在 template, and a verb-stacking pick must
+    fall back to a generic anchor without that fact."""
+
+    def test_completed_onset_slot_is_never_retemplated(self):
+        # Round 3 P5 verbatim: onset "昨天开始拉肚子的" stacked into
+        # "从昨天开始拉肚子的开始到现在" on four rounds. At every
+        # rotation index the sentence must carry no onset template at
+        # all, and the recorded fact itself must be untouched.
+        facts = {
+            "chief_complaint": fact(
+                "chief_complaint", "拉肚子一天了，嘴干，尿很少，精神蔫蔫的"
+            ),
+            "onset": fact("onset", "昨天开始拉肚子的"),
+        }
+        for index in range(4):
+            sentence, kind = build_bridging_sentence(
+                facts,
+                "medications_taken",
+                "这次不舒服后，用过什么药或做过什么处理？",
+                [],
+                index,
+            )
+            self.assertEqual(kind, "anchor")
+            self.assertNotIn("开始拉肚子的开始", sentence)
+            self.assertNotIn("开始到现在", sentence)
+            self.assertEqual(sentence.count("开始"), 0)
+        self.assertEqual(facts["onset"].value, "昨天开始拉肚子的")
+
+    def test_completed_onset_variants_are_dropped(self):
+        # Same stacking class without the trailing 的, and with a
+        # different onset verb: neither may surface as an onset anchor.
+        for onset_value in ("昨天开始拉肚子", "昨天出现咳嗽的", "三天前发病了"):
+            facts = {
+                "chief_complaint": fact("chief_complaint", "头痛"),
+                "onset": fact("onset", onset_value),
+            }
+            sentence, kind = build_bridging_sentence(
+                facts, "severity", "严重吗？", [], 1
+            )
+            self.assertEqual(kind, "anchor")
+            self.assertNotIn("开始到现在", sentence)
+            self.assertEqual(sentence, "你说头痛，再问一句：")
+
+    def test_rotation_hit_falls_back_to_generic_anchor(self):
+        # The round 2 medications-round shape: the old candidate pool
+        # was [chief, onset], so rotation index 1 used to pick the
+        # stacked onset sentence. It must now fall back to the generic
+        # chief anchor, with no trace of the onset fact.
+        facts = {
+            "chief_complaint": fact(
+                "chief_complaint", "拉肚子一天了，嘴干，尿很少，精神蔫蔫的"
+            ),
+            "onset": fact("onset", "昨天开始拉肚子的"),
+        }
+        sentence, kind = build_bridging_sentence(
+            facts,
+            "medications_taken",
+            "这次不舒服后，用过什么药或做过什么处理？",
+            [],
+            1,
+        )
+        self.assertEqual(kind, "anchor")
+        self.assertEqual(
+            sentence, "你说拉肚子一天了，嘴干，尿很少，精神蔫蔫的，再问一句："
+        )
+        self.assertNotIn("昨天开始", sentence)
+
+    def test_bare_time_onset_still_templates(self):
+        # Positive control against over-exclusion: a slot that reduces
+        # to a bare time expression keeps the onset template.
+        facts = {
+            "chief_complaint": fact("chief_complaint", "头痛"),
+            "onset": fact("onset", "三天前开始的"),
+        }
+        sentence, kind = build_bridging_sentence(
+            facts, "severity", "严重吗？", [], 1
+        )
+        self.assertEqual(kind, "anchor")
+        self.assertIn("从三天前开始到现在", sentence)
+
+    def test_stacking_pick_walks_to_next_candidate(self):
+        # Second line of defence: a non-onset candidate that still
+        # stacks the verb is skipped in favour of the next generic
+        # anchor, and when every candidate stacks the question is
+        # shown unadorned rather than doubled.
+        from medagent.bridging import _has_verb_stacking
+
+        self.assertTrue(_has_verb_stacking("从昨天开始拉肚子的开始到现在，再问一句："))
+        self.assertFalse(_has_verb_stacking("你说昨天开始拉肚子，再问一句："))
+        facts = {
+            "chief_complaint": fact("chief_complaint", "昨天开始发烧，今天开始咳嗽"),
+            "severity": fact("severity", 7),
+        }
+        sentence, kind = build_bridging_sentence(
+            facts, "trajectory", "加重了吗？", [], 0
+        )
+        self.assertEqual(kind, "anchor")
+        self.assertEqual(sentence, "你说现在大约7分，再问一句：")
+        sentence, kind = build_bridging_sentence(
+            {"chief_complaint": fact("chief_complaint", "昨天开始发烧，今天开始咳嗽")},
+            "trajectory",
+            "加重了吗？",
+            [],
+            0,
+        )
+        self.assertEqual((sentence, kind), (None, "no_anchor"))
+
+
 class BridgingEngineTriggerTests(unittest.TestCase):
     """repeat / denial trigger paths through the _record_reply choke point
     (run7 never exercised them live, so they are pinned here, not deleted)."""

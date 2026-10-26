@@ -635,6 +635,45 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 if self._active_turns.get(session_id) is turn:
                     self._active_turns.pop(session_id, None)
 
+    def _emergency_clarification_denied_before(
+        self, state: CaseState, text: str
+    ) -> bool:
+        """True when this turn's bare-signal group was already denied.
+
+        C-10: a clarification round denied once must not be re-asked
+        verbatim when the patient later paraphrases the same complaint.
+        The gate itself lives in the base engine (consultation.py,
+        untouched); this is the adaptive engine's pre-gate memory check
+        at its own clarification call sites. Labels scope the memory to
+        the same danger-signal group: a turn whose labels are a subset
+        of a denied round's labels is the same group; a turn with a
+        label outside every denied set is a new group and may still
+        clarify. A denied record without labels (written before labels
+        were stored) falls back to presence: a denial did happen, and
+        the clarification template is a single fixed group.
+        """
+        snapshot = state.runtime_snapshot
+        denied = snapshot.get("emergency_clarification_denied")
+        label_sets: List[set] = []
+        history = snapshot.get("emergency_clarification_denied_labels")
+        if isinstance(history, list):
+            label_sets.extend(
+                set(entry) for entry in history if isinstance(entry, list)
+            )
+        if isinstance(denied, dict) and isinstance(
+            denied.get("labels"), list
+        ):
+            label_sets.append(set(denied["labels"]))
+        if not label_sets:
+            return isinstance(denied, dict)
+        try:
+            current = {hit.label for hit in self.triage.scan_detailed(text)}
+        except Exception:
+            return True
+        if not current:
+            return False
+        return any(current <= labels for labels in label_sets)
+
     def _submit(self, state: CaseState, user_input: UserInput) -> AgentReply:
         if user_input.choice_value == "request_emergency_help":
             return self._requested_emergency_help(state, user_input.text)
@@ -726,9 +765,35 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 # evidence rule is otherwise untouched.
                 denied_text = pending.get("text")
                 if isinstance(denied_text, str) and denied_text.strip():
+                    denied_labels = pending.get("labels")
                     state.runtime_snapshot[
                         "emergency_clarification_denied"
-                    ] = {"text": denied_text, "for_input": text}
+                    ] = {
+                        "text": denied_text,
+                        "for_input": text,
+                        "labels": list(denied_labels)
+                        if isinstance(denied_labels, list)
+                        else [],
+                    }
+                    # C-10: accumulate denied label sets (the dict
+                    # above keeps only the latest denial). Later
+                    # paraphrases are checked against every denied
+                    # group, not just the most recent one.
+                    history = state.runtime_snapshot.get(
+                        "emergency_clarification_denied_labels"
+                    )
+                    if not isinstance(history, list):
+                        history = []
+                        state.runtime_snapshot[
+                            "emergency_clarification_denied_labels"
+                        ] = history
+                    labels = sorted(
+                        set(denied_labels)
+                        if isinstance(denied_labels, list)
+                        else set()
+                    )
+                    if labels not in history:
+                        history.append(labels)
                 state.runtime_snapshot.pop("emergency_clarification", None)
                 self.events.append(
                     Event(
@@ -758,13 +823,26 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 text,
                 adaptive_answer["risk_tags"] if adaptive_answer else (),
             )
-            if action == "clarify":
+            if (
+                action == "clarify"
+                and self._emergency_clarification_denied_before(state, text)
+            ):
+                # C-10: this danger-signal group was already denied
+                # once; do not re-ask the whole clarification round on
+                # a paraphrase. Fall through to normal consultation
+                # (never to the emergency reply below: the signal is
+                # the same not-yet-confirmed one). Risk must be stood
+                # down exactly as the clarification reply does it, or
+                # the publication gate would block the normal question
+                # and close the case as an emergency instead.
+                state.risk = self._deferred_risk(state)
+            elif action == "clarify":
                 return self._deliver(
                     state,
                     self._emergency_clarification_reply(state, text, turn_id),
                     turn_id,
                 )
-            if action == "confirmed":
+            elif action == "confirmed":
                 return self._deliver(
                     state,
                     self._emergency_reply(
@@ -772,9 +850,10 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     ),
                     turn_id,
                 )
-            return self._deliver(
-                state, self._emergency_reply(state, risk.triggers), turn_id
-            )
+            else:
+                return self._deliver(
+                    state, self._emergency_reply(state, risk.triggers), turn_id
+                )
         # (P5 ④-4: the adaptive-answer duplicate of the pre-model urgent
         # gate is removed for the same record-first reason; _run's
         # post-record gate covers it.)
@@ -921,13 +1000,22 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.risk = self.triage.assess(state, text)
             if state.risk.level == RiskLevel.EMERGENCY:
                 action = self._emergency_clarification_action(state, text, ())
-                if action == "clarify":
+                if (
+                    action == "clarify"
+                    and self._emergency_clarification_denied_before(state, text)
+                ):
+                    # C-10: same group already denied; suppress the
+                    # repeat clarification and continue normal flow
+                    # (risk stood down as in the clarification reply,
+                    # so the next question stays deliverable).
+                    state.risk = self._deferred_risk(state)
+                elif action == "clarify":
                     return self._deliver(
                         state,
                         self._emergency_clarification_reply(state, text, turn_id),
                         turn_id,
                     )
-                if action == "confirmed":
+                elif action == "confirmed":
                     return self._deliver(
                         state,
                         self._emergency_reply(
@@ -935,9 +1023,12 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         ),
                         turn_id,
                     )
-                return self._deliver(
-                    state, self._emergency_reply(state, state.risk.triggers), turn_id
-                )
+                else:
+                    return self._deliver(
+                        state,
+                        self._emergency_reply(state, state.risk.triggers),
+                        turn_id,
+                    )
             # Only canonical option-only answers take the zero-model fast path.
             # Mixed free text must still reach the planner for fact extraction.
             if text.strip(" 。！!，,") in {"都没有", "这些危险情况都没有", "没有上述情况", "没有危险信号"}:
@@ -1787,13 +1878,24 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             )
             if state.risk.level == RiskLevel.EMERGENCY:
                 action = self._emergency_clarification_action(state, text, ())
-                if action == "clarify":
+                if (
+                    action == "clarify"
+                    and self._emergency_clarification_denied_before(state, text)
+                ):
+                    # C-10: same group already denied; suppress the
+                    # repeat clarification. Record_facts re-assesses
+                    # risk from this same text, so this post-record
+                    # site is where a suppressed pre-model turn would
+                    # otherwise re-trigger; stand risk down and fall
+                    # through to the normal next question.
+                    state.risk = self._deferred_risk(state)
+                elif action == "clarify":
                     return self._deliver(
                         state,
                         self._emergency_clarification_reply(state, text, turn_id),
                         turn_id,
                     )
-                if action == "confirmed":
+                elif action == "confirmed":
                     return self._deliver(
                         state,
                         self._emergency_reply(
@@ -1801,9 +1903,12 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         ),
                         turn_id,
                     )
-                return self._deliver(
-                    state, self._emergency_reply(state, state.risk.triggers), turn_id
-                )
+                else:
+                    return self._deliver(
+                        state,
+                        self._emergency_reply(state, state.risk.triggers),
+                        turn_id,
+                    )
             if state.risk.level == RiskLevel.URGENT:
                 gated = self._urgent_or_defer(state, turn_id)
                 if gated is not None:
@@ -2839,13 +2944,22 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             state.phase = Phase.HISTORY
             if state.risk.level == RiskLevel.EMERGENCY:
                 action = self._emergency_clarification_action(state, new_text, ())
-                if action == "clarify":
+                if (
+                    action == "clarify"
+                    and self._emergency_clarification_denied_before(state, new_text)
+                ):
+                    # C-10: same group already denied; suppress the
+                    # repeat clarification and continue the normal
+                    # correction flow (risk stood down as in the
+                    # clarification reply).
+                    state.risk = self._deferred_risk(state)
+                elif action == "clarify":
                     return self._deliver(
                         state,
                         self._emergency_clarification_reply(state, new_text, turn_id),
                         turn_id,
                     )
-                if action == "confirmed":
+                elif action == "confirmed":
                     return self._deliver(
                         state,
                         self._emergency_reply(
@@ -2853,8 +2967,9 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         ),
                         turn_id,
                     )
-                reply = self._emergency_reply(state, state.risk.triggers)
-                return self._deliver(state, reply, turn_id)
+                else:
+                    reply = self._emergency_reply(state, state.risk.triggers)
+                    return self._deliver(state, reply, turn_id)
             if state.risk.level == RiskLevel.URGENT:
                 gated = self._urgent_or_defer(state, turn_id)
                 if gated is not None:

@@ -295,6 +295,45 @@ def _strip_onset_slot(text: str) -> str:
     return _strip_trailing_start(text)
 
 
+# Onset verbs marking a slot as already expressing onset as a completed
+# clause (round 3, P-23): "昨天开始拉肚子的" already says when the
+# symptom began, so fitting it into the "从……开始到现在" template
+# stacks the verb ("开始拉肚子的开始"). A slot that still carries one
+# of these verbs after stripping is never re-templated -- the onset
+# candidate is dropped and rotation falls back to a generic anchor that
+# does not carry the fact (or to no bridge when no other anchor
+# exists). The fact itself is untouched; only its rendering as an
+# anchor is suppressed. A slot that reduces to a bare time expression
+# after stripping ("一天半前开始" -> "一天半前") keeps the template;
+# the pinned regression for that shape is preserved.
+_ONSET_VERBS = ("开始", "出现", "发病", "犯", "得了", "患上")
+
+
+def _onset_anchor_text(text: str) -> Optional[str]:
+    """Render an onset slot for the 从…开始到现在 template, or None.
+
+    Returns None for a completed-state slot (see _ONSET_VERBS): the
+    caller drops the onset candidate rather than stacking the verb.
+    """
+    stripped = _strip_onset_slot(text)
+    if not stripped or any(verb in stripped for verb in _ONSET_VERBS):
+        return None
+    return stripped
+
+
+def _has_verb_stacking(sentence: str) -> bool:
+    """True when a composed anchor stacks the onset template's own verbs.
+
+    Second line of defence for P-23: if a candidate somehow still
+    carries the template verb twice ("从昨天开始拉肚子的开始到现在"
+    has two "开始"), the anchor pick must skip it instead of showing
+    the doubled sentence. A single occurrence -- e.g. a chief anchor
+    echoing "昨天开始拉肚子" -- is ordinary patient wording, not
+    stacking, and passes.
+    """
+    return sentence.count("开始") > 1 or sentence.count("到现在") > 1
+
+
 # Leading verbs stripped from a slot when the anchor template already
 # supplies that verb (P-23 audit). Each entry is only stripped when the
 # slot literally starts with it, so symptom text that merely contains
@@ -443,7 +482,9 @@ def build_bridging_sentence(
         candidates.append(f"你说{chief}，再问一句：")
     onset = _present_text(facts, "onset")
     if onset:
-        onset = _strip_onset_slot(onset)
+        # P-23: a completed-state slot yields None here and the onset
+        # candidate is dropped outright -- never re-templated.
+        onset = _onset_anchor_text(onset)
         if onset:
             candidates.append(f"从{onset}开始到现在，再问一句：")
     severity = _severity_text(facts)
@@ -528,9 +569,21 @@ def build_bridging_sentence(
     ]
     if not candidates:
         return None, "no_anchor"
-    sentence = _normalize_bridging_sentence(
-        candidates[question_turn_index % len(candidates)]
-    )
+    # P-23 fallback: if the rotated pick still stacks the onset verb
+    # (a shape the slot filter did not catch), walk forward to the next
+    # candidate that does not stack -- the generic anchor without that
+    # fact. If every candidate stacks, show the question unadorned
+    # rather than a doubled-verb sentence.
+    start = question_turn_index % len(candidates)
+    sentence = None
+    for offset in range(len(candidates)):
+        candidate = candidates[(start + offset) % len(candidates)]
+        if not _has_verb_stacking(candidate):
+            sentence = candidate
+            break
+    if sentence is None:
+        return None, "no_anchor"
+    sentence = _normalize_bridging_sentence(sentence)
     return (sentence, "anchor") if lint_bridging_sentence(sentence) else (None, "lint_dropped")
 
 

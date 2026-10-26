@@ -43,6 +43,58 @@ def _applies_term_match(text: str, term: str) -> bool:
         working = working[:index] + "\x00" + working[index + 1 :]
 
 
+def _is_infant_subject(facts: Mapping[str, Fact]) -> bool:
+    """Whether the consultation subject is an infant who cannot be
+    presumed to report pain location / character (P-17, question layer).
+
+    Mirrors ``conclusion._is_infant_case``: the subject must be a child
+    consultation, and either a recorded age of 3 years or under, or a
+    recorded fact saying pain cannot be described （说不清 + 疼/痛 in
+    the same fact text). The 3-year bound is reused from
+    ``_is_infant_case`` / the infant question's ``age_between_when_known``
+    window — no new clinical threshold is introduced. Assertion values
+    are read the same tolerant way as the infant-question subject gate
+    in ``question_applies_in_state`` (enum or plain string), and a
+    numeric-string age parses the same way that gate parses it.
+    """
+    consult = facts.get("consult_for")
+    if consult is None:
+        return False
+    consult_value = (
+        consult.value
+        if getattr(consult.assertion, "value", consult.assertion) == "present"
+        else None
+    )
+    if consult_value != "child":
+        return False
+    age_fact = facts.get("age_years")
+    age_value = None
+    if age_fact is not None and (
+        getattr(age_fact.assertion, "value", age_fact.assertion) == "present"
+    ):
+        raw_age = age_fact.value
+        if isinstance(raw_age, bool):
+            raw_age = None
+        elif isinstance(raw_age, (int, float)):
+            age_value = float(raw_age)
+        elif isinstance(raw_age, str):
+            try:
+                age_value = float(raw_age)
+            except ValueError:
+                age_value = None
+    if age_value is not None and age_value <= 3:
+        return True
+    for fact in facts.values():
+        text = ""
+        if fact.value is not None:
+            text += str(fact.value)
+        if fact.evidence:
+            text += str(fact.evidence)
+        if "说不清" in text and ("疼" in text or "痛" in text):
+            return True
+    return False
+
+
 def question_fact_gates_pass(question: "Question", facts: Mapping[str, Fact]) -> bool:
     """Fact-dependent eligibility, evaluated at candidate-computation time.
 
@@ -218,7 +270,23 @@ class ContentRepository:
         for a child applies even when the age is still unknown; an
         unknown age with no child consultation does not apply. The
         question text (questions.json) and the separate
-        age_between_when_known fact gate are untouched."""
+        age_between_when_known fact gate are untouched.
+
+        P-17 (round 3, question layer): the gi_details bundle asks for
+        pain location / character, which presumes the subject can report
+        pain. For an infant subject (same predicate as
+        ``conclusion._is_infant_case``) the bundle is not applicable at
+        all — branch (a) of the W4 triage — and the catalog's
+        infant_observable_signs question (caregiver-observable items)
+        carries the GI detail round instead. Sub-item shielding (branch
+        (b)) is not implementable here: the bundle is a single fixed
+        prompt string rendered verbatim by ask_question paths outside
+        this module, so shielding only its pain sub-items would need a
+        catalog split (questions.json, supervisor approval) — see the
+        W4 report for the non-pain sub-item coverage check."""
+        if question.id == "gi_details" and state is not None:
+            if _is_infant_subject(getattr(state, "facts", {}) or {}):
+                return False
         if question.id == "infant_observable_signs" and state is not None:
             facts = getattr(state, "facts", {}) or {}
             consult = facts.get("consult_for")

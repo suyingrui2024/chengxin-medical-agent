@@ -761,6 +761,34 @@ def _denied_texts(state: CaseState) -> List[str]:
             texts.append(str(fact.value))
         if fact.evidence:
             texts.append(str(fact.evidence))
+    # N-12/T-04 live shape: in real runs the denial is usually NOT
+    # its own ABSENT fact. The grouped emergency_screen ABSENT fact
+    # carries no value or evidence, and the denial survives only
+    # inside a PRESENT fact's evidence ("没有肢体无力、说话不清").
+    # Take the text after each negation marker up to the sentence
+    # end, so an enumeration under one marker ("没有A、B") keeps
+    # both items: splitting on 、 would orphan B. A marker counts
+    # only at a clause boundary (start or after ，/、/；/。/space,
+    # optionally led by 也/还/并/且), so "说不清" (unknown, no
+    # marker) never qualifies, and a bare "无" in 无法/无论 is
+    # excluded. Qualifying on a loose match stays fail-safe here
+    # — it only narrows an alert to a new occurrence, never
+    # removes it.
+    for fact in state.facts.values():
+        if fact.assertion == Assertion.ABSENT:
+            continue
+        for raw in (fact.value, fact.evidence):
+            if raw is None:
+                continue
+            text = str(raw)
+            for match in re.finditer(
+                r"(?:^|[，、；。\s])(?:也|还|并|且)?(没有|否认|无)([^。；]+)", text
+            ):
+                marker, remainder = match.group(1), match.group(2).strip()
+                if marker == "无" and remainder[:1] in ("法", "论"):
+                    continue
+                if len(remainder) >= 2:
+                    texts.append(remainder)
     return texts
 
 
@@ -834,7 +862,23 @@ def _adjust_assertion_wording(sheet: Dict[str, Any], state: CaseState) -> Dict[s
     return sheet
 
 
-_SHORT_TERM_OUTLOOK_MARKERS = ("数天内", "几天内", "1–2 天内", "3–5 天", "数天")
+_SHORT_TERM_OUTLOOK_MARKERS = (
+    "数天内",
+    "几天内",
+    "1–2 天内",
+    "3–5 天",
+    "数天",
+    # E-09 worsening class (self_care.json course grep, 2026-10-26):
+    # respiratory_urgent "数小时内加重" is the E-09 case itself;
+    # abdominal_urgent "以小时计" is the other hour-scale template;
+    # generic_urgent / headache_urgent / dizziness_urgent
+    # "短时间内变化/加重" is the same short-term urgency class.
+    # Week-scale templates ("1–2 周内", "一两周内") are NOT added:
+    # they are consistent with a chronic course.
+    "数小时内",
+    "以小时计",
+    "短时间内",
+)
 _CHRONIC_OUTLOOK = (
     "这类不适已持续一段时间，观察期间重点看整体状态是好转还是加重，"
     "出现下方警示信号请及时就医。"
@@ -865,12 +909,13 @@ def _onset_is_chronic_gradual(state: CaseState) -> bool:
 
 
 def _adjust_chronic_outlook(sheet: Dict[str, Any], state: CaseState) -> Dict[str, Any]:
-    """E-04/U-09: a chronic gradual course must not be paired with a
-    short-term relief template (“数天内缓解” class). Only the time
-    claim is replaced — by a duration-acknowledging observation
-    sentence with no relief-time prognosis — and only when the
-    current outlook actually carries such a claim; outlooks without
-    a time claim are left untouched."""
+    """E-04/U-09/E-09: a chronic gradual course must not be paired
+    with a short-term template — relief class (“数天内缓解”) or
+    worsening class (“数小时内加重”, “以小时计”, “短时间内”).
+    Only the time claim is replaced — by a duration-acknowledging
+    observation sentence with no relief-time prognosis — and only
+    when the current outlook actually carries such a claim;
+    outlooks without a time claim are left untouched."""
     if not isinstance(sheet, dict):
         return sheet
     outlook = sheet.get("outlook")
@@ -1457,27 +1502,116 @@ def _part_keywords(part: str) -> List[str]:
 _GOAL_VISIT_PART_KEYWORDS = _VISIT_GOAL_KEYWORDS + ("就医",)
 
 
+def _keyword_addressed(keyword: str, visible: str) -> bool:
+    """A keyword occurrence counts as handling only when it is not
+    a negated mention. O-17: the batch-A condition clause
+    "症状持续不缓解" contains 缓解, but a negated mention is not a
+    relief-method response — only an occurrence not immediately
+    preceded by 不 counts."""
+    if not keyword:
+        return False
+    start = 0
+    while True:
+        index = visible.find(keyword, start)
+        if index < 0:
+            return False
+        if index == 0 or visible[index - 1] != "不":
+            return True
+        start = index + 1
+
+
+def _visit_part_residual(part: str) -> str:
+    """Content hidden inside a visit part (Y-16 / D-14).
+
+    A part like "去医院挑开" or "去医院开药" is filtered as a
+    visit part, which used to swallow the non-visit content after
+    the visit phrase. The residual exists only for the narrow
+    destination-plus-content shape: after stripping question
+    scaffolding and urgency fillers, the part must *start* with
+    去医院, and the text after it (with any further visit wording
+    stripped) is the residual. Pure visit parts ("去医院",
+    "去医院检查") leave an empty residual and stay covered, and
+    a visit keyword embedded in a noun phrase ("想整理就医记录":
+    就医记录 is the record itself, not a second question) never
+    yields a residual — that pinned shape stays covered by the
+    disposition line alone."""
+    core = part.strip()
+    for _ in range(3):
+        stripped = False
+        for prefix in _GOAL_PART_PREFIXES:
+            if core.startswith(prefix) and len(core) > len(prefix):
+                core = core[len(prefix):]
+                stripped = True
+                break
+        if not stripped:
+            break
+    for filler in ("马上", "立刻", "尽快"):
+        if core.startswith(filler):
+            core = core[len(filler):]
+    if not core.startswith("去医院"):
+        return ""
+    suffix = core[len("去医院"):]
+    for keyword in _GOAL_VISIT_PART_KEYWORDS + ("急诊", "看病"):
+        suffix = suffix.replace(keyword, "")
+    suffix = suffix.strip(" ，、；。！？")
+    for prefix in ("还是", "或者", "顺便"):
+        if suffix.startswith(prefix) and len(suffix) > len(prefix):
+            suffix = suffix[len(prefix):]
+    suffix = suffix.strip(" ，、；。！？")
+    return suffix if len(suffix) >= 2 else ""
+
+
 def unaddressed_goal_parts(goal_line: str, visible_text: str) -> List[str]:
     """Parts of a goal line with no handling in the visible text.
 
-    Visit-keyword parts are treated as covered by the batch-A visit
-    sentence and never listed; any other part whose keywords appear
-    nowhere in visible_text is unaddressed. Callers must pass the
-    close text *without* the goal_response quote (see _part_keywords)
-    or the check is vacuous."""
+    Pure visit-keyword parts are treated as covered by the batch-A
+    visit sentence and never listed; any other part whose keywords
+    appear nowhere in visible_text is unaddressed. A visit part
+    with residual non-visit content (Y-16 "挑开", D-14 "开药")
+    contributes the residual as its own part. Callers must pass
+    the close text *without* the goal_response quote (see
+    _part_keywords) or the check is vacuous."""
     if not goal_line:
         return []
     visible = visible_text or ""
     unaddressed: List[str] = []
     for part in split_goal_parts(goal_line):
         if any(keyword in part for keyword in _GOAL_VISIT_PART_KEYWORDS):
+            residual = _visit_part_residual(part)
+            if not residual:
+                continue
+            keywords = _part_keywords(residual)
+            if not keywords:
+                continue
+            if not any(_keyword_addressed(keyword, visible) for keyword in keywords):
+                unaddressed.append(residual)
             continue
         keywords = _part_keywords(part)
         if not keywords:
             continue
-        if not any(keyword in visible for keyword in keywords):
+        if not any(_keyword_addressed(keyword, visible) for keyword in keywords):
             unaddressed.append(part)
     return unaddressed
+
+
+def unaddressed_urgent_goal_parts(goal_line: str, visible_text: str) -> List[str]:
+    """Urgent-close walk (O-19): the shared walk plus examination
+    parts. The urgent head answers the destination question
+    ("要不要马上去急诊：要") but never the examination question,
+    so a part naming 检查 with no 检查 handling in the visible
+    text is walked with the fixed sentence ("需当面评估后决定"
+    is the offline-evaluation framing the O-19 opinion allows).
+    Pure destination parts stay covered by the direct sentence
+    and are never listed — listing them would re-introduce the
+    N-11 contradiction in per-part form."""
+    parts = unaddressed_goal_parts(goal_line, visible_text)
+    visible = visible_text or ""
+    if _keyword_addressed("检查", visible):
+        return parts
+    for part in split_goal_parts(goal_line or ""):
+        if "检查" in part and part not in parts:
+            parts.append(part)
+    return parts
 
 
 def goal_part_handling(
