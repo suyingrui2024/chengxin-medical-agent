@@ -53,3 +53,16 @@ test('medical overlay disables shell, subprocesses and log uploading', async () 
     assert.equal(rows.find(row => row.id === id)?.disabled, true, `${id} must be disabled`);
   }
 });
+
+test('medical overlay keeps required SDK services but disables their model tools', async () => {
+  const { default: yaml } = await import('js-yaml');
+  const rows = yaml.load(await readFile(new URL('../medical.patch.yml', import.meta.url), 'utf8'));
+  for (const id of ['filesystem', 'working-directory']) {
+    assert.notEqual(rows.find(row => row.id === id)?.disabled, true,
+      `${id} is required by sdk-jsonrpc-server startup`);
+  }
+  for (const id of ['attachment-local', 'tool-fs', 'tool-working-directory']) {
+    assert.equal(rows.find(row => row.id === id)?.disabled, true,
+      `${id} must remain unavailable to the medical model`);
+  }
+});

@@ -1,10 +1,12 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { readFile, mkdtemp, rm } from "node:fs/promises";
+import { readFile, mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import { DeepSeekHarness } from "@deepseek-ai/dsh-sdk-client";
+import { launchOptions } from "./bridge.mjs";
 
 const require = createRequire(import.meta.url);
 const here = dirname(fileURLToPath(import.meta.url));
@@ -53,6 +55,7 @@ try {
         stderr.slice(0, 1000),
     );
   const active = rows.filter((row) => row.disabled !== true);
+  const medicalEntry = (id) => rows.find((row) => row.id === id);
   const forbidden = active.filter((row) =>
     /tool-|terminal|subprocess|mcp-client|session-log-deepseek|plugin-package-inventory/.test(
       row.name,
@@ -62,6 +65,36 @@ try {
     throw new Error(
       `Forbidden plugins active: ${forbidden.map((row) => row.id).join(",")}`,
     );
+  if (
+    medicalEntry("filesystem")?.disabled === true ||
+    medicalEntry("working-directory")?.disabled === true ||
+    medicalEntry("tool-fs")?.disabled !== true ||
+    medicalEntry("tool-working-directory")?.disabled !== true ||
+    medicalEntry("attachment-local")?.disabled !== true
+  )
+    throw new Error(
+      "Medical SDK services or model-facing filesystem boundaries are invalid",
+    );
+
+  // --dump-config only checks composition. Start the SDK transport as well so
+  // a required plugin waiting on a disabled service cannot pass installation
+  // checks and then fail on the patient's first message. initialize performs
+  // no model request, so the sentinel endpoint and key never leave this host.
+  const runtimeScratch = join(scratch, "runtime");
+  await mkdir(join(runtimeScratch, "home"), { recursive: true });
+  const harness = new DeepSeekHarness(
+    launchOptions(
+      runtimeScratch,
+      "https://api.invalid/anthropic",
+      "installation-check-only",
+      "deepseek-flash",
+    ),
+  );
+  try {
+    await harness.start();
+  } finally {
+    await harness.close();
+  }
   const executionDump = await exec(
     process.execPath,
     [
@@ -94,9 +127,7 @@ try {
       "/execution-search.mjs",
     ) ||
     entry("web-fetch-http")?.disabled !== true ||
-    !entry("chengxin-execution-fetch")?.name.endsWith(
-      "/execution-fetch.mjs",
-    ) ||
+    !entry("chengxin-execution-fetch")?.name.endsWith("/execution-fetch.mjs") ||
     entry("tool-subagent")?.config?.provider !== "spawn" ||
     entry("tool-subagent")?.config?.maxDepth !== 2 ||
     entry("tool-subagent-fork")?.config?.provider !== "fork" ||
@@ -117,6 +148,7 @@ try {
     JSON.stringify(
       {
         dsh_version: pkg.version,
+        runtime_startup: "passed",
         active_plugins: active.map((row) => row.id),
         model_facing_host_tools: 0,
         execution: {
