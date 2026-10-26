@@ -19,6 +19,11 @@ export async function reachDegree(page, { complaint = "头疼" } = {}) {
     await expect(page.locator("#send-button")).toBeEnabled();
   };
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  // d1568d6 起开场题序为 consult_for → sex → age → 主诉 → 急诊筛查：
+  // sex 是选项题（questions.json：choice，按钮“男”/“女”），须在“32岁”
+  // 之前先点选；旧夹具跳过 sex 导致“32岁”喂给 sex 题、主诉喂给 age 题。
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#send-button")).toBeEnabled();
   await answer("32岁");
   await answer(complaint);
   await page.getByRole("button", { name: "都没有", exact: true }).click();
@@ -37,6 +42,9 @@ export async function reachDegree(page, { complaint = "头疼" } = {}) {
     back_details: "没有",
     urinary_details: "没有",
     skin_details: "没有",
+    // 与 reachSelfCheck 的 post-severity 循环同款：发热路径可能在任何
+    // 阶段问自述体温，答“没量过”不触发体温阈值分支。
+    reported_temperature: "没量过",
   };
   for (let step = 0; step < 12; step++) {
     if (await page.locator("#active-question .severity-scale").isVisible())

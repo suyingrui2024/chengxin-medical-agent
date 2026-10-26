@@ -515,7 +515,12 @@ export function renderQuestion(data, context) {
     });
     card.append(signals);
   }
-  if (data.question_id === "severity" && spec) {
+  if (data.question_id === "severity") {
+    // 量表是 severity 题的输入控件，跟问题身份走，不跟 canonical 走：
+    // 桥接锚只是宿主在问题前加的承接句，不改变问题本身；旧门控把
+    // “被装饰的银行题”当“被改写的问题”，致使锚一拼接量表就消失、
+    // severity 退化为纯文本框（d1568d6 题序调整后暴露）。可见标题
+    // 仍走 spec 回退（锚＋prompt 全文），此处只恢复输入控件。
     const scale = node("div", "severity-scale");
     const toolbar = node("div", "severity-selection");
     const display = node("output", "severity-value", "—");

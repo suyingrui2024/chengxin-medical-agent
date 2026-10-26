@@ -14,7 +14,10 @@ import {
 } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const root = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../..",
+);
 const metadata = JSON.parse(
   await readFile(path.join(root, "package.json"), "utf8"),
 );

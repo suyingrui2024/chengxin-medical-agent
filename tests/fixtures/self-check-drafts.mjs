@@ -26,6 +26,9 @@ export async function reachSelfCheck(page, complaint = "头疼") {
     allergies: "没有",
     relevant_history: "没有",
     patient_goal: "整理信息",
+    // 发热路径下 ranker 会在 severity 之后追问自述体温；答“没量过”不触发
+    // 体温阈值分支，保持 facts 最小（与本 map 其余“没有”系答案同款）。
+    reported_temperature: "没量过",
   };
   for (let step = 0; step < 12; step++) {
     const snapshot = await degreeSnapshot(page, id);
