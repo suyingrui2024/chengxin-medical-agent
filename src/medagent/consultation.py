@@ -3093,9 +3093,20 @@ class ConsultationEngine(
     def _apply_group_bridge(self, state: CaseState, reply: AgentReply) -> None:
         """P1 Tier 1 group-bridge wiring (P2 owns this call site).
 
-        Runs after the single-question bridge: only when that bridge
-        did not splice (trace "bridging.applied" is not True) is a
-        group bridge prepended, so the two never stack. The group
+        Runs after the single-question bridge and, on a group switch,
+        prepends the group bridge even when the single bridge already
+        spliced: the two say different things (single-question承接 vs
+        group intent), and the old "single applied => skip group" rule
+        starved the group bridge, because the single anchor fires on
+        almost every round. Design §3.2 requires a group bridge
+        before every group of questions; the switch rule is what
+        makes that hold without repeating the bridge on every
+        question of the group. The last asked group lives in
+        ``runtime_snapshot["last_question_group"]`` and is updated
+        only when a bridge actually splices: "other" questions carry
+        no bridge and do not reset it, so returning to a group after
+        other business does not re-bridge, and a lint-dropped bridge
+        does not poison the next question of that group. The group
         comes solely from bridging.question_group (P1's contract);
         a P3 warning question reaches it under its pinned id
         ``warning_<domain>``. lint_group_bridge False drops the whole
@@ -3104,10 +3115,6 @@ class ConsultationEngine(
         Fail-open: any failure leaves the question untouched.
         """
         if reply.kind != "question" or not reply.question_id:
-            return
-        trace = dict(reply.developer_trace or {})
-        bridging = trace.get("bridging")
-        if isinstance(bridging, dict) and bridging.get("applied"):
             return
         try:
             from .bridging import (
@@ -3122,8 +3129,18 @@ class ConsultationEngine(
             return
         if not bridge or not lint_group_bridge(bridge):
             return
+        snapshot = state.runtime_snapshot
+        if snapshot is None:
+            snapshot = state.runtime_snapshot = {}
+        if group == snapshot.get("last_question_group"):
+            return
         reply.message = bridge + reply.message
-        trace["bridging"] = {"applied": True, "kind": f"group:{group}"}
+        snapshot["last_question_group"] = group
+        trace = dict(reply.developer_trace or {})
+        trace["group_bridge"] = {"applied": True, "group": group}
+        bridging = trace.get("bridging")
+        if not (isinstance(bridging, dict) and bridging.get("applied")):
+            trace["bridging"] = {"applied": True, "kind": f"group:{group}"}
         reply.developer_trace = trace
 
     def _record_reply(
@@ -3354,7 +3371,12 @@ class ConsultationEngine(
         close text *without* the goal_response quote (see
         conclusion.unaddressed_goal_parts) or the check is vacuous."""
         try:
-            from .conclusion import goal_part_handling, unaddressed_goal_parts
+            from .conclusion import (
+                _GOAL_PART_FIXED_HANDLING,
+                _part_keywords,
+                goal_part_handling,
+                unaddressed_goal_parts,
+            )
 
             goal_line = sheet.get("goal_line") or ""
             chief_text = ""
@@ -3366,6 +3388,25 @@ class ConsultationEngine(
                     chief_text += str(chief_fact.evidence)
             for part in unaddressed_goal_parts(goal_line, visible_text):
                 handling = goal_part_handling(part, sheet, chief_text)
+                # N-S1-1 single-source dedup: the addressed check
+                # above deliberately excludes the worry/goal extra,
+                # so a part whose handling is only the fixed
+                # insufficient-information sentence would re-quote a
+                # target the close already renders (goal_response's
+                # "你问到‘…’" or the worry response's "你问过是不是
+                # ‘…’") without adding information. Both call sites
+                # run this after the extra is already in
+                # reply.message, so a keyword hit there means the
+                # target renders once already: drop the per-part
+                # sentence. A self-care handling always appends: it
+                # adds new information even when the target was
+                # quoted, and mechanism ② keeps its pinned cases
+                # (all goal_response-None visit goals, unaffected).
+                if handling == _GOAL_PART_FIXED_HANDLING and any(
+                    keyword in reply.message
+                    for keyword in _part_keywords(part)
+                ):
+                    continue
                 sentence = f"关于‘{part}’：{handling}"
                 if not sentence.endswith(("。", "！", "？")):
                     sentence += "。"

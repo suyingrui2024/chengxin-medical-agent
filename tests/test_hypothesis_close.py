@@ -371,6 +371,66 @@ class GoalPartCloseTests(unittest.TestCase):
         self.assertNotIn("一片", message)
 
 
+class GoalSingleRenderTests(unittest.TestCase):
+    """N-S1-1: one close renders a given goal target exactly once.
+
+    The whole-goal rendering (goal_response "你问到‘…’" or the worry
+    response "你问过是不是‘…’") already quotes the target; a
+    per-part sentence whose handling is only the fixed
+    insufficient-information sentence would re-quote the same target
+    without adding information, so it must be dropped. A per-part
+    sentence carrying a real self-care handling still renders (that
+    is mechanism ②, pinned by GoalPartCloseTests).
+    """
+
+    def setUp(self):
+        self.host = build_runtime()
+        self.context = self.host.start()
+        self.engine = self.context.services.require("consultation")
+
+    def tearDown(self):
+        self.host.stop()
+
+    def _close_with_goal(self, chief, goal, worry=None):
+        facts = [
+            _fact("consult_for", "self", "我自己"),
+            _fact("chief_complaint", chief, chief),
+            _fact("emergency_screen", None, "没有危险信号", Assertion.ABSENT),
+            _fact("onset", "两天前", "两天前"),
+            _fact("severity", 5, "5分"),
+        ]
+        if worry is not None:
+            facts.append(_fact("patient_worry", worry, "我这是不是" + worry))
+        facts.append(_fact("patient_goal", goal, goal))
+        state = _closed_state(self.engine, facts)
+        sheet = compose_conclusion(state)
+        message = _speak(self.engine, state, sheet)
+        return sheet, message
+
+    def test_single_part_goal_renders_once_via_goal_response(self):
+        # S1 shape: non-visit single-part goal, so goal_response
+        # renders "你问到‘想知道要不要去急诊’：…"; the per-part
+        # "关于‘想知道要不要去急诊’：" sentence must not follow it.
+        goal = "想知道要不要去急诊"
+        sheet, message = self._close_with_goal("头晕两天", goal)
+        self.assertIsNotNone(sheet["goal_response"])
+        self.assertIn(f"你问到‘{goal}’", message)
+        self.assertEqual(message.count(goal), 1)
+        self.assertNotIn(f"关于‘{goal}’", message)
+
+    def test_worry_and_goal_channels_render_shared_target_once(self):
+        # Dual channel: the worry response already quotes 阑尾炎;
+        # the goal part restating the same worry must not gain a
+        # second, fixed-handling "关于‘…阑尾炎’" sentence.
+        sheet, message = self._close_with_goal(
+            "肚子疼两天", "想知道是不是阑尾炎", "阑尾炎"
+        )
+        self.assertIsNotNone(sheet["worry"]["response"])
+        self.assertIsNone(sheet["goal_response"])
+        self.assertEqual(message.count("阑尾炎"), 1)
+        self.assertNotIn("关于‘想知道是不是阑尾炎’", message)
+
+
 class SlotCollisionTests(unittest.TestCase):
     """Mechanism ③: a worry sentence in the goal slot renders once."""
 
@@ -726,11 +786,79 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
                 self.engine._apply_group_bridge(state, reply)
                 self.assertTrue(reply.message.startswith(GROUP_BRIDGES[group]))
 
-    def test_group_bridge_never_stacks_on_single_bridge(self):
+    def test_group_bridge_stacks_with_single_bridge_on_group_switch(self):
+        # N-S1 bridge starvation: the old "single applied => skip
+        # group" rule starved the group bridge, because the single
+        # anchor fires on almost every round. On a group switch the
+        # group bridge now splices even when the single anchor already
+        # did, each exactly once, group bridge first. This replaces
+        # the old test_group_bridge_never_stacks_on_single_bridge,
+        # which pinned the starvation behavior itself.
         state, reply = self._question_reply("severity", "咳嗽两天")
-        reply.developer_trace = {"bridging": {"applied": True, "kind": "single"}}
+        reply.message = "承接句，原问题？"
+        reply.developer_trace = {"bridging": {"applied": True, "kind": "anchor"}}
         self.engine._apply_group_bridge(state, reply)
+        self.assertEqual(
+            reply.message,
+            GROUP_BRIDGES["deep_dive"] + "承接句，原问题？",
+        )
+        self.assertEqual(reply.message.count(GROUP_BRIDGES["deep_dive"]), 1)
+        self.assertEqual(reply.message.count("承接句"), 1)
+        self.assertEqual(
+            reply.developer_trace["bridging"]["kind"], "anchor"
+        )
+        self.assertEqual(
+            reply.developer_trace["group_bridge"],
+            {"applied": True, "group": "deep_dive"},
+        )
+
+    def test_group_bridge_switches_once_then_holds_within_group(self):
+        state, _ = self.engine.create_session()
+        state.record(_fact("chief_complaint", "咳嗽两天", "咳嗽两天"))
+        first = AgentReply(
+            "原问题？", Phase.HISTORY, kind="question", question_id="severity"
+        )
+        self.engine._apply_group_bridge(state, first)
+        self.assertTrue(first.message.startswith(GROUP_BRIDGES["deep_dive"]))
+        same_group = AgentReply(
+            "原问题？", Phase.HISTORY, kind="question", question_id="onset"
+        )
+        self.engine._apply_group_bridge(state, same_group)
+        self.assertEqual(same_group.message, "原问题？")
+        switched = AgentReply(
+            "原问题？",
+            Phase.HISTORY,
+            kind="question",
+            question_id="medications_taken",
+        )
+        self.engine._apply_group_bridge(state, switched)
+        self.assertTrue(switched.message.startswith(GROUP_BRIDGES["background"]))
+        back = AgentReply(
+            "原问题？", Phase.HISTORY, kind="question", question_id="severity"
+        )
+        self.engine._apply_group_bridge(state, back)
+        self.assertTrue(back.message.startswith(GROUP_BRIDGES["deep_dive"]))
+
+    def test_group_bridge_lint_drop_still_applies_and_does_not_poison(self):
+        from unittest import mock
+
+        state, reply = self._question_reply("severity", "咳嗽两天")
+        with mock.patch(
+            "medagent.bridging.build_group_bridge",
+            return_value="初步考虑是感冒。",
+        ):
+            self.engine._apply_group_bridge(state, reply)
         self.assertEqual(reply.message, "原问题？")
+        # A lint-dropped bridge must not record the group: the next
+        # real question in that group still gets its bridge.
+        self.engine._apply_group_bridge(state, reply)
+        self.assertTrue(reply.message.startswith(GROUP_BRIDGES["deep_dive"]))
+
+    def test_group_bridge_p3_warning_still_bridges_with_anchor(self):
+        state, reply = self._question_reply("warning_意识", "体重一年涨了20斤")
+        reply.developer_trace = {"bridging": {"applied": True, "kind": "anchor"}}
+        self.engine._apply_group_bridge(state, reply)
+        self.assertTrue(reply.message.startswith(GROUP_BRIDGES["proactive"]))
 
     def test_scope_note_appended_on_off_pathway_close_only(self):
         for chief, expect in (

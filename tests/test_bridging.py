@@ -225,10 +225,25 @@ class BridgingAdaptiveEngineTests(unittest.TestCase):
             "腹痛在哪个位置？", state.phase, kind="question", question_id="gi_details"
         )
         self.engine._record_reply(state, reply, "t1", "test")
+        # N-S1 bridge starvation fix: on a group switch the group
+        # bridge now precedes the single entry anchor even on the
+        # adaptive engine (shared _record_reply choke point) — the
+        # old bytes pinned the anchor alone because the group bridge
+        # was skipped whenever the anchor applied. Each renders once,
+        # and the anchor's trace kind is preserved, not clobbered.
+        from medagent.bridging import GROUP_BRIDGES
+
         self.assertEqual(
-            reply.message, "你说肚子痛，再细问一下这方面的情况：腹痛在哪个位置？"
+            reply.message,
+            GROUP_BRIDGES["deep_dive"]
+            + "你说肚子痛，再细问一下这方面的情况：腹痛在哪个位置？",
         )
+        self.assertEqual(reply.message.count(GROUP_BRIDGES["deep_dive"]), 1)
         self.assertEqual(reply.developer_trace["bridging"]["kind"], "entry")
+        self.assertEqual(
+            reply.developer_trace["group_bridge"],
+            {"applied": True, "group": "deep_dive"},
+        )
 
 
 class BridgingDefectFixTests(unittest.TestCase):
