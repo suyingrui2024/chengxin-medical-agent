@@ -393,7 +393,7 @@ class ConsultationSubjectTests(unittest.TestCase):
                     ]
                 },
             },
-            calculation_fixture.ask("emergency_screen"),
+            calculation_fixture.ask("sex"),
         ]
         recovered = self.engine.submit(
             self.state.session_id, UserInput("重试", "retry_turn", restored.action_id)

@@ -138,7 +138,24 @@ class DifferentialFlowTests(unittest.TestCase):
                 self.state.session_id, UserInput(text, choice)
             )
         history_questions = asked[5:]
-        self.assertEqual(history_questions[:3], ["onset", "trajectory", "severity"])
+        # P0 ranker contract (supersedes the old bank-order contract):
+        # RulePlanner.plan delegates to _plan_next, which picks via
+        # ranker.choose with no planner exemption, so the pinned rule
+        # planner is subject to the HypothesisRanker HISTORY reorder
+        # just like any other planner. Within the deep-dive group
+        # (onset/trajectory/severity + chief-detail questions), order
+        # is by q_score, not catalog order: resp_breathing 4
+        # (falsifiable +2, its fact_key is in lower_respiratory's
+        # refute set, + discriminating in lower_respiratory and
+        # asthma_exacerbation), trajectory 3 (discriminating in all
+        # three active hypotheses), severity 2 (discriminating in
+        # lower_respiratory and influenza_like), onset 0 (in no
+        # discriminating list). Hence resp_breathing first, then
+        # trajectory, then severity — verified step by step, not
+        # copied from the observed output.
+        self.assertEqual(
+            history_questions[:3], ["resp_breathing", "trajectory", "severity"]
+        )
         self.assertEqual(self.state.reasoning, {})
 
 

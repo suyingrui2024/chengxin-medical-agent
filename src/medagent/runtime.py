@@ -10,7 +10,7 @@ from .knowledge import ContentRepository
 from .plugins import PluginHost, RuntimeContext
 from .self_checks import SelfCheckService
 from .triage import TriageService
-from .reasoner import OrderedQuestionRanker
+from .hypothesis_ranking import HypothesisRanker
 from .agent import AdaptiveConsultationEngine
 from .backends import (
     CompatibleBackend,
@@ -52,7 +52,7 @@ def build_runtime(event_path: Optional[Path] = None, backend: Optional[str] = No
     def create_engine(ctx):
         kwargs = dict(content=ctx.services.require("content"), triage=ctx.services.require("triage"),
                       self_checks=ctx.services.require("self_checks"), events=ctx.services.require("events"),
-                      ranker=OrderedQuestionRanker())
+                      ranker=HypothesisRanker())
         # Session persistence: an explicit session_dir wins, then the
         # MEDAGENT_SESSION_DATA_DIR env override, then a sibling of the
         # event log. Without any of these, sessions stay process-memory.

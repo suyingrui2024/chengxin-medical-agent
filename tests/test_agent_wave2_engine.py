@@ -322,6 +322,19 @@ class PartialRecordingTests(unittest.TestCase):
         )
 
     def test_valid_items_land_and_only_failures_are_returned(self):
+        # Ranker front-load: OrderedQuestionRanker picks the first
+        # catalog-order candidate, so sex/chief must already be recorded
+        # for emergency_screen to be the pick at ask time. The submit
+        # batch below is unchanged, so its partial feedback is intact.
+        record(
+            self.engine,
+            self.state,
+            "男，咳嗽",
+            [
+                fact("sex", "male", "男"),
+                fact("chief_complaint", "咳嗽", "咳嗽"),
+            ],
+        )
         self.backend.commands = [
             cmd(
                 "record_facts",
@@ -436,6 +449,14 @@ class AgeToneTests(unittest.TestCase):
         )
 
     def test_adult_self_consult_gets_adapted_age_prompt(self):
+        # Ranker front-load: sex precedes age in catalog order, so it
+        # must already be recorded for age to be the ranker pick.
+        record(
+            self.engine,
+            self.state,
+            "男",
+            [fact("sex", "male", "男")],
+        )
         self.backend.commands = [
             cmd(
                 "record_facts",
@@ -452,6 +473,14 @@ class AgeToneTests(unittest.TestCase):
         self.assertIn("32 岁", reply.message)
 
     def test_child_consult_keeps_catalog_age_prompt(self):
+        # Ranker front-load: sex precedes age in catalog order, so it
+        # must already be recorded for age to be the ranker pick.
+        record(
+            self.engine,
+            self.state,
+            "男",
+            [fact("sex", "male", "男")],
+        )
         self.backend.commands = [
             cmd(
                 "record_facts",

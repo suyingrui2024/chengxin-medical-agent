@@ -2509,15 +2509,51 @@ class ConsultationEngine(
                 None,
             )
             if first_user:
+                # P-21: an early emergency close has no recorded chief
+                # fact, so the fallback echoes the whole first turn —
+                # including its consult_for identity sentence ("我是替
+                # 孩子咨询的。"). The chief echo must be only the
+                # complaint itself, so a leading identity sentence is
+                # dropped from both value and evidence (evidence is
+                # what _close_facts_text prefers).
+                chief_text = self._strip_identity_prefix(first_user)
                 items.append(
                     {
                         "key": "chief_complaint",
                         "label": "主要问题",
-                        "value": first_user,
-                        "evidence": first_user,
+                        "value": chief_text,
+                        "evidence": chief_text,
                     }
                 )
         return items[:8]
+
+    @staticmethod
+    def _strip_identity_prefix(text: str) -> str:
+        """Drop a leading consult_for identity sentence, if present.
+
+        Only the first sentence is examined, only when more text
+        follows, and only when that sentence is itself an identity
+        clause: it starts with 我, names 自己 / 替 / 为, and ends
+        with 咨询 / 咨询的 / 咨询一下. A real statement that merely
+        mentions consulting ("我自己咨询过医生") does not end that
+        way and passes through untouched — this is echo hygiene, not
+        parsing of the complaint."""
+        for separator in ("。", "．", "，"):
+            first, sep, rest = text.partition(separator)
+            if not sep or not rest.strip():
+                continue
+            segment = first.strip()
+            if (
+                segment.startswith("我")
+                and ("自己" in segment or "替" in segment or "为" in segment)
+                and (
+                    segment.endswith("咨询")
+                    or segment.endswith("咨询的")
+                    or segment.endswith("咨询一下")
+                )
+            ):
+                return rest.strip()
+        return text
 
     # -- Batch C (CLOSE-COPY) close-copy helpers ----------------------
     # Three slots for emergency/urgent closes: (1) a short soothing
@@ -2549,6 +2585,13 @@ class ConsultationEngine(
         for item in items:
             evidence = (item.get("evidence") or "").strip()
             text = evidence if evidence else str(item.get("value") or "").strip()
+            # P-21: patient wording often ends with its own 。; the
+            # emergency template adds another 。 after the joined
+            # list, which used to render "叫不应。。". Strip one
+            # layer of terminal punctuation here (the single shared
+            # renderer for the emergency and urgent lists) so the
+            # caller's terminator is the only one.
+            text = text.rstrip("。！？.")
             if text:
                 parts.append(f"{item.get('label')}：{text}")
         return "；".join(parts)
@@ -3047,10 +3090,47 @@ class ConsultationEngine(
             trace["bridging"] = {"applied": True, "kind": kind}
         reply.developer_trace = trace
 
+    def _apply_group_bridge(self, state: CaseState, reply: AgentReply) -> None:
+        """P1 Tier 1 group-bridge wiring (P2 owns this call site).
+
+        Runs after the single-question bridge: only when that bridge
+        did not splice (trace "bridging.applied" is not True) is a
+        group bridge prepended, so the two never stack. The group
+        comes solely from bridging.question_group (P1's contract);
+        a P3 warning question reaches it under its pinned id
+        ``warning_<domain>``. lint_group_bridge False drops the whole
+        sentence. Runs before the publication gate, like the single
+        bridge, so the gate sees the final patient-visible text.
+        Fail-open: any failure leaves the question untouched.
+        """
+        if reply.kind != "question" or not reply.question_id:
+            return
+        trace = dict(reply.developer_trace or {})
+        bridging = trace.get("bridging")
+        if isinstance(bridging, dict) and bridging.get("applied"):
+            return
+        try:
+            from .bridging import (
+                build_group_bridge,
+                lint_group_bridge,
+                question_group,
+            )
+
+            group = question_group(reply.question_id, state)
+            bridge = build_group_bridge(group)
+        except Exception:
+            return
+        if not bridge or not lint_group_bridge(bridge):
+            return
+        reply.message = bridge + reply.message
+        trace["bridging"] = {"applied": True, "kind": f"group:{group}"}
+        reply.developer_trace = trace
+
     def _record_reply(
         self, state: CaseState, reply: AgentReply, turn_id: str, reason: str
     ) -> None:
         self._apply_bridging(state, reply)
+        self._apply_group_bridge(state, reply)
         decision = self.publication_gate.validate(state, reply)
         if not decision.allowed:
             if state.risk.level == RiskLevel.EMERGENCY:
@@ -3096,6 +3176,36 @@ class ConsultationEngine(
                 # turn speaks the disposition; the already-closed guard
                 # reply (no transition) must not repeat it every turn.
                 self._speak_close_line(state, reply)
+                # P2 urgent close (mechanism ①): _urgent built its
+                # message before the sheet existed, so the sheet's
+                # worry / goal sections are appended here, at the
+                # choke point where the sheet is attached — never in
+                # _urgent itself. Same shared helper as the confirmed
+                # close, plus the same per-part goal handling.
+                if reply.kind == "urgent" and isinstance(
+                    reply.conclusion, dict
+                ):
+                    visible = reply.message
+                    self._append_sheet_worry_goal(reply, reply.conclusion)
+                    self._append_unaddressed_goals(
+                        state, reply, reply.conclusion, visible
+                    )
+                    self._append_uncertainty_note(reply, reply.conclusion)
+                    # ④-4, second option (gate untouched): when the
+                    # urgent close lands before background questions
+                    # were asked, say so generically — background
+                    # names only, no new clinical content — so the
+                    # offline evaluation knows what to confirm first.
+                    self._append_unconfirmed_background_note(state, reply)
+                # P3 scope disclosure: an off-pathway close says
+                # plainly what this consultation did not cover.
+                # Inside the transition block only, so a guard reply
+                # on an already-closed case never repeats it.
+                if state.closed_reason in (
+                    "confirmed_by_user",
+                    "urgent_route",
+                ) and isinstance(reply.conclusion, dict):
+                    self._append_scope_note(state, reply)
         state.subject_candidate = None
         if reply.kind != "subject_change":
             if reply.kind != "service_error":
@@ -3194,6 +3304,139 @@ class ConsultationEngine(
                 pass
             return
 
+    @staticmethod
+    def _sheet_worry_goal_text(sheet: Dict[str, Any]) -> str:
+        """Single source of the worry/goal append rule (was inline in
+        _speak_close_line): worry response first, goal response
+        second, each stripped, given a terminal 。/！/？ when missing.
+        A missing or malformed field degrades to no append, never to
+        a broken close line."""
+        extra = ""
+        try:
+            worry = sheet.get("worry") or {}
+            worry_response = (
+                worry.get("response") if isinstance(worry, dict) else None
+            )
+            goal_response = sheet.get("goal_response")
+            for piece in (worry_response, goal_response):
+                if isinstance(piece, str) and piece.strip():
+                    piece = piece.strip()
+                    if not piece.endswith(("。", "！", "？")):
+                        piece += "。"
+                    extra += piece
+        except Exception:
+            extra = ""
+        return extra
+
+    def _append_sheet_worry_goal(
+        self, reply: AgentReply, sheet: Dict[str, Any]
+    ) -> None:
+        """Shared close append (P2): the sheet's worry response and
+        goal response, verbatim, in that order. Used by the urgent
+        close path in _record_reply; the confirmed close path uses
+        _sheet_worry_goal_text for the same rule so its byte layout
+        (extra before the boilerplate) is unchanged."""
+        reply.message += self._sheet_worry_goal_text(sheet)
+
+    def _append_unaddressed_goals(
+        self,
+        state: CaseState,
+        reply: AgentReply,
+        sheet: Dict[str, Any],
+        visible_text: str,
+    ) -> None:
+        """P2 goal-part close append (mechanism ②): for each goal
+        part with no handling in visible_text, append one sentence
+        "关于‘{part}’：{handling}". Handling comes from the sheet's
+        own self-care items or the fixed insufficient-information
+        sentence — never newly composed clinical content. Fail-open:
+        any failure leaves the close untouched. Callers pass the
+        close text *without* the goal_response quote (see
+        conclusion.unaddressed_goal_parts) or the check is vacuous."""
+        try:
+            from .conclusion import goal_part_handling, unaddressed_goal_parts
+
+            goal_line = sheet.get("goal_line") or ""
+            chief_text = ""
+            chief_fact = state.facts.get("chief_complaint")
+            if chief_fact is not None:
+                if chief_fact.value is not None:
+                    chief_text += str(chief_fact.value)
+                if chief_fact.evidence:
+                    chief_text += str(chief_fact.evidence)
+            for part in unaddressed_goal_parts(goal_line, visible_text):
+                handling = goal_part_handling(part, sheet, chief_text)
+                sentence = f"关于‘{part}’：{handling}"
+                if not sentence.endswith(("。", "！", "？")):
+                    sentence += "。"
+                reply.message += sentence
+        except Exception:
+            return
+
+    @staticmethod
+    def _append_unconfirmed_background_note(
+        state: CaseState, reply: AgentReply
+    ) -> None:
+        """④-4 note option: list background items never recorded at
+        all (用药 / 过敏 / 病史) so the offline evaluation confirms
+        them first. Presence in any assertion state counts as asked;
+        only wholly absent keys are named. No clinical content is
+        added and the urgent gate itself is untouched."""
+        labels = (
+            ("medications_taken", "用药"),
+            ("allergies", "过敏"),
+            ("relevant_history", "病史"),
+        )
+        missing = [label for key, label in labels if key not in state.facts]
+        if not missing:
+            return
+        note = (
+            "以下背景信息本次尚未确认，线下评估时请首先确认："
+            + "、".join(missing)
+            + "。"
+        )
+        if note not in reply.message:
+            reply.message += note
+
+    @staticmethod
+    def _append_uncertainty_note(
+        reply: AgentReply, sheet: Dict[str, Any]
+    ) -> None:
+        """G-12 (a): render the sheet's explicit uncertainty note on
+        the close text, once, when the composer set one."""
+        note = sheet.get("uncertainty_note") if isinstance(sheet, dict) else None
+        if isinstance(note, str) and note.strip():
+            note = note.strip()
+            if not note.endswith(("。", "！", "？")):
+                note += "。"
+            if note not in reply.message:
+                reply.message += note
+
+    def _append_scope_note(self, state: CaseState, reply: AgentReply) -> None:
+        """P3 scope disclosure (read-only reuse): on an off-pathway
+        close, append out_of_pathway.SCOPE_NOTE once. The pathway
+        check reuses conclusion.chief_matches_pathway over the
+        recorded chief value + evidence; a missing chief never
+        triggers the note."""
+        try:
+            from .conclusion import chief_matches_pathway
+            from .out_of_pathway import SCOPE_NOTE
+        except Exception:
+            return
+        if SCOPE_NOTE in reply.message:
+            return
+        chief_fact = state.facts.get("chief_complaint")
+        chief = ""
+        if chief_fact is not None:
+            if chief_fact.value is not None:
+                chief += str(chief_fact.value)
+            if chief_fact.evidence:
+                chief += " " + str(chief_fact.evidence)
+        chief = chief.strip()
+        if not chief or chief_matches_pathway(chief):
+            return
+        reply.message += SCOPE_NOTE
+
     def _speak_close_line(self, state: CaseState, reply: AgentReply) -> None:
         """Say the disposition out loud on a user-confirmed close.
 
@@ -3257,22 +3500,11 @@ class ConsultationEngine(
             # goal_response, so that goal class is still answered only
             # by the batch-A sentence above, never twice. A missing or
             # malformed worry/goal field degrades to no append, never
-            # to a broken close line.
-            extra = ""
-            try:
-                worry = sheet.get("worry") or {}
-                worry_response = (
-                    worry.get("response") if isinstance(worry, dict) else None
-                )
-                goal_response = sheet.get("goal_response")
-                for piece in (worry_response, goal_response):
-                    if isinstance(piece, str) and piece.strip():
-                        piece = piece.strip()
-                        if not piece.endswith(("。", "！", "？")):
-                            piece += "。"
-                        extra += piece
-            except Exception:
-                extra = ""
+            # to a broken close line. The rule lives in
+            # _sheet_worry_goal_text (shared with the urgent path);
+            # this call site keeps the original byte layout (extra
+            # before the boilerplate).
+            extra = self._sheet_worry_goal_text(sheet)
             # Batch C (CLOSE-COPY): a confirmed close whose sheet is
             # urgent_today also speaks the level direct answer, so the
             # chat stream alone answers "要不要马上去急诊". This is
@@ -3290,7 +3522,14 @@ class ConsultationEngine(
                     disposition.get("window_hours") or 24,
                     disposition=disposition,
                 )
-            reply.message = line + direct + sentence + extra + reply.message
+            # P2 goal parts: the addressed check runs against the
+            # close text *without* the worry/goal extra — the
+            # goal_response quote must not count as its own answer.
+            original = reply.message
+            visible = line + direct + sentence + original
+            reply.message = line + direct + sentence + extra + original
+            self._append_unaddressed_goals(state, reply, sheet, visible)
+            self._append_uncertainty_note(reply, sheet)
 
     @staticmethod
     def _self_check_block_reason(state):

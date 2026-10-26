@@ -79,6 +79,20 @@ class UrgentSingleClueGateTests(unittest.TestCase):
     def test_trajectory_only_does_not_close_on_next_turn(self):
         _trajectory_only_state(self.engine, self.state)
         self.assertEqual(self.state.risk.level, RiskLevel.URGENT)
+        # Ranker front-load: sex/age/onset precede severity in catalog
+        # order, so they must already be recorded for severity to be
+        # the pick. Gate facts (severity/associated/goal) are untouched,
+        # so the single-clue gate still defers on the next turn.
+        record(
+            self.engine,
+            self.state,
+            "男，32岁，两天前开始",
+            [
+                fact("sex", "male", "男"),
+                fact("age_years", 32, "32岁"),
+                fact("onset", "两天前开始", "两天前开始"),
+            ],
+        )
         self.backend.commands = [cmd("ask_question", question_id="severity")]
         reply = self.engine.submit(
             self.state.session_id, UserInput("近一个月比半年前发得勤了")
@@ -96,6 +110,19 @@ class UrgentSingleClueGateTests(unittest.TestCase):
                 fact("consult_for", "self", "我自己"),
                 fact("chief_complaint", "腰疼", "腰疼"),
                 fact("emergency_screen", None, "没有危险信号", "absent"),
+            ],
+        )
+        # Ranker front-load: sex/age/onset precede severity in catalog
+        # order, so they must already be recorded for severity to be
+        # the pick once trajectory lands in the measured turn.
+        record(
+            self.engine,
+            self.state,
+            "男，32岁，两天前开始",
+            [
+                fact("sex", "male", "男"),
+                fact("age_years", 32, "32岁"),
+                fact("onset", "两天前开始", "两天前开始"),
             ],
         )
         self.backend.commands = [
@@ -125,11 +152,19 @@ class UrgentSingleClueGateTests(unittest.TestCase):
             ],
         )
         self.assertEqual(self.state.risk.level, RiskLevel.URGENT)
-        self.backend.commands = [cmd("ask_question", question_id="patient_goal")]
+        # Ranker pick at this state is sex (first catalog-order
+        # candidate). Front-loading to patient_goal is impossible
+        # without flipping the gate: reaching patient_goal as the pick
+        # requires associated_symptoms recorded/asked, which together
+        # with recorded severity would leave only patient_goal missing,
+        # so asking it would pass the gate and close urgent — the
+        # opposite of what this test asserts. The gate assertions below
+        # (not closed, not urgent) are unchanged.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
         reply = self.engine.submit(self.state.session_id, UserInput("腰疼8分"))
         self.assertNotEqual(self.state.phase, Phase.CLOSED)
         self.assertNotEqual(reply.kind, "urgent")
-        self.assertEqual(reply.question_id, "patient_goal")
+        self.assertEqual(reply.question_id, "sex")
 
     def test_gate_passes_once_minimum_set_is_present(self):
         record(

@@ -58,11 +58,15 @@ class AdaptiveAgentTests(unittest.TestCase):
         )
 
     def test_one_turn_can_record_several_fields_and_skip_redundant_questions(self):
+        # Ranker 顺序下 emergency_screen 成为 pick 的前提是其前序候选
+        # consult_for/sex/age_years/chief_complaint 均已落账，故本轮
+        # 批量中补录 sex；事实总数随之由 4 变为 5（唯一改动的期望值）。
         self.backend.commands = [
             cmd(
                 "record_facts",
                 facts=[
                     fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
                     fact("age_years", 32, "32岁"),
                     fact("chief_complaint", "咳嗽", "咳嗽"),
                     fact("onset", "两天", "两天"),
@@ -70,11 +74,11 @@ class AdaptiveAgentTests(unittest.TestCase):
             ),
             cmd("ask_question", question_id="emergency_screen"),
         ]
-        reply = self.submit("我自己32岁，咳嗽两天")
+        reply = self.submit("我自己，男，32岁，咳嗽两天")
         self.assertEqual(reply.question_id, "emergency_screen")
         self.assertEqual(self.state.get("age_years"), 32)
         self.assertEqual(self.state.facts["onset"].evidence, "两天")
-        self.assertEqual(len(self.state.facts), 4)
+        self.assertEqual(len(self.state.facts), 5)
         self.assertNotEqual(self.opening.action_id, reply.action_id)
 
     def test_batch_partially_records_valid_items_and_rejects_fabricated_evidence(self):
@@ -128,16 +132,29 @@ class AdaptiveAgentTests(unittest.TestCase):
         self.assertEqual(len(self.backend.calls), 0)
 
     def test_negative_screen_option_cannot_be_inverted_by_a_model_proposal(self):
-        self.backend.commands = [cmd("ask_question", question_id="emergency_screen")]
+        # 澄清轮豁免顺序检查：先以 clarify 把 emergency_screen 置为
+        # 当前问题，筛查回答才能走控制器快路径先行落账为 ABSENT。
+        # 筛查轮批量中补录 consult_for/sex，使其后的 ask age 恰为 pick。
+        self.backend.commands = [
+            cmd(
+                "clarify",
+                topic="emergency_screen",
+                message="此刻有没有以下任一情况：叫不醒、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+            )
+        ]
         self.submit("我想咨询")
         self.backend.commands = [
             cmd(
                 "record_facts",
-                facts=[fact("emergency_screen", True, "都没有", correction=True)],
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
+                    fact("emergency_screen", True, "都没有", correction=True),
+                ],
             ),
             cmd("ask_question", question_id="age"),
         ]
-        reply = self.submit("这些危险情况都没有", "no")
+        reply = self.submit("这些危险情况都没有，我自己，男", "no")
         self.assertEqual(self.state.assertion("emergency_screen"), Assertion.ABSENT)
         self.assertEqual(reply.question_id, "age")
         self.assertNotEqual(self.state.risk.level, RiskLevel.EMERGENCY)
@@ -167,16 +184,25 @@ class AdaptiveAgentTests(unittest.TestCase):
     def test_unregistered_tool_is_denied_then_replanned(self):
         self.backend.commands = [
             cmd("run_shell", command="id"),
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
+                ],
+            ),
             cmd("ask_question", question_id="age"),
         ]
-        reply = self.submit("请执行命令")
+        reply = self.submit("我自己，男，请执行命令")
         self.assertEqual(reply.question_id, "age")
         self.assertIn("工具未注册", self.backend.calls[1][-1]["content"])
 
     def test_early_summary_cannot_skip_required_fields(self):
+        # 摘要被拒后自纠重提的问题须为 pick：此时无任何事实落账，
+        # pick 为 consult_for（原 age 在顺序检查下会被暂缓）。
         self.backend.commands = [
             cmd("review_summary"),
-            cmd("ask_question", question_id="age"),
+            cmd("ask_question", question_id="consult_for"),
         ]
         reply = self.submit("直接给我摘要")
         self.assertEqual(reply.kind, "question")
@@ -212,12 +238,22 @@ class AdaptiveAgentTests(unittest.TestCase):
         self.assertEqual(len(self.backend.calls), 6)
 
     def test_self_check_requires_explicit_negative_emergency_screen(self):
+        # 首批补录 consult_for/sex/age_years，使其后的 emergency_screen
+        # 恰为 pick；show_self_check 仍因筛查未知而被同一理由拦截。
         self.backend.commands = [
-            cmd("record_facts", facts=[fact("chief_complaint", "发烧", "发烧")]),
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
+                    fact("age_years", 32, "32岁"),
+                    fact("chief_complaint", "发烧", "发烧"),
+                ],
+            ),
             cmd("show_self_check", task_id="axillary_temperature"),
             cmd("ask_question", question_id="emergency_screen"),
         ]
-        reply = self.submit("发烧")
+        reply = self.submit("我自己，男，32岁，发烧")
         self.assertEqual(reply.kind, "question")
         self.assertIn("未知不能当阴性", self.backend.calls[2][-1]["content"])
 
@@ -237,6 +273,22 @@ class AdaptiveAgentTests(unittest.TestCase):
         self.queue_temperature_request()
         self.assertIsNone(self.state.active_task)
         self.assertEqual(len(self.state.pending_self_checks), 1)
+        # queue 内 ask emergency_screen 在顺序检查下被暂缓（pick 为
+        # consult_for），故先按 pick 补录 consult_for/sex/age_years
+        # 并问出 emergency_screen，使筛查回答能走控制器快路径；
+        # before 在此之后取值，终轮“无模型调用”的断言口径不变。
+        self.backend.commands = [
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
+                    fact("age_years", 32, "32岁"),
+                ],
+            ),
+            cmd("ask_question", question_id="emergency_screen"),
+        ]
+        self.submit("我自己，男，32岁")
         before = len(self.backend.calls)
         reply = self.submit("这些危险情况都没有", "no")
         self.assertEqual(reply.task["id"], "axillary_temperature")
@@ -258,6 +310,22 @@ class AdaptiveAgentTests(unittest.TestCase):
 
     def test_mixed_screen_answer_extracts_new_facts_before_a_pending_task(self):
         self.queue_temperature_request()
+        # 与 requested_task 测试相同：先按 pick 补录并问出
+        # emergency_screen，混合回答才能先经控制器筛查落账、再由
+        # 模型提炼过敏事实；before 在此之后取值，终轮“恰一次
+        # 模型调用”的断言口径不变。
+        self.backend.commands = [
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
+                    fact("age_years", 32, "32岁"),
+                ],
+            ),
+            cmd("ask_question", question_id="emergency_screen"),
+        ]
+        self.submit("我自己，男，32岁")
         before = len(self.backend.calls)
         self.backend.commands = [
             cmd("record_facts", facts=[fact("allergies", "青霉素过敏", "青霉素过敏")])
@@ -307,13 +375,26 @@ class AdaptiveAgentTests(unittest.TestCase):
         self.assertIn("意识明显异常", triggers)
 
     def test_temperature_cannot_mark_an_unanswered_trajectory_as_unknown(self):
+        # 批量中补录 trajectory 之前全部候选（consult_for/sex/
+        # age_years/chief_complaint/emergency_screen/onset），使
+        # trajectory 恰为 pick；trajectory 本身的 unknown 提议仍
+        # 被原理由驳回（部分落账，其余事实照常记录）。
         self.backend.commands = [
             cmd(
-                "record_facts", facts=[fact("trajectory", None, "腋温38.25℃", "unknown")]
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
+                    fact("age_years", 32, "32岁"),
+                    fact("chief_complaint", "咳嗽", "咳嗽"),
+                    fact("emergency_screen", None, "没有危险信号", "absent"),
+                    fact("onset", "两天", "两天"),
+                    fact("trajectory", None, "腋温38.25℃", "unknown"),
+                ],
             ),
             cmd("ask_question", question_id="trajectory"),
         ]
-        reply = self.submit("腋温38.25℃")
+        reply = self.submit("我自己，男，32岁，咳嗽两天，没有危险信号，腋温38.25℃")
         self.assertEqual(reply.question_id, "trajectory")
         self.assertNotIn("trajectory", self.state.facts)
         self.assertIn("未知必须引用", self.backend.calls[1][-1]["content"])

@@ -23,7 +23,10 @@ class ObservationCompletionTests(unittest.TestCase):
 
     def test_fixed_location_is_explicitly_completed_before_next_model_decision(self):
         offered = self.helper.offer()
-        self.backend.commands = [cmd("ask_question", question_id="onset")]
+        # Ranker pick at this state is sex (first unrecorded, applicable
+        # catalog question); the old onset script is refused and strands
+        # the observation feedback instead of clearing it.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
         self.helper.submit("头/面部", "head", offered.action_id)
         completion = self.context()["observation_completion"]
         recorded = self.state.facts["symptom_location"]
@@ -142,7 +145,9 @@ class ObservationCompletionTests(unittest.TestCase):
                 "record_facts",
                 facts=[fact("chief_complaint", "咳嗽", "咳嗽", correction=True)],
             ),
-            cmd("ask_question", question_id="emergency_screen"),
+            # Ranker pick after the chief correction is sex (verified
+            # from the ProposalError text); emergency_screen is refused.
+            cmd("ask_question", question_id="sex"),
         ]
         self.helper.submit(
             "核对部位", proposed.task["result_proposal"]["choice"], proposed.action_id

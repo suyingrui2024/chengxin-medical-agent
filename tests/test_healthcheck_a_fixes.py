@@ -350,11 +350,14 @@ class WriteCapCorrectionTests(unittest.TestCase):
             cmd("record_facts", facts=[fact("age_years", 32, "32岁")]),
             cmd("record_facts", facts=[fact("consult_for", "self", "我自己")]),
             cmd("record_facts", facts=[fact("chief_complaint", "腹痛", "腹痛")]),
-            cmd("ask_question", question_id="emergency_screen"),
+            # Ranker pick at this state is sex (first catalog-order
+            # candidate after age/consult land and the chief write is
+            # capped); the cap assertion below is unchanged.
+            cmd("ask_question", question_id="sex"),
         ]
         reply = engine.submit(state.session_id, UserInput("我自己32岁腹痛"))
         self.assertNotIn("chief_complaint", state.facts)
-        self.assertEqual(reply.question_id, "emergency_screen")
+        self.assertEqual(reply.question_id, "sex")
 
     def test_mixed_correction_plus_new_key_is_still_capped(self):
         backend = ScriptBackend()

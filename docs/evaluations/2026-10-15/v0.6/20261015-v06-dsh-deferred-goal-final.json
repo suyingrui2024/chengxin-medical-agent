@@ -1,17 +1,18 @@
 {
-  "backend": "dsh",
+  "backend": "scripted",
   "layout": "optimized",
-  "model": "deepseek-flash",
-  "prompt_sha256": "1eded3197c0ac5154c0fec87e9d5f52efca5e3a677501af60516656ca069b393",
-  "prefix_sha256": "85b39d53d6ded5cb7dc754051b6229cd63be14d1f89aeb7d2a1061572f7ace5c",
+  "model": "scripted-synthetic",
+  "prompt_sha256": "bf02ec77e2f5e124af2ebb750c9d557b15eb9065d0ca44254e0498f851a92e2d",
+  "prefix_sha256": "1d897b51ac21abb70e5082efd5a13ac63837436e0f65ec90d61d9d596ea07d8f",
   "synthetic_only": true,
-  "maximum_calls": 26,
+  "maximum_calls": 30,
   "requested_case_ids": [
     "full_interview"
   ],
   "cases": [
     {
       "id": "full_interview",
+      "recovery_attempts": 0,
       "passed": false,
       "checks": {
         "summary_confirmed": false,
@@ -21,293 +22,224 @@
         "no_excessive_repetition": true,
         "age_corrected": true,
         "same_reading_after_correction": true,
-        "request_audited": true
+        "request_audited": true,
+        "additional_symptom_collected": true
       },
       "model_outputs": [
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"consult_for\",\"value\":\"self\",\"assertion\":\"present\",\"evidence\":\"我自己32岁\",\"correction\":false},{\"key\":\"age_years\",\"value\":32,\"assertion\":\"present\",\"evidence\":\"32岁\",\"correction\":false},{\"key\":\"chief_complaint\",\"value\":\"咳嗽发烧两天\",\"assertion\":\"present\",\"evidence\":\"咳嗽发烧两天\",\"correction\":false},{\"key\":\"onset\",\"value\":\"两天前\",\"assertion\":\"present\",\"evidence\":\"两天\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 4626,
-            "prompt_cache_hit_tokens": 768,
-            "prompt_cache_miss_tokens": 3858,
-            "completion_tokens": 115,
-            "total_tokens": 4741
-          },
-          "duration_ms": 1511,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"chief_complaint\", \"value\": \"咳嗽发烧两天\", \"assertion\": \"present\", \"evidence\": \"咳嗽发烧两天\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"request_self_check\",\"arguments\":{\"task_id\":\"axillary_temperature\",\"evidence\":\"家里有数字体温计，想按图测一下腋温\"}}",
-          "usage": {
-            "prompt_tokens": 5486,
-            "prompt_cache_hit_tokens": 4608,
-            "prompt_cache_miss_tokens": 878,
-            "completion_tokens": 35,
-            "total_tokens": 5521
-          },
-          "duration_ms": 1724,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"consult_for\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"emergency_screen\"}}",
-          "usage": {
-            "prompt_tokens": 6289,
-            "prompt_cache_hit_tokens": 5376,
-            "prompt_cache_miss_tokens": 913,
-            "completion_tokens": 18,
-            "total_tokens": 6307
-          },
-          "duration_ms": 1168,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"consult_for\", \"value\": \"self\", \"assertion\": \"present\", \"evidence\": \"我自己\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"resp_breathing\"}}",
-          "usage": {
-            "prompt_tokens": 4981,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1013,
-            "completion_tokens": 18,
-            "total_tokens": 4999
-          },
-          "duration_ms": 1151,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"sex\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"age_years\",\"value\":40,\"assertion\":\"present\",\"correction\":true,\"evidence\":\"40岁\"}]}}",
-          "usage": {
-            "prompt_tokens": 5033,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1065,
-            "completion_tokens": 39,
-            "total_tokens": 5072
-          },
-          "duration_ms": 1079,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"sex\", \"value\": \"male\", \"assertion\": \"present\", \"evidence\": \"男\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"resp_breathing\"}}",
-          "usage": {
-            "prompt_tokens": 5976,
-            "prompt_cache_hit_tokens": 4992,
-            "prompt_cache_miss_tokens": 984,
-            "completion_tokens": 18,
-            "total_tokens": 5994
-          },
-          "duration_ms": 1296,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"age\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"resp_breathing\",\"value\":\"没有气促，能完整说话\",\"assertion\":\"present\",\"evidence\":\"没有气促，能完整说话\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 5106,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1138,
-            "completion_tokens": 50,
-            "total_tokens": 5156
-          },
-          "duration_ms": 1071,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"age_years\", \"value\": 32, \"assertion\": \"present\", \"evidence\": \"32岁\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"resp_cough_details\"}}",
-          "usage": {
-            "prompt_tokens": 6172,
-            "prompt_cache_hit_tokens": 4992,
-            "prompt_cache_miss_tokens": 1180,
-            "completion_tokens": 18,
-            "total_tokens": 6190
-          },
-          "duration_ms": 1249,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"emergency_screen\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"resp_cough_details\",\"value\":\"干咳，没有咳血\",\"assertion\":\"present\",\"evidence\":\"干咳，没有咳血\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 5202,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1234,
-            "completion_tokens": 48,
-            "total_tokens": 5250
-          },
-          "duration_ms": 1337,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"reported_temperature\", \"value\": \"腋温38.2℃\", \"assertion\": \"present\", \"evidence\": \"腋温38.2℃\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"trajectory\"}}",
-          "usage": {
-            "prompt_tokens": 6360,
-            "prompt_cache_hit_tokens": 5120,
-            "prompt_cache_miss_tokens": 1240,
-            "completion_tokens": 17,
-            "total_tokens": 6377
-          },
-          "duration_ms": 1184,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"onset\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"trajectory\",\"value\":\"stable\",\"assertion\":\"present\",\"evidence\":\"变化不大\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 5274,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1306,
-            "completion_tokens": 38,
-            "total_tokens": 5312
-          },
-          "duration_ms": 1398,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"onset\", \"value\": \"两天前逐渐开始\", \"assertion\": \"present\", \"evidence\": \"两天前逐渐开始\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"severity\"}}",
-          "usage": {
-            "prompt_tokens": 6486,
-            "prompt_cache_hit_tokens": 5248,
-            "prompt_cache_miss_tokens": 1238,
-            "completion_tokens": 16,
-            "total_tokens": 6502
-          },
-          "duration_ms": 1262,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"trajectory\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"severity\",\"value\":3,\"assertion\":\"present\",\"evidence\":\"不适程度3分\",\"correction\":false},{\"key\":\"associated_symptoms\",\"value\":\"能正常活动\",\"assertion\":\"present\",\"evidence\":\"能正常活动\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 5370,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1402,
-            "completion_tokens": 67,
-            "total_tokens": 5437
-          },
-          "duration_ms": 1307,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"trajectory\", \"value\": \"stable\", \"assertion\": \"present\", \"evidence\": \"变化不大\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"inspect_case\",\"arguments\":{}}",
-          "usage": {
-            "prompt_tokens": 6746,
-            "prompt_cache_hit_tokens": 5248,
-            "prompt_cache_miss_tokens": 1498,
-            "completion_tokens": 11,
-            "total_tokens": 6757
-          },
-          "duration_ms": 1252,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"severity\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"resp_intake\"}}",
-          "usage": {
-            "prompt_tokens": 8045,
-            "prompt_cache_hit_tokens": 6656,
-            "prompt_cache_miss_tokens": 1389,
-            "completion_tokens": 17,
-            "total_tokens": 8062
-          },
-          "duration_ms": 1107,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"severity\", \"value\": 3, \"assertion\": \"present\", \"evidence\": \"不适程度3分\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"resp_intake\",\"value\":\"能正常喝水吃饭，排尿正常\",\"assertion\":\"present\",\"evidence\":\"能正常喝水吃饭，排尿正常\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 5408,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1440,
-            "completion_tokens": 49,
-            "total_tokens": 5457
-          },
-          "duration_ms": 1345,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"associated_symptoms\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"medications_taken\"}}",
-          "usage": {
-            "prompt_tokens": 6776,
-            "prompt_cache_hit_tokens": 5376,
-            "prompt_cache_miss_tokens": 1400,
-            "completion_tokens": 18,
-            "total_tokens": 6794
-          },
-          "duration_ms": 1134,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"associated_symptoms\", \"value\": \"喉咙痛\", \"assertion\": \"present\", \"evidence\": \"喉咙痛\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"medications_taken\",\"value\":null,\"assertion\":\"absent\",\"evidence\":\"没有用药\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 5431,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1463,
-            "completion_tokens": 39,
-            "total_tokens": 5470
-          },
-          "duration_ms": 1163,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"resp_breathing\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"allergies\"}}",
-          "usage": {
-            "prompt_tokens": 6796,
-            "prompt_cache_hit_tokens": 5376,
-            "prompt_cache_miss_tokens": 1420,
-            "completion_tokens": 16,
-            "total_tokens": 6812
-          },
-          "duration_ms": 1318,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"resp_breathing\", \"value\": \"没有气促，能完整说话\", \"assertion\": \"present\", \"evidence\": \"与本轮无关的症状描述\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"record_facts\",\"arguments\":{\"facts\":[{\"key\":\"allergies\",\"value\":null,\"assertion\":\"unknown\",\"evidence\":\"药物过敏史不知道\",\"correction\":false}]}}",
-          "usage": {
-            "prompt_tokens": 5443,
-            "prompt_cache_hit_tokens": 3968,
-            "prompt_cache_miss_tokens": 1475,
-            "completion_tokens": 39,
-            "total_tokens": 5482
-          },
-          "duration_ms": 1342,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"resp_breathing\", \"value\": \"没有气促，能完整说话\", \"assertion\": \"present\", \"evidence\": \"没有气促，能完整说话\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
-          "content": "{\"tool\":\"ask_question\",\"arguments\":{\"question_id\":\"relevant_history\"}}",
-          "usage": {
-            "prompt_tokens": 6824,
-            "prompt_cache_hit_tokens": 5376,
-            "prompt_cache_miss_tokens": 1448,
-            "completion_tokens": 16,
-            "total_tokens": 6840
-          },
-          "duration_ms": 1380,
-          "model": null,
-          "finish_reason": null
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"resp_cough_details\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"resp_cough_details\", \"value\": \"干咳，没有咳血\", \"assertion\": \"present\", \"evidence\": \"干咳，没有咳血\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"resp_intake\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"resp_intake\", \"value\": \"能正常喝水吃饭，排尿正常\", \"assertion\": \"present\", \"evidence\": \"能正常喝水吃饭，排尿正常\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"medications_taken\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"medications_taken\", \"value\": null, \"assertion\": \"absent\", \"evidence\": \"没有用药\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"allergies\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"record_facts\", \"arguments\": {\"facts\": [{\"key\": \"allergies\", \"value\": null, \"assertion\": \"unknown\", \"evidence\": \"药物过敏史不知道\", \"correction\": false}]}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
+        },
+        {
+          "content": "{\"tool\": \"ask_question\", \"arguments\": {\"question_id\": \"relevant_history\"}}",
+          "usage": {},
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         },
         {
           "content": "",
           "usage": {},
-          "duration_ms": 10859,
-          "model": null,
-          "finish_reason": null
+          "duration_ms": 0,
+          "model": "scripted-synthetic",
+          "finish_reason": "stop"
         }
       ],
       "backend_errors": [
         {
-          "error_type": "JSONDecodeError",
+          "error_type": "ValueError",
           "status_code": null
         }
       ],
@@ -315,7 +247,225 @@
         {
           "input": "我自己32岁，咳嗽发烧两天。家里有数字体温计，想按图测一下腋温。",
           "reply": {
-            "message": "此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+            "message": "你说咳嗽发烧两天，再问一句：先确认一下：这次是为谁咨询？",
+            "phase": "opening",
+            "kind": "question",
+            "question_id": "consult_for",
+            "quick_replies": [
+              {
+                "label": "我自己",
+                "value": "self"
+              },
+              {
+                "label": "孩子",
+                "value": "child"
+              },
+              {
+                "label": "其他家人",
+                "value": "other_adult"
+              }
+            ],
+            "task": null,
+            "summary": null,
+            "developer_trace": {
+              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
+            },
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:2",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:2",
+                  "type": "message",
+                  "data": {
+                    "text": "你说咳嗽发烧两天，再问一句：先确认一下：这次是为谁咨询？",
+                    "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:2",
+                  "type": "question",
+                  "data": {
+                    "question_id": "consult_for",
+                    "prompt": "你说咳嗽发烧两天，再问一句：先确认一下：这次是为谁咨询？",
+                    "canonical": false,
+                    "input_kind": "choice",
+                    "choices": [
+                      {
+                        "label": "我自己",
+                        "value": "self"
+                      },
+                      {
+                        "label": "孩子",
+                        "value": "child"
+                      },
+                      {
+                        "label": "其他家人",
+                        "value": "other_adult"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "input": "我自己",
+          "reply": {
+            "message": "你说咳嗽发烧两天，再问一句：请问是男是女？",
+            "phase": "opening",
+            "kind": "question",
+            "question_id": "sex",
+            "quick_replies": [
+              {
+                "label": "男",
+                "value": "male"
+              },
+              {
+                "label": "女",
+                "value": "female"
+              }
+            ],
+            "task": null,
+            "summary": null,
+            "developer_trace": {
+              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
+            },
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:3",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:3",
+                  "type": "message",
+                  "data": {
+                    "text": "你说咳嗽发烧两天，再问一句：请问是男是女？",
+                    "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:3",
+                  "type": "question",
+                  "data": {
+                    "question_id": "sex",
+                    "prompt": "你说咳嗽发烧两天，再问一句：请问是男是女？",
+                    "canonical": false,
+                    "input_kind": "choice",
+                    "choices": [
+                      {
+                        "label": "男",
+                        "value": "male"
+                      },
+                      {
+                        "label": "女",
+                        "value": "female"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "input": "男",
+          "reply": {
+            "message": "你说咳嗽发烧两天，再问一句：你多大？可直接写年龄，例如 32 岁。",
+            "phase": "opening",
+            "kind": "question",
+            "question_id": "age",
+            "quick_replies": [],
+            "task": null,
+            "summary": null,
+            "developer_trace": {
+              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
+            },
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:4",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:4",
+                  "type": "message",
+                  "data": {
+                    "text": "你说咳嗽发烧两天，再问一句：你多大？可直接写年龄，例如 32 岁。",
+                    "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:4",
+                  "type": "question",
+                  "data": {
+                    "question_id": "age",
+                    "prompt": "你说咳嗽发烧两天，再问一句：你多大？可直接写年龄，例如 32 岁。",
+                    "canonical": false,
+                    "input_kind": "age",
+                    "choices": []
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "input": "32岁",
+          "reply": {
+            "message": "你说咳嗽发烧两天，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
             "phase": "emergency_screen",
             "kind": "question",
             "question_id": "emergency_screen",
@@ -337,18 +487,60 @@
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              },
+              "transition_id": "11bd2d3f-f7ac-474d-965e-9b4189f8d01b"
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:2",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:5",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:2",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:5",
                   "type": "message",
                   "data": {
-                    "text": "此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+                    "text": "你说咳嗽发烧两天，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:5",
+                  "type": "question",
+                  "data": {
+                    "question_id": "emergency_screen",
+                    "prompt": "你说咳嗽发烧两天，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？",
+                    "canonical": false,
+                    "input_kind": "yes_no_unknown",
+                    "choices": [
+                      {
+                        "label": "有任一项",
+                        "value": "yes"
+                      },
+                      {
+                        "label": "都没有",
+                        "value": "no"
+                      },
+                      {
+                        "label": "不确定",
+                        "value": "unknown"
+                      }
+                    ]
                   }
                 }
               ]
@@ -380,7 +572,34 @@
               "id": "axillary_temperature",
               "result_key": "temperature_c",
               "input_kind": "temperature",
+              "repeatable": true,
+              "repeat_phrases": [
+                "想重新测量",
+                "想重新测温",
+                "再测一次腋温",
+                "想再测腋温",
+                "重新测腋温",
+                "重新测体温",
+                "再量一次体温",
+                "刚刚又测了一次腋温"
+              ],
               "invalidate_on": [],
+              "request_phrases": [
+                "想按图测一下腋温",
+                "想按图测温",
+                "想测腋温",
+                "想测体温",
+                "想量体温"
+              ],
+              "cancel_phrases": [
+                "取消测温",
+                "先不测体温",
+                "不想测体温",
+                "不测腋温了",
+                "先不测腋温",
+                "暂时不测体温",
+                "不想按图测一下腋温"
+              ],
               "title": "测一次腋下体温",
               "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
               "applies_when": {
@@ -395,11 +614,11 @@
               "equipment": [
                 "可正常使用的数字体温计"
               ],
-              "asset": "/temperature.svg",
+              "asset": "/neutral-temperature.svg",
               "step_assets": [
-                "/temperature.svg#step-1",
-                "/temperature.svg#step-2",
-                "/temperature.svg#step-3"
+                "/neutral-temperature.svg#step-1",
+                "/neutral-temperature.svg#step-2",
+                "/neutral-temperature.svg#step-3"
               ],
               "steps": [
                 "先阅读体温计说明书；擦干腋窝。",
@@ -434,19 +653,34 @@
               "review_status": "prototype_requires_clinical_review",
               "provider": {
                 "id": "observe.temperature",
-                "version": "0.3.0"
-              }
+                "version": "0.7.0"
+              },
+              "interaction_id": "offer:a073deed-a388-47e7-8ca1-2e26c2b6c158"
             },
             "summary": null,
             "developer_trace": {
-              "reason": "主诉符合固定任务的适用条件；任务结果保留自述来源"
+              "reason": "主诉符合固定任务的适用条件；任务结果保留自述来源",
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              },
+              "transition_id": "aac8fd6d-b18c-4450-b7ce-061378a34fda"
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:3",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:6",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:3",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:6",
                   "type": "message",
                   "data": {
                     "text": "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。",
@@ -454,13 +688,40 @@
                   }
                 },
                 {
-                  "id": "task:e0769340-cc83-416c-9dd0-36e369a112e1:3",
+                  "id": "task:c35f0100-6ee4-4a82-8648-402b043710b1:6",
                   "type": "self_check",
                   "data": {
                     "id": "axillary_temperature",
                     "result_key": "temperature_c",
                     "input_kind": "temperature",
+                    "repeatable": true,
+                    "repeat_phrases": [
+                      "想重新测量",
+                      "想重新测温",
+                      "再测一次腋温",
+                      "想再测腋温",
+                      "重新测腋温",
+                      "重新测体温",
+                      "再量一次体温",
+                      "刚刚又测了一次腋温"
+                    ],
                     "invalidate_on": [],
+                    "request_phrases": [
+                      "想按图测一下腋温",
+                      "想按图测温",
+                      "想测腋温",
+                      "想测体温",
+                      "想量体温"
+                    ],
+                    "cancel_phrases": [
+                      "取消测温",
+                      "先不测体温",
+                      "不想测体温",
+                      "不测腋温了",
+                      "先不测腋温",
+                      "暂时不测体温",
+                      "不想按图测一下腋温"
+                    ],
                     "title": "测一次腋下体温",
                     "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
                     "applies_when": {
@@ -475,11 +736,11 @@
                     "equipment": [
                       "可正常使用的数字体温计"
                     ],
-                    "asset": "/temperature.svg",
+                    "asset": "/neutral-temperature.svg",
                     "step_assets": [
-                      "/temperature.svg#step-1",
-                      "/temperature.svg#step-2",
-                      "/temperature.svg#step-3"
+                      "/neutral-temperature.svg#step-1",
+                      "/neutral-temperature.svg#step-2",
+                      "/neutral-temperature.svg#step-3"
                     ],
                     "steps": [
                       "先阅读体温计说明书；擦干腋窝。",
@@ -514,8 +775,9 @@
                     "review_status": "prototype_requires_clinical_review",
                     "provider": {
                       "id": "observe.temperature",
-                      "version": "0.3.0"
-                    }
+                      "version": "0.7.0"
+                    },
+                    "interaction_id": "offer:a073deed-a388-47e7-8ca1-2e26c2b6c158"
                   }
                 }
               ]
@@ -525,27 +787,109 @@
         {
           "input": "腋温38.2℃，刚刚测的",
           "reply": {
-            "message": "现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+            "message": "你说咳嗽发烧两天，再问一句：这个问题从什么时候开始？是突然出现，还是逐渐出现？",
             "phase": "history",
             "kind": "question",
-            "question_id": "resp_breathing",
+            "question_id": "onset",
             "quick_replies": [],
             "task": null,
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              },
+              "transition_id": "e729a9e4-af82-4d22-8e36-e5690d998af6"
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:4",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:7",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": {
+              "task_id": "axillary_temperature",
+              "key": "temperature_c",
+              "title": "腋温记录",
+              "unit": "℃",
+              "entries": [
+                {
+                  "id": "ea5c4ec8-6d22-4a72-b5b1-7582bf097ef1",
+                  "status": "recorded",
+                  "value": 38.2,
+                  "recorded_at": "2026-10-26T03:14:12.809076+00:00",
+                  "source": "patient",
+                  "quality": "not_assessed",
+                  "evidence": "腋温38.2℃",
+                  "current": true
+                }
+              ],
+              "total": 1,
+              "can_repeat": true,
+              "latest_status": "recorded",
+              "supplement": {
+                "text": "腋温38.2℃，刚刚测的",
+                "status": "forwarded"
+              }
+            },
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:4",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:7",
                   "type": "message",
                   "data": {
-                    "text": "现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+                    "text": "你说咳嗽发烧两天，再问一句：这个问题从什么时候开始？是突然出现，还是逐渐出现？",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:7",
+                  "type": "question",
+                  "data": {
+                    "question_id": "onset",
+                    "prompt": "你说咳嗽发烧两天，再问一句：这个问题从什么时候开始？是突然出现，还是逐渐出现？",
+                    "canonical": false,
+                    "input_kind": "text",
+                    "choices": []
+                  }
+                },
+                {
+                  "id": "observation:c35f0100-6ee4-4a82-8648-402b043710b1:7",
+                  "type": "observation_series",
+                  "data": {
+                    "task_id": "axillary_temperature",
+                    "key": "temperature_c",
+                    "title": "腋温记录",
+                    "unit": "℃",
+                    "entries": [
+                      {
+                        "id": "ea5c4ec8-6d22-4a72-b5b1-7582bf097ef1",
+                        "status": "recorded",
+                        "value": 38.2,
+                        "recorded_at": "2026-10-26T03:14:12.809076+00:00",
+                        "source": "patient",
+                        "quality": "not_assessed",
+                        "evidence": "腋温38.2℃",
+                        "current": true
+                      }
+                    ],
+                    "total": 1,
+                    "can_repeat": true,
+                    "latest_status": "recorded",
+                    "supplement": {
+                      "text": "腋温38.2℃，刚刚测的",
+                      "status": "forwarded"
+                    }
                   }
                 }
               ]
@@ -556,27 +900,55 @@
           "operation": "correct",
           "input": "40岁",
           "reply": {
-            "message": "现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+            "message": "你说咳嗽发烧两天，再问一句：这个问题从什么时候开始？是突然出现，还是逐渐出现？",
             "phase": "history",
             "kind": "question",
-            "question_id": "resp_breathing",
+            "question_id": "onset",
             "quick_replies": [],
             "task": null,
             "summary": null,
             "developer_trace": {
-              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "reason": "更正已由控制器写入，继续此前未回答的问题",
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:5",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:8",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:5",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:8",
                   "type": "message",
                   "data": {
-                    "text": "现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+                    "text": "你说咳嗽发烧两天，再问一句：这个问题从什么时候开始？是突然出现，还是逐渐出现？",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:8",
+                  "type": "question",
+                  "data": {
+                    "question_id": "onset",
+                    "prompt": "你说咳嗽发烧两天，再问一句：这个问题从什么时候开始？是突然出现，还是逐渐出现？",
+                    "canonical": false,
+                    "input_kind": "text",
+                    "choices": []
                   }
                 }
               ]
@@ -584,39 +956,9 @@
           }
         },
         {
-          "input": "没有气促，能完整说话",
+          "input": "两天前逐渐开始",
           "reply": {
-            "message": "如果有咳嗽，是干咳还是有痰？有没有咳血、胸痛，或夜间明显加重？没有咳嗽请直接说没有。",
-            "phase": "history",
-            "kind": "question",
-            "question_id": "resp_cough_details",
-            "quick_replies": [],
-            "task": null,
-            "summary": null,
-            "developer_trace": {
-              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
-            },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:6",
-            "presentation": {
-              "schema_version": "medical-ui/v1",
-              "blocks": [
-                {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:6",
-                  "type": "message",
-                  "data": {
-                    "text": "如果有咳嗽，是干咳还是有痰？有没有咳血、胸痛，或夜间明显加重？没有咳嗽请直接说没有。",
-                    "kind": "question"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "input": "干咳，没有咳血",
-          "reply": {
-            "message": "从开始到现在，总体是在加重、减轻，还是变化不大？",
+            "message": "你说咳嗽发烧两天，再问一句：从开始到现在，总体是在加重、减轻，还是变化不大？",
             "phase": "history",
             "kind": "question",
             "question_id": "trajectory",
@@ -642,18 +984,63 @@
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:7",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:9",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:7",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:9",
                   "type": "message",
                   "data": {
-                    "text": "从开始到现在，总体是在加重、减轻，还是变化不大？",
+                    "text": "你说咳嗽发烧两天，再问一句：从开始到现在，总体是在加重、减轻，还是变化不大？",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:9",
+                  "type": "question",
+                  "data": {
+                    "question_id": "trajectory",
+                    "prompt": "你说咳嗽发烧两天，再问一句：从开始到现在，总体是在加重、减轻，还是变化不大？",
+                    "canonical": false,
+                    "input_kind": "choice",
+                    "choices": [
+                      {
+                        "label": "在加重",
+                        "value": "worsening"
+                      },
+                      {
+                        "label": "在减轻",
+                        "value": "improving"
+                      },
+                      {
+                        "label": "变化不大",
+                        "value": "stable"
+                      },
+                      {
+                        "label": "说不清",
+                        "value": "unknown"
+                      }
+                    ]
                   }
                 }
               ]
@@ -663,7 +1050,7 @@
         {
           "input": "变化不大",
           "reply": {
-            "message": "如果 0 分是完全不影响，10 分是难以忍受，现在大约几分？也可以直接描述对吃饭、睡觉、活动的影响。",
+            "message": "从两天前逐渐开始到现在，再问一句：如果 0 分是完全不影响，10 分是难以忍受，现在大约几分？也可以直接描述对吃饭、睡觉、活动的影响。",
             "phase": "history",
             "kind": "question",
             "question_id": "severity",
@@ -672,18 +1059,46 @@
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:8",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:10",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:8",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:10",
                   "type": "message",
                   "data": {
-                    "text": "如果 0 分是完全不影响，10 分是难以忍受，现在大约几分？也可以直接描述对吃饭、睡觉、活动的影响。",
+                    "text": "从两天前逐渐开始到现在，再问一句：如果 0 分是完全不影响，10 分是难以忍受，现在大约几分？也可以直接描述对吃饭、睡觉、活动的影响。",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:10",
+                  "type": "question",
+                  "data": {
+                    "question_id": "severity",
+                    "prompt": "从两天前逐渐开始到现在，再问一句：如果 0 分是完全不影响，10 分是难以忍受，现在大约几分？也可以直接描述对吃饭、睡觉、活动的影响。",
+                    "canonical": false,
+                    "input_kind": "severity",
+                    "choices": []
                   }
                 }
               ]
@@ -693,7 +1108,181 @@
         {
           "input": "不适程度3分，能正常活动",
           "reply": {
-            "message": "现在能正常喝水、进食和排尿吗？如果明显减少，请描述大约到什么程度。",
+            "message": "从两天前逐渐开始到现在，再问一句：除了最主要的问题，还有哪些同时出现的不舒服？没有也请直接说没有。",
+            "phase": "history",
+            "kind": "question",
+            "question_id": "associated_symptoms",
+            "quick_replies": [],
+            "task": null,
+            "summary": null,
+            "developer_trace": {
+              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
+            },
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:11",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:11",
+                  "type": "message",
+                  "data": {
+                    "text": "从两天前逐渐开始到现在，再问一句：除了最主要的问题，还有哪些同时出现的不舒服？没有也请直接说没有。",
+                    "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:11",
+                  "type": "question",
+                  "data": {
+                    "question_id": "associated_symptoms",
+                    "prompt": "从两天前逐渐开始到现在，再问一句：除了最主要的问题，还有哪些同时出现的不舒服？没有也请直接说没有。",
+                    "canonical": false,
+                    "input_kind": "text_or_absent",
+                    "choices": []
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "input": "还有喉咙痛，没有其他不适",
+          "reply": {
+            "message": "你说咳嗽发烧两天，再细问一下这方面的情况：现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+            "phase": "history",
+            "kind": "question",
+            "question_id": "resp_breathing",
+            "quick_replies": [],
+            "task": null,
+            "summary": null,
+            "developer_trace": {
+              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "entry"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
+            },
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:12",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:12",
+                  "type": "message",
+                  "data": {
+                    "text": "你说咳嗽发烧两天，再细问一下这方面的情况：现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+                    "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:12",
+                  "type": "question",
+                  "data": {
+                    "question_id": "resp_breathing",
+                    "prompt": "你说咳嗽发烧两天，再细问一下这方面的情况：现在呼吸和平时相比怎样？请说清是否气短、喘、说完整句话是否费力，以及静坐时会不会也觉得呼吸困难。",
+                    "canonical": false,
+                    "input_kind": "text_or_absent",
+                    "choices": []
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "input": "没有气促，能完整说话",
+          "reply": {
+            "message": "你说咳嗽发烧两天，再细问一下这方面的情况：如果有咳嗽，是干咳还是有痰？有没有咳血、胸痛，或夜间明显加重？没有咳嗽请直接说没有。",
+            "phase": "history",
+            "kind": "question",
+            "question_id": "resp_cough_details",
+            "quick_replies": [],
+            "task": null,
+            "summary": null,
+            "developer_trace": {
+              "reason": "根据本轮证据与尚未处理的缺口选择下一问",
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "entry"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
+            },
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:13",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
+            "presentation": {
+              "schema_version": "medical-ui/v1",
+              "blocks": [
+                {
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:13",
+                  "type": "message",
+                  "data": {
+                    "text": "你说咳嗽发烧两天，再细问一下这方面的情况：如果有咳嗽，是干咳还是有痰？有没有咳血、胸痛，或夜间明显加重？没有咳嗽请直接说没有。",
+                    "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:13",
+                  "type": "question",
+                  "data": {
+                    "question_id": "resp_cough_details",
+                    "prompt": "你说咳嗽发烧两天，再细问一下这方面的情况：如果有咳嗽，是干咳还是有痰？有没有咳血、胸痛，或夜间明显加重？没有咳嗽请直接说没有。",
+                    "canonical": false,
+                    "input_kind": "text_or_absent",
+                    "choices": []
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "input": "干咳，没有咳血",
+          "reply": {
+            "message": "你说咳嗽发烧两天，再细问一下这方面的情况：现在能正常喝水、进食和排尿吗？如果明显减少，请描述大约到什么程度。",
             "phase": "history",
             "kind": "question",
             "question_id": "resp_intake",
@@ -702,18 +1291,46 @@
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "entry"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:9",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:14",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:9",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:14",
                   "type": "message",
                   "data": {
-                    "text": "现在能正常喝水、进食和排尿吗？如果明显减少，请描述大约到什么程度。",
+                    "text": "你说咳嗽发烧两天，再细问一下这方面的情况：现在能正常喝水、进食和排尿吗？如果明显减少，请描述大约到什么程度。",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:14",
+                  "type": "question",
+                  "data": {
+                    "question_id": "resp_intake",
+                    "prompt": "你说咳嗽发烧两天，再细问一下这方面的情况：现在能正常喝水、进食和排尿吗？如果明显减少，请描述大约到什么程度。",
+                    "canonical": false,
+                    "input_kind": "text",
+                    "choices": []
                   }
                 }
               ]
@@ -723,7 +1340,7 @@
         {
           "input": "能正常喝水吃饭，排尿正常",
           "reply": {
-            "message": "这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。",
+            "message": "你说咳嗽发烧两天，再问一句：这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。",
             "phase": "background",
             "kind": "question",
             "question_id": "medications_taken",
@@ -732,18 +1349,47 @@
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              },
+              "transition_id": "0334033a-48ff-455d-80db-fddce33648f4"
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:10",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:15",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:10",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:15",
                   "type": "message",
                   "data": {
-                    "text": "这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。",
+                    "text": "你说咳嗽发烧两天，再问一句：这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:15",
+                  "type": "question",
+                  "data": {
+                    "question_id": "medications_taken",
+                    "prompt": "你说咳嗽发烧两天，再问一句：这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。",
+                    "canonical": false,
+                    "input_kind": "text_or_absent",
+                    "choices": []
                   }
                 }
               ]
@@ -753,7 +1399,7 @@
         {
           "input": "没有用药",
           "reply": {
-            "message": "有没有已知的药物或食物过敏？不知道和没有需要分开说。",
+            "message": "从两天前逐渐开始到现在，再问一句：有没有已知的药物或食物过敏？不知道和没有需要分开说。",
             "phase": "background",
             "kind": "question",
             "question_id": "allergies",
@@ -762,18 +1408,46 @@
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:11",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:16",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:11",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:16",
                   "type": "message",
                   "data": {
-                    "text": "有没有已知的药物或食物过敏？不知道和没有需要分开说。",
+                    "text": "从两天前逐渐开始到现在，再问一句：有没有已知的药物或食物过敏？不知道和没有需要分开说。",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:16",
+                  "type": "question",
+                  "data": {
+                    "question_id": "allergies",
+                    "prompt": "从两天前逐渐开始到现在，再问一句：有没有已知的药物或食物过敏？不知道和没有需要分开说。",
+                    "canonical": false,
+                    "input_kind": "text_or_absent",
+                    "choices": []
                   }
                 }
               ]
@@ -783,7 +1457,7 @@
         {
           "input": "药物过敏史不知道",
           "reply": {
-            "message": "有没有正在治疗的疾病、近期手术，或其他可能影响这次情况的病史？没有请说没有。",
+            "message": "你说现在大约3分，再问一句：有没有正在治疗的疾病、近期手术，或其他可能影响这次情况的病史？没有请说没有。",
             "phase": "background",
             "kind": "question",
             "question_id": "relevant_history",
@@ -792,18 +1466,46 @@
             "summary": null,
             "developer_trace": {
               "reason": "根据本轮证据与尚未处理的缺口选择下一问",
-              "content_version": "2026-10-15.v1"
+              "content_version": "2026-10-25.v1",
+              "bridging": {
+                "applied": true,
+                "kind": "anchor"
+              },
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
             },
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:12",
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:17",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:12",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:17",
                   "type": "message",
                   "data": {
-                    "text": "有没有正在治疗的疾病、近期手术，或其他可能影响这次情况的病史？没有请说没有。",
+                    "text": "你说现在大约3分，再问一句：有没有正在治疗的疾病、近期手术，或其他可能影响这次情况的病史？没有请说没有。",
                     "kind": "question"
+                  }
+                },
+                {
+                  "id": "question:c35f0100-6ee4-4a82-8648-402b043710b1:17",
+                  "type": "question",
+                  "data": {
+                    "question_id": "relevant_history",
+                    "prompt": "你说现在大约3分，再问一句：有没有正在治疗的疾病、近期手术，或其他可能影响这次情况的病史？没有请说没有。",
+                    "canonical": false,
+                    "input_kind": "text_or_absent",
+                    "choices": []
                   }
                 }
               ]
@@ -825,13 +1527,27 @@
             ],
             "task": null,
             "summary": null,
-            "developer_trace": null,
-            "action_id": "e0769340-cc83-416c-9dd0-36e369a112e1:13",
+            "developer_trace": {
+              "publication": {
+                "status": "allowed",
+                "rule_ids": []
+              }
+            },
+            "action_id": "c35f0100-6ee4-4a82-8648-402b043710b1:18",
+            "input_error": false,
+            "calculation_input": null,
+            "calculation_result": null,
+            "observation_result": null,
+            "calculation_followup": null,
+            "follow_up": null,
+            "conclusion": null,
+            "subject_change": null,
+            "adaptive_question": null,
             "presentation": {
               "schema_version": "medical-ui/v1",
               "blocks": [
                 {
-                  "id": "message:e0769340-cc83-416c-9dd0-36e369a112e1:13",
+                  "id": "message:c35f0100-6ee4-4a82-8648-402b043710b1:18",
                   "type": "message",
                   "data": {
                     "text": "这一步的对话服务暂时不可用，已保存的内容会保留。请稍后重试，或先查看目前记录。",
@@ -844,67 +1560,83 @@
         }
       ],
       "state": {
-        "session_id": "e0769340-cc83-416c-9dd0-36e369a112e1",
+        "session_id": "c35f0100-6ee4-4a82-8648-402b043710b1",
+        "consultation_subject": {
+          "category": "self",
+          "label": "本人",
+          "reference": {
+            "attributes": [
+              "self",
+              "*",
+              "*"
+            ],
+            "label": "本人"
+          },
+          "evidence": "我自己",
+          "source_turn_id": "95091d83-3b1e-4edf-ba77-c62ee7992d28",
+          "scope": "reported_relationship_only"
+        },
         "phase": "background",
+        "committed_phase": "background",
         "facts": {
+          "chief_complaint": {
+            "key": "chief_complaint",
+            "value": "咳嗽发烧两天",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "933af2e7-a211-46c8-af8b-71664c60ad80",
+            "recorded_at": "2026-10-26T03:14:12.778863+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "4e9958e0-dfd2-4838-911f-cf6adb5ad882",
+            "evidence": "咳嗽发烧两天"
+          },
           "consult_for": {
             "key": "consult_for",
             "value": "self",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "cba0aa9f-ca98-4ca9-a615-57be77d4ed4c",
-            "recorded_at": "2026-10-15T14:04:23.338306+00:00",
+            "turn_id": "95091d83-3b1e-4edf-ba77-c62ee7992d28",
+            "recorded_at": "2026-10-26T03:14:12.785256+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "7624052e-5454-4063-9fc4-7e1a9356c315",
-            "evidence": "我自己32岁"
+            "fact_id": "2fd0d9dd-9a9e-4bb6-bf06-2620442c3b16",
+            "evidence": "我自己"
+          },
+          "sex": {
+            "key": "sex",
+            "value": "male",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "4bdd1ba6-d423-4fb6-96ad-f188bad35800",
+            "recorded_at": "2026-10-26T03:14:12.791034+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "051a2af9-9971-4eb7-b80b-fedea74d7aa8",
+            "evidence": "男"
           },
           "age_years": {
             "key": "age_years",
             "value": 40,
             "assertion": "present",
             "source": "patient",
-            "turn_id": "b036d9fd-7950-471c-b210-5cb81e6c2e0e",
-            "recorded_at": "2026-10-15T14:04:28.468552+00:00",
+            "turn_id": "7d690f33-31e2-4dc4-bb57-0c173c07d2a1",
+            "recorded_at": "2026-10-26T03:14:12.813591+00:00",
             "quality": "not_assessed",
-            "supersedes": "627175bb-a762-4b11-8699-5a5904f4d408",
-            "fact_id": "52638f14-0d0b-47e8-96f8-54e7d6bbbde7",
+            "supersedes": "28a818f0-aef1-4461-b0ef-dd383ebbebc4",
+            "fact_id": "dd7b1041-830a-4a71-a52c-ca4d96383156",
             "evidence": "40岁"
-          },
-          "chief_complaint": {
-            "key": "chief_complaint",
-            "value": "咳嗽发烧两天",
-            "assertion": "present",
-            "source": "patient",
-            "turn_id": "cba0aa9f-ca98-4ca9-a615-57be77d4ed4c",
-            "recorded_at": "2026-10-15T14:04:23.338486+00:00",
-            "quality": "not_assessed",
-            "supersedes": null,
-            "fact_id": "67b1fcef-89cd-4a4a-8d3d-0a4ba135bc18",
-            "evidence": "咳嗽发烧两天"
-          },
-          "onset": {
-            "key": "onset",
-            "value": "两天前",
-            "assertion": "present",
-            "source": "patient",
-            "turn_id": "cba0aa9f-ca98-4ca9-a615-57be77d4ed4c",
-            "recorded_at": "2026-10-15T14:04:23.338551+00:00",
-            "quality": "not_assessed",
-            "supersedes": null,
-            "fact_id": "c1920a22-b286-43e7-85c7-5292c014327f",
-            "evidence": "两天"
           },
           "emergency_screen": {
             "key": "emergency_screen",
             "value": null,
             "assertion": "absent",
             "source": "patient",
-            "turn_id": "ce35e029-7210-40d5-9f61-e8d7c77ed822",
-            "recorded_at": "2026-10-15T14:04:26.234112+00:00",
+            "turn_id": "f2805de0-eeb1-4ad3-8479-1a28e67a85d0",
+            "recorded_at": "2026-10-26T03:14:12.802811+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "8448f049-4541-4e2b-985d-4f9c163be945",
+            "fact_id": "d8f27cb5-5819-47e2-b4d9-c8d128427781",
             "evidence": "这些危险情况都没有"
           },
           "temperature_c": {
@@ -912,47 +1644,47 @@
             "value": 38.2,
             "assertion": "present",
             "source": "patient",
-            "turn_id": "1f663a9a-b990-41d6-bfbf-9a873a887b60",
-            "recorded_at": "2026-10-15T14:04:26.234983+00:00",
+            "turn_id": "29006a14-4c69-4a39-81b9-a09cf7695136",
+            "recorded_at": "2026-10-26T03:14:12.809076+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "89f4a250-f53f-4519-a151-275c5a9a88a2",
-            "evidence": "腋温38.2℃，刚刚测的"
+            "fact_id": "ea5c4ec8-6d22-4a72-b5b1-7582bf097ef1",
+            "evidence": "腋温38.2℃"
           },
-          "resp_breathing": {
-            "key": "resp_breathing",
-            "value": "没有气促，能完整说话",
+          "reported_temperature": {
+            "key": "reported_temperature",
+            "value": "腋温38.2℃",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "5a0a3882-28bd-4ec5-b82c-668dade70637",
-            "recorded_at": "2026-10-15T14:04:30.840063+00:00",
+            "turn_id": "29006a14-4c69-4a39-81b9-a09cf7695136",
+            "recorded_at": "2026-10-26T03:14:12.810874+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "c5a0e18c-4e23-4823-a03c-29edb93549d1",
-            "evidence": "没有气促，能完整说话"
+            "fact_id": "86736ba3-fb16-4d7b-a11b-66ee56dda195",
+            "evidence": "腋温38.2℃"
           },
-          "resp_cough_details": {
-            "key": "resp_cough_details",
-            "value": "干咳，没有咳血",
+          "onset": {
+            "key": "onset",
+            "value": "两天前逐渐开始",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "ecda47dc-ac1d-410d-a610-5ef5ae39b6dc",
-            "recorded_at": "2026-10-15T14:04:33.431497+00:00",
+            "turn_id": "b8cdcafa-ddfb-4a20-9685-d3c0d11ab77c",
+            "recorded_at": "2026-10-26T03:14:12.816791+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "ba2c3d99-de8d-4f1d-b5d1-823408faf406",
-            "evidence": "干咳，没有咳血"
+            "fact_id": "a7b36e37-cbe4-4ac2-8a30-f38a2be7d613",
+            "evidence": "两天前逐渐开始"
           },
           "trajectory": {
             "key": "trajectory",
             "value": "stable",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "d1f30709-dd87-4a72-a23f-dbd7804cfe2a",
-            "recorded_at": "2026-10-15T14:04:36.018427+00:00",
+            "turn_id": "66154c00-5767-4c06-b62c-3f376bb08ed2",
+            "recorded_at": "2026-10-26T03:14:12.820648+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "a4157d8b-69e1-4b06-ae1d-77ec2e276e94",
+            "fact_id": "57e8c89a-fc22-4d3a-bd8e-10ba7154bd06",
             "evidence": "变化不大"
           },
           "severity": {
@@ -960,35 +1692,59 @@
             "value": 3,
             "assertion": "present",
             "source": "patient",
-            "turn_id": "d728e802-3717-4cf9-8f64-b694b5a91972",
-            "recorded_at": "2026-10-15T14:04:38.592586+00:00",
+            "turn_id": "3b9ab122-5c99-48d1-b05c-83c018de59b5",
+            "recorded_at": "2026-10-26T03:14:12.824930+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "4f01315a-3d93-4dc4-9534-da8ee363aaea",
+            "fact_id": "0a30b7f5-5bad-4fd9-94af-4b7d926eb9f7",
             "evidence": "不适程度3分"
           },
           "associated_symptoms": {
             "key": "associated_symptoms",
-            "value": "能正常活动",
+            "value": "喉咙痛",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "d728e802-3717-4cf9-8f64-b694b5a91972",
-            "recorded_at": "2026-10-15T14:04:38.592770+00:00",
+            "turn_id": "fc408c70-323d-4a9a-9029-852b5187d7c5",
+            "recorded_at": "2026-10-26T03:14:12.830056+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "a012b0ef-c90e-4b68-b93b-10aab4d5fc84",
-            "evidence": "能正常活动"
+            "fact_id": "15740c8d-3060-478a-81b6-23d6e216a2e8",
+            "evidence": "喉咙痛"
+          },
+          "resp_breathing": {
+            "key": "resp_breathing",
+            "value": "没有气促，能完整说话",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "59069726-b4f3-4580-9abf-629bff53afb6",
+            "recorded_at": "2026-10-26T03:14:12.836853+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "f8d2d255-f38b-4570-a8ef-84e6d4e7421c",
+            "evidence": "没有气促，能完整说话"
+          },
+          "resp_cough_details": {
+            "key": "resp_cough_details",
+            "value": "干咳，没有咳血",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "73951c83-50f2-43fe-8a71-4d3b8f841e32",
+            "recorded_at": "2026-10-26T03:14:12.844381+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "2515bf60-09c9-4bbd-a185-0f4f73b6b5e7",
+            "evidence": "干咳，没有咳血"
           },
           "resp_intake": {
             "key": "resp_intake",
             "value": "能正常喝水吃饭，排尿正常",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "18a1d77c-7f84-45ec-b895-fb468a9c23e3",
-            "recorded_at": "2026-10-15T14:04:42.304154+00:00",
+            "turn_id": "a38d840d-17bf-4dfa-bae5-38113d33d0d3",
+            "recorded_at": "2026-10-26T03:14:12.850069+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "b0a6aabf-2b72-4bfe-b001-c0aac3373f23",
+            "fact_id": "5f9fbb00-9d33-44a0-91ec-3bcc6adce3cd",
             "evidence": "能正常喝水吃饭，排尿正常"
           },
           "medications_taken": {
@@ -996,11 +1752,11 @@
             "value": null,
             "assertion": "absent",
             "source": "patient",
-            "turn_id": "0a8427fd-ce97-427f-bcb3-d9ba2d32bb54",
-            "recorded_at": "2026-10-15T14:04:44.606493+00:00",
+            "turn_id": "2fdac882-3c63-46f8-8476-15abbecdc675",
+            "recorded_at": "2026-10-26T03:14:12.854480+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "3e0615f3-2281-4fa2-9716-8181dd53bf32",
+            "fact_id": "8dfc27ed-cb2f-4106-99dd-bdfe9113f145",
             "evidence": "没有用药"
           },
           "allergies": {
@@ -1008,73 +1764,73 @@
             "value": null,
             "assertion": "unknown",
             "source": "patient",
-            "turn_id": "67f6b620-9c74-4503-b6c3-d96c85578bf0",
-            "recorded_at": "2026-10-15T14:04:47.271497+00:00",
+            "turn_id": "9e4e31a1-f0ca-4bf7-b058-fcd6760aed3d",
+            "recorded_at": "2026-10-26T03:14:12.858551+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "ba50c204-2a34-44c5-875f-9ac9126deaf5",
+            "fact_id": "d9f1bdac-b7e0-4128-b840-32703ae503f4",
             "evidence": "药物过敏史不知道"
           }
         },
         "history": [
           {
+            "key": "chief_complaint",
+            "value": "咳嗽发烧两天",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "933af2e7-a211-46c8-af8b-71664c60ad80",
+            "recorded_at": "2026-10-26T03:14:12.778863+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "4e9958e0-dfd2-4838-911f-cf6adb5ad882",
+            "evidence": "咳嗽发烧两天"
+          },
+          {
             "key": "consult_for",
             "value": "self",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "cba0aa9f-ca98-4ca9-a615-57be77d4ed4c",
-            "recorded_at": "2026-10-15T14:04:23.338306+00:00",
+            "turn_id": "95091d83-3b1e-4edf-ba77-c62ee7992d28",
+            "recorded_at": "2026-10-26T03:14:12.785256+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "7624052e-5454-4063-9fc4-7e1a9356c315",
-            "evidence": "我自己32岁"
+            "fact_id": "2fd0d9dd-9a9e-4bb6-bf06-2620442c3b16",
+            "evidence": "我自己"
+          },
+          {
+            "key": "sex",
+            "value": "male",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "4bdd1ba6-d423-4fb6-96ad-f188bad35800",
+            "recorded_at": "2026-10-26T03:14:12.791034+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "051a2af9-9971-4eb7-b80b-fedea74d7aa8",
+            "evidence": "男"
           },
           {
             "key": "age_years",
             "value": 32,
             "assertion": "present",
             "source": "patient",
-            "turn_id": "cba0aa9f-ca98-4ca9-a615-57be77d4ed4c",
-            "recorded_at": "2026-10-15T14:04:23.338413+00:00",
+            "turn_id": "85c82aae-38bf-4021-9406-1d46ce0b380f",
+            "recorded_at": "2026-10-26T03:14:12.799402+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "bbad0d07-12ce-4afd-9f62-f3c059b7c460",
+            "fact_id": "28a818f0-aef1-4461-b0ef-dd383ebbebc4",
             "evidence": "32岁"
-          },
-          {
-            "key": "chief_complaint",
-            "value": "咳嗽发烧两天",
-            "assertion": "present",
-            "source": "patient",
-            "turn_id": "cba0aa9f-ca98-4ca9-a615-57be77d4ed4c",
-            "recorded_at": "2026-10-15T14:04:23.338486+00:00",
-            "quality": "not_assessed",
-            "supersedes": null,
-            "fact_id": "67b1fcef-89cd-4a4a-8d3d-0a4ba135bc18",
-            "evidence": "咳嗽发烧两天"
-          },
-          {
-            "key": "onset",
-            "value": "两天前",
-            "assertion": "present",
-            "source": "patient",
-            "turn_id": "cba0aa9f-ca98-4ca9-a615-57be77d4ed4c",
-            "recorded_at": "2026-10-15T14:04:23.338551+00:00",
-            "quality": "not_assessed",
-            "supersedes": null,
-            "fact_id": "c1920a22-b286-43e7-85c7-5292c014327f",
-            "evidence": "两天"
           },
           {
             "key": "emergency_screen",
             "value": null,
             "assertion": "absent",
             "source": "patient",
-            "turn_id": "ce35e029-7210-40d5-9f61-e8d7c77ed822",
-            "recorded_at": "2026-10-15T14:04:26.234112+00:00",
+            "turn_id": "f2805de0-eeb1-4ad3-8479-1a28e67a85d0",
+            "recorded_at": "2026-10-26T03:14:12.802811+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "8448f049-4541-4e2b-985d-4f9c163be945",
+            "fact_id": "d8f27cb5-5819-47e2-b4d9-c8d128427781",
             "evidence": "这些危险情况都没有"
           },
           {
@@ -1082,71 +1838,59 @@
             "value": 38.2,
             "assertion": "present",
             "source": "patient",
-            "turn_id": "1f663a9a-b990-41d6-bfbf-9a873a887b60",
-            "recorded_at": "2026-10-15T14:04:26.234983+00:00",
+            "turn_id": "29006a14-4c69-4a39-81b9-a09cf7695136",
+            "recorded_at": "2026-10-26T03:14:12.809076+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "89f4a250-f53f-4519-a151-275c5a9a88a2",
-            "evidence": "腋温38.2℃，刚刚测的"
+            "fact_id": "ea5c4ec8-6d22-4a72-b5b1-7582bf097ef1",
+            "evidence": "腋温38.2℃"
+          },
+          {
+            "key": "reported_temperature",
+            "value": "腋温38.2℃",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "29006a14-4c69-4a39-81b9-a09cf7695136",
+            "recorded_at": "2026-10-26T03:14:12.810874+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "86736ba3-fb16-4d7b-a11b-66ee56dda195",
+            "evidence": "腋温38.2℃"
           },
           {
             "key": "age_years",
             "value": 40,
             "assertion": "present",
             "source": "patient",
-            "turn_id": "b036d9fd-7950-471c-b210-5cb81e6c2e0e",
-            "recorded_at": "2026-10-15T14:04:27.387512+00:00",
+            "turn_id": "7d690f33-31e2-4dc4-bb57-0c173c07d2a1",
+            "recorded_at": "2026-10-26T03:14:12.813591+00:00",
             "quality": "not_assessed",
-            "supersedes": "bbad0d07-12ce-4afd-9f62-f3c059b7c460",
-            "fact_id": "627175bb-a762-4b11-8699-5a5904f4d408",
+            "supersedes": "28a818f0-aef1-4461-b0ef-dd383ebbebc4",
+            "fact_id": "dd7b1041-830a-4a71-a52c-ca4d96383156",
             "evidence": "40岁"
           },
           {
-            "key": "age_years",
-            "value": 40,
+            "key": "onset",
+            "value": "两天前逐渐开始",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "b036d9fd-7950-471c-b210-5cb81e6c2e0e",
-            "recorded_at": "2026-10-15T14:04:28.468552+00:00",
-            "quality": "not_assessed",
-            "supersedes": "627175bb-a762-4b11-8699-5a5904f4d408",
-            "fact_id": "52638f14-0d0b-47e8-96f8-54e7d6bbbde7",
-            "evidence": "40岁"
-          },
-          {
-            "key": "resp_breathing",
-            "value": "没有气促，能完整说话",
-            "assertion": "present",
-            "source": "patient",
-            "turn_id": "5a0a3882-28bd-4ec5-b82c-668dade70637",
-            "recorded_at": "2026-10-15T14:04:30.840063+00:00",
+            "turn_id": "b8cdcafa-ddfb-4a20-9685-d3c0d11ab77c",
+            "recorded_at": "2026-10-26T03:14:12.816791+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "c5a0e18c-4e23-4823-a03c-29edb93549d1",
-            "evidence": "没有气促，能完整说话"
-          },
-          {
-            "key": "resp_cough_details",
-            "value": "干咳，没有咳血",
-            "assertion": "present",
-            "source": "patient",
-            "turn_id": "ecda47dc-ac1d-410d-a610-5ef5ae39b6dc",
-            "recorded_at": "2026-10-15T14:04:33.431497+00:00",
-            "quality": "not_assessed",
-            "supersedes": null,
-            "fact_id": "ba2c3d99-de8d-4f1d-b5d1-823408faf406",
-            "evidence": "干咳，没有咳血"
+            "fact_id": "a7b36e37-cbe4-4ac2-8a30-f38a2be7d613",
+            "evidence": "两天前逐渐开始"
           },
           {
             "key": "trajectory",
             "value": "stable",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "d1f30709-dd87-4a72-a23f-dbd7804cfe2a",
-            "recorded_at": "2026-10-15T14:04:36.018427+00:00",
+            "turn_id": "66154c00-5767-4c06-b62c-3f376bb08ed2",
+            "recorded_at": "2026-10-26T03:14:12.820648+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "a4157d8b-69e1-4b06-ae1d-77ec2e276e94",
+            "fact_id": "57e8c89a-fc22-4d3a-bd8e-10ba7154bd06",
             "evidence": "变化不大"
           },
           {
@@ -1154,35 +1898,59 @@
             "value": 3,
             "assertion": "present",
             "source": "patient",
-            "turn_id": "d728e802-3717-4cf9-8f64-b694b5a91972",
-            "recorded_at": "2026-10-15T14:04:38.592586+00:00",
+            "turn_id": "3b9ab122-5c99-48d1-b05c-83c018de59b5",
+            "recorded_at": "2026-10-26T03:14:12.824930+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "4f01315a-3d93-4dc4-9534-da8ee363aaea",
+            "fact_id": "0a30b7f5-5bad-4fd9-94af-4b7d926eb9f7",
             "evidence": "不适程度3分"
           },
           {
             "key": "associated_symptoms",
-            "value": "能正常活动",
+            "value": "喉咙痛",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "d728e802-3717-4cf9-8f64-b694b5a91972",
-            "recorded_at": "2026-10-15T14:04:38.592770+00:00",
+            "turn_id": "fc408c70-323d-4a9a-9029-852b5187d7c5",
+            "recorded_at": "2026-10-26T03:14:12.830056+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "a012b0ef-c90e-4b68-b93b-10aab4d5fc84",
-            "evidence": "能正常活动"
+            "fact_id": "15740c8d-3060-478a-81b6-23d6e216a2e8",
+            "evidence": "喉咙痛"
+          },
+          {
+            "key": "resp_breathing",
+            "value": "没有气促，能完整说话",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "59069726-b4f3-4580-9abf-629bff53afb6",
+            "recorded_at": "2026-10-26T03:14:12.836853+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "f8d2d255-f38b-4570-a8ef-84e6d4e7421c",
+            "evidence": "没有气促，能完整说话"
+          },
+          {
+            "key": "resp_cough_details",
+            "value": "干咳，没有咳血",
+            "assertion": "present",
+            "source": "patient",
+            "turn_id": "73951c83-50f2-43fe-8a71-4d3b8f841e32",
+            "recorded_at": "2026-10-26T03:14:12.844381+00:00",
+            "quality": "not_assessed",
+            "supersedes": null,
+            "fact_id": "2515bf60-09c9-4bbd-a185-0f4f73b6b5e7",
+            "evidence": "干咳，没有咳血"
           },
           {
             "key": "resp_intake",
             "value": "能正常喝水吃饭，排尿正常",
             "assertion": "present",
             "source": "patient",
-            "turn_id": "18a1d77c-7f84-45ec-b895-fb468a9c23e3",
-            "recorded_at": "2026-10-15T14:04:42.304154+00:00",
+            "turn_id": "a38d840d-17bf-4dfa-bae5-38113d33d0d3",
+            "recorded_at": "2026-10-26T03:14:12.850069+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "b0a6aabf-2b72-4bfe-b001-c0aac3373f23",
+            "fact_id": "5f9fbb00-9d33-44a0-91ec-3bcc6adce3cd",
             "evidence": "能正常喝水吃饭，排尿正常"
           },
           {
@@ -1190,11 +1958,11 @@
             "value": null,
             "assertion": "absent",
             "source": "patient",
-            "turn_id": "0a8427fd-ce97-427f-bcb3-d9ba2d32bb54",
-            "recorded_at": "2026-10-15T14:04:44.606493+00:00",
+            "turn_id": "2fdac882-3c63-46f8-8476-15abbecdc675",
+            "recorded_at": "2026-10-26T03:14:12.854480+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "3e0615f3-2281-4fa2-9716-8181dd53bf32",
+            "fact_id": "8dfc27ed-cb2f-4106-99dd-bdfe9113f145",
             "evidence": "没有用药"
           },
           {
@@ -1202,63 +1970,179 @@
             "value": null,
             "assertion": "unknown",
             "source": "patient",
-            "turn_id": "67f6b620-9c74-4503-b6c3-d96c85578bf0",
-            "recorded_at": "2026-10-15T14:04:47.271497+00:00",
+            "turn_id": "9e4e31a1-f0ca-4bf7-b058-fcd6760aed3d",
+            "recorded_at": "2026-10-26T03:14:12.858551+00:00",
             "quality": "not_assessed",
             "supersedes": null,
-            "fact_id": "ba50c204-2a34-44c5-875f-9ac9126deaf5",
+            "fact_id": "d9f1bdac-b7e0-4128-b840-32703ae503f4",
             "evidence": "药物过敏史不知道"
           }
         ],
         "asked_questions": [
           "chief_complaint",
+          "consult_for",
+          "sex",
+          "age",
           "emergency_screen",
-          "resp_breathing",
-          "resp_cough_details",
+          "onset",
           "trajectory",
           "severity",
+          "associated_symptoms",
+          "resp_breathing",
+          "resp_cough_details",
           "resp_intake",
           "medications_taken",
           "allergies",
           "relevant_history"
         ],
         "active_question": "relevant_history",
+        "active_question_is_clarification": false,
         "active_task": null,
+        "suspended_self_check": null,
         "risk": {
           "level": "routine",
           "triggers": [],
-          "assessed_at": "2026-10-15T14:04:48.654180+00:00"
+          "assessed_at": "2026-10-26T03:14:12.860952+00:00"
         },
         "closed_reason": null,
-        "created_at": "2026-10-15T14:04:21.824998+00:00",
-        "updated_at": "2026-10-15T14:04:47.271513+00:00",
-        "revision": 13,
+        "follow_up": null,
+        "conclusion": null,
+        "profile_baseline": {},
+        "baseline_reference_enabled": true,
+        "created_at": "2026-10-26T03:14:12.773659+00:00",
+        "updated_at": "2026-10-26T03:14:12.858568+00:00",
+        "revision": 18,
         "runtime_snapshot": {
-          "engine_version": "0.6.0",
+          "engine_version": "0.11.17",
           "composition": {
             "api_version": "medical-capability/v1",
             "template": {
               "id": "general",
-              "version": "0.1.0",
+              "version": "0.2.0",
               "title": "通用问诊研究模板",
               "description": "采集必要病史，按适用条件提供图示观察，允许显式计算。未完成临床审核。",
               "enabled": [
                 "observe.temperature",
                 "observe.location",
-                "calculate.units"
+                "calculate.units",
+                "calculate.glucose"
               ]
             },
             "capabilities": [
               {
+                "id": "calculate.glucose",
+                "name": "血糖单位换算",
+                "version": "0.1.0",
+                "api_version": "medical-capability/v1",
+                "kind": "calculation",
+                "description": "仅换算明确的血糖（葡萄糖）读数：mmol/L与mg/dL；使用常用系数18，显示近似标记、公式、来源和适用范围。",
+                "permissions": [],
+                "review_status": "engineering_verified_not_clinical",
+                "ui": "calculation",
+                "patient_form": "unit_conversion/v2",
+                "input_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "from_unit",
+                    "to_unit"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "title": "输入数值",
+                      "minLength": 1,
+                      "maxLength": 25
+                    },
+                    "from_unit": {
+                      "type": "string",
+                      "title": "原单位",
+                      "enum": [
+                        "mmol/L",
+                        "mg/dL"
+                      ]
+                    },
+                    "to_unit": {
+                      "type": "string",
+                      "title": "目标单位",
+                      "enum": [
+                        "mmol/L",
+                        "mg/dL"
+                      ]
+                    }
+                  }
+                },
+                "output_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "unit",
+                    "formula",
+                    "method",
+                    "limitations",
+                    "approximate",
+                    "precision_policy"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "formula": {
+                      "type": "string"
+                    },
+                    "method": {
+                      "type": "string"
+                    },
+                    "limitations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "approximate": {
+                      "type": "boolean"
+                    },
+                    "precision_policy": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "value": "10",
+                  "from_unit": "mmol/L",
+                  "to_unit": "mg/dL"
+                },
+                "validation": {
+                  "status": "engineering_prototype_requires_review",
+                  "scope": "固定18近似系数、双向换算、出处、输入核对与版本绑定；不评价临床意义"
+                },
+                "patient_input_policy": "blood_glucose",
+                "references": [
+                  {
+                    "title": "American Diabetes Association · Common Terms",
+                    "url": "https://diabetes.org/about-diabetes/common-terms",
+                    "section": "Mg/dL与Mmol/L词条的文字换算规则；采用常用近似系数18。",
+                    "accessed": "2026-10-17"
+                  }
+                ],
+                "enabled": true
+              },
+              {
                 "id": "calculate.units",
                 "name": "可解释单位换算",
-                "version": "0.1.0",
+                "version": "0.1.1",
                 "api_version": "medical-capability/v1",
                 "kind": "calculation",
                 "description": "质量或体积同量纲内的十进制换算；显示原始输入、换算比例、结果与限制。",
                 "permissions": [],
                 "review_status": "engineering_verified_not_clinical",
                 "ui": "calculation",
+                "patient_form": "unit_conversion/v1",
                 "input_schema": {
                   "type": "object",
                   "additionalProperties": false,
@@ -1343,7 +2227,7 @@
               {
                 "id": "observe.location",
                 "name": "指出最明显的不适部位",
-                "version": "0.2.0",
+                "version": "0.4.0",
                 "api_version": "medical-capability/v1",
                 "kind": "self_check",
                 "description": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
@@ -1356,6 +2240,16 @@
                   "input_kind": "location",
                   "invalidate_on": [
                     "chief_complaint"
+                  ],
+                  "request_phrases": [
+                    "想按图指出部位",
+                    "想按图标出位置",
+                    "想标出疼痛部位"
+                  ],
+                  "cancel_phrases": [
+                    "取消定位",
+                    "先不标位置",
+                    "不想标出疼痛部位"
                   ],
                   "title": "指出最明显的不适部位",
                   "purpose": "把你感到不舒服的位置说清楚，帮助下一步定向追问。",
@@ -1412,7 +2306,72 @@
                     "这是主观症状定位，不是客观查体或疾病判断。",
                     "不需要按压、扭转或诱发疼痛。"
                   ],
-                  "review_status": "prototype_requires_clinical_review"
+                  "review_status": "prototype_requires_clinical_review",
+                  "answer_contract": {
+                    "schema": "location-answer/v1",
+                    "fields": [
+                      "region",
+                      "area",
+                      "side",
+                      "extent"
+                    ],
+                    "side_options": [
+                      {
+                        "value": "left",
+                        "label": "左侧"
+                      },
+                      {
+                        "value": "right",
+                        "label": "右侧"
+                      },
+                      {
+                        "value": "both",
+                        "label": "两侧"
+                      },
+                      {
+                        "value": "midline",
+                        "label": "正中"
+                      },
+                      {
+                        "value": "unknown",
+                        "label": "说不清"
+                      }
+                    ],
+                    "extent_options": [
+                      {
+                        "value": "point",
+                        "label": "一个点"
+                      },
+                      {
+                        "value": "area",
+                        "label": "一片范围"
+                      },
+                      {
+                        "value": "unknown",
+                        "label": "说不清"
+                      }
+                    ],
+                    "area_presets": {
+                      "head": [
+                        {
+                          "value": "forehead",
+                          "label": "额头附近"
+                        },
+                        {
+                          "value": "crown",
+                          "label": "头顶附近"
+                        },
+                        {
+                          "value": "occiput",
+                          "label": "后脑附近"
+                        },
+                        {
+                          "value": "temple",
+                          "label": "太阳穴附近"
+                        }
+                      ]
+                    }
+                  }
                 },
                 "validation": {
                   "status": "prototype_requires_clinical_review",
@@ -1423,7 +2382,7 @@
               {
                 "id": "observe.temperature",
                 "name": "测一次腋下体温",
-                "version": "0.3.0",
+                "version": "0.7.0",
                 "api_version": "medical-capability/v1",
                 "kind": "self_check",
                 "description": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
@@ -1434,7 +2393,34 @@
                   "id": "axillary_temperature",
                   "result_key": "temperature_c",
                   "input_kind": "temperature",
+                  "repeatable": true,
+                  "repeat_phrases": [
+                    "想重新测量",
+                    "想重新测温",
+                    "再测一次腋温",
+                    "想再测腋温",
+                    "重新测腋温",
+                    "重新测体温",
+                    "再量一次体温",
+                    "刚刚又测了一次腋温"
+                  ],
                   "invalidate_on": [],
+                  "request_phrases": [
+                    "想按图测一下腋温",
+                    "想按图测温",
+                    "想测腋温",
+                    "想测体温",
+                    "想量体温"
+                  ],
+                  "cancel_phrases": [
+                    "取消测温",
+                    "先不测体温",
+                    "不想测体温",
+                    "不测腋温了",
+                    "先不测腋温",
+                    "暂时不测体温",
+                    "不想按图测一下腋温"
+                  ],
                   "title": "测一次腋下体温",
                   "purpose": "记录一个带测量方式和时间的体温值，帮助描述当前情况。",
                   "applies_when": {
@@ -1449,11 +2435,11 @@
                   "equipment": [
                     "可正常使用的数字体温计"
                   ],
-                  "asset": "/temperature.svg",
+                  "asset": "/neutral-temperature.svg",
                   "step_assets": [
-                    "/temperature.svg#step-1",
-                    "/temperature.svg#step-2",
-                    "/temperature.svg#step-3"
+                    "/neutral-temperature.svg#step-1",
+                    "/neutral-temperature.svg#step-2",
+                    "/neutral-temperature.svg#step-3"
                   ],
                   "steps": [
                     "先阅读体温计说明书；擦干腋窝。",
@@ -1494,84 +2480,222 @@
                 "enabled": true
               }
             ],
-            "sha256": "9495892fc3b55af3b6e6f6fcaf99453b9579f063dd6f344022bee2d11255b4a1"
+            "sha256": "bff3dea7b127cf5cd35a5e6df9434b7eb323008cdfa91e1eeba4228b995a784a"
           },
           "content_versions": {
-            "questions": "2026-10-15.v1",
-            "questions_sha256": "e768e4db6804eb79e95ec2d34f12702f96b096364ca4d23bf9e176eda507a234",
-            "self_checks": "9495892fc3b55af3b6e6f6fcaf99453b9579f063dd6f344022bee2d11255b4a1"
+            "questions": "2026-10-25.v1",
+            "questions_sha256": "a286638fc452720d27de78e1896207622faaba676d1ce3c4e6406030d6ec0b90",
+            "self_checks": "bff3dea7b127cf5cd35a5e6df9434b7eb323008cdfa91e1eeba4228b995a784a"
           },
           "transport": {}
         },
         "calculations": [],
-        "pending_self_checks": []
+        "pending_calculation": null,
+        "pending_self_checks": [],
+        "observation_attempts": [],
+        "report_items": [],
+        "background_review": null,
+        "subagent_digest": null
       },
-      "model_calls": 22
+      "model_calls": 30
     }
   ],
-  "harness_sha256": "2dc5886dd73f7c4a5225830dd12c0e35f4e2986fecd06f6a5ff355cf0e92a0a2",
-  "engine_sha256": "ffed44a34f55473dcde7e9c278d9c45214c49e9adb0585ac6dcc7e75e5d05dc8",
+  "harness_sha256": "4b1741189986db48247ae28de1c9e3cc02133c73914d5a7fa5dd35c13dbe9fe4",
+  "engine_sha256": "e46918fac92aebb2e111dd52767445c2a721895d9d05929ff89a63ffbd9e84b3",
   "source_sha256": {
-    "src/medagent/__init__.py": "bb8175a12ef116ea9fd3f625cca81020b70d4a16204f6be593a4aeac9a5c3631",
-    "src/medagent/agent.py": "ffed44a34f55473dcde7e9c278d9c45214c49e9adb0585ac6dcc7e75e5d05dc8",
-    "src/medagent/agent_tools.py": "b095759ff2af03ed5eb5c917e10dcca8c0901a22c382a9aa8809aab86d5b0add",
-    "src/medagent/backends.py": "8d56bd088e4e8d4ed688327a77292895b77038e08944883b098adb06333c538a",
+    "src/medagent/__init__.py": "8387e3763247fb2dca42c85d233fcca283b628d0f9ddaa39d48f8c8af3fedd84",
+    "src/medagent/adaptive_questions.py": "353579095f66a6935413a4fd981d0baddf647f43cc1a30c636947604a09c784c",
+    "src/medagent/agent.py": "e46918fac92aebb2e111dd52767445c2a721895d9d05929ff89a63ffbd9e84b3",
+    "src/medagent/agent_tools.py": "a32ca4c881ff70bc260e64e5c6fa06737dd920be467222492fb0a63d91511335",
+    "src/medagent/assertion_evidence.py": "4bc9bbb80b83c325619b0efa74c132e417bdd47ae5afce95cc39cc88f3921a4f",
+    "src/medagent/audit_recording.py": "c20f593ce823aeb4e062cb7d14b45d4f9c14dbe380c6b778f2dc3b994d2ef2f5",
+    "src/medagent/backends.py": "62b8eb9221bbb853fd8a13ea91fe9de53f6b534f0b38ab211fec36b185b084a9",
+    "src/medagent/background_review.py": "05bda2e90bbf5910b163db48e07ed76e4b9c2cc10cf999d25330a68b735acf02",
+    "src/medagent/background_review_evaluation.py": "9d3b58eee28c4ec74e89b07664622f31de0e0d3d20c6e7e0899e9508ede8af68",
+    "src/medagent/baseline_projection.py": "84a0565637489076cb868653a925888c5f82499b9ea6cb2e35666a1918a1ab12",
+    "src/medagent/bridging.py": "df822e9791bb4bf2489f1361987060a3750e4930987d18d02152094a932d98d7",
+    "src/medagent/calculation_followup.py": "abe7cdd10f6bf89953171ba43d52b78025cae325aba14a91402ad6f0f999898e",
     "src/medagent/cli.py": "d553146d21d554b1b3a420b3de49c1cc9a7179bc4ad19c575a7117c33ccb7479",
-    "src/medagent/consultation.py": "4c42678fc6bda45726b36aa21105fc4d24a8a3848786580ef91cde99bd03981f",
+    "src/medagent/conclusion.py": "d2eef96e02fee7f18e2b46bb1ed3c796b01c6b5c7d2287be616fcde9a8b3a280",
+    "src/medagent/consultation.py": "0a5f42fab7cc29e2d1bf0758899c38798b0053deb32438a88782eae293ac967c",
+    "src/medagent/consultation_subject.py": "e38be6fb942297607e56474eaa11d7c28ed11926b52f3ba61e34e960e379f434",
     "src/medagent/content/__init__.py": "3052aa55b48c259afa9bd3746085628453d39d707d6033a654b5924eee8e2ccf",
-    "src/medagent/content/agent_prompt.txt": "1eded3197c0ac5154c0fec87e9d5f52efca5e3a677501af60516656ca069b393",
-    "src/medagent/content/questions.json": "e6a67443675079974de9b05738141f6ccc3c6e94322f8b356bc1e4a32e927c0b",
-    "src/medagent/desktop_service.py": "e649ece32efb49274062f8ee99babfc9d86eec4cdc09f9ff5084fba624fd118b",
-    "src/medagent/domain.py": "aafe87d7c986e575423f76474ab586d3265a6378fe9a62cf0dd755844f7ae15a",
-    "src/medagent/env_config.py": "ff669e3ede9f9990e0ac40862beae1f1e8c0a8c74dada47b5213576a3dd1ed01",
-    "src/medagent/events.py": "a12c2f3caa238df7930e214c09c747b4f986f56302c132836b59a7b739189456",
+    "src/medagent/content/agent_prompt.txt": "bf02ec77e2f5e124af2ebb750c9d557b15eb9065d0ca44254e0498f851a92e2d",
+    "src/medagent/content/conclusion_narrative.json": "a57a898debc6a521090d379db5497075843add3c49abca463b2e74cdab758d6d",
+    "src/medagent/content/departments.json": "db2f0564347afabba28af84c899392832c3b5c3b33113003bcf77c5c072dd3d3",
+    "src/medagent/content/differentials.json": "b3ae2c21d4aede6ec9cb3b1e3ee340c68d73e67752418a6fa5aabd84b85291da",
+    "src/medagent/content/followup_windows.json": "ae46dba8ff714a189c76bd0070732ad1ae9b60e5f09c43f1ddff7310fa1aa89a",
+    "src/medagent/content/prior_weights.json": "c40514aecb880ff4aec557e795957245cff3f54b45c641632a777eda41045a04",
+    "src/medagent/content/questions.json": "27a1803b0e28b991c919dfb2f84bd6bd77cc70caf5073780ec015212c1c6fbda",
+    "src/medagent/content/red_flags.json": "5b02f3c48c774b06819f05fd86a3c85aaf399befb00dc3bebddc013059e16cf8",
+    "src/medagent/content/reference_ranges.json": "33bfcb200136dd8dafe157364e5cd6dd5c4f266a09f42f7b4a4406768da80116",
+    "src/medagent/content/self_care.json": "80f59117b560b9db303d1c2d8a28598780f61dac238e872f6cc0e963199d590a",
+    "src/medagent/content/warning_signs.json": "272b2cd5684349fcdbe3dab2fbac924a625c117e886ebb325de3098e911b25f9",
+    "src/medagent/content/web_sources.json": "0430c6ed6067e7e0cfca35e58b04939e357792cc6ec8eb16c950052aeadc99ce",
+    "src/medagent/decision_wait.py": "4c4f8a2d13edce191c51fb0f50cde958714ce61024b0214c5b8928bc4c7cf995",
+    "src/medagent/desktop_service.py": "09bde0bc58f0194a23aff0091b29b44fb76b4a2284af903c23a2f5ab06230468",
+    "src/medagent/direction_guards.py": "0acda10ae78c8ec259e5d5e3fe128f8e686bb2aa56f11f04d489ed45522617b5",
+    "src/medagent/domain.py": "1996cbbb831977567757cf836102a18169ff42bf733cd9d09d58992c35d597bf",
+    "src/medagent/education.py": "eebf2db248bb6dbfcb440153b8972a559ad3b3b964ac6f8876d87b1e3db1bfae",
+    "src/medagent/env_config.py": "2894216680c7813d95dd0694e11440080fb1ed5316a83ae728521300d0dae9ac",
+    "src/medagent/events.py": "a8241b00770d6cd9f01764f3c820013f836bdb0b7d034a10546830a46fec82c2",
+    "src/medagent/execution.py": "18b8e0382f1426c266e42134886e0ea5bd2a3ad7de7a9b8391fcce97fea55c54",
+    "src/medagent/execution_artifacts.py": "bf4e0f3b386de6a1a73ee1c3c0118a9fe788faf78e0f2a48fec7e57fee307fe5",
+    "src/medagent/execution_capabilities.py": "f78438216f9db8599f645ea473d205248958ceb3f81ed3bfb76e955b2d48c32a",
+    "src/medagent/execution_changes.py": "03a193ee4f5db957a4c253166bcb991821caf8ae0ed4d78871a61e8367da0b59",
+    "src/medagent/execution_checkpoints.py": "bede208543c4bb1f99e8e6511e264469e8c213be3c97356db7180113137c4fed",
+    "src/medagent/execution_clarifications.py": "6349abcd3c0c2b1116d28abeb684cb6625153463e0ac0c0f8b53100a52c5ea26",
+    "src/medagent/execution_files.py": "88af856b30eac157eac5958ec715fb13aa69ff9d2242299595d109c5636d223f",
+    "src/medagent/execution_identity.py": "93e0d9b8e1882d135b7eb8632e628727bbf0bc1b70cf2b5193b80ca9ca813f37",
+    "src/medagent/execution_limits.py": "91c4c616db6c3cdbe8e4f83a9deb1d52c98a84c0067c01c5e781e6bf94759559",
+    "src/medagent/execution_observations.py": "092c0b1786aa55455b1065ebc206eb32b00319a5db24847db4a1f65ef8564119",
+    "src/medagent/execution_projects.py": "78a6f153c6bf507c9854c02d282088baeea443dad5cc591d60078abac878fddd",
+    "src/medagent/execution_store.py": "ed1d78d845db43ae972c3db52e766d1a83f18e771f25e9f30f4b031ab41c51fc",
     "src/medagent/extensions/__init__.py": "671b1499b6b78c8d7eaff023ef1902f9b59bca86e5a5b0d0f965a3a0ce1d0ce8",
-    "src/medagent/extensions/builtin.py": "0edcf12b1ccc99deb54a41005955ae443a76a62825903ddaedf00e669d510fd5",
-    "src/medagent/extensions/contracts.py": "91bc2226d6f884b666d8129b86d463d118cc494fcae5f249664f5b122cb6bf7d",
-    "src/medagent/extensions/packs/location.json": "5e3407f3e1efa60c3a93e3afc438f2425131a05b500e1c36b74b11480c54ef40",
-    "src/medagent/extensions/packs/temperature.json": "0a415f8bc8267bc1825ea700ad64ec2159c4526bf21805c0889d7a28f5d9e738",
-    "src/medagent/extensions/packs/units.json": "171acbae77448a5ed7071793462a50c9360cb716b73e444dd8da8c14eb882e69",
-    "src/medagent/extensions/registry.py": "c775aa25a449e08229ac9fc5cc1852adb718274bf9dcc3c41ca9f2c924ea60d3",
-    "src/medagent/extensions/templates/general.json": "d01371107dff6e6c63080d0e4bd998cb7d3827122c729c9b1ef05adcbc6800b7",
+    "src/medagent/extensions/builtin.py": "f600f7a159fa8e34874b7e1bdcb8c0135b469b7bd2cc42488c6132d7d7847d65",
+    "src/medagent/extensions/contracts.py": "7e257889ecfb84a3beeaccc7385d13fc2750839204516174042cd4c10026532a",
+    "src/medagent/extensions/conversion_forms.py": "9848058e872a1b25f0d0f62306f406eed8f45769bf3bc9c7abccaecbd68378a4",
+    "src/medagent/extensions/glucose.py": "c1e8a5c869e006b10c6a2ac4718981f601f436a10065845c51ac55bd090c4ae2",
+    "src/medagent/extensions/input_evidence.py": "c0001e5b4a84e7b317e993f5c2aa883b003ca9fa1bf6ecabaad90952a19beb49",
+    "src/medagent/extensions/packs/glucose.json": "b0491bb09d663c1eb60dbaefab11b7163fc41c57bc46f0840fc6076c0926de49",
+    "src/medagent/extensions/packs/location.json": "67ced0e32e33cabf00e9a49640021f61fb33a6f0bc5dda7314f8b97b3d84f219",
+    "src/medagent/extensions/packs/temperature.json": "3dffd6a1946369c54318690292bf04c2e1a12099c10d26ebe7e92e8de595cd12",
+    "src/medagent/extensions/packs/units.json": "2686961b665dc7683bbadd12474a08bfbf31df5912d94102441aeeab9db13768",
+    "src/medagent/extensions/registry.py": "a4c4a2a2401b312040442a08caf0e3dcd36406024274210a591797501efccbf9",
+    "src/medagent/extensions/templates/general.json": "952f4c68bd1a6c5cc64bdb05bac035ba4df7abd38dd195c7bf7e195a0e64b4f8",
     "src/medagent/extensions/templates/history.json": "f80dcc199634cb1040358e67be440e697cd72716a928b4c6821f3d2f4b205731",
-    "src/medagent/interpreter.py": "763b7e0279460efa149dc8a90a0f360d47ea6d30baf6ed49e01089e609e2cbb4",
-    "src/medagent/knowledge.py": "372656a3038e57c4c98ee71803b26156e30e25ba4c842b312e02d37dd4a746f8",
+    "src/medagent/flywheel.py": "da3768d5d4b307887e0738f934f3605bb8d5fc6e607c8df98b9b72456fb22e8a",
+    "src/medagent/followups.py": "1d568b1779ad705b0c37401b3f66588f7381eaa202a7f7acab3ef69b1659c0b5",
+    "src/medagent/handoff.py": "48cbfcc630f59389b3d0fd0c8e20e6c416d4efffac5ed0a090d854a9175c8333",
+    "src/medagent/hypothesis_ranking.py": "472905cc8b7ec7938bf79dd69452a910150e5563dde65b905b4c0a698996f50b",
+    "src/medagent/interpreter.py": "249c205f2da4978d12de734a07e53419f7e3fb2012e4bfed6490b983d2340b84",
+    "src/medagent/knowledge.py": "73980de25c4f11119412c94fd29e5534e47a018a1df45fb2816154a72ce761b3",
+    "src/medagent/location_answers.py": "fc411cb06f43b008941d5ba9d4ddd9e5e861dcf35d30942c403dd3024526ea8a",
+    "src/medagent/location_revisions.py": "17aba67df640304328bceb511ce05ef6dcf047712b4a4157f79bf41c6579e800",
+    "src/medagent/measurement_kinds.py": "b7c9ed7d087ad9efccc45f901f5b5931537b053dc3c16511a41d0b97fdbbb699",
+    "src/medagent/measurement_reports.py": "3e284cc7b1134953ce1339a214521cc0268ed5bc9944521191ebe0deff4b16ff",
+    "src/medagent/medical_images.py": "6dbc8737e59430ef6b4609b6585b20c2b4feeda08efa4576de55c7a73d772419",
+    "src/medagent/medication_reminders.py": "a01ddb4dc43eb7da99ccb7ad172c93f3cd5e03ca5298bbc28f7c25f1b252736e",
+    "src/medagent/observations.py": "b4dc79b967555f169378a18fa13b73416ae954f0cc1b5e810255fa8f982ee40d",
+    "src/medagent/out_of_pathway.py": "b6764d2321a688534f8ef32d671f441f043040ca58a66b8bd841bef96114b080",
+    "src/medagent/patient_calculations.py": "e62f25aaac1180090b8070ed9a8ff6f23f4c137b02325297195678fbbc0ffa5b",
+    "src/medagent/patient_records.py": "e6f8617cea591b60b826e594fb87f12d20a2d6b101c125062d453e131f529d38",
+    "src/medagent/phase_graph.py": "90dff7155b5c62ee5f46c525071484919abe4442ca940e2d1f3029c016ebe434",
+    "src/medagent/planner.py": "e5f34e3a68af2896e6caacecf7603ca09a80ef69853d136b34e9f74fbfc1262d",
+    "src/medagent/platform_fs.py": "4d4a14d4010617df621d83de49e12a9a4559a2a79ce4f16db761df424331300d",
     "src/medagent/plugins.py": "6ac11ba78de1939086f2a7a8fb9b8dabeb229996f266ac455a5abc5f8c772705",
-    "src/medagent/presentation.py": "20838b05c40246b8788d726f2720d9754943688904c6112e3040257d895e6f2b",
+    "src/medagent/presentation.py": "e09e62a6f7bfdb2268ed947a7d49834d4bdff998bbc1e603013504e8327b14e8",
+    "src/medagent/processes.py": "a84b42e9e0cd92049b02fb667d687b9e4e41c315e71df823e5e51fa9c8ce9338",
+    "src/medagent/publication.py": "737287feb621c2867d43b09aa8f7d3b99a6874716914c8e411f95710715ba3d4",
     "src/medagent/reasoner.py": "c506a88c074741709c57573ad15d4481c2376e385942eb6b9e5bd6bb2aef2cd0",
-    "src/medagent/runtime.py": "8b505c55c3af458d0ce48a4a1442beb58a03c796b3468cee745f48b1873944aa",
+    "src/medagent/reasoning.py": "897dabda06f22a5c1eb8434c21483d3fa8ed1b5202beb6e79cca5b491c13f948",
+    "src/medagent/recognition_jobs.py": "7a2a0f0c0dd0c6b67d5ffe1baa6724d9d12e456dcf9bb33800f04da537c9990e",
+    "src/medagent/red_flags.py": "6cc1873f89e1b1031405af3bf30df8e0d28abc3b0d8bdec08689006c1e7349ec",
+    "src/medagent/release_evaluation.py": "aa820da021c34ca6a541c8ffb2e1d0db5d5b078b918a487fbd6574728c1c500f",
+    "src/medagent/report_drafts.py": "c01f1d07ca21a4958ae9e0ae81bc52692309fbd87eb063d9790f669bc3037b47",
+    "src/medagent/report_interpretation.py": "8d578742f4bf0e41f9ea7b8e9b01cd3db0d7e57378555f55aa2a6ef0c81b966d",
+    "src/medagent/runtime.py": "47f8fb63f345fe91c5ebf59ce83c71459591da855cb81940177b6e195505238a",
     "src/medagent/self_checks.py": "c6a3a5e65a8e813fe6ea2d3f71d857a34da49cebaeea3a04034f128217ca0fef",
-    "src/medagent/server.py": "ce5657efacd635f9cf07fe3fb07701d4f589d6088ea91ed962c2c3665e751c84",
-    "src/medagent/triage.py": "fb5f9c6117f24baf73a8d5085e99235ea3c15d08fa7da767936b1f76782b0f6a",
+    "src/medagent/server.py": "b69866fc9688ade36c2f21ca04a047fed65e68d6457957b8ab1a4d3afb5958c8",
+    "src/medagent/session_store.py": "78600963dffbf67af38996c300321a2ed023b9add09482127df6ee66cbdec6dd",
+    "src/medagent/state_transitions.py": "aa3eb33e203e7b3d834cbc4a4787e18ef92ca52db0f48d06fdf421d1c827b0f0",
+    "src/medagent/subagents.py": "169c8fb37f86986a3cab6f5ca47caa8a183c99c8fc7318040e61200f3de45710",
+    "src/medagent/task_conversation.py": "6b0ae096d42521c75a663ae69638cbd4209dde326871ff9cd47d21363f6255aa",
+    "src/medagent/task_intents.py": "4e238e07e00adc6591adfc691e1c7b65a9a137b3d00ad44005270c1cbd148b0b",
+    "src/medagent/task_interactions.py": "563fff1eca4d567ffed6d1c62caede0bb1d1c904a3988541b09ca158f65e94c4",
+    "src/medagent/text_match.py": "35877e7b00c2ce0b1ee1ea427a54bdd3f8183d9162f6f86cee2c9f42ea0bd27e",
+    "src/medagent/triage.py": "0a57f19e2dba607848291abca278251ef883398a5b7b90698166910e63be221b",
+    "src/medagent/triage_review.py": "4a7e09079aefddf8e4719d49b1571fe79fe49adc02d0e97e89293e0afab96de8",
+    "src/medagent/turn_context.py": "da540f62f8a8c95c93e91792e276a0b5d94b33b651011705dbd5ce661e2cca85",
     "src/medagent/web/__init__.py": "110cd4ca5cbad1f99686fa97cb6ee327a45083aa51ca66abb9871cffdfc40d41",
-    "src/medagent/web/app.js": "78647a76b1de519c84eccb55c83f38a640ac979b77f7607c34ae8af7097b10db",
-    "src/medagent/web/body-location.svg": "62221848e7bb474c12191d8e56c6fbbd5c6e43a50078efd1819f892cb5396ca6",
-    "src/medagent/web/brand.svg": "6aa5f9c2dc836090b62c2cc4a33cee9689a8b8deba4cc7828ab9404194710090",
-    "src/medagent/web/index.html": "9115f81a03093b62deec91ba6d740bc244b341ce033bdbad52af89e57fb33294",
-    "src/medagent/web/structured-ui.js": "6ade12758a4c0ae7a0e3bbb816722c828f48543ec7ba349e4e26f38f7580f315",
-    "src/medagent/web/styles.css": "999084be8e1e2bf8eb45553edd63886c6d5c350b408e6e8d6880c756642fec6a",
-    "src/medagent/web/temperature.svg": "347cef5a84682e1f1bff6da05490bbbec4138511f7ed19aea102f93e436fafa6",
-    "src/medagent/workspace.py": "c744943b284ddac1ec932c896e24e8457ed481dc2830d111a0b1f635dd475bf6",
-    "integrations/dsh/bridge.mjs": "15a5b008d8df9d993d81c75279f7c27e4615707cb6615a005292b5b8042fb4e6",
-    "integrations/dsh/check.mjs": "9aa132f2ab9b4bc3760938fcc3b0a67ff82dea2047900c73a9462e3ebff7fcee",
-    "integrations/dsh/tests/bridge.test.mjs": "e32c09a98aff7c4759a9546bfaec4c1ccf9c2532bcc0ef64d9b220cac40038ca",
-    "integrations/dsh/tests/runtime-smoke.mjs": "4eebf77e9177dc2304a9e1cd35462a320ee39e281f5b2a22a8a2c7c8b0f974cf"
+    "src/medagent/web/app.js": "0cf4aee2d390e4780c50fe89c2e24c64c3feecdd582b3321d9f2018d5c3c6298",
+    "src/medagent/web/appearance.css": "286d1da559f8350c7618ea7b60919800dd80f18c8f20b95337766e5de235bb84",
+    "src/medagent/web/artifact-chart-ui.js": "66f62eb904cbdcb6eb78aad4f4bb49feea3de1ff781e9de7ec95e3c479ac2da0",
+    "src/medagent/web/artifact-chart.css": "676103119aa41cea4f511390bbbc0deec3d0168c55e1824414359a0f17dcc03b",
+    "src/medagent/web/body-location.svg": "3bfb62227824d89b8f37bab9970858484c7f4e08dda95fd0cd6c4cfe7842c2bc",
+    "src/medagent/web/execution-artifact-ui.js": "3de119a2e70a7770e36b5c13cb47f48e05b06038ae0de83e8027ea41ae84866c",
+    "src/medagent/web/execution-changes-ui.js": "4f781509e38773c3d889dde857d1e5f960553e8ade689c6207cf4cf0fe8450c8",
+    "src/medagent/web/execution-clarification-ui.js": "b11cb3839b098a3be2736bb204e381292df4f1174ad902b4b11701fa2fab7c30",
+    "src/medagent/web/execution-directory-ui.js": "950c04b4cbb3d22396047fe3dced43b017f145300e6f2528ebf6a91b2abb553c",
+    "src/medagent/web/execution-focus-ui.js": "7fba9fb4d91d3bb486700c3671712ebbc0639a9b1b15ecab3c63bd12b42eeccb",
+    "src/medagent/web/execution-focus.css": "0d608a33741a6da5775a136d76c65df70a7bb9a3711f10d9741e439c0ddc936e",
+    "src/medagent/web/execution-observation-ui.js": "a445c0bab7ee61586222440cffbdddfcd8fb42733e1714254adc498085ca8eba",
+    "src/medagent/web/execution-ui.js": "505bb11664c33d2944d6e3ade648955fb749bf1413ee29c82e40e48e316a6605",
+    "src/medagent/web/font-sources.json": "fdf73b2c96946fd5cdee93590c97fc64cb2dcf2b137d168efcd5d9345243c2d7",
+    "src/medagent/web/fonts-OFL.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+    "src/medagent/web/fonts.css": "a7c58c0a400e1a52eb1865e4be1eba2954886cc22c4bd9d962950ac80d35ac04",
+    "src/medagent/web/handoff-print.js": "ded51bdb3e306197a2d72b7d4eec5d62bd01ed31cc89626fcaa70b45e7abbe74",
+    "src/medagent/web/illustration-labels.json": "170d5a98df4ebea30c24216c0d91607fadcbe1427ebe531b30610d93b473dd7f",
+    "src/medagent/web/index.html": "f221f9821aca14d0c18681fb8fe75e4560d3afd122e00ffe8016714291887258",
+    "src/medagent/web/location-answer-ui.js": "e021f5777f77511fad6850e226038e38d5a0ffa98397acdd78076917095cb081",
+    "src/medagent/web/neutral-temperature.svg": "ffab72e23c951574f494c4d6df3e9ef7343498441b75f15df241fefb4669939e",
+    "src/medagent/web/patient-records-ui.js": "3e237913092ca018ee85da581696c66a513fddc8f13f89d9292312e678625746",
+    "src/medagent/web/patient-records.css": "72ff6c5557207a7c36ebd08a3ad85b04508f6affd1e2cf7d9157d8065e3511dd",
+    "src/medagent/web/patient-reflow.css": "8a05b0e2a0e593baac249b4840aeb9ae46f081e819e5405307596785191c8f2f",
+    "src/medagent/web/self-check.css": "65ff2fe118dabe4868f3af01b54a4520abba2c676aaf2d4090a5af630abce47d",
+    "src/medagent/web/structured-ui.js": "52c91f1508ff18bd9223d228585083dfb8d52efca1e624af57537b466c64db2a",
+    "src/medagent/web/styles.css": "8d6ca3e3368fd68b457d1fa7046bc8ec711a425a7310aa1dfd43a1e2a367560c",
+    "src/medagent/web/themes.css": "19afb32327891de5f690eb6807b5397f1337312de240c97d1d435b21911d24d3",
+    "src/medagent/web/themes.js": "3c0e81ced003ebb5fca11ca2250a2df8758c28219ad82e632bc3e987f68ba94f",
+    "src/medagent/web/visual-question.js": "ac31629f4daaf69811e596d3e3ed2941e55314ce83d04e9e2085cec6e99771fb",
+    "src/medagent/web_tools.py": "2aa83e8a74918b1045418ce4c76e5d87573936400105cc395b76d19e7ab764c3",
+    "src/medagent/windows_process.py": "4f24dd730dfcf1e21619a45bc262a074074fe7985b45b6d6f890e8749ea0c359",
+    "src/medagent/workspace.py": "6d48cd93dfcd762bca32c0cb84dc0123d14ff95686794cdfb5ef9e67d67c019b",
+    "src/medagent/worry.py": "ec44ddca2983eecf2c94cced933f44f0de2f4800bd42bccbb71f888b4d844918",
+    "integrations/dsh/bridge.mjs": "7886a07c21bb15a893163ec7072a4bac1a00dd653bcf7f575781a6a168bc672a",
+    "integrations/dsh/check-artifacts.mjs": "d1bac924af3e4f52e92f36fc593e2c0787dfa206db273392b51041a4d4291307",
+    "integrations/dsh/check.mjs": "aad54626e1cfc5e95ab1f7d7e8f08910c1d02526e1c3acfbaa687ec27370af18",
+    "integrations/dsh/execution-admission.mjs": "a3875bc1bdea7a241fa1a491e021e34993d3c2d7d4b4eb49fd75ceacb9060929",
+    "integrations/dsh/execution-cancellation.mjs": "2ec2fd5a880c1fa949e0d3c26fd3720f0c8846056c56b2723b52ab806c81136e",
+    "integrations/dsh/execution-capabilities.mjs": "6eb9220c1ba36ecab82908a090e15ec0e30d51b3f7e88ce0e00b6b18a3d1ea12",
+    "integrations/dsh/execution-checkpoints.mjs": "ae24816191bf6637b11de70ffda05b3ea2904777804789fa1f1b3b663627f7ec",
+    "integrations/dsh/execution-clarification-tool.mjs": "a40e10f92c35d42d1082b9f53fe0a154b812e8229dc2bd7339db436fc5078ff8",
+    "integrations/dsh/execution-clarifications.mjs": "c9b5babaf13e376923601489f8cf7950ee3ce6d37edccd48b493440a138dd993",
+    "integrations/dsh/execution-control-channel.mjs": "e4e33920507a4d49a792fa74f2281d0af99442925db12e2ff20761d126ea04bf",
+    "integrations/dsh/execution-control.mjs": "1c82a91f9988e437fc27b22f12c969e1a6bd0b55984457c1befa92f577920ce0",
+    "integrations/dsh/execution-deadline.mjs": "2472ca2060bce51a705cad4b229f83977bb657396dfe8029995a5c686aab2daa",
+    "integrations/dsh/execution-delivery-contract.mjs": "fe5d0ae9e9ba45c6a621cd82f964c8fe635d7cae0fe0744aab8ecb0023a50f35",
+    "integrations/dsh/execution-delivery.mjs": "770fc31f5cbac55a751315a02f488b5bb7d239d8440b8dae2f03b944a6bcf715",
+    "integrations/dsh/execution-fetch.mjs": "8884a06249acf568c2df78d65229b85bb7837052c3ea358ebb54e93e465edf46",
+    "integrations/dsh/execution-observations.mjs": "35f001215431575ffe20b6ebadd2663149e2c6d0219933d967f5c03f58757c64",
+    "integrations/dsh/execution-ownership.mjs": "82b4f61bfcbedf7a5f80ac786472e5b3e5a77ddc75701e3b36cfe803f003bde9",
+    "integrations/dsh/execution-prompt.mjs": "d36e3eb570e911aafebb9e10879f33c8534ec67f189608895284b24b34064e00",
+    "integrations/dsh/execution-sdk.mjs": "559261d787e68cbda1f065ae7d0f6ab6591d33d0afa8c062d78bfff6deef88c4",
+    "integrations/dsh/execution-search.mjs": "c5eb67948d7c4b7f9706863583cb8b7b08ce52997ba2791c641378d76c0e59e7",
+    "integrations/dsh/execution-shell.mjs": "529bd5870faf80ae9ab0ee460f45663a5c7b3e5e00cfc3b9eaff170ceef098e8",
+    "integrations/dsh/execution-web-budget.mjs": "0361e37f2398eaf35d493f5d91cd647078071409e3794fc931263193c2454810",
+    "integrations/dsh/execution-worker.mjs": "156318ab80ef598be0eff3c92531d771d2864eb89e8dbdd3d7bd8f7c57545c93",
+    "integrations/dsh/execution-workspace.mjs": "e00d88f42b476a43a70df9d78bc2d11d5465e4da8169339893e7a83168098f03",
+    "integrations/dsh/isolated-entry.mjs": "05dfe5f408030f2fdc604fd824ed29f0b5f4cb93ce3f7df9c92e002119b25448",
+    "integrations/dsh/tests/bridge.test.mjs": "cf21db8a1d70df127fdfa48090ad27e7fcfa9308cbc50f8c6e5fcec00dad0977",
+    "integrations/dsh/tests/execution-admission.test.mjs": "6c620a46b463d1985360d55e92871ea17e2b48b22c85583eef681426981e62c2",
+    "integrations/dsh/tests/execution-cancellation.test.mjs": "a6ac6d7abf84478c8307fe1470993f7766fbb418bc137a002263b619d755176b",
+    "integrations/dsh/tests/execution-checkpoints.test.mjs": "b285b35b8f923b0c0ff30e2666c753feb2da67da1cea757e84b3ed74ee0d76d9",
+    "integrations/dsh/tests/execution-clarifications.test.mjs": "f5228a854747a183b0f05435c84e7aa5a8b443b3d354e543109a6989ef088349",
+    "integrations/dsh/tests/execution-deadline.test.mjs": "52a0eaf49c8a697ddc854ec2b44c93ac68518b7202864f343138664827257f30",
+    "integrations/dsh/tests/execution-delivery.test.mjs": "1e291b22b26f4933756177f3f3bec1f8725f7d60c645a7f768c8ceff0f3c09ac",
+    "integrations/dsh/tests/execution-fetch.test.mjs": "cbdb1d1c9095353fc743b4da0de85d9055d3df2d672556fe7a55d0e64b0150ea",
+    "integrations/dsh/tests/execution-inputs.test.mjs": "2f229d9df158adaa44151032eef05050cecfec08a0e518bf14223db0512f88b2",
+    "integrations/dsh/tests/execution-observations.test.mjs": "09117a08190b5eeb4e489427c2e6ac780f0af2e6e1fba1059c735578549668ab",
+    "integrations/dsh/tests/execution-ownership.test.mjs": "1c3ce4d27c61a476183e7fc013963e673b5d6bf34d9e8eaf5e4460407950c36a",
+    "integrations/dsh/tests/execution-search.test.mjs": "4eb695b9fee260c57cfb3ae63ecaf362555138f49dbfe0f5ffd4d03e60824018",
+    "integrations/dsh/tests/execution-workspace.test.mjs": "b5746ab0d724078dac5af2bc43ad3ac574ec4a0ee00e1ed7534da8be96449cea",
+    "integrations/dsh/tests/gateway-stream.test.mjs": "ed406c757e16caef5c9c5d557e7ddaa0a4bd54039a44e721c485fe025649e223",
+    "integrations/dsh/tests/root-wakeup-runtime.mjs": "ad714b317f99b810d1ea98754c14302991b313677e527afe5cfb66dc9ad89772",
+    "integrations/dsh/tests/runtime-smoke.mjs": "4eebf77e9177dc2304a9e1cd35462a320ee39e281f5b2a22a8a2c7c8b0f974cf",
+    "integrations/dsh/tests/windows-path-broker.test.mjs": "6541596c10dec9ab5c8caa59988dbb8d58121a4d197ee1e041ff61e069338d58"
   },
   "case_set_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
   "metrics": {
-    "completed_model_calls": 22,
-    "usage": {
-      "prompt_tokens": 123830,
-      "prompt_cache_hit_tokens": 94848,
-      "prompt_cache_miss_tokens": 28982,
-      "completion_tokens": 702,
-      "total_tokens": 124532
-    },
-    "reported_models": [],
-    "cache_hit_ratio": 0.7659533231042558,
-    "median_call_ms": 1279
+    "completed_model_calls": 30,
+    "usage": {},
+    "reported_models": [
+      "scripted-synthetic"
+    ],
+    "cache_hit_ratio": null,
+    "median_call_ms": 0
   },
-  "attempted_calls": 22,
+  "attempted_calls": 30,
   "passed_cases": 0,
   "all_requested_completed": true
 }

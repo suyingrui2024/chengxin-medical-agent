@@ -35,6 +35,26 @@ _SEVERITY_ONLY = ("很严重", "严重", "要紧", "危险", "很危险")
 # to the goal slot (and the batch-A exam-goal branch answers visit ones).
 _PLAN_FRAGMENTS = ("去医院", "看医生", "就诊", "挂号", "吃药", "打针", "输液")
 
+# P5: treatment questions are not disease worries either. Without this,
+# "是不是需要做复位治疗？" was read as a disease worry (its "是不是…"
+# shape), consuming the goal line with an empty worry answer while the
+# real goal went unanswered. A "是不是 + disease/symptom name" worry is
+# untouched: these fragments only match treatment semantics.
+_TREATMENT_FRAGMENTS = (
+    "需要做",
+    "要不要做",
+    "要做",
+    "复位",
+    "手术",
+    "用药",
+    "滴眼药水",
+    "眼药水",
+    "含片",
+    "止痛药",
+    "退烧药",
+    "开药",
+)
+
 _TERMINATORS = "？?。！!；;\n"
 _LIST_CUTS = ("，", "、", "；", "而且", "但是", "不过")
 _TRAILING_PARTICLES = ("了", "的", "吗", "呢", "啊", "吧")
@@ -95,6 +115,8 @@ def extract_worry_object(text: str) -> Optional[str]:
     if obj in _SEVERITY_ONLY:
         return None
     if any(fragment in obj for fragment in _PLAN_FRAGMENTS):
+        return None
+    if any(fragment in obj for fragment in _TREATMENT_FRAGMENTS):
         return None
     return obj
 

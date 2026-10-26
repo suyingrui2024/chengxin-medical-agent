@@ -200,7 +200,18 @@ class GoalResponseTests(unittest.TestCase):
         self.assertIn(goal[:60], response)
 
     def test_banned_goal_degrades_without_quoting(self):
-        response = _build_goal_response("想知道是不是肯定是肺炎")
+        # P2 slot guard (O-15 / U-17): a worry-shaped goal is fully
+        # degraded to None here and answered by the worry channel
+        # instead — it must never render a second goal answer next
+        # to the worry slot's own response. Returning None is the
+        # new contract, not a regression: the banned phrase still
+        # never reaches a patient-visible rendering (the worry
+        # channel degrades it; see test_worry_banned_object_degrades).
+        self.assertIsNone(_build_goal_response("想知道是不是肯定是肺炎"))
+        # The original banned-degradation assertions are preserved
+        # verbatim on a non-worry banned goal: degraded to the
+        # object-free form, without quoting the banned phrase.
+        response = _build_goal_response("希望肯定是小问题")
         self.assertNotIn("肯定是", response)
         self.assertIn("你问到的这一点", response)
 

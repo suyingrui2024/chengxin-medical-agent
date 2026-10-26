@@ -50,6 +50,7 @@ from .interpreter import Interpretation
 from .knowledge import Question, question_fact_gates_pass
 from .reasoning import RuleBasedProposer, load_pathways
 from .text_match import contains_unnegated
+from .worry import extract_worry_object, is_worry_sentence
 from .adaptive_questions import (
     AdaptiveQuestionError,
     RISK_TAG_CUES,
@@ -713,7 +714,21 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             if confirmed is not None:
                 return self._deliver(state, confirmed, turn_id)
         if user_input.choice_value == "deny_emergency_clarification":
-            if self._emergency_clarification_pending(state) is not None:
+            pending = self._emergency_clarification_pending(state)
+            if pending is not None:
+                # P5 (C-07/C-08): the denial negates the danger signals,
+                # not the chief-complaint statement itself. Remember the
+                # clarified turn's text, scoped to this denial turn's
+                # input, so the model round that follows may quote it
+                # for chief facts that never landed (see _evidence_sources
+                # in agent_tools). The scope key (for_input) keeps the
+                # exception inert on every later turn: the current-turn
+                # evidence rule is otherwise untouched.
+                denied_text = pending.get("text")
+                if isinstance(denied_text, str) and denied_text.strip():
+                    state.runtime_snapshot[
+                        "emergency_clarification_denied"
+                    ] = {"text": denied_text, "for_input": text}
                 state.runtime_snapshot.pop("emergency_clarification", None)
                 self.events.append(
                     Event(
@@ -723,15 +738,20 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         turn_id=turn_id,
                     )
                 )
-        # Single-clue urgent close is gated here, before any handler can
-        # fall through to question-asking: without the gate (and its risk
-        # stand-down) the publication gate would block every question
-        # while risk stays URGENT, so deferral must happen at this point
-        # rather than only on the pending-calculation/self-check branch.
-        if risk.level == RiskLevel.URGENT:
-            gated = self._urgent_or_defer(state, turn_id)
-            if gated is not None:
-                return self._deliver(state, gated, turn_id)
+        # P5 (round-2 ④-4): the urgent gate is NOT evaluated here, before
+        # this round's record_facts. The old pre-model gate closed on
+        # "asked" minimum facts (see _urgent_gate_fact_satisfied) while
+        # the closing round's answer was still unrecorded, so the
+        # associated_symptoms / patient_goal answer never reached the
+        # final state. Mirror the deterministic order (record, then gate,
+        # then plan): _run evaluates _urgent_or_defer after each
+        # record_facts execution (and before delivering a model-planned
+        # question), where record_facts has already re-assessed risk from
+        # the landed facts. The gate's trigger conditions and minimum
+        # facts are unchanged; only the evaluation point moved. The
+        # pending-calculation/self-check branch below keeps its own gate:
+        # that path resumes pending work rather than recording a fresh
+        # model answer, so its gate is not a closing-round answer gate.
         if risk.level == RiskLevel.EMERGENCY:
             action = self._emergency_clarification_action(
                 state,
@@ -755,10 +775,9 @@ class AdaptiveConsultationEngine(ConsultationEngine):
             return self._deliver(
                 state, self._emergency_reply(state, risk.triggers), turn_id
             )
-        if adaptive_answer and risk.level == RiskLevel.URGENT:
-            gated = self._urgent_or_defer(state, turn_id)
-            if gated is not None:
-                return self._deliver(state, gated, turn_id)
+        # (P5 ④-4: the adaptive-answer duplicate of the pre-model urgent
+        # gate is removed for the same record-first reason; _run's
+        # post-record gate covers it.)
         revision_reply = self._handle_location_revision_action(
             state, user_input, text, turn_id
         )
@@ -1610,6 +1629,11 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     if writes >= 2 and not correction_only:
                         raise ProposalError("本轮写入次数已达上限，请提问或核对摘要")
                 answering_goal = state.active_question == "patient_goal"
+                goal_fact_id_before = (
+                    state.facts["patient_goal"].fact_id
+                    if "patient_goal" in state.facts
+                    else None
+                )
                 result = self._execute(state, command, text, turn_id)
                 if command["tool"] == "record_facts":
                     if not correction_only:
@@ -1630,6 +1654,67 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                     # Judge by what actually landed: under partial recording
                     # the patient_goal item itself may have been rejected.
                     goal_answered = answering_goal and "patient_goal" in state.facts
+                    # P5 (round-2 ④-3): a worry sentence filed as
+                    # patient_goal is diverted, never booked as the goal.
+                    # The single worry contract is worry.py's
+                    # is_worry_sentence / extract_worry_object — no local
+                    # pattern is invented here. The diverted goal fact is
+                    # removed from facts (history keeps the audit trail),
+                    # the worry lands in patient_worry only, goal_answered
+                    # stays False, and the goal question stays active so
+                    # the patient's real goal is still asked afterwards.
+                    # This applies to any newly landed goal value, not
+                    # only the answering-goal round: a worry must never
+                    # occupy the goal slot.
+                    if command["tool"] == "record_facts":
+                        goal_fact = state.facts.get("patient_goal")
+                        if (
+                            goal_fact is not None
+                            and goal_fact.fact_id != goal_fact_id_before
+                        ):
+                            goal_text = (
+                                goal_fact.value
+                                if isinstance(goal_fact.value, str)
+                                else ""
+                            )
+                            if not goal_text and isinstance(
+                                goal_fact.evidence, str
+                            ):
+                                goal_text = goal_fact.evidence
+                            worry_obj = (
+                                extract_worry_object(goal_text)
+                                if goal_text
+                                else None
+                            )
+                            if worry_obj is not None and is_worry_sentence(
+                                goal_text
+                            ):
+                                del state.facts["patient_goal"]
+                                if "patient_worry" not in state.facts:
+                                    state.record(
+                                        Fact(
+                                            key="patient_worry",
+                                            value=worry_obj,
+                                            assertion=Assertion.PRESENT,
+                                            source=goal_fact.source,
+                                            turn_id=turn_id,
+                                            evidence=goal_text,
+                                        )
+                                    )
+                                if answering_goal:
+                                    state.active_question = "patient_goal"
+                                    state.active_question_is_clarification = (
+                                        False
+                                    )
+                                goal_answered = False
+                                self.events.append(
+                                    Event(
+                                        state.session_id,
+                                        "goal.worry_diverted",
+                                        {"object": worry_obj},
+                                        turn_id=turn_id,
+                                    )
+                                )
             except SubjectBoundaryError as exc:
                 self.events.append(
                     Event(
@@ -1672,6 +1757,21 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                         turn_id=turn_id,
                     )
                 )
+                # P5 (④-4, record-first): a model-planned question is
+                # the plan step, so the urgent gate runs before it is
+                # delivered — never before this round's record_facts.
+                # A passing gate closes urgently (with any facts this
+                # round already landed); a deferring gate stands risk
+                # down, so the question itself stays deliverable.
+                # Only questions are intercepted: subject/task/self-check
+                # replies keep their own _submit handlers and gates.
+                if (
+                    result.kind == "question"
+                    and state.risk.level == RiskLevel.URGENT
+                ):
+                    gated = self._urgent_or_defer(state, turn_id)
+                    if gated is not None:
+                        return self._deliver(state, gated, turn_id)
                 return self._deliver(state, result, turn_id)
             self.events.append(
                 Event(
@@ -2265,6 +2365,33 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 raise ProposalError("问题不适用于当前主诉")
             if not self._fact_gates_pass(state, question):
                 raise ProposalError("该问题已被当前已知事实排除（如性别或年龄范围不适用）")
+            # Hypothesis-order check (P0): the model may phrase the
+            # question, but what to ask next is the ranker's call. The
+            # existing 6-step self-correction loop re-proposes on this
+            # error. Exempt: clarification rounds (the clarify tool has
+            # its own branch below; here a clarification round is
+            # flagged by active_question_is_clarification), follow-ups
+            # of the active question, and pending emergency
+            # clarifications. The pick must come from the same validated
+            # candidate set, otherwise the check passes through rather
+            # than risk a proposal loop the model cannot exit.
+            ranker = getattr(self, "ranker", None)
+            if ranker is not None and not state.active_question_is_clarification:
+                chief = str(state.get("chief_complaint", "") or "")
+                candidates = self._candidate_questions(state, chief)
+                candidate_ids = {item.id for item in candidates}
+                pick = ranker.choose(state, candidates)
+                if (
+                    pick is not None
+                    and pick in candidate_ids
+                    and args["question_id"] in candidate_ids
+                    and args["question_id"] != state.active_question
+                    and self._emergency_clarification_pending(state) is None
+                    and args["question_id"] != pick
+                ):
+                    raise ProposalError(
+                        f"按假设排序应先问 {pick}，当前提议 {args['question_id']} 暂缓"
+                    )
             return self._ask(state, question, "根据本轮证据与尚未处理的缺口选择下一问")
         if tool == "ask_patient":
             if state.self_check_conversation:

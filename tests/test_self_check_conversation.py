@@ -47,12 +47,12 @@ class SelfCheckConversationTests(unittest.TestCase):
         offered = self.offer()
         self.backend.commands = [
             self.medicine(),
-            cmd("ask_question", question_id="onset"),
+            cmd("ask_question", question_id="sex"),
         ]
         reply = self.submit("昨晚用过药物甲。", action=offered.action_id)
         self.assertNotIn("symptom_location", self.state.facts)
         self.assertEqual(self.state.get("medications_taken"), "昨晚用过药物甲")
-        self.assertEqual(reply.question_id, "onset")
+        self.assertEqual(reply.question_id, "sex")
         before = len(self.backend.calls)
         choice = next(
             q.value
@@ -62,7 +62,7 @@ class SelfCheckConversationTests(unittest.TestCase):
         resumed = self.submit("继续定位", choice, reply.action_id)
         self.assertEqual(len(self.backend.calls), before)
         self.assertEqual(resumed.task["interaction_id"], offered.task["interaction_id"])
-        self.backend.commands = [cmd("ask_question", question_id="onset")]
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
         self.submit("头/面部", "head", resumed.action_id)
         self.assertEqual(self.state.get("symptom_location"), "头/面部")
         self.assertIsNone(self.state.self_check_conversation)
@@ -290,7 +290,7 @@ class SelfCheckConversationTests(unittest.TestCase):
 
     def test_resume_button_without_current_action_is_rejected_before_journaling(self):
         self.offer()
-        self.backend.commands = [cmd("ask_question", question_id="onset")]
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
         reply = self.submit("先说说其他情况")
         choice = next(
             q.value
@@ -308,7 +308,7 @@ class SelfCheckConversationTests(unittest.TestCase):
         self.offer()
         self.backend.commands = [
             self.medicine(),
-            cmd("ask_question", question_id="onset"),
+            cmd("ask_question", question_id="sex"),
         ]
         reply = self.submit("昨晚用过药物甲")
         frame = deepcopy(self.state.self_check_conversation)

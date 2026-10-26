@@ -16,7 +16,7 @@ class RecordedRecoveryTests(unittest.TestCase):
         spec.loader.exec_module(module)
         report = module.verify(root)
         self.assertEqual(report["live_api_calls"], 0)
-        self.assertEqual(report["recorded_decisions"], 26)
+        self.assertEqual(report["recorded_decisions"], 33)
         self.assertTrue(report["passed"], report["result"]["checks"])
 
 

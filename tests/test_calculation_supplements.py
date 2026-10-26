@@ -210,9 +210,9 @@ class CalculationSupplementTests(unittest.TestCase):
         self.assertEqual(result.calculation_followup["outcome"], "completed")
         self.assertEqual(len(self.backend.calls), 1)
         self.assertEqual(self.state.facts, {})
-        self.backend.commands = [medication(), ask()]
+        self.backend.commands = [medication(), ask("consult_for")]
         reply = self.continue_result(result)
-        self.assertEqual(reply.question_id, "age")
+        self.assertEqual(reply.question_id, "consult_for")
         self.assertEqual(self.state.facts["medications_taken"].turn_id, source)
         self.assertIn(self.text, self.backend.calls[-1][1]["content"])
         self.assertEqual(reply.calculation_followup["status"], "forwarded")
@@ -221,7 +221,7 @@ class CalculationSupplementTests(unittest.TestCase):
 
     def test_skipping_arithmetic_still_processes_the_rest_of_the_original_message(self):
         draft = self.offer()
-        self.backend.commands = [medication(), ask()]
+        self.backend.commands = [medication(), ask("consult_for")]
         reply = self.engine.submit(
             self.state.session_id,
             UserInput(
@@ -246,11 +246,11 @@ class CalculationSupplementTests(unittest.TestCase):
         self.assertEqual(failed.kind, "service_error")
         self.assertEqual(failed.calculation_followup["status"], "pending")
         self.assertEqual(self.state.pending_input, self.text)
-        self.backend.commands = [calculation(self.text), medication(), ask()]
+        self.backend.commands = [calculation(self.text), medication(), ask("consult_for")]
         reply = self.engine.submit(
             self.state.session_id, UserInput("重试这一轮", "retry_turn", failed.action_id)
         )
-        self.assertEqual(reply.question_id, "age")
+        self.assertEqual(reply.question_id, "consult_for")
         self.assertEqual(self.state.facts["medications_taken"].turn_id, source)
         self.assertEqual(len(self.state.calculations), 1)
         self.assertIsNone(self.state.pending_calculation)

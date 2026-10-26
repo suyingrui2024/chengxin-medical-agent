@@ -235,6 +235,7 @@ class MeasurementSupplementTests(unittest.TestCase):
                 "record_facts",
                 facts=[
                     fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
                     fact("age_years", 32, "32岁"),
                     fact("chief_complaint", "咳嗽发烧", "咳嗽发烧"),
                     fact("onset", "两天", "两天"),

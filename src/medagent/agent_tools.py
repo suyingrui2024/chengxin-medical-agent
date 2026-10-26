@@ -17,7 +17,7 @@ from .assertion_evidence import (
 TOOL_DEFINITIONS = [
     {
         "name": "record_facts",
-        "description": "从患者原话提议fact_schema中的问诊事实。逐条校验：通过项先写入，未通过项不写入并逐条返回原因与修复指引；只需修正未通过项后单独重提，已写入项不要重复提议（再次提议须correction=true）。每个事实必须附患者原话的连续逐字引文——本轮输入；更正既有事实时也可引用该事实原始记录所在轮次的原话。体温、部位等observation_fields_read_only由宿主图示处理，不得通过此工具写入。",
+        "description": "从患者原话提议fact_schema中的问诊事实。逐条校验：通过项先写入，未通过项不写入并逐条返回原因与修复指引；只需修正未通过项后单独重提，已写入项不要重复提议（再次提议须correction=true）。每个事实必须附患者原话的连续逐字引文——本轮输入；更正既有事实时也可引用该事实原始记录所在轮次的原话。澄清否认当轮除外：患者否认危险信号澄清后，可引用被澄清的首轮主诉原话为尚未落账的主诉事实作证。体温、部位等observation_fields_read_only由宿主图示处理，不得通过此工具写入。",
         "arguments": {
             "facts": [
                 {
@@ -261,8 +261,29 @@ def _evidence_sources(
     evidence in the transcript, falling back to the recorded evidence
     itself). Quotes from other turns stay invalid, so a superseded fact
     cannot be resurrected by re-quoting its stale source turn.
+
+    One narrow exception (P5, C-07/C-08): on the turn where the patient
+    denies an emergency clarification, the clarified first turn's text is
+    also a source — but only for facts not yet recorded, and only when
+    the current input is exactly that denial turn's input (the adaptive
+    engine stamps the marker with for_input). The denial negates the
+    danger signals, not the chief-complaint statement itself, so quoting
+    the chief statement in the denial round is not a stale resurrection;
+    on any other turn the marker is inert and the current-turn rule
+    applies unchanged.
     """
     sources = [raw_text]
+    if not correction and key not in state.facts:
+        snapshot = getattr(state, "runtime_snapshot", None) or {}
+        denied = snapshot.get("emergency_clarification_denied")
+        if (
+            isinstance(denied, dict)
+            and denied.get("for_input") == raw_text
+            and isinstance(denied.get("text"), str)
+            and denied["text"].strip()
+            and denied["text"] not in sources
+        ):
+            sources.append(denied["text"])
     if correction:
         existing = state.facts.get(key)
         if existing is not None and existing.evidence:
@@ -324,7 +345,8 @@ def _validate_item(
             "evidence 必须是本轮输入的连续原文，不能虚构引文",
             "修复：从患者原话中逐字复制一段连续文字作为 evidence，不要改字、删字或跨句拼接；"
             "更正既有事实时也可引用该事实原始记录所在轮次的患者原话（须 correction=true），"
-            "其他轮次的原话不能用作新事实的引文。",
+            "其他轮次的原话不能用作新事实的引文。澄清否认当轮除外：患者否认危险信号澄清后，"
+            "可引用被澄清的首轮主诉原话为尚未落账的主诉事实作证（否认仅否定危险信号，不否定主诉陈述本身）。",
         )
     try:
         assertion = Assertion(item.get("assertion"))

@@ -206,7 +206,53 @@ class ContentRepository:
         question's ``applies_also_when`` metadata is evaluated against
         the named facts' values + evidence (PRESENT facts only,
         negation-aware): this is how a fever recorded only under
-        associated_symptoms makes reported_temperature requestable."""
+        associated_symptoms makes reported_temperature requestable.
+
+        P4 (G-11 / E-10): the infant-observable question has its own
+        subject gate on top of the chief check, because its old
+        "unknown age keeps it eligible" behaviour asked adults who
+        had already said they consult for themselves about babies.
+        It applies only when the subject is plausibly an infant:
+        consult_for=self never applies; a known age over 3 never
+        applies; a known age of 3 or under applies; a consultation
+        for a child applies even when the age is still unknown; an
+        unknown age with no child consultation does not apply. The
+        question text (questions.json) and the separate
+        age_between_when_known fact gate are untouched."""
+        if question.id == "infant_observable_signs" and state is not None:
+            facts = getattr(state, "facts", {}) or {}
+            consult = facts.get("consult_for")
+            consult_value = (
+                consult.value
+                if consult is not None
+                and getattr(consult, "assertion", None) is not None
+                and getattr(consult.assertion, "value", consult.assertion)
+                == "present"
+                else None
+            )
+            if consult_value == "self":
+                return False
+            age_fact = facts.get("age_years")
+            age_value = None
+            if age_fact is not None and (
+                getattr(age_fact.assertion, "value", age_fact.assertion)
+                == "present"
+            ):
+                raw_age = age_fact.value
+                if isinstance(raw_age, bool):
+                    raw_age = None
+                elif isinstance(raw_age, (int, float)):
+                    age_value = float(raw_age)
+                elif isinstance(raw_age, str):
+                    try:
+                        age_value = float(raw_age)
+                    except ValueError:
+                        age_value = None
+            if age_value is not None:
+                if age_value > 3:
+                    return False
+            elif consult_value != "child":
+                return False
         terms = question.applies_when.get("chief_complaint_contains_any", [])
         if not terms:
             return True

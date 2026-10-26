@@ -21,6 +21,11 @@ from importlib import resources
 from typing import Any, Dict, List, Optional
 
 from .baseline_projection import build_allergy_hint
+from .direction_guards import (
+    direction_kept,
+    is_affirmed_in_text,
+    severity_consistent_text,
+)
 from .domain import Assertion, CaseState, Phase, RiskLevel
 from .followups import build_follow_up_plan
 from .handoff import LABELS as FACT_LABELS
@@ -29,7 +34,9 @@ from .text_match import contains_unnegated, find_unnegated_certain
 from .worry import extract_worry_object, is_worry_sentence
 
 # Batch B citation validation uses text_match's shared
-# ``find_unnegated_certain`` directly (imported above). An earlier
+# ``find_unnegated_certain`` via direction_guards.is_affirmed_in_text
+# (shared test plus the P4 perception / sentence-tail / local rules).
+# An earlier
 # revision carried a local fallback (``_quote_affirmed_certain_local``)
 # for a time when those names were not in text_match yet; it was
 # deleted in the batch-B rework because its semantics diverged from
@@ -327,9 +334,11 @@ def apply_neutral_fallback(sheet: Dict[str, Any]) -> Dict[str, Any]:
 # Batch B: a support quote is only usable when it is affirmed and
 # certain patient wording — not a denial, not an unknown, not a
 # truncated character, not a score, not an encoded value. The
-# affirmed-and-certain test is text_match.find_unnegated_certain
-# itself (imported at the top); there is deliberately no local copy
-# of its negation/uncertainty rules in this module.
+# affirmed-and-certain test is direction_guards.is_affirmed_in_text
+# (the shared text_match.find_unnegated_certain test plus the P4
+# perception / sentence-tail / local-descriptor rules); there is
+# deliberately no second local copy of its negation/uncertainty
+# rules in this module.
 # Encoded fact values that must never pose as patient quotes. This
 # mirrors consultation.VALUE_LABELS keys (and reasoning._ENCODING_VALUES);
 # consultation itself cannot be imported here (circular via bridging,
@@ -367,6 +376,15 @@ def _valid_support_quote(state: CaseState, ref) -> bool:
     is single-character by design); it is not a pure number or an
     encoded value; it is a substring of the fact's evidence/value or a
     user transcript turn; and that occurrence is affirmed and certain.
+
+    P4: the affirmation test is direction_guards.is_affirmed_in_text,
+    which is the shared find_unnegated_certain test *plus* the three
+    shapes it misses — perception-verb negation ("也不觉得呼吸困难"
+    denying 困难, P-03/T-06), sentence-tail uncertainty over a
+    "、"-joined recapitulation ("……都不清楚" closing the list, N-10),
+    and local-descriptor substrings ("脸颊发红发热" as systemic fever,
+    D-13). A quote whose only occurrences fail that test is inverted
+    evidence and is dropped here, before any direction can use it.
     """
     fact = state.facts.get(ref.fact_key)
     if fact is None or fact.assertion != Assertion.PRESENT:
@@ -389,7 +407,7 @@ def _valid_support_quote(state: CaseState, ref) -> bool:
         if item.get("role") == "user" and item.get("content")
     )
     for source in sources:
-        if quote in source and find_unnegated_certain(source, quote) >= 0:
+        if quote in source and is_affirmed_in_text(source, quote):
             return True
     return False
 
@@ -497,12 +515,23 @@ def _select_directions(accepted, state: CaseState) -> tuple[List[Dict[str, Any]]
         # against_note is untouched by this gate — it only ever
         # narrates ABSENT facts, so an affirmation check on it would
         # be backwards.
-        valid_quotes = [
-            ref.quote
+        valid_quote_refs = [
+            (ref, ref.quote)
             for ref in hypothesis.evidence_for
             if _valid_support_quote(state, ref)
         ]
+        valid_quotes = [quote for _ref, quote in valid_quote_refs]
         if not valid_quotes:
+            continue
+        # P4 direction anchoring (④-6): a direction that survives
+        # the quote gate can still be unanchored — trajectory/coding
+        # wording as its only support (J-07), fever/coding-only
+        # cross-system rule-outs (U-11/U-14), or every quote denied
+        # on record by an ABSENT fact. Such a direction is dropped
+        # here, never kept to preserve a direction count; dropping
+        # also removes its label from narrative reasoning and the
+        # department reason, which are both rendered from this list.
+        if not direction_kept(hypothesis, group, valid_quote_refs, state):
             continue
         against_note = _against_note(hypothesis, state)
         directions.append(
@@ -903,7 +932,15 @@ def _apply_infant_observable(sheet: Dict[str, Any], state: CaseState) -> Dict[st
     self-care / warning items are replaced by caregiver-observable
     ones (crying, refusal to eat, alertness, urine output, stool
     character). Avoid items are untouched (medication wording is
-    not pain reporting)."""
+    not pain reporting).
+
+    P-22 supplement (replacement alone was base-table dependent):
+    when the base table has no pain / abdominal item to replace —
+    e.g. the generic emergency list on an infant dehydration sheet —
+    the infant items are *appended* instead, so the adaptation no
+    longer depends on which base table the sheet happened to draw.
+    The worsening item is appended only when no existing item
+    already names reduced urine output, to avoid near-duplicates."""
     if not isinstance(sheet, dict) or not _is_infant_case(state):
         return sheet
     care = sheet.get("self_care")
@@ -918,11 +955,20 @@ def _apply_infant_observable(sheet: Dict[str, Any], state: CaseState) -> Dict[st
             _INFANT_OBSERVABLE_MEASURE if "疼痛" in item else item
             for item in care.get("measure", [])
         ]
+        if _INFANT_OBSERVABLE_DO not in care.get("do", []):
+            care["do"] = list(care.get("do", [])) + [_INFANT_OBSERVABLE_DO]
     if isinstance(sheet.get("return_now_if"), list):
         sheet["return_now_if"] = [
             _INFANT_WORSENING if "腹痛" in item else item
             for item in sheet["return_now_if"]
         ]
+        if _INFANT_WORSENING not in sheet["return_now_if"] and not any(
+            "尿量" in item for item in sheet["return_now_if"]
+            if isinstance(item, str)
+        ):
+            sheet["return_now_if"] = list(sheet["return_now_if"]) + [
+                _INFANT_WORSENING
+            ]
     return sheet
 
 
@@ -1089,11 +1135,18 @@ def _build_narrative(
     group_key: str,
     directions: List[Dict[str, Any]],
     gaps: List[Dict[str, Any]],
+    state: Optional[CaseState] = None,
 ) -> Optional[Dict[str, Any]]:
     """Three-part narrative (benchmark design §3.1): framing （定性）,
     reasoning （原理）, severity （大白话程度）. Framing and severity are
     always present on a sheet when the asset is available; reasoning
-    may be None. Deterministic template assembly only."""
+    may be None. Deterministic template assembly only.
+
+    P4 (S-11): the severity line passes through the consistency
+    fallback when a state is supplied — a recorded low score never
+    keeps the urgent template's "程度偏高" claim; it falls back to
+    restating the recorded score. The template itself is untouched,
+    and no disposition is recomputed."""
     if not templates:
         return None
     framing_map = templates.get("framing") or {}
@@ -1105,12 +1158,15 @@ def _build_narrative(
     if not framing_template or not severity_template:
         return None
     group_label = (templates.get("group_labels") or {}).get(group_key, "身体")
+    severity_text = severity_template.replace("{group}", group_label)
+    if state is not None:
+        severity_text = severity_consistent_text(severity_text, state)
     return {
         "framing": framing_template.replace("{group}", group_label),
         "reasoning": _narrative_reasoning(
             templates.get("reasoning") or {}, directions, gaps
         ),
-        "severity": severity_template.replace("{group}", group_label),
+        "severity": severity_text,
     }
 
 
@@ -1215,6 +1271,15 @@ def _build_goal_response(goal_line: Optional[str]) -> Optional[str]:
     object-free form (the goal itself is still quoted nowhere)."""
     if not goal_line:
         return None
+    # P2 slot guard (O-15 / U-17): a worry sentence sitting in the
+    # goal slot must never render a second, near-identical answer
+    # next to the worry slot's own response. is_worry_sentence is
+    # reused from worry.py; no local judgement is invented here.
+    # (The goal slot itself is still emptied by _build_worry only
+    # when no separate patient_worry fact exists; when both facts
+    # exist this guard is what keeps the close to one rendering.)
+    if is_worry_sentence(goal_line):
+        return None
     if any(keyword in goal_line for keyword in _VISIT_GOAL_KEYWORDS):
         return None
     display = goal_line if len(goal_line) <= 60 else goal_line[:60] + "…"
@@ -1228,6 +1293,297 @@ def _build_goal_response(goal_line: Optional[str]) -> Optional[str]:
             "需要当面评估后决定；请按结论单的处置建议行动，出现警示信号及时就医。"
         )
     return response
+
+
+# ---------------------------------------------------------------------------
+# P2 goal-part handling (mechanism ②: a multi-part goal must be
+# answered part by part, not only on its visit part).
+#
+# Why the whole-goal slot is not enough: _build_goal_response returns
+# None for any goal_line containing a visit keyword, so a goal like
+# "要不要去医院，还是先吃止痛药观察" (K-16) lost its non-visit part
+# entirely — the batch-A visit sentence answered only the visit part.
+# The close layer therefore re-walks the parts: visit parts are
+# covered by the batch-A sentence, every other part needs its own
+# handling sentence, and a part whose handling cannot be sourced from
+# the sheet's own self-care items gets the fixed "insufficient
+# information" sentence. No efficacy, dosage, or disposition promise
+# is ever composed here: drug / treatment parts always take the
+# fixed sentence, never a self-care item's wording.
+# ---------------------------------------------------------------------------
+
+# Leading question scaffolding stripped (longest first) before a
+# part's content keywords are derived. These are question frames,
+# never content: stripping them leaves the thing actually asked
+# about (e.g. "要不要吃退烧药" -> "吃退烧药" -> "退烧药").
+_GOAL_PART_PREFIXES = (
+    "我就想知道",
+    "我只想知道",
+    "最想知道",
+    "想知道",
+    "想问",
+    "要不要",
+    "能不能",
+    "会不会",
+    "需不需要",
+    "是不是",
+    "是否",
+    "平时怎么",
+    "吃什么能",
+    "吃什么",
+    "先吃",
+    "还是",
+    "还有",
+    "需要",
+    "先",
+    "要",
+)
+
+# Parts naming a drug or a named treatment: handling is always the
+# fixed sentence, even if a self-care item happens to share a word.
+# (A generic "不要自行服用抗生素" is not an answer to "要不要吃退烧药".)
+_GOAL_DRUG_TREATMENT_WORDS = (
+    "止痛药",
+    "退烧药",
+    "眼药水",
+    "滴眼液",
+    "滴眼药",
+    "复位",
+    "含片",
+    "感冒药",
+    "抗生素",
+    "用药",
+    "吃药",
+)
+
+_GOAL_PART_FIXED_HANDLING = (
+    "这一点这次问诊的信息还不足以直接回答，需当面评估后决定"
+)
+
+# Stopwords removed when deriving chief-complaint chunks for the
+# K-17 preference (a self-care item overlapping the chief wins over
+# a merely part-matching one); the chunks themselves are patient
+# wording, never new clinical content.
+_CHIEF_CHUNK_STOPWORDS = (
+    "我",
+    "自己",
+    "孩子",
+    "咨询",
+    "的",
+    "了",
+    "很",
+    "有",
+    "是",
+    "最近",
+    "一直",
+    "感觉",
+    "出现",
+    "情况",
+    "问题",
+    "这次",
+    "有点",
+    "比较",
+)
+
+
+def split_goal_parts(goal_line: str) -> List[str]:
+    """Split a goal line into parts on ，、；, stripped, deduped,
+    order preserved. Empty parts and trailing terminal punctuation
+    (the recorded sentence's own 。) are dropped."""
+    if not goal_line:
+        return []
+    parts: List[str] = []
+    for raw in re.split("[，、；]", goal_line):
+        part = raw.strip().strip("。！？")
+        if part and part not in parts:
+            parts.append(part)
+    return parts
+
+
+def _part_keywords(part: str) -> List[str]:
+    """Content keywords of one goal part, for the addressed check.
+
+    The full part is always a keyword; stripping question scaffolding
+    and one leading verb character adds the shorter content form
+    (e.g. "吃退烧药" -> "退烧药"), and a "不X" form adds X
+    (e.g. "正不正常" -> "正常"). The addressed check is a substring
+    check of these keywords in the visible close text *excluding*
+    the goal_response's own quote of the goal — otherwise every part
+    would trivially "appear" via its own quotation. Note the
+    deliberate non-shortening: "缓解一点" is kept whole, not cut to
+    "缓解", so a batch-A condition clause ("症状持续不缓解") does
+    not falsely mark a relief-method part as answered (F-13)."""
+    core = part.strip()
+    # Strip scaffolding repeatedly (longest first each pass): stacked
+    # frames are real ("还是先吃…" -> "先吃…" -> content; "是不是
+    # 需要做…" -> "需要做…" -> content). Bounded so a degenerate
+    # part cannot loop.
+    for _ in range(3):
+        stripped = False
+        for prefix in _GOAL_PART_PREFIXES:
+            if core.startswith(prefix) and len(core) > len(prefix):
+                core = core[len(prefix):]
+                stripped = True
+                break
+        if not stripped:
+            break
+    keywords: List[str] = []
+    if part.strip() and part.strip() not in keywords:
+        keywords.append(part.strip())
+    if core and core not in keywords:
+        keywords.append(core)
+    # One leading verb character off (吃/用/做/留 …): "吃退烧药"
+    # also matches on "退烧药" alone.
+    if len(core) >= 3 and core[0] in "吃用喝做贴滴停开留":
+        shorter = core[1:]
+        if shorter not in keywords:
+            keywords.append(shorter)
+    # "不X" -> X ("正不正常" -> "正常").
+    index = core.find("不")
+    if index >= 0 and len(core) - index - 1 >= 2:
+        without_bu = core[index + 1:]
+        if without_bu not in keywords:
+            keywords.append(without_bu)
+    return [keyword for keyword in keywords if len(keyword) >= 2]
+
+
+# Visit semantics for the *part* filter only (the composer's
+# _VISIT_GOAL_KEYWORDS is untouched): 就医 is visit wording too —
+# a part like "想整理就医记录" is answered by the disposition line
+# ("暂时不需要专门跑一趟医院") and the confirmation flow itself,
+# not by a per-part sentence. Without this, record-organisation
+# goals that the composer already answers generically would gain a
+# redundant per-part sentence and break the pinned close bytes.
+_GOAL_VISIT_PART_KEYWORDS = _VISIT_GOAL_KEYWORDS + ("就医",)
+
+
+def unaddressed_goal_parts(goal_line: str, visible_text: str) -> List[str]:
+    """Parts of a goal line with no handling in the visible text.
+
+    Visit-keyword parts are treated as covered by the batch-A visit
+    sentence and never listed; any other part whose keywords appear
+    nowhere in visible_text is unaddressed. Callers must pass the
+    close text *without* the goal_response quote (see _part_keywords)
+    or the check is vacuous."""
+    if not goal_line:
+        return []
+    visible = visible_text or ""
+    unaddressed: List[str] = []
+    for part in split_goal_parts(goal_line):
+        if any(keyword in part for keyword in _GOAL_VISIT_PART_KEYWORDS):
+            continue
+        keywords = _part_keywords(part)
+        if not keywords:
+            continue
+        if not any(keyword in visible for keyword in keywords):
+            unaddressed.append(part)
+    return unaddressed
+
+
+def goal_part_handling(
+    part: str, sheet: Dict[str, Any], chief_text: str = ""
+) -> str:
+    """Handling sentence body for one unaddressed goal part.
+
+    Drug / treatment parts always take the fixed sentence. Otherwise
+    the first self-care "do" item sharing a part keyword wins, with
+    chief-overlapping items preferred (K-17: a do item matching the
+    chief complaint's own wording is the most specific answer the
+    sheet already contains). When no sheet item matches, the fixed
+    sentence is returned — never an invented self-care line. In
+    particular, self_care.json contains no ulcer-specific entry at
+    all (verified: 溃疡/口腔/辣/酸 all absent), so ulcer goals fall
+    through to the fixed sentence and stay a reported residual."""
+    if any(word in part for word in _GOAL_DRUG_TREATMENT_WORDS):
+        return _GOAL_PART_FIXED_HANDLING
+    keywords = _part_keywords(part)
+    care = sheet.get("self_care") if isinstance(sheet, dict) else None
+    do_items = (
+        [item for item in (care or {}).get("do", []) if isinstance(item, str)]
+        if isinstance(care, dict)
+        else []
+    )
+    candidates = [
+        item for item in do_items if any(keyword in item for keyword in keywords)
+    ]
+    if not candidates:
+        return _GOAL_PART_FIXED_HANDLING
+    chunks = [
+        chunk
+        for chunk in re.split("[，、。；：\\s]", chief_text or "")
+        if len(chunk) >= 2 and chunk not in _CHIEF_CHUNK_STOPWORDS
+    ]
+    for item in candidates:
+        if any(chunk in item for chunk in chunks):
+            return item
+    return candidates[0]
+
+
+# ---------------------------------------------------------------------------
+# G-12 engineering-side exit (UNDETERMINED must not silently slide
+# to routine). The disposition mapping itself is untouched: this only
+# adds (a) an explicit uncertainty note on the sheet, rendered by the
+# close layer, and (b) worsening items derived strictly from
+# symptoms the patient already reported (PRESENT facts). Whether the
+# level itself should move is a clinical-review decision, not made
+# here; asking the discriminating questions before close (volume,
+# frequency, persistence / recurrence, whether dizziness / palpitations
+# persist) would need a planning change and is recorded as a residual.
+# ---------------------------------------------------------------------------
+
+UNCERTAINTY_NOTE = (
+    "需要说明的是：这次问诊里急症筛查的结果还不明确，"
+    "现有信息还不足以完全判断紧急程度，请对照下方加重即就医项留意变化，"
+    "必要时尽快线下评估。"
+)
+
+# (reported-symptom terms, worsening item, dedup terms already covered
+# by an existing safety-net item). Only PRESENT facts are read, so a
+# denied or unknown symptom never invents an item.
+_G12_WORSENING_MAP = (
+    (("便血", "黑便", "血便"), "再出现便血或黑便", ("便血", "黑便")),
+    (("呕血", "吐血"), "再出现呕血", ("呕血",)),
+    (("头晕",), "头晕加重", ("头晕",)),
+    (("心慌",), "心慌加重", ("心慌",)),
+)
+
+
+def _is_undetermined_unknown_screen(state: CaseState) -> bool:
+    """G-12 gate: risk UNDETERMINED *and* the emergency screen itself
+    answered unknown. A missing screen is not an unknown screen."""
+    if state.risk is None or state.risk.level != RiskLevel.UNDETERMINED:
+        return False
+    screen = state.facts.get("emergency_screen")
+    return screen is not None and screen.assertion == Assertion.UNKNOWN
+
+
+def _apply_undetermined_safety(sheet: Dict[str, Any], state: CaseState) -> Dict[str, Any]:
+    """G-12 (a)+(b): uncertainty note + patient-derived worsening items."""
+    if not isinstance(sheet, dict) or not _is_undetermined_unknown_screen(state):
+        return sheet
+    sheet["uncertainty_note"] = UNCERTAINTY_NOTE
+    reported = ""
+    for fact in state.facts.values():
+        if fact.assertion != Assertion.PRESENT:
+            continue
+        if isinstance(fact.value, str):
+            reported += fact.value
+        if fact.evidence:
+            reported += fact.evidence
+    current = sheet.get("return_now_if")
+    if isinstance(current, list):
+        for terms, item, dedup_terms in _G12_WORSENING_MAP:
+            if not any(term in reported for term in terms):
+                continue
+            if any(
+                any(dedup in existing for dedup in dedup_terms)
+                for existing in current
+                if isinstance(existing, str)
+            ):
+                continue
+            if item not in current:
+                current.append(item)
+    return sheet
 
 
 def _hypothesis_support_terms(hypothesis_id: str) -> set:
@@ -1260,9 +1616,10 @@ def _sheet_evidence_count(accepted, state: CaseState, direction) -> int:
     signature — a reasoning change smuggled in as a display fix.
 
     The count here is the union of the direction's valid quotes with
-    the hypothesis's DSL terms attested — unnegated and certain under
-    the shared find_unnegated_certain — in the value/evidence of the
-    facts its evidence refs actually point at. A single token can
+    the hypothesis's DSL terms attested — affirmed and certain under
+    direction_guards.is_affirmed_in_text (the shared test plus the
+    P4 perception / sentence-tail / local-descriptor rules) — in the
+    value/evidence of the facts its evidence refs actually point at. A single token can
     never drive sheet_group, so the K-12 shape (one respiratory quote
     on a urinary chief complaint) still falls back to generic; two
     distinct tokens drive their group whether they arrived as two
@@ -1291,7 +1648,7 @@ def _sheet_evidence_count(accepted, state: CaseState, direction) -> int:
             texts.append(fact.evidence)
         for text in texts:
             for term in terms:
-                if find_unnegated_certain(text, term) >= 0:
+                if is_affirmed_in_text(text, term):
                     attested.add(term)
     return len(valid | attested)
 
@@ -1417,6 +1774,7 @@ def compose_conclusion(
         group_key=alert_group,
         directions=directions,
         gaps=gaps,
+        state=state,  # P4 S-11: severity consistency fallback only
     )
     subject = state.facts.get("consult_for")
     goal_fact = state.facts.get("patient_goal")
@@ -1513,6 +1871,10 @@ def compose_conclusion(
     sheet = _adjust_chronic_outlook(sheet, state)
     sheet = _apply_infant_observable(sheet, state)
     sheet = _apply_eye_generic_worsening(sheet, state)
+    # G-12 engineering exit (disposition mapping untouched): an
+    # UNDETERMINED sheet whose emergency screen is unknown carries an
+    # explicit uncertainty note and patient-derived worsening items.
+    sheet = _apply_undetermined_safety(sheet, state)
     # The banned-phrase lint guards *system* wording. Patient quotes
     # (support_quotes) are the patient's own words — a patient writing
     # "没事，就是咳" must not silently void the whole sheet.

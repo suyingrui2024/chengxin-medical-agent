@@ -490,6 +490,7 @@ def full_interview(
     state, reply = engine.create_session()
     answers = {
         "consult_for": ("我自己", "self"),
+        "sex": ("男", "male"),
         "age": ("32岁", None),
         "chief_complaint": ("我自己32岁，咳嗽发烧两天。家里有数字体温计，想按图测一下腋温。", None),
         "emergency_screen": ("这些危险情况都没有", "no"),

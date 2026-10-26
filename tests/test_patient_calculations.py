@@ -224,10 +224,10 @@ class PatientCalculationTests(unittest.TestCase):
     def test_new_patient_message_cancels_draft_and_reaches_the_planner(self):
         self.request()
         self.backend.commands = [
-            {"tool": "ask_question", "arguments": {"question_id": "age"}}
+            {"tool": "ask_question", "arguments": {"question_id": "consult_for"}}
         ]
         reply = self.engine.submit(self.state.session_id, UserInput("先不换算了，我想说说咳嗽"))
-        self.assertEqual(reply.question_id, "age")
+        self.assertEqual(reply.question_id, "consult_for")
         self.assertIsNone(self.state.pending_calculation)
         self.assertEqual(self.state.calculations, [])
         self.assertIn("先不换算了", self.backend.calls[-1][1]["content"])
@@ -247,10 +247,10 @@ class PatientCalculationTests(unittest.TestCase):
                         "evidence": text,
                     },
                 },
-                {"tool": "ask_question", "arguments": {"question_id": "age"}},
+                {"tool": "ask_question", "arguments": {"question_id": "consult_for"}},
             ]
             reply = self.engine.submit(self.state.session_id, UserInput(text))
-            self.assertEqual(reply.question_id, "age")
+            self.assertEqual(reply.question_id, "consult_for")
             self.assertIsNone(self.state.pending_calculation)
             self.assertEqual(self.state.calculations, [])
 

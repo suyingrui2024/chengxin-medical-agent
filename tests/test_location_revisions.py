@@ -46,6 +46,15 @@ class LocationRevisionTests(unittest.TestCase):
     def test_revise_and_confirm_keeps_history_and_resumes_without_an_extra_model_call(
         self,
     ):
+        # setUp's scripted onset is refused under the new order (pick is
+        # sex), leaving a service_error reply plus pending observation
+        # feedback that blocks revision entry. Retry with the pick to
+        # recover the host question before exercising the revision.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         calls = len(self.backend.calls)
         self.assertEqual(
             self.original_reply.location_revision_action["fact_id"],
@@ -72,11 +81,19 @@ class LocationRevisionTests(unittest.TestCase):
         self.assertEqual(len(self.backend.calls), calls)
 
     def test_cancel_keeps_the_original_fact_and_invalidates_the_form(self):
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         reply = self.start()
         calls = len(self.backend.calls)
         resumed = self.cancel(reply)
         self.assertEqual(self.state.facts["symptom_location"].to_dict(), self.original)
-        self.assertEqual(resumed.question_id, "onset")
+        self.assertEqual(resumed.question_id, self.original_reply.question_id)
         self.assertEqual(len(self.backend.calls), calls)
         before = deepcopy(self.state.to_dict())
         events = len(self.engine.events.for_session(self.state.session_id))
@@ -98,6 +115,14 @@ class LocationRevisionTests(unittest.TestCase):
         )
 
     def test_skip_cancels_the_revision_instead_of_overwriting_a_known_location(self):
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         reply = self.start()
         self.engine.submit(
             self.state.session_id, UserInput("先跳过", "skip", reply.action_id)
@@ -105,6 +130,14 @@ class LocationRevisionTests(unittest.TestCase):
         self.assertEqual(self.state.facts["symptom_location"].to_dict(), self.original)
 
     def test_urgent_note_precedes_a_stale_revision_and_preserves_the_old_location(self):
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         reply = self.start()
         payload = self.flow.payload(reply)
         payload["note"] = "现在叫不醒了"
@@ -120,6 +153,14 @@ class LocationRevisionTests(unittest.TestCase):
         self.assertIsNone(self.state.self_check_conversation)
 
     def test_summary_revision_rebuilds_current_values_and_requires_confirmation(self):
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         summary = self.engine._finish(self.state)
         self.engine._record_reply(self.state, summary, "fixture", "Summary setup")
         reply = self.start(summary)
@@ -158,6 +199,14 @@ class LocationRevisionTests(unittest.TestCase):
         self.assertIsNone(self.state.closed_reason)
 
     def test_other_field_correction_invalidates_the_old_revision_form(self):
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         reply = self.start()
         self.engine.correct_fact(
             self.state.session_id,
@@ -171,6 +220,14 @@ class LocationRevisionTests(unittest.TestCase):
         self.assertEqual(self.state.facts["symptom_location"].to_dict(), self.original)
 
     def test_new_note_service_retry_does_not_duplicate_the_revised_fact(self):
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         reply = self.start()
         payload = self.flow.payload(reply)
         payload["answers"]["side"] = "left"
@@ -179,7 +236,8 @@ class LocationRevisionTests(unittest.TestCase):
         failed = self.flow.confirm(reply, payload)
         self.assertEqual(failed.kind, "service_error")
         saved = deepcopy(self.state.facts["symptom_location"].to_dict())
-        self.backend.commands = [cmd("ask_question", question_id="onset")]
+        # At retry time sex is still unrecorded, so it is the ranker pick.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
         self.engine.submit(
             self.state.session_id, UserInput("重试这一轮", "retry_turn", failed.action_id)
         )
@@ -257,10 +315,19 @@ class LocationRevisionTests(unittest.TestCase):
         )
 
     def test_unchanged_note_is_preserved_without_reprocessing_it(self):
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         reply = self.start()
         payload = self.flow.payload(reply)
         payload["note"] = "这是先前的备注"
-        self.backend.commands = [cmd("ask_question", question_id="onset")]
+        # After the first revision confirm, sex is still the ranker pick.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
         reply = self.flow.confirm(reply, payload)
         self.original = deepcopy(self.state.facts["symptom_location"].to_dict())
         reply = self.start(reply)
@@ -279,15 +346,25 @@ class LocationRevisionTests(unittest.TestCase):
     def test_answering_history_during_revision_resumes_the_newer_question(self):
         from tests.test_agent import fact
 
+        # Recover the host question first: setUp's scripted onset is
+        # refused under the new order (pick is sex), leaving pending
+        # observation feedback that blocks revision entry.
+        self.backend.commands = [cmd("ask_question", question_id="sex")]
+        self.original_reply = self.engine.submit(
+            self.state.session_id,
+            UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
+        )
         reply = self.start()
         self.backend.commands = [
             cmd("record_facts", facts=[fact("onset", "昨天开始", "昨天开始")]),
-            cmd("ask_question", question_id="trajectory"),
+            # After recording onset, sex is still unrecorded, so it is
+            # the ranker pick and therefore the newer question resumed.
+            cmd("ask_question", question_id="sex"),
         ]
         reply = self.engine.submit(
             self.state.session_id, UserInput("昨天开始", expected_action_id=reply.action_id)
         )
-        self.assertEqual(reply.question_id, "trajectory")
+        self.assertEqual(reply.question_id, "sex")
         resume = next(
             q.value
             for q in reply.quick_replies
@@ -300,7 +377,7 @@ class LocationRevisionTests(unittest.TestCase):
         payload["answers"]["side"] = "left"
         calls = len(self.backend.calls)
         completed = self.flow.confirm(reply, payload)
-        self.assertEqual(completed.question_id, "trajectory")
+        self.assertEqual(completed.question_id, "sex")
         self.assertEqual(len(self.backend.calls), calls)
         self.assertEqual(self.state.get("onset"), "昨天开始")
 

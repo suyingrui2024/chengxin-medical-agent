@@ -37,10 +37,18 @@ class TaskIntentTests(unittest.TestCase):
 
     def request(self):
         self.backend.commands = [
-            cmd("record_facts", facts=[fact("chief_complaint", "发烧", "发烧")]),
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("sex", "male", "男"),
+                    fact("age_years", 32, "32岁"),
+                    fact("chief_complaint", "发烧", "发烧"),
+                ],
+            ),
             cmd("ask_question", question_id="emergency_screen"),
         ]
-        self.send("发烧，想按图测一下腋温")
+        self.send("我自己，男，32岁，发烧，想按图测一下腋温")
 
     def test_declarative_request_is_retained_when_the_model_omits_the_request_tool(
         self,
