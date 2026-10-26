@@ -49,6 +49,7 @@ from medagent.consultation import UserInput  # noqa: F401  (parity import)
 from medagent.domain import (
     AgentReply,
     Assertion,
+    CaseState,
     Fact,
     Phase,
     RiskAssessment,
@@ -432,3 +433,64 @@ class ChronicOutlookTests(unittest.TestCase):
         sheet = compose_conclusion(state)
         self.assertEqual(sheet["outlook"], _CHRONIC_OUTLOOK)
         self.assertNotIn("数小时内", sheet["outlook"])
+
+
+class Section62VisibleTextContractTests(unittest.TestCase):
+    """§6.2 frozen contract: _append_unaddressed_goals callers must
+    pass visible text WITHOUT the goal_response quote.
+
+    The addressed check is a plain substring check of the part's
+    keywords in visible_text. A goal_response quote ("你问到‘…’")
+    restates the goal itself, so passing quoted text makes every
+    quoted part look answered and its per-part sentence is silently
+    dropped — baseline behaviour, frozen, not a bug to fix here.
+    Production call sites therefore capture visible BEFORE the
+    worry/goal extra is spliced in (confirmed close) or before the
+    worry/goal append (urgent close). These tests pin both sides:
+    quoted input drops the sentence (counter-example), de-quoted
+    input walks the part (correct path). No engine is needed: the
+    helper only reads state.facts for the chief text, which is
+    empty here, and the part handling is the fixed sentence (no
+    self-care item matches 热敷, as pinned in
+    test_method_limbs_still_fall_back_to_fixed_sentence)."""
+
+    GOAL = "想知道要不要去医院，能不能自己热敷"
+    QUOTED_VISIBLE = (
+        "先说结论：暂时不需要专门跑一趟医院。"
+        "你问到‘能不能自己热敷’：这次问诊的信息还不足以直接回答这一点，"
+        "需要当面评估后决定。"
+    )
+    DEQUOTED_VISIBLE = "先说结论：暂时不需要专门跑一趟医院。"
+
+    def _sheet(self):
+        return {
+            "goal_line": self.GOAL,
+            "self_care": {
+                "do": ["多休息，避免劳累", "适量喝水", "把症状变化记下来，就诊时告诉医生"],
+                "avoid": ["不要自行服用抗生素"],
+                "measure": [],
+            },
+        }
+
+    def _run(self, visible_text):
+        state = CaseState(session_id="t-6-2")
+        reply = AgentReply("先说结论。", Phase.CLOSED, kind="closed")
+        closing._append_unaddressed_goals(state, reply, self._sheet(), visible_text)
+        return reply.message
+
+    def test_quoted_visible_text_misjudges_part_as_addressed(self):
+        # The pit itself, at the addressed-check level: the quote
+        # alone marks the part addressed, while the same text
+        # without the quote leaves it unaddressed.
+        self.assertEqual(unaddressed_goal_parts(self.GOAL, self.QUOTED_VISIBLE), [])
+        self.assertEqual(
+            unaddressed_goal_parts(self.GOAL, self.DEQUOTED_VISIBLE),
+            ["能不能自己热敷"],
+        )
+        # And at the helper level: no per-part sentence is appended
+        # for the misjudged part.
+        self.assertNotIn("关于‘能不能自己热敷’", self._run(self.QUOTED_VISIBLE))
+
+    def test_dequoted_visible_text_walks_the_part(self):
+        message = self._run(self.DEQUOTED_VISIBLE)
+        self.assertIn(f"关于‘能不能自己热敷’：{FIXED_HANDLING}。", message)
