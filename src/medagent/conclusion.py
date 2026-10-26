@@ -394,6 +394,7 @@ _ENCODING_QUOTES = frozenset(
         "worsening",
         "improving",
         "stable",
+        "intermittent",
         "unknown",
         "present",
         "absent",
@@ -788,6 +789,15 @@ def _disposition(state, tier, directions, due_hours, show_directions):
 # only — it never decides which symptoms belong in the safety net
 # (no new clinical mapping is created here).
 _QUALIFIED_MARKERS = ("新出现", "突然出现", "明显加重", "迅速加重", "加重")
+# E2E-P2-4: tokens after 新出现 that are course qualifiers, not
+# symptoms. The oral course reads "<symptoms>有没有新出现或加重"
+# — no symptom follows 新出现 at all, the symptoms precede it.
+# A qualifier token matching present_texts ("加重" inside
+# "吃东西时加重") must never empty the enumeration into the
+# "原有症状" fallback: that fallback asserts the listed symptoms
+# already exist, which is false when the patient denied one (no
+# swelling) and never mentioned another (no fever).
+_OUTLOOK_QUALIFIER_TOKENS = frozenset({"加重", "变化", "出现", "好转", "缓解"})
 _GENERIC_WORD_FRAGMENTS = {"症状", "出现", "感觉", "不适", "情况", "问题"}
 
 
@@ -902,6 +912,16 @@ def _adjust_assertion_wording(sheet: Dict[str, Any], state: CaseState) -> Dict[s
             kept = [token for token in tokens if token not in present_texts]
             if kept:
                 return f"{prefix}新出现{'、'.join(kept)}"
+            # Empty enumeration: the "原有症状" fallback is only
+            # sound when at least one removed token was a symptom.
+            # When every removed token is a qualifier (oral "或加重"),
+            # nothing was shown to pre-exist — leave the course
+            # verbatim instead of asserting "原有症状".
+            removed = [token for token in tokens if token in present_texts]
+            if not any(
+                token not in _OUTLOOK_QUALIFIER_TOKENS for token in removed
+            ):
+                return match.group(0)
             if prefix:
                 return "原有症状有没有加重"
             return "原有症状加重"

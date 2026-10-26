@@ -2065,7 +2065,16 @@ export function createRenderer({ taskProgress = new Map() } = {}) {
       if (data.outlook || data.follow_up) {
         const outlook = el("section", "conclusion-outlook");
         outlook.append(el("h4", "", "接下来"));
-        if (data.outlook) outlook.append(el("p", "", data.outlook + "。"));
+        if (data.outlook)
+          outlook.append(
+            el(
+              "p",
+              "",
+              /[。！？]$/.test(data.outlook)
+                ? data.outlook
+                : `${data.outlook}。`,
+            ),
+          );
         if (data.follow_up?.due_in_hours)
           outlook.append(
             el(

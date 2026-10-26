@@ -35,7 +35,7 @@ def observation(text, choice, parser):
             "other": "其他部位",
         }
         if choice not in labels:
-            raise ObservationInputError("请先选择图示部位；文字补充应由问诊理解，不能直接当成位置记录。")
+            raise ObservationInputError("请先选择图示部位；文字补充应由问诊理解，不能直接当成位置记录。如说不清具体部位，可点“说不清”或跳过这一步。")
         return Interpretation(
             labels[choice],
             Assertion.PRESENT,

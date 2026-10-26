@@ -48,6 +48,7 @@ const values = {
   worsening: "加重",
   improving: "减轻",
   stable: "变化不大",
+  intermittent: "阵发性",
 };
 const sourceNames = {
   patient: "患者自述",

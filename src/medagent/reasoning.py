@@ -150,6 +150,7 @@ _ENCODING_VALUES = frozenset(
         "worsening",
         "improving",
         "stable",
+        "intermittent",
         "unknown",
         "present",
         "absent",

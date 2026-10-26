@@ -249,3 +249,33 @@ test("the smallest desktop window keeps the actual response controls inside the 
   await choice.click();
   await expect(page.locator("#send-button")).toBeEnabled();
 });
+
+// E2E-P2-5 回炉（W4 断言，W5 搬迁）：trajectory=intermittent 落账后，病例“已记录”
+// 面板经 displayFact 渲染，须显示“阵发性”而非机器值 intermittent。
+// 不调用 history()：该 helper 写于 sex-first 题序之前，点“我自己”后直接答
+// “32岁”会被记到 sex 键、流程卡在年龄澄清步（基线既有陈旧问题，另作跟进，
+// 本用例不改 helper 与既有用例）。本用例自带 sex-first 驱动路径。
+test("intermittent trajectory renders as 阵发性 in recorded facts", async ({
+  page,
+  request,
+}) => {
+  const id = await start(page);
+  await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await answer(page, "32岁");
+  await answer(page, "咳嗽发烧两天");
+  await expect(
+    page.getByRole("button", { name: "都没有", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "都没有", exact: true }).click();
+  await answer(page, "两天前逐渐出现");
+  await expect(page.locator("#active-question .visual-choices")).toContainText(
+    "一阵一阵的",
+  );
+  await page.getByRole("button", { name: "一阵一阵的", exact: true }).click();
+  const after = await (await request.get(`/api/sessions/${id}`)).json();
+  expect(after.state.facts.trajectory.value).toBe("intermittent");
+  const row = page.locator(".fact-row").filter({ hasText: "变化趋势" });
+  await expect(row).toContainText("阵发性");
+  await expect(row).not.toContainText("intermittent");
+});

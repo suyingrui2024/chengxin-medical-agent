@@ -90,6 +90,7 @@ VALUE_LABELS = {
     "worsening": "加重",
     "improving": "减轻",
     "stable": "变化不大",
+    "intermittent": "阵发性",
 }
 
 # -- Batch A controller gates (W3) -------------------------------------

@@ -84,6 +84,13 @@ FLUCTUATION_PHRASES = (
     "消了又起",
     "新旧交替",
     "时起时伏",
+    # E2E-P2-5: paroxysmal / intermittent course ("一阵一阵的，
+    # 中间有缓解") is fluctuation, not steadiness — it used to
+    # slip through this guard and land as stable.
+    "一阵一阵",
+    "一阵阵",
+    "中间有缓解",
+    "时好时坏",
 )
 
 # Purpose-clause markers that must not be stripped by the denied-item
@@ -2266,10 +2273,15 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 ):
                     # Batch C BURDEN (D-02): fluctuation wording
                     # ("此起彼伏，旧的消了新的又起") is waxing and
-                    # waning, not steadiness. A free-text answer that
-                    # matches no single option must not be forced onto
-                    # the nearest one: reject with guidance to record
-                    # unknown or clarify with an open question instead.
+                    # waning, not steadiness. A fluctuation answer
+                    # must not be forced onto the nearest option:
+                    # reject with guidance to record the
+                    # intermittent option (E2E-P2-5: the old
+                    # "record unknown" guidance was itself
+                    # unbookable — unknown requires an uncertainty
+                    # quote, while "一阵一阵的，中间有缓解" is a
+                    # definite statement) or clarify with an open
+                    # question instead.
                     rejected.append(
                         {
                             "key": "trajectory",
@@ -2278,7 +2290,7 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                                 "证据表述为波动交替，不得记为变化不大"
                             ),
                             "guidance": (
-                                "请记为说不清（unknown），或用开放式追问澄清总体"
+                                "请记为一阵一阵的（intermittent），或用开放式追问澄清总体"
                                 "趋势后再提议，不得把波动描述强行映射为稳定。"
                             ),
                         }

@@ -52,6 +52,48 @@ function handoffValue(value) {
     : String(value ?? "");
 }
 
+// 建议科室拆解（结论卡同款，structured-ui.js）：v2 hint 为
+// {department, reason} 对象时拆成“科室 —— 原因”；旧的纯字符串
+// hint 保持原样；空对象不输出空行。直接插值对象会渲染成
+// [object Object]（E2E-P1-1），故此处是科室行的唯一文口径。
+function departmentHintText(hint) {
+  if (typeof hint === "string") return hint;
+  if (typeof hint === "object" && hint !== null) {
+    const department = hint.department || "";
+    const reason = hint.reason || "";
+    if (department && reason) return `${department} —— ${reason}`;
+    return department || reason;
+  }
+  return "";
+}
+
+// 已记录行的患者化文案（E2E-P2-2）：handoff 事实行只带
+// label/value（另有 assertion），没有 key，故按后端 handoff.LABELS
+// 的固定中文标签分发；只映射代码中已核实含义的值，其余一律留原样。
+const CONSULT_FOR_LABELS = {
+  self: "本人",
+  child: "孩子",
+  other_adult: "其他家人",
+};
+
+function factValueText(item) {
+  if (item.label === "咨询对象")
+    return CONSULT_FOR_LABELS[item.value] || handoffValue(item.value);
+  if (item.label === "急症筛查") {
+    // interpreter yes_no_unknown：“no”→(False, ABSENT)；agent 固定选项
+    // 路径则记 (None, ABSENT)。两路的 ABSENT 都表示患者否认了提示中
+    // 的危险信号（与 app.js displayFact“用户否认上述紧急信号”、
+    // consultation 总结“患者否认上述危险信号”同义、非逐字；
+    // 此处输出“已否认上述危险信号”）。
+    if (item.assertion === "absent" || item.value === false)
+      return "已否认上述危险信号";
+    if (item.assertion === "present" || item.value === true)
+      return "报告了紧急信号";
+    return handoffValue(item.value);
+  }
+  return handoffValue(item.value);
+}
+
 function isNonEmpty(value) {
   return value !== undefined && value !== null && value !== "";
 }
@@ -111,8 +153,13 @@ export function handoffPrintSections(handoff) {
     // 科室与方向同理，单源契约（模块化重整 §4.4）：仅
     // department_visible === true 时输出；只凭“hint 在场”不输出，
     // flag 缺失时按不可见处理（fail-closed）——不得信任上游已剥离。
-    if (conclusion.department_visible === true && disposition?.department_hint)
-      lines.push(`建议科室：${disposition.department_hint}`);
+    if (
+      conclusion.department_visible === true &&
+      disposition?.department_hint
+    ) {
+      const department = departmentHintText(disposition.department_hint);
+      if (department) lines.push(`建议科室：${department}`);
+    }
     const narrative = conclusion.narrative || null;
     if (narrative?.framing) lines.push(`定性：${narrative.framing}`);
     // 模式门（设计 §13.6）：mode 在场时以 mode 为准——restricted/on
@@ -175,7 +222,7 @@ export function handoffPrintSections(handoff) {
   }
 
   const facts = asList(data.facts).map(
-    (item) => `${item.label}：${handoffValue(item.value)}`,
+    (item) => `${item.label}：${factValueText(item)}`,
   );
   if (facts.length) sections.push({ heading: "已记录", lines: facts });
 

@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-25.v1",
+  "version": "2026-10-26.v1",
   "questions": [
     {
       "id": "consult_for",
@@ -86,7 +86,7 @@
       "id": "trajectory",
       "phase": "history",
       "fact_key": "trajectory",
-      "prompt": "从开始到现在，总体是在加重、减轻，还是变化不大？",
+      "prompt": "从开始到现在，总体是在加重、减轻、变化不大，还是一阵一阵的？",
       "input": "choice",
       "options": [
         {
@@ -100,6 +100,10 @@
         {
           "label": "变化不大",
           "value": "stable"
+        },
+        {
+          "label": "一阵一阵的",
+          "value": "intermittent"
         },
         {
           "label": "说不清",
