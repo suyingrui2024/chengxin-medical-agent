@@ -36,6 +36,7 @@ WD_SOURCE = "Wikidata P780 (CC0) fetched 2026-10-28"
 DIAKG_SOURCE = "OpenKG DiaKG (CC BY) fetched 2026-10-28"
 DIAKG_DIR = SOURCES / "diakg"
 TRIAGE_ALIASES = ROOT / "data" / "kg" / "candidates" / "triage-aliases.tsv"
+MODEL_ALIASES = ROOT / "data" / "kg" / "candidates" / "model-aliases.tsv"
 
 #: Entity types we can place in our closed kind set. Anatomy, Class,
 #: Treatment, Amount and the rest are dropped: importing them would mean
@@ -259,6 +260,54 @@ def apply_triage_aliases(store: ConceptStore) -> int:
     return applied
 
 
+def apply_model_aliases(store: ConceptStore) -> int:
+    """Attach aliases a model proposed, keyed by canonical name.
+
+    Adding an alias is monotonic: it can only make the matcher fire more
+    often, never less. For emergency detection that is the safe direction
+    — a spurious red flag sends someone to be checked, a missing one does
+    not. The opposite risk is the one to watch, and it is why these carry
+    ``model_proposed`` in their source rather than passing as imported
+    knowledge.
+
+    Confidence is kept so a reviewer can start with the low ones.
+    """
+    if not MODEL_ALIASES.is_file():
+        return 0
+    by_name = {concept["canonical"]: concept["id"] for concept in store.concepts()}
+    applied = 0
+    seen: set[tuple[str, str]] = set()
+    for raw in MODEL_ALIASES.read_text(encoding="utf-8").splitlines():
+        if not raw.strip() or raw.startswith("#"):
+            continue
+        parts = raw.split("\t")
+        if len(parts) < 4:
+            continue
+        canonical, alias, confidence, status = parts[0], parts[1], parts[2], parts[3]
+        if status.strip() == "rejected":
+            continue
+        concept_id = by_name.get(canonical)
+        if not concept_id:
+            continue
+        key = (concept_id, alias)
+        if key in seen:
+            continue
+        seen.add(key)
+        with store.connection:
+            clash = store.connection.execute(
+                "SELECT concept_id FROM alias WHERE text = ?", (alias,)
+            ).fetchone()
+            if clash and clash["concept_id"] != concept_id:
+                continue
+            store.connection.execute(
+                "INSERT OR REPLACE INTO alias (concept_id, text, source)"
+                " VALUES (?,?,?)",
+                (concept_id, alias, f"model_proposed:{confidence.strip()}"),
+            )
+            applied += 1
+    return applied
+
+
 def diakg_concepts(
     index: dict[str, str]
 ) -> tuple[list[Concept], list[Relation]]:
@@ -344,6 +393,7 @@ def build(store: ConceptStore | None = None) -> ConceptStore:
     store.set_meta("wikidata_rows", str(len(wd)))
     store.set_meta("diakg_rows", str(len(dk)))
     store.set_meta("triage_aliases", str(apply_triage_aliases(store)))
+    store.set_meta("model_aliases", str(apply_model_aliases(store)))
     store.set_meta("built", "2026-10-28")
     return store
 

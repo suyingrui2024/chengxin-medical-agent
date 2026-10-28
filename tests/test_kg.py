@@ -350,9 +350,13 @@ class CorpusCoverageFloorTests(unittest.TestCase):
 
     The red-flag corpus is small and unreviewed, but it is real text. The
     floor tracks the gains: 19% before the ICD title rules, 32% after,
-    65% once the triage rules' own phrases became aliases. A future
-    change that quietly loses any of those layers would drop back without
-    anyone noticing.
+    65% once the triage rules' own phrases became aliases, 97% after the
+    model-proposed ones.
+
+    That last step is **in-sample**: the aliases were proposed for these
+    very sentences, so 97% measures regression risk, not generalisation.
+    It is a guard against losing a layer, not an estimate of field
+    accuracy.
     """
 
     @unittest.skipUnless(BUILT.is_file(), "知识库尚未装配")
@@ -375,7 +379,7 @@ class CorpusCoverageFloorTests(unittest.TestCase):
         )
         coverage = seen / len(positives)
         self.assertGreaterEqual(
-            coverage, 0.60, f"红旗语料覆盖率跌到 {coverage:.0%}，低于 60% 下限"
+            coverage, 0.90, f"红旗语料覆盖率跌到 {coverage:.0%}，低于 90% 下限"
         )
 
 

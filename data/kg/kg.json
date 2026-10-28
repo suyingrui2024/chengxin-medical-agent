@@ -6,6 +6,7 @@
     "wikidata_rows": "390",
     "diakg_rows": "1166",
     "triage_aliases": "24",
+    "model_aliases": "11",
     "built": "2026-10-28"
   },
   "concepts": [
@@ -10090,7 +10091,8 @@
       "review_status": "imported_pending_review",
       "note": null,
       "aliases": [
-        "上消化道出血"
+        "上消化道出血",
+        "吐了好多血"
       ]
     },
     {
@@ -36199,6 +36201,9 @@
       "review_status": "engineering_seed_not_reviewed",
       "note": "level=emergency",
       "aliases": [
+        "压了块石头",
+        "往左胳膊窜",
+        "胸口疼",
         "高风险胸痛描述"
       ]
     },
@@ -36229,7 +36234,9 @@
         "冒血",
         "呕血",
         "大量或无法控制的出血",
-        "尿血"
+        "尿血",
+        "血止不住",
+        "血流个不停"
       ]
     },
     {
@@ -36258,7 +36265,8 @@
       "note": "level=emergency",
       "aliases": [
         "上不来气",
-        "严重呼吸困难"
+        "严重呼吸困难",
+        "气短"
       ]
     },
     {
@@ -36275,6 +36283,7 @@
         "人事不省",
         "反应都没有",
         "失去知觉",
+        "意识不清",
         "意识明显异常",
         "没反应",
         "没有反应",
@@ -36558,7 +36567,9 @@
       "review_status": "imported_pending_review",
       "note": null,
       "aliases": [
-        "呼吸困难"
+        "呼吸困难",
+        "喘不上气",
+        "喘气喘得厉害"
       ]
     },
     {
@@ -37079,6 +37090,7 @@
       "review_status": "imported_pending_review",
       "note": null,
       "aliases": [
+        "失去意识",
         "昏迷"
       ]
     },
