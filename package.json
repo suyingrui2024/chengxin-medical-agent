@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "main": "desktop/main.cjs",
-  "productName": "\u77e5\u5fae",
+  "productName": "知微",
   "scripts": {
     "start": "electron .",
     "desktop:setup": "node node_modules/electron/install.js",
@@ -22,7 +22,11 @@
     "dsh:check": "node integrations/dsh/check.mjs",
     "test:dsh": "node --test integrations/dsh/tests/*.test.mjs",
     "test:dsh:integration": "node integrations/dsh/tests/runtime-smoke.mjs",
-    "test:appearance": "playwright test tests/ui/appearance.spec.mjs"
+    "test:appearance": "playwright test tests/ui/appearance.spec.mjs",
+    "test:python": "PYTHONPATH=src python3 -m pytest tests/ -q",
+    "test:kg": "PYTHONPATH=src python3 -m pytest tests/test_kg.py -q",
+    "build:kg": "PYTHONPATH=src python3 scripts/build/build_kg.py",
+    "audit:kg": "PYTHONPATH=src python3 scripts/evaluation/medical/audit_kg.py"
   },
   "dependencies": {
     "@deepseek-ai/dsh": "0.2.1-rc.2",
