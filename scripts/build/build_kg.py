@@ -35,6 +35,7 @@ ICD_SOURCE = "ICD-10-CN(MIT)@2017 chaseliu/ICD-10-CN"
 WD_SOURCE = "Wikidata P780 (CC0) fetched 2026-10-28"
 DIAKG_SOURCE = "OpenKG DiaKG (CC BY) fetched 2026-10-28"
 DIAKG_DIR = SOURCES / "diakg"
+TRIAGE_ALIASES = ROOT / "data" / "kg" / "candidates" / "triage-aliases.tsv"
 
 #: Entity types we can place in our closed kind set. Anatomy, Class,
 #: Treatment, Amount and the rest are dropped: importing them would mean
@@ -206,6 +207,58 @@ def wikidata_concepts() -> tuple[list[Concept], list[Relation]]:
     return list(diseases.values()) + list(symptoms.values()), relations
 
 
+def triage_aliases() -> dict[str, list[str]]:
+    """Colloquial phrases the triage rules already treat as red flags.
+
+    These are not new clinical claims. ``red_flags.json`` already asserts
+    that 「叫不醒」 indicates the unresponsive flag and acts on it every
+    turn; this only teaches the concept layer the same phrases, so the
+    graph and the rule layer stop disagreeing about what a sentence says.
+
+    The TSV is the review surface: mark a row ``rejected`` and it stops
+    being loaded. Rows are included by default because excluding them
+    would mean the concept layer ignores wording the product already
+    trusts.
+    """
+    grouped: dict[str, list[str]] = {}
+    if not TRIAGE_ALIASES.is_file():
+        return grouped
+    for raw in TRIAGE_ALIASES.read_text(encoding="utf-8").splitlines():
+        if not raw.strip() or raw.startswith("#"):
+            continue
+        parts = raw.split("\t")
+        if len(parts) < 4:
+            continue
+        concept, alias, _, status = parts[0], parts[1], parts[2], parts[3]
+        if status.strip() == "rejected":
+            continue
+        grouped.setdefault(concept, []).append(alias.strip())
+    return grouped
+
+
+def apply_triage_aliases(store: ConceptStore) -> int:
+    """Attach the aliases to their red-flag concepts. Returns how many."""
+    applied = 0
+    for concept_id, aliases in triage_aliases().items():
+        concept = store.get(concept_id)
+        if not concept:
+            continue
+        with store.connection:
+            for alias in aliases:
+                clash = store.connection.execute(
+                    "SELECT concept_id FROM alias WHERE text = ?", (alias,)
+                ).fetchone()
+                if clash and clash["concept_id"] != concept_id:
+                    continue
+                store.connection.execute(
+                    "INSERT OR REPLACE INTO alias (concept_id, text, source)"
+                    " VALUES (?,?,?)",
+                    (concept_id, alias, "derived:content/red_flags.json"),
+                )
+                applied += 1
+    return applied
+
+
 def diakg_concepts(
     index: dict[str, str]
 ) -> tuple[list[Concept], list[Relation]]:
@@ -290,6 +343,7 @@ def build(store: ConceptStore | None = None) -> ConceptStore:
     store.set_meta("icd10_rows", str(len(icd)))
     store.set_meta("wikidata_rows", str(len(wd)))
     store.set_meta("diakg_rows", str(len(dk)))
+    store.set_meta("triage_aliases", str(apply_triage_aliases(store)))
     store.set_meta("built", "2026-10-28")
     return store
 

@@ -349,9 +349,10 @@ class CorpusCoverageFloorTests(unittest.TestCase):
     """A floor under the only clinical evaluation we have.
 
     The red-flag corpus is small and unreviewed, but it is real text. The
-    floor exists because coverage was 19% before the ICD title rules and
-    32% after; a future import that quietly loses those rules would drop
-    back without anyone noticing.
+    floor tracks the gains: 19% before the ICD title rules, 32% after,
+    65% once the triage rules' own phrases became aliases. A future
+    change that quietly loses any of those layers would drop back without
+    anyone noticing.
     """
 
     @unittest.skipUnless(BUILT.is_file(), "知识库尚未装配")
@@ -374,7 +375,7 @@ class CorpusCoverageFloorTests(unittest.TestCase):
         )
         coverage = seen / len(positives)
         self.assertGreaterEqual(
-            coverage, 0.30, f"红旗语料覆盖率跌到 {coverage:.0%}，低于 30% 下限"
+            coverage, 0.60, f"红旗语料覆盖率跌到 {coverage:.0%}，低于 60% 下限"
         )
 
 

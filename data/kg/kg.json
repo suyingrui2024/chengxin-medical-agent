@@ -5,6 +5,7 @@
     "icd10_rows": "1586",
     "wikidata_rows": "390",
     "diakg_rows": "1166",
+    "triage_aliases": "24",
     "built": "2026-10-28"
   },
   "concepts": [
@@ -36209,7 +36210,11 @@
       "review_status": "engineering_seed_not_reviewed",
       "note": "level=emergency",
       "aliases": [
-        "口唇发紫"
+        "发紫",
+        "发青",
+        "口唇发紫",
+        "紫了",
+        "青了"
       ]
     },
     {
@@ -36220,7 +36225,11 @@
       "review_status": "engineering_seed_not_reviewed",
       "note": "level=emergency",
       "aliases": [
-        "大量或无法控制的出血"
+        "便血",
+        "冒血",
+        "呕血",
+        "大量或无法控制的出血",
+        "尿血"
       ]
     },
     {
@@ -36231,7 +36240,13 @@
       "review_status": "engineering_seed_not_reviewed",
       "note": "level=emergency",
       "aliases": [
-        "抽搐"
+        "发抖",
+        "口吐白沫",
+        "抖动",
+        "抽动",
+        "抽搐",
+        "抽风",
+        "牙关紧闭"
       ]
     },
     {
@@ -36242,6 +36257,7 @@
       "review_status": "engineering_seed_not_reviewed",
       "note": "level=emergency",
       "aliases": [
+        "上不来气",
         "严重呼吸困难"
       ]
     },
@@ -36253,7 +36269,16 @@
       "review_status": "engineering_seed_not_reviewed",
       "note": "level=emergency",
       "aliases": [
-        "意识明显异常"
+        "不应",
+        "不省人事",
+        "不醒",
+        "人事不省",
+        "反应都没有",
+        "失去知觉",
+        "意识明显异常",
+        "没反应",
+        "没有反应",
+        "醒不过来"
       ]
     },
     {
