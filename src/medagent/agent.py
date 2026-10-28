@@ -41,6 +41,7 @@ from .domain import (
 )
 from .events import Event
 from .kg import runtime as kg_runtime
+from .kg.ambiguity import should_clarify
 from .consultation_subject import (
     subject_profile,
     reference as subject_reference,
@@ -682,12 +683,30 @@ class AdaptiveConsultationEngine(ConsultationEngine):
         corrupt knowledge base must never cost a patient their turn.
         """
         try:
-            matches = kg_runtime.observe(getattr(user_input, "text", "") or "")
-            if not matches:
-                return
-            self.events.append(
-                Event(state.session_id, "kg.normalized", {"matches": matches})
-            )
+            text = getattr(user_input, "text", "") or ""
+            matches = kg_runtime.observe(text)
+            if matches:
+                self.events.append(
+                    Event(state.session_id, "kg.normalized", {"matches": matches})
+                )
+            # A clarification is only ever proposed when the triage layer
+            # found nothing. Asking "胸口还是上腹" while a chest-pain flag
+            # is already firing would put a question mark in front of an
+            # emergency.
+            flags = self.triage.scan_text(text) if text else []
+            clarification = should_clarify(text, flags)
+            if clarification:
+                self.events.append(
+                    Event(
+                        state.session_id,
+                        "kg.ambiguous",
+                        {
+                            "phrase": clarification.phrase,
+                            "options": list(clarification.options),
+                            "reason": clarification.reason,
+                        },
+                    )
+                )
         except Exception:  # noqa: BLE001 - observation must never break a turn
             return
 

@@ -426,3 +426,61 @@ class ImportedRelationTests(unittest.TestCase):
             with self.subTest(edge["src"]):
                 self.assertIn(edge["src"], known)
                 self.assertIn(edge["dst"], known)
+
+
+class AmbiguityTests(unittest.TestCase):
+    """The safety ordering: escalate first, ask second.
+
+    「心口窝疼得厉害，一阵一阵冒汗」 already fires the high-risk chest
+    pain flag. A clarification question at that moment would put a
+    question mark in front of an emergency, so the rule is absolute.
+    """
+
+    def test_a_firing_red_flag_suppresses_the_question(self):
+        from medagent.kg.ambiguity import should_clarify
+
+        self.assertIsNone(
+            should_clarify("心口窝疼得厉害，一阵一阵冒汗", ["高风险胸痛描述"])
+        )
+
+    def test_the_same_words_without_a_flag_are_worth_asking_about(self):
+        from medagent.kg.ambiguity import should_clarify
+
+        clarification = should_clarify("心口窝疼得厉害", [])
+        self.assertIsNotNone(clarification)
+        self.assertEqual(clarification.phrase, "心口窝")
+        self.assertIn("胸口", clarification.options)
+        self.assertIn("上腹", clarification.options)
+
+    def test_a_vague_complaint_is_the_best_case_for_asking(self):
+        from medagent.kg.ambiguity import should_clarify
+
+        clarification = should_clarify("心口窝有点不舒服", [])
+        self.assertIsNotNone(clarification)
+
+    def test_non_complaints_are_not_asked_about(self):
+        from medagent.kg.ambiguity import should_clarify
+
+        for text in ("今天天气不错", "我最近失眠", "帮我做个 PHQ-8"):
+            with self.subTest(text):
+                self.assertIsNone(should_clarify(text, []))
+
+    def test_the_engine_records_the_decision_without_acting_on_it(self):
+        from medagent.consultation import UserInput
+
+        engine, events, backend = ShadowObservationTests().make_engine()
+        state, _ = engine.create_session()
+        backend.commands.append(
+            {
+                "tool": "clarify",
+                "arguments": {"message": "这种情况多久了？", "topic": "chief_complaint"},
+            }
+        )
+        engine.submit(state.session_id, UserInput("心口窝有点不舒服"))
+        ambiguous = [
+            event
+            for event in events.for_session(state.session_id)
+            if event.event_type == "kg.ambiguous"
+        ]
+        self.assertEqual(len(ambiguous), 1)
+        self.assertEqual(ambiguous[0].payload["phrase"], "心口窝")
