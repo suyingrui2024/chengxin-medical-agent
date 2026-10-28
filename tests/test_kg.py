@@ -239,7 +239,18 @@ class BuiltKnowledgeBaseTests(unittest.TestCase):
         self.assertEqual(matches[0].canonical, "头痛")
 
     def test_a_symptom_reaches_its_diseases(self):
-        edges = self.store.relations("symptom:wd:头痛")
+        # Resolve by name, not by id: when two sources describe the same
+        # symptom, the merge keeps one node and the id is not stable.
+        headache = next(
+            concept
+            for concept in self.store.concepts()
+            if concept["canonical"] == "头痛"
+        )
+        edges = [
+            edge
+            for edge in self.store.relations(headache["id"])
+            if edge["predicate"] == "has_symptom"
+        ]
         self.assertGreater(len(edges), 20)
 
     def test_capability_aliases_survive_the_import(self):

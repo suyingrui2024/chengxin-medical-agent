@@ -37,6 +37,10 @@ KINDS = (
     "scale",
     "formula",
     "red_flag",
+    # An ICD chapter or block: a classification grouping, not a clinical
+    # entity. Kept distinct so consumers filtering for "symptom" or
+    # "disease" never pick one up.
+    "category",
 )
 
 SCHEMA = """

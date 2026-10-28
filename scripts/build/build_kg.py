@@ -140,16 +140,29 @@ def icd_concepts() -> tuple[list[Concept], list[Relation]]:
             )
         )
 
-    # Hierarchy: chapter -> block -> code. The JSON keeps the tree, but
-    # chapters and blocks are grouping nodes with no concept of their own,
-    # so an edge is only emitted when both ends exist as concepts —
-    # otherwise the graph carries dangling references.
+    # Hierarchy: chapter -> block -> code. Chapters and blocks are real
+    # ICD categories, so they get concepts of their own (kind
+    # "category"); without them every leaf hangs in space and half the
+    # graph is a flat list.
     known = {concept.id for concept in concepts}
     tree = json.loads((SOURCES / "diseases.json").read_text(encoding="utf-8-sig"))
 
     def walk(node, parent: str | None):
         identity = f"icd10:{node['value']}"
-        if parent and parent in known and identity in known:
+        if identity not in known:
+            concepts.append(
+                Concept(
+                    id=identity,
+                    kind="category",
+                    canonical=node["label"],
+                    source=ICD_SOURCE,
+                    review_status="imported_pending_review",
+                    note="icd_group",
+                    aliases=(node["label"],),
+                )
+            )
+            known.add(identity)
+        if parent:
             relations.append(
                 Relation(src=parent, predicate="contains", dst=identity, source=ICD_SOURCE)
             )
@@ -161,8 +174,17 @@ def icd_concepts() -> tuple[list[Concept], list[Relation]]:
     return concepts, relations
 
 
-def wikidata_concepts() -> tuple[list[Concept], list[Relation]]:
-    """Symptom→disease from P780, inverted into disease has_symptom symptom."""
+def wikidata_concepts(
+    index: dict[str, str] | None = None
+) -> tuple[list[Concept], list[Relation]]:
+    """Symptom→disease from P780, inverted into disease has_symptom symptom.
+
+    ``index`` maps an existing canonical name to its concept id. Without
+    it this import mints ``disease:wd:偏头痛`` beside ``icd10:G43`` — two
+    nodes for one disease, and every relation hangs off whichever one
+    happened to be created first.
+    """
+    index = index if index is not None else {}
     symptoms: dict[str, Concept] = {}
     diseases: dict[str, Concept] = {}
     relations: list[Relation] = []
@@ -173,30 +195,39 @@ def wikidata_concepts() -> tuple[list[Concept], list[Relation]]:
             symptom = (row.get("sLabel") or "").strip()
             if not disease or not symptom:
                 continue
-            disease_id = f"disease:wd:{_slug(disease)}"
-            symptom_id = f"symptom:wd:{_slug(symptom)}"
-            diseases.setdefault(
-                disease_id,
-                Concept(
-                    id=disease_id,
-                    kind="disease",
-                    canonical=disease,
-                    source=WD_SOURCE,
-                    review_status="imported_pending_review",
-                    aliases=(disease,),
-                ),
-            )
-            symptoms.setdefault(
-                symptom_id,
-                Concept(
-                    id=symptom_id,
-                    kind="symptom",
-                    canonical=symptom,
-                    source=WD_SOURCE,
-                    review_status="imported_pending_review",
-                    aliases=(symptom,),
-                ),
-            )
+            disease_id = index.get(disease) or f"disease:wd:{_slug(disease)}"
+            symptom_id = index.get(symptom) or f"symptom:wd:{_slug(symptom)}"
+
+            # Only mint a node when the name is new. Re-inserting an id
+            # that came from ICD would overwrite its source and review
+            # status with Wikidata's, silently re-labelling imported
+            # terminology as something it is not.
+            if disease_id not in index.values():
+                diseases.setdefault(
+                    disease_id,
+                    Concept(
+                        id=disease_id,
+                        kind="disease",
+                        canonical=disease,
+                        source=WD_SOURCE,
+                        review_status="imported_pending_review",
+                        aliases=(disease,),
+                    ),
+                )
+                index[disease] = disease_id
+            if symptom_id not in index.values():
+                symptoms.setdefault(
+                    symptom_id,
+                    Concept(
+                        id=symptom_id,
+                        kind="symptom",
+                        canonical=symptom,
+                        source=WD_SOURCE,
+                        review_status="imported_pending_review",
+                        aliases=(symptom,),
+                    ),
+                )
+                index[symptom] = symptom_id
             relations.append(
                 Relation(
                     src=disease_id,
@@ -258,6 +289,77 @@ def apply_triage_aliases(store: ConceptStore) -> int:
                 )
                 applied += 1
     return applied
+
+
+def collapse_duplicate_names(store: ConceptStore) -> int:
+    """Fold concepts that share a canonical name into one node.
+
+    Two imports can reach the same entity by different routes — 偏头痛
+    from ICD and from Wikidata, 巨球蛋白血症 once as a disease and once
+    as a symptom. Resolving by name during import handles most of it;
+    this is the backstop, because import order should not decide whether
+    the graph is connected.
+
+    The survivor is the node with the most edges, so relations stay
+    attached to the richer side, and edges are re-pointed rather than
+    dropped.
+    """
+    groups: dict[str, list[dict]] = {}
+    for concept in store.concepts():
+        groups.setdefault(concept["canonical"], []).append(concept)
+
+    priority = {"disease": 0, "symptom": 1, "drug": 2, "lab": 3, "category": 4}
+    merged = 0
+    for name, items in groups.items():
+        if len(items) < 2:
+            continue
+        items.sort(
+            key=lambda c: (-len(store.relations(c["id"])), priority.get(c["kind"], 9))
+        )
+        keep = items[0]["id"]
+        for other in items[1:]:
+            removed = other["id"]
+            with store.connection:
+                for edge in store.relations(removed):
+                    src = keep if edge["src"] == removed else edge["src"]
+                    dst = keep if edge["dst"] == removed else edge["dst"]
+                    if src == dst:
+                        continue
+                    store.connection.execute(
+                        "INSERT OR IGNORE INTO relation (src, predicate, dst, source)"
+                        " VALUES (?,?,?,?)",
+                        (src, edge["predicate"], dst, edge["source"]),
+                    )
+                store.connection.execute(
+                    "DELETE FROM relation WHERE src = ? OR dst = ?", (removed, removed)
+                )
+                store.connection.execute(
+                    "DELETE FROM alias WHERE concept_id = ?", (removed,)
+                )
+                store.connection.execute("DELETE FROM concept WHERE id = ?", (removed,))
+            merged += 1
+    return merged
+
+
+def ensure_alias(store: ConceptStore) -> int:
+    """Give every concept its own name as an alias.
+
+    Alias de-duplication keeps the most specific concept when two claim
+    the same string, which can leave a concept with no alias at all — a
+    node that exists but cannot be found. Its own canonical name is
+    always a legitimate alias for it.
+    """
+    added = 0
+    for concept in store.concepts():
+        if store.aliases(concept["id"]):
+            continue
+        with store.connection:
+            store.connection.execute(
+                "INSERT OR REPLACE INTO alias (concept_id, text, source) VALUES (?,?,?)",
+                (concept["id"], concept["canonical"], concept["source"]),
+            )
+        added += 1
+    return added
 
 
 def apply_model_aliases(store: ConceptStore) -> int:
@@ -379,13 +481,16 @@ def build(store: ConceptStore | None = None) -> ConceptStore:
     seed.build(load_registry(), store)
 
     icd, icd_rel = icd_concepts()
-    wd, wd_rel = wikidata_concepts()
     store.add(icd, icd_rel)
+
+    # Every later source resolves against what is already loaded, so one
+    # disease stays one node. Without this, 偏头痛 exists as both
+    # icd10:G43 and disease:wd:偏头痛 and the graph splits in two.
+    index = {concept["canonical"]: concept["id"] for concept in store.concepts()}
+    wd, wd_rel = wikidata_concepts(index)
     store.add(wd, wd_rel)
 
-    # DiaKG last, so its entities can resolve onto the concepts already
-    # loaded instead of duplicating them.
-    index = {concept["canonical"]: concept["id"] for concept in store.concepts()}
+    index.update({concept["canonical"]: concept["id"] for concept in store.concepts()})
     dk, dk_rel = diakg_concepts(index)
     store.add(dk, dk_rel)
 
@@ -394,6 +499,8 @@ def build(store: ConceptStore | None = None) -> ConceptStore:
     store.set_meta("diakg_rows", str(len(dk)))
     store.set_meta("triage_aliases", str(apply_triage_aliases(store)))
     store.set_meta("model_aliases", str(apply_model_aliases(store)))
+    store.set_meta("merged_duplicates", str(collapse_duplicate_names(store)))
+    store.set_meta("orphan_aliases", str(ensure_alias(store)))
     store.set_meta("built", "2026-10-28")
     return store
 
