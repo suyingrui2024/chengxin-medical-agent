@@ -22,6 +22,7 @@ export default defineConfig({
   timeout: 30000,
   workers: 1,
   use: {
+    viewport: { width: 1280, height: 900 },
     baseURL: "http://127.0.0.1:18766",
     headless: true,
     viewport: { width: 1440, height: 1080 },

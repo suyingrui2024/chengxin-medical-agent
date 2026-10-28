@@ -40,6 +40,7 @@ from .domain import (
     Source,
 )
 from .events import Event
+from .kg import runtime as kg_runtime
 from .consultation_subject import (
     subject_profile,
     reference as subject_reference,
@@ -238,6 +239,41 @@ def _decision_envelope_guidance(exc: BaseException) -> Optional[str]:
     return None
 
 
+def _capability_advertisement(item):
+    """What the model is told about one patient-facing capability.
+
+    Kept deliberately thin. With ~60 patient-facing capabilities the
+    advertisement had grown to 30 KB — more than half the static prefix —
+    because every entry repeated ``version``, ``review_status``,
+    ``patient_form`` and a per-item call note, and formulas shipped their
+    full input schema twice. None of that helps the model choose; the
+    shared facts now live once in ``capability_note``.
+
+    What remains is what selection actually needs: id, name, size, and
+    the aliases a patient might say.
+    """
+    base = {"id": item["id"], "name": item["name"]}
+    if item.get("patient_form") == "scale_form/v1":
+        scale = item.get("scale") or {}
+        aggregate = scale.get("aggregate") or {}
+        base["items"] = len(scale.get("items") or [])
+        base["range"] = [aggregate.get("min"), aggregate.get("max")]
+        base["aliases"] = list(item.get("aliases") or [])
+        return base
+    formula = item.get("formula")
+    if isinstance(formula, dict):
+        base["inputs"] = [entry["id"] for entry in formula.get("inputs") or []]
+        base["unit"] = (formula.get("output") or {}).get("unit", "")
+        base["aliases"] = list(item.get("aliases") or [])
+        return base
+    # Unit conversions keep their schema: the prompt tells the model to
+    # prefill value/from_unit when the patient already said them, so it
+    # needs the field names. There are only two of these.
+    base["proposal_input_schema"] = {**item["input_schema"], "required": []}
+    base["execution_input_schema"] = item["input_schema"]
+    return base
+
+
 class AdaptiveConsultationEngine(ConsultationEngine):
     """LLM proposes actions; evidence/type/eligibility gates own every effect."""
 
@@ -350,24 +386,16 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 for task in self.content.tasks.values()
             ],
             "available_capabilities": [
-                {
-                    key: item[key]
-                    for key in (
-                        "id",
-                        "name",
-                        "version",
-                        "description",
-                        "review_status",
-                        "patient_form",
-                    )
-                }
-                | {
-                    "proposal_input_schema": {**item["input_schema"], "required": []},
-                    "execution_input_schema": item["input_schema"],
-                }
+                _capability_advertisement(item)
                 for item in self.content.registry.descriptions()
                 if item.get("patient_form")
             ],
+            # Shared once instead of repeated on every capability entry.
+            "capability_note": (
+                "调用 run_capability 时只提供 id 与 evidence，不要提供 input；"
+                "量表答案与公式数值只能由患者在输入卡中填写。"
+                "所有能力均为工程验证，未经临床审核，结果不构成诊断。"
+            ),
             "adaptive_question_risk_tags": {
                 name: list(cues) for name, cues in RISK_TAG_CUES.items()
             },
@@ -636,11 +664,32 @@ class AdaptiveConsultationEngine(ConsultationEngine):
                 decision_id,
             )
             try:
+                self._observe_knowledge(state, user_input)
                 return self._submit(state, user_input)
             finally:
                 self.events.clear_trace(session_id)
                 if self._active_turns.get(session_id) is turn:
                     self._active_turns.pop(session_id, None)
+
+    def _observe_knowledge(self, state: CaseState, user_input) -> None:
+        """Record what the knowledge base recognised, without acting on it.
+
+        This is an observation, not a decision input: nothing downstream
+        reads ``kg.normalized``. It exists so that, once real transcripts
+        have run through it, we can measure how often the graph saw a
+        concept the pattern layer missed — and only then decide whether to
+        wire it in further. Any failure here is swallowed: a missing or
+        corrupt knowledge base must never cost a patient their turn.
+        """
+        try:
+            matches = kg_runtime.observe(getattr(user_input, "text", "") or "")
+            if not matches:
+                return
+            self.events.append(
+                Event(state.session_id, "kg.normalized", {"matches": matches})
+            )
+        except Exception:  # noqa: BLE001 - observation must never break a turn
+            return
 
     def _emergency_clarification_denied_before(
         self, state: CaseState, text: str

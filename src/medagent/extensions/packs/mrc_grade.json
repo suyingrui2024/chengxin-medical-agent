@@ -1,0 +1,203 @@
+{
+  "id": "calculate.mrc_grade",
+  "name": "MRC 肌力分级",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "英国医学研究委员会肌力分级（0–5 级）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["MRC 肌力", "肌力分级"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 5,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "grade",
+        "label": "选择最符合的肌力等级",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 级：无肌肉收缩"
+          },
+          {
+            "value": 1,
+            "label": "1 级：可见或触及收缩，但无关节活动"
+          },
+          {
+            "value": 2,
+            "label": "2 级：可在消除重力下活动关节"
+          },
+          {
+            "value": 3,
+            "label": "3 级：可对抗重力活动，但不能对抗阻力"
+          },
+          {
+            "value": 4,
+            "label": "4 级：可对抗部分阻力"
+          },
+          {
+            "value": 5,
+            "label": "5 级：正常肌力"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "key": "severe",
+        "label": "重度无力"
+      },
+      {
+        "min": 3,
+        "max": 3,
+        "key": "moderate",
+        "label": "中度无力"
+      },
+      {
+        "min": 4,
+        "max": 4,
+        "key": "mild",
+        "label": "轻度无力"
+      },
+      {
+        "min": 5,
+        "max": 5,
+        "key": "normal",
+        "label": "正常"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "grade": {
+        "type": "number",
+        "title": "选择最符合的肌力等级",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Medical Research Council muscle scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Medical+Research+Council+muscle+power+scale",
+      "section": "MRC 1943；0–5 级",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

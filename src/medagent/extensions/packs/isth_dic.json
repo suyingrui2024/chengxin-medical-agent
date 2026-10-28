@@ -1,0 +1,250 @@
+{
+  "id": "calculate.isth_dic",
+  "name": "ISTH DIC 评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "国际血栓与止血学会弥散性血管内凝血评分（0–8 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["ISTH DIC", "DIC 评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 8,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "d1",
+        "label": "血小板计数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "大于 100"
+          },
+          {
+            "value": 1,
+            "label": "50 至 100"
+          },
+          {
+            "value": 2,
+            "label": "小于 50"
+          }
+        ]
+      },
+      {
+        "id": "d2",
+        "label": "D-二聚体或纤维蛋白降解产物升高",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无升高"
+          },
+          {
+            "value": 2,
+            "label": "中度升高"
+          },
+          {
+            "value": 3,
+            "label": "显著升高"
+          }
+        ]
+      },
+      {
+        "id": "d3",
+        "label": "凝血酶原时间延长",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "小于 3 秒"
+          },
+          {
+            "value": 1,
+            "label": "3 至 6 秒"
+          },
+          {
+            "value": 2,
+            "label": "大于 6 秒"
+          }
+        ]
+      },
+      {
+        "id": "d4",
+        "label": "纤维蛋白原",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "大于 1.0 g/L"
+          },
+          {
+            "value": 1,
+            "label": "小于 1.0 g/L"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 4,
+        "key": "not_dic",
+        "label": "不符合显性 DIC"
+      },
+      {
+        "min": 5,
+        "max": 8,
+        "key": "dic",
+        "label": "符合显性 DIC"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "d1": {
+        "type": "number",
+        "title": "血小板计数",
+        "enum": [0, 1, 2]
+      },
+      "d2": {
+        "type": "number",
+        "title": "D-二聚体或纤维蛋白降解产物升高",
+        "enum": [0, 2, 3]
+      },
+      "d3": {
+        "type": "number",
+        "title": "凝血酶原时间延长",
+        "enum": [0, 1, 2]
+      },
+      "d4": {
+        "type": "number",
+        "title": "纤维蛋白原",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "ISTH overt DIC score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=ISTH+overt+disseminated+intravascular+coagulation+score",
+      "section": "Taylor FB, et al. 2001；4 项合计 0–8 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

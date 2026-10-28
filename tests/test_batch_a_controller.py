@@ -404,7 +404,10 @@ class SummaryConfirmationTests(unittest.TestCase):
         self.state, _ = self.engine.create_session()
 
     def _reach_summary(self):
-        text = "我自己32岁膝盖疼，没有危险信号，最近开始，不知道，想知道要不要去医院"
+        text = (
+            "我自己32岁膝盖疼，没有危险信号，没有剧烈疼痛，没有持续加重，"
+            "也没有不能活动，最近开始，不知道，想知道要不要去医院"
+        )
         record(
             self.engine,
             self.state,
@@ -414,6 +417,12 @@ class SummaryConfirmationTests(unittest.TestCase):
                 fact("age_years", 32, "32岁"),
                 fact("chief_complaint", "膝盖疼", "膝盖疼"),
                 fact("emergency_screen", None, "没有危险信号", "absent"),
+                # P3 off-pathway warning screen (knee pain triggers no
+                # pathway; the emergency screen subsumes the other three
+                # domains).
+                fact("warning_剧痛", None, "没有剧烈疼痛", "absent"),
+                fact("warning_持续加重", None, "没有持续加重", "absent"),
+                fact("warning_功能骤降", None, "没有不能活动", "absent"),
                 fact("onset", None, "不知道", "unknown"),
                 fact("trajectory", None, "不知道", "unknown"),
                 fact("severity", None, "不知道", "unknown"),

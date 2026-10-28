@@ -1,0 +1,165 @@
+{
+  "id": "calculate.free_water_deficit",
+  "name": "自由水缺失",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按体重、血钠、性别估算自由水缺失。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["自由水缺失"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "free_water_deficit",
+    "citation": "FWD-CALC",
+    "inputs": [
+      {
+        "id": "weight_kg",
+        "label": "体重",
+        "type": "number",
+        "unit": "kg",
+        "min": "2",
+        "max": "300",
+        "step": "0.1"
+      },
+      {
+        "id": "sodium",
+        "label": "血钠",
+        "type": "number",
+        "unit": "mmol/L",
+        "min": "100",
+        "max": "200",
+        "step": "1"
+      },
+      {
+        "id": "sex",
+        "label": "性别",
+        "type": "enum",
+        "options": [
+          {
+            "value": "male",
+            "label": "男"
+          },
+          {
+            "value": "female",
+            "label": "女"
+          }
+        ]
+      }
+    ],
+    "output": {
+      "label": "自由水缺失",
+      "unit": "L",
+      "min": "0",
+      "max": "30",
+      "precision": {
+        "places": 2
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "自由水缺失 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=free+water+deficit+hypernatremia+formula",
+      "section": "FWD-CALC：系数 × 体重 × (血钠 ÷ 140 − 1)，男性系数 0.6、女性 0.5",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "weight_kg": {
+        "type": "string",
+        "title": "体重",
+        "maxLength": 12
+      },
+      "sodium": {
+        "type": "string",
+        "title": "血钠",
+        "maxLength": 12
+      },
+      "sex": {
+        "type": "string",
+        "title": "性别",
+        "enum": ["male", "female"]
+      }
+    }
+  }
+}

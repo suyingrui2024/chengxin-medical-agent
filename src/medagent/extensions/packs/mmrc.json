@@ -1,0 +1,188 @@
+{
+  "id": "calculate.mmrc",
+  "name": "mMRC 呼吸困难分级",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "改良英国医学研究委员会呼吸困难量表（0–4 级），记录日常活动受限程度，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["mMRC", "呼吸困难分级", "呼吸困难量表"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 4,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "grade",
+        "label": "选择最符合你平时气短情况的一项",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "只在剧烈活动时才气短"
+          },
+          {
+            "value": 1,
+            "label": "平地快走或上小坡时气短"
+          },
+          {
+            "value": 2,
+            "label": "平地走路比同龄人慢，或按自己速度走一会儿就要停下喘气"
+          },
+          {
+            "value": 3,
+            "label": "平地走约 100 米或几分钟就要停下喘气"
+          },
+          {
+            "value": 4,
+            "label": "穿衣、说话等日常活动就会气短，不能出门"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 1,
+        "key": "low",
+        "label": "0–1 级"
+      },
+      {
+        "min": 2,
+        "max": 4,
+        "key": "high",
+        "label": "2–4 级"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "grade": {
+        "type": "number",
+        "title": "选择最符合你平时气短情况的一项",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Global Initiative for Chronic Obstructive Lung Disease (GOLD) report: dyspnoea assessment",
+      "url": "https://goldcopd.org/2024-gold-report/",
+      "section": "GOLD 报告中的 mMRC 呼吸困难量表（原始量表见 MRC 1960）",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

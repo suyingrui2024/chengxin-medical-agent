@@ -1,0 +1,159 @@
+{
+  "id": "calculate.aa_gradient",
+  "name": "肺泡-动脉氧梯度",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按 FiO2、PaCO2、PaO2 计算 A-a 梯度。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["A-a梯度", "肺泡动脉氧梯度"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "aa_gradient",
+    "citation": "AA-GRADIENT",
+    "inputs": [
+      {
+        "id": "pao2",
+        "label": "动脉氧分压",
+        "type": "number",
+        "unit": "mmHg",
+        "min": "20",
+        "max": "600",
+        "step": "1"
+      },
+      {
+        "id": "paco2",
+        "label": "动脉二氧化碳分压",
+        "type": "number",
+        "unit": "mmHg",
+        "min": "10",
+        "max": "120",
+        "step": "1"
+      },
+      {
+        "id": "fio2",
+        "label": "吸氧浓度",
+        "type": "number",
+        "unit": "小数",
+        "min": "0.21",
+        "max": "1",
+        "step": "0.01"
+      }
+    ],
+    "output": {
+      "label": "肺泡-动脉氧梯度",
+      "unit": "mmHg",
+      "min": "-50",
+      "max": "600",
+      "precision": {
+        "places": 1
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "肺泡-动脉氧梯度 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=alveolar+arterial+oxygen+gradient+formula",
+      "section": "AA-GRADIENT：FiO2×(760−47) − PaCO2÷0.8 − PaO2",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "pao2": {
+        "type": "string",
+        "title": "动脉氧分压",
+        "maxLength": 12
+      },
+      "paco2": {
+        "type": "string",
+        "title": "动脉二氧化碳分压",
+        "maxLength": 12
+      },
+      "fio2": {
+        "type": "string",
+        "title": "吸氧浓度",
+        "maxLength": 12
+      }
+    }
+  }
+}

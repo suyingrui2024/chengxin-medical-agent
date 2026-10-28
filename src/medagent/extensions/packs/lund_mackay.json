@@ -1,0 +1,310 @@
+{
+  "id": "calculate.lund_mackay",
+  "name": "Lund-Mackay 鼻窦评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "鼻窦 CT 评分（6 个窦腔，0–12 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Lund-Mackay", "鼻窦评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 12,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "m1",
+        "label": "上颌窦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无混浊"
+          },
+          {
+            "value": 1,
+            "label": "部分混浊"
+          },
+          {
+            "value": 2,
+            "label": "完全混浊"
+          }
+        ]
+      },
+      {
+        "id": "m2",
+        "label": "前组筛窦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无混浊"
+          },
+          {
+            "value": 1,
+            "label": "部分混浊"
+          },
+          {
+            "value": 2,
+            "label": "完全混浊"
+          }
+        ]
+      },
+      {
+        "id": "m3",
+        "label": "后组筛窦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无混浊"
+          },
+          {
+            "value": 1,
+            "label": "部分混浊"
+          },
+          {
+            "value": 2,
+            "label": "完全混浊"
+          }
+        ]
+      },
+      {
+        "id": "m4",
+        "label": "蝶窦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无混浊"
+          },
+          {
+            "value": 1,
+            "label": "部分混浊"
+          },
+          {
+            "value": 2,
+            "label": "完全混浊"
+          }
+        ]
+      },
+      {
+        "id": "m5",
+        "label": "额窦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无混浊"
+          },
+          {
+            "value": 1,
+            "label": "部分混浊"
+          },
+          {
+            "value": 2,
+            "label": "完全混浊"
+          }
+        ]
+      },
+      {
+        "id": "m6",
+        "label": "窦口鼻道复合体",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "通畅"
+          },
+          {
+            "value": 1,
+            "label": "部分阻塞"
+          },
+          {
+            "value": 2,
+            "label": "完全阻塞"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 4,
+        "max": 7,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 8,
+        "max": 12,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "m1": {
+        "type": "number",
+        "title": "上颌窦",
+        "enum": [0, 1, 2]
+      },
+      "m2": {
+        "type": "number",
+        "title": "前组筛窦",
+        "enum": [0, 1, 2]
+      },
+      "m3": {
+        "type": "number",
+        "title": "后组筛窦",
+        "enum": [0, 1, 2]
+      },
+      "m4": {
+        "type": "number",
+        "title": "蝶窦",
+        "enum": [0, 1, 2]
+      },
+      "m5": {
+        "type": "number",
+        "title": "额窦",
+        "enum": [0, 1, 2]
+      },
+      "m6": {
+        "type": "number",
+        "title": "窦口鼻道复合体",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Lund-Mackay score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Lund-Mackay+score+sinus+CT",
+      "section": "Lund VJ, Mackay IS. 1993；6 个部位各 0–2 分，合计 0–12 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

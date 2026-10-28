@@ -68,7 +68,11 @@ def validate_binding(binding):
         or not isinstance(binding["template_id"], str)
         or len(binding["template_id"]) > 80
         or not isinstance(binding["enabled"], list)
-        or len(binding["enabled"]) > 64
+        # Raised from 64 when the department catalog grew past it: a
+        # workspace that legitimately enables 80 capabilities is not
+        # malformed. The bound still exists so a hostile payload cannot
+        # force an unbounded rebuild.
+        or len(binding["enabled"]) > 256
         or any(
             not isinstance(v, str) or not re.fullmatch(r"[a-z][a-z0-9_.-]{2,80}", v)
             for v in binding["enabled"]
@@ -87,11 +91,10 @@ def bound_registry(binding):
     if binding is None:
         raise CapabilityError("capability_binding_missing", "旧工作区未绑定注册计算；请新建工作区使用。")
     try:
-        registry = load_registry(binding["template_id"])
-        for item in registry.snapshot()["capabilities"]:
-            registry = registry.with_enabled(
-                item["id"], item["id"] in binding["enabled"]
-            )
+        # One construction with the frozen enabled set. The previous
+        # per-capability ``with_enabled`` replay was O(N^2) — 100
+        # capabilities cost ~2.9 s on every dispatch.
+        registry = load_registry(binding["template_id"], enabled=binding["enabled"])
     except ValueError:
         raise CapabilityError(
             "capability_version_unavailable", "原能力组合已不可用；通用执行仍可使用。"

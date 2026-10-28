@@ -1,0 +1,370 @@
+{
+  "id": "calculate.gad7",
+  "name": "GAD-7 焦虑症状自评",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "过去两周内 7 项焦虑症状的自评计分（0–21 分），用于症状严重度记录，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["GAD-7", "GAD7", "焦虑自评", "焦虑量表"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 21,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "g1",
+        "label": "感到紧张、焦虑或急躁",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全不会"
+          },
+          {
+            "value": 1,
+            "label": "好几天"
+          },
+          {
+            "value": 2,
+            "label": "一半以上的天数"
+          },
+          {
+            "value": 3,
+            "label": "几乎每天"
+          }
+        ]
+      },
+      {
+        "id": "g2",
+        "label": "无法停止或控制担忧",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全不会"
+          },
+          {
+            "value": 1,
+            "label": "好几天"
+          },
+          {
+            "value": 2,
+            "label": "一半以上的天数"
+          },
+          {
+            "value": 3,
+            "label": "几乎每天"
+          }
+        ]
+      },
+      {
+        "id": "g3",
+        "label": "对各种各样的事情担忧过多",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全不会"
+          },
+          {
+            "value": 1,
+            "label": "好几天"
+          },
+          {
+            "value": 2,
+            "label": "一半以上的天数"
+          },
+          {
+            "value": 3,
+            "label": "几乎每天"
+          }
+        ]
+      },
+      {
+        "id": "g4",
+        "label": "很难放松下来",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全不会"
+          },
+          {
+            "value": 1,
+            "label": "好几天"
+          },
+          {
+            "value": 2,
+            "label": "一半以上的天数"
+          },
+          {
+            "value": 3,
+            "label": "几乎每天"
+          }
+        ]
+      },
+      {
+        "id": "g5",
+        "label": "由于不安而无法静坐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全不会"
+          },
+          {
+            "value": 1,
+            "label": "好几天"
+          },
+          {
+            "value": 2,
+            "label": "一半以上的天数"
+          },
+          {
+            "value": 3,
+            "label": "几乎每天"
+          }
+        ]
+      },
+      {
+        "id": "g6",
+        "label": "变得容易烦恼或急躁",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全不会"
+          },
+          {
+            "value": 1,
+            "label": "好几天"
+          },
+          {
+            "value": 2,
+            "label": "一半以上的天数"
+          },
+          {
+            "value": 3,
+            "label": "几乎每天"
+          }
+        ]
+      },
+      {
+        "id": "g7",
+        "label": "感到似乎将有可怕的事情发生而害怕",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全不会"
+          },
+          {
+            "value": 1,
+            "label": "好几天"
+          },
+          {
+            "value": 2,
+            "label": "一半以上的天数"
+          },
+          {
+            "value": 3,
+            "label": "几乎每天"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 4,
+        "key": "none_minimal",
+        "label": "无或极轻微"
+      },
+      {
+        "min": 5,
+        "max": 9,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 10,
+        "max": 14,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 15,
+        "max": 21,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "g1": {
+        "type": "number",
+        "title": "感到紧张、焦虑或急躁",
+        "enum": [0, 1, 2, 3]
+      },
+      "g2": {
+        "type": "number",
+        "title": "无法停止或控制担忧",
+        "enum": [0, 1, 2, 3]
+      },
+      "g3": {
+        "type": "number",
+        "title": "对各种各样的事情担忧过多",
+        "enum": [0, 1, 2, 3]
+      },
+      "g4": {
+        "type": "number",
+        "title": "很难放松下来",
+        "enum": [0, 1, 2, 3]
+      },
+      "g5": {
+        "type": "number",
+        "title": "由于不安而无法静坐",
+        "enum": [0, 1, 2, 3]
+      },
+      "g6": {
+        "type": "number",
+        "title": "变得容易烦恼或急躁",
+        "enum": [0, 1, 2, 3]
+      },
+      "g7": {
+        "type": "number",
+        "title": "感到似乎将有可怕的事情发生而害怕",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "A brief measure for assessing generalized anxiety disorder: the GAD-7",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=A+brief+measure+for+assessing+generalized+anxiety+disorder+the+GAD-7",
+      "section": "Spitzer RL, Kroenke K, Williams JB, Löwe B. Arch Intern Med. 2006;166(10):1092-1097.",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

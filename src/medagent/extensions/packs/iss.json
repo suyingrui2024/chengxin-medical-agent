@@ -1,0 +1,278 @@
+{
+  "id": "calculate.iss",
+  "name": "ISS 创伤严重度评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "损伤严重度评分（0–75 分），三个最重损伤区域的简明损伤定级平方和。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["ISS", "损伤严重度"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 75,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "r1",
+        "label": "最重区域简明损伤定级",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无损伤"
+          },
+          {
+            "value": 1,
+            "label": "AIS 1"
+          },
+          {
+            "value": 4,
+            "label": "AIS 2"
+          },
+          {
+            "value": 9,
+            "label": "AIS 3"
+          },
+          {
+            "value": 16,
+            "label": "AIS 4"
+          },
+          {
+            "value": 25,
+            "label": "AIS 5"
+          }
+        ]
+      },
+      {
+        "id": "r2",
+        "label": "次重区域简明损伤定级",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无损伤"
+          },
+          {
+            "value": 1,
+            "label": "AIS 1"
+          },
+          {
+            "value": 4,
+            "label": "AIS 2"
+          },
+          {
+            "value": 9,
+            "label": "AIS 3"
+          },
+          {
+            "value": 16,
+            "label": "AIS 4"
+          },
+          {
+            "value": 25,
+            "label": "AIS 5"
+          }
+        ]
+      },
+      {
+        "id": "r3",
+        "label": "第三重区域简明损伤定级",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无损伤"
+          },
+          {
+            "value": 1,
+            "label": "AIS 1"
+          },
+          {
+            "value": 4,
+            "label": "AIS 2"
+          },
+          {
+            "value": 9,
+            "label": "AIS 3"
+          },
+          {
+            "value": 16,
+            "label": "AIS 4"
+          },
+          {
+            "value": 25,
+            "label": "AIS 5"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 8,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 9,
+        "max": 15,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 16,
+        "max": 24,
+        "key": "severe",
+        "label": "重度"
+      },
+      {
+        "min": 25,
+        "max": 75,
+        "key": "critical",
+        "label": "极重度"
+      }
+    ],
+    "note": "选项值直接编码 AIS 的平方，因此合计即为 ISS。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "r1": {
+        "type": "number",
+        "title": "最重区域简明损伤定级",
+        "enum": [0, 1, 4, 9, 16, 25]
+      },
+      "r2": {
+        "type": "number",
+        "title": "次重区域简明损伤定级",
+        "enum": [0, 1, 4, 9, 16, 25]
+      },
+      "r3": {
+        "type": "number",
+        "title": "第三重区域简明损伤定级",
+        "enum": [0, 1, 4, 9, 16, 25]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Injury Severity Score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Injury+Severity+Score+ISS",
+      "section": "Baker SP, et al. 1974；三个最重区域 AIS 的平方和，0–75 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

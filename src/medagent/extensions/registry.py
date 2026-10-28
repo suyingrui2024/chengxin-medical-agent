@@ -8,6 +8,8 @@ from typing import Callable, Optional
 
 from .contracts import validate, validate_schema, validate_references
 from .conversion_forms import conversion_spec
+from .scale_forms import scale_form_spec
+from .formula_forms import formula_form_spec
 from ..presentation import calculation_presentation
 from ..location_answers import validate_answer_contract
 
@@ -63,7 +65,18 @@ class CapabilityRegistry:
                 validate_schema(item["input_schema"])
                 validate_schema(item["output_schema"])
                 form = item.get("patient_form")
-                if form is not None:
+                has_scale = isinstance(item.get("scale"), dict)
+                has_formula = isinstance(item.get("formula"), dict)
+                if has_scale and has_formula:
+                    raise ValueError("计算能力不能同时声明量表与公式")
+                if has_scale:
+                    # Declarative scale packs are validated as a whole:
+                    # items, bands, the input contract and the output
+                    # contract must all describe the same form.
+                    scale_form_spec(item)
+                elif has_formula:
+                    formula_form_spec(item)
+                elif form is not None:
                     conversion_spec(item)
                 if "references" in item:
                     validate_references(item["references"])
@@ -153,24 +166,34 @@ class CapabilityRegistry:
         if selected - self._entries.keys():
             raise ValueError("模板引用了未注册能力")
         self._enabled = frozenset(selected)
-        self._tasks = {}
+        self._tasks = self._build_tasks()
+        self.revision = self.snapshot()["sha256"]
+
+    def _build_tasks(self):
+        """Self-check tasks for the currently enabled set.
+
+        Extracted so ``with_enabled_set`` can rebuild the registry in one
+        pass instead of replaying ``with_enabled`` per capability (which
+        was O(N^2): 100 capabilities cost 2.9 s per dispatch).
+        """
+        tasks = {}
         priority = {
-            identity: index for index, identity in enumerate(template["enabled"])
+            identity: index for index, identity in enumerate(self._template["enabled"])
         }
         for identity in sorted(
-            selected, key=lambda key: (priority.get(key, len(priority)), key)
+            self._enabled, key=lambda key: (priority.get(key, len(priority)), key)
         ):
             item = self._entries[identity].manifest
             if item["kind"] != "self_check":
                 continue
             task = deepcopy(item["task"])
-            if task["id"] in self._tasks or any(
-                t["result_key"] == task["result_key"] for t in self._tasks.values()
+            if task["id"] in tasks or any(
+                t["result_key"] == task["result_key"] for t in tasks.values()
             ):
                 raise ValueError("任务 ID 或结果字段冲突")
             task["provider"] = {"id": identity, "version": item["version"]}
-            self._tasks[task["id"]] = task
-        self.revision = self.snapshot()["sha256"]
+            tasks[task["id"]] = task
+        return tasks
 
     @property
     def tasks(self):
@@ -199,6 +222,34 @@ class CapabilityRegistry:
         selected = set(self._enabled)
         (selected.add if enabled else selected.discard)(identity)
         return CapabilityRegistry(self._entries.values(), self._template, selected)
+
+    def with_enabled_set(self, identities):
+        """Clone with a different enabled set, reusing the parsed entries.
+
+        Equivalent to replaying ``with_enabled`` for every capability but
+        O(N) instead of O(N^2): the manifest validation already happened
+        when this registry was built, so only the task index and the
+        revision are recomputed. The revision must stay byte-identical to
+        the per-item replay — ``execution_capabilities`` compares it
+        against a binding frozen at workspace creation.
+        """
+        selected = set(identities)
+        if selected - self._entries.keys():
+            raise ValueError("模板引用了未注册能力")
+        clone = object.__new__(type(self))
+        clone._entries = self._entries
+        clone._template = self._template
+        clone._enabled = frozenset(selected)
+        clone._tasks = clone._build_tasks()
+        clone.revision = clone.snapshot()["sha256"]
+        return clone
+
+    def manifest(self, identity):
+        """One manifest copy, without materialising the whole catalog."""
+        entry = self._entries.get(identity)
+        if entry is None:
+            return None
+        return deepcopy(entry.manifest)
 
     def descriptions(self):
         return [

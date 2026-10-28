@@ -1,0 +1,420 @@
+{
+  "id": "calculate.ipss",
+  "name": "IPSS 前列腺症状评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "国际前列腺症状评分（7 项，0–35 分），用于记录下尿路症状程度，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["IPSS", "前列腺症状", "国际前列腺症状评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 35,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "i1",
+        "label": "排尿不尽感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "少于五分之一"
+          },
+          {
+            "value": 2,
+            "label": "少于一半"
+          },
+          {
+            "value": 3,
+            "label": "大约一半"
+          },
+          {
+            "value": 4,
+            "label": "多于一半"
+          },
+          {
+            "value": 5,
+            "label": "几乎总是"
+          }
+        ]
+      },
+      {
+        "id": "i2",
+        "label": "排尿间隔少于两小时",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "少于五分之一"
+          },
+          {
+            "value": 2,
+            "label": "少于一半"
+          },
+          {
+            "value": 3,
+            "label": "大约一半"
+          },
+          {
+            "value": 4,
+            "label": "多于一半"
+          },
+          {
+            "value": 5,
+            "label": "几乎总是"
+          }
+        ]
+      },
+      {
+        "id": "i3",
+        "label": "排尿中断",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "少于五分之一"
+          },
+          {
+            "value": 2,
+            "label": "少于一半"
+          },
+          {
+            "value": 3,
+            "label": "大约一半"
+          },
+          {
+            "value": 4,
+            "label": "多于一半"
+          },
+          {
+            "value": 5,
+            "label": "几乎总是"
+          }
+        ]
+      },
+      {
+        "id": "i4",
+        "label": "憋尿困难",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "少于五分之一"
+          },
+          {
+            "value": 2,
+            "label": "少于一半"
+          },
+          {
+            "value": 3,
+            "label": "大约一半"
+          },
+          {
+            "value": 4,
+            "label": "多于一半"
+          },
+          {
+            "value": 5,
+            "label": "几乎总是"
+          }
+        ]
+      },
+      {
+        "id": "i5",
+        "label": "尿线细弱",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "少于五分之一"
+          },
+          {
+            "value": 2,
+            "label": "少于一半"
+          },
+          {
+            "value": 3,
+            "label": "大约一半"
+          },
+          {
+            "value": 4,
+            "label": "多于一半"
+          },
+          {
+            "value": 5,
+            "label": "几乎总是"
+          }
+        ]
+      },
+      {
+        "id": "i6",
+        "label": "需要用力才能排尿",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "少于五分之一"
+          },
+          {
+            "value": 2,
+            "label": "少于一半"
+          },
+          {
+            "value": 3,
+            "label": "大约一半"
+          },
+          {
+            "value": 4,
+            "label": "多于一半"
+          },
+          {
+            "value": 5,
+            "label": "几乎总是"
+          }
+        ]
+      },
+      {
+        "id": "i7",
+        "label": "夜间起夜排尿次数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 次"
+          },
+          {
+            "value": 1,
+            "label": "1 次"
+          },
+          {
+            "value": 2,
+            "label": "2 次"
+          },
+          {
+            "value": 3,
+            "label": "3 次"
+          },
+          {
+            "value": 4,
+            "label": "4 次"
+          },
+          {
+            "value": 5,
+            "label": "5 次及以上"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 7,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 8,
+        "max": 19,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 20,
+        "max": 35,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "i1": {
+        "type": "number",
+        "title": "排尿不尽感",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "i2": {
+        "type": "number",
+        "title": "排尿间隔少于两小时",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "i3": {
+        "type": "number",
+        "title": "排尿中断",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "i4": {
+        "type": "number",
+        "title": "憋尿困难",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "i5": {
+        "type": "number",
+        "title": "尿线细弱",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "i6": {
+        "type": "number",
+        "title": "需要用力才能排尿",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "i7": {
+        "type": "number",
+        "title": "夜间起夜排尿次数",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "International Prostate Symptom Score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=International+Prostate+Symptom+Score+IPSS",
+      "section": "IPSS：7 项症状各 0–5 分，合计 0–35 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

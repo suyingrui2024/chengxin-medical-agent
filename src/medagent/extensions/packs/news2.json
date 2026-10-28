@@ -1,0 +1,378 @@
+{
+  "id": "calculate.news2",
+  "name": "NEWS2 早期预警评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "国家早期预警评分第二版（7 项，0–20 分），分数越高风险越高。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["NEWS2", "早期预警"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 20,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "rr",
+        "label": "呼吸频率",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 9,
+            "score": 3
+          },
+          {
+            "gte": 9,
+            "lt": 12,
+            "score": 1
+          },
+          {
+            "gte": 12,
+            "lt": 21,
+            "score": 0
+          },
+          {
+            "gte": 21,
+            "lt": 25,
+            "score": 2
+          },
+          {
+            "gte": 25,
+            "score": 3
+          }
+        ]
+      },
+      {
+        "id": "spo2",
+        "label": "血氧饱和度",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 92,
+            "score": 3
+          },
+          {
+            "gte": 92,
+            "lt": 94,
+            "score": 2
+          },
+          {
+            "gte": 94,
+            "lt": 96,
+            "score": 1
+          },
+          {
+            "gte": 96,
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "oxygen",
+        "label": "是否吸氧",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 2,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "sbp",
+        "label": "收缩压",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 91,
+            "score": 3
+          },
+          {
+            "gte": 91,
+            "lt": 101,
+            "score": 2
+          },
+          {
+            "gte": 101,
+            "lt": 111,
+            "score": 1
+          },
+          {
+            "gte": 111,
+            "lt": 220,
+            "score": 0
+          },
+          {
+            "gte": 220,
+            "score": 3
+          }
+        ]
+      },
+      {
+        "id": "pulse",
+        "label": "脉搏",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 41,
+            "score": 3
+          },
+          {
+            "gte": 41,
+            "lt": 51,
+            "score": 1
+          },
+          {
+            "gte": 51,
+            "lt": 91,
+            "score": 0
+          },
+          {
+            "gte": 91,
+            "lt": 111,
+            "score": 1
+          },
+          {
+            "gte": 111,
+            "lt": 131,
+            "score": 2
+          },
+          {
+            "gte": 131,
+            "score": 3
+          }
+        ]
+      },
+      {
+        "id": "consciousness",
+        "label": "意识",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "清醒"
+          },
+          {
+            "value": 3,
+            "label": "对声音、疼痛无反应或不能唤醒"
+          }
+        ]
+      },
+      {
+        "id": "temp",
+        "label": "体温",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 35.1,
+            "score": 3
+          },
+          {
+            "gte": 35.1,
+            "lt": 36.1,
+            "score": 1
+          },
+          {
+            "gte": 36.1,
+            "lt": 38.1,
+            "score": 0
+          },
+          {
+            "gte": 38.1,
+            "lt": 39.1,
+            "score": 1
+          },
+          {
+            "gte": 39.1,
+            "score": 2
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 4,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 5,
+        "max": 6,
+        "key": "medium",
+        "label": "中等风险"
+      },
+      {
+        "min": 7,
+        "max": 20,
+        "key": "high",
+        "label": "高风险"
+      }
+    ],
+    "note": "血氧采用第一套量表；高碳酸血症性呼吸衰竭适用的第二套量表未纳入。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "rr": {
+        "type": "number",
+        "title": "呼吸频率"
+      },
+      "spo2": {
+        "type": "number",
+        "title": "血氧饱和度"
+      },
+      "oxygen": {
+        "type": "number",
+        "title": "是否吸氧",
+        "enum": [0, 2]
+      },
+      "sbp": {
+        "type": "number",
+        "title": "收缩压"
+      },
+      "pulse": {
+        "type": "number",
+        "title": "脉搏"
+      },
+      "consciousness": {
+        "type": "number",
+        "title": "意识",
+        "enum": [0, 3]
+      },
+      "temp": {
+        "type": "number",
+        "title": "体温"
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "National Early Warning Score 2",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=National+Early+Warning+Score+NEWS2",
+      "section": "Royal College of Physicians 2017；7 项合计 0–20 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

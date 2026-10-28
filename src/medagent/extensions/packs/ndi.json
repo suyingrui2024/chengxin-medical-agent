@@ -1,0 +1,543 @@
+{
+  "id": "calculate.ndi",
+  "name": "NDI 颈痛功能障碍指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Neck Disability Index（10 项，折算 0–100%），用于记录颈痛对日常活动的影响，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["NDI", "颈痛功能障碍", "Neck Disability Index"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum_percent",
+      "min": 0,
+      "max": 50,
+      "unit": "%",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "n1",
+        "label": "疼痛程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无痛"
+          },
+          {
+            "value": 1,
+            "label": "轻微疼痛"
+          },
+          {
+            "value": 2,
+            "label": "中度疼痛"
+          },
+          {
+            "value": 3,
+            "label": "较重疼痛"
+          },
+          {
+            "value": 4,
+            "label": "很重疼痛"
+          },
+          {
+            "value": 5,
+            "label": "最重疼痛"
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "label": "个人照料",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常，不需要帮助"
+          },
+          {
+            "value": 1,
+            "label": "正常但会加重疼痛"
+          },
+          {
+            "value": 2,
+            "label": "需要帮助但能自理"
+          },
+          {
+            "value": 3,
+            "label": "大部分需要帮助"
+          },
+          {
+            "value": 4,
+            "label": "几乎每天需要帮助"
+          },
+          {
+            "value": 5,
+            "label": "完全依赖他人"
+          }
+        ]
+      },
+      {
+        "id": "n3",
+        "label": "提物",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能提重物且不痛"
+          },
+          {
+            "value": 1,
+            "label": "能提重物但会痛"
+          },
+          {
+            "value": 2,
+            "label": "疼痛妨碍从地上提物"
+          },
+          {
+            "value": 3,
+            "label": "只能提中等重量"
+          },
+          {
+            "value": 4,
+            "label": "只能提很轻的物品"
+          },
+          {
+            "value": 5,
+            "label": "完全不能提物"
+          }
+        ]
+      },
+      {
+        "id": "n4",
+        "label": "阅读",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能读多久都不痛"
+          },
+          {
+            "value": 1,
+            "label": "能读但会痛"
+          },
+          {
+            "value": 2,
+            "label": "读一小时会痛"
+          },
+          {
+            "value": 3,
+            "label": "读半小时会痛"
+          },
+          {
+            "value": 4,
+            "label": "读十分钟会痛"
+          },
+          {
+            "value": 5,
+            "label": "因痛不能阅读"
+          }
+        ]
+      },
+      {
+        "id": "n5",
+        "label": "头痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有头痛"
+          },
+          {
+            "value": 1,
+            "label": "偶尔轻微头痛"
+          },
+          {
+            "value": 2,
+            "label": "经常中度头痛"
+          },
+          {
+            "value": 3,
+            "label": "经常较重头痛"
+          },
+          {
+            "value": 4,
+            "label": "几乎一直头痛"
+          },
+          {
+            "value": 5,
+            "label": "持续严重头痛"
+          }
+        ]
+      },
+      {
+        "id": "n6",
+        "label": "集中注意力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能完全集中"
+          },
+          {
+            "value": 1,
+            "label": "需要稍加努力"
+          },
+          {
+            "value": 2,
+            "label": "需要较多努力"
+          },
+          {
+            "value": 3,
+            "label": "难以集中"
+          },
+          {
+            "value": 4,
+            "label": "很难集中"
+          },
+          {
+            "value": 5,
+            "label": "完全不能集中"
+          }
+        ]
+      },
+      {
+        "id": "n7",
+        "label": "工作",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能完成全部工作"
+          },
+          {
+            "value": 1,
+            "label": "只能做日常工作"
+          },
+          {
+            "value": 2,
+            "label": "只能做部分工作"
+          },
+          {
+            "value": 3,
+            "label": "只能做轻工作"
+          },
+          {
+            "value": 4,
+            "label": "几乎不能工作"
+          },
+          {
+            "value": 5,
+            "label": "完全不能工作"
+          }
+        ]
+      },
+      {
+        "id": "n8",
+        "label": "驾驶",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能驾驶且不痛"
+          },
+          {
+            "value": 1,
+            "label": "能驾驶但会痛"
+          },
+          {
+            "value": 2,
+            "label": "驾驶时间需控制"
+          },
+          {
+            "value": 3,
+            "label": "驾驶明显受限"
+          },
+          {
+            "value": 4,
+            "label": "几乎不能驾驶"
+          },
+          {
+            "value": 5,
+            "label": "完全不能驾驶"
+          }
+        ]
+      },
+      {
+        "id": "n9",
+        "label": "睡眠",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "睡眠不受影响"
+          },
+          {
+            "value": 1,
+            "label": "偶尔因痛醒来"
+          },
+          {
+            "value": 2,
+            "label": "因痛睡不足六小时"
+          },
+          {
+            "value": 3,
+            "label": "因痛睡不足四小时"
+          },
+          {
+            "value": 4,
+            "label": "因痛睡不足两小时"
+          },
+          {
+            "value": 5,
+            "label": "因痛完全不能睡"
+          }
+        ]
+      },
+      {
+        "id": "n10",
+        "label": "娱乐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能参加全部娱乐"
+          },
+          {
+            "value": 1,
+            "label": "能参加但会痛"
+          },
+          {
+            "value": 2,
+            "label": "只能参加部分娱乐"
+          },
+          {
+            "value": 3,
+            "label": "娱乐明显受限"
+          },
+          {
+            "value": 4,
+            "label": "娱乐极少"
+          },
+          {
+            "value": 5,
+            "label": "完全没有娱乐"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 20,
+        "key": "mild",
+        "label": "轻度受限"
+      },
+      {
+        "min": 21,
+        "max": 40,
+        "key": "moderate",
+        "label": "中度受限"
+      },
+      {
+        "min": 41,
+        "max": 60,
+        "key": "severe",
+        "label": "重度受限"
+      },
+      {
+        "min": 61,
+        "max": 80,
+        "key": "very_severe",
+        "label": "极重度受限"
+      },
+      {
+        "min": 81,
+        "max": 100,
+        "key": "complete",
+        "label": "接近完全受限"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "n1": {
+        "type": "number",
+        "title": "疼痛程度",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n2": {
+        "type": "number",
+        "title": "个人照料",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n3": {
+        "type": "number",
+        "title": "提物",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n4": {
+        "type": "number",
+        "title": "阅读",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n5": {
+        "type": "number",
+        "title": "头痛",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n6": {
+        "type": "number",
+        "title": "集中注意力",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n7": {
+        "type": "number",
+        "title": "工作",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n8": {
+        "type": "number",
+        "title": "驾驶",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n9": {
+        "type": "number",
+        "title": "睡眠",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "n10": {
+        "type": "number",
+        "title": "娱乐",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "The Neck Disability Index",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Neck+Disability+Index+reliability+validity",
+      "section": "NDI：Vernon H, Mior S. 1991；10 项各 0–5 分，合计除以 50 折算为百分比",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

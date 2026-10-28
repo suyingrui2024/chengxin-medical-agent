@@ -1,0 +1,159 @@
+{
+  "id": "calculate.prostate_volume",
+  "name": "前列腺体积估算",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按三个径线估算前列腺体积。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["前列腺体积"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "prostate_volume",
+    "citation": "PROSTATE-VOL",
+    "inputs": [
+      {
+        "id": "length_cm",
+        "label": "前后径",
+        "type": "number",
+        "unit": "cm",
+        "min": "1",
+        "max": "15",
+        "step": "0.1"
+      },
+      {
+        "id": "width_cm",
+        "label": "左右径",
+        "type": "number",
+        "unit": "cm",
+        "min": "1",
+        "max": "15",
+        "step": "0.1"
+      },
+      {
+        "id": "height_cm",
+        "label": "上下径",
+        "type": "number",
+        "unit": "cm",
+        "min": "1",
+        "max": "15",
+        "step": "0.1"
+      }
+    ],
+    "output": {
+      "label": "前列腺体积",
+      "unit": "mL",
+      "min": "1",
+      "max": "500",
+      "precision": {
+        "places": 1
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "前列腺体积估算 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=prostate+volume+ellipsoid+formula",
+      "section": "PROSTATE-VOL：0.52 × 前后径 × 左右径 × 上下径",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "length_cm": {
+        "type": "string",
+        "title": "前后径",
+        "maxLength": 12
+      },
+      "width_cm": {
+        "type": "string",
+        "title": "左右径",
+        "maxLength": 12
+      },
+      "height_cm": {
+        "type": "string",
+        "title": "上下径",
+        "maxLength": 12
+      }
+    }
+  }
+}

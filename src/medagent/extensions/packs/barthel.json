@@ -1,0 +1,423 @@
+{
+  "id": "calculate.barthel",
+  "name": "Barthel 指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "日常生活活动能力评分（10 项，0–100 分），用于记录自理能力，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["Barthel", "巴氏指数", "日常生活能力"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 100,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "b1",
+        "label": "进食",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "独立进食"
+          },
+          {
+            "value": 5,
+            "label": "需要部分帮助"
+          },
+          {
+            "value": 0,
+            "label": "完全依赖"
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "label": "洗澡",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 5,
+            "label": "独立完成"
+          },
+          {
+            "value": 0,
+            "label": "需要帮助"
+          }
+        ]
+      },
+      {
+        "id": "b3",
+        "label": "修饰（洗脸刷牙）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 5,
+            "label": "独立完成"
+          },
+          {
+            "value": 0,
+            "label": "需要帮助"
+          }
+        ]
+      },
+      {
+        "id": "b4",
+        "label": "穿衣",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "独立完成"
+          },
+          {
+            "value": 5,
+            "label": "需要部分帮助"
+          },
+          {
+            "value": 0,
+            "label": "完全依赖"
+          }
+        ]
+      },
+      {
+        "id": "b5",
+        "label": "大便控制",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "能控制"
+          },
+          {
+            "value": 5,
+            "label": "偶尔失禁"
+          },
+          {
+            "value": 0,
+            "label": "失禁"
+          }
+        ]
+      },
+      {
+        "id": "b6",
+        "label": "小便控制",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "能控制"
+          },
+          {
+            "value": 5,
+            "label": "偶尔失禁"
+          },
+          {
+            "value": 0,
+            "label": "失禁"
+          }
+        ]
+      },
+      {
+        "id": "b7",
+        "label": "如厕",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "独立完成"
+          },
+          {
+            "value": 5,
+            "label": "需要部分帮助"
+          },
+          {
+            "value": 0,
+            "label": "完全依赖"
+          }
+        ]
+      },
+      {
+        "id": "b8",
+        "label": "床椅转移",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 15,
+            "label": "独立完成"
+          },
+          {
+            "value": 10,
+            "label": "少量帮助"
+          },
+          {
+            "value": 5,
+            "label": "较多帮助"
+          },
+          {
+            "value": 0,
+            "label": "完全依赖"
+          }
+        ]
+      },
+      {
+        "id": "b9",
+        "label": "平地行走",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 15,
+            "label": "独立行走"
+          },
+          {
+            "value": 10,
+            "label": "少量帮助"
+          },
+          {
+            "value": 5,
+            "label": "借助轮椅"
+          },
+          {
+            "value": 0,
+            "label": "完全依赖"
+          }
+        ]
+      },
+      {
+        "id": "b10",
+        "label": "上下楼梯",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "独立完成"
+          },
+          {
+            "value": 5,
+            "label": "需要帮助"
+          },
+          {
+            "value": 0,
+            "label": "不能完成"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 20,
+        "key": "total",
+        "label": "完全依赖"
+      },
+      {
+        "min": 21,
+        "max": 40,
+        "key": "severe",
+        "label": "严重依赖"
+      },
+      {
+        "min": 41,
+        "max": 60,
+        "key": "moderate",
+        "label": "中度依赖"
+      },
+      {
+        "min": 61,
+        "max": 99,
+        "key": "mild",
+        "label": "轻度依赖"
+      },
+      {
+        "min": 100,
+        "max": 100,
+        "key": "independent",
+        "label": "基本独立"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "b1": {
+        "type": "number",
+        "title": "进食",
+        "enum": [10, 5, 0]
+      },
+      "b2": {
+        "type": "number",
+        "title": "洗澡",
+        "enum": [5, 0]
+      },
+      "b3": {
+        "type": "number",
+        "title": "修饰（洗脸刷牙）",
+        "enum": [5, 0]
+      },
+      "b4": {
+        "type": "number",
+        "title": "穿衣",
+        "enum": [10, 5, 0]
+      },
+      "b5": {
+        "type": "number",
+        "title": "大便控制",
+        "enum": [10, 5, 0]
+      },
+      "b6": {
+        "type": "number",
+        "title": "小便控制",
+        "enum": [10, 5, 0]
+      },
+      "b7": {
+        "type": "number",
+        "title": "如厕",
+        "enum": [10, 5, 0]
+      },
+      "b8": {
+        "type": "number",
+        "title": "床椅转移",
+        "enum": [15, 10, 5, 0]
+      },
+      "b9": {
+        "type": "number",
+        "title": "平地行走",
+        "enum": [15, 10, 5, 0]
+      },
+      "b10": {
+        "type": "number",
+        "title": "上下楼梯",
+        "enum": [10, 5, 0]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Barthel Index of Activities of Daily Living",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Barthel+Index+activities+of+daily+living",
+      "section": "Barthel：Mahoney FI, Barthel DW. 1965；10 项加权合计 0–100 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

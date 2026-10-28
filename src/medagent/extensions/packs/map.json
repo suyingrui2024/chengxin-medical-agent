@@ -1,0 +1,147 @@
+{
+  "id": "calculate.map",
+  "name": "平均动脉压 MAP",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "由收缩压与舒张压计算平均动脉压（mmHg），只做算术换算。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "patient_form": "formula_form/v1",
+  "aliases": ["MAP", "平均动脉压"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "map",
+    "citation": "AHA-MAP",
+    "inputs": [
+      {
+        "id": "sbp",
+        "label": "收缩压",
+        "type": "number",
+        "unit": "mmHg",
+        "min": "50",
+        "max": "300",
+        "step": "1"
+      },
+      {
+        "id": "dbp",
+        "label": "舒张压",
+        "type": "number",
+        "unit": "mmHg",
+        "min": "30",
+        "max": "200",
+        "step": "1"
+      }
+    ],
+    "output": {
+      "label": "平均动脉压",
+      "unit": "mmHg",
+      "min": "20",
+      "max": "200",
+      "precision": {
+        "places": 1
+      },
+      "direction": "no_direction"
+    },
+    "bands": [],
+    "note": "不评价血压高低，也不提示处理方式。"
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Mean arterial pressure formula",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=mean+arterial+pressure+formula+diastolic+one+third",
+      "section": "AHA-MAP：MAP=(SBP+2×DBP)/3",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "sbp": {
+        "type": "string",
+        "title": "收缩压",
+        "maxLength": 12
+      },
+      "dbp": {
+        "type": "string",
+        "title": "舒张压",
+        "maxLength": 12
+      }
+    }
+  }
+}

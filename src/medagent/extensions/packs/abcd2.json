@@ -1,0 +1,274 @@
+{
+  "id": "calculate.abcd2",
+  "name": "ABCD2 TIA 短期风险评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "短暂性脑缺血发作后短期卒中风险（0–7 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["ABCD2", "TIA 风险"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 7,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "a1",
+        "label": "年龄",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "60 岁以下"
+          },
+          {
+            "value": 1,
+            "label": "60 岁及以上"
+          }
+        ]
+      },
+      {
+        "id": "a2",
+        "label": "血压",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "收缩压低于 140 且舒张压低于 90"
+          },
+          {
+            "value": 1,
+            "label": "收缩压 140 及以上或舒张压 90 及以上"
+          }
+        ]
+      },
+      {
+        "id": "a3",
+        "label": "症状",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "其他症状"
+          },
+          {
+            "value": 1,
+            "label": "仅有言语障碍"
+          },
+          {
+            "value": 2,
+            "label": "单侧肢体无力"
+          }
+        ]
+      },
+      {
+        "id": "a4",
+        "label": "症状持续时间",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "少于 10 分钟"
+          },
+          {
+            "value": 1,
+            "label": "10 至 59 分钟"
+          },
+          {
+            "value": 2,
+            "label": "60 分钟及以上"
+          }
+        ]
+      },
+      {
+        "id": "a5",
+        "label": "糖尿病",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 4,
+        "max": 5,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 6,
+        "max": 7,
+        "key": "high",
+        "label": "高风险"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "a1": {
+        "type": "number",
+        "title": "年龄",
+        "enum": [0, 1]
+      },
+      "a2": {
+        "type": "number",
+        "title": "血压",
+        "enum": [0, 1]
+      },
+      "a3": {
+        "type": "number",
+        "title": "症状",
+        "enum": [0, 1, 2]
+      },
+      "a4": {
+        "type": "number",
+        "title": "症状持续时间",
+        "enum": [0, 1, 2]
+      },
+      "a5": {
+        "type": "number",
+        "title": "糖尿病",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "ABCD2 score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=ABCD2+score+transient+ischaemic+attack",
+      "section": "Johnston SC, et al. 2007；5 项合计 0–7 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

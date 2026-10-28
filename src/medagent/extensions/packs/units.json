@@ -37,16 +37,41 @@
     "additionalProperties": false,
     "required": ["value", "unit", "formula", "method", "limitations"],
     "properties": {
-      "value": { "type": "string" },
-      "unit": { "type": "string" },
-      "formula": { "type": "string" },
-      "method": { "type": "string" },
-      "limitations": { "type": "array", "items": { "type": "string" } }
+      "value": {
+        "type": "string"
+      },
+      "unit": {
+        "type": "string"
+      },
+      "formula": {
+        "type": "string"
+      },
+      "method": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
     }
   },
-  "example": { "value": "1.25", "from_unit": "kg", "to_unit": "g" },
+  "example": {
+    "value": "1.25",
+    "from_unit": "kg",
+    "to_unit": "g"
+  },
   "validation": {
     "status": "automated_engineering_tests",
     "scope": "精确换算、量纲拒绝、契约和版本隔离；不评价临床意义"
-  }
+  },
+  "references": [
+    {
+      "title": "SI Brochure: The International System of Units (SI), 9th edition",
+      "url": "https://www.bipm.org/en/publications/si-brochure",
+      "section": "BIPM SI Brochure 9th ed. (2019), Table 4: SI prefixes (kg/g/mg, L/mL)",
+      "accessed": "2026-10-28"
+    }
+  ]
 }

@@ -1,0 +1,196 @@
+{
+  "id": "calculate.amh",
+  "name": "AMH 卵巢储备判读",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按抗苗勒管激素水平归类卵巢储备（分级型）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["AMH", "卵巢储备"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 3,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "level",
+        "label": "AMH 水平",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "低于 0.5 ng/mL"
+          },
+          {
+            "value": 1,
+            "label": "0.5 至 1.0 ng/mL"
+          },
+          {
+            "value": 2,
+            "label": "1.0 至 4.0 ng/mL"
+          },
+          {
+            "value": 3,
+            "label": "高于 4.0 ng/mL"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "low",
+        "label": "储备偏低"
+      },
+      {
+        "min": 1,
+        "max": 1,
+        "key": "borderline",
+        "label": "偏低临界"
+      },
+      {
+        "min": 2,
+        "max": 2,
+        "key": "normal",
+        "label": "常见范围"
+      },
+      {
+        "min": 3,
+        "max": 3,
+        "key": "high",
+        "label": "偏高"
+      }
+    ],
+    "note": "只做区间归类，不判断生育能力。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "level": {
+        "type": "number",
+        "title": "AMH 水平",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Anti-Müllerian hormone reference ranges",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=anti-Mullerian+hormone+ovarian+reserve+reference",
+      "section": "常用参考区间；判读须结合年龄与临床",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

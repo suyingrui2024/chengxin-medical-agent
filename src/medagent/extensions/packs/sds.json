@@ -1,0 +1,758 @@
+{
+  "id": "calculate.sds",
+  "name": "SDS 抑郁自评量表",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Zung 抑郁自评量表（20 项，20–80 分），含 10 道反向计分。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["SDS", "Zung 抑郁自评", "抑郁自评量表"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 20,
+      "max": 80,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "d1",
+        "label": "我觉得闷闷不乐，情绪低沉",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d2",
+        "label": "我觉得一天之中早晨最好",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d3",
+        "label": "我一阵阵哭出来或觉得想哭",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d4",
+        "label": "我晚上睡眠不好",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d5",
+        "label": "我吃得跟平常一样多",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d6",
+        "label": "我与异性密切接触时和以往一样感到愉快",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d7",
+        "label": "我发觉我的体重在下降",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d8",
+        "label": "我有便秘的苦恼",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d9",
+        "label": "我心跳比平时快",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d10",
+        "label": "我无缘无故地感到疲乏",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d11",
+        "label": "我的头脑跟平常一样清楚",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d12",
+        "label": "我觉得经常做的事情并没有困难",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d13",
+        "label": "我觉得不安而平静不下来",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d14",
+        "label": "我对将来抱有希望",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d15",
+        "label": "我比平常容易生气激动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d16",
+        "label": "我觉得作出决定是容易的",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d17",
+        "label": "我觉得自己是个有用的人，有人需要我",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d18",
+        "label": "我的生活过得很有意思",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "d19",
+        "label": "我认为如果我死了别人会生活得好些",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "d20",
+        "label": "平常感兴趣的事我仍然照样感兴趣",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      }
+    ],
+    "bands": [
+      {
+        "min": 20,
+        "max": 39,
+        "key": "normal",
+        "label": "无抑郁"
+      },
+      {
+        "min": 40,
+        "max": 47,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 48,
+        "max": 55,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 56,
+        "max": 80,
+        "key": "severe",
+        "label": "重度"
+      }
+    ],
+    "note": "第 19 项涉及死亡念头，命中时请走紧急求助渠道；本量表不承担该判断。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "d1": {
+        "type": "number",
+        "title": "我觉得闷闷不乐，情绪低沉",
+        "enum": [1, 2, 3, 4]
+      },
+      "d2": {
+        "type": "number",
+        "title": "我觉得一天之中早晨最好",
+        "enum": [1, 2, 3, 4]
+      },
+      "d3": {
+        "type": "number",
+        "title": "我一阵阵哭出来或觉得想哭",
+        "enum": [1, 2, 3, 4]
+      },
+      "d4": {
+        "type": "number",
+        "title": "我晚上睡眠不好",
+        "enum": [1, 2, 3, 4]
+      },
+      "d5": {
+        "type": "number",
+        "title": "我吃得跟平常一样多",
+        "enum": [1, 2, 3, 4]
+      },
+      "d6": {
+        "type": "number",
+        "title": "我与异性密切接触时和以往一样感到愉快",
+        "enum": [1, 2, 3, 4]
+      },
+      "d7": {
+        "type": "number",
+        "title": "我发觉我的体重在下降",
+        "enum": [1, 2, 3, 4]
+      },
+      "d8": {
+        "type": "number",
+        "title": "我有便秘的苦恼",
+        "enum": [1, 2, 3, 4]
+      },
+      "d9": {
+        "type": "number",
+        "title": "我心跳比平时快",
+        "enum": [1, 2, 3, 4]
+      },
+      "d10": {
+        "type": "number",
+        "title": "我无缘无故地感到疲乏",
+        "enum": [1, 2, 3, 4]
+      },
+      "d11": {
+        "type": "number",
+        "title": "我的头脑跟平常一样清楚",
+        "enum": [1, 2, 3, 4]
+      },
+      "d12": {
+        "type": "number",
+        "title": "我觉得经常做的事情并没有困难",
+        "enum": [1, 2, 3, 4]
+      },
+      "d13": {
+        "type": "number",
+        "title": "我觉得不安而平静不下来",
+        "enum": [1, 2, 3, 4]
+      },
+      "d14": {
+        "type": "number",
+        "title": "我对将来抱有希望",
+        "enum": [1, 2, 3, 4]
+      },
+      "d15": {
+        "type": "number",
+        "title": "我比平常容易生气激动",
+        "enum": [1, 2, 3, 4]
+      },
+      "d16": {
+        "type": "number",
+        "title": "我觉得作出决定是容易的",
+        "enum": [1, 2, 3, 4]
+      },
+      "d17": {
+        "type": "number",
+        "title": "我觉得自己是个有用的人，有人需要我",
+        "enum": [1, 2, 3, 4]
+      },
+      "d18": {
+        "type": "number",
+        "title": "我的生活过得很有意思",
+        "enum": [1, 2, 3, 4]
+      },
+      "d19": {
+        "type": "number",
+        "title": "我认为如果我死了别人会生活得好些",
+        "enum": [1, 2, 3, 4]
+      },
+      "d20": {
+        "type": "number",
+        "title": "平常感兴趣的事我仍然照样感兴趣",
+        "enum": [1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Zung Self-Rating Depression Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Zung+Self-Rating+Depression+Scale+SDS",
+      "section": "Zung WWK. 1965；20 项各 1–4 分，10 项反向计分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

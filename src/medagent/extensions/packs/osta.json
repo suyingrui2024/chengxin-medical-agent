@@ -1,0 +1,236 @@
+{
+  "id": "calculate.osta",
+  "name": "OSTA 骨质疏松风险指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "亚洲人骨质疏松自我筛查工具（基于年龄与体重）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["OSTA", "骨质疏松风险"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 10,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "age",
+        "label": "年龄",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "50 至 54 岁"
+          },
+          {
+            "value": 1,
+            "label": "55 至 59 岁"
+          },
+          {
+            "value": 2,
+            "label": "60 至 64 岁"
+          },
+          {
+            "value": 3,
+            "label": "65 至 69 岁"
+          },
+          {
+            "value": 4,
+            "label": "70 至 74 岁"
+          },
+          {
+            "value": 5,
+            "label": "75 岁及以上"
+          }
+        ]
+      },
+      {
+        "id": "weight",
+        "label": "体重",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "大于 57 公斤"
+          },
+          {
+            "value": 1,
+            "label": "52 至 57 公斤"
+          },
+          {
+            "value": 2,
+            "label": "47 至 51 公斤"
+          },
+          {
+            "value": 3,
+            "label": "42 至 46 公斤"
+          },
+          {
+            "value": 4,
+            "label": "37 至 41 公斤"
+          },
+          {
+            "value": 5,
+            "label": "37 公斤以下"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 1,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 2,
+        "max": 3,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 4,
+        "max": 10,
+        "key": "high",
+        "label": "高风险"
+      }
+    ],
+    "note": "本实现为年龄与体重两档相加的简化形式，原式为年龄减体重。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "age": {
+        "type": "number",
+        "title": "年龄",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "weight": {
+        "type": "number",
+        "title": "体重",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "OSTA index",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=OSTA+osteoporosis+self-assessment+tool+Asians",
+      "section": "Koh LK, et al. 2001；年龄分减体重分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

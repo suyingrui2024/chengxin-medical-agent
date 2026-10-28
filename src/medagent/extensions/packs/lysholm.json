@@ -1,0 +1,410 @@
+{
+  "id": "calculate.lysholm",
+  "name": "Lysholm 膝关节评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Lysholm 膝关节功能评分（8 项，0–100 分），分数越高功能越好。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Lysholm", "膝关节评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 100,
+      "unit": "分",
+      "direction": "higher_is_better"
+    },
+    "items": [
+      {
+        "id": "l1",
+        "label": "跛行",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 5,
+            "label": "无"
+          },
+          {
+            "value": 3,
+            "label": "轻度或间歇"
+          },
+          {
+            "value": 0,
+            "label": "持续严重"
+          }
+        ]
+      },
+      {
+        "id": "l2",
+        "label": "是否需要支撑",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 5,
+            "label": "不需要"
+          },
+          {
+            "value": 2,
+            "label": "需要手杖或拐杖"
+          },
+          {
+            "value": 0,
+            "label": "不能负重"
+          }
+        ]
+      },
+      {
+        "id": "l3",
+        "label": "交锁感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 15,
+            "label": "无"
+          },
+          {
+            "value": 10,
+            "label": "有卡住感但无交锁"
+          },
+          {
+            "value": 6,
+            "label": "偶尔交锁"
+          },
+          {
+            "value": 2,
+            "label": "经常交锁"
+          },
+          {
+            "value": 0,
+            "label": "检查时即交锁"
+          }
+        ]
+      },
+      {
+        "id": "l4",
+        "label": "不稳定",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 25,
+            "label": "从不"
+          },
+          {
+            "value": 20,
+            "label": "剧烈运动时偶有"
+          },
+          {
+            "value": 15,
+            "label": "剧烈运动时经常"
+          },
+          {
+            "value": 10,
+            "label": "日常活动偶有"
+          },
+          {
+            "value": 5,
+            "label": "日常活动经常"
+          },
+          {
+            "value": 0,
+            "label": "每次活动都有"
+          }
+        ]
+      },
+      {
+        "id": "l5",
+        "label": "疼痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 25,
+            "label": "无"
+          },
+          {
+            "value": 20,
+            "label": "剧烈活动时轻度"
+          },
+          {
+            "value": 15,
+            "label": "剧烈活动时明显"
+          },
+          {
+            "value": 10,
+            "label": "走路两公里后明显"
+          },
+          {
+            "value": 5,
+            "label": "走路两公里内明显"
+          },
+          {
+            "value": 0,
+            "label": "持续疼痛"
+          }
+        ]
+      },
+      {
+        "id": "l6",
+        "label": "肿胀",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "无"
+          },
+          {
+            "value": 6,
+            "label": "剧烈活动后"
+          },
+          {
+            "value": 2,
+            "label": "日常活动后"
+          },
+          {
+            "value": 0,
+            "label": "持续"
+          }
+        ]
+      },
+      {
+        "id": "l7",
+        "label": "上楼",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 10,
+            "label": "无困难"
+          },
+          {
+            "value": 6,
+            "label": "轻度困难"
+          },
+          {
+            "value": 2,
+            "label": "每步都痛"
+          },
+          {
+            "value": 0,
+            "label": "不能上楼"
+          }
+        ]
+      },
+      {
+        "id": "l8",
+        "label": "下蹲",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 5,
+            "label": "无困难"
+          },
+          {
+            "value": 4,
+            "label": "轻度困难"
+          },
+          {
+            "value": 2,
+            "label": "不超过九十度"
+          },
+          {
+            "value": 0,
+            "label": "不能下蹲"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 24,
+        "key": "poor",
+        "label": "差"
+      },
+      {
+        "min": 25,
+        "max": 64,
+        "key": "fair",
+        "label": "一般"
+      },
+      {
+        "min": 65,
+        "max": 83,
+        "key": "good",
+        "label": "良好"
+      },
+      {
+        "min": 84,
+        "max": 100,
+        "key": "excellent",
+        "label": "优"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "l1": {
+        "type": "number",
+        "title": "跛行",
+        "enum": [5, 3, 0]
+      },
+      "l2": {
+        "type": "number",
+        "title": "是否需要支撑",
+        "enum": [5, 2, 0]
+      },
+      "l3": {
+        "type": "number",
+        "title": "交锁感",
+        "enum": [15, 10, 6, 2, 0]
+      },
+      "l4": {
+        "type": "number",
+        "title": "不稳定",
+        "enum": [25, 20, 15, 10, 5, 0]
+      },
+      "l5": {
+        "type": "number",
+        "title": "疼痛",
+        "enum": [25, 20, 15, 10, 5, 0]
+      },
+      "l6": {
+        "type": "number",
+        "title": "肿胀",
+        "enum": [10, 6, 2, 0]
+      },
+      "l7": {
+        "type": "number",
+        "title": "上楼",
+        "enum": [10, 6, 2, 0]
+      },
+      "l8": {
+        "type": "number",
+        "title": "下蹲",
+        "enum": [5, 4, 2, 0]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Lysholm knee score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Lysholm+knee+scoring+scale",
+      "section": "Lysholm J, Gillquist J. 1982；8 项合计 0–100 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

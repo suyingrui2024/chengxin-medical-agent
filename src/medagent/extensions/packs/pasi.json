@@ -1,0 +1,613 @@
+{
+  "id": "calculate.pasi",
+  "name": "PASI 银屑病面积与严重度指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按四个身体区域的受累面积与体征计算 PASI。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["PASI", "银屑病面积"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "pasi",
+    "citation": "PASI",
+    "inputs": [
+      {
+        "id": "head_area",
+        "label": "头颈受累面积",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "0%"
+          },
+          {
+            "value": "1",
+            "label": "1–9%"
+          },
+          {
+            "value": "2",
+            "label": "10–19%"
+          },
+          {
+            "value": "3",
+            "label": "20–29%"
+          },
+          {
+            "value": "4",
+            "label": "30–49%"
+          },
+          {
+            "value": "5",
+            "label": "50–69%"
+          },
+          {
+            "value": "6",
+            "label": "70–100%"
+          }
+        ]
+      },
+      {
+        "id": "head_e",
+        "label": "头颈红斑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "head_i",
+        "label": "头颈浸润",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "head_d",
+        "label": "头颈脱屑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "arms_area",
+        "label": "上肢受累面积",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "0%"
+          },
+          {
+            "value": "1",
+            "label": "1–9%"
+          },
+          {
+            "value": "2",
+            "label": "10–19%"
+          },
+          {
+            "value": "3",
+            "label": "20–29%"
+          },
+          {
+            "value": "4",
+            "label": "30–49%"
+          },
+          {
+            "value": "5",
+            "label": "50–69%"
+          },
+          {
+            "value": "6",
+            "label": "70–100%"
+          }
+        ]
+      },
+      {
+        "id": "arms_e",
+        "label": "上肢红斑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "arms_i",
+        "label": "上肢浸润",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "arms_d",
+        "label": "上肢脱屑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "trunk_area",
+        "label": "躯干受累面积",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "0%"
+          },
+          {
+            "value": "1",
+            "label": "1–9%"
+          },
+          {
+            "value": "2",
+            "label": "10–19%"
+          },
+          {
+            "value": "3",
+            "label": "20–29%"
+          },
+          {
+            "value": "4",
+            "label": "30–49%"
+          },
+          {
+            "value": "5",
+            "label": "50–69%"
+          },
+          {
+            "value": "6",
+            "label": "70–100%"
+          }
+        ]
+      },
+      {
+        "id": "trunk_e",
+        "label": "躯干红斑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "trunk_i",
+        "label": "躯干浸润",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "trunk_d",
+        "label": "躯干脱屑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "legs_area",
+        "label": "下肢受累面积",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "0%"
+          },
+          {
+            "value": "1",
+            "label": "1–9%"
+          },
+          {
+            "value": "2",
+            "label": "10–19%"
+          },
+          {
+            "value": "3",
+            "label": "20–29%"
+          },
+          {
+            "value": "4",
+            "label": "30–49%"
+          },
+          {
+            "value": "5",
+            "label": "50–69%"
+          },
+          {
+            "value": "6",
+            "label": "70–100%"
+          }
+        ]
+      },
+      {
+        "id": "legs_e",
+        "label": "下肢红斑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "legs_i",
+        "label": "下肢浸润",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "legs_d",
+        "label": "下肢脱屑",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "无"
+          },
+          {
+            "value": "1",
+            "label": "轻度"
+          },
+          {
+            "value": "2",
+            "label": "中度"
+          },
+          {
+            "value": "3",
+            "label": "重度"
+          }
+        ]
+      }
+    ],
+    "output": {
+      "label": "银屑病面积与严重度指数",
+      "unit": "分",
+      "min": "0",
+      "max": "54",
+      "precision": {
+        "places": 1
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "PASI 银屑病面积与严重度指数 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Psoriasis+Area+and+Severity+Index+PASI",
+      "section": "PASI：Σ 区域系数 × 面积分 ×（红斑+浸润+脱屑），系数 0.1/0.2/0.3/0.4",
+      "accessed": "2026-10-28"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "head_area": {
+        "type": "string",
+        "title": "头颈受累面积",
+        "enum": ["0", "1", "2", "3", "4", "5", "6"]
+      },
+      "head_e": {
+        "type": "string",
+        "title": "头颈红斑",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "head_i": {
+        "type": "string",
+        "title": "头颈浸润",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "head_d": {
+        "type": "string",
+        "title": "头颈脱屑",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "arms_area": {
+        "type": "string",
+        "title": "上肢受累面积",
+        "enum": ["0", "1", "2", "3", "4", "5", "6"]
+      },
+      "arms_e": {
+        "type": "string",
+        "title": "上肢红斑",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "arms_i": {
+        "type": "string",
+        "title": "上肢浸润",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "arms_d": {
+        "type": "string",
+        "title": "上肢脱屑",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "trunk_area": {
+        "type": "string",
+        "title": "躯干受累面积",
+        "enum": ["0", "1", "2", "3", "4", "5", "6"]
+      },
+      "trunk_e": {
+        "type": "string",
+        "title": "躯干红斑",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "trunk_i": {
+        "type": "string",
+        "title": "躯干浸润",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "trunk_d": {
+        "type": "string",
+        "title": "躯干脱屑",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "legs_area": {
+        "type": "string",
+        "title": "下肢受累面积",
+        "enum": ["0", "1", "2", "3", "4", "5", "6"]
+      },
+      "legs_e": {
+        "type": "string",
+        "title": "下肢红斑",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "legs_i": {
+        "type": "string",
+        "title": "下肢浸润",
+        "enum": ["0", "1", "2", "3"]
+      },
+      "legs_d": {
+        "type": "string",
+        "title": "下肢脱屑",
+        "enum": ["0", "1", "2", "3"]
+      }
+    }
+  }
+}

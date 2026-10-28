@@ -1,0 +1,244 @@
+{
+  "id": "calculate.burn_area",
+  "name": "烧伤面积九分法",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按各部位体表面积百分比相加。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "aliases": ["烧伤面积", "九分法"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "burn_area",
+    "citation": "RULE-OF-NINES",
+    "inputs": [
+      {
+        "id": "head",
+        "label": "头颈",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "trunk_front",
+        "label": "躯干前",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "trunk_back",
+        "label": "躯干后",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "arm_left",
+        "label": "左上肢",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "arm_right",
+        "label": "右上肢",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "leg_left",
+        "label": "左下肢",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "leg_right",
+        "label": "右下肢",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "perineum",
+        "label": "会阴",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      },
+      {
+        "id": "other",
+        "label": "其他",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "100",
+        "step": "0.5"
+      }
+    ],
+    "output": {
+      "label": "烧伤面积",
+      "unit": "%TBSA",
+      "min": "0",
+      "max": "100",
+      "precision": {
+        "places": 1
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "烧伤面积九分法 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=rule+of+nines+burn+body+surface+area",
+      "section": "RULE-OF-NINES：各部位体表面积百分比相加（九分法）",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "formula_form/v1",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "head": {
+        "type": "string",
+        "title": "头颈",
+        "maxLength": 12
+      },
+      "trunk_front": {
+        "type": "string",
+        "title": "躯干前",
+        "maxLength": 12
+      },
+      "trunk_back": {
+        "type": "string",
+        "title": "躯干后",
+        "maxLength": 12
+      },
+      "arm_left": {
+        "type": "string",
+        "title": "左上肢",
+        "maxLength": 12
+      },
+      "arm_right": {
+        "type": "string",
+        "title": "右上肢",
+        "maxLength": 12
+      },
+      "leg_left": {
+        "type": "string",
+        "title": "左下肢",
+        "maxLength": 12
+      },
+      "leg_right": {
+        "type": "string",
+        "title": "右下肢",
+        "maxLength": 12
+      },
+      "perineum": {
+        "type": "string",
+        "title": "会阴",
+        "maxLength": 12
+      },
+      "other": {
+        "type": "string",
+        "title": "其他",
+        "maxLength": 12
+      }
+    }
+  }
+}

@@ -1,0 +1,259 @@
+{
+  "id": "calculate.gcs",
+  "name": "GCS 格拉斯哥昏迷评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "格拉斯哥昏迷评分（3–15 分），分数越低意识障碍越重。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["GCS", "格拉斯哥昏迷"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 3,
+      "max": 15,
+      "unit": "分",
+      "direction": "higher_is_better"
+    },
+    "items": [
+      {
+        "id": "eye",
+        "label": "睁眼反应",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 4,
+            "label": "自发睁眼"
+          },
+          {
+            "value": 3,
+            "label": "呼唤睁眼"
+          },
+          {
+            "value": 2,
+            "label": "疼痛刺激睁眼"
+          },
+          {
+            "value": 1,
+            "label": "无睁眼"
+          }
+        ]
+      },
+      {
+        "id": "verbal",
+        "label": "语言反应",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 5,
+            "label": "回答切题"
+          },
+          {
+            "value": 4,
+            "label": "回答不切题"
+          },
+          {
+            "value": 3,
+            "label": "说出不恰当词句"
+          },
+          {
+            "value": 2,
+            "label": "只能发出无意义声音"
+          },
+          {
+            "value": 1,
+            "label": "无语言反应"
+          }
+        ]
+      },
+      {
+        "id": "motor",
+        "label": "运动反应",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 6,
+            "label": "遵嘱运动"
+          },
+          {
+            "value": 5,
+            "label": "疼痛定位"
+          },
+          {
+            "value": 4,
+            "label": "疼痛躲避"
+          },
+          {
+            "value": 3,
+            "label": "异常屈曲"
+          },
+          {
+            "value": 2,
+            "label": "异常伸展"
+          },
+          {
+            "value": 1,
+            "label": "无运动反应"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 3,
+        "max": 8,
+        "key": "severe",
+        "label": "重度昏迷"
+      },
+      {
+        "min": 9,
+        "max": 12,
+        "key": "moderate",
+        "label": "中度昏迷"
+      },
+      {
+        "min": 13,
+        "max": 15,
+        "key": "mild",
+        "label": "轻度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "eye": {
+        "type": "number",
+        "title": "睁眼反应",
+        "enum": [4, 3, 2, 1]
+      },
+      "verbal": {
+        "type": "number",
+        "title": "语言反应",
+        "enum": [5, 4, 3, 2, 1]
+      },
+      "motor": {
+        "type": "number",
+        "title": "运动反应",
+        "enum": [6, 5, 4, 3, 2, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Glasgow Coma Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Glasgow+Coma+Scale",
+      "section": "Teasdale G, Jennett B. 1974；三项合计 3–15 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "id": "calculate.retic_corrected",
+  "name": "校正网织红细胞",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按网织红细胞百分比与红细胞压积校正。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "aliases": ["校正网织红细胞"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "retic_corrected",
+    "citation": "RETIC-CORRECTED",
+    "inputs": [
+      {
+        "id": "retic_percent",
+        "label": "网织红细胞百分比",
+        "type": "number",
+        "unit": "%",
+        "min": "0",
+        "max": "30",
+        "step": "0.1"
+      },
+      {
+        "id": "hematocrit",
+        "label": "红细胞压积",
+        "type": "number",
+        "unit": "%",
+        "min": "10",
+        "max": "70",
+        "step": "0.1"
+      }
+    ],
+    "output": {
+      "label": "校正网织红细胞",
+      "unit": "%",
+      "min": "0",
+      "max": "30",
+      "precision": {
+        "places": 2
+      },
+      "direction": "no_direction"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "校正网织红细胞 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=corrected+reticulocyte+count",
+      "section": "RETIC-CORRECTED：网织红细胞% × (实测红细胞压积 ÷ 45)",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "formula_form/v1",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "retic_percent": {
+        "type": "string",
+        "title": "网织红细胞百分比",
+        "maxLength": 12
+      },
+      "hematocrit": {
+        "type": "string",
+        "title": "红细胞压积",
+        "maxLength": 12
+      }
+    }
+  }
+}

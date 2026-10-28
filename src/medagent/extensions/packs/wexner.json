@@ -1,0 +1,437 @@
+{
+  "id": "calculate.wexner",
+  "name": "Wexner 便秘评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Cleveland 便秘评分（8 项，0–32 分），记录排便情况。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["Wexner", "便秘评分", "Cleveland"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 32,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "w1",
+        "label": "排便频率",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "每天 1 至 2 次"
+          },
+          {
+            "value": 1,
+            "label": "每周 3 至 6 次"
+          },
+          {
+            "value": 2,
+            "label": "每周 1 至 2 次"
+          },
+          {
+            "value": 3,
+            "label": "每周少于 1 次"
+          },
+          {
+            "value": 4,
+            "label": "每月少于 1 次"
+          }
+        ]
+      },
+      {
+        "id": "w2",
+        "label": "排便费力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "w3",
+        "label": "排便不尽感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "w4",
+        "label": "腹痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "w5",
+        "label": "每次如厕时间",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "5 分钟以内"
+          },
+          {
+            "value": 1,
+            "label": "5 至 10 分钟"
+          },
+          {
+            "value": 2,
+            "label": "10 至 20 分钟"
+          },
+          {
+            "value": 3,
+            "label": "20 至 30 分钟"
+          },
+          {
+            "value": 4,
+            "label": "30 分钟以上"
+          }
+        ]
+      },
+      {
+        "id": "w6",
+        "label": "需要帮助排便",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不需要"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "w7",
+        "label": "24 小时内排便失败次数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 次"
+          },
+          {
+            "value": 1,
+            "label": "1 次"
+          },
+          {
+            "value": 2,
+            "label": "2 次"
+          },
+          {
+            "value": 3,
+            "label": "3 次"
+          },
+          {
+            "value": 4,
+            "label": "4 次及以上"
+          }
+        ]
+      },
+      {
+        "id": "w8",
+        "label": "使用灌肠或泻药",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 次"
+          },
+          {
+            "value": 1,
+            "label": "1 次"
+          },
+          {
+            "value": 2,
+            "label": "2 次"
+          },
+          {
+            "value": 3,
+            "label": "3 次"
+          },
+          {
+            "value": 4,
+            "label": "4 次及以上"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "normal",
+        "label": "正常"
+      },
+      {
+        "min": 1,
+        "max": 5,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 6,
+        "max": 10,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 11,
+        "max": 15,
+        "key": "severe",
+        "label": "重度"
+      },
+      {
+        "min": 16,
+        "max": 32,
+        "key": "very_severe",
+        "label": "极重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "w1": {
+        "type": "number",
+        "title": "排便频率",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "w2": {
+        "type": "number",
+        "title": "排便费力",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "w3": {
+        "type": "number",
+        "title": "排便不尽感",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "w4": {
+        "type": "number",
+        "title": "腹痛",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "w5": {
+        "type": "number",
+        "title": "每次如厕时间",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "w6": {
+        "type": "number",
+        "title": "需要帮助排便",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "w7": {
+        "type": "number",
+        "title": "24 小时内排便失败次数",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "w8": {
+        "type": "number",
+        "title": "使用灌肠或泻药",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Wexner constipation score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Wexner+constipation+scoring+system+Cleveland",
+      "section": "Agachan F, et al. 1996；8 项各 0–4 分，合计 0–32 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

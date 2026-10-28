@@ -1,0 +1,1602 @@
+[
+  {
+    "id": "calculate.4t",
+    "audience": "clinician",
+    "name": "4T 肝素诱导血小板减少评分",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["4T", "HIT 评分"],
+    "inputs": null,
+    "sample": {
+      "t1": 0,
+      "t2": 0,
+      "t3": 0,
+      "t4": 0
+    }
+  },
+  {
+    "id": "calculate.aa_gradient",
+    "audience": "clinician",
+    "name": "肺泡-动脉氧梯度",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["A-a梯度", "肺泡动脉氧梯度"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "20",
+        "max": "600"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "120"
+      },
+      {
+        "type": "number",
+        "min": "0.21",
+        "max": "1"
+      }
+    ],
+    "sample": {
+      "pao2": "78.0000",
+      "paco2": "21.0000",
+      "fio2": "0.2890"
+    }
+  },
+  {
+    "id": "calculate.alvarado",
+    "audience": "clinician",
+    "name": "Alvarado 阑尾炎评分",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["Alvarado", "阑尾炎评分"],
+    "inputs": null,
+    "sample": {
+      "a1": 0,
+      "a2": 0,
+      "a3": 0,
+      "a4": 0,
+      "a5": 0,
+      "a6": 0,
+      "a7": 0,
+      "a8": 0
+    }
+  },
+  {
+    "id": "calculate.amh",
+    "audience": "clinician",
+    "name": "AMH 卵巢储备判读",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["AMH", "卵巢储备"],
+    "inputs": null,
+    "sample": {
+      "level": 0
+    }
+  },
+  {
+    "id": "calculate.anc",
+    "audience": "clinician",
+    "name": "中性粒细胞绝对计数",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["ANC", "中性粒细胞计数"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0.1",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      }
+    ],
+    "sample": {
+      "wbc": "10.0900",
+      "neutrophil_percent": "10.0000"
+    }
+  },
+  {
+    "id": "calculate.apgar",
+    "audience": "clinician",
+    "name": "Apgar 评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["Apgar", "新生儿评分"],
+    "inputs": null,
+    "sample": {
+      "a1": 0,
+      "a2": 0,
+      "a3": 0,
+      "a4": 0,
+      "a5": 0
+    }
+  },
+  {
+    "id": "calculate.apri",
+    "audience": "clinician",
+    "name": "APRI 指数",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["APRI"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "1",
+        "max": "2000"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "1000"
+      }
+    ],
+    "sample": {
+      "ast": "200.9000",
+      "ast_uln": "19.0000",
+      "platelet": "100.9000"
+    }
+  },
+  {
+    "id": "calculate.asa",
+    "audience": "clinician",
+    "name": "ASA 分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["ASA", "ASA 分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 1
+    }
+  },
+  {
+    "id": "calculate.bishop",
+    "audience": "clinician",
+    "name": "Bishop 宫颈评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["Bishop", "宫颈评分"],
+    "inputs": null,
+    "sample": {
+      "b1": 0,
+      "b2": 0,
+      "b3": 0,
+      "b4": 0,
+      "b5": 0
+    }
+  },
+  {
+    "id": "calculate.bode",
+    "audience": "clinician",
+    "name": "BODE 指数",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["BODE", "BODE 指数"],
+    "inputs": null,
+    "sample": {
+      "b1": 0,
+      "b2": 0,
+      "b3": 0,
+      "b4": 0
+    }
+  },
+  {
+    "id": "calculate.bone_density",
+    "audience": "clinician",
+    "name": "骨密度 T 值判读",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["骨密度", "T 值"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.cam",
+    "audience": "clinician",
+    "name": "CAM 谵妄评估",
+    "kind": "formula",
+    "size": 4,
+    "aliases": ["CAM", "谵妄评估"],
+    "inputs": [
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      }
+    ],
+    "sample": {
+      "acute_onset": "0",
+      "inattention": "0",
+      "disorganized": "0",
+      "altered_consciousness": "0"
+    }
+  },
+  {
+    "id": "calculate.cha2ds2vasc",
+    "audience": "clinician",
+    "name": "CHA2DS2-VASc 卒中风险评分",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["CHA2DS2-VASc", "房颤卒中风险"],
+    "inputs": null,
+    "sample": {
+      "c1": 0,
+      "c2": 0,
+      "c3": 0,
+      "c4": 0,
+      "c5": 0,
+      "c6": 0,
+      "c8": 0
+    }
+  },
+  {
+    "id": "calculate.childpugh",
+    "audience": "clinician",
+    "name": "Child-Pugh 分级",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["Child-Pugh", "Child Pugh"],
+    "inputs": null,
+    "sample": {
+      "p1": 1,
+      "p2": 1,
+      "p3": 1,
+      "p4": 1,
+      "p5": 1
+    }
+  },
+  {
+    "id": "calculate.cpi",
+    "audience": "clinician",
+    "name": "CPI 社区牙周指数",
+    "kind": "formula",
+    "size": 6,
+    "aliases": ["CPI", "牙周指数"],
+    "inputs": [
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      }
+    ],
+    "sample": {
+      "s1": "0",
+      "s2": "0",
+      "s3": "0",
+      "s4": "0",
+      "s5": "0",
+      "s6": "0"
+    }
+  },
+  {
+    "id": "calculate.crcl_cg",
+    "audience": "clinician",
+    "name": "肌酐清除率 Cockcroft-Gault",
+    "kind": "formula",
+    "size": 4,
+    "aliases": ["肌酐清除率", "Cockcroft-Gault"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "18",
+        "max": "120"
+      },
+      {
+        "type": "number",
+        "min": "20",
+        "max": "300"
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "2000"
+      }
+    ],
+    "sample": {
+      "age_years": "28.2000",
+      "weight_kg": "48.0000",
+      "sex": "male",
+      "creatinine_umol_l": "209.0000"
+    }
+  },
+  {
+    "id": "calculate.curb65",
+    "audience": "clinician",
+    "name": "CURB-65 肺炎严重度评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["CURB-65", "CURB65"],
+    "inputs": null,
+    "sample": {
+      "u1": 0,
+      "u2": 0,
+      "u3": 0,
+      "u4": 0,
+      "u5": 0
+    }
+  },
+  {
+    "id": "calculate.dehydration",
+    "audience": "clinician",
+    "name": "小儿脱水程度评估",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["脱水程度", "小儿脱水"],
+    "inputs": null,
+    "sample": {
+      "d1": 0,
+      "d2": 0,
+      "d3": 0,
+      "d4": 0
+    }
+  },
+  {
+    "id": "calculate.dmft",
+    "audience": "clinician",
+    "name": "DMFT 龋失补指数",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["DMFT", "龋失补"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "32"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "32"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "32"
+      }
+    ],
+    "sample": {
+      "decayed": "3.2000",
+      "missing": "3.2000",
+      "filled": "3.2000"
+    }
+  },
+  {
+    "id": "calculate.easi",
+    "audience": "clinician",
+    "name": "EASI 湿疹面积与严重度指数",
+    "kind": "formula",
+    "size": 20,
+    "aliases": ["EASI", "湿疹面积"],
+    "inputs": [
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      }
+    ],
+    "sample": {
+      "head_area": "0",
+      "head_e": "0",
+      "head_i": "0",
+      "head_x": "0",
+      "head_l": "0",
+      "arms_area": "0",
+      "arms_e": "0",
+      "arms_i": "0",
+      "arms_x": "0",
+      "arms_l": "0",
+      "trunk_area": "0",
+      "trunk_e": "0",
+      "trunk_i": "0",
+      "trunk_x": "0",
+      "trunk_l": "0",
+      "legs_area": "0",
+      "legs_e": "0",
+      "legs_i": "0",
+      "legs_x": "0",
+      "legs_l": "0"
+    }
+  },
+  {
+    "id": "calculate.egfr_ckdepi2021",
+    "audience": "clinician",
+    "name": "eGFR CKD-EPI 2021",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["eGFR", "肾小球滤过率"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "18",
+        "max": "120"
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "2000"
+      }
+    ],
+    "sample": {
+      "age_years": "28.2000",
+      "sex": "male",
+      "creatinine_umol_l": "209.0000"
+    }
+  },
+  {
+    "id": "calculate.ehs",
+    "audience": "clinician",
+    "name": "腹壁疝 EHS 分级",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["EHS", "腹壁疝分级"],
+    "inputs": null,
+    "sample": {
+      "size": 1,
+      "site": 1,
+      "recurrent": 0
+    }
+  },
+  {
+    "id": "calculate.essen",
+    "audience": "clinician",
+    "name": "Essen 卒中复发风险评分",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["Essen", "卒中复发风险"],
+    "inputs": null,
+    "sample": {
+      "e1": 0,
+      "e3": 0,
+      "e4": 0,
+      "e5": 0,
+      "e6": 0,
+      "e7": 0,
+      "e8": 0,
+      "e9": 0
+    }
+  },
+  {
+    "id": "calculate.fena",
+    "audience": "clinician",
+    "name": "尿钠排泄分数 FeNa",
+    "kind": "formula",
+    "size": 4,
+    "aliases": ["FeNa", "尿钠排泄分数"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "300"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "2000"
+      },
+      {
+        "type": "number",
+        "min": "100",
+        "max": "200"
+      },
+      {
+        "type": "number",
+        "min": "100",
+        "max": "50000"
+      }
+    ],
+    "sample": {
+      "urine_sodium": "30.0000",
+      "plasma_creatinine": "209.0000",
+      "plasma_sodium": "110.0000",
+      "urine_creatinine": "5090.0000"
+    }
+  },
+  {
+    "id": "calculate.fim",
+    "audience": "clinician",
+    "name": "FIM 功能独立性评定",
+    "kind": "scale",
+    "size": 18,
+    "aliases": ["FIM", "功能独立性"],
+    "inputs": null,
+    "sample": {
+      "f1": 1,
+      "f2": 1,
+      "f3": 1,
+      "f4": 1,
+      "f5": 1,
+      "f6": 1,
+      "f7": 1,
+      "f8": 1,
+      "f9": 1,
+      "f10": 1,
+      "f11": 1,
+      "f12": 1,
+      "f13": 1,
+      "f14": 1,
+      "f15": 1,
+      "f16": 1,
+      "f17": 1,
+      "f18": 1
+    }
+  },
+  {
+    "id": "calculate.flacc",
+    "audience": "clinician",
+    "name": "FLACC 儿童疼痛评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["FLACC", "儿童疼痛"],
+    "inputs": null,
+    "sample": {
+      "f1": 0,
+      "f2": 0,
+      "f3": 0,
+      "f4": 0,
+      "f5": 0
+    }
+  },
+  {
+    "id": "calculate.free_water_deficit",
+    "audience": "clinician",
+    "name": "自由水缺失",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["自由水缺失"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "2",
+        "max": "300"
+      },
+      {
+        "type": "number",
+        "min": "100",
+        "max": "200"
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      }
+    ],
+    "sample": {
+      "weight_kg": "151.0000",
+      "sodium": "150.0000",
+      "sex": "male"
+    }
+  },
+  {
+    "id": "calculate.gap",
+    "audience": "clinician",
+    "name": "GAP 创伤评分",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["GAP", "GAP 评分"],
+    "inputs": null,
+    "sample": {
+      "age": 0,
+      "gcs": 3,
+      "sbp": 91
+    }
+  },
+  {
+    "id": "calculate.gcs",
+    "audience": "clinician",
+    "name": "GCS 格拉斯哥昏迷评分",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["GCS", "格拉斯哥昏迷"],
+    "inputs": null,
+    "sample": {
+      "eye": 4,
+      "verbal": 5,
+      "motor": 6
+    }
+  },
+  {
+    "id": "calculate.hasbled",
+    "audience": "clinician",
+    "name": "HAS-BLED 出血风险评分",
+    "kind": "scale",
+    "size": 9,
+    "aliases": ["HAS-BLED", "出血风险"],
+    "inputs": null,
+    "sample": {
+      "h1": 0,
+      "h2": 0,
+      "h3": 0,
+      "h4": 0,
+      "h5": 0,
+      "h6": 0,
+      "h7": 0,
+      "h8": 0,
+      "h9": 0
+    }
+  },
+  {
+    "id": "calculate.hearing_loss",
+    "audience": "clinician",
+    "name": "听力损失程度分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["听力损失", "听力分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.homa_ir",
+    "audience": "clinician",
+    "name": "HOMA-IR 胰岛素抵抗",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["HOMA-IR", "胰岛素抵抗"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "1",
+        "max": "40"
+      },
+      {
+        "type": "number",
+        "min": "0.1",
+        "max": "300"
+      }
+    ],
+    "sample": {
+      "glucose_mmol_l": "4.9000",
+      "insulin_uiu_ml": "30.0900"
+    }
+  },
+  {
+    "id": "calculate.hunt_hess",
+    "audience": "clinician",
+    "name": "Hunt-Hess 分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["Hunt-Hess", "蛛网膜下腔出血分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 1
+    }
+  },
+  {
+    "id": "calculate.ipss_mf",
+    "audience": "clinician",
+    "name": "IPSS 骨髓纤维化预后评分",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["IPSS-MF", "骨髓纤维化预后"],
+    "inputs": null,
+    "sample": {
+      "i1": 0,
+      "i2": 0,
+      "i3": 0,
+      "i4": 0
+    }
+  },
+  {
+    "id": "calculate.iss",
+    "audience": "clinician",
+    "name": "ISS 创伤严重度评分",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["ISS", "损伤严重度"],
+    "inputs": null,
+    "sample": {
+      "r1": 0,
+      "r2": 0,
+      "r3": 0
+    }
+  },
+  {
+    "id": "calculate.isth_dic",
+    "audience": "clinician",
+    "name": "ISTH DIC 评分",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["ISTH DIC", "DIC 评分"],
+    "inputs": null,
+    "sample": {
+      "d1": 0,
+      "d2": 0,
+      "d3": 0,
+      "d4": 0
+    }
+  },
+  {
+    "id": "calculate.joa",
+    "audience": "clinician",
+    "name": "JOA 腰椎评分",
+    "kind": "scale",
+    "size": 13,
+    "aliases": ["JOA", "腰椎评分"],
+    "inputs": null,
+    "sample": {
+      "j1": 3,
+      "j2": 3,
+      "j3": 3,
+      "j4": 2,
+      "j5": 2,
+      "j6": 2,
+      "j7": 2,
+      "j8": 2,
+      "j9": 2,
+      "j10": 2,
+      "j11": 2,
+      "j12": 2,
+      "j13": 2
+    }
+  },
+  {
+    "id": "calculate.killip",
+    "audience": "clinician",
+    "name": "Killip 分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["Killip", "Killip 分级"],
+    "inputs": null,
+    "sample": {
+      "class": 1
+    }
+  },
+  {
+    "id": "calculate.light_criteria",
+    "audience": "clinician",
+    "name": "胸腔积液 Light 标准",
+    "kind": "formula",
+    "size": 4,
+    "aliases": ["Light标准"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "120"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "10000"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "10000"
+      }
+    ],
+    "sample": {
+      "pleural_protein": "10.0000",
+      "serum_protein": "21.0000",
+      "pleural_ldh": "1000.0000",
+      "serum_ldh": "1009.0000"
+    }
+  },
+  {
+    "id": "calculate.locs",
+    "audience": "clinician",
+    "name": "白内障 LOCS 分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["LOCS", "白内障分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.logmar",
+    "audience": "clinician",
+    "name": "LogMAR 视力换算",
+    "kind": "formula",
+    "size": 1,
+    "aliases": ["LogMAR", "视力换算"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0.01",
+        "max": "2"
+      }
+    ],
+    "sample": {
+      "decimal_acuity": "0.2090"
+    }
+  },
+  {
+    "id": "calculate.lund_mackay",
+    "audience": "clinician",
+    "name": "Lund-Mackay 鼻窦评分",
+    "kind": "scale",
+    "size": 6,
+    "aliases": ["Lund-Mackay", "鼻窦评分"],
+    "inputs": null,
+    "sample": {
+      "m1": 0,
+      "m2": 0,
+      "m3": 0,
+      "m4": 0,
+      "m5": 0,
+      "m6": 0
+    }
+  },
+  {
+    "id": "calculate.lysholm",
+    "audience": "clinician",
+    "name": "Lysholm 膝关节评分",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["Lysholm", "膝关节评分"],
+    "inputs": null,
+    "sample": {
+      "l1": 5,
+      "l2": 5,
+      "l3": 15,
+      "l4": 25,
+      "l5": 25,
+      "l6": 10,
+      "l7": 10,
+      "l8": 5
+    }
+  },
+  {
+    "id": "calculate.mallampati",
+    "audience": "clinician",
+    "name": "Mallampati 气道分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["Mallampati", "气道分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 1
+    }
+  },
+  {
+    "id": "calculate.mews",
+    "audience": "clinician",
+    "name": "MEWS 改良早期预警评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["MEWS", "早期预警评分"],
+    "inputs": null,
+    "sample": {
+      "sbp": 102,
+      "hr": 52,
+      "rr": 10,
+      "temp": 36,
+      "avpu": 0
+    }
+  },
+  {
+    "id": "calculate.mmt",
+    "audience": "clinician",
+    "name": "MMT 徒手肌力分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["MMT", "徒手肌力"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.morse",
+    "audience": "clinician",
+    "name": "Morse 跌倒风险评分",
+    "kind": "scale",
+    "size": 6,
+    "aliases": ["Morse", "跌倒风险"],
+    "inputs": null,
+    "sample": {
+      "m1": 0,
+      "m2": 0,
+      "m3": 0,
+      "m4": 0,
+      "m5": 0,
+      "m6": 0
+    }
+  },
+  {
+    "id": "calculate.mrc_grade",
+    "audience": "clinician",
+    "name": "MRC 肌力分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["MRC 肌力", "肌力分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.news2",
+    "audience": "clinician",
+    "name": "NEWS2 早期预警评分",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["NEWS2", "早期预警"],
+    "inputs": null,
+    "sample": {
+      "rr": 13,
+      "spo2": 97,
+      "oxygen": 0,
+      "sbp": 112,
+      "pulse": 52,
+      "consciousness": 0,
+      "temp": 37.1
+    }
+  },
+  {
+    "id": "calculate.nihss",
+    "audience": "clinician",
+    "name": "NIHSS 卒中量表",
+    "kind": "scale",
+    "size": 15,
+    "aliases": ["NIHSS", "卒中量表"],
+    "inputs": null,
+    "sample": {
+      "n1a": 0,
+      "n1b": 0,
+      "n1c": 0,
+      "n2": 0,
+      "n3": 0,
+      "n4": 0,
+      "n5a": 0,
+      "n5b": 0,
+      "n6a": 0,
+      "n6b": 0,
+      "n7": 0,
+      "n8": 0,
+      "n9": 0,
+      "n10": 0,
+      "n11": 0
+    }
+  },
+  {
+    "id": "calculate.ort",
+    "audience": "clinician",
+    "name": "ORT 阿片风险工具",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["ORT", "阿片风险"],
+    "inputs": null,
+    "sample": {
+      "o1": 0,
+      "o2": 0,
+      "o3": 0,
+      "o4": 0
+    }
+  },
+  {
+    "id": "calculate.pasi",
+    "audience": "clinician",
+    "name": "PASI 银屑病面积与严重度指数",
+    "kind": "formula",
+    "size": 16,
+    "aliases": ["PASI", "银屑病面积"],
+    "inputs": [
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      }
+    ],
+    "sample": {
+      "head_area": "0",
+      "head_e": "0",
+      "head_i": "0",
+      "head_d": "0",
+      "arms_area": "0",
+      "arms_e": "0",
+      "arms_i": "0",
+      "arms_d": "0",
+      "trunk_area": "0",
+      "trunk_e": "0",
+      "trunk_i": "0",
+      "trunk_d": "0",
+      "legs_area": "0",
+      "legs_e": "0",
+      "legs_i": "0",
+      "legs_d": "0"
+    }
+  },
+  {
+    "id": "calculate.pcs",
+    "audience": "clinician",
+    "name": "PCS 疼痛灾难化量表",
+    "kind": "scale",
+    "size": 13,
+    "aliases": ["PCS", "疼痛灾难化"],
+    "inputs": null,
+    "sample": {
+      "p1": 0,
+      "p2": 0,
+      "p3": 0,
+      "p4": 0,
+      "p5": 0,
+      "p6": 0,
+      "p7": 0,
+      "p8": 0,
+      "p9": 0,
+      "p10": 0,
+      "p11": 0,
+      "p12": 0,
+      "p13": 0
+    }
+  },
+  {
+    "id": "calculate.pct",
+    "audience": "clinician",
+    "name": "降钙素原判读",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["PCT", "降钙素原"],
+    "inputs": null,
+    "sample": {
+      "level": 0
+    }
+  },
+  {
+    "id": "calculate.pph_volume",
+    "audience": "clinician",
+    "name": "产后出血量估算",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["产后出血量"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "10000"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "10000"
+      }
+    ],
+    "sample": {
+      "wet_weight_g": "1000.0000",
+      "dry_weight_g": "1000.0000"
+    }
+  },
+  {
+    "id": "calculate.ppofev1",
+    "audience": "clinician",
+    "name": "术后预计 FEV1",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["ppoFEV1", "术后预计FEV1"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0.3",
+        "max": "8"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "19"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "19"
+      }
+    ],
+    "sample": {
+      "fev1_l": "1.0700",
+      "resected_segments": "1.9000",
+      "total_segments": "10.9000"
+    }
+  },
+  {
+    "id": "calculate.prostate_volume",
+    "audience": "clinician",
+    "name": "前列腺体积估算",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["前列腺体积"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "1",
+        "max": "15"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "15"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "15"
+      }
+    ],
+    "sample": {
+      "length_cm": "2.4000",
+      "width_cm": "2.4000",
+      "height_cm": "2.4000"
+    }
+  },
+  {
+    "id": "calculate.psa_density",
+    "audience": "clinician",
+    "name": "PSA 密度",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["PSA密度"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "1000"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "500"
+      }
+    ],
+    "sample": {
+      "psa_ng_ml": "100.0000",
+      "volume_ml": "50.9000"
+    }
+  },
+  {
+    "id": "calculate.pss",
+    "audience": "clinician",
+    "name": "中毒严重度评分",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["PSS", "中毒严重度"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.qsofa",
+    "audience": "clinician",
+    "name": "qSOFA 脓毒症筛查",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["qSOFA", "脓毒症筛查"],
+    "inputs": null,
+    "sample": {
+      "rr": 0,
+      "mental": 0,
+      "sbp": 0
+    }
+  },
+  {
+    "id": "calculate.rcri",
+    "audience": "clinician",
+    "name": "RCRI 心脏风险指数",
+    "kind": "scale",
+    "size": 6,
+    "aliases": ["RCRI", "心脏风险指数"],
+    "inputs": null,
+    "sample": {
+      "r1": 0,
+      "r2": 0,
+      "r3": 0,
+      "r4": 0,
+      "r5": 0,
+      "r6": 0
+    }
+  },
+  {
+    "id": "calculate.rfi",
+    "audience": "clinician",
+    "name": "肾衰指数 RFI",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["RFI", "肾衰指数"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "300"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "2000"
+      },
+      {
+        "type": "number",
+        "min": "100",
+        "max": "50000"
+      }
+    ],
+    "sample": {
+      "urine_sodium": "30.0000",
+      "plasma_creatinine": "209.0000",
+      "urine_creatinine": "5090.0000"
+    }
+  },
+  {
+    "id": "calculate.rockall",
+    "audience": "clinician",
+    "name": "Rockall 再出血风险评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["Rockall", "再出血风险"],
+    "inputs": null,
+    "sample": {
+      "r1": 0,
+      "r2": 0,
+      "r3": 0,
+      "r4": 0,
+      "r5": 0
+    }
+  },
+  {
+    "id": "calculate.rts",
+    "audience": "clinician",
+    "name": "RTS 创伤生理评分",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["RTS", "修订创伤评分"],
+    "inputs": null,
+    "sample": {
+      "gcs": 3,
+      "sbp": 0,
+      "rr": 0
+    }
+  },
+  {
+    "id": "calculate.rutherford",
+    "audience": "clinician",
+    "name": "Rutherford 下肢缺血分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["Rutherford", "下肢缺血分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.sofa",
+    "audience": "clinician",
+    "name": "SOFA 器官衰竭评分",
+    "kind": "scale",
+    "size": 6,
+    "aliases": ["SOFA", "器官衰竭评分"],
+    "inputs": null,
+    "sample": {
+      "pf": 401,
+      "plt": 151,
+      "bili": 19,
+      "cv": 0,
+      "gcs": 16,
+      "creatinine": 109
+    }
+  },
+  {
+    "id": "calculate.timi",
+    "audience": "clinician",
+    "name": "TIMI 风险评分",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["TIMI", "TIMI 评分"],
+    "inputs": null,
+    "sample": {
+      "t1": 0,
+      "t2": 0,
+      "t3": 0,
+      "t4": 0,
+      "t5": 0,
+      "t6": 0,
+      "t7": 0
+    }
+  },
+  {
+    "id": "calculate.tongue",
+    "audience": "clinician",
+    "name": "舌象记录",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["舌象"],
+    "inputs": null,
+    "sample": {
+      "color": 0,
+      "shape": 0,
+      "coating": 0
+    }
+  },
+  {
+    "id": "calculate.tsat",
+    "audience": "clinician",
+    "name": "转铁蛋白饱和度",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["TSAT", "转铁蛋白饱和度"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "150"
+      }
+    ],
+    "sample": {
+      "iron_umol_l": "10.0000",
+      "tibc_umol_l": "24.0000"
+    }
+  },
+  {
+    "id": "calculate.wells_dvt",
+    "audience": "clinician",
+    "name": "Wells 深静脉血栓评分",
+    "kind": "scale",
+    "size": 9,
+    "aliases": ["Wells DVT", "深静脉血栓评分"],
+    "inputs": null,
+    "sample": {
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "w5": 0,
+      "w6": 0,
+      "w7": 0,
+      "w8": 0,
+      "w9": 0
+    }
+  },
+  {
+    "id": "calculate.wfns",
+    "audience": "clinician",
+    "name": "WFNS 分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["WFNS", "世界神经外科联盟分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 1
+    }
+  }
+]

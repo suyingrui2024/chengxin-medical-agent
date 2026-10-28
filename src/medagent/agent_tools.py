@@ -379,6 +379,13 @@ def _validate_item(
                 "修复：请核对否定词的范围——患者否认该筛查项时按阴性证据要求记 absent，范围不清时先澄清，不要记 present。",
             )
         if assertion == Assertion.ABSENT:
+            # Collective-denial requirement applies to the COMBINED
+            # emergency screen only: denying one item must not mark the
+            # whole screen negative. A single-domain warning question
+            # (P3 off-pathway screen, ``warning_*``) is not a
+            # combination — the patient's plain 「没有」 answers exactly
+            # that one question, so requiring 「都没有」 there would
+            # reject every valid negative answer.
             collective = evidence.strip(" 。！!，,") in {"没有", "无", "否认", "全无"} or any(
                 phrase in evidence
                 for phrase in (
@@ -396,7 +403,7 @@ def _validate_item(
                     "没有以上",
                 )
             )
-            if not collective:
+            if key == "emergency_screen" and not collective:
                 raise _ItemRejection(
                     "否认单项或其他事情不能视为全部急症筛查阴性，请澄清或保留未知",
                     "修复：整个筛查记 absent 必须引用患者对全部筛查项目的整体否认原话（如「都没有」"

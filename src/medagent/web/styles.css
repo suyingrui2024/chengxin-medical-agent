@@ -6690,3 +6690,285 @@ body.task-focused .surface-actions {
   color: var(--ink);
   padding: 14px 0;
 }
+
+/* ------------------------------------------------------------------
+   Declarative scales (scale_form/v1 input card, scale/v1 result).
+   Neutral by design: a score band is not a traffic light. No red/green
+   colouring is applied to bands — that would read as a verdict.
+   ------------------------------------------------------------------ */
+.scale-form .scale-intro {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.scale-progress {
+  margin: 8px 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.scale-item {
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+.scale-item-label {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.scale-item-index {
+  flex: 0 0 auto;
+  min-width: 20px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.scale-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0 28px;
+}
+.scale-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 14px;
+}
+.scale-option input {
+  margin: 0;
+}
+.scale-option:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--selected);
+}
+.scale-option:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.scale-score {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+.scale-score-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.scale-score-unit {
+  color: var(--muted);
+  font-size: 14px;
+}
+.scale-band {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--raised);
+  font-size: 14px;
+}
+.scale-band-range {
+  color: var(--muted);
+  font-size: 12px;
+}
+.scale-disclaimer {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.scale-detail summary,
+.calculation-limitations summary,
+.calculation-references summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 6px 0;
+}
+@media (max-width: 700px) {
+  .scale-options {
+    margin-left: 0;
+  }
+  .scale-option {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Named-formula input card: one labelled numeric field per input. */
+.formula-fields {
+  display: grid;
+  gap: 16px;
+  margin: 8px 0 4px;
+}
+.formula-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+.formula-field input,
+.formula-field select {
+  flex: 1 1 140px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.formula-unit {
+  color: var(--muted);
+  font-size: 13px;
+}
+.formula-range {
+  flex: 1 1 100%;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------
+   Scale form alignment and density.
+   The question shell centres its text; a multi-item form must not
+   inherit that, or every legend sits centred above left-aligned
+   options. Spacing is tightened so more than four items fit on screen.
+   ------------------------------------------------------------------ */
+.scale-form {
+  text-align: left;
+}
+.scale-form .scale-item {
+  margin: 0 0 14px;
+  text-align: left;
+}
+.scale-form .scale-item-label {
+  justify-content: flex-start;
+  text-align: left;
+}
+.scale-form .scale-options {
+  margin: 8px 0 0;
+}
+.scale-form .scale-intro,
+.scale-form .scale-progress {
+  text-align: left;
+}
+
+/* ------------------------------------------------------------------
+   The compact two-column result card (>=701px wide, <=820px tall) was
+   built for unit conversion: heading, big value, input list. A scale
+   result has a different child set, and auto-placement into that grid
+   overlapped them. Let scale results flow normally at every size.
+   ------------------------------------------------------------------ */
+@media (min-width: 701px) and (max-height: 820px) {
+  .patient-calculation-result.scale-result {
+    display: block;
+    padding: 20px;
+  }
+  .patient-calculation-result.scale-result .scale-score {
+    margin-top: 2px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Scale form alignment and density.
+   The question shell centres its text; a multi-item form must not
+   inherit that, or every legend sits centred above left-aligned
+   options. Spacing is tightened so more than four items fit on screen.
+   ------------------------------------------------------------------ */
+.scale-form {
+  text-align: left;
+}
+.scale-form .scale-item {
+  margin: 0 0 14px;
+  text-align: left;
+}
+.scale-form .scale-item-label {
+  justify-content: flex-start;
+  text-align: left;
+}
+.scale-form .scale-options {
+  margin: 8px 0 0;
+}
+.scale-form .scale-intro,
+.scale-form .scale-progress {
+  text-align: left;
+}
+
+/* ------------------------------------------------------------------
+   The compact two-column result card (>=701px wide, <=820px tall) was
+   built for unit conversion: heading, big value, input list. A scale
+   result has a different child set, and auto-placement into that grid
+   overlapped them. Let scale results flow normally at every size.
+   ------------------------------------------------------------------ */
+@media (min-width: 701px) and (max-height: 820px) {
+  .patient-calculation-result.scale-result {
+    display: block;
+    padding: 20px;
+  }
+  .patient-calculation-result.scale-result .scale-score {
+    margin-top: 2px;
+  }
+}
+
+/* Formula form matches the scale form: left-aligned, hints under their
+   own field rather than centred under the card. */
+.formula-form {
+  text-align: left;
+}
+.formula-form .scale-intro {
+  text-align: left;
+}
+.formula-form .formula-field {
+  align-items: baseline;
+}
+.formula-form .formula-range {
+  padding-left: 2px;
+}
+
+/* Formula form matches the scale form: left-aligned, hints under their
+   own field rather than centred under the card. */
+.formula-form {
+  text-align: left;
+}
+.formula-form .scale-intro {
+  text-align: left;
+}
+.formula-form .formula-field {
+  align-items: baseline;
+}
+.formula-form .formula-range {
+  padding-left: 2px;
+}
+
+/* ------------------------------------------------------------------
+   The capability lab used to be `position: sticky; top: 20px` so it
+   stayed in view beside the 132-item capability list. That breaks as
+   soon as the form is tall: the view is its own scroll container, a
+   sticky panel taller than the scrollport pins its top and leaves its
+   bottom — the run button — permanently outside it. Nine-input scales
+   were already unreachable; EASI (20 inputs) could not be executed at
+   all, and no amount of scrolling revealed the button.
+   A form that can be taller than the viewport should not be pinned.
+   Let it scroll with the page instead.
+   ------------------------------------------------------------------ */
+.capability-lab {
+  position: static;
+  max-height: none;
+  overflow: visible;
+}

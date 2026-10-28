@@ -473,6 +473,11 @@ class BurdenCompletenessTests(unittest.TestCase):
             ("age_years", 32, Assertion.PRESENT),
             ("chief_complaint", "便秘好几天", Assertion.PRESENT),
             ("emergency_screen", None, Assertion.ABSENT),
+            # P3 off-pathway warning screen (constipation triggers no
+            # pathway; the emergency screen subsumes the other three).
+            ("warning_剧痛", None, Assertion.ABSENT),
+            ("warning_持续加重", None, Assertion.ABSENT),
+            ("warning_功能骤降", None, Assertion.ABSENT),
             ("onset", "三天前", Assertion.PRESENT),
             ("trajectory", "stable", Assertion.PRESENT),
             ("severity", 3, Assertion.PRESENT),

@@ -1,0 +1,208 @@
+{
+  "id": "calculate.cam",
+  "name": "CAM 谵妄评估",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按 CAM 四项特征判定是否符合谵妄筛查标准。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["CAM", "谵妄评估"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "cam",
+    "citation": "CAM",
+    "inputs": [
+      {
+        "id": "acute_onset",
+        "label": "急性起病或病程波动",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "否"
+          },
+          {
+            "value": "1",
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "inattention",
+        "label": "注意力不集中",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "否"
+          },
+          {
+            "value": "1",
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "disorganized",
+        "label": "思维混乱",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "否"
+          },
+          {
+            "value": "1",
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "altered_consciousness",
+        "label": "意识水平改变",
+        "type": "enum",
+        "options": [
+          {
+            "value": "0",
+            "label": "否"
+          },
+          {
+            "value": "1",
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "output": {
+      "label": "CAM 判定",
+      "unit": "结果",
+      "min": "0",
+      "max": "1",
+      "precision": {
+        "places": 0
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": [
+      {
+        "lt": "0.5",
+        "key": "negative",
+        "label": "未达筛查标准"
+      },
+      {
+        "gte": "0.5",
+        "key": "positive",
+        "label": "符合筛查标准"
+      }
+    ]
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "CAM 谵妄评估 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Confusion+Assessment+Method+CAM",
+      "section": "CAM：（急性起病或波动 且 注意力不集中）且（思维混乱 或 意识改变）",
+      "accessed": "2026-10-28"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "acute_onset": {
+        "type": "string",
+        "title": "急性起病或病程波动",
+        "enum": ["0", "1"]
+      },
+      "inattention": {
+        "type": "string",
+        "title": "注意力不集中",
+        "enum": ["0", "1"]
+      },
+      "disorganized": {
+        "type": "string",
+        "title": "思维混乱",
+        "enum": ["0", "1"]
+      },
+      "altered_consciousness": {
+        "type": "string",
+        "title": "意识水平改变",
+        "enum": ["0", "1"]
+      }
+    }
+  }
+}

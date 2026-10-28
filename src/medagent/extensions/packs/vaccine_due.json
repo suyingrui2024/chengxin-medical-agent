@@ -1,0 +1,156 @@
+{
+  "id": "calculate.vaccine_due",
+  "name": "疫苗接种到期提醒",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按上一剂日期与间隔推算距下次接种天数。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "aliases": ["疫苗到期"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "vaccine_due",
+    "citation": "VACCINE-INTERVAL",
+    "inputs": [
+      {
+        "id": "last_dose",
+        "label": "上一剂接种日期",
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      },
+      {
+        "id": "interval_months",
+        "label": "接种间隔",
+        "type": "number",
+        "unit": "月",
+        "min": "1",
+        "max": "120",
+        "step": "1"
+      },
+      {
+        "id": "today",
+        "label": "记录日期",
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      }
+    ],
+    "output": {
+      "label": "距下次接种",
+      "unit": "天",
+      "min": "-3650",
+      "max": "3650",
+      "precision": {
+        "places": 0
+      },
+      "direction": "no_direction"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "疫苗接种到期提醒 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=vaccination+schedule+interval",
+      "section": "VACCINE-INTERVAL：(上一剂日期 + 间隔月数×30.44) − 记录日期",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "formula_form/v1",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "last_dose": {
+        "type": "string",
+        "title": "上一剂接种日期",
+        "maxLength": 10
+      },
+      "interval_months": {
+        "type": "string",
+        "title": "接种间隔",
+        "maxLength": 12
+      },
+      "today": {
+        "type": "string",
+        "title": "记录日期",
+        "maxLength": 10
+      }
+    }
+  }
+}

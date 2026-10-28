@@ -1,0 +1,916 @@
+{
+  "id": "calculate.fim",
+  "name": "FIM 功能独立性评定",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "功能独立性评定（18 项，18–126 分），分数越高越独立。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["FIM", "功能独立性"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 18,
+      "max": 126,
+      "unit": "分",
+      "direction": "higher_is_better"
+    },
+    "items": [
+      {
+        "id": "f1",
+        "label": "进食",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f2",
+        "label": "梳洗",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f3",
+        "label": "洗澡",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f4",
+        "label": "穿上衣",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f5",
+        "label": "穿下衣",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f6",
+        "label": "如厕",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f7",
+        "label": "膀胱控制",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f8",
+        "label": "肠道控制",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f9",
+        "label": "床椅转移",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f10",
+        "label": "进出厕所",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f11",
+        "label": "进出浴盆",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f12",
+        "label": "平地行走",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f13",
+        "label": "上下楼梯",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f14",
+        "label": "理解",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f15",
+        "label": "表达",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f16",
+        "label": "社会交往",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f17",
+        "label": "解决问题",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      },
+      {
+        "id": "f18",
+        "label": "记忆",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全依赖"
+          },
+          {
+            "value": 2,
+            "label": "最大帮助"
+          },
+          {
+            "value": 3,
+            "label": "中等帮助"
+          },
+          {
+            "value": 4,
+            "label": "最小帮助"
+          },
+          {
+            "value": 5,
+            "label": "监督或准备"
+          },
+          {
+            "value": 6,
+            "label": "辅助器具下独立"
+          },
+          {
+            "value": 7,
+            "label": "完全独立"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 18,
+        "max": 53,
+        "key": "total",
+        "label": "完全依赖"
+      },
+      {
+        "min": 54,
+        "max": 71,
+        "key": "maximal",
+        "label": "最大帮助"
+      },
+      {
+        "min": 72,
+        "max": 89,
+        "key": "moderate",
+        "label": "中等帮助"
+      },
+      {
+        "min": 90,
+        "max": 107,
+        "key": "minimal",
+        "label": "最小帮助"
+      },
+      {
+        "min": 108,
+        "max": 125,
+        "key": "supervision",
+        "label": "监督下独立"
+      },
+      {
+        "min": 126,
+        "max": 126,
+        "key": "independent",
+        "label": "完全独立"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "f1": {
+        "type": "number",
+        "title": "进食",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f2": {
+        "type": "number",
+        "title": "梳洗",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f3": {
+        "type": "number",
+        "title": "洗澡",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f4": {
+        "type": "number",
+        "title": "穿上衣",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f5": {
+        "type": "number",
+        "title": "穿下衣",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f6": {
+        "type": "number",
+        "title": "如厕",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f7": {
+        "type": "number",
+        "title": "膀胱控制",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f8": {
+        "type": "number",
+        "title": "肠道控制",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f9": {
+        "type": "number",
+        "title": "床椅转移",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f10": {
+        "type": "number",
+        "title": "进出厕所",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f11": {
+        "type": "number",
+        "title": "进出浴盆",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f12": {
+        "type": "number",
+        "title": "平地行走",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f13": {
+        "type": "number",
+        "title": "上下楼梯",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f14": {
+        "type": "number",
+        "title": "理解",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f15": {
+        "type": "number",
+        "title": "表达",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f16": {
+        "type": "number",
+        "title": "社会交往",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f17": {
+        "type": "number",
+        "title": "解决问题",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      },
+      "f18": {
+        "type": "number",
+        "title": "记忆",
+        "enum": [1, 2, 3, 4, 5, 6, 7]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Functional Independence Measure",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Functional+Independence+Measure+FIM",
+      "section": "Granger CV, et al. 1986；18 项各 1–7 分，合计 18–126 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

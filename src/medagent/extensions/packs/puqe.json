@@ -1,0 +1,260 @@
+{
+  "id": "calculate.puqe",
+  "name": "PUQE 妊娠恶心呕吐评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "妊娠期恶心呕吐量化评分（3 项，3–15 分），用于记录症状程度，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["PUQE", "妊娠恶心", "孕吐评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 3,
+      "max": 15,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "p1",
+        "label": "过去一天恶心持续时间",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有"
+          },
+          {
+            "value": 2,
+            "label": "一小时以内"
+          },
+          {
+            "value": 3,
+            "label": "两到三小时"
+          },
+          {
+            "value": 4,
+            "label": "四到六小时"
+          },
+          {
+            "value": 5,
+            "label": "六小时以上"
+          }
+        ]
+      },
+      {
+        "id": "p2",
+        "label": "过去一天呕吐次数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "0 次"
+          },
+          {
+            "value": 2,
+            "label": "1 到 2 次"
+          },
+          {
+            "value": 3,
+            "label": "3 到 4 次"
+          },
+          {
+            "value": 4,
+            "label": "5 到 6 次"
+          },
+          {
+            "value": 5,
+            "label": "7 次及以上"
+          }
+        ]
+      },
+      {
+        "id": "p3",
+        "label": "过去一天干呕次数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "0 次"
+          },
+          {
+            "value": 2,
+            "label": "1 到 2 次"
+          },
+          {
+            "value": 3,
+            "label": "3 到 4 次"
+          },
+          {
+            "value": 4,
+            "label": "5 到 6 次"
+          },
+          {
+            "value": 5,
+            "label": "7 次及以上"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 3,
+        "max": 6,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 7,
+        "max": 12,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 13,
+        "max": 15,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "p1": {
+        "type": "number",
+        "title": "过去一天恶心持续时间",
+        "enum": [1, 2, 3, 4, 5]
+      },
+      "p2": {
+        "type": "number",
+        "title": "过去一天呕吐次数",
+        "enum": [1, 2, 3, 4, 5]
+      },
+      "p3": {
+        "type": "number",
+        "title": "过去一天干呕次数",
+        "enum": [1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "PUQE score for nausea and vomiting of pregnancy",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=PUQE+score+nausea+and+vomiting+of+pregnancy",
+      "section": "PUQE：Koren G, et al. 2005；3 项各 1–5 分，合计 3–15 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

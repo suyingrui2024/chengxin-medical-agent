@@ -1,0 +1,286 @@
+{
+  "id": "calculate.apgar",
+  "name": "Apgar 评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "新生儿出生后状态评分（5 项，0–10 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Apgar", "新生儿评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 10,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "a1",
+        "label": "心率",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "低于 100 次/分"
+          },
+          {
+            "value": 2,
+            "label": "100 次/分及以上"
+          }
+        ]
+      },
+      {
+        "id": "a2",
+        "label": "呼吸",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "微弱或不规则"
+          },
+          {
+            "value": 2,
+            "label": "有力啼哭"
+          }
+        ]
+      },
+      {
+        "id": "a3",
+        "label": "肌张力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "松弛"
+          },
+          {
+            "value": 1,
+            "label": "四肢略屈曲"
+          },
+          {
+            "value": 2,
+            "label": "主动活动"
+          }
+        ]
+      },
+      {
+        "id": "a4",
+        "label": "反射应激",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无反应"
+          },
+          {
+            "value": 1,
+            "label": "面部皱眉"
+          },
+          {
+            "value": 2,
+            "label": "啼哭或打喷嚏"
+          }
+        ]
+      },
+      {
+        "id": "a5",
+        "label": "皮肤颜色",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "青紫或苍白"
+          },
+          {
+            "value": 1,
+            "label": "躯干红四肢青紫"
+          },
+          {
+            "value": 2,
+            "label": "全身红润"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "key": "low",
+        "label": "低分"
+      },
+      {
+        "min": 4,
+        "max": 6,
+        "key": "moderate",
+        "label": "中分"
+      },
+      {
+        "min": 7,
+        "max": 10,
+        "key": "normal",
+        "label": "常见范围"
+      }
+    ],
+    "note": "用于记录出生后状态，不预测远期结局。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "a1": {
+        "type": "number",
+        "title": "心率",
+        "enum": [0, 1, 2]
+      },
+      "a2": {
+        "type": "number",
+        "title": "呼吸",
+        "enum": [0, 1, 2]
+      },
+      "a3": {
+        "type": "number",
+        "title": "肌张力",
+        "enum": [0, 1, 2]
+      },
+      "a4": {
+        "type": "number",
+        "title": "反射应激",
+        "enum": [0, 1, 2]
+      },
+      "a5": {
+        "type": "number",
+        "title": "皮肤颜色",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Apgar score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Apgar+score+newborn",
+      "section": "Apgar V. 1953；5 项各 0–2 分，合计 0–10 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

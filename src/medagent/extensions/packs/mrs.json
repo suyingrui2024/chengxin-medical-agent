@@ -1,0 +1,226 @@
+{
+  "id": "calculate.mrs",
+  "name": "mRS 改良 Rankin 量表",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "卒中后残障程度（0–6 级），记录功能状态。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["mRS", "改良Rankin"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 6,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "grade",
+        "label": "选择最符合目前状态的一项",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "完全无症状"
+          },
+          {
+            "value": 1,
+            "label": "有症状但无明显残障，能完成日常活动"
+          },
+          {
+            "value": 2,
+            "label": "轻度残障，不能完成病前所有活动，但能自理"
+          },
+          {
+            "value": 3,
+            "label": "中度残障，需要一些帮助，但能独立行走"
+          },
+          {
+            "value": 4,
+            "label": "中重度残障，不能独立行走，日常生活需帮助"
+          },
+          {
+            "value": 5,
+            "label": "重度残障，卧床、失禁，需持续护理"
+          },
+          {
+            "value": 6,
+            "label": "死亡"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "none",
+        "label": "0 级"
+      },
+      {
+        "min": 1,
+        "max": 1,
+        "key": "no_disability",
+        "label": "1 级"
+      },
+      {
+        "min": 2,
+        "max": 2,
+        "key": "slight",
+        "label": "2 级"
+      },
+      {
+        "min": 3,
+        "max": 3,
+        "key": "moderate",
+        "label": "3 级"
+      },
+      {
+        "min": 4,
+        "max": 4,
+        "key": "moderately_severe",
+        "label": "4 级"
+      },
+      {
+        "min": 5,
+        "max": 5,
+        "key": "severe",
+        "label": "5 级"
+      },
+      {
+        "min": 6,
+        "max": 6,
+        "key": "dead",
+        "label": "6 级"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "grade": {
+        "type": "number",
+        "title": "选择最符合目前状态的一项",
+        "enum": [0, 1, 2, 3, 4, 5, 6]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "modified Rankin Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=modified+Rankin+Scale+stroke+disability",
+      "section": "van Swieten JC, et al. 1988；0–6 级",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

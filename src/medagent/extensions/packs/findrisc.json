@@ -1,0 +1,361 @@
+{
+  "id": "calculate.findrisc",
+  "name": "FINDRISC 糖尿病风险评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "芬兰糖尿病风险评分（8 项，0–26 分），用于风险筛查，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["FINDRISC", "糖尿病风险"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 26,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "f1",
+        "label": "年龄",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "45 岁以下"
+          },
+          {
+            "value": 2,
+            "label": "45 至 54 岁"
+          },
+          {
+            "value": 3,
+            "label": "55 至 64 岁"
+          },
+          {
+            "value": 4,
+            "label": "64 岁以上"
+          }
+        ]
+      },
+      {
+        "id": "f2",
+        "label": "体重指数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "25 以下"
+          },
+          {
+            "value": 1,
+            "label": "25 至 30"
+          },
+          {
+            "value": 3,
+            "label": "30 以上"
+          }
+        ]
+      },
+      {
+        "id": "f3",
+        "label": "腰围（男/女）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "男小于 94、女小于 80 厘米"
+          },
+          {
+            "value": 3,
+            "label": "男 94 至 102、女 80 至 88 厘米"
+          },
+          {
+            "value": 4,
+            "label": "男大于 102、女大于 88 厘米"
+          }
+        ]
+      },
+      {
+        "id": "f4",
+        "label": "每周是否运动至少 30 分钟",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "是"
+          },
+          {
+            "value": 2,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "f5",
+        "label": "每天是否吃蔬菜水果",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "每天"
+          },
+          {
+            "value": 1,
+            "label": "不是每天"
+          }
+        ]
+      },
+      {
+        "id": "f6",
+        "label": "是否曾因血压高服药",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 2,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "f7",
+        "label": "是否曾被告知血糖偏高",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 5,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "f8",
+        "label": "家族中是否有人患糖尿病",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 3,
+            "label": "有：祖父母、叔伯姑舅或堂表亲"
+          },
+          {
+            "value": 5,
+            "label": "有：父母、兄弟姐妹或子女"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 6,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 7,
+        "max": 11,
+        "key": "slightly",
+        "label": "略高"
+      },
+      {
+        "min": 12,
+        "max": 14,
+        "key": "moderate",
+        "label": "中等"
+      },
+      {
+        "min": 15,
+        "max": 20,
+        "key": "high",
+        "label": "高风险"
+      },
+      {
+        "min": 21,
+        "max": 26,
+        "key": "very_high",
+        "label": "很高风险"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "f1": {
+        "type": "number",
+        "title": "年龄",
+        "enum": [0, 2, 3, 4]
+      },
+      "f2": {
+        "type": "number",
+        "title": "体重指数",
+        "enum": [0, 1, 3]
+      },
+      "f3": {
+        "type": "number",
+        "title": "腰围（男/女）",
+        "enum": [0, 3, 4]
+      },
+      "f4": {
+        "type": "number",
+        "title": "每周是否运动至少 30 分钟",
+        "enum": [0, 2]
+      },
+      "f5": {
+        "type": "number",
+        "title": "每天是否吃蔬菜水果",
+        "enum": [0, 1]
+      },
+      "f6": {
+        "type": "number",
+        "title": "是否曾因血压高服药",
+        "enum": [0, 2]
+      },
+      "f7": {
+        "type": "number",
+        "title": "是否曾被告知血糖偏高",
+        "enum": [0, 5]
+      },
+      "f8": {
+        "type": "number",
+        "title": "家族中是否有人患糖尿病",
+        "enum": [0, 3, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "FINDRISC",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=FINDRISC+Finnish+Diabetes+Risk+Score",
+      "section": "Lindström J, Tuomilehto J. 2003；8 项合计 0–26 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

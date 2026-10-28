@@ -1,0 +1,159 @@
+{
+  "id": "calculate.apri",
+  "name": "APRI 指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按 AST 与血小板计算 APRI。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["APRI"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "apri",
+    "citation": "APRI",
+    "inputs": [
+      {
+        "id": "ast",
+        "label": "AST",
+        "type": "number",
+        "unit": "U/L",
+        "min": "1",
+        "max": "2000",
+        "step": "0.1"
+      },
+      {
+        "id": "ast_uln",
+        "label": "AST 正常上限",
+        "type": "number",
+        "unit": "U/L",
+        "min": "10",
+        "max": "100",
+        "step": "1"
+      },
+      {
+        "id": "platelet",
+        "label": "血小板",
+        "type": "number",
+        "unit": "×10⁹/L",
+        "min": "1",
+        "max": "1000",
+        "step": "1"
+      }
+    ],
+    "output": {
+      "label": "APRI 指数",
+      "unit": "",
+      "min": "0",
+      "max": "100",
+      "precision": {
+        "places": 2
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "APRI 指数 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=APRI+aspartate+aminotransferase+platelet+ratio+index",
+      "section": "APRI：(AST ÷ AST 上限) × 100 ÷ 血小板",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "ast": {
+        "type": "string",
+        "title": "AST",
+        "maxLength": 12
+      },
+      "ast_uln": {
+        "type": "string",
+        "title": "AST 正常上限",
+        "maxLength": 12
+      },
+      "platelet": {
+        "type": "string",
+        "title": "血小板",
+        "maxLength": 12
+      }
+    }
+  }
+}

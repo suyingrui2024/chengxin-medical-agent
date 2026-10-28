@@ -1,0 +1,752 @@
+{
+  "id": "calculate.sas",
+  "name": "SAS 焦虑自评量表",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Zung 焦虑自评量表（20 项，20–80 分），含 5 道反向计分。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["SAS", "Zung 焦虑自评", "焦虑自评量表"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 20,
+      "max": 80,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "s1",
+        "label": "我觉得比平时容易紧张和着急",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "label": "我无缘无故地感到害怕",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "label": "我容易心里烦乱或觉得惊恐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s4",
+        "label": "我觉得我可能将要发疯",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s5",
+        "label": "我觉得一切都很好，也不会发生什么不幸",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "s6",
+        "label": "我手脚发抖打颤",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s7",
+        "label": "我因为头痛、颈痛和背痛而苦恼",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s8",
+        "label": "我感觉容易衰弱和疲乏",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s9",
+        "label": "我觉得心平气和，并且容易安静坐着",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "s10",
+        "label": "我觉得心跳得很快",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s11",
+        "label": "我因为一阵阵头晕而苦恼",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s12",
+        "label": "我有过晕倒发作，或觉得要晕倒似的",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s13",
+        "label": "我呼气吸气都感到很容易",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "s14",
+        "label": "我手脚麻木和刺痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s15",
+        "label": "我因为胃痛和消化不良而苦恼",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s16",
+        "label": "我常常要小便",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s17",
+        "label": "我的手常常是干燥温暖的",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "s18",
+        "label": "我脸红发热",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      },
+      {
+        "id": "s19",
+        "label": "我容易入睡并且一夜睡得很好",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ],
+        "reverse_of": 5
+      },
+      {
+        "id": "s20",
+        "label": "我做噩梦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "没有或很少时间"
+          },
+          {
+            "value": 2,
+            "label": "少部分时间"
+          },
+          {
+            "value": 3,
+            "label": "相当多时间"
+          },
+          {
+            "value": 4,
+            "label": "绝大部分或全部时间"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 20,
+        "max": 39,
+        "key": "normal",
+        "label": "无焦虑"
+      },
+      {
+        "min": 40,
+        "max": 47,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 48,
+        "max": 55,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 56,
+        "max": 80,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "s1": {
+        "type": "number",
+        "title": "我觉得比平时容易紧张和着急",
+        "enum": [1, 2, 3, 4]
+      },
+      "s2": {
+        "type": "number",
+        "title": "我无缘无故地感到害怕",
+        "enum": [1, 2, 3, 4]
+      },
+      "s3": {
+        "type": "number",
+        "title": "我容易心里烦乱或觉得惊恐",
+        "enum": [1, 2, 3, 4]
+      },
+      "s4": {
+        "type": "number",
+        "title": "我觉得我可能将要发疯",
+        "enum": [1, 2, 3, 4]
+      },
+      "s5": {
+        "type": "number",
+        "title": "我觉得一切都很好，也不会发生什么不幸",
+        "enum": [1, 2, 3, 4]
+      },
+      "s6": {
+        "type": "number",
+        "title": "我手脚发抖打颤",
+        "enum": [1, 2, 3, 4]
+      },
+      "s7": {
+        "type": "number",
+        "title": "我因为头痛、颈痛和背痛而苦恼",
+        "enum": [1, 2, 3, 4]
+      },
+      "s8": {
+        "type": "number",
+        "title": "我感觉容易衰弱和疲乏",
+        "enum": [1, 2, 3, 4]
+      },
+      "s9": {
+        "type": "number",
+        "title": "我觉得心平气和，并且容易安静坐着",
+        "enum": [1, 2, 3, 4]
+      },
+      "s10": {
+        "type": "number",
+        "title": "我觉得心跳得很快",
+        "enum": [1, 2, 3, 4]
+      },
+      "s11": {
+        "type": "number",
+        "title": "我因为一阵阵头晕而苦恼",
+        "enum": [1, 2, 3, 4]
+      },
+      "s12": {
+        "type": "number",
+        "title": "我有过晕倒发作，或觉得要晕倒似的",
+        "enum": [1, 2, 3, 4]
+      },
+      "s13": {
+        "type": "number",
+        "title": "我呼气吸气都感到很容易",
+        "enum": [1, 2, 3, 4]
+      },
+      "s14": {
+        "type": "number",
+        "title": "我手脚麻木和刺痛",
+        "enum": [1, 2, 3, 4]
+      },
+      "s15": {
+        "type": "number",
+        "title": "我因为胃痛和消化不良而苦恼",
+        "enum": [1, 2, 3, 4]
+      },
+      "s16": {
+        "type": "number",
+        "title": "我常常要小便",
+        "enum": [1, 2, 3, 4]
+      },
+      "s17": {
+        "type": "number",
+        "title": "我的手常常是干燥温暖的",
+        "enum": [1, 2, 3, 4]
+      },
+      "s18": {
+        "type": "number",
+        "title": "我脸红发热",
+        "enum": [1, 2, 3, 4]
+      },
+      "s19": {
+        "type": "number",
+        "title": "我容易入睡并且一夜睡得很好",
+        "enum": [1, 2, 3, 4]
+      },
+      "s20": {
+        "type": "number",
+        "title": "我做噩梦",
+        "enum": [1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Zung Self-Rating Anxiety Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Zung+Self-Rating+Anxiety+Scale+SAS",
+      "section": "Zung WWK. 1971；20 项各 1–4 分，5 项反向计分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

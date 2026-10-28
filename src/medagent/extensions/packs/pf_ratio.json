@@ -1,0 +1,146 @@
+{
+  "id": "calculate.pf_ratio",
+  "name": "氧合指数 P/F",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "动脉氧分压除以吸氧浓度。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "aliases": ["氧合指数", "P/F"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "pf_ratio",
+    "citation": "PF-RATIO",
+    "inputs": [
+      {
+        "id": "pao2",
+        "label": "动脉氧分压",
+        "type": "number",
+        "unit": "mmHg",
+        "min": "20",
+        "max": "600",
+        "step": "1"
+      },
+      {
+        "id": "fio2",
+        "label": "吸氧浓度",
+        "type": "number",
+        "unit": "小数",
+        "min": "0.21",
+        "max": "1",
+        "step": "0.01"
+      }
+    ],
+    "output": {
+      "label": "氧合指数",
+      "unit": "mmHg",
+      "min": "20",
+      "max": "600",
+      "precision": {
+        "places": 0
+      },
+      "direction": "higher_is_better"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "氧合指数 P/F 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=PaO2+FiO2+ratio+oxygenation",
+      "section": "PF-RATIO：PaO2 ÷ FiO2",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "formula_form/v1",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "pao2": {
+        "type": "string",
+        "title": "动脉氧分压",
+        "maxLength": 12
+      },
+      "fio2": {
+        "type": "string",
+        "title": "吸氧浓度",
+        "maxLength": 12
+      }
+    }
+  }
+}

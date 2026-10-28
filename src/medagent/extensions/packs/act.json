@@ -1,0 +1,333 @@
+{
+  "id": "calculate.act",
+  "name": "ACT 哮喘控制测试",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "哮喘控制测试（5 项，5–25 分），分数越高控制越好。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["ACT", "哮喘控制测试"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 5,
+      "max": 25,
+      "unit": "分",
+      "direction": "higher_is_better"
+    },
+    "items": [
+      {
+        "id": "a1",
+        "label": "过去四周有多少时间哮喘得到控制",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全没有"
+          },
+          {
+            "value": 2,
+            "label": "很少"
+          },
+          {
+            "value": 3,
+            "label": "有时"
+          },
+          {
+            "value": 4,
+            "label": "经常"
+          },
+          {
+            "value": 5,
+            "label": "完全控制"
+          }
+        ]
+      },
+      {
+        "id": "a2",
+        "label": "过去四周有多少时间因哮喘出现呼吸困难",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全没有"
+          },
+          {
+            "value": 2,
+            "label": "很少"
+          },
+          {
+            "value": 3,
+            "label": "有时"
+          },
+          {
+            "value": 4,
+            "label": "经常"
+          },
+          {
+            "value": 5,
+            "label": "完全控制"
+          }
+        ]
+      },
+      {
+        "id": "a3",
+        "label": "过去四周有多少时间因哮喘夜间醒来",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全没有"
+          },
+          {
+            "value": 2,
+            "label": "很少"
+          },
+          {
+            "value": 3,
+            "label": "有时"
+          },
+          {
+            "value": 4,
+            "label": "经常"
+          },
+          {
+            "value": 5,
+            "label": "完全控制"
+          }
+        ]
+      },
+      {
+        "id": "a4",
+        "label": "过去四周有多少时间使用急救药",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全没有"
+          },
+          {
+            "value": 2,
+            "label": "很少"
+          },
+          {
+            "value": 3,
+            "label": "有时"
+          },
+          {
+            "value": 4,
+            "label": "经常"
+          },
+          {
+            "value": 5,
+            "label": "完全控制"
+          }
+        ]
+      },
+      {
+        "id": "a5",
+        "label": "你如何评价过去四周的哮喘控制",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "完全没有"
+          },
+          {
+            "value": 2,
+            "label": "很少"
+          },
+          {
+            "value": 3,
+            "label": "有时"
+          },
+          {
+            "value": 4,
+            "label": "经常"
+          },
+          {
+            "value": 5,
+            "label": "完全控制"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 5,
+        "max": 15,
+        "key": "uncontrolled",
+        "label": "未控制"
+      },
+      {
+        "min": 16,
+        "max": 19,
+        "key": "partial",
+        "label": "部分控制"
+      },
+      {
+        "min": 20,
+        "max": 24,
+        "key": "well",
+        "label": "良好控制"
+      },
+      {
+        "min": 25,
+        "max": 25,
+        "key": "complete",
+        "label": "完全控制"
+      }
+    ],
+    "note": "分数越高表示控制越好；本量表方向与其他量表相反。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "a1": {
+        "type": "number",
+        "title": "过去四周有多少时间哮喘得到控制",
+        "enum": [1, 2, 3, 4, 5]
+      },
+      "a2": {
+        "type": "number",
+        "title": "过去四周有多少时间因哮喘出现呼吸困难",
+        "enum": [1, 2, 3, 4, 5]
+      },
+      "a3": {
+        "type": "number",
+        "title": "过去四周有多少时间因哮喘夜间醒来",
+        "enum": [1, 2, 3, 4, 5]
+      },
+      "a4": {
+        "type": "number",
+        "title": "过去四周有多少时间使用急救药",
+        "enum": [1, 2, 3, 4, 5]
+      },
+      "a5": {
+        "type": "number",
+        "title": "你如何评价过去四周的哮喘控制",
+        "enum": [1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Asthma Control Test",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Asthma+Control+Test+ACT",
+      "section": "Nathan RA, et al. 2004；5 项各 1–5 分，合计 5–25 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

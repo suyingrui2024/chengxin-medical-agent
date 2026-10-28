@@ -587,8 +587,16 @@ class ConsultationEngine(
     def _calculation_input_reply(self, state, feedback=""):
         draft = deepcopy(state.pending_calculation)
         draft["feedback"] = feedback
+        if draft.get("form_kind") == "scale_form/v1":
+            total = len(draft.get("items") or [])
+            message = f"下面有 {total} 项，请逐条选择；全部选完再提交计算。"
+        elif draft.get("form_kind") == "formula_form/v1":
+            count = len(draft.get("inputs") or [])
+            message = f"请填写这 {count} 项数值，核对后再计算。"
+        else:
+            message = "核对这三个输入，再开始换算。"
         return AgentReply(
-            "核对这三个输入，再开始换算。",
+            message,
             state.phase,
             kind="calculation_input",
             calculation_input=draft,
@@ -728,23 +736,52 @@ class ConsultationEngine(
             except (ValueError, TypeError):
                 candidate = user_input.calculation.get("input")
                 if isinstance(candidate, dict):
-                    for key, value in candidate.items():
-                        if (
-                            key == "value"
-                            and isinstance(value, str)
-                            and len(value) <= 25
-                        ):
-                            state.pending_calculation["input"][key] = value
-                        elif (
-                            key in {"from_unit", "to_unit"}
-                            and isinstance(value, str)
-                            and value
-                            in {
-                                unit["value"]
-                                for unit in state.pending_calculation["unit_options"]
-                            }
-                        ):
-                            state.pending_calculation["input"][key] = value
+                    if state.pending_calculation.get("form_kind") == "scale_form/v1":
+                        # Keep only integer answers to items that belong
+                        # to this scale; everything else is dropped.
+                        allowed = {
+                            item["id"]
+                            for item in state.pending_calculation.get("items") or []
+                        }
+                        for key, value in candidate.items():
+                            if key in allowed and type(value) is int:
+                                state.pending_calculation["input"][key] = value
+                    elif (
+                        state.pending_calculation.get("form_kind")
+                        == "formula_form/v1"
+                    ):
+                        # Keep only decimal strings for this formula's
+                        # own inputs; a bad value is preserved so the
+                        # patient can correct it instead of retyping all.
+                        allowed = {
+                            item["id"]
+                            for item in state.pending_calculation.get("inputs") or []
+                        }
+                        for key, value in candidate.items():
+                            if (
+                                key in allowed
+                                and isinstance(value, str)
+                                and len(value) <= 12
+                            ):
+                                state.pending_calculation["input"][key] = value
+                    else:
+                        for key, value in candidate.items():
+                            if (
+                                key == "value"
+                                and isinstance(value, str)
+                                and len(value) <= 25
+                            ):
+                                state.pending_calculation["input"][key] = value
+                            elif (
+                                key in {"from_unit", "to_unit"}
+                                and isinstance(value, str)
+                                and value
+                                in {
+                                    unit["value"]
+                                    for unit in state.pending_calculation["unit_options"]
+                                }
+                            ):
+                                state.pending_calculation["input"][key] = value
                 return self._calculation_input_reply(
                     state,
                     state.pending_calculation.get("feedback_hint", "未完成计算，请核对参数。"),
@@ -753,8 +790,14 @@ class ConsultationEngine(
             if state.calculation_feedback:
                 state.calculation_feedback["outcome"] = "completed"
             state.calculation_resume["execution_id"] = result["execution_id"]
+            if (result.get("data") or {}).get("result_renderer") == "scale/v1":
+                message = "量表已计分，作答已核对。结果只反映本次作答，不构成诊断。"
+            elif (result.get("data") or {}).get("result_renderer") == "formula/v1":
+                message = "计算已完成，输入已核对。结果只作记录与参考，不构成诊断。"
+            else:
+                message = "换算已完成，参数已核对。实际测量质量仍未评价。"
             return AgentReply(
-                "换算已完成，参数已核对。实际测量质量仍未评价。",
+                message,
                 state.phase,
                 kind="calculation_result",
                 calculation_result=deepcopy(result),

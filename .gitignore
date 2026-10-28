@@ -25,3 +25,7 @@ playwright-report/
 !docs/evaluations/2026-10-16/v0.10.2/__pycache__/
 !docs/evaluations/2026-10-16/v0.10.2/__pycache__/candidate_tree.cpython-310.pyc
 !docs/evaluations/2026-10-16/v0.10.2/__pycache__/replay.cpython-310.pyc
+
+# 流水线与代理工作目录
+output/
+.workbuddy-ai/

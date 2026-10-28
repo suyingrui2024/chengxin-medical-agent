@@ -1,0 +1,290 @@
+{
+  "id": "calculate.dn4",
+  "name": "DN4 神经病理性疼痛问卷",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "神经病理性疼痛筛查问卷（自评部分 7 项，0–7 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["DN4", "神经病理性疼痛"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 7,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "n1",
+        "label": "疼痛是否有烧灼感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "label": "疼痛是否有冰凉感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "n3",
+        "label": "疼痛是否有电击样感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "n4",
+        "label": "疼痛部位是否有麻刺感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "n5",
+        "label": "疼痛部位是否有针刺感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "n6",
+        "label": "疼痛部位是否有麻木感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "n7",
+        "label": "疼痛部位是否有瘙痒感",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [],
+    "note": "原量表另含 3 项查体，本版只做自评部分，因此总分上限为 7 而非 10；不给分档。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "n1": {
+        "type": "number",
+        "title": "疼痛是否有烧灼感",
+        "enum": [0, 1]
+      },
+      "n2": {
+        "type": "number",
+        "title": "疼痛是否有冰凉感",
+        "enum": [0, 1]
+      },
+      "n3": {
+        "type": "number",
+        "title": "疼痛是否有电击样感",
+        "enum": [0, 1]
+      },
+      "n4": {
+        "type": "number",
+        "title": "疼痛部位是否有麻刺感",
+        "enum": [0, 1]
+      },
+      "n5": {
+        "type": "number",
+        "title": "疼痛部位是否有针刺感",
+        "enum": [0, 1]
+      },
+      "n6": {
+        "type": "number",
+        "title": "疼痛部位是否有麻木感",
+        "enum": [0, 1]
+      },
+      "n7": {
+        "type": "number",
+        "title": "疼痛部位是否有瘙痒感",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "DN4 questionnaire",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=DN4+questionnaire+neuropathic+pain",
+      "section": "Bouhassira D, et al. 2005；本版仅含 7 项自评症状，不含 3 项查体",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

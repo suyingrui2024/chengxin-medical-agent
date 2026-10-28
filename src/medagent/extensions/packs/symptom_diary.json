@@ -1,0 +1,278 @@
+{
+  "id": "calculate.symptom_diary",
+  "name": "症状日记评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "每日症状负担自评（4 项，0–12 分），用于记录变化趋势。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["症状日记"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 12,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "s1",
+        "label": "今天症状的严重程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "label": "症状对日常活动的影响",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "label": "症状对睡眠的影响",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "s4",
+        "label": "对症状的担心程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 3,
+        "max": 6,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 7,
+        "max": 12,
+        "key": "severe",
+        "label": "重度"
+      }
+    ],
+    "note": "这是记录工具而非验证量表，不用于诊断。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "s1": {
+        "type": "number",
+        "title": "今天症状的严重程度",
+        "enum": [0, 1, 2, 3]
+      },
+      "s2": {
+        "type": "number",
+        "title": "症状对日常活动的影响",
+        "enum": [0, 1, 2, 3]
+      },
+      "s3": {
+        "type": "number",
+        "title": "症状对睡眠的影响",
+        "enum": [0, 1, 2, 3]
+      },
+      "s4": {
+        "type": "number",
+        "title": "对症状的担心程度",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Symptom diary scoring",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=symptom+diary+patient+reported+outcome",
+      "section": "自评条目，用于纵向记录，非诊断工具",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

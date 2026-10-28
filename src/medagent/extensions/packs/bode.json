@@ -1,0 +1,274 @@
+{
+  "id": "calculate.bode",
+  "name": "BODE 指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "慢阻肺多维评估指数（0–10 分），综合体重指数、肺功能、呼吸困难与运动能力。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["BODE", "BODE 指数"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 10,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "b1",
+        "label": "体重指数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "大于 21"
+          },
+          {
+            "value": 1,
+            "label": "21 及以下"
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "label": "FEV1 占预计值百分比",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "65% 及以上"
+          },
+          {
+            "value": 1,
+            "label": "50% 至 64%"
+          },
+          {
+            "value": 2,
+            "label": "36% 至 49%"
+          },
+          {
+            "value": 3,
+            "label": "35% 及以下"
+          }
+        ]
+      },
+      {
+        "id": "b3",
+        "label": "mMRC 呼吸困难分级",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 至 1 级"
+          },
+          {
+            "value": 1,
+            "label": "2 级"
+          },
+          {
+            "value": 2,
+            "label": "3 级"
+          },
+          {
+            "value": 3,
+            "label": "4 级"
+          }
+        ]
+      },
+      {
+        "id": "b4",
+        "label": "6 分钟步行距离",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "350 米及以上"
+          },
+          {
+            "value": 1,
+            "label": "250 至 349 米"
+          },
+          {
+            "value": 2,
+            "label": "150 至 249 米"
+          },
+          {
+            "value": 3,
+            "label": "149 米及以下"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "key": "quartile1",
+        "label": "第一档"
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "key": "quartile2",
+        "label": "第二档"
+      },
+      {
+        "min": 5,
+        "max": 6,
+        "key": "quartile3",
+        "label": "第三档"
+      },
+      {
+        "min": 7,
+        "max": 10,
+        "key": "quartile4",
+        "label": "第四档"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "b1": {
+        "type": "number",
+        "title": "体重指数",
+        "enum": [0, 1]
+      },
+      "b2": {
+        "type": "number",
+        "title": "FEV1 占预计值百分比",
+        "enum": [0, 1, 2, 3]
+      },
+      "b3": {
+        "type": "number",
+        "title": "mMRC 呼吸困难分级",
+        "enum": [0, 1, 2, 3]
+      },
+      "b4": {
+        "type": "number",
+        "title": "6 分钟步行距离",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "BODE index",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=BODE+index+COPD+prognosis",
+      "section": "Celli BR, et al. 2004；4 项合计 0–10 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

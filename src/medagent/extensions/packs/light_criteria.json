@@ -1,0 +1,184 @@
+{
+  "id": "calculate.light_criteria",
+  "name": "胸腔积液 Light 标准",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按胸水与血清蛋白、LDH 判定漏出液或渗出液。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["Light标准"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "light_criteria",
+    "citation": "LIGHT-CRITERIA",
+    "inputs": [
+      {
+        "id": "pleural_protein",
+        "label": "胸水蛋白",
+        "type": "number",
+        "unit": "g/L",
+        "min": "0",
+        "max": "100",
+        "step": "0.1"
+      },
+      {
+        "id": "serum_protein",
+        "label": "血清蛋白",
+        "type": "number",
+        "unit": "g/L",
+        "min": "10",
+        "max": "120",
+        "step": "0.1"
+      },
+      {
+        "id": "pleural_ldh",
+        "label": "胸水 LDH",
+        "type": "number",
+        "unit": "U/L",
+        "min": "0",
+        "max": "10000",
+        "step": "1"
+      },
+      {
+        "id": "serum_ldh",
+        "label": "血清 LDH",
+        "type": "number",
+        "unit": "U/L",
+        "min": "10",
+        "max": "10000",
+        "step": "1"
+      }
+    ],
+    "output": {
+      "label": "Light 标准判定",
+      "unit": "分类",
+      "min": "0",
+      "max": "1",
+      "precision": {
+        "places": 0
+      },
+      "direction": "no_direction"
+    },
+    "bands": [
+      {
+        "lt": "0.5",
+        "key": "transudate",
+        "label": "符合漏出液"
+      },
+      {
+        "gte": "0.5",
+        "key": "exudate",
+        "label": "符合渗出液"
+      }
+    ]
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "胸腔积液 Light 标准 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Light+criteria+pleural+fluid",
+      "section": "LIGHT-CRITERIA：满足任一项即为渗出液：胸水/血清蛋白 > 0.5；胸水/血清 LDH > 0.6；胸水 LDH > 血清上限 2/3（此处用 0.67×血清 LDH 近似）",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "pleural_protein": {
+        "type": "string",
+        "title": "胸水蛋白",
+        "maxLength": 12
+      },
+      "serum_protein": {
+        "type": "string",
+        "title": "血清蛋白",
+        "maxLength": 12
+      },
+      "pleural_ldh": {
+        "type": "string",
+        "title": "胸水 LDH",
+        "maxLength": 12
+      },
+      "serum_ldh": {
+        "type": "string",
+        "title": "血清 LDH",
+        "maxLength": 12
+      }
+    }
+  }
+}

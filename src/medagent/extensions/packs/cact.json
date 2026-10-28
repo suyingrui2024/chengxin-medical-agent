@@ -1,0 +1,370 @@
+{
+  "id": "calculate.cact",
+  "name": "C-ACT 儿童哮喘控制测试",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "儿童哮喘控制测试（7 项，0–27 分），由儿童与家长共同作答，用于记录控制水平，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["C-ACT", "儿童哮喘控制", "儿童哮喘控制测试"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 27,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "c1",
+        "label": "今天哮喘控制得怎么样",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "很差"
+          },
+          {
+            "value": 1,
+            "label": "不太好"
+          },
+          {
+            "value": 2,
+            "label": "还可以"
+          },
+          {
+            "value": 3,
+            "label": "很好"
+          }
+        ]
+      },
+      {
+        "id": "c2",
+        "label": "跑步、运动或玩耍时哮喘怎么样",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "很差"
+          },
+          {
+            "value": 1,
+            "label": "不太好"
+          },
+          {
+            "value": 2,
+            "label": "还可以"
+          },
+          {
+            "value": 3,
+            "label": "很好"
+          }
+        ]
+      },
+      {
+        "id": "c3",
+        "label": "咳嗽怎么样",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "很频繁"
+          },
+          {
+            "value": 1,
+            "label": "比较频繁"
+          },
+          {
+            "value": 2,
+            "label": "偶尔"
+          },
+          {
+            "value": 3,
+            "label": "没有"
+          }
+        ]
+      },
+      {
+        "id": "c4",
+        "label": "夜里会因为哮喘醒来吗",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "经常"
+          },
+          {
+            "value": 1,
+            "label": "有时"
+          },
+          {
+            "value": 2,
+            "label": "偶尔"
+          },
+          {
+            "value": 3,
+            "label": "没有"
+          }
+        ]
+      },
+      {
+        "id": "c5",
+        "label": "过去四周白天有几天出现哮喘症状",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "每天"
+          },
+          {
+            "value": 1,
+            "label": "19 到 24 天"
+          },
+          {
+            "value": 2,
+            "label": "11 到 18 天"
+          },
+          {
+            "value": 3,
+            "label": "4 到 10 天"
+          },
+          {
+            "value": 4,
+            "label": "1 到 3 天"
+          },
+          {
+            "value": 5,
+            "label": "没有"
+          }
+        ]
+      },
+      {
+        "id": "c6",
+        "label": "过去四周白天有几天喘息",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "每天"
+          },
+          {
+            "value": 1,
+            "label": "19 到 24 天"
+          },
+          {
+            "value": 2,
+            "label": "11 到 18 天"
+          },
+          {
+            "value": 3,
+            "label": "4 到 10 天"
+          },
+          {
+            "value": 4,
+            "label": "1 到 3 天"
+          },
+          {
+            "value": 5,
+            "label": "没有"
+          }
+        ]
+      },
+      {
+        "id": "c7",
+        "label": "过去四周夜里因哮喘醒来几次",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "每晚或几乎每晚"
+          },
+          {
+            "value": 1,
+            "label": "14 到 18 次"
+          },
+          {
+            "value": 2,
+            "label": "8 到 13 次"
+          },
+          {
+            "value": 3,
+            "label": "4 到 7 次"
+          },
+          {
+            "value": 4,
+            "label": "1 到 3 次"
+          },
+          {
+            "value": 5,
+            "label": "没有"
+          }
+        ]
+      }
+    ],
+    "bands": [],
+    "note": "分界值随指南版本变化，本版只出总分，不给分档。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "c1": {
+        "type": "number",
+        "title": "今天哮喘控制得怎么样",
+        "enum": [0, 1, 2, 3]
+      },
+      "c2": {
+        "type": "number",
+        "title": "跑步、运动或玩耍时哮喘怎么样",
+        "enum": [0, 1, 2, 3]
+      },
+      "c3": {
+        "type": "number",
+        "title": "咳嗽怎么样",
+        "enum": [0, 1, 2, 3]
+      },
+      "c4": {
+        "type": "number",
+        "title": "夜里会因为哮喘醒来吗",
+        "enum": [0, 1, 2, 3]
+      },
+      "c5": {
+        "type": "number",
+        "title": "过去四周白天有几天出现哮喘症状",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "c6": {
+        "type": "number",
+        "title": "过去四周白天有几天喘息",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "c7": {
+        "type": "number",
+        "title": "过去四周夜里因哮喘醒来几次",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Childhood Asthma Control Test",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Childhood+Asthma+Control+Test+C-ACT",
+      "section": "C-ACT：Liu AH, et al. 2007；7 项合计 0–27 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

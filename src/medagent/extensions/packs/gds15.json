@@ -1,0 +1,463 @@
+{
+  "id": "calculate.gds15",
+  "name": "GDS-15 老年抑郁筛查",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "老年抑郁量表简版（15 项是/否，0–15 分），含反向计分，用于症状记录，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["GDS-15", "GDS15", "老年抑郁", "老年抑郁量表"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 15,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "q1",
+        "label": "你对现在的生活基本满意吗",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ],
+        "reverse_of": 1
+      },
+      {
+        "id": "q2",
+        "label": "你是否放弃了很多活动和兴趣",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q3",
+        "label": "你是否觉得生活空虚",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q4",
+        "label": "你是否常常感到厌烦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q5",
+        "label": "你是否大部分时间精神很好",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ],
+        "reverse_of": 1
+      },
+      {
+        "id": "q6",
+        "label": "你是否害怕会有不好的事情发生",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q7",
+        "label": "你是否大部分时间感到快乐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ],
+        "reverse_of": 1
+      },
+      {
+        "id": "q8",
+        "label": "你是否常常感到无助",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q9",
+        "label": "你是否宁愿待在家里而不愿外出做新事",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q10",
+        "label": "你是否觉得记忆力比多数人差",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q11",
+        "label": "你是否觉得现在活着很好",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ],
+        "reverse_of": 1
+      },
+      {
+        "id": "q12",
+        "label": "你是否觉得现在这样生活没有价值",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q13",
+        "label": "你是否觉得精力充沛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ],
+        "reverse_of": 1
+      },
+      {
+        "id": "q14",
+        "label": "你是否觉得自己的处境没有希望",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      },
+      {
+        "id": "q15",
+        "label": "你是否觉得大多数人比你过得好",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "是"
+          },
+          {
+            "value": 0,
+            "label": "否"
+          }
+        ]
+      }
+    ],
+    "bands": [],
+    "note": "阈值随人群与场所变化，本版只出总分，不给分档。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "q1": {
+        "type": "number",
+        "title": "你对现在的生活基本满意吗",
+        "enum": [1, 0]
+      },
+      "q2": {
+        "type": "number",
+        "title": "你是否放弃了很多活动和兴趣",
+        "enum": [1, 0]
+      },
+      "q3": {
+        "type": "number",
+        "title": "你是否觉得生活空虚",
+        "enum": [1, 0]
+      },
+      "q4": {
+        "type": "number",
+        "title": "你是否常常感到厌烦",
+        "enum": [1, 0]
+      },
+      "q5": {
+        "type": "number",
+        "title": "你是否大部分时间精神很好",
+        "enum": [1, 0]
+      },
+      "q6": {
+        "type": "number",
+        "title": "你是否害怕会有不好的事情发生",
+        "enum": [1, 0]
+      },
+      "q7": {
+        "type": "number",
+        "title": "你是否大部分时间感到快乐",
+        "enum": [1, 0]
+      },
+      "q8": {
+        "type": "number",
+        "title": "你是否常常感到无助",
+        "enum": [1, 0]
+      },
+      "q9": {
+        "type": "number",
+        "title": "你是否宁愿待在家里而不愿外出做新事",
+        "enum": [1, 0]
+      },
+      "q10": {
+        "type": "number",
+        "title": "你是否觉得记忆力比多数人差",
+        "enum": [1, 0]
+      },
+      "q11": {
+        "type": "number",
+        "title": "你是否觉得现在活着很好",
+        "enum": [1, 0]
+      },
+      "q12": {
+        "type": "number",
+        "title": "你是否觉得现在这样生活没有价值",
+        "enum": [1, 0]
+      },
+      "q13": {
+        "type": "number",
+        "title": "你是否觉得精力充沛",
+        "enum": [1, 0]
+      },
+      "q14": {
+        "type": "number",
+        "title": "你是否觉得自己的处境没有希望",
+        "enum": [1, 0]
+      },
+      "q15": {
+        "type": "number",
+        "title": "你是否觉得大多数人比你过得好",
+        "enum": [1, 0]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Geriatric Depression Scale (short form)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Geriatric+Depression+Scale+short+form+15+item",
+      "section": "GDS-15：Sheikh JI, Yesavage JA. 1986；含 5 道反向计分题",
+      "accessed": "2026-10-27"
+    }
+  ]
+}
