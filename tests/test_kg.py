@@ -376,3 +376,48 @@ class CorpusCoverageFloorTests(unittest.TestCase):
         self.assertGreaterEqual(
             coverage, 0.30, f"红旗语料覆盖率跌到 {coverage:.0%}，低于 30% 下限"
         )
+
+
+class ImportedRelationTests(unittest.TestCase):
+    """Relations from DiaKG: the axes ICD and Wikidata do not provide."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.store = ConceptStore.open(BUILT)
+        cls.predicates = {edge["predicate"] for edge in cls.store.relations()}
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.store.close()
+
+    @unittest.skipUnless(BUILT.is_file(), "知识库尚未装配")
+    def test_drug_relations_are_present(self):
+        # Nothing else in the graph knows about drugs at all.
+        self.assertIn("treats", self.predicates)
+        self.assertIn("causes_adverse_event", self.predicates)
+        self.assertIn("has_test", self.predicates)
+
+    @unittest.skipUnless(BUILT.is_file(), "知识库尚未装配")
+    def test_entities_resolve_across_sources(self):
+        # A DiaKG drug pointing at a Wikidata symptom means the resolver
+        # matched by canonical name instead of minting a duplicate node.
+        edges = [
+            edge
+            for edge in self.store.relations()
+            if edge["predicate"] == "causes_adverse_event"
+        ]
+        self.assertTrue(edges)
+        cross = [
+            edge
+            for edge in edges
+            if edge["src"].startswith("diakg:") and not edge["dst"].startswith("diakg:")
+        ]
+        self.assertTrue(cross, "DiaKG 实体没有复用已有概念，图谱被切碎了")
+
+    @unittest.skipUnless(BUILT.is_file(), "知识库尚未装配")
+    def test_every_relation_endpoint_exists(self):
+        known = {concept["id"] for concept in self.store.concepts()}
+        for edge in self.store.relations():
+            with self.subTest(edge["src"]):
+                self.assertIn(edge["src"], known)
+                self.assertIn(edge["dst"], known)

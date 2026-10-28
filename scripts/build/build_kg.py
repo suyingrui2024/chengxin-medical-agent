@@ -33,6 +33,29 @@ OUT_JSON = ROOT / "data" / "kg" / "kg.json"
 
 ICD_SOURCE = "ICD-10-CN(MIT)@2017 chaseliu/ICD-10-CN"
 WD_SOURCE = "Wikidata P780 (CC0) fetched 2026-10-28"
+DIAKG_SOURCE = "OpenKG DiaKG (CC BY) fetched 2026-10-28"
+DIAKG_DIR = SOURCES / "diakg"
+
+#: Entity types we can place in our closed kind set. Anatomy, Class,
+#: Treatment, Amount and the rest are dropped: importing them would mean
+#: inventing kinds for data nothing consumes.
+DIAKG_KINDS = {
+    "Disease": "disease",
+    "Symptom": "symptom",
+    "ADE": "symptom",  # an adverse drug event is a clinical manifestation
+    "Drug": "drug",
+    "Test_items": "lab",
+}
+
+#: relation name -> (head kind, tail kind, predicate, source is head?)
+#: In DiaKG a relation named X_Y has head of type X and tail of type Y,
+#: verified against 低血糖(ADE) -> 格列本脲(Drug).
+DIAKG_RELATIONS = {
+    "Symptom_Disease": ("symptom", "disease", "has_symptom", False),
+    "ADE_Drug": ("symptom", "drug", "causes_adverse_event", False),
+    "Drug_Disease": ("drug", "disease", "treats", True),
+    "Test_items_Disease": ("lab", "disease", "has_test", False),
+}
 
 
 def _slug(text: str) -> str:
@@ -183,6 +206,72 @@ def wikidata_concepts() -> tuple[list[Concept], list[Relation]]:
     return list(diseases.values()) + list(symptoms.values()), relations
 
 
+def diakg_concepts(
+    index: dict[str, str]
+) -> tuple[list[Concept], list[Relation]]:
+    """Import DiaKG: entities and relations from Chinese diabetes guidelines.
+
+    Entities are resolved against concepts we already hold, by canonical
+    name, so 「低血糖」 stays one node instead of splitting into an ICD
+    one and a DiaKG one. Only relations whose both ends land in a known
+    kind are kept.
+    """
+    concepts: dict[str, Concept] = {}
+    relations: list[Relation] = []
+
+    def resolve(entity: str, entity_type: str) -> str | None:
+        kind = DIAKG_KINDS.get(entity_type)
+        if not kind or not entity:
+            return None
+        if entity in index:
+            return index[entity]
+        identity = f"diakg:{kind}:{_slug(entity)}"
+        if identity not in concepts:
+            concepts[identity] = Concept(
+                id=identity,
+                kind=kind,
+                canonical=entity,
+                source=DIAKG_SOURCE,
+                review_status="imported_pending_review",
+                aliases=(entity,),
+            )
+            index[entity] = identity
+        return identity
+
+    for path in sorted(DIAKG_DIR.glob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        for paragraph in payload.get("paragraphs", []):
+            for sentence in paragraph.get("sentences", []):
+                by_id = {
+                    entry["entity_id"]: entry
+                    for entry in sentence.get("entities", [])
+                    if "entity_id" in entry
+                }
+                for relation in sentence.get("relations", []):
+                    rule = DIAKG_RELATIONS.get(relation.get("relation_type"))
+                    if not rule:
+                        continue
+                    head_kind, tail_kind, predicate, source_is_head = rule
+                    head = by_id.get(relation.get("head_entity_id"))
+                    tail = by_id.get(relation.get("tail_entity_id"))
+                    if not head or not tail:
+                        continue
+                    if DIAKG_KINDS.get(head.get("entity_type")) != head_kind:
+                        continue
+                    if DIAKG_KINDS.get(tail.get("entity_type")) != tail_kind:
+                        continue
+                    head_id = resolve(head["entity"], head["entity_type"])
+                    tail_id = resolve(tail["entity"], tail["entity_type"])
+                    if not head_id or not tail_id or head_id == tail_id:
+                        continue
+                    src, dst = (head_id, tail_id) if source_is_head else (tail_id, head_id)
+                    relations.append(
+                        Relation(src=src, predicate=predicate, dst=dst, source=DIAKG_SOURCE)
+                    )
+
+    return list(concepts.values()), relations
+
+
 def build(store: ConceptStore | None = None) -> ConceptStore:
     store = store or ConceptStore.in_memory()
     seed.build(load_registry(), store)
@@ -192,8 +281,15 @@ def build(store: ConceptStore | None = None) -> ConceptStore:
     store.add(icd, icd_rel)
     store.add(wd, wd_rel)
 
+    # DiaKG last, so its entities can resolve onto the concepts already
+    # loaded instead of duplicating them.
+    index = {concept["canonical"]: concept["id"] for concept in store.concepts()}
+    dk, dk_rel = diakg_concepts(index)
+    store.add(dk, dk_rel)
+
     store.set_meta("icd10_rows", str(len(icd)))
     store.set_meta("wikidata_rows", str(len(wd)))
+    store.set_meta("diakg_rows", str(len(dk)))
     store.set_meta("built", "2026-10-28")
     return store
 
