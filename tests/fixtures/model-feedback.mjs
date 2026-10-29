@@ -106,6 +106,12 @@ export function denialClause() {
  * the script.
  */
 export function nextCommand(body, commands, { abstainPathway = true } = {}) {
+  // A `null` at the head of the queue is a deliberate backend failure, not
+  // a missing line: the harnesses push it to exercise the retry UI. It
+  // must win over any compliance reply, or the failure under test never
+  // happens and the retry button never appears.
+  if (commands.length && commands[0] === null) return commands.shift();
+
   const context = readContext(body);
 
   const required = requiredQuestion(context);

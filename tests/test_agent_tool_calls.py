@@ -233,3 +233,136 @@ class AgentMultiturnTests(unittest.TestCase):
         self.assertTrue(message.strip())
         for phrase in BANNED_PHRASES:
             self.assertNotIn(phrase, message, f"追问回答里出现禁用表述：{phrase}")
+
+
+class PathwayGateTests(unittest.TestCase):
+    """The summary gate: explore a triggered pathway, or say why not.
+
+    Every browser fixture answers this gate by abstaining, so without this
+    test the rule itself has no coverage at all — a gate that only exists
+    in the fixtures' favour is not a gate.
+
+    The chief complaint below triggers the respiratory pathway while its
+    detail fields stay unrecorded, which is exactly the state the gate
+    guards.
+    """
+
+    TEXT = (
+        "我自己32岁，男，咳嗽发烧两天，变化不大，影响程度3分，没有其他不适，"
+        "上述危险信号都没有。能正常喝水吃饭；过敏不知道；没有用药；"
+        "没有相关既往病史。想整理信息去就医。"
+    )
+
+    @staticmethod
+    def fact(key, value, evidence, assertion="present"):
+        return {
+            "key": key,
+            "value": value,
+            "evidence": evidence,
+            "assertion": assertion,
+        }
+
+    def open_case(self):
+        """A case with every blocking field recorded, pathway untouched."""
+        engine = build_engine([])
+        state, _ = engine.create_session()
+        engine._execute(
+            state,
+            {
+                "tool": "record_facts",
+                "arguments": {
+                    "facts": [
+                        self.fact("consult_for", "self", "我自己"),
+                        self.fact("sex", "male", "男"),
+                        self.fact("age_years", 32, "32岁"),
+                        self.fact("chief_complaint", "咳嗽发烧", "咳嗽发烧"),
+                        self.fact("onset", "两天", "两天"),
+                        self.fact("trajectory", "stable", "变化不大"),
+                        self.fact("severity", 3, "影响程度3分"),
+                        self.fact("associated_symptoms", None, "没有其他不适", "absent"),
+                        self.fact("emergency_screen", None, "上述危险信号都没有", "absent"),
+                        self.fact("resp_intake", "能正常喝水吃饭", "能正常喝水吃饭"),
+                        self.fact("allergies", None, "过敏不知道", "unknown"),
+                        self.fact("medications_taken", None, "没有用药", "absent"),
+                        self.fact("relevant_history", None, "没有相关既往病史", "absent"),
+                        self.fact("patient_goal", "整理信息去就医", "想整理信息去就医"),
+                    ]
+                },
+            },
+            self.TEXT,
+            "t1",
+        )
+        warnings = [
+            key
+            for key in engine._context(state, self.TEXT)["missing_required"]
+            if key.startswith("warning_")
+        ]
+        if warnings:
+            engine._execute(
+                state,
+                {
+                    "tool": "record_facts",
+                    "arguments": {
+                        "facts": [
+                            self.fact(key, None, "上述危险信号都没有", "absent")
+                            for key in warnings
+                        ]
+                    },
+                },
+                self.TEXT,
+                "t1",
+            )
+        return engine, state
+
+    def test_the_fixture_really_leaves_the_pathway_unexplored(self):
+        engine, state = self.open_case()
+        pathway = engine._context(state, self.TEXT)["pathway_exploration"]
+        self.assertEqual([entry["pathway"] for entry in pathway], ["respiratory"])
+        self.assertFalse(pathway[0]["explored"])
+
+    def test_summary_is_refused_while_the_pathway_is_unexplored(self):
+        from medagent.agent_tools import ProposalError
+
+        engine, state = self.open_case()
+        with self.assertRaises(ProposalError) as raised:
+            engine._execute(
+                state, {"tool": "review_summary", "arguments": {}}, self.TEXT, "t1"
+            )
+        self.assertIn("主诉通路尚未探明", str(raised.exception))
+        self.assertIn("resp_breathing", str(raised.exception))
+
+    def test_abstaining_lets_the_summary_through(self):
+        from medagent.agent_tools import ProposalError
+
+        engine, state = self.open_case()
+        try:
+            engine._execute(
+                state,
+                {
+                    "tool": "review_summary",
+                    "arguments": {
+                        "abstain_reason": "该通路与主诉无关，按已记录事实生成结论"
+                    },
+                },
+                self.TEXT,
+                "t1",
+            )
+        except ProposalError as error:  # pragma: no cover - failure path
+            self.fail(f"弃权后仍被拒：{error}")
+
+    def test_an_empty_abstain_reason_is_not_an_escape(self):
+        from medagent.agent_tools import ProposalError
+
+        engine, state = self.open_case()
+        for reason in ("", "   ", "x" * 201):
+            with self.subTest(reason=reason):
+                with self.assertRaises(ProposalError):
+                    engine._execute(
+                        state,
+                        {
+                            "tool": "review_summary",
+                            "arguments": {"abstain_reason": reason},
+                        },
+                        self.TEXT,
+                        "t1",
+                    )
