@@ -18,6 +18,13 @@ const history = [
   ["medications_taken", null, "是否用过药不确定", "unknown"],
   ["relevant_history", null, "病史记不清", "unknown"],
   ["patient_goal", "整理就医记录", "这次想整理就医记录", "present"],
+  // The engine refuses a summary until the chief complaint's triage fields
+  // have been attempted, and the per-turn write budget is too small to add
+  // them later. The patient denied red flags in the same breath, so they
+  // belong in this batch — citing that sentence, not a guess.
+  ["warning_剧痛", null, "上述危险信号都没有", "absent"],
+  ["warning_持续加重", null, "上述危险信号都没有", "absent"],
+  ["warning_功能骤降", null, "上述危险信号都没有", "absent"],
 ];
 
 export async function createAssertionModel() {

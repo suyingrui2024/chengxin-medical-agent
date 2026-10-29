@@ -366,3 +366,74 @@ class PathwayGateTests(unittest.TestCase):
                         self.TEXT,
                         "t1",
                     )
+
+
+class AssertionEvidenceTests(unittest.TestCase):
+    """Asserting absence from an uncertain answer must not be swallowed.
+
+    `assertion-flow` drives exactly this case in the browser: the patient
+    says 「过敏不知道」 and the scripted model answers `absent`. The engine
+    is supposed to refuse it and tell the model to use `unknown/null`.
+
+    Today it does neither. The batch is accepted, nine facts land, and the
+    three uncertain ones vanish — no error, no event, and the next context
+    simply lists them as missing again. The model is never told that what
+    it said was wrong, so it can keep asserting 「无过敏史」 in prose while
+    the record says nothing.
+
+    Kept as an expected failure rather than deleted: the moment the engine
+    starts refusing (the right behaviour), this test turns red and says so.
+    """
+
+    TEXT = (
+        "我自己，32岁，手臂不舒服，从昨天开始，变化不大，影响程度3分，"
+        "没有其他不适，上述危险信号都没有。过敏不知道；是否用过药不确定；"
+        "病史记不清。这次想整理就医记录。"
+    )
+
+    @unittest.expectedFailure
+    def test_uncertain_answers_cannot_be_recorded_as_absent(self):
+        from medagent.agent_tools import ProposalError
+
+        engine = build_engine([])
+        state, _ = engine.create_session()
+        facts = [
+            {
+                "key": "chief_complaint",
+                "value": "手臂不舒服",
+                "evidence": "手臂不舒服",
+                "assertion": "present",
+            },
+            {
+                "key": "allergies",
+                "value": None,
+                "evidence": "过敏不知道",
+                "assertion": "absent",
+            },
+        ]
+        with self.assertRaises(ProposalError):
+            engine._execute(
+                state, {"tool": "record_facts", "arguments": {"facts": facts}}, self.TEXT, "t1"
+            )
+
+    def test_the_same_answers_are_accepted_as_unknown(self):
+        engine = build_engine([])
+        state, _ = engine.create_session()
+        facts = [
+            {
+                "key": "chief_complaint",
+                "value": "手臂不舒服",
+                "evidence": "手臂不舒服",
+                "assertion": "present",
+            },
+            {
+                "key": "allergies",
+                "value": None,
+                "evidence": "过敏不知道",
+                "assertion": "unknown",
+            },
+        ]
+        engine._execute(
+            state, {"tool": "record_facts", "arguments": {"facts": facts}}, self.TEXT, "t1"
+        )
+        self.assertIn("allergies", state.facts)

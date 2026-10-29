@@ -34,6 +34,7 @@
  * the one the current turn is based on.
  */
 let lastFullContext = {};
+let writeBudgetSpent = false;
 
 function readContext(body) {
   const last = [...(body.messages || [])]
@@ -45,12 +46,36 @@ function readContext(body) {
   } catch {
     return {};
   }
-  if (parsed.latest_user_text) lastFullContext = parsed;
+  if (parsed.latest_user_text) {
+    if (parsed.latest_user_text !== lastFullContext.latest_user_text) {
+      writeBudgetSpent = false;
+    }
+    lastFullContext = parsed;
+  }
   return parsed;
 }
 
 function errorOf(context) {
   return String(context.tool_result?.error ?? "");
+}
+
+/**
+ * Set `MODEL_FEEDBACK_DIAG=1` to see every frame the scripted model
+ * receives. A rejected proposal is otherwise invisible: the test fails on
+ * a missing card far downstream, and the reason is buried in a payload
+ * nobody prints.
+ */
+function diag(context, reply) {
+  if (!process.env.MODEL_FEEDBACK_DIAG) return;
+  const error = errorOf(context);
+  console.error(
+    "[model-feedback]",
+    JSON.stringify({
+      active: context.active_question ?? null,
+      error: error.slice(0, 160),
+      reply: reply?.tool ?? reply ?? null,
+    }),
+  );
 }
 
 /** The question the engine insists on before the proposed one, if any. */
@@ -76,11 +101,18 @@ export function pathwayGateOpen(context) {
 /** Required triage fields the engine says have not been attempted. */
 export function untriedWarningFields(context) {
   const match = errorOf(context).match(/必要字段尚未尝试：([^。]+)/);
-  if (!match) return [];
-  return match[1]
-    .split(/[,，]/)
-    .map((name) => name.trim())
-    .filter((name) => name.startsWith("warning_"));
+  if (match) {
+    return match[1]
+      .split(/[,，]/)
+      .map((name) => name.trim())
+      .filter((name) => name.startsWith("warning_"));
+  }
+  // The engine only names them once a summary is proposed, but the same
+  // list is already visible in the context. Reading it early lets the
+  // fields ride along with the next scripted write instead of costing a
+  // write of their own — and the per-turn write budget is finite.
+  const missing = lastFullContext.missing_required || [];
+  return missing.filter((key) => key.startsWith("warning_"));
 }
 
 /**
@@ -113,7 +145,12 @@ export function nextCommand(body, commands, { abstainPathway = true } = {}) {
   if (commands.length && commands[0] === null) return commands.shift();
 
   const context = readContext(body);
+  const reply = decide(context, commands, { abstainPathway });
+  diag(context, reply);
+  return reply;
+}
 
+function decide(context, commands, { abstainPathway }) {
   const required = requiredQuestion(context);
   if (required) {
     return { tool: "ask_question", arguments: { question_id: required } };
@@ -126,21 +163,39 @@ export function nextCommand(body, commands, { abstainPathway = true } = {}) {
     };
   }
 
+  // A turn only allows so many writes. Answering the triage gate with
+  // another record_facts can spend the last one, and the engine then
+  // refuses to write at all — so stop writing for this turn and take the
+  // route it names: ask, or summarise.
+  if (errorOf(context).includes("写入次数已达上限")) writeBudgetSpent = true;
+  if (writeBudgetSpent) {
+    const next = commands.shift();
+    if (next) return next;
+    return { tool: "review_summary", arguments: {} };
+  }
+
   const warnings = untriedWarningFields(context);
   if (warnings.length) {
     const evidence = denialClause();
     if (evidence) {
-      return {
-        tool: "record_facts",
-        arguments: {
-          facts: warnings.map((key) => ({
-            key,
-            value: null,
-            evidence,
-            assertion: "absent",
-          })),
-        },
-      };
+      const facts = warnings.map((key) => ({
+        key,
+        value: null,
+        evidence,
+        assertion: "absent",
+      }));
+      // Fold them into the next scripted write when there is one. A turn
+      // allows only so many writes; spending an extra one on the triage
+      // fields exhausts the budget and then nothing can be written at all.
+      const head = commands[0];
+      if (head && head.tool === "record_facts") {
+        commands.shift();
+        return {
+          tool: "record_facts",
+          arguments: { facts: [...(head.arguments.facts || []), ...facts] },
+        };
+      }
+      return { tool: "record_facts", arguments: { facts } };
     }
   }
 
