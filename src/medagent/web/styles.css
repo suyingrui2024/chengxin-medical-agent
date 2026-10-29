@@ -6636,9 +6636,17 @@ body.task-focused .surface-actions {
   background: none;
   border: 0;
   cursor: pointer;
-  color: var(--accent);
+  /* --accent is a background tint in every theme (it is used as
+     `background` in seven other rules), so using it as a text colour gave
+     a contrast ratio of 1.32–1.90 — the two welcome-screen entries were
+     effectively invisible. --primary is the text/action colour. */
+  color: var(--primary);
   font-size: 15px;
   padding: 4px 2px;
+}
+.starter-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
 }
 .facts-footnote {
   font-size: 13px;

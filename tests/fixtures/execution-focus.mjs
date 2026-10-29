@@ -1,5 +1,6 @@
 // Synthetic host snapshots for rendering and interaction checks; no model calls.
 import { expect } from "@playwright/test";
+import { setInterfaceMode } from "./interface-mode.mjs";
 const pixel = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
   "base64",
@@ -138,9 +139,7 @@ export async function installExecutionFocusFixture(page) {
   return { first, second, previews: () => previews, answers };
 }
 export async function openFocusWorkspace(page) {
-  if (await page.locator("#mobile-menu").isVisible())
-    await page.locator("#mobile-menu").click();
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   if (await page.locator("#mobile-menu").isVisible())
     await page.locator("#mobile-menu").click();
   await page.getByRole("button", { name: "执行工作台", exact: true }).click();

@@ -38,13 +38,31 @@ async function contrast(page) {
   expect(result).toEqual([]);
 }
 
+/**
+ * Narrow viewports collapse the sidebar behind a menu button, and every
+ * `navigate()` closes it again — so the drawer has to be reopened before
+ * *each* nav click, not once per helper call. Desktop keeps the nav on
+ * screen and this is a no-op.
+ */
+async function openSidebar(page) {
+  const menu = page.locator("#mobile-menu");
+  if (await menu.isVisible()) await menu.click();
+}
+
 async function choose(page, theme) {
   const nav = page.locator('.nav-item[data-view="settings"]');
-  const returnToTask = !(await nav.isVisible());
+  // Task focus hides the transcript and the nav with it — but so does a
+  // collapsed mobile sidebar. Keying off the nav's visibility conflated
+  // the two; the transcript toggle is the direct signal for task focus.
+  const returnToTask = await page
+    .getByRole("button", { name: "展开对话记录" })
+    .isVisible();
   if (returnToTask)
     await page.getByRole("button", { name: "展开对话记录" }).click();
+  await openSidebar(page);
   await nav.click();
   await page.locator(`input[name="appearance"][value="${theme}"]`).check();
+  await openSidebar(page);
   await page.locator('.nav-item[data-view="consultation"]').click();
   if (returnToTask)
     await page.getByRole("button", { name: "返回当前任务" }).click();
@@ -122,7 +140,11 @@ for (const theme of themes) {
       fullPage: true,
     });
 
+    // Task focus hides the nav, so open the transcript first. 界面模式 and
+    // the model-config entry both live inside the settings view now
+    // (8629351 collapsed the settings dialog into a full page).
     await page.getByRole("button", { name: "展开对话记录" }).click();
+    await page.locator('.nav-item[data-view="settings"]').click();
     await page.getByLabel("界面模式").selectOption("developer");
     for (const view of [
       "history",
@@ -134,7 +156,10 @@ for (const theme of themes) {
       await page.locator(`.nav-item[data-view="${view}"]`).click();
       await contrast(page);
     }
-    await page.getByRole("button", { name: "模型与运行配置" }).click();
+    await page.locator('.nav-item[data-view="settings"]').click();
+    await page
+      .getByRole("button", { name: "模型与运行配置", exact: true })
+      .click();
     await contrast(page);
   });
 }
@@ -179,6 +204,7 @@ for (const [width, height] of [
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "ocean");
     const nav = page.locator('.nav-item[data-view="settings"]');
+    await openSidebar(page);
     await nav.click();
     await page.locator('input[value="ocean"]').focus();
     await expect(page.locator('input[value="ocean"]')).toBeFocused();
@@ -196,6 +222,7 @@ for (const [width, height] of [
       };
     });
     expect(overflow).toEqual({ page: false, dialog: false });
+    await openSidebar(page);
     await page.locator('.nav-item[data-view="consultation"]').click();
     await expect(page.locator("#view-consultation")).toBeVisible();
   });
@@ -312,6 +339,9 @@ test("short developer windows can reach all navigation and model settings", asyn
 }) => {
   await page.setViewportSize({ width: 900, height: 648 });
   await page.goto("/");
+  // Both controls moved into the settings view; the dialog itself still
+  // exists behind 打开模型与运行配置.
+  await page.locator('.nav-item[data-view="settings"]').click();
   await page.getByLabel("界面模式").selectOption("developer");
   await page
     .getByRole("button", { name: "模型与运行配置", exact: true })

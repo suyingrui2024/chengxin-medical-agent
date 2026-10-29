@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { setInterfaceMode } from "../fixtures/interface-mode.mjs";
 import { mkdir } from "node:fs/promises";
 
 const shots = "docs/assets/ui";
@@ -97,7 +98,7 @@ test("patient conversation, self-check, history, evidence and export use actual 
     .getByRole("button", { name: "确认摘要并结束本次问诊", exact: true })
     .click();
   await expect(page.locator("#composer")).toBeHidden();
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.getByRole("button", { name: "查看本次运行记录" }).click();
   await expect(
     page.getByRole("heading", { name: "看清每一步，才能继续改进。" }),
@@ -184,7 +185,7 @@ test("unknown result components produce a visible fallback instead of disappeari
   page,
 }) => {
   await page.goto("/");
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.locator('.nav-item[data-view="capabilities"]').click();
   await page.route("**/api/capabilities/preview", async (route) => {
     const response = await route.fetch();
@@ -226,7 +227,7 @@ test("settings are real, keep old sessions, and never return credentials", async
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.getByRole("button", { name: "模型与运行配置" }).click();
   await expect(page.locator("#settings-dialog")).toBeVisible();
   await page.getByRole("radio", { name: /DSH 问诊/ }).check();
@@ -291,7 +292,7 @@ test("task library preview cannot write observations and has step navigation", a
   request,
 }) => {
   await page.goto("/");
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.locator('.nav-item[data-view="tasks"]').click();
   await expect(
     page.getByRole("heading", { name: "用图示，把下一步说清楚。" }),
@@ -330,7 +331,7 @@ test("mobile layout has no horizontal overflow and exposes records and navigatio
     fullPage: true,
   });
   await page.getByRole("button", { name: "打开导航" }).click();
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.getByRole("button", { name: "打开导航" }).click();
   await page.locator('.nav-item[data-view="tasks"]').click();
   await expect(
