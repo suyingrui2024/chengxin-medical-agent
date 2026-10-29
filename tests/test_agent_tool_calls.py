@@ -368,21 +368,19 @@ class PathwayGateTests(unittest.TestCase):
                     )
 
 
-class AssertionEvidenceTests(unittest.TestCase):
-    """Asserting absence from an uncertain answer must not be swallowed.
+class PartialRecordingTests(unittest.TestCase):
+    """Uncertain answers cannot become denials — and the model is told so.
 
-    `assertion-flow` drives exactly this case in the browser: the patient
-    says 「过敏不知道」 and the scripted model answers `absent`. The engine
-    is supposed to refuse it and tell the model to use `unknown/null`.
+    `assertion-flow` drives this in the browser: the patient says 「过敏
+    不知道」 and the scripted model answers `absent`. The engine records the
+    items that passed, hands the rest back with a reason and a repair, and
+    the model retries them as `unknown`.
 
-    Today it does neither. The batch is accepted, nine facts land, and the
-    three uncertain ones vanish — no error, no event, and the next context
-    simply lists them as missing again. The model is never told that what
-    it said was wrong, so it can keep asserting 「无过敏史」 in prose while
-    the record says nothing.
-
-    Kept as an expected failure rather than deleted: the moment the engine
-    starts refusing (the right behaviour), this test turns red and says so.
+    This was briefly filed as a silent-drop defect. It is not: the batch is
+    split, not swallowed. The earlier probe only read `state.facts` and
+    never looked at the verdicts the tool returns, which is exactly the
+    mistake the browser test made when it read `tool_result.error` instead
+    of `tool_result.rejected`.
     """
 
     TEXT = (
@@ -391,10 +389,9 @@ class AssertionEvidenceTests(unittest.TestCase):
         "病史记不清。这次想整理就医记录。"
     )
 
-    @unittest.expectedFailure
-    def test_uncertain_answers_cannot_be_recorded_as_absent(self):
-        from medagent.agent_tools import ProposalError
+    UNCERTAIN = ("allergies", "medications_taken", "relevant_history")
 
+    def record(self, assertion):
         engine = build_engine([])
         state, _ = engine.create_session()
         facts = [
@@ -405,35 +402,47 @@ class AssertionEvidenceTests(unittest.TestCase):
                 "assertion": "present",
             },
             {
-                "key": "allergies",
-                "value": None,
-                "evidence": "过敏不知道",
-                "assertion": "absent",
-            },
-        ]
-        with self.assertRaises(ProposalError):
-            engine._execute(
-                state, {"tool": "record_facts", "arguments": {"facts": facts}}, self.TEXT, "t1"
-            )
-
-    def test_the_same_answers_are_accepted_as_unknown(self):
-        engine = build_engine([])
-        state, _ = engine.create_session()
-        facts = [
-            {
-                "key": "chief_complaint",
-                "value": "手臂不舒服",
-                "evidence": "手臂不舒服",
+                "key": "onset",
+                "value": "昨天",
+                "evidence": "从昨天开始",
                 "assertion": "present",
             },
-            {
-                "key": "allergies",
-                "value": None,
-                "evidence": "过敏不知道",
-                "assertion": "unknown",
-            },
         ]
-        engine._execute(
+        facts += [
+            {"key": key, "value": None, "evidence": "过敏不知道", "assertion": assertion}
+            for key in self.UNCERTAIN
+        ]
+        result = engine._execute(
             state, {"tool": "record_facts", "arguments": {"facts": facts}}, self.TEXT, "t1"
         )
-        self.assertIn("allergies", state.facts)
+        return state, result
+
+    def test_uncertain_denials_come_back_with_guidance(self):
+        _, result = self.record("absent")
+        self.assertFalse(result["ok"])
+        rejected = result["rejected"]
+        self.assertEqual([item["key"] for item in rejected], list(self.UNCERTAIN))
+        for item in rejected:
+            with self.subTest(key=item["key"]):
+                self.assertIn("unknown/null", item["reason"])
+                self.assertIn("unknown", item["guidance"])
+
+    def test_the_uncertain_denials_are_not_recorded(self):
+        state, _ = self.record("absent")
+        for key in self.UNCERTAIN:
+            with self.subTest(key=key):
+                self.assertNotIn(key, state.facts)
+
+    def test_the_clear_facts_still_land(self):
+        # Partial recording, not all-or-nothing: a bad item must not cost
+        # the patient the facts that were fine.
+        state, _ = self.record("absent")
+        self.assertEqual(state.facts["chief_complaint"].value, "手臂不舒服")
+        self.assertEqual(state.facts["onset"].value, "昨天")
+
+    def test_unknown_is_accepted_for_the_same_answers(self):
+        state, result = self.record("unknown")
+        self.assertTrue(result["ok"])
+        for key in self.UNCERTAIN:
+            with self.subTest(key=key):
+                self.assertIn(key, state.facts)

@@ -98,7 +98,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
   const before = await snapshot();
   expect(before.state.facts.medications_taken.value).toBe("用过药物甲");
   expect(before.state.facts.medications_taken.assertion).toBe("present");
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   async function openSource() {
     const provenance = medication().locator(".summary-provenance");
     const toggle = provenance.locator(":scope > summary");
@@ -118,7 +120,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
   }
   await openSource();
   expect((await snapshot()).state.revision).toBe(before.state.revision);
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   await current()
     .locator(".summary-item[data-fact-key='age_years']")
     .getByRole("button", { name: "更正", exact: true })
@@ -133,7 +137,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
   ).toHaveText("40 岁");
   await openSource();
   expect((await snapshot()).state.facts.age_years.value).toBe(40);
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -161,7 +167,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
       .filter((fact) => fact.key === "medications_taken")
       .map((fact) => fact.evidence),
   ).toEqual(["昨晚用过药物甲", "今晚用过药物乙"]);
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   await page
     .getByRole("button", { name: "确认摘要并结束本次问诊", exact: true })
     .click();

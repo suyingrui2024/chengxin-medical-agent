@@ -35,6 +35,7 @@
  */
 let lastFullContext = {};
 let writeBudgetSpent = false;
+let summaryPending = false;
 
 function readContext(body) {
   const last = [...(body.messages || [])]
@@ -49,6 +50,7 @@ function readContext(body) {
   if (parsed.latest_user_text) {
     if (parsed.latest_user_text !== lastFullContext.latest_user_text) {
       writeBudgetSpent = false;
+      summaryPending = false;
     }
     lastFullContext = parsed;
   }
@@ -184,6 +186,10 @@ function decide(context, commands, { abstainPathway }) {
         evidence,
         assertion: "absent",
       }));
+      // The script's summary was already refused for these fields, so
+      // nothing is left in the queue to ask again. Remember to re-issue it
+      // once they land.
+      summaryPending = true;
       // Fold them into the next scripted write when there is one. A turn
       // allows only so many writes; spending an extra one on the triage
       // fields exhausts the budget and then nothing can be written at all.
@@ -197,6 +203,11 @@ function decide(context, commands, { abstainPathway }) {
       }
       return { tool: "record_facts", arguments: { facts } };
     }
+  }
+
+  if (summaryPending && !errorOf(context)) {
+    summaryPending = false;
+    return { tool: "review_summary", arguments: {} };
   }
 
   return commands.shift();

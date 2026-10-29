@@ -97,7 +97,20 @@ export async function verifyAssertionFlow(page, model) {
   expect(model.requests).toHaveLength(3);
   const observed = JSON.parse(model.requests[1].messages.at(-1).content);
   expect(observed.tool_result.ok).toBe(false);
-  expect(observed.tool_result.error).toContain("unknown/null");
+  // Partial recording returns the per-item verdicts rather than one error
+  // string: the batch lands what passed and hands the rest back with a
+  // reason and a repair. Reading `error` here silently became `undefined`
+  // when that shape changed.
+  const rejected = observed.tool_result.rejected || [];
+  expect(rejected.map((item) => item.key)).toEqual([
+    "allergies",
+    "medications_taken",
+    "relevant_history",
+  ]);
+  for (const item of rejected) {
+    expect(item.reason).toContain("unknown/null");
+    expect(item.guidance).toContain("unknown");
+  }
   const snapshot = () =>
     page.evaluate(
       async (sessionId) =>
@@ -112,7 +125,10 @@ export async function verifyAssertionFlow(page, model) {
       1,
     );
   }
-  expect(data.state.history).toHaveLength(12);
+  // Twelve scripted facts plus the three triage fields the engine requires
+  // before a summary. The patient denied red flags, so those three are
+  // recorded absent against that same sentence.
+  expect(data.state.history).toHaveLength(15);
   expect(data.state.facts.age_years.value).toBe(32);
   expect(data.state.facts.associated_symptoms.assertion).toBe("absent");
 
