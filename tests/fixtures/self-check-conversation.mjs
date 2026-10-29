@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { nextCommand } from "./model-feedback.mjs";
 import { once } from "node:events";
 import { expect } from "@playwright/test";
 
@@ -35,8 +36,9 @@ export async function createSelfCheckConversationModel(option = "head") {
   const server = createServer(async (request, response) => {
     let raw = "";
     for await (const chunk of request) raw += chunk;
-    requests.push(JSON.parse(raw));
-    const command = commands.shift();
+    const body = JSON.parse(raw);
+    requests.push(body);
+    const command = nextCommand(body, commands);
     response.writeHead(command ? 200 : 500, {
       "Content-Type": "application/json",
     });
@@ -197,6 +199,10 @@ export async function verifySelfCheckConversation(
     window.oldConversationConfirm.click();
   });
   expect((await snapshot()).events).toEqual(after.events);
-  expect(model.requests).toHaveLength(6);
+  // Six scripted turns plus two compliance retries: the engine rejects a
+  // proposal that breaks question ordering or leaves a triage field
+  // unattempted, and nextCommand answers it without advancing the script.
+  // The count still catches a runaway loop.
+  expect(model.requests).toHaveLength(8);
   expect(errors).toEqual([]);
 }

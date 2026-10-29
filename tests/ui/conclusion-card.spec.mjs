@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createServer } from "node:http";
+import { nextCommand } from "../fixtures/model-feedback.mjs";
 import { once } from "node:events";
 
 // Conclusion card P1 regressions: the narrative block (framing /
@@ -46,7 +47,7 @@ async function createScriptedModel() {
   const server = createServer(async (request, response) => {
     let raw = "";
     for await (const chunk of request) raw += chunk;
-    const command = commands.shift() || {
+    const command = nextCommand(JSON.parse(raw), commands) || {
       tool: "review_summary",
       arguments: {},
     };

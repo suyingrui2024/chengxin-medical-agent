@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { createServer } from "node:http";
+import { nextCommand } from "./model-feedback.mjs";
 import { once } from "node:events";
 
 const input =
@@ -36,8 +37,9 @@ export async function createAssertionModel() {
   const server = createServer(async (request, response) => {
     let raw = "";
     for await (const chunk of request) raw += chunk;
-    requests.push(JSON.parse(raw));
-    const command = commands.shift();
+    const body = JSON.parse(raw);
+    requests.push(body);
+    const command = nextCommand(body, commands);
     if (!command) {
       response.writeHead(500);
       response.end("Unexpected fixture call");

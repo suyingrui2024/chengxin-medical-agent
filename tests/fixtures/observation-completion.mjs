@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { nextCommand } from "./model-feedback.mjs";
 import { once } from "node:events";
 import { expect } from "@playwright/test";
 import { degreeSnapshot } from "./visual-answer-drafts.mjs";
@@ -53,8 +54,9 @@ export async function createObservationCompletionModel() {
   const server = createServer(async (request, response) => {
     let raw = "";
     for await (const chunk of request) raw += chunk;
-    requests.push(JSON.parse(raw));
-    const command = commands.shift();
+    const body = JSON.parse(raw);
+    requests.push(body);
+    const command = nextCommand(body, commands);
     response.writeHead(command ? 200 : command === null ? 503 : 500, {
       "Content-Type": "application/json",
     });

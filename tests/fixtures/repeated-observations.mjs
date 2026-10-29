@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { once } from "node:events";
 import { expect } from "@playwright/test";
+import { nextCommand } from "./model-feedback.mjs";
 
 // Sex is stated up front on purpose. The engine orders questions by
 // hypothesis (d1568d6), and with sex unknown it ranks `sex` above
@@ -19,23 +20,6 @@ const fact = (key, value, evidence, assertion = "present") => ({
   assertion,
 });
 const command = (tool, args = {}) => ({ tool, arguments: args });
-
-/** The question the engine says must be asked first, if it said so. */
-function requiredQuestion(body) {
-  const last = [...(body.messages || [])]
-    .reverse()
-    .find((message) => message.role === "user");
-  let parsed;
-  try {
-    parsed = JSON.parse(last?.content ?? "");
-  } catch {
-    return null;
-  }
-  const error = parsed?.tool_result?.error;
-  if (typeof error !== "string") return null;
-  const match = error.match(/应先问\s*([a-z_]+)/);
-  return match ? match[1] : null;
-}
 
 export async function createRepeatedObservationModel(extraCommands = []) {
   const requests = [];
@@ -78,17 +62,10 @@ export async function createRepeatedObservationModel(extraCommands = []) {
     const body = JSON.parse(raw);
     requests.push(body);
     // The engine's ordering check rejects a proposal and names the
-    // question it wants first. Comply with that instead of advancing the
-    // script: a fixed queue that ignores the feedback shifts by one and
-    // every later command then answers the wrong turn.
-    //
-    // The context lists `questions` in content order, not in the
-    // ranker's order, so the script cannot predict the preference — this
-    // retry is the only way to follow it.
-    const required = requiredQuestion(body);
-    const next = required
-      ? command("ask_question", { question_id: required })
-      : commands.shift();
+    // question it wants first; nextCommand obeys that without advancing
+    // the script. The context lists `questions` in content order, not in
+    // the ranker's order, so the script cannot predict the preference.
+    const next = nextCommand(body, commands);
     response.writeHead(next ? 200 : 500, {
       "Content-Type": "application/json",
     });
