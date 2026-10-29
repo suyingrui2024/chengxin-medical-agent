@@ -356,7 +356,11 @@ export async function verifyLocationAnswers(
     window.oldDetailConfirm.click();
   });
   expect((await degreeSnapshot(page, id)).events).toEqual(after.events);
-  expect(model.requests).toHaveLength(model.prefill ? 5 : 4);
+  // One more call than scripted turns: the engine rejects a proposal that
+  // breaks question ordering or leaves a triage field unattempted, and
+  // nextCommand answers it without advancing the script. Still exact, so a
+  // runaway loop is caught.
+  expect(model.requests).toHaveLength(model.prefill ? 6 : 5);
   expect(errors).toEqual([]);
   return { sessionId: id, result, snapshot: after };
 }

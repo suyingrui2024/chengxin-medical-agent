@@ -87,6 +87,8 @@ export async function verifyLocationRevision(page, model, { shot } = {}) {
   expect(
     final.state.history.filter((f) => f.key === "symptom_location"),
   ).toHaveLength(2);
-  expect(model.requests).toHaveLength(4);
+  // One more call than scripted turns: the engine rejected a proposal and
+  // nextCommand answered it without advancing the script.
+  expect(model.requests).toHaveLength(5);
   await expect(input).toHaveValue("这段用药补充还没有发送。");
 }
