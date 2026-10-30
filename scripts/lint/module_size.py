@@ -46,7 +46,9 @@ SKIP_DIRS = {
 # path (relative to repo root) -> current line count.  Existing debt only.
 # Remove an entry once the file has been split below THRESHOLD.
 BASELINE: dict[str, int] = {
-    # Frontend god-files — scheduled for P2 (cards/controller split).
+    # The frontend entry module: 132 top-level declarations sharing mutable
+    # state with bidirectional feature dependencies. Splitting it needs a shared
+    # runtime object (ES modules cannot assign to imported `let`s).
     "src/medagent/web/app.js": 3613,
 }
 
