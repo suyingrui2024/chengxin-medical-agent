@@ -102,7 +102,7 @@ def sheet_with_workspace(state, hyp):
             return workspace
 
     with mock.patch.object(
-        conclusion_module, "RuleBasedProposer", StubProposer
+        conclusion_module.adjustments, "RuleBasedProposer", StubProposer
     ):
         sheet = compose_conclusion(state)
     assert sheet is not None

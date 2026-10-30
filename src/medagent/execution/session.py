@@ -1,170 +1,5 @@
-"""Owned full-DSH workspaces. Clinical engines never receive these host tools."""
-from __future__ import annotations
-
-from collections import deque
-import hashlib
-import json
-from .platform_fs import os, fcntl
-from pathlib import Path, PurePosixPath
-import select
-import shutil
-import signal
-import stat
-import subprocess
-import sys
-import threading
-import time
-from uuid import uuid4
-from urllib.parse import urlsplit
-
-from .env_config import for_backend
-from .execution_capabilities import freeze_binding, validate_receipt
-from .execution_observations import ACTIVE_JOB_STATES, validate_observation
-from .execution_limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
-from .execution_changes import ChangeTracker
-from .execution_identity import encode_identity
-from .execution_clarifications import (
-    validate_clarification,
-    ACTIVE_CLARIFICATION_STATES,
-)
-from .execution_projects import project_path as validate_project_path
-from .execution_files import directory_page, DirectoryChanged
-from .execution_artifacts import (
-    projection as artifact_projection,
-    read_limit,
-    IMAGE_LIMIT,
-)
-from .execution_store import (
-    WorkspaceStore,
-    WorkspaceStoreError,
-    WorkspaceOccupied,
-    FORMAT,
-    DSH_VERSION,
-)
-
-
-class ExecutionError(ValueError):
-    pass
-
-
-class ExecutionBusy(ExecutionError):
-    pass
-
-
-def route_identity(settings):
-    endpoint = settings["MEDAGENT_LLM_BASE_URL"].rstrip("/")
-    try:
-        parsed = urlsplit(endpoint)
-        if (
-            parsed.scheme not in {"https", "http"}
-            or not parsed.hostname
-            or parsed.username
-            or parsed.password
-            or parsed.query
-            or parsed.fragment
-        ):
-            raise ValueError()
-    except ValueError:
-        raise ExecutionError("模型服务地址无效") from None
-    return (
-        hashlib.sha256(
-            json.dumps(
-                [endpoint, settings["MEDAGENT_LLM_MODEL"]], ensure_ascii=False
-            ).encode()
-        ).hexdigest(),
-        parsed.hostname,
-    )
-
-
-def scrub(text, secret):
-    return text.replace(secret, "[REDACTED]") if secret else text
-
-
-def open_workspace_directory(root, identity=None):
-    """Refuse missing, linked or replaced workspace roots before reading data."""
-    directory = None
-    try:
-        directory = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-        info = os.fstat(directory)
-        if identity is not None and (info.st_dev, info.st_ino) != identity:
-            raise ExecutionError("工作目录已被替换，请恢复原目录或新建工作区")
-        return directory
-    except (OSError, ExecutionError):
-        if directory is not None:
-            os.close(directory)
-        raise ExecutionError("工作目录不存在、已被替换或不可读取；请恢复原目录或新建工作区") from None
-
-
-def file_revision(info):
-    return f"{info.st_size}:{info.st_mtime_ns}:{info.st_ctime_ns}"
-
-
-def safe_bytes(root: Path, relative: str, limit=128_000, root_identity=None):
-    """Open every component relative to an owned directory fd, never a symlink."""
-    if not isinstance(relative, str):
-        raise ExecutionError("文件路径无效")
-    try:
-        relative.encode("utf-8")
-    except UnicodeEncodeError:
-        raise ExecutionError("文件名称须为有效UTF-8") from None
-    path = PurePosixPath(relative)
-    if (
-        not relative
-        or path.is_absolute()
-        or any(p in {"..", ".", ""} for p in relative.split("/"))
-        or "\\" in relative
-    ):
-        raise ExecutionError("文件路径无效")
-    directory = open_workspace_directory(root, root_identity)
-    try:
-        for component in path.parts[:-1]:
-            child = os.open(
-                component,
-                os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                dir_fd=directory,
-            )
-            os.close(directory)
-            directory = child
-        fd = os.open(
-            path.parts[-1],
-            os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
-            dir_fd=directory,
-        )
-        try:
-            info = os.fstat(fd)
-            if not stat.S_ISREG(info.st_mode):
-                raise ExecutionError("仅允许读取工作区普通文件")
-            if info.st_size > limit:
-                raise ExecutionError("文件过大，请在本机工作目录查看")
-            chunks, count = [], 0
-            while count <= limit:
-                chunk = os.read(fd, min(64 * 1024, limit + 1 - count))
-                if not chunk:
-                    break
-                chunks.append(chunk)
-                count += len(chunk)
-            data = b"".join(chunks)
-            after = os.fstat(fd)
-            if file_revision(after) != file_revision(info):
-                raise ExecutionError("文件读取期间发生变化，请重新读取")
-        finally:
-            os.close(fd)
-    except OSError:
-        raise ExecutionError("文件不存在、为链接或不可读取") from None
-    finally:
-        os.close(directory)
-    if len(data) > limit:
-        raise ExecutionError("文件过大，请在本机工作目录查看")
-    return data, file_revision(info)
-
-
-def safe_file(root: Path, relative: str, limit=128_000, root_identity=None):
-    data, _ = safe_bytes(root, relative, limit, root_identity)
-    try:
-        text = data.decode("utf-8")
-    except UnicodeDecodeError:
-        raise ExecutionError("当前预览支持 UTF-8 文本文件") from None
-    return {"path": relative, "text": text, "size": len(data)}
+"""Owned full-DSH workspace session."""
+from ._preamble import *  # noqa: F401,F403
 
 
 class ExecutionSession:
@@ -701,7 +536,7 @@ class ExecutionSession:
             ):
                 environment[key] = value
         environment["NO_PROXY"] = "127.0.0.1,localhost,::1"
-        from .processes import popen
+        from ..processes import popen
         self.process = popen(
             [
                 shutil.which("node"),
@@ -1026,20 +861,20 @@ class ExecutionSession:
                     process.wait(timeout=6)
                 except subprocess.TimeoutExpired:
                     if os.name == "nt":
-                        from .processes import terminate
+                        from ..processes import terminate
                         terminate(process)
                     else:
                         os.killpg(process.pid, signal.SIGTERM)
                     try:
                         process.wait(timeout=3)
                     except subprocess.TimeoutExpired:
-                        from .processes import terminate
+                        from ..processes import terminate
                         terminate(process)
                         process.wait(timeout=3)
         except (OSError, ProcessLookupError):
             pass
         finally:
-            from .processes import release
+            from ..processes import release
             release(process)
             if process.stdin and not process.stdin.closed:
                 process.stdin.close()
@@ -1315,166 +1150,4 @@ class ExecutionSession:
             }
 
 
-class ExecutionManager:
-    def __init__(self, root=None, source_root=None):
-        self.source_root = Path(source_root or Path(__file__).resolve().parents[2])
-        self.root = Path(
-            root
-            or os.environ.get(
-                "MEDAGENT_EXECUTION_ROOT", str(self.source_root / "workspaces")
-            )
-        ).resolve()
-        self.sessions = {}
-        self.lock = threading.RLock()
-        self.closed = False
-        self.store = WorkspaceStore(self.root)
-
-    def create(self, settings, registry=None, *, project_path=None):
-        if not all(
-            isinstance(settings.get(key), str) and settings[key]
-            for key in (
-                "MEDAGENT_LLM_BASE_URL",
-                "MEDAGENT_LLM_API_KEY",
-                "MEDAGENT_LLM_MODEL",
-            )
-        ):
-            raise ExecutionError("请先在模型配置中填写服务地址、模型和密钥；默认离线演示不会调用模型")
-        config = for_backend(settings, "dsh")
-        route_identity(config)
-        with self.lock:
-            if self.closed:
-                raise ExecutionError("执行工作台正在关闭")
-            if len(self.sessions) >= 20:
-                raise ExecutionError("本进程最多保留 20 个执行工作区")
-            identifier = str(uuid4())
-            lease = None
-            try:
-                lease = self.store.acquire(identifier)
-                session = ExecutionSession(
-                    identifier,
-                    self.root,
-                    self.source_root,
-                    config,
-                    store=self.store,
-                    lease=lease,
-                    capability_binding=freeze_binding(registry),
-                    project_path=project_path,
-                )
-                session.persist(strict=True)
-            except Exception as exc:
-                if lease is not None:
-                    os.close(lease)
-                if "session" in locals():
-                    session.lease = None
-                    session.store = None
-                    session.close()
-                if isinstance(exc, WorkspaceOccupied):
-                    raise ExecutionBusy(str(exc)) from None
-                raise
-            self.sessions[identifier] = session
-            return session
-
-    def attach_project(self, directory, settings, registry=None):
-        """Trusted host entry point. HTTP cannot supply a filesystem path."""
-        directory = validate_project_path(directory, self.root, self.source_root)
-        with self.lock:
-            if self.closed:
-                raise ExecutionError("执行工作台正在关闭")
-            for session in self.sessions.values():
-                if session.project_path is not None and session.directory == directory:
-                    with session.lock:
-                        os.close(
-                            open_workspace_directory(
-                                directory, session.directory_identity
-                            )
-                        )
-                        session.bind(settings)
-                    return session
-            for saved in self.store.catalog():
-                if saved.get("project_path") == str(directory):
-                    return self.open(saved["id"], settings)
-            return self.create(settings, registry, project_path=str(directory))
-
-    def open(self, identity, settings):
-        with self.lock:
-            if self.closed:
-                raise ExecutionError("执行工作台正在关闭")
-            if identity in self.sessions:
-                with self.sessions[identity].lock:
-                    self.sessions[identity].bind(settings)
-                return self.sessions[identity]
-            if len(self.sessions) >= 20:
-                raise ExecutionError("本进程最多打开20个工作区，请重启后再打开其他工作区")
-            config = dict(settings)
-            lease = None
-            try:
-                record = self.store.read(identity)
-                lease = self.store.acquire(identity)
-                record = self.store.read(identity)
-                session = ExecutionSession(
-                    identity,
-                    self.root,
-                    self.source_root,
-                    config,
-                    reopened=True,
-                    store=self.store,
-                    lease=lease,
-                    record=record,
-                )
-                session.persist(strict=True)
-            except WorkspaceOccupied as exc:
-                if lease is not None:
-                    os.close(lease)
-                raise ExecutionBusy(str(exc)) from None
-            except (WorkspaceStoreError, OSError) as exc:
-                if lease is not None:
-                    os.close(lease)
-                raise ExecutionError("工作区记录或目录不可读取，未创建替代会话") from None
-            except Exception:
-                if lease is not None:
-                    os.close(lease)
-                if "session" in locals():
-                    session.lease = None
-                    session.store = None
-                    session.close()
-                raise
-            self.sessions[identity] = session
-            return session
-
-    def catalog(self):
-        with self.lock:
-            try:
-                saved = {r["id"]: r for r in self.store.catalog()}
-            except (WorkspaceStoreError, OSError):
-                raise ExecutionError("工作区记录目录不可读取") from None
-            for session in self.sessions.values():
-                with session.lock:
-                    saved[session.id] = session.summary()
-            return sorted(saved.values(), key=lambda r: r["updated_at"], reverse=True)
-
-    def get(self, identifier):
-        with self.lock:
-            if identifier not in self.sessions:
-                raise ExecutionError("执行工作区不存在")
-            return self.sessions[identifier]
-
-    def release(self, identifier):
-        with self.lock:
-            session = self.get(identifier)
-            with session.lock:
-                if (
-                    session.status in {"starting", "running", "cancelling"}
-                    or session.has_pending_clarification()
-                    or any(j["status"] in ACTIVE_JOB_STATES for j in session.jobs)
-                    or bool(session.agents)
-                ):
-                    raise ExecutionBusy("请先停止当前任务和后台工作，再关闭工作区")
-            session.close()
-            self.sessions.pop(identifier)
-
-    def close(self):
-        with self.lock:
-            self.closed = True
-            sessions = list(self.sessions.values())
-        for session in sessions:
-            session.close()
+__all__ = ["ExecutionSession"]

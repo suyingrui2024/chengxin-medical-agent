@@ -269,7 +269,7 @@ class ServerHardeningTests(unittest.TestCase):
         original = self.server.enricher
         self.server.enricher = BareEnricher()
         try:
-            with patch("medagent.server.education_module") as module:
+            with patch("medagent.server.consultation.education_module") as module:
                 module.needs_enrichment = None
                 status, payload = self.request(f"/api/sessions/{session_id}/snapshot")
             self.assertEqual(status, 200)

@@ -358,10 +358,10 @@ class OralRoutingTests(unittest.TestCase):
 
             with (
                 mock.patch.object(
-                    conclusion_module, "RuleBasedProposer", StubProposer
+                    conclusion_module.adjustments, "RuleBasedProposer", StubProposer
                 ),
                 mock.patch.object(
-                    conclusion_module, "_self_care_group", stub_group
+                    conclusion_module.adjustments, "_self_care_group", stub_group
                 ),
             ):
                 sheet = compose_conclusion(state)
