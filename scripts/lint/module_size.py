@@ -48,7 +48,6 @@ SKIP_DIRS = {
 BASELINE: dict[str, int] = {
     # Frontend god-files — scheduled for P2 (cards/controller split).
     "src/medagent/web/app.js": 3613,
-    "src/medagent/web/patient-records-ui.js": 2154,
 }
 
 
