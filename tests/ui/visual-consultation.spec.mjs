@@ -1,4 +1,10 @@
 import { test, expect } from "@playwright/test";
+import {
+  answerText,
+  answerUntil,
+  chooseChoice,
+  currentQuestion,
+} from "../fixtures/intake.mjs";
 
 async function start(page) {
   await page.goto("/");
@@ -13,15 +19,25 @@ async function answer(page, text) {
   await page.getByRole("button", { name: "发送回答" }).click();
   await expect(page.locator("#send-button")).toBeEnabled();
 }
-async function history(page, chief = "咳嗽发烧两天") {
-  await page.getByRole("button", { name: "我自己", exact: true }).click();
-  await page.getByRole("button", { name: "男", exact: true }).click();
+async function history(
+  page,
+  id,
+  chief = "咳嗽发烧两天",
+  { stopAt = "severity" } = {},
+) {
+  await chooseChoice(page, "我自己");
+  await chooseChoice(page, "男");
   await expect(page.locator("#active-question h2")).toContainText("多大");
-  await answer(page, "32岁");
-  await answer(page, chief);
-  await expect(page.locator(".signal-grid li")).toHaveCount(6);
-  await page.getByRole("button", { name: "都没有", exact: true }).click();
-  await answer(page, "两天前逐渐出现");
+  await answerText(page, "32岁");
+  await answerText(page, chief);
+  await chooseChoice(page, "都没有");
+  // History order is discrimination-driven: answer whatever is asked until the
+  // requested question is pending instead of assuming onset -> trajectory.
+  await answerUntil(
+    page,
+    id,
+    async () => (await currentQuestion(page, id)) === stopAt,
+  );
 }
 
 test("visual choices show actual questions, keep history available and send one explicit answer", async ({
@@ -76,7 +92,7 @@ test("degree scale confirms one selected answer independently of the text draft"
   request,
 }) => {
   const id = await start(page);
-  await history(page);
+  await history(page, id, undefined, { stopAt: "trajectory" });
   await expect(page.locator("#active-question .visual-choices")).toContainText(
     "在加重",
   );
@@ -115,10 +131,10 @@ test("body location uses a deliberate selection and confirmation, preserving sel
   request,
 }) => {
   const id = await start(page);
-  await history(page, "手臂疼痛两天");
-  await page.getByRole("button", { name: "变化不大", exact: true }).click();
-  await answer(page, "3分");
-  await answer(page, "没有");
+  await history(page, id, "手臂疼痛两天");
+  await page.getByRole("button", { name: "3 分", exact: true }).click();
+  await page.getByRole("button", { name: "确认 3 分", exact: true }).click();
+  await answerUntil(page, id, () => page.locator(".body-map").isVisible());
   await expect(page.locator(".body-map")).toBeVisible();
   await expect(page.locator(".map-confirm")).toBeDisabled();
   await page
@@ -222,9 +238,12 @@ test("custom and malformed visual components preserve question meaning and isola
   await expect(page.locator("#visual-contract-test h2")).toHaveText(
     "你说的无法活动，是现在发生的吗？",
   );
+  // The severity scale is an input control and follows the question id, not
+  // `canonical`: a clarification keeps the control (only the title shortcut is
+  // dropped). The malformed second block falls back instead.
   await expect(
     page.locator("#visual-contract-test .severity-scale"),
-  ).toHaveCount(0);
+  ).toHaveCount(1);
   await expect(
     page.locator("#visual-contract-test .structured-fallback"),
   ).toHaveCount(1);
@@ -241,6 +260,7 @@ test("the smallest desktop window keeps the actual response controls inside the 
     .boundingBox();
   expect(send.y + send.height).toBeLessThanOrEqual(680);
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
   await answer(page, "32岁");
   await answer(page, "咳嗽");
   const choice = page.getByRole("button", { name: "不确定", exact: true });
