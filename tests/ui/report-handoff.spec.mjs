@@ -14,6 +14,7 @@ test("pasted report rows require patient confirmation before appearing in the ha
   );
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const sessionId = (await (await created).json()).session_id;
+  await page.getByRole("button", { name: "我自己", exact: true }).click();
 
   await page.getByRole("button", { name: "添加报告内容", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "核对报告内容" });
