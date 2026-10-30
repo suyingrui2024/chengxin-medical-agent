@@ -52,6 +52,13 @@ test("pasted report rows require patient confirmation before appearing in the ha
   await handoff.getByRole("button", { name: "关闭交接摘要" }).click();
 
   page.once("dialog", (dialogEvent) => dialogEvent.accept());
+  // The report summary lives in the facts drawer, which starts closed.
+  if (
+    !(await page
+      .locator("#facts-panel")
+      .evaluate((n) => n.classList.contains("open")))
+  )
+    await page.locator("#toggle-facts").click();
   await page
     .locator("#report-items-summary")
     .getByRole("button", { name: "移除" })
