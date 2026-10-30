@@ -293,7 +293,7 @@ export function installTask(register, taskProgress) {
       figure.append(image, caption);
       if (data.id !== "body_location" || context.preview) {
         const viewer = el("dialog", "illustration-dialog");
-        const viewerId = `illustration-title-${++illustrationSequence}`;
+        const viewerId = `illustration-title-${++illustrationSequence.value}`;
         const heading = el("h2");
         heading.id = viewerId;
         viewer.setAttribute("aria-labelledby", viewerId);

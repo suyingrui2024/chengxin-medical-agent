@@ -22,7 +22,7 @@ export {
   renderLocationChips,
 };
 export const UI_VERSION = "medical-ui/v1";
-export let illustrationSequence = 0;
+export const illustrationSequence = { value: 0 };
 // Compact captions only apply to this exact, repository-owned instruction set.
 // Other capability versions retain their complete supplied instructions.
 export const temperatureGuide = [
