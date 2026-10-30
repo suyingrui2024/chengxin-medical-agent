@@ -56,7 +56,7 @@ export async function verifyMeasurementSupplements(
     "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。",
   );
   await expect(current().locator(".observation-value")).toHaveText("38.25 ℃");
-  expect(model.requests).toHaveLength(4);
+  expect(model.requests).toHaveLength(5);
   await current()
     .getByRole("button", { name: "再测一次", exact: true })
     .click();

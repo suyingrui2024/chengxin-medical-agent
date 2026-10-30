@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { nextCommand } from "./model-feedback.mjs";
+import { nextCommand, outage } from "./model-feedback.mjs";
 import { once } from "node:events";
 import { expect } from "@playwright/test";
 import { degreeSnapshot } from "./visual-answer-drafts.mjs";
@@ -47,7 +47,7 @@ export async function createObservationCompletionModel() {
         evidence: "右太阳穴附近疼",
       },
     },
-    null,
+    ...outage(),
     { tool: "ask_question", arguments: { question_id: "onset" } },
   ];
   const requests = [];
@@ -174,7 +174,7 @@ export async function verifyObservationCompletion(page, model, { shot } = {}) {
   const failed = await degreeSnapshot(page, id);
   const result = failed.state.facts.symptom_location;
   expect(result.value).toBe("头/面部");
-  const firstContext = JSON.parse(model.requests[5].messages[1].content);
+  const firstContext = JSON.parse(model.requests.at(-2).messages[1].content);
   expect(firstContext.observation_completion.fact_id).toBe(result.fact_id);
   expect(firstContext.observation_completion.result_is_current).toBe(true);
   expect(firstContext.latest_user_text).toBe(text);
@@ -187,7 +187,7 @@ export async function verifyObservationCompletion(page, model, { shot } = {}) {
   expect(completed.state.facts.symptom_location.evidence).toBe(
     "右太阳穴附近疼",
   );
-  const retriedContext = JSON.parse(model.requests[6].messages[1].content);
+  const retriedContext = JSON.parse(model.requests.at(-1).messages[1].content);
   expect(retriedContext.observation_completion).toEqual(
     firstContext.observation_completion,
   );
@@ -200,6 +200,6 @@ export async function verifyObservationCompletion(page, model, { shot } = {}) {
     ),
   ).toHaveLength(1);
   await expect(input).toHaveValue(draft);
-  expect(model.requests).toHaveLength(7);
+  expect(model.requests).toHaveLength(9);
   expect(errors).toEqual([]);
 }
