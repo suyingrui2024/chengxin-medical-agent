@@ -93,9 +93,9 @@ test("glucose renderer rejects missing basis and unsafe links while preserving l
     .click();
   // The injected link is appended last; the capability may carry its own
   // references (units now cites the SI Brochure).
-  await expect(target.locator(".calculation-references a").last()).toContainText(
-    "原文标题",
-  );
+  await expect(
+    target.locator(".calculation-references a").last(),
+  ).toContainText("原文标题");
   await expect(target.locator('img[src="x"]')).toHaveCount(0);
 });
 
