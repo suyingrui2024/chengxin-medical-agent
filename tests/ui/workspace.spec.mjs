@@ -23,6 +23,8 @@ test("patient conversation, self-check, history, evidence and export use actual 
   });
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   const input = page.getByRole("textbox", { name: "输入你的描述" });
   async function answer(text) {
     await input.fill(text);
@@ -368,6 +370,8 @@ test("editing a fact updates the actual case and retains the previous value", as
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await page.getByRole("textbox", { name: "输入你的描述" }).fill("32岁");
   await page.getByRole("button", { name: "发送回答" }).click();
   const age = page.locator(".fact-row").filter({ hasText: "年龄" });
@@ -403,6 +407,8 @@ test("a stale fact editor preserves the draft and refreshes the current record",
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const { session_id: id } = await (await created).json();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await page.getByRole("textbox", { name: "输入你的描述" }).fill("32岁");
   await page.getByRole("button", { name: "发送回答" }).click();
   await expect(page.locator("#busy-indicator")).toBeHidden();
@@ -450,6 +456,8 @@ test("changing the consultation subject opens a separate case and retains the or
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const { session_id: originalId } = await (await created).json();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   const subject = page.locator(".fact-row").filter({ hasText: "咨询对象" });
   await subject.getByRole("button", { name: "更正", exact: true }).click();
   await expect(page.locator("#edit-hint")).toContainText("本次咨询对象已固定");
@@ -476,6 +484,8 @@ test("a lost response recovers persisted progress and patient markup stays plain
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   const input = page.getByRole("textbox", { name: "输入你的描述" });
   await input.fill("32岁");
   await page.getByRole("button", { name: "发送回答" }).click();

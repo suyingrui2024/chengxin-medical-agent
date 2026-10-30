@@ -15,6 +15,8 @@ async function answer(page, text) {
 }
 async function history(page, chief = "咳嗽发烧两天") {
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await answer(page, "32岁");
   await answer(page, chief);
   await expect(page.locator(".signal-grid li")).toHaveCount(6);
@@ -37,9 +39,14 @@ test("visual choices show actual questions, keep history available and send one 
   await page.getByRole("button", { name: "我自己", exact: true }).focus();
   await page.keyboard.press("Enter");
   expect((await chosen).postDataJSON().choice_value).toBe("self");
-  await expect(page.locator("#active-question h2")).toHaveText("患者多大了？");
+  // Opening order is consult_for -> sex -> age.
+  await expect(page.locator("#active-question h2")).toHaveText(
+    "请问是男是女？",
+  );
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await page.getByRole("button", { name: "展开对话记录" }).click();
-  await expect(page.locator(".message.user").last()).toHaveText("你我自己");
+  await expect(page.locator(".message.user").last()).toHaveText("你男");
   await page.getByRole("button", { name: "返回当前问题" }).click();
   await answer(page, "不清楚");
   await expect(page.locator("#active-question h2")).toContainText(
@@ -138,6 +145,8 @@ test("mobile visual screen and degree scale stay readable without overlapping ta
   await page.setViewportSize({ width: 390, height: 844 });
   await start(page);
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await answer(page, "32岁");
   await answer(page, "咳嗽");
   await expect(page.locator(".signal-grid li")).toHaveCount(6);
