@@ -1,0 +1,656 @@
+/* 08-settings-and-late-refinements.css — Settings view, late visual refinements and formula/scale forms. */
+.connection-alert .status-dot {
+  background: var(--red);
+}
+.sidebar-bottom .backend-pill {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  margin-bottom: 8px;
+}
+
+/* Flex children of the panel must be allowed to shrink below content
+   height on short screens; otherwise the question spills over the page
+   footnote and blocks clicks (CI patient-reflow regression). */
+.conversation-panel > #active-question,
+.conversation-panel > #active-task,
+.conversation-panel > #active-observation {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   Full-bleed consultation surface
+   (design: docs/问诊页去横条与全幅工作面方案.md)
+   The consultation view is one white surface edge to edge:
+   no heading strip in session, no footnote; the two heading
+   actions float at the surface's top-right; content keeps a
+   centered reading measure; focused questions center vertically.
+   ============================================================ */
+main:has(#view-consultation:not([hidden])) {
+  padding: 0;
+}
+main:has(#view-consultation:not([hidden])) #connection-alert {
+  margin: 14px 18px 0;
+}
+#view-consultation {
+  background: var(--surface);
+}
+#view-consultation .consult-grid {
+  max-width: none;
+  margin: 0;
+}
+#view-consultation .page-heading {
+  padding: 30px 34px 4px;
+}
+.has-session #view-consultation .page-heading {
+  display: none;
+}
+.conversation-panel {
+  position: relative;
+}
+.surface-actions {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+body.task-focused .surface-actions {
+  display: none;
+}
+.hero-note {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.conversation-scroll .messages {
+  max-width: 880px;
+  margin-inline: auto;
+  width: 100%;
+}
+#active-question {
+  display: flex;
+  flex-direction: column;
+}
+#active-question > :only-child {
+  margin-block: auto;
+  width: 100%;
+}
+.task-focus-bar {
+  padding: 10px 18px 0;
+  justify-content: flex-start;
+  gap: 14px;
+}
+.conversation-footer > * {
+  max-width: 812px;
+  margin-inline: auto;
+}
+
+/* ---- 2026-10-22 visual refinement pass (see docs/evaluations/2026-10-22/桌面端视觉精修清单.md) ---- */
+/* F2: unselected severity readout is a watermark, not a stray mark. */
+.severity-value[data-empty="true"] {
+  color: color-mix(in srgb, var(--ink) 16%, transparent);
+}
+/* F4: cues and emergency signals join the choice-card family (border + radius). */
+.question-cue {
+  border: 1px solid var(--line);
+  border-radius: 17px;
+}
+.signal-grid li {
+  border: 1px solid color-mix(in srgb, var(--orange) 24%, transparent);
+  border-radius: 12px;
+}
+/* F5: summary overview items match the detail cards; emphasis stays typographic. */
+.summary-overview .summary-item {
+  background: var(--surface);
+}
+/* F7: the full-question disclosure recedes. */
+.question-original {
+  color: var(--muted);
+}
+/* F8: settings rail active section. */
+.settings-rail a.active {
+  background: var(--light);
+  color: var(--ink);
+  font-weight: 600;
+}
+/* F6: custom file picker for the medical-image dialog. */
+#medical-image-file.sr-only {
+  /* Beat the generic full-width input rule, or the clipped 100%-wide input
+     still stretches the dialog's scrollable overflow (horizontal scrollbar). */
+  width: 1px;
+  height: 1px;
+}
+.file-drop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background 120ms;
+}
+.file-drop:hover {
+  border-color: var(--primary);
+  background: var(--light);
+}
+.file-drop .icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+  flex: none;
+}
+.file-drop-action {
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+.file-drop-name {
+  color: var(--muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* F3 + F10: in task focus the footer takes the task card's measure, and the
+   task card centers vertically like focused questions do. */
+@media (min-width: 981px) {
+  body[data-mode="patient"].task-focused .conversation-footer > * {
+    max-width: none;
+  }
+  body[data-mode="patient"].task-focused .active-task {
+    display: flex;
+    flex-direction: column;
+  }
+  body[data-mode="patient"].task-focused .active-task > .task-card {
+    margin-block: auto;
+  }
+}
+
+/* Round 2 (G3): inspect metrics share the full row instead of orphaning
+   the last card on a second row. */
+@media (min-width: 1201px) {
+  #inspect-metrics {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+/* Longitudinal loop: pending follow-ups on the history view, the outcome
+   dialog, and the re-triage source banner. */
+.followup-section {
+  margin: 0 0 26px;
+}
+.followup-heading {
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+.followup-hint {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 0 0 14px;
+}
+.followup-list {
+  display: grid;
+  gap: 12px;
+}
+.followup-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 18px 20px;
+}
+.followup-draft {
+  flex-basis: 100%;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+.followup-draft-label {
+  margin: 0 0 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.followup-draft-text {
+  margin: 0;
+  font-size: 13.5px;
+  white-space: pre-wrap;
+}
+.followup-badge {
+  flex: none;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--light);
+  color: var(--muted);
+}
+.followup-badge.due {
+  background: color-mix(in srgb, #d97706 20%, var(--surface));
+  color: var(--ink);
+}
+.retriage-banner {
+  margin: 10px auto 0;
+  max-width: 880px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--light);
+  color: var(--ink);
+  font-size: 13px;
+}
+.outcome-field {
+  border: 0;
+  padding: 0;
+  margin: 0 0 14px;
+  min-width: 0;
+}
+.outcome-field legend {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  padding: 0;
+}
+.outcome-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.outcome-options label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.outcome-options input {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  margin: 0;
+  accent-color: #2f6c59;
+}
+.followup-retriage {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--light);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.followup-retriage p {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+}
+
+/* S1 visualization simplification (2026-10-24): progressive disclosure. */
+.banner-suppressed {
+  display: none !important;
+}
+.starter-links {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 20px;
+}
+.starter-link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  /* --accent is a background tint in every theme (it is used as
+     `background` in seven other rules), so using it as a text colour gave
+     a contrast ratio of 1.32–1.90 — the two welcome-screen entries were
+     effectively invisible. --primary is the text/action colour. */
+  color: var(--primary);
+  font-size: 15px;
+  padding: 4px 2px;
+}
+.starter-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+.facts-footnote {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+.history-card-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.history-card-row .history-card {
+  flex: 1;
+  min-width: 0;
+}
+.history-delete {
+  flex: none;
+}
+
+/* S2 visualization simplification: conclusion collapsible sections. */
+.conclusion-collapse-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 10px 0;
+}
+.conclusion-collapse-body {
+  padding-bottom: 4px;
+}
+
+/* S4 visualization simplification: settings advanced disclosure. */
+.settings-advanced-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 14px 0;
+}
+
+/* ------------------------------------------------------------------
+   Declarative scales (scale_form/v1 input card, scale/v1 result).
+   Neutral by design: a score band is not a traffic light. No red/green
+   colouring is applied to bands — that would read as a verdict.
+   ------------------------------------------------------------------ */
+.scale-form .scale-intro {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.scale-progress {
+  margin: 8px 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.scale-item {
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+.scale-item-label {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.scale-item-index {
+  flex: 0 0 auto;
+  min-width: 20px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.scale-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0 28px;
+}
+.scale-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 14px;
+}
+.scale-option input {
+  margin: 0;
+}
+.scale-option:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--selected);
+}
+.scale-option:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.scale-score {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+.scale-score-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.scale-score-unit {
+  color: var(--muted);
+  font-size: 14px;
+}
+.scale-band {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--raised);
+  font-size: 14px;
+}
+.scale-band-range {
+  color: var(--muted);
+  font-size: 12px;
+}
+.scale-disclaimer {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.scale-detail summary,
+.calculation-limitations summary,
+.calculation-references summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 6px 0;
+}
+@media (max-width: 700px) {
+  .scale-options {
+    margin-left: 0;
+  }
+  .scale-option {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Named-formula input card: one labelled numeric field per input. */
+.formula-fields {
+  display: grid;
+  gap: 16px;
+  margin: 8px 0 4px;
+}
+.formula-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+.formula-field input,
+.formula-field select {
+  flex: 1 1 140px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.formula-unit {
+  color: var(--muted);
+  font-size: 13px;
+}
+.formula-range {
+  flex: 1 1 100%;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------
+   Scale form alignment and density.
+   The question shell centres its text; a multi-item form must not
+   inherit that, or every legend sits centred above left-aligned
+   options. Spacing is tightened so more than four items fit on screen.
+   ------------------------------------------------------------------ */
+.scale-form {
+  text-align: left;
+}
+.scale-form .scale-item {
+  margin: 0 0 14px;
+  text-align: left;
+}
+.scale-form .scale-item-label {
+  justify-content: flex-start;
+  text-align: left;
+}
+.scale-form .scale-options {
+  margin: 8px 0 0;
+}
+.scale-form .scale-intro,
+.scale-form .scale-progress {
+  text-align: left;
+}
+
+/* ------------------------------------------------------------------
+   The compact two-column result card (>=701px wide, <=820px tall) was
+   built for unit conversion: heading, big value, input list. A scale
+   result has a different child set, and auto-placement into that grid
+   overlapped them. Let scale results flow normally at every size.
+   ------------------------------------------------------------------ */
+@media (min-width: 701px) and (max-height: 820px) {
+  .patient-calculation-result.scale-result {
+    display: block;
+    padding: 20px;
+  }
+  .patient-calculation-result.scale-result .scale-score {
+    margin-top: 2px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Scale form alignment and density.
+   The question shell centres its text; a multi-item form must not
+   inherit that, or every legend sits centred above left-aligned
+   options. Spacing is tightened so more than four items fit on screen.
+   ------------------------------------------------------------------ */
+.scale-form {
+  text-align: left;
+}
+.scale-form .scale-item {
+  margin: 0 0 14px;
+  text-align: left;
+}
+.scale-form .scale-item-label {
+  justify-content: flex-start;
+  text-align: left;
+}
+.scale-form .scale-options {
+  margin: 8px 0 0;
+}
+.scale-form .scale-intro,
+.scale-form .scale-progress {
+  text-align: left;
+}
+
+/* ------------------------------------------------------------------
+   The compact two-column result card (>=701px wide, <=820px tall) was
+   built for unit conversion: heading, big value, input list. A scale
+   result has a different child set, and auto-placement into that grid
+   overlapped them. Let scale results flow normally at every size.
+   ------------------------------------------------------------------ */
+@media (min-width: 701px) and (max-height: 820px) {
+  .patient-calculation-result.scale-result {
+    display: block;
+    padding: 20px;
+  }
+  .patient-calculation-result.scale-result .scale-score {
+    margin-top: 2px;
+  }
+}
+
+/* Formula form matches the scale form: left-aligned, hints under their
+   own field rather than centred under the card. */
+.formula-form {
+  text-align: left;
+}
+.formula-form .scale-intro {
+  text-align: left;
+}
+.formula-form .formula-field {
+  align-items: baseline;
+}
+.formula-form .formula-range {
+  padding-left: 2px;
+}
+
+/* Formula form matches the scale form: left-aligned, hints under their
+   own field rather than centred under the card. */
+.formula-form {
+  text-align: left;
+}
+.formula-form .scale-intro {
+  text-align: left;
+}
+.formula-form .formula-field {
+  align-items: baseline;
+}
+.formula-form .formula-range {
+  padding-left: 2px;
+}
+
+/* ------------------------------------------------------------------
+   The capability lab used to be `position: sticky; top: 20px` so it
+   stayed in view beside the 132-item capability list. That breaks as
+   soon as the form is tall: the view is its own scroll container, a
+   sticky panel taller than the scrollport pins its top and leaves its
+   bottom — the run button — permanently outside it. Nine-input scales
+   were already unreachable; EASI (20 inputs) could not be executed at
+   all, and no amount of scrolling revealed the button.
+   A form that can be taller than the viewport should not be pinned.
+   Let it scroll with the page instead.
+   ------------------------------------------------------------------ */
+.capability-lab {
+  position: static;
+  max-height: none;
+  overflow: visible;
+}

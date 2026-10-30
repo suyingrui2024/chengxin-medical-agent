@@ -1,0 +1,875 @@
+/* 07-urgent-summary-connection.css — Urgent help, summary states, follow-up cards and connection alerts. */
+.urgent-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.4rem 0.8rem;
+  margin: 0;
+  color: var(--red);
+  border: 1px solid var(--warning-line);
+  border-radius: 12px;
+  background: var(--warning-bg);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+#urgent-help-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.5rem;
+}
+#urgent-help-error {
+  color: var(--red);
+}
+
+@media (max-width: 700px) {
+  .urgent-help {
+    padding: 0.4rem 0.55rem;
+    font-size: 0.75rem;
+  }
+}
+/* Repeated observations keep the retained reading separate from failed attempts. */
+.observation-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  margin: 12px 0;
+  background: var(--raised);
+  min-width: 0;
+}
+.observation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+}
+.observation-repeat {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.observation-repeat:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.observation-current-label {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--primary);
+}
+.observation-value {
+  display: block;
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1.3;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0;
+}
+/* Keyed on the card's own risk level, not on `.summary-route.urgent`:
+   when a conclusion sheet is present the route section is not rendered
+   (structured-ui.js, 结论单 §7), and that is exactly the escalation case
+   where the reading needs to stand out. */
+.summary-card[data-risk-level="urgent"] .observation-card {
+  background: var(--warning-bg);
+  border-color: var(--warning-line);
+}
+.summary-card[data-risk-level="urgent"] .observation-value {
+  color: var(--orange);
+}
+.observation-details summary,
+.observation-evidence summary,
+.observation-proposal summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 12px;
+}
+.observation-history {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 12px;
+  border-left: 2px solid var(--line);
+}
+.observation-history li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 10px 0 10px 10px;
+  align-items: center;
+}
+.observation-history time,
+.observation-status {
+  color: var(--muted);
+  font-size: 11px;
+}
+.observation-history li.current > strong {
+  color: var(--ink);
+}
+.observation-evidence {
+  width: 100%;
+}
+.observation-card blockquote,
+.observation-proposal blockquote {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 10px;
+  background: var(--surface);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.observation-previous {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 12px 0;
+}
+.observation-proposal {
+  padding: 16px;
+  background: var(--light);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin: 12px 0;
+}
+.observation-confirm {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: var(--on-primary);
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+.observation-confirm:focus-visible,
+.observation-repeat:focus-visible {
+  outline: 3px solid var(--line-strong);
+  outline-offset: 3px;
+}
+.observation-history strong {
+  font-size: 14px;
+}
+.observation-supplement {
+  grid-column: 1 / -1;
+  font-size: 12px;
+}
+.observation-supplement > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.active-observation {
+  padding: 0 22px;
+}
+.active-observation .observation-card {
+  margin-bottom: 0;
+}
+.observation-compact {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 8px;
+  padding: 8px 12px;
+}
+.observation-compact .observation-header {
+  grid-column: 1 / -1;
+}
+.observation-compact-metric {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.observation-compact-metric > span {
+  font-size: 12px;
+  font-weight: 400;
+}
+.observation-compact .observation-value {
+  font-size: 23px;
+  margin: 0;
+}
+.observation-compact .observation-current-label {
+  align-self: center;
+  margin: 0;
+  font-size: 11px;
+}
+.observation-compact .observation-details > summary {
+  font-size: 11px;
+}
+.observation-compact .observation-details[open] {
+  grid-column: 1 / -1;
+}
+.active-observation:not([hidden]) + .active-question {
+  padding-top: 12px;
+}
+.active-observation:not([hidden]) + .active-question .question-symbol {
+  display: none;
+}
+@media (min-width: 701px) and (max-height: 800px) {
+  .observation-compact {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0 12px;
+  }
+  .observation-compact .observation-header {
+    display: contents;
+  }
+  .observation-compact-metric {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .observation-compact .observation-repeat {
+    grid-column: 3;
+    grid-row: 1 / 3;
+  }
+  .observation-compact .observation-current-label {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .observation-compact .observation-details {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .observation-compact .observation-details[open] {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  .active-observation:not([hidden]) + .active-question .visual-choices {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .active-observation:not([hidden]) + .active-question .visual-choice {
+    min-height: 54px;
+    padding: 8px 6px;
+    gap: 6px;
+    flex-direction: row;
+  }
+  .active-observation:not([hidden]) + .active-question .visual-choice svg {
+    width: 24px;
+    height: 24px;
+  }
+  .active-observation:not([hidden]) + .active-question .choice-unknown {
+    grid-column: auto;
+  }
+}
+@media (max-width: 600px) {
+  .observation-confirm {
+    width: 100%;
+  }
+  .active-observation {
+    padding: 0 12px;
+  }
+}
+
+@media (max-height: 780px) and (min-width: 761px) {
+  .active-question:has(.severity-scale) {
+    padding: 12px 18px;
+  }
+  .visual-question:has(.severity-scale) {
+    display: grid;
+    grid-template-columns: minmax(140px, 0.8fr) minmax(0, 1.5fr);
+    gap: 4px 18px;
+    text-align: left;
+    align-items: start;
+  }
+  .visual-question:has(.severity-scale) .question-symbol {
+    grid-column: 1;
+    grid-row: 1;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+  }
+  .visual-question:has(.severity-scale) .question-symbol svg {
+    width: 24px;
+    height: 24px;
+  }
+  .visual-question:has(.severity-scale) .question-title {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.35;
+  }
+  .visual-question:has(.severity-scale) .question-hint {
+    grid-column: 1;
+    grid-row: 3;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .visual-question:has(.severity-scale) .severity-scale {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+  }
+  .visual-question:has(.severity-scale) .severity-selection {
+    margin: 0 0 6px;
+  }
+  .visual-question:has(.severity-scale) .severity-value {
+    font-size: 34px;
+  }
+  .visual-question:has(.severity-scale) .severity-options {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .visual-question:has(.severity-scale) .severity-options button {
+    min-height: 44px;
+  }
+  .visual-question:has(.severity-scale) .scale-ends {
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  .visual-question:has(.severity-scale) .question-original {
+    grid-column: 1;
+    grid-row: 4;
+    margin-top: 0;
+    font-size: 11px;
+  }
+}
+.location-answer-field.with-area-figure {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.5fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 10px;
+}
+.location-area-figure {
+  margin: 0;
+  text-align: center;
+}
+.location-area-figure svg {
+  display: block;
+  width: 100%;
+  height: 88px;
+}
+.location-area-figure figcaption {
+  font-size: 11px;
+  color: var(--primary);
+}
+.location-answer .body-map-canvas > svg {
+  max-height: 132px;
+}
+.location-answer-progress {
+  margin-bottom: 2px;
+}
+.location-answer-navigation {
+  margin-top: 4px;
+}
+.location-area-figure svg {
+  height: 80px;
+}
+.location-answer-final-actions {
+  display: grid;
+  grid-template-columns: minmax(104px, 1fr) minmax(0, 2fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+.location-answer-final-actions .location-answer-confirm {
+  margin: 0;
+}
+.location-revision-start {
+  min-height: 44px;
+  min-width: 44px;
+}
+.location-answer .primary-button {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--line-strong);
+}
+.location-answer .primary-button:disabled {
+  color: var(--primary);
+  background: var(--selected);
+  border-color: var(--line);
+}
+
+/* Patient summaries make record status legible without repeating the full source text. */
+.summary-review-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 10px;
+  margin: -2px 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.summary-review-status strong,
+.summary-record-state span {
+  color: var(--primary);
+  background: var(--light);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.4;
+  padding: 3px 7px;
+}
+.summary-correction-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: -3px 0 14px;
+  padding: 9px 11px;
+  color: var(--primary);
+  background: var(--selected);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.summary-undo {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 10px;
+  color: var(--primary);
+  background: var(--surface);
+  border-color: var(--line-strong);
+}
+.summary-record-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+.summary-record-state span:last-child {
+  color: var(--muted);
+  background: transparent;
+}
+.summary-route.routine {
+  border: 1px solid var(--line);
+}
+.summary-route p {
+  margin: 0;
+}
+.summary-route-action {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.summary-risk-triggers {
+  margin-top: 12px;
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.summary-risk-triggers summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  font-weight: 550;
+}
+.summary-risk-triggers p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+.structured-notice .notice-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 2px 0 10px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--on-danger, #fff);
+  background: var(--red);
+  font-size: 16px;
+  font-weight: 650;
+  text-decoration: none;
+}
+body[data-mode="patient"] .structured-notice .notice-level,
+body[data-mode="patient"] .structured-notice .notice-reasons,
+body[data-mode="patient"] .illustrated-task .task-equipment,
+body[data-mode="patient"] .illustrated-task .step-progress > span,
+body[data-mode="patient"] .illustrated-task .step-track li,
+body[data-mode="patient"] .illustrated-task .step-cue,
+body[data-mode="patient"] .illustrated-task .step-full-instruction,
+body[data-mode="patient"] .illustrated-task .task-stop,
+body[data-mode="patient"]:has(#active-task .illustrated-task)
+  .quick-replies
+  button {
+  font-size: 14px;
+}
+body[data-mode="patient"] .structured-notice p,
+body[data-mode="patient"] .structured-notice .notice-reasons {
+  font-size: 16px;
+}
+
+/* During a patient self-check, retain only the current action and urgent help. */
+@media (min-width: 981px) {
+  body[data-mode="patient"].task-focused .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-mode="patient"].task-focused .topbar,
+  body[data-mode="patient"].task-focused #view-consultation .page-heading,
+  body[data-mode="patient"].task-focused .facts-panel {
+    display: none;
+  }
+  body[data-mode="patient"].task-focused .sidebar {
+    display: block;
+    position: fixed;
+    width: 0;
+    height: 0;
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    visibility: hidden;
+  }
+  body[data-mode="patient"].task-focused .sidebar > :not(#new-session) {
+    display: none;
+  }
+  body[data-mode="patient"].task-focused #new-session {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 40;
+    width: auto;
+    margin: 0;
+    visibility: visible;
+  }
+  body[data-mode="patient"].task-focused main {
+    max-width: 1080px;
+    padding: 18px 28px;
+  }
+  body[data-mode="patient"].task-focused .consult-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  body[data-mode="patient"].task-focused .conversation-panel {
+    height: auto;
+    min-height: 0;
+  }
+  body[data-mode="patient"].task-focused .task-focus-bar {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  body[data-mode="patient"].task-focused .active-task {
+    padding: 24px 28px;
+  }
+}
+body[data-mode="patient"].task-focused .step-controls button:focus-visible,
+body[data-mode="patient"].task-focused .illustration-zoom:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 4px;
+}
+.field-extent .location-answer-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  white-space: nowrap;
+}
+.field-extent .extent-symbol {
+  margin-right: 0;
+}
+@media (min-width: 701px) and (max-height: 780px) {
+  .location-focused
+    .active-task
+    .structured-task:has(.location-answer)
+    .task-header {
+    padding-bottom: 4px;
+  }
+  .location-focused
+    .active-task
+    .structured-task:has(.location-answer)
+    .task-header
+    h3 {
+    margin-top: 0;
+  }
+}
+
+/* ============================================================
+   Visual refresh (design: docs/知微视觉改版设计说明.md)
+   Single narrative column; the facts panel becomes a drawer.
+   ============================================================ */
+#view-consultation .page-heading,
+#view-consultation .consult-grid {
+  max-width: 880px;
+  margin-inline: auto;
+  width: 100%;
+}
+.consult-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.facts-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(370px, 94vw);
+  height: 100dvh;
+  max-height: none;
+  border-radius: 0;
+  z-index: 70;
+  transform: translateX(106%);
+  transition: transform 220ms ease;
+  box-shadow: var(--elevation);
+}
+.facts-panel.open {
+  transform: translateX(0);
+}
+@media (max-width: 980px) {
+  .facts-panel {
+    display: block;
+    visibility: hidden;
+  }
+  .facts-panel.open {
+    visibility: visible;
+  }
+}
+#facts-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 65;
+}
+#facts-scrim[hidden] {
+  display: none;
+}
+#facts-close {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .facts-panel {
+    transition: none;
+  }
+}
+.fontscale-options {
+  margin-top: 18px;
+}
+.fontscale-options legend {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 0;
+  margin-bottom: 8px;
+}
+.fontscale-option {
+  min-width: 86px;
+  justify-content: center;
+}
+/* Font-scale steps (patient surfaces; design: 视觉改版 §2.1) */
+html[data-font-scale="large"] .bubble,
+html[data-font-scale="large"] .composer textarea {
+  font-size: 16.5px;
+}
+html[data-font-scale="large"] .quick-replies button,
+html[data-font-scale="large"] .fact-value,
+html[data-font-scale="large"] .page-description {
+  font-size: 15px;
+}
+html[data-font-scale="large"] .conclusion-disposition-text {
+  font-size: 16.5px;
+}
+html[data-font-scale="large"] .conclusion-narrative-framing {
+  font-size: 17.5px;
+}
+html[data-font-scale="small"] .bubble,
+html[data-font-scale="small"] .composer textarea {
+  font-size: 14px;
+}
+html[data-font-scale="small"] .quick-replies button,
+html[data-font-scale="small"] .fact-value {
+  font-size: 12.5px;
+}
+/* Emergency screen: signals read as a checklist, not buttons (design §4.5) */
+.screen-question .question-cues {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 18px 0 12px;
+}
+.screen-question .question-cue {
+  flex-direction: row;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+}
+.screen-question .question-cue svg {
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+.screen-question .question-symbol {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 8px;
+}
+
+/* Settings view (design: docs/设置视图改造方案.md) */
+#view-settings .settings-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 36px;
+  max-width: 1020px;
+  margin-inline: auto;
+}
+.settings-rail {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.settings-rail a {
+  padding: 10px 14px;
+  border-radius: 9px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14.5px;
+}
+.settings-rail a:hover {
+  background: var(--light);
+  color: var(--primary);
+}
+.settings-section {
+  padding: 26px 0 34px;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 20px;
+}
+.settings-section:first-child {
+  padding-top: 6px;
+}
+.settings-section:last-child {
+  border-bottom: 0;
+}
+.settings-section h2 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 550;
+  margin: 0 0 8px;
+}
+.settings-hint {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 20px;
+  max-width: 640px;
+}
+.subagent-kind-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 640px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.subagent-kind-name {
+  display: grid;
+  gap: 2px;
+  min-width: 104px;
+  font-size: 14.5px;
+}
+.subagent-kind-name small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.subagent-mode-select {
+  font-size: 14px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--raised);
+}
+.subagent-metrics {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.subagent-feedback {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.7;
+  min-height: 23px;
+  margin: 10px 0 12px;
+}
+.subagent-feedback.error {
+  color: var(--red);
+}
+#view-settings .appearance-options {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+#view-settings .workspace-mode {
+  max-width: 340px;
+  margin-bottom: 18px;
+}
+@media (max-width: 700px) {
+  #view-settings .settings-layout {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .settings-rail {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+.fontscale-option {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: center;
+  background: var(--surface);
+}
+.fontscale-option:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--selected);
+}
+
+.page-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+.conversation-footer {
+  background: transparent;
+}
+
+/* Topbar removal + full-height consultation column (2026-10-22 plan). */
+@media (min-width: 981px) {
+  .topbar {
+    display: none;
+  }
+}
+@media (max-width: 980px) {
+  .topbar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .breadcrumb #breadcrumb-root,
+  .breadcrumb .slash {
+    display: none;
+  }
+}
+#view-consultation:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.consult-grid {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+.connection-alert {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--warning-line, var(--line));
+  border-radius: 10px;
+  background: var(--warning-bg);
+  color: var(--warning-ink, #7a5410);
+  font-size: 13.5px;
+}

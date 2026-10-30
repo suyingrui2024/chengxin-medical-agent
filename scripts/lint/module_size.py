@@ -46,10 +46,8 @@ SKIP_DIRS = {
 # path (relative to repo root) -> current line count.  Existing debt only.
 # Remove an entry once the file has been split below THRESHOLD.
 BASELINE: dict[str, int] = {
-    # Frontend god-files — scheduled for P2/P3 (cards/controller split, CSS layers).
-    "src/medagent/web/styles.css": 6995,
+    # Frontend god-files — scheduled for P2 (cards/controller split).
     "src/medagent/web/app.js": 3613,
-    "src/medagent/web/structured-ui.js": 2960,
     "src/medagent/web/patient-records-ui.js": 2154,
 }
 

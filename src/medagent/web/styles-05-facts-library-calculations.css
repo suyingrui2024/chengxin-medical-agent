@@ -1,0 +1,878 @@
+/* 05-facts-library-calculations.css — Facts panel, library cards, patient calculations and visual choices. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Patient-facing content stays legible; decorative lines retain the quiet palette. */
+.page-description,
+.welcome > p,
+.composer-context,
+.records-hint,
+.sidebar-empty,
+.field-hint,
+.field-label,
+.mode-options legend,
+.mode-options label small,
+.dialog-description,
+.fact-source,
+.fact-top,
+.fact-source,
+.task-purpose,
+.task-details,
+.task-kicker,
+.evidence-meta,
+.evidence-top,
+.history-info small,
+.library-card > p,
+.library-meta,
+.metric-label,
+.metric-note,
+.event-type,
+.event-time,
+.composer-note,
+.page-footnote,
+.source-legend,
+.version-line,
+.recent-head,
+.nav-label,
+.welcome-divider,
+.starter-card small,
+.starter-card > span,
+.connection,
+.subtle-pill,
+.surface-heading > span,
+.live-tag,
+.facts-heading > span {
+  color: var(--muted);
+}
+.welcome > p,
+.page-description,
+.library-card > p {
+  font-size: 13px;
+}
+.bubble {
+  font-size: 14px;
+}
+.composer textarea {
+  font-size: 14px;
+}
+.quick-replies button {
+  font-size: 12px;
+}
+.starter-card strong {
+  font-size: 13px;
+}
+.starter-card small,
+.composer-context,
+.fact-top,
+.records-hint,
+.field-hint,
+.field-label,
+.mode-options label small,
+.task-purpose,
+.task-details,
+.fact-source,
+.summary-item span,
+.source-legend,
+.history-info small,
+.evidence-meta,
+.metric-note {
+  font-size: 11px;
+}
+.phase-track > div {
+  font-size: 11px;
+  color: var(--muted);
+}
+.fact-value,
+.step-text,
+.summary-item strong {
+  font-size: 13px;
+}
+.event-title,
+.evidence-value {
+  font-size: 12px;
+}
+.composer textarea::placeholder {
+  color: var(--muted);
+}
+.task-image {
+  height: 220px;
+  object-fit: contain;
+}
+.form-feedback {
+  color: var(--primary);
+}
+/* medical-ui/v1: component styles shared by live, replay and preview views. */
+.structured-task .task-stage {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.85fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  padding: 4px 20px 20px;
+}
+.structured-task .step-figure {
+  margin: 0;
+  min-width: 0;
+}
+.structured-task .task-image {
+  width: 100%;
+  height: 255px;
+  margin: 0;
+  padding: 10px;
+  object-fit: contain;
+  background: var(--light);
+}
+.step-figure figcaption {
+  color: var(--primary);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 9px;
+}
+.structured-task .step-view {
+  padding: 0;
+  min-width: 0;
+}
+.structured-task .task-stage > .step-view {
+  grid-area: auto;
+  align-self: center;
+}
+.structured-task .step-text {
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.85;
+  min-height: 100px;
+}
+.structured-task .step-progress {
+  color: var(--primary);
+  font-size: 13px;
+}
+.structured-task .step-controls button {
+  font-size: 13px;
+  padding: 10px 15px;
+  color: var(--ink);
+}
+.structured-task .step-controls button:last-child:not(:disabled) {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--line-strong);
+}
+.structured-task .task-purpose,
+.structured-task .task-equipment,
+.structured-task .task-prompt {
+  font-size: 13px;
+  color: var(--primary);
+}
+.active-task .structured-task {
+  display: block;
+}
+.active-task .structured-task .task-image {
+  height: 255px;
+}
+.calculation-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.calculation-heading p {
+  margin: 0;
+}
+.calculation-status {
+  font-size: 12px;
+  color: var(--orange);
+  background: var(--warning-bg);
+  border-radius: 20px;
+  padding: 5px 10px;
+}
+.execution-calculation {
+  padding: 16px 0;
+}
+.execution-calculation > .task-kicker {
+  margin-bottom: 8px;
+}
+.calculation-evidence {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent);
+  background: var(--light);
+  overflow-wrap: anywhere;
+}
+.patient-calculation-input {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+.calculation-subject {
+  margin: 0 0 12px;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 650;
+}
+.calculation-references {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.calculation-references a {
+  color: var(--green);
+  text-underline-offset: 3px;
+}
+.calculation-references p {
+  margin: 0;
+}
+.calculation-title {
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 650;
+}
+.subject-change-card {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
+}
+.subject-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  max-width: 420px;
+  margin: 0 auto 24px;
+}
+.subject-person {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 2px;
+  text-align: left;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+.subject-person svg {
+  grid-row: 1 / 3;
+  width: 36px;
+  height: 36px;
+  color: var(--green);
+}
+.subject-person small {
+  color: var(--muted);
+}
+.subject-requested {
+  background: var(--light);
+}
+.subject-arrow {
+  color: var(--green);
+  font-size: 24px;
+}
+.subject-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.subject-change-card .calculation-source {
+  text-align: left;
+}
+@media (max-height: 820px) {
+  .subject-pair {
+    margin-bottom: 12px;
+  }
+  .subject-person {
+    padding: 8px;
+    gap: 3px;
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+  .subject-person svg {
+    width: 32px;
+    height: 32px;
+  }
+  .subject-change-card .conversion-hint {
+    margin: 6px 0 8px;
+    font-size: 12px;
+  }
+  .subject-change-card .question-title {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.3;
+  }
+  .subject-change-card .subject-action {
+    min-height: 36px;
+    padding: 7px 12px;
+  }
+  .subject-change-card .calculation-source {
+    margin-top: 12px;
+  }
+}
+@media (max-width: 700px) {
+  .subject-pair {
+    margin-bottom: 12px;
+  }
+  .subject-person {
+    padding: 10px;
+  }
+  .subject-person strong {
+    font-size: 14px;
+  }
+  .subject-change-card .conversion-hint {
+    font-size: 13px;
+    margin: 8px 0 14px;
+  }
+}
+.interaction-followup {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0;
+  color: var(--orange);
+  font-size: 12px;
+  text-align: left;
+}
+.interaction-followup details {
+  min-width: 0;
+}
+.interaction-followup summary {
+  cursor: pointer;
+}
+.interaction-followup[data-status="forwarded"] {
+  color: var(--green);
+}
+.interaction-followup .calculation-evidence {
+  max-height: 150px;
+  overflow-y: auto;
+  margin: 8px 0;
+}
+.interaction-followup .followup-process {
+  flex: none;
+  min-height: 36px;
+}
+.conversion-hint {
+  color: var(--primary);
+  font-size: 14px;
+  margin: 12px 0 28px;
+}
+.conversion-fields {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.15fr) minmax(120px, 1fr) 28px minmax(
+      120px,
+      1fr
+    );
+  gap: 12px;
+  align-items: end;
+  text-align: left;
+}
+.conversion-fields label {
+  color: var(--primary);
+  font-size: 13px;
+  min-width: 0;
+}
+.conversion-fields input,
+.conversion-fields select {
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 18px;
+  color: var(--ink);
+  padding: 12px;
+  margin-top: 8px;
+}
+.conversion-arrow {
+  font-size: 24px;
+  padding-bottom: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+.calculation-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 22px;
+}
+.calculation-feedback {
+  color: var(--red);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.calculation-feedback:empty {
+  display: none;
+}
+.calculation-source {
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-top: 28px;
+}
+.calculation-source summary {
+  cursor: pointer;
+}
+.patient-calculation-result {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px;
+}
+.patient-calculation-result h3 {
+  font-size: 40px;
+}
+.calculation-continue {
+  display: block;
+  margin: 24px auto 0;
+}
+@media (min-width: 701px) and (max-height: 820px) {
+  .active-question:has(.patient-calculation-result) {
+    padding: 8px 14px;
+  }
+  .patient-calculation-result {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: center;
+    gap: 6px 12px;
+    padding: 10px 14px;
+  }
+  .patient-calculation-result .calculation-heading {
+    grid-column: 1;
+    grid-row: 1;
+    gap: 4px;
+  }
+  .patient-calculation-result .calculation-title {
+    font-size: 12px;
+  }
+  .patient-calculation-result .calculation-status {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+  .patient-calculation-result h3 {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+    font-size: 28px;
+    overflow-wrap: anywhere;
+  }
+  .patient-calculation-result .calculation-inputs {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+    gap: 6px;
+  }
+  .patient-calculation-result .calculation-inputs > div {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 8px;
+    overflow-wrap: anywhere;
+  }
+  .patient-calculation-result .calculation-inputs dt {
+    font-size: 11px;
+  }
+  .patient-calculation-result .calculation-inputs dd {
+    font-size: 12px;
+  }
+  .patient-calculation-result .calculation-formula {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin: 0;
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+  .patient-calculation-result .calculation-caution {
+    grid-column: 1;
+    grid-row: 4;
+    margin: 0;
+    font-size: 11px;
+  }
+  .patient-calculation-result > details {
+    grid-column: 2;
+    grid-row: 4;
+    margin: 0;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .patient-calculation-result > details[open] {
+    grid-column: 1 / -1;
+    grid-row: 5;
+  }
+  .patient-calculation-result .calculation-continue {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    margin: 0;
+    min-height: 36px;
+    padding: 7px 14px;
+  }
+}
+@media (max-width: 700px) {
+  .conversion-fields {
+    grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .conversion-value {
+    grid-column: 1 / -1;
+  }
+  .patient-calculation-result {
+    padding: 20px;
+  }
+  .patient-calculation-input .question-symbol {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 12px;
+    border-radius: 16px;
+  }
+  .patient-calculation-input .question-symbol svg {
+    width: 30px;
+    height: 30px;
+  }
+  .conversion-hint {
+    margin: 8px 0 14px;
+    font-size: 13px;
+  }
+  .patient-calculation-input .question-symbol {
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 8px;
+    border-radius: 12px;
+  }
+  .patient-calculation-input .question-symbol svg {
+    width: 25px;
+    height: 25px;
+  }
+  .patient-calculation-input .conversion-fields input,
+  .patient-calculation-input .conversion-fields select {
+    min-height: 48px;
+    margin-top: 6px;
+    padding: 10px;
+  }
+  .patient-calculation-input .calculation-form-actions {
+    margin-top: 14px;
+  }
+  .patient-calculation-input .calculation-source {
+    margin-top: 16px;
+  }
+}
+.calculation-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.calculation-inputs > div {
+  min-width: 95px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 13px;
+}
+.calculation-inputs dt {
+  color: var(--primary);
+  font-size: 12px;
+}
+.calculation-inputs dd {
+  color: var(--ink);
+  font-size: 15px;
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+}
+#messages .calculation-result {
+  margin-left: 37px;
+}
+.summary-intro {
+  color: var(--primary);
+  font-size: 13px;
+  line-height: 1.8;
+  margin: -5px 0 12px;
+}
+.summary-item {
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  align-items: start;
+}
+.summary-item .summary-edit {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+.summary-unknown {
+  background: var(--warning-bg);
+  color: var(--orange);
+  padding: 13px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-size: 12px;
+}
+.unknown-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 8px;
+}
+.unknown-items > span {
+  border: 1px solid var(--warning-line);
+  border-radius: 20px;
+  padding: 3px 10px;
+  background: var(--warning-bg);
+}
+.unknown-report {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--warning-line);
+  border-radius: 8px;
+  background: var(--warning-bg);
+}
+.unknown-report-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.unknown-report .summary-edit {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 6px 9px;
+  color: var(--orange);
+  font-size: 12px;
+}
+.unknown-report-quote {
+  margin: 7px 0;
+  padding: 0 0 0 10px;
+  border-left: 2px solid var(--orange);
+  color: var(--orange);
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.unknown-report-source {
+  color: var(--orange);
+  font-size: 11px;
+}
+.summary-card .unknown-report-expanded {
+  color: var(--orange);
+  font-size: 12px;
+  margin-top: 7px;
+}
+.structured-fallback {
+  margin: 16px 0;
+  padding: 18px;
+  border: 1px solid var(--warning-line);
+  background: var(--warning-bg);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--orange);
+}
+.structured-fallback p {
+  line-height: 1.8;
+  margin: 7px 0 0;
+}
+.structured-notice {
+  color: var(--red);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-line);
+  border-radius: 10px;
+  padding: 18px;
+  margin-left: 37px;
+  font-size: 15px;
+}
+.notice-level,
+.summary-route-label {
+  margin: 0 0 7px;
+  color: currentColor;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+}
+.structured-notice p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.notice-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.notice-heading svg {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+.notice-heading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.structured-notice .notice-action {
+  font-size: 17px;
+  margin: 16px 0;
+  overflow-wrap: anywhere;
+}
+.structured-notice.level-emergency {
+  color: var(--red);
+  background: var(--danger-bg);
+  border-color: var(--danger-line);
+}
+.structured-notice.level-urgent {
+  color: var(--orange);
+  background: var(--warning-bg);
+  border-color: var(--warning-line);
+}
+.structured-notice.level-urgent .notice-reasons {
+  border-color: var(--warning-line);
+}
+.notice-reasons {
+  border-top: 1px solid var(--danger-line);
+  padding-top: 12px;
+  font-size: 13px;
+}
+.notice-reasons summary {
+  cursor: pointer;
+}
+.messages:has(.structured-notice .notice-action) > .message.emergency {
+  display: none;
+}
+@media (max-width: 700px) {
+  .structured-task .task-stage {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 16px 18px;
+  }
+  .structured-task .task-image,
+  .active-task .structured-task .task-image {
+    height: 230px;
+  }
+  .structured-task .step-text {
+    min-height: auto;
+    font-size: 15px;
+  }
+  .summary-item {
+    grid-template-columns: 85px minmax(0, 1fr) auto;
+  }
+  #messages .calculation-result {
+    margin-left: 0;
+  }
+}
+@media (max-width: 700px) {
+  .bubble,
+  .composer textarea {
+    font-size: 14px;
+  }
+  .welcome > p,
+  .page-description {
+    font-size: 12px;
+  }
+  .starter-card strong {
+    font-size: 12px;
+  }
+  .starter-card small {
+    font-size: 10px;
+  }
+  .task-image {
+    height: 170px;
+  }
+  .composer-note {
+    font-size: 9px;
+  }
+  .page-footnote {
+    font-size: 10px;
+  }
+  .conversation-panel {
+    height: auto;
+    min-height: 0;
+  }
+}
+
+/* Patient attention: one current action, with history and evidence on demand. */
+.active-question {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px 34px;
+  background: radial-gradient(
+    ellipse at 50% 0,
+    var(--raised),
+    var(--surface) 68%
+  );
+}
+.visual-question {
+  max-width: 760px;
+  margin: auto;
+  text-align: center;
+}
+.question-symbol {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin: 5px auto 20px;
+  color: var(--primary);
+  background: var(--light);
+  border: 1px solid var(--line);
+  border-radius: 25px;
+}
+.question-symbol svg {
+  width: 44px;
+  height: 44px;
+}
+.question-title {
+  font-size: clamp(21px, 2vw, 28px);
+  font-weight: 550;
+  line-height: 1.65;
+  margin: 0;
+  text-wrap: balance;
+}
+.question-hint {
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 12px 0 0;
+}
+.visual-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 32px 0 22px;
+}
+.visual-choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 144px;
+  padding: 24px 14px 19px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 2%, transparent);
+  transition:
+    background 120ms,
+    border-color 120ms,
+    box-shadow 120ms;
+}
+.visual-choice:hover:not(:disabled) {
+  background: var(--light);
+  border-color: var(--line-strong);
+  box-shadow: 0 5px 16px color-mix(in srgb, var(--primary) 6.3%, transparent);
+}
+.visual-choice svg {
+  width: 48px;
+  height: 48px;
+}
+.visual-choice strong {
+  font-size: 16px;
+  font-weight: 550;
+}
+.adaptive-answer {
+  margin-top: 28px;
+  text-align: left;
+}
