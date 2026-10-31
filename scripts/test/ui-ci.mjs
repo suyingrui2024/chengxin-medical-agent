@@ -16,6 +16,14 @@
  * All this script adds is the loop and the data-directory reset between
  * invocations. Sequential on purpose — the config pins `workers: 1` and
  * every run binds the same port.
+ *
+ * This is the only way the suite is meant to run whole (`test:ui`,
+ * `test:ui:ci`). Running every file through a single `playwright test`
+ * invocation is not offered: it is the setup that produced the drift
+ * above, and it fails in ways that look like product bugs. For a single
+ * file while iterating, either pass a name filter
+ * (`npm run test:ui -- location`) or call `npx playwright test <file>`
+ * directly — one file never inherits anything.
  */
 import { spawn } from "node:child_process";
 import { readdirSync } from "node:fs";
