@@ -5,21 +5,19 @@ import base from "./playwright.config.mjs";
  * previous three-file list is exactly how 16 appearance tests stayed red
  * for five days without anyone noticing.
  *
- * `grepInvert` below is a named, temporary exclusion — not a filter that
- * can quietly grow. Every entry is a test whose expectations still
- * describe the dialogue the engine ran before d1568d6 reordered
- * questions by hypothesis:
+ * There is no `grepInvert` here any more, on purpose. The last one named
+ * eleven tests that still expected the dialogue the engine ran before
+ * d1568d6 reordered questions by hypothesis. Two things fixed them:
  *
- *   - the six `urgent summaries` cases in appearance.spec.mjs
- *   - the five fixture-driven cases in repeated-observations.spec.mjs
+ *   - the scripted models now obey the engine's machine-readable feedback
+ *     (tests/fixtures/model-feedback.mjs), so a rejected proposal no
+ *     longer desyncs the whole queue;
+ *   - `summary-card[data-risk-level="urgent"]` carries the urgent accent
+ *     itself, instead of borrowing it from `.summary-route.urgent` — a
+ *     section that is deliberately not rendered once the conclusion sheet
+ *     takes over the routing guidance.
  *
- * Repairing them means deciding which question should come first for a
- * febrile patient and whether a 40.1℃ reading routes to 急诊科 or 今天
- * 就医. That is a clinical call, so the tests stay excluded until it is
- * made — they are listed here rather than deleted so the gap is visible.
+ * An exclusion list is a place for failures to hide. If a test has to be
+ * excluded again, name it here with the reason and a plan to remove it.
  */
-export default {
-  ...base,
-  grepInvert:
-    /urgent summaries|repeated temperatures|narrow-screen repeat|short desktop observation/,
-};
+export default base;

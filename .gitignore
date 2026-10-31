@@ -28,4 +28,7 @@ playwright-report/
 
 # 流水线与代理工作目录
 output/
+
+# macOS 目录元数据（Finder 每次浏览都会重写，与代码无关）
+.DS_Store
 .workbuddy-ai/
