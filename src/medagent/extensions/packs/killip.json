@@ -1,0 +1,195 @@
+{
+  "id": "calculate.killip",
+  "name": "Killip 分级",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "急性心肌梗死后的心功能分级（Ⅰ–Ⅳ级），记录心衰体征。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Killip", "Killip 分级"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 1,
+      "max": 4,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "class",
+        "label": "选择最符合当前体征的一项",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "Ⅰ级：无心衰体征"
+          },
+          {
+            "value": 2,
+            "label": "Ⅱ级：肺部啰音、颈静脉压升高或第三心音"
+          },
+          {
+            "value": 3,
+            "label": "Ⅲ级：急性肺水肿"
+          },
+          {
+            "value": 4,
+            "label": "Ⅳ级：心源性休克"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 1,
+        "max": 1,
+        "key": "class1",
+        "label": "Ⅰ级"
+      },
+      {
+        "min": 2,
+        "max": 2,
+        "key": "class2",
+        "label": "Ⅱ级"
+      },
+      {
+        "min": 3,
+        "max": 3,
+        "key": "class3",
+        "label": "Ⅲ级"
+      },
+      {
+        "min": 4,
+        "max": 4,
+        "key": "class4",
+        "label": "Ⅳ级"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "class": {
+        "type": "number",
+        "title": "选择最符合当前体征的一项",
+        "enum": [1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Killip 分级",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Killip+classification+acute+myocardial+infarction",
+      "section": "Killip T, Kimball JT. 1967；Ⅰ–Ⅳ级",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

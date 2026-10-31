@@ -1,0 +1,145 @@
+{
+  "id": "calculate.pph_volume",
+  "name": "产后出血量估算",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按敷料湿重与干重估算出血量。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["产后出血量"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "pph_volume",
+    "citation": "PPH-WEIGHING",
+    "inputs": [
+      {
+        "id": "wet_weight_g",
+        "label": "吸血后敷料湿重",
+        "type": "number",
+        "unit": "g",
+        "min": "0",
+        "max": "10000",
+        "step": "1"
+      },
+      {
+        "id": "dry_weight_g",
+        "label": "敷料干重",
+        "type": "number",
+        "unit": "g",
+        "min": "0",
+        "max": "10000",
+        "step": "1"
+      }
+    ],
+    "output": {
+      "label": "估计出血量",
+      "unit": "mL",
+      "min": "0",
+      "max": "5000",
+      "precision": {
+        "places": 0
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "产后出血量估算 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=postpartum+hemorrhage+blood+loss+weighing",
+      "section": "PPH-WEIGHING：(湿重 − 干重) ÷ 1.05",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "wet_weight_g": {
+        "type": "string",
+        "title": "吸血后敷料湿重",
+        "maxLength": 12
+      },
+      "dry_weight_g": {
+        "type": "string",
+        "title": "敷料干重",
+        "maxLength": 12
+      }
+    }
+  }
+}

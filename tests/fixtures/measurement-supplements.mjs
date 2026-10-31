@@ -1,8 +1,10 @@
 import { expect } from "@playwright/test";
 import {
   createRepeatedObservationModel,
+  opening,
   sendPatientText,
 } from "./repeated-observations.mjs";
+import { outage } from "./model-feedback.mjs";
 
 const medication = "昨晚用药物甲2次，具体用量不清楚";
 const secondMedication = "今天用过药物乙，用量不清楚";
@@ -25,7 +27,9 @@ const update = (value) => ({
 
 export function createMeasurementSupplementsModel() {
   return createRepeatedObservationModel([
-    null,
+    // Two frames, not one: CompatibleBackend retries a 5xx once, so a
+    // single failure is absorbed and the retry UI never appears.
+    ...outage(),
     update(medication),
     { tool: "review_summary", arguments: {} },
     update(secondMedication),
@@ -46,9 +50,7 @@ export async function verifyMeasurementSupplements(
   const id = (await (await created).json()).session_id;
   const send = (text) => sendPatientText(page, text);
   const current = () => page.locator(".summary-card.current-summary");
-  await send(
-    "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。",
-  );
+  await send(opening);
   await expect(page.locator("#active-task")).toBeVisible();
   await send("腋温38.25℃");
   await expect(page.locator("#active-question")).toBeVisible();
@@ -56,7 +58,7 @@ export async function verifyMeasurementSupplements(
     "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。",
   );
   await expect(current().locator(".observation-value")).toHaveText("38.25 ℃");
-  expect(model.requests).toHaveLength(4);
+  expect(model.requests).toHaveLength(5);
   await current()
     .getByRole("button", { name: "再测一次", exact: true })
     .click();
@@ -106,13 +108,18 @@ export async function verifyMeasurementSupplements(
   expect(repaired.state.facts.temperature_c.turn_id).toBe(
     repaired.state.facts.medications_taken.turn_id,
   );
-  expect(model.requests).toHaveLength(7);
+  // Seven turns plus the two 5xx frames the backend retried before the
+  // failure surfaced.
+  expect(model.requests).toHaveLength(9);
+  // Every frame of the supplement turn — the failed attempt, the backend's
+  // retry, and the repaired one — must carry the pasted report. Selected by
+  // content rather than by index so the outage frames cannot shift it.
   const observed = model.requests
-    .slice(4)
     .map((r) =>
       JSON.parse(r.messages.find((message) => message.role === "user").content),
-    );
-  expect(observed.every((c) => c.latest_user_text === report)).toBe(true);
+    )
+    .filter((c) => c.latest_user_text === report);
+  expect(observed.length).toBeGreaterThanOrEqual(3);
   expect(
     observed.every(
       (c) => c.completed_observation_with_supplement.text === report,
@@ -141,7 +148,7 @@ export async function verifyMeasurementSupplements(
   expect(
     final.state.history.filter((f) => f.key === "temperature_c"),
   ).toHaveLength(2);
-  expect(model.requests).toHaveLength(9);
+  expect(model.requests).toHaveLength(11);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

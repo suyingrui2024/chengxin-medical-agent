@@ -24,6 +24,8 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:18766",
     headless: true,
+    // One viewport key only: a duplicated literal silently kept whichever
+    // came last, so the 1280x900 line above it was dead.
     viewport: { width: 1440, height: 1080 },
     launchOptions: browserExecutable
       ? { executablePath: browserExecutable }

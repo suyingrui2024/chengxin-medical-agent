@@ -1,0 +1,297 @@
+{
+  "id": "calculate.bishop",
+  "name": "Bishop 宫颈评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "宫颈成熟度评分（0–13 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Bishop", "宫颈评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 13,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "b1",
+        "label": "宫颈扩张",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "闭合"
+          },
+          {
+            "value": 1,
+            "label": "1 至 2 厘米"
+          },
+          {
+            "value": 2,
+            "label": "3 至 4 厘米"
+          },
+          {
+            "value": 3,
+            "label": "5 厘米及以上"
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "label": "宫颈消退",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 至 30%"
+          },
+          {
+            "value": 1,
+            "label": "40 至 50%"
+          },
+          {
+            "value": 2,
+            "label": "60 至 70%"
+          },
+          {
+            "value": 3,
+            "label": "80% 及以上"
+          }
+        ]
+      },
+      {
+        "id": "b3",
+        "label": "胎头位置",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "坐骨棘上 3 厘米"
+          },
+          {
+            "value": 1,
+            "label": "坐骨棘上 2 厘米"
+          },
+          {
+            "value": 2,
+            "label": "坐骨棘上 1 厘米或平坐骨棘"
+          },
+          {
+            "value": 3,
+            "label": "坐骨棘下 1 厘米及以下"
+          }
+        ]
+      },
+      {
+        "id": "b4",
+        "label": "宫颈硬度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "硬"
+          },
+          {
+            "value": 1,
+            "label": "中等"
+          },
+          {
+            "value": 2,
+            "label": "软"
+          }
+        ]
+      },
+      {
+        "id": "b5",
+        "label": "宫颈位置",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "后位"
+          },
+          {
+            "value": 1,
+            "label": "中位"
+          },
+          {
+            "value": 2,
+            "label": "前位"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 5,
+        "key": "unfavourable",
+        "label": "宫颈不成熟"
+      },
+      {
+        "min": 6,
+        "max": 8,
+        "key": "intermediate",
+        "label": "中等"
+      },
+      {
+        "min": 9,
+        "max": 13,
+        "key": "favourable",
+        "label": "宫颈成熟"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "b1": {
+        "type": "number",
+        "title": "宫颈扩张",
+        "enum": [0, 1, 2, 3]
+      },
+      "b2": {
+        "type": "number",
+        "title": "宫颈消退",
+        "enum": [0, 1, 2, 3]
+      },
+      "b3": {
+        "type": "number",
+        "title": "胎头位置",
+        "enum": [0, 1, 2, 3]
+      },
+      "b4": {
+        "type": "number",
+        "title": "宫颈硬度",
+        "enum": [0, 1, 2]
+      },
+      "b5": {
+        "type": "number",
+        "title": "宫颈位置",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Bishop score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Bishop+score+cervical+ripening",
+      "section": "Bishop EH. 1964；5 项合计 0–13 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

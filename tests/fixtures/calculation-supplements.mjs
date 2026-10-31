@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { nextCommand, outage } from "./model-feedback.mjs";
 import { once } from "node:events";
 import { expect } from "@playwright/test";
 
@@ -31,7 +32,7 @@ export async function createCalculationSupplementsModel() {
   const requests = [];
   const commands = [
     calculate(text),
-    null,
+    ...outage(),
     record([medication]),
     ask("age"),
     calculate(earlier),
@@ -44,8 +45,9 @@ export async function createCalculationSupplementsModel() {
   const server = createServer(async (request, response) => {
     let raw = "";
     for await (const chunk of request) raw += chunk;
-    requests.push(JSON.parse(raw));
-    const command = commands.shift();
+    const body = JSON.parse(raw);
+    requests.push(body);
+    const command = nextCommand(body, commands);
     response.writeHead(command ? 200 : command === null ? 503 : 500, {
       "Content-Type": "application/json",
     });
@@ -160,7 +162,11 @@ export async function verifyCalculationSupplements(
   expect(recovered.state.facts.medications_taken.evidence).toBe(
     "昨晚用过药物甲",
   );
-  expect(model.requests).toHaveLength(4);
+  // Four scripted turns, plus the two attempts the failed turn costs:
+  // the transport retries HTTP 5xx once, so `outage()` has to inject the
+  // failure twice before the patient sees it. Exact, so a runaway retry
+  // loop still fails.
+  expect(model.requests).toHaveLength(6);
   await page.locator("#new-session").click();
   const second = await send(earlier),
     other = second.state.session_id;
@@ -186,7 +192,7 @@ export async function verifyCalculationSupplements(
     { other, oldAction, id: second.reply.calculation_followup.id },
   );
   expect(stale).toBe(409);
-  expect(model.requests).toHaveLength(7);
+  expect(model.requests).toHaveLength(9);
   if (mobile) await page.setViewportSize({ width: 390, height: 844 });
   const processBounds = await process.boundingBox();
   expect(processBounds.y + processBounds.height).toBeLessThanOrEqual(
@@ -216,6 +222,6 @@ export async function verifyCalculationSupplements(
         JSON.stringify(event.payload).includes("不能覆盖随后"),
     ),
   ).toBe(true);
-  expect(model.requests).toHaveLength(10);
+  expect(model.requests).toHaveLength(12);
   expect(errors).toEqual([]);
 }

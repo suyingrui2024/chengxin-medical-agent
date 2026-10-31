@@ -1,0 +1,142 @@
+{
+  "id": "calculate.edd",
+  "name": "孕周计算",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按末次月经与记录日期计算孕周。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "aliases": ["孕周", "预产期"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "edd",
+    "citation": "GEST-AGE",
+    "inputs": [
+      {
+        "id": "lmp",
+        "label": "末次月经第一天",
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      },
+      {
+        "id": "today",
+        "label": "记录日期",
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      }
+    ],
+    "output": {
+      "label": "孕周",
+      "unit": "周",
+      "min": "0",
+      "max": "45",
+      "precision": {
+        "places": 1
+      },
+      "direction": "no_direction"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "孕周计算 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=gestational+age+last+menstrual+period",
+      "section": "GEST-AGE：(记录日期 − 末次月经) ÷ 7",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "formula_form/v1",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "lmp": {
+        "type": "string",
+        "title": "末次月经第一天",
+        "maxLength": 10
+      },
+      "today": {
+        "type": "string",
+        "title": "记录日期",
+        "maxLength": 10
+      }
+    }
+  }
+}

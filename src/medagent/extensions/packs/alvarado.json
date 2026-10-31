@@ -1,0 +1,328 @@
+{
+  "id": "calculate.alvarado",
+  "name": "Alvarado 阑尾炎评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "急性阑尾炎临床评分（0–10 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Alvarado", "阑尾炎评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 10,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "a1",
+        "label": "疼痛向右下腹转移",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "a2",
+        "label": "右下腹压痛",
+        "kind": "choice",
+        "weight": 2,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "a3",
+        "label": "反跳痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "a4",
+        "label": "体温升高",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "a5",
+        "label": "恶心或呕吐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "a6",
+        "label": "食欲不振",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "a7",
+        "label": "白细胞升高",
+        "kind": "choice",
+        "weight": 2,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "a8",
+        "label": "中性粒细胞左移",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "key": "low",
+        "label": "可能性低"
+      },
+      {
+        "min": 4,
+        "max": 6,
+        "key": "moderate",
+        "label": "可能"
+      },
+      {
+        "min": 7,
+        "max": 10,
+        "key": "high",
+        "label": "可能性高"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "a1": {
+        "type": "number",
+        "title": "疼痛向右下腹转移",
+        "enum": [0, 1]
+      },
+      "a2": {
+        "type": "number",
+        "title": "右下腹压痛",
+        "enum": [0, 1]
+      },
+      "a3": {
+        "type": "number",
+        "title": "反跳痛",
+        "enum": [0, 1]
+      },
+      "a4": {
+        "type": "number",
+        "title": "体温升高",
+        "enum": [0, 1]
+      },
+      "a5": {
+        "type": "number",
+        "title": "恶心或呕吐",
+        "enum": [0, 1]
+      },
+      "a6": {
+        "type": "number",
+        "title": "食欲不振",
+        "enum": [0, 1]
+      },
+      "a7": {
+        "type": "number",
+        "title": "白细胞升高",
+        "enum": [0, 1]
+      },
+      "a8": {
+        "type": "number",
+        "title": "中性粒细胞左移",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Alvarado score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Alvarado+score+acute+appendicitis",
+      "section": "Alvarado A. 1986；7 项合计 0–10 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

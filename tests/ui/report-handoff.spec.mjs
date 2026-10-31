@@ -14,6 +14,7 @@ test("pasted report rows require patient confirmation before appearing in the ha
   );
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const sessionId = (await (await created).json()).session_id;
+  await page.getByRole("button", { name: "我自己", exact: true }).click();
 
   await page.getByRole("button", { name: "添加报告内容", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "核对报告内容" });
@@ -51,6 +52,13 @@ test("pasted report rows require patient confirmation before appearing in the ha
   await handoff.getByRole("button", { name: "关闭交接摘要" }).click();
 
   page.once("dialog", (dialogEvent) => dialogEvent.accept());
+  // The report summary lives in the facts drawer, which starts closed.
+  if (
+    !(await page
+      .locator("#facts-panel")
+      .evaluate((n) => n.classList.contains("open")))
+  )
+    await page.locator("#toggle-facts").click();
   await page
     .locator("#report-items-summary")
     .getByRole("button", { name: "移除" })

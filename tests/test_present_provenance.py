@@ -13,7 +13,7 @@ from medagent.triage import TriageService
 from tests.test_agent import ScriptBackend, cmd, fact
 
 
-RAW = "我自己，男，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
+RAW = "我自己，男，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。没有剧烈疼痛，没有持续加重，也没有不能活动。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"
 ROWS = [
     ("consult_for", "self", "我自己", "present"),
     ("sex", "male", "男", "present"),
@@ -24,6 +24,12 @@ ROWS = [
     ("severity", 3, "影响程度3分", "present"),
     ("associated_symptoms", None, "没有其他不适", "absent"),
     ("emergency_screen", None, "上述危险信号都没有", "absent"),
+    # P3 off-pathway warning screen: an arm complaint triggers no
+    # differential pathway, so the three domains the emergency screen
+    # does not subsume are asked and must be on file before summary.
+    ("warning_剧痛", None, "没有剧烈疼痛", "absent"),
+    ("warning_持续加重", None, "没有持续加重", "absent"),
+    ("warning_功能骤降", None, "没有不能活动", "absent"),
     ("medications_taken", "用过药物甲", "昨晚用过药物甲", "present"),
     ("allergies", None, "没有过敏", "absent"),
     ("relevant_history", None, "没有相关既往病史", "absent"),

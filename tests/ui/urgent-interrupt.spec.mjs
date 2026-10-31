@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const late of ["response", "error"]) {
   test(`priority help stays available during a pending message and ignores its late ${late}`, async ({
@@ -36,7 +37,7 @@ for (const late of ["response", "error"]) {
       const text = '<img src=x onerror="alert(1)"> 我需要先求助';
       await page.getByLabel("现在的情况（选填）").fill(text);
       await page.screenshot({
-        path: "docs/assets/ui/38-priority-help-dialog.png",
+        path: shotPath("38-priority-help-dialog.png"),
         fullPage: true,
       });
       await page.getByRole("button", { name: "优先求助", exact: true }).click();
@@ -46,7 +47,7 @@ for (const late of ["response", "error"]) {
       await expect(page.locator("#busy-indicator")).toBeHidden();
       expect(await page.locator('img[src="x"]').count()).toBe(0);
       await page.screenshot({
-        path: "docs/assets/ui/39-priority-help-response.png",
+        path: shotPath("39-priority-help-response.png"),
         fullPage: true,
       });
       if (late === "error") {
@@ -120,7 +121,7 @@ test("priority help preserves a failed request draft and works at a narrow viewp
   expect(bounds.y).toBeGreaterThanOrEqual(0);
   expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
   await page.screenshot({
-    path: "docs/assets/ui/42-mobile-priority-response.png",
+    path: shotPath("42-mobile-priority-response.png"),
     animations: "disabled",
   });
 });

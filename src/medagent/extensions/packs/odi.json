@@ -1,0 +1,543 @@
+{
+  "id": "calculate.odi",
+  "name": "ODI 腰痛功能障碍指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Oswestry 腰痛功能障碍指数（10 项，折算 0–100%），用于记录腰痛对日常活动的影响，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["ODI", "腰痛功能障碍", "Oswestry"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum_percent",
+      "min": 0,
+      "max": 50,
+      "unit": "%",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "o1",
+        "label": "疼痛程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无痛"
+          },
+          {
+            "value": 1,
+            "label": "轻微疼痛"
+          },
+          {
+            "value": 2,
+            "label": "中度疼痛"
+          },
+          {
+            "value": 3,
+            "label": "较重疼痛"
+          },
+          {
+            "value": 4,
+            "label": "很重疼痛"
+          },
+          {
+            "value": 5,
+            "label": "能想象的最重疼痛"
+          }
+        ]
+      },
+      {
+        "id": "o2",
+        "label": "个人照料",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常，不需要帮助"
+          },
+          {
+            "value": 1,
+            "label": "正常，但会引起疼痛"
+          },
+          {
+            "value": 2,
+            "label": "动作慢且小心"
+          },
+          {
+            "value": 3,
+            "label": "需要一些帮助"
+          },
+          {
+            "value": 4,
+            "label": "大部分需要帮助"
+          },
+          {
+            "value": 5,
+            "label": "完全需要帮助"
+          }
+        ]
+      },
+      {
+        "id": "o3",
+        "label": "提物",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能提重物且不痛"
+          },
+          {
+            "value": 1,
+            "label": "能提重物但会痛"
+          },
+          {
+            "value": 2,
+            "label": "疼痛妨碍从地上提物"
+          },
+          {
+            "value": 3,
+            "label": "只能提轻物"
+          },
+          {
+            "value": 4,
+            "label": "几乎不能提物"
+          },
+          {
+            "value": 5,
+            "label": "完全不能提物"
+          }
+        ]
+      },
+      {
+        "id": "o4",
+        "label": "行走",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能走多远都不痛"
+          },
+          {
+            "value": 1,
+            "label": "能走但会痛"
+          },
+          {
+            "value": 2,
+            "label": "走一公里内会痛"
+          },
+          {
+            "value": 3,
+            "label": "走几百米会痛"
+          },
+          {
+            "value": 4,
+            "label": "需用手杖才能走"
+          },
+          {
+            "value": 5,
+            "label": "大部分时间卧床"
+          }
+        ]
+      },
+      {
+        "id": "o5",
+        "label": "坐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "想坐多久都行"
+          },
+          {
+            "value": 1,
+            "label": "只能坐特定椅子"
+          },
+          {
+            "value": 2,
+            "label": "坐一小时会痛"
+          },
+          {
+            "value": 3,
+            "label": "坐半小时会痛"
+          },
+          {
+            "value": 4,
+            "label": "坐十分钟会痛"
+          },
+          {
+            "value": 5,
+            "label": "因痛不能坐"
+          }
+        ]
+      },
+      {
+        "id": "o6",
+        "label": "站立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "想站多久都行"
+          },
+          {
+            "value": 1,
+            "label": "站久了会痛"
+          },
+          {
+            "value": 2,
+            "label": "站一小时会痛"
+          },
+          {
+            "value": 3,
+            "label": "站半小时会痛"
+          },
+          {
+            "value": 4,
+            "label": "站十分钟会痛"
+          },
+          {
+            "value": 5,
+            "label": "因痛不能站"
+          }
+        ]
+      },
+      {
+        "id": "o7",
+        "label": "睡眠",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "睡眠不受影响"
+          },
+          {
+            "value": 1,
+            "label": "偶尔因痛醒来"
+          },
+          {
+            "value": 2,
+            "label": "因痛睡不足六小时"
+          },
+          {
+            "value": 3,
+            "label": "因痛睡不足四小时"
+          },
+          {
+            "value": 4,
+            "label": "因痛睡不足两小时"
+          },
+          {
+            "value": 5,
+            "label": "因痛完全不能睡"
+          }
+        ]
+      },
+      {
+        "id": "o8",
+        "label": "性生活",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "正常但会痛"
+          },
+          {
+            "value": 2,
+            "label": "明显受影响"
+          },
+          {
+            "value": 3,
+            "label": "严重受限"
+          },
+          {
+            "value": 4,
+            "label": "几乎不能"
+          },
+          {
+            "value": 5,
+            "label": "因痛完全没有"
+          }
+        ]
+      },
+      {
+        "id": "o9",
+        "label": "社交生活",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "社交正常"
+          },
+          {
+            "value": 1,
+            "label": "社交正常但会增加疼痛"
+          },
+          {
+            "value": 2,
+            "label": "疼痛限制了部分社交"
+          },
+          {
+            "value": 3,
+            "label": "疼痛明显限制社交"
+          },
+          {
+            "value": 4,
+            "label": "社交基本限于家中"
+          },
+          {
+            "value": 5,
+            "label": "因痛没有社交"
+          }
+        ]
+      },
+      {
+        "id": "o10",
+        "label": "旅行",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "能去任何地方"
+          },
+          {
+            "value": 1,
+            "label": "旅行会痛"
+          },
+          {
+            "value": 2,
+            "label": "疼痛限制两小时以上出行"
+          },
+          {
+            "value": 3,
+            "label": "疼痛限制一小时以上出行"
+          },
+          {
+            "value": 4,
+            "label": "疼痛限制半小时以内出行"
+          },
+          {
+            "value": 5,
+            "label": "除就医外不能出行"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 20,
+        "key": "mild",
+        "label": "轻度受限"
+      },
+      {
+        "min": 21,
+        "max": 40,
+        "key": "moderate",
+        "label": "中度受限"
+      },
+      {
+        "min": 41,
+        "max": 60,
+        "key": "severe",
+        "label": "重度受限"
+      },
+      {
+        "min": 61,
+        "max": 80,
+        "key": "very_severe",
+        "label": "极重度受限"
+      },
+      {
+        "min": 81,
+        "max": 100,
+        "key": "bed_bound",
+        "label": "接近卧床"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "o1": {
+        "type": "number",
+        "title": "疼痛程度",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o2": {
+        "type": "number",
+        "title": "个人照料",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o3": {
+        "type": "number",
+        "title": "提物",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o4": {
+        "type": "number",
+        "title": "行走",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o5": {
+        "type": "number",
+        "title": "坐",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o6": {
+        "type": "number",
+        "title": "站立",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o7": {
+        "type": "number",
+        "title": "睡眠",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o8": {
+        "type": "number",
+        "title": "性生活",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o9": {
+        "type": "number",
+        "title": "社交生活",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "o10": {
+        "type": "number",
+        "title": "旅行",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Oswestry Disability Index",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Oswestry+Disability+Index+low+back+pain",
+      "section": "ODI：Fairbank JC, et al. 1980；10 项各 0–5 分，合计除以 50 折算为百分比",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

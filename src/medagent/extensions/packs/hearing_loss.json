@@ -1,0 +1,215 @@
+{
+  "id": "calculate.hearing_loss",
+  "name": "听力损失程度分级",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按平均听阈分级（分级型）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["听力损失", "听力分级"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 5,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "grade",
+        "label": "按较好耳平均听阈选择",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常：25 分贝及以下"
+          },
+          {
+            "value": 1,
+            "label": "轻度：26 至 40 分贝"
+          },
+          {
+            "value": 2,
+            "label": "中度：41 至 55 分贝"
+          },
+          {
+            "value": 3,
+            "label": "中重度：56 至 70 分贝"
+          },
+          {
+            "value": 4,
+            "label": "重度：71 至 90 分贝"
+          },
+          {
+            "value": 5,
+            "label": "极重度：91 分贝及以上"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "normal",
+        "label": "正常"
+      },
+      {
+        "min": 1,
+        "max": 1,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 2,
+        "max": 2,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 3,
+        "max": 3,
+        "key": "moderately_severe",
+        "label": "中重度"
+      },
+      {
+        "min": 4,
+        "max": 4,
+        "key": "severe",
+        "label": "重度"
+      },
+      {
+        "min": 5,
+        "max": 5,
+        "key": "profound",
+        "label": "极重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "grade": {
+        "type": "number",
+        "title": "按较好耳平均听阈选择",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "WHO hearing loss grades",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=WHO+grades+of+hearing+impairment",
+      "section": "WHO 听力损失分级；按 500/1000/2000/4000 Hz 平均听阈",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

@@ -1,0 +1,260 @@
+{
+  "id": "calculate.tongue",
+  "name": "舌象记录",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "舌象要素记录（分级型），用于留档，不作辨证结论。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["舌象"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 12,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "color",
+        "label": "舌质颜色",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "淡红"
+          },
+          {
+            "value": 1,
+            "label": "淡白"
+          },
+          {
+            "value": 2,
+            "label": "红"
+          },
+          {
+            "value": 3,
+            "label": "绛"
+          },
+          {
+            "value": 4,
+            "label": "紫暗"
+          }
+        ]
+      },
+      {
+        "id": "shape",
+        "label": "舌形",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "胖大"
+          },
+          {
+            "value": 2,
+            "label": "瘦小"
+          },
+          {
+            "value": 3,
+            "label": "齿痕"
+          },
+          {
+            "value": 4,
+            "label": "裂纹"
+          }
+        ]
+      },
+      {
+        "id": "coating",
+        "label": "舌苔",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "薄白"
+          },
+          {
+            "value": 1,
+            "label": "白腻"
+          },
+          {
+            "value": 2,
+            "label": "黄腻"
+          },
+          {
+            "value": 3,
+            "label": "少苔或无苔"
+          },
+          {
+            "value": 4,
+            "label": "剥苔"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "key": "balanced",
+        "label": "常见舌象"
+      },
+      {
+        "min": 4,
+        "max": 8,
+        "key": "deviated",
+        "label": "偏颇舌象"
+      },
+      {
+        "min": 9,
+        "max": 12,
+        "key": "marked",
+        "label": "明显偏颇"
+      }
+    ],
+    "note": "只做要素记录，不输出证型或治法。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "color": {
+        "type": "number",
+        "title": "舌质颜色",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "shape": {
+        "type": "number",
+        "title": "舌形",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "coating": {
+        "type": "number",
+        "title": "舌苔",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "TCM tongue diagnosis descriptors",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=traditional+Chinese+medicine+tongue+diagnosis",
+      "section": "舌质、舌形、舌苔三要素记录",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

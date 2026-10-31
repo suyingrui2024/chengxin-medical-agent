@@ -85,10 +85,21 @@ def reply_presentation(reply):
     ):
         adaptive = deepcopy(reply.get("adaptive_question"))
         question_id = question["id"] if question else adaptive["topic"]
+        # A bridging anchor is a host sentence prepended to the *same* bank
+        # question ("你说…，再问一句：" + prompt).  Comparing the whole message
+        # to the prompt alone marked those questions non-canonical, which made
+        # the UI drop their visual spec (the 6-item emergency signal grid and
+        # the short title).  Treat "prompt is the message, or its suffix" as
+        # canonical; a genuine clarification never ends with the bank prompt.
+        message = reply["message"]
+        prompt = question["prompt"] if question else None
+        canonical = bool(question) and (
+            message == prompt or message.endswith(prompt)
+        )
         question_data = {
             "question_id": question_id,
-            "prompt": reply["message"],
-            "canonical": bool(question and reply["message"] == question["prompt"]),
+            "prompt": message,
+            "canonical": canonical,
             "input_kind": question["input"] if question else "adaptive",
             "choices": reply.get("quick_replies", []),
         }

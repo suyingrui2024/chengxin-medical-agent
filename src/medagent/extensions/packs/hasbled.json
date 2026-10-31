@@ -1,0 +1,344 @@
+{
+  "id": "calculate.hasbled",
+  "name": "HAS-BLED 出血风险评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "抗凝出血风险分层（0–9 分），仅作风险记录，不给停药建议。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["HAS-BLED", "出血风险"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 9,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "h1",
+        "label": "高血压（收缩压高于 160 mmHg）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h2",
+        "label": "肾功能异常",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h3",
+        "label": "肝功能异常",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h4",
+        "label": "卒中史",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h5",
+        "label": "出血史或易出血体质",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h6",
+        "label": "INR 不稳定（达标时间少）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h7",
+        "label": "年龄大于 65 岁",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h8",
+        "label": "合并抗血小板药或非甾体抗炎药",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "h9",
+        "label": "酒精过量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 3,
+        "max": 9,
+        "key": "high",
+        "label": "高风险"
+      }
+    ],
+    "note": "高分提示需更密切随访，不等于停用抗凝。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "h1": {
+        "type": "number",
+        "title": "高血压（收缩压高于 160 mmHg）",
+        "enum": [0, 1]
+      },
+      "h2": {
+        "type": "number",
+        "title": "肾功能异常",
+        "enum": [0, 1]
+      },
+      "h3": {
+        "type": "number",
+        "title": "肝功能异常",
+        "enum": [0, 1]
+      },
+      "h4": {
+        "type": "number",
+        "title": "卒中史",
+        "enum": [0, 1]
+      },
+      "h5": {
+        "type": "number",
+        "title": "出血史或易出血体质",
+        "enum": [0, 1]
+      },
+      "h6": {
+        "type": "number",
+        "title": "INR 不稳定（达标时间少）",
+        "enum": [0, 1]
+      },
+      "h7": {
+        "type": "number",
+        "title": "年龄大于 65 岁",
+        "enum": [0, 1]
+      },
+      "h8": {
+        "type": "number",
+        "title": "合并抗血小板药或非甾体抗炎药",
+        "enum": [0, 1]
+      },
+      "h9": {
+        "type": "number",
+        "title": "酒精过量",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "HAS-BLED 出血风险评分",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=HAS-BLED+bleeding+risk+score+anticoagulation",
+      "section": "Pisters R, et al. 2010；9 项合计 0–9 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

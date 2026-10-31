@@ -1,0 +1,34 @@
+{
+  "note": "多轮桥接：第一轮模型调用能力，患者作答并确认，第三轮患者追问解读。",
+  "recorded_by": "subagent-bridge (2026-10-28)",
+  "turns": {
+    "turn1_utterance": "帮我做个 PHQ-8",
+    "turn1_decision": {
+      "tool": "run_capability",
+      "arguments": {
+        "id": "calculate.phq8",
+        "input": {},
+        "evidence": "帮我做个 PHQ-8"
+      }
+    },
+    "answers": {
+      "p1": 1,
+      "p2": 1,
+      "p3": 1,
+      "p4": 1,
+      "p5": 1,
+      "p6": 1,
+      "p7": 1,
+      "p8": 1
+    },
+    "expected_score": "8",
+    "turn3_utterance": "这个分数说明什么",
+    "turn3_decision": {
+      "tool": "clarify",
+      "arguments": {
+        "message": "你这次每一条都选了「好几天」，这个分数只是把这次作答记录下来，不能说明是什么病，也不决定该怎么处理；想弄清它对你意味着什么，得先知道你最近最困扰的是哪件事——这段时间最让你难受的是什么？",
+        "topic": "chief_complaint"
+      }
+    }
+  }
+}

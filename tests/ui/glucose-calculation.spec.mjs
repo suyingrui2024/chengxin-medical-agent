@@ -3,6 +3,7 @@ import {
   createGlucoseModel,
   verifyGlucoseCalculation,
 } from "../fixtures/glucose-calculation.mjs";
+import { SHOTS_DIR } from "../fixtures/shots.mjs";
 
 test("glucose renderer rejects missing basis and unsafe links while preserving legacy results", async ({
   page,
@@ -91,9 +92,11 @@ test("glucose renderer rejects missing basis and unsafe links while preserving l
     .last()
     .getByText("执行依据与限制", { exact: true })
     .click();
-  await expect(target.locator(".calculation-references a")).toContainText(
-    "原文标题",
-  );
+  // The injected link is appended last; the capability may carry its own
+  // references (units now cites the SI Brochure).
+  await expect(
+    target.locator(".calculation-references a").last(),
+  ).toContainText("原文标题");
   await expect(target.locator('img[src="x"]')).toHaveCount(0);
 });
 
@@ -117,7 +120,7 @@ test("sourced glucose conversion uses a scoped form, approximate result and orig
     ).toBe(true);
     await page.goto("/");
     await verifyGlucoseCalculation(page, model, {
-      shots: "docs/assets/ui",
+      shots: SHOTS_DIR,
       mobile: true,
     });
   } finally {

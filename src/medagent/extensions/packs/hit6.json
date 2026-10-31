@@ -1,0 +1,341 @@
+{
+  "id": "calculate.hit6",
+  "name": "HIT-6 头痛影响测试",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "头痛影响测试（6 项，36–78 分），用于记录头痛对生活的影响，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["HIT-6", "HIT6", "头痛影响"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 36,
+      "max": 78,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "h1",
+        "label": "头痛时疼痛有多剧烈",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 6,
+            "label": "从不"
+          },
+          {
+            "value": 8,
+            "label": "很少"
+          },
+          {
+            "value": 10,
+            "label": "有时"
+          },
+          {
+            "value": 11,
+            "label": "经常"
+          },
+          {
+            "value": 13,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "h2",
+        "label": "头痛是否限制了日常活动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 6,
+            "label": "从不"
+          },
+          {
+            "value": 8,
+            "label": "很少"
+          },
+          {
+            "value": 10,
+            "label": "有时"
+          },
+          {
+            "value": 11,
+            "label": "经常"
+          },
+          {
+            "value": 13,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "h3",
+        "label": "头痛时是否想躺下休息",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 6,
+            "label": "从不"
+          },
+          {
+            "value": 8,
+            "label": "很少"
+          },
+          {
+            "value": 10,
+            "label": "有时"
+          },
+          {
+            "value": 11,
+            "label": "经常"
+          },
+          {
+            "value": 13,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "h4",
+        "label": "过去四周是否因头痛感到疲劳",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 6,
+            "label": "从不"
+          },
+          {
+            "value": 8,
+            "label": "很少"
+          },
+          {
+            "value": 10,
+            "label": "有时"
+          },
+          {
+            "value": 11,
+            "label": "经常"
+          },
+          {
+            "value": 13,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "h5",
+        "label": "过去四周是否因头痛感到烦躁",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 6,
+            "label": "从不"
+          },
+          {
+            "value": 8,
+            "label": "很少"
+          },
+          {
+            "value": 10,
+            "label": "有时"
+          },
+          {
+            "value": 11,
+            "label": "经常"
+          },
+          {
+            "value": 13,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "h6",
+        "label": "过去四周是否因头痛难以集中注意力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 6,
+            "label": "从不"
+          },
+          {
+            "value": 8,
+            "label": "很少"
+          },
+          {
+            "value": 10,
+            "label": "有时"
+          },
+          {
+            "value": 11,
+            "label": "经常"
+          },
+          {
+            "value": 13,
+            "label": "总是"
+          }
+        ]
+      }
+    ],
+    "bands": [],
+    "note": "分级直接对应影响程度，易被读成结论，本版只出总分。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "h1": {
+        "type": "number",
+        "title": "头痛时疼痛有多剧烈",
+        "enum": [6, 8, 10, 11, 13]
+      },
+      "h2": {
+        "type": "number",
+        "title": "头痛是否限制了日常活动",
+        "enum": [6, 8, 10, 11, 13]
+      },
+      "h3": {
+        "type": "number",
+        "title": "头痛时是否想躺下休息",
+        "enum": [6, 8, 10, 11, 13]
+      },
+      "h4": {
+        "type": "number",
+        "title": "过去四周是否因头痛感到疲劳",
+        "enum": [6, 8, 10, 11, 13]
+      },
+      "h5": {
+        "type": "number",
+        "title": "过去四周是否因头痛感到烦躁",
+        "enum": [6, 8, 10, 11, 13]
+      },
+      "h6": {
+        "type": "number",
+        "title": "过去四周是否因头痛难以集中注意力",
+        "enum": [6, 8, 10, 11, 13]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Headache Impact Test (HIT-6)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Headache+Impact+Test+HIT-6",
+      "section": "HIT-6：6 项各 6/8/10/11/13 分，合计 36–78 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# 开发与测试依赖。
+#
+# 测试套件混用两种风格：unittest 的 TestCase 与 pytest 的模块级函数。
+# `python -m unittest discover` 只收集前者，会**静默跳过** pytest 风格的
+# 模块（此前有 84 项从未执行）。pytest 两种都能收集，因此测试统一用
+# pytest 跑：
+#
+#   PYTHONPATH=src python3 -m pytest tests/ -q
+#
+# 或 npm run test:python
+pytest>=8

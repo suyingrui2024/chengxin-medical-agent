@@ -78,12 +78,12 @@ class ComposerUnitTests(unittest.TestCase):
         self.assertIn("发烧", flu["support_quotes"])
 
     def test_missing_patient_label_never_reaches_patient_text(self):
-        original = conclusion_module._patient_labels
-        conclusion_module._patient_labels = lambda: {}
+        original = conclusion_module.support._patient_labels
+        conclusion_module.support._patient_labels = lambda: {}
         try:
             sheet = compose_conclusion(closed_state())
         finally:
-            conclusion_module._patient_labels = original
+            conclusion_module.support._patient_labels = original
         for direction in sheet["directions"]:
             self.assertIsNone(direction["patient_label"])
 

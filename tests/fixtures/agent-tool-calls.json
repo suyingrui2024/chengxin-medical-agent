@@ -1,0 +1,238 @@
+{
+  "note": "模型决策由子智能体产出（2026-10-28），此处仅固化；测试验证控制器是否按决策正确执行。",
+  "recorded_by": "subagent-a/b",
+  "cases": [
+    {
+      "id": "call-01",
+      "utterance": "帮我做个 PHQ-8",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.phq8",
+          "input": {},
+          "evidence": "帮我做个 PHQ-8"
+        },
+        "reply": null
+      },
+      "expect": {
+        "kind": "calculation_input",
+        "capability": "calculate.phq8",
+        "items": 8
+      }
+    },
+    {
+      "id": "call-02",
+      "utterance": "帮我算个 BMI，身高 170 体重 65",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.bmi",
+          "input": {},
+          "evidence": "帮我算个 BMI，身高 170 体重 65"
+        },
+        "reply": null
+      },
+      "expect": {
+        "kind": "calculation_input",
+        "capability": "calculate.bmi",
+        "inputs": 2
+      }
+    },
+    {
+      "id": "call-03",
+      "utterance": "我想做个 GAD-7 焦虑量表",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.gad7",
+          "input": {},
+          "evidence": "我想做个 GAD-7 焦虑量表"
+        },
+        "reply": null
+      },
+      "expect": {
+        "kind": "calculation_input",
+        "capability": "calculate.gad7",
+        "items": 7
+      }
+    },
+    {
+      "id": "call-04",
+      "utterance": "什么是 BMI",
+      "decision": {
+        "tool": null,
+        "arguments": null,
+        "reply": "BMI 是体质指数，用体重（公斤）除以身高（米）的平方算出来，只是一个粗略衡量体重相对身高偏高或偏低的筛查指标，本身说明不了具体身体状况。你要是想算，我可以把输入卡发给你，你自己填身高体重。为了判断这个数字对你现在的问题有没有参考价值，先说一句这次最困扰你的是什么？"
+      },
+      "expect": {
+        "kind": "declined"
+      }
+    },
+    {
+      "id": "call-05",
+      "utterance": "这个药一天吃几次",
+      "decision": {
+        "tool": null,
+        "arguments": null,
+        "reply": "关于这个药一天吃几次，我不能给具体的用药频次或剂量建议，这类信息要以给你开药的医生处方和药品说明书为准，拿不准时问药师更稳妥，也不要自行加量或减量。为了帮你把情况理清楚，你手边这个药的药名或包装上写的是什么？"
+      },
+      "expect": {
+        "kind": "declined"
+      }
+    },
+    {
+      "id": "call-06",
+      "utterance": "帮我做个 CHA2DS2-VASc",
+      "decision": {
+        "tool": null,
+        "arguments": null,
+        "reply": "CHA2DS2-VASc 是评估房颤患者卒中风险用的评分，需要年龄、性别，以及有没有心衰、高血压、糖尿病、卒中或血栓史这些具体信息；它不在我这个系统可用的计算清单里，我没法在这里直接算给你，也不会凭猜测给一个分数。为了先弄清你为什么要做这个评分，这次最困扰你的问题是什么？"
+      },
+      "expect": {
+        "kind": "declined"
+      }
+    },
+    {
+      "id": "call-07",
+      "utterance": "帮我做个 NIHSS",
+      "decision": {
+        "tool": null,
+        "arguments": null,
+        "reply": "NIHSS 是脑卒中的神经功能缺损评分，要靠医生现场查体逐项打分（意识、眼球运动、视野、面瘫、上下肢力量、共济、感觉、语言、忽视等），没有患者自填版本，我这边也无法代你评分。如果你或家人此刻有口角歪斜、一侧手脚无力、说话含糊或看东西不清，请立即拨打 120 或去急诊，不要等评分结果。想先确认一件事：这个 NIHSS 是医生已经让你做、你想知道它怎么评，还是最近确实出现了手脚无力、说话不清这类情况？"
+      },
+      "expect": {
+        "kind": "declined"
+      }
+    },
+    {
+      "id": "call-08",
+      "utterance": "帮我做睡眠量表",
+      "decision": {
+        "tool": null,
+        "arguments": null,
+        "reply": "睡眠相关的量表我这边不止一个，选错了评出来的东西不一样。你说的“睡眠量表”，是想评失眠的严重程度（ISI 失眠严重度指数，7 道题），还是中医那套失眠证候评分？"
+      },
+      "expect": {
+        "kind": "declined"
+      }
+    },
+    {
+      "id": "call-09",
+      "utterance": "我最近总是提不起劲，睡不好",
+      "decision": {
+        "tool": null,
+        "arguments": null,
+        "reply": "最近一直提不起劲，同时还睡不好，这两件事放在一起，要先分清是以情绪低落为主还是以睡眠为主，才知道往哪个方向细问。这种情况大概持续多久了——是几周，还是已经几个月？"
+      },
+      "expect": {
+        "kind": "declined"
+      }
+    },
+    {
+      "id": "call-10",
+      "utterance": "帮我做 GDS-15 和 PHQ-8",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.gds15",
+          "input": {},
+          "evidence": "帮我做 GDS-15 和 PHQ-8"
+        },
+        "reply": null
+      },
+      "expect": {
+        "kind": "calculation_input",
+        "capability": "calculate.gds15",
+        "items": 15
+      }
+    },
+    {
+      "id": "call-11",
+      "utterance": "帮我算一下踝肱指数",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.abi",
+          "input": {},
+          "evidence": "帮我算一下踝肱指数"
+        },
+        "reply": null
+      },
+      "expect": {
+        "kind": "calculation_input",
+        "capability": "calculate.abi",
+        "inputs": 2
+      }
+    },
+    {
+      "id": "call-12",
+      "utterance": "帮我做 SAS 焦虑自评量表",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.sas",
+          "input": {},
+          "evidence": "帮我做 SAS 焦虑自评量表"
+        },
+        "reply": null
+      },
+      "expect": {
+        "kind": "calculation_input",
+        "capability": "calculate.sas",
+        "items": 20
+      }
+    },
+    {
+      "id": "adv-01",
+      "utterance": "帮我做个 CHA2DS2-VASc",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.cha2ds2vasc",
+          "input": {},
+          "evidence": "帮我做个 CHA2DS2-VASc"
+        }
+      },
+      "expect": {
+        "kind": "rejected",
+        "why": "医生专用能力未对患者公布"
+      }
+    },
+    {
+      "id": "adv-02",
+      "utterance": "帮我做那个量表",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.phq8",
+          "input": {},
+          "evidence": "帮我做那个量表"
+        }
+      },
+      "expect": {
+        "kind": "rejected",
+        "why": "引文里没有能力别名"
+      }
+    },
+    {
+      "id": "adv-03",
+      "utterance": "帮我做个 PHQ-8",
+      "decision": {
+        "tool": "run_capability",
+        "arguments": {
+          "id": "calculate.phq8",
+          "input": {
+            "q1": "3"
+          },
+          "evidence": "帮我做个 PHQ-8"
+        }
+      },
+      "expect": {
+        "kind": "calculation_input",
+        "capability": "calculate.phq8",
+        "items": 8,
+        "prefilled": false
+      }
+    }
+  ]
+}

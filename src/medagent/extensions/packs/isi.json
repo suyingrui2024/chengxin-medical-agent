@@ -1,0 +1,398 @@
+{
+  "id": "calculate.isi",
+  "name": "ISI 失眠严重度指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "过去两周睡眠问题的自评计分（0–28 分），用于记录失眠严重程度，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["ISI", "失眠严重度", "失眠指数"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 28,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "i1",
+        "label": "入睡困难的程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          },
+          {
+            "value": 4,
+            "label": "极重度"
+          }
+        ]
+      },
+      {
+        "id": "i2",
+        "label": "难以维持睡眠（夜间醒来）的程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          },
+          {
+            "value": 4,
+            "label": "极重度"
+          }
+        ]
+      },
+      {
+        "id": "i3",
+        "label": "过早醒来、难以再入睡的程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          },
+          {
+            "value": 4,
+            "label": "极重度"
+          }
+        ]
+      },
+      {
+        "id": "i4",
+        "label": "对目前睡眠状况的不满意程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          },
+          {
+            "value": 4,
+            "label": "极重度"
+          }
+        ]
+      },
+      {
+        "id": "i5",
+        "label": "睡眠问题影响白天功能的程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          },
+          {
+            "value": 4,
+            "label": "极重度"
+          }
+        ]
+      },
+      {
+        "id": "i6",
+        "label": "睡眠问题让别人察觉到你状态不佳的程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          },
+          {
+            "value": 4,
+            "label": "极重度"
+          }
+        ]
+      },
+      {
+        "id": "i7",
+        "label": "对目前睡眠问题的担心或苦恼程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          },
+          {
+            "value": 4,
+            "label": "极重度"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 7,
+        "key": "none",
+        "label": "无临床意义失眠"
+      },
+      {
+        "min": 8,
+        "max": 14,
+        "key": "subthreshold",
+        "label": "轻度（亚临床）"
+      },
+      {
+        "min": 15,
+        "max": 21,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 22,
+        "max": 28,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "i1": {
+        "type": "number",
+        "title": "入睡困难的程度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "i2": {
+        "type": "number",
+        "title": "难以维持睡眠（夜间醒来）的程度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "i3": {
+        "type": "number",
+        "title": "过早醒来、难以再入睡的程度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "i4": {
+        "type": "number",
+        "title": "对目前睡眠状况的不满意程度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "i5": {
+        "type": "number",
+        "title": "睡眠问题影响白天功能的程度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "i6": {
+        "type": "number",
+        "title": "睡眠问题让别人察觉到你状态不佳的程度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "i7": {
+        "type": "number",
+        "title": "对目前睡眠问题的担心或苦恼程度",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Validation of the Insomnia Severity Index as an outcome measure for insomnia research",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Validation+of+the+Insomnia+Severity+Index+as+an+outcome+measure+for+insomnia+research",
+      "section": "Bastien CH, Vallières A, Morin CM. Sleep Med. 2001;2(4):297-307.",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

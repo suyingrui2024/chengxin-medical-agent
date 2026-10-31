@@ -1,0 +1,213 @@
+{
+  "id": "calculate.rutherford",
+  "name": "Rutherford 下肢缺血分级",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "下肢动脉缺血临床分级（0–6 级）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Rutherford", "下肢缺血分级"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 6,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "grade",
+        "label": "选择最符合的分级",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 级：无症状"
+          },
+          {
+            "value": 1,
+            "label": "1 级：轻度间歇性跛行"
+          },
+          {
+            "value": 2,
+            "label": "2 级：中度间歇性跛行"
+          },
+          {
+            "value": 3,
+            "label": "3 级：重度间歇性跛行"
+          },
+          {
+            "value": 4,
+            "label": "4 级：静息痛"
+          },
+          {
+            "value": 5,
+            "label": "5 级：轻微组织缺损"
+          },
+          {
+            "value": 6,
+            "label": "6 级：重大组织缺损"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "asymptomatic",
+        "label": "0 级"
+      },
+      {
+        "min": 1,
+        "max": 2,
+        "key": "claudication",
+        "label": "1–2 级"
+      },
+      {
+        "min": 3,
+        "max": 3,
+        "key": "severe_claudication",
+        "label": "3 级"
+      },
+      {
+        "min": 4,
+        "max": 4,
+        "key": "rest_pain",
+        "label": "4 级"
+      },
+      {
+        "min": 5,
+        "max": 6,
+        "key": "tissue_loss",
+        "label": "5–6 级"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "grade": {
+        "type": "number",
+        "title": "选择最符合的分级",
+        "enum": [0, 1, 2, 3, 4, 5, 6]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Rutherford classification",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Rutherford+classification+peripheral+arterial+disease",
+      "section": "Rutherford RB, et al. 1997；0–6 级",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

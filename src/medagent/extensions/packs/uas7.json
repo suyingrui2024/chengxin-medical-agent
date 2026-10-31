@@ -1,0 +1,573 @@
+{
+  "id": "calculate.uas7",
+  "name": "UAS7 荨麻疹活动度评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "7 天荨麻疹活动度评分（14 项，0–42 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["UAS7", "荨麻疹活动度"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 42,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "w1",
+        "label": "第 1 天风团数量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "少于 20 个"
+          },
+          {
+            "value": 2,
+            "label": "20 至 50 个"
+          },
+          {
+            "value": 3,
+            "label": "多于 50 个"
+          }
+        ]
+      },
+      {
+        "id": "w2",
+        "label": "第 2 天风团数量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "少于 20 个"
+          },
+          {
+            "value": 2,
+            "label": "20 至 50 个"
+          },
+          {
+            "value": 3,
+            "label": "多于 50 个"
+          }
+        ]
+      },
+      {
+        "id": "w3",
+        "label": "第 3 天风团数量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "少于 20 个"
+          },
+          {
+            "value": 2,
+            "label": "20 至 50 个"
+          },
+          {
+            "value": 3,
+            "label": "多于 50 个"
+          }
+        ]
+      },
+      {
+        "id": "w4",
+        "label": "第 4 天风团数量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "少于 20 个"
+          },
+          {
+            "value": 2,
+            "label": "20 至 50 个"
+          },
+          {
+            "value": 3,
+            "label": "多于 50 个"
+          }
+        ]
+      },
+      {
+        "id": "w5",
+        "label": "第 5 天风团数量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "少于 20 个"
+          },
+          {
+            "value": 2,
+            "label": "20 至 50 个"
+          },
+          {
+            "value": 3,
+            "label": "多于 50 个"
+          }
+        ]
+      },
+      {
+        "id": "w6",
+        "label": "第 6 天风团数量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "少于 20 个"
+          },
+          {
+            "value": 2,
+            "label": "20 至 50 个"
+          },
+          {
+            "value": 3,
+            "label": "多于 50 个"
+          }
+        ]
+      },
+      {
+        "id": "w7",
+        "label": "第 7 天风团数量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "少于 20 个"
+          },
+          {
+            "value": 2,
+            "label": "20 至 50 个"
+          },
+          {
+            "value": 3,
+            "label": "多于 50 个"
+          }
+        ]
+      },
+      {
+        "id": "i1",
+        "label": "第 1 天瘙痒程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "i2",
+        "label": "第 2 天瘙痒程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "i3",
+        "label": "第 3 天瘙痒程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "i4",
+        "label": "第 4 天瘙痒程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "i5",
+        "label": "第 5 天瘙痒程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "i6",
+        "label": "第 6 天瘙痒程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "i7",
+        "label": "第 7 天瘙痒程度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 6,
+        "key": "well",
+        "label": "控制良好"
+      },
+      {
+        "min": 7,
+        "max": 15,
+        "key": "mild",
+        "label": "轻度活动"
+      },
+      {
+        "min": 16,
+        "max": 27,
+        "key": "moderate",
+        "label": "中度活动"
+      },
+      {
+        "min": 28,
+        "max": 42,
+        "key": "severe",
+        "label": "重度活动"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "w1": {
+        "type": "number",
+        "title": "第 1 天风团数量",
+        "enum": [0, 1, 2, 3]
+      },
+      "w2": {
+        "type": "number",
+        "title": "第 2 天风团数量",
+        "enum": [0, 1, 2, 3]
+      },
+      "w3": {
+        "type": "number",
+        "title": "第 3 天风团数量",
+        "enum": [0, 1, 2, 3]
+      },
+      "w4": {
+        "type": "number",
+        "title": "第 4 天风团数量",
+        "enum": [0, 1, 2, 3]
+      },
+      "w5": {
+        "type": "number",
+        "title": "第 5 天风团数量",
+        "enum": [0, 1, 2, 3]
+      },
+      "w6": {
+        "type": "number",
+        "title": "第 6 天风团数量",
+        "enum": [0, 1, 2, 3]
+      },
+      "w7": {
+        "type": "number",
+        "title": "第 7 天风团数量",
+        "enum": [0, 1, 2, 3]
+      },
+      "i1": {
+        "type": "number",
+        "title": "第 1 天瘙痒程度",
+        "enum": [0, 1, 2, 3]
+      },
+      "i2": {
+        "type": "number",
+        "title": "第 2 天瘙痒程度",
+        "enum": [0, 1, 2, 3]
+      },
+      "i3": {
+        "type": "number",
+        "title": "第 3 天瘙痒程度",
+        "enum": [0, 1, 2, 3]
+      },
+      "i4": {
+        "type": "number",
+        "title": "第 4 天瘙痒程度",
+        "enum": [0, 1, 2, 3]
+      },
+      "i5": {
+        "type": "number",
+        "title": "第 5 天瘙痒程度",
+        "enum": [0, 1, 2, 3]
+      },
+      "i6": {
+        "type": "number",
+        "title": "第 6 天瘙痒程度",
+        "enum": [0, 1, 2, 3]
+      },
+      "i7": {
+        "type": "number",
+        "title": "第 7 天瘙痒程度",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Urticaria Activity Score over 7 days",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Urticaria+Activity+Score+UAS7",
+      "section": "7 天风团与瘙痒各 0–3 分，合计 0–42 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

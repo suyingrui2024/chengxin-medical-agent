@@ -66,3 +66,47 @@ def warning_questions(chief: str) -> List[Dict[str, str]]:
         {"domain": str(item["domain"]), "question": str(item["question"])}
         for item in domains
     ]
+
+
+# Domains whose ground is already covered by the combined
+# ``emergency_screen`` question asked before deep-dive (design §5.3:
+# 急诊筛查顺序不变). When that screen was explicitly answered 「都没有」,
+# re-asking the same three domains would be a visible regression, so
+# the question layer skips them. This is question economy, not a
+# clinical threshold: an unanswered or 「不确定」 screen asks all six.
+# Review note: clinical sign-off (C1) may widen or narrow this list;
+# it is a Python constant, not content, precisely so it stays a
+# reviewable engineering decision rather than content drift.
+SUBSUMED_BY_EMERGENCY_SCREEN = ("意识", "呼吸", "出血")
+
+
+def warning_domain_specs(
+    emergency_screen_absent: bool = False,
+) -> List[Dict[str, str]]:
+    """Askable specs for the P3 warning domains (question-layer seam).
+
+    ``warning_questions`` keeps its frozen ``{domain, question}``
+    contract (tests/test_out_of_pathway.py pins the content schema, and
+    ``bridging.py`` derives ``warning_<domain>`` ids from it). This
+    function is the seam that adds the id/fact_key the question layer
+    needs. The id convention is the same ``warning_<domain>`` that
+    bridging already derives, so both agree without touching the
+    content schema.
+
+    ``emergency_screen_absent`` drops the domains listed in
+    :data:`SUBSUMED_BY_EMERGENCY_SCREEN`; see that constant for why.
+    """
+    specs: List[Dict[str, str]] = []
+    for item in _load_warning_signs().get("domains") or []:
+        domain = str(item["domain"])
+        if emergency_screen_absent and domain in SUBSUMED_BY_EMERGENCY_SCREEN:
+            continue
+        specs.append(
+            {
+                "id": f"warning_{domain}",
+                "fact_key": f"warning_{domain}",
+                "domain": domain,
+                "question": str(item["question"]),
+            }
+        )
+    return specs

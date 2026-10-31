@@ -205,7 +205,7 @@ class SheetGroupTokenTests(unittest.TestCase):
                 return workspace
 
         with mock.patch.object(
-            conclusion_module, "RuleBasedProposer", StubProposer
+            conclusion_module.adjustments, "RuleBasedProposer", StubProposer
         ):
             return compose_conclusion(state)
 

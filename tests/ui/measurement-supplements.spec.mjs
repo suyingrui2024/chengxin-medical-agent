@@ -3,6 +3,7 @@ import {
   createMeasurementSupplementsModel,
   verifyMeasurementSupplements,
 } from "../fixtures/measurement-supplements.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const narrow of [false, true])
   test(`full measurement reports retain medication updates through failure and retry${narrow ? " on a narrow screen" : ""}`, async ({
@@ -28,7 +29,9 @@ for (const narrow of [false, true])
       await verifyMeasurementSupplements(
         page,
         model,
-        `docs/assets/ui/${narrow ? "63-measurement-supplement-narrow" : "62-measurement-supplement"}`,
+        shotPath(
+          `${narrow ? "63-measurement-supplement-narrow" : "62-measurement-supplement"}`,
+        ),
       );
     } finally {
       await request.post("/api/settings", { data: { backend: "demo" } });

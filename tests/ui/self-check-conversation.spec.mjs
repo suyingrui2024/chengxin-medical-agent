@@ -3,6 +3,7 @@ import {
   createSelfCheckConversationModel,
   verifySelfCheckConversation,
 } from "../fixtures/self-check-conversation.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const [label, width, height, option, manual] of [
   ["wide", 1440, 1080, "head", false],
@@ -31,7 +32,7 @@ for (const [label, width, height, option, manual] of [
       await page.goto("/");
       await verifySelfCheckConversation(page, model, {
         manual,
-        shot: `docs/assets/ui/75-${label}-self-check-conversation.png`,
+        shot: shotPath(`75-${label}-self-check-conversation.png`),
       });
     } finally {
       await request.post("/api/settings", { data: { backend: "demo" } });

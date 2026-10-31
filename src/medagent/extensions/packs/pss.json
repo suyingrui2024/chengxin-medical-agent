@@ -1,0 +1,205 @@
+{
+  "id": "calculate.pss",
+  "name": "中毒严重度评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "中毒严重度评分（0–4 级）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["PSS", "中毒严重度"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 4,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "grade",
+        "label": "选择最符合的严重度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 级：无症状"
+          },
+          {
+            "value": 1,
+            "label": "1 级：轻度、一过性症状"
+          },
+          {
+            "value": 2,
+            "label": "2 级：明显或持续症状"
+          },
+          {
+            "value": 3,
+            "label": "3 级：严重或危及生命的症状"
+          },
+          {
+            "value": 4,
+            "label": "4 级：致命"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "none",
+        "label": "0 级"
+      },
+      {
+        "min": 1,
+        "max": 1,
+        "key": "minor",
+        "label": "1 级"
+      },
+      {
+        "min": 2,
+        "max": 2,
+        "key": "moderate",
+        "label": "2 级"
+      },
+      {
+        "min": 3,
+        "max": 3,
+        "key": "severe",
+        "label": "3 级"
+      },
+      {
+        "min": 4,
+        "max": 4,
+        "key": "fatal",
+        "label": "4 级"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "grade": {
+        "type": "number",
+        "title": "选择最符合的严重度",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Poisoning Severity Score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Poisoning+Severity+Score+PSS",
+      "section": "Persson HE, et al. 1998；0–4 级",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

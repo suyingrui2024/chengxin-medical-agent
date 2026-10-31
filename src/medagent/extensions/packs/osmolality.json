@@ -1,0 +1,161 @@
+{
+  "id": "calculate.osmolality",
+  "name": "血浆渗透压",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "由血钠、血糖、尿素估算血浆渗透压（mOsm/kg）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "patient_form": "formula_form/v1",
+  "aliases": ["血浆渗透压", "渗透压"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "osmolality",
+    "citation": "OSM-CALC",
+    "inputs": [
+      {
+        "id": "sodium",
+        "label": "血钠",
+        "type": "number",
+        "unit": "mmol/L",
+        "min": "100",
+        "max": "180",
+        "step": "1"
+      },
+      {
+        "id": "glucose_mmol_l",
+        "label": "血糖",
+        "type": "number",
+        "unit": "mmol/L",
+        "min": "0",
+        "max": "60",
+        "step": "0.1"
+      },
+      {
+        "id": "urea_mmol_l",
+        "label": "尿素",
+        "type": "number",
+        "unit": "mmol/L",
+        "min": "0",
+        "max": "60",
+        "step": "0.1"
+      }
+    ],
+    "output": {
+      "label": "血浆渗透压",
+      "unit": "mOsm/kg",
+      "min": "200",
+      "max": "400",
+      "precision": {
+        "places": 1
+      },
+      "direction": "no_direction"
+    },
+    "bands": [],
+    "note": "估算值，未计入乙醇等；不判断高渗状态。"
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Calculated plasma osmolality",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=calculated+plasma+osmolality+formula",
+      "section": "OSM-CALC：渗透压=2×Na+血糖+尿素（mmol/L）",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "sodium": {
+        "type": "string",
+        "title": "血钠",
+        "maxLength": 12
+      },
+      "glucose_mmol_l": {
+        "type": "string",
+        "title": "血糖",
+        "maxLength": 12
+      },
+      "urea_mmol_l": {
+        "type": "string",
+        "title": "尿素",
+        "maxLength": 12
+      }
+    }
+  }
+}

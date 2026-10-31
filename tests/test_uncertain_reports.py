@@ -23,6 +23,10 @@ ANSWERS = {
     "age": ("32岁", None),
     "chief_complaint": ("手臂疼痛", None),
     "emergency_screen": ("都没有", "no"),
+    # P3 off-pathway warning screen (arm pain triggers no pathway).
+    "warning_剧痛": ("没有", "no"),
+    "warning_持续加重": ("没有", "no"),
+    "warning_功能骤降": ("没有", "no"),
     "onset": ("昨天", None),
     "trajectory": ("变化不大", "stable"),
     "severity": ("3分", None),

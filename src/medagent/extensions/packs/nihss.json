@@ -1,0 +1,589 @@
+{
+  "id": "calculate.nihss",
+  "name": "NIHSS 卒中量表",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "美国国立卫生研究院卒中量表（15 项，0–42 分），分数越高神经功能缺损越重。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["NIHSS", "卒中量表"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 42,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "n1a",
+        "label": "意识水平",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "清醒"
+          },
+          {
+            "value": 1,
+            "label": "嗜睡"
+          },
+          {
+            "value": 2,
+            "label": "昏睡"
+          },
+          {
+            "value": 3,
+            "label": "昏迷"
+          }
+        ]
+      },
+      {
+        "id": "n1b",
+        "label": "意识水平提问（月份、年龄）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "两项均正确"
+          },
+          {
+            "value": 1,
+            "label": "一项正确"
+          },
+          {
+            "value": 2,
+            "label": "两项均不正确"
+          }
+        ]
+      },
+      {
+        "id": "n1c",
+        "label": "意识水平指令（睁眼、握拳）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "两项均正确"
+          },
+          {
+            "value": 1,
+            "label": "一项正确"
+          },
+          {
+            "value": 2,
+            "label": "两项均不正确"
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "label": "最佳凝视",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "部分凝视麻痹"
+          },
+          {
+            "value": 2,
+            "label": "完全凝视麻痹"
+          }
+        ]
+      },
+      {
+        "id": "n3",
+        "label": "视野",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无视野缺损"
+          },
+          {
+            "value": 1,
+            "label": "部分偏盲"
+          },
+          {
+            "value": 2,
+            "label": "完全偏盲"
+          },
+          {
+            "value": 3,
+            "label": "双侧偏盲"
+          }
+        ]
+      },
+      {
+        "id": "n4",
+        "label": "面瘫",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "部分"
+          },
+          {
+            "value": 3,
+            "label": "完全"
+          }
+        ]
+      },
+      {
+        "id": "n5a",
+        "label": "左上肢运动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无漂移"
+          },
+          {
+            "value": 1,
+            "label": "可维持但漂移"
+          },
+          {
+            "value": 2,
+            "label": "不能维持"
+          },
+          {
+            "value": 3,
+            "label": "不能抗重力"
+          },
+          {
+            "value": 4,
+            "label": "无运动"
+          }
+        ]
+      },
+      {
+        "id": "n5b",
+        "label": "右上肢运动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无漂移"
+          },
+          {
+            "value": 1,
+            "label": "可维持但漂移"
+          },
+          {
+            "value": 2,
+            "label": "不能维持"
+          },
+          {
+            "value": 3,
+            "label": "不能抗重力"
+          },
+          {
+            "value": 4,
+            "label": "无运动"
+          }
+        ]
+      },
+      {
+        "id": "n6a",
+        "label": "左下肢运动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无漂移"
+          },
+          {
+            "value": 1,
+            "label": "可维持但漂移"
+          },
+          {
+            "value": 2,
+            "label": "不能维持"
+          },
+          {
+            "value": 3,
+            "label": "不能抗重力"
+          },
+          {
+            "value": 4,
+            "label": "无运动"
+          }
+        ]
+      },
+      {
+        "id": "n6b",
+        "label": "右下肢运动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无漂移"
+          },
+          {
+            "value": 1,
+            "label": "可维持但漂移"
+          },
+          {
+            "value": 2,
+            "label": "不能维持"
+          },
+          {
+            "value": 3,
+            "label": "不能抗重力"
+          },
+          {
+            "value": 4,
+            "label": "无运动"
+          }
+        ]
+      },
+      {
+        "id": "n7",
+        "label": "肢体共济失调",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "一个肢体"
+          },
+          {
+            "value": 2,
+            "label": "两个肢体"
+          }
+        ]
+      },
+      {
+        "id": "n8",
+        "label": "感觉",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "轻中度减退"
+          },
+          {
+            "value": 2,
+            "label": "重度减退"
+          }
+        ]
+      },
+      {
+        "id": "n9",
+        "label": "语言",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "轻度失语"
+          },
+          {
+            "value": 2,
+            "label": "重度失语"
+          },
+          {
+            "value": 3,
+            "label": "缄默"
+          }
+        ]
+      },
+      {
+        "id": "n10",
+        "label": "构音障碍",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "n11",
+        "label": "忽视",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "一种模态忽视"
+          },
+          {
+            "value": 2,
+            "label": "多种模态忽视"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 4,
+        "key": "minor",
+        "label": "轻型"
+      },
+      {
+        "min": 5,
+        "max": 15,
+        "key": "moderate",
+        "label": "中型"
+      },
+      {
+        "min": 16,
+        "max": 20,
+        "key": "moderately_severe",
+        "label": "中重型"
+      },
+      {
+        "min": 21,
+        "max": 42,
+        "key": "severe",
+        "label": "重型"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "n1a": {
+        "type": "number",
+        "title": "意识水平",
+        "enum": [0, 1, 2, 3]
+      },
+      "n1b": {
+        "type": "number",
+        "title": "意识水平提问（月份、年龄）",
+        "enum": [0, 1, 2]
+      },
+      "n1c": {
+        "type": "number",
+        "title": "意识水平指令（睁眼、握拳）",
+        "enum": [0, 1, 2]
+      },
+      "n2": {
+        "type": "number",
+        "title": "最佳凝视",
+        "enum": [0, 1, 2]
+      },
+      "n3": {
+        "type": "number",
+        "title": "视野",
+        "enum": [0, 1, 2, 3]
+      },
+      "n4": {
+        "type": "number",
+        "title": "面瘫",
+        "enum": [0, 1, 2, 3]
+      },
+      "n5a": {
+        "type": "number",
+        "title": "左上肢运动",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "n5b": {
+        "type": "number",
+        "title": "右上肢运动",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "n6a": {
+        "type": "number",
+        "title": "左下肢运动",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "n6b": {
+        "type": "number",
+        "title": "右下肢运动",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "n7": {
+        "type": "number",
+        "title": "肢体共济失调",
+        "enum": [0, 1, 2]
+      },
+      "n8": {
+        "type": "number",
+        "title": "感觉",
+        "enum": [0, 1, 2]
+      },
+      "n9": {
+        "type": "number",
+        "title": "语言",
+        "enum": [0, 1, 2, 3]
+      },
+      "n10": {
+        "type": "number",
+        "title": "构音障碍",
+        "enum": [0, 1, 2]
+      },
+      "n11": {
+        "type": "number",
+        "title": "忽视",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "NIH Stroke Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=National+Institutes+of+Health+Stroke+Scale+NIHSS",
+      "section": "Brott T, et al. 1989；15 项合计 0–42 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

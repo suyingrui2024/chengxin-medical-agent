@@ -376,6 +376,119 @@ def check_report_interpretation(fixtures: Path) -> bool:
     return ok
 
 
+def check_calculations() -> bool:
+    """Engineering invariants for every registered calculation capability.
+
+    Clinical review is a separate, human gate. What this can prove is that
+    the content is internally sound: each item declares a source, each
+    scale can actually reach its declared range, each formula reproduces
+    its published worked examples, and no patient-visible band label
+    carries a diagnostic phrase.
+    """
+    from medagent.conclusion import BANNED_PHRASES
+    from medagent.extensions.builtin import load_registry
+    from medagent.extensions.formula_engine import run_formula, validate_formula
+    from medagent.extensions.formulas import FORMULAS
+    from medagent.extensions.scale_engine import ScaleInputError, run_scale, validate_scale
+
+    registry = load_registry()
+    items = registry.descriptions()
+    problems: list[str] = []
+
+    # Sources.
+    for item in items:
+        if not item.get("references"):
+            problems.append(f"{item['id']}: 缺少来源")
+
+    # Aliases: unique, present, short.
+    seen: dict[str, str] = {}
+    for item in items:
+        if not (isinstance(item.get("scale"), dict) or isinstance(item.get("formula"), dict)):
+            continue
+        aliases = item.get("aliases") or []
+        if not aliases:
+            problems.append(f"{item['id']}: 缺少触发别名")
+        for alias in aliases:
+            key = alias.lower()
+            if key in seen:
+                problems.append(f"{alias!r} 同时属于 {seen[key]} 与 {item['id']}")
+            seen[key] = item["id"]
+
+    # Scales: reachable range, extremes accepted, gaps refused, safe labels.
+    scales = 0
+    for item in items:
+        if not isinstance(item.get("scale"), dict):
+            continue
+        spec = validate_scale(item)
+        low, high = {}, {}
+        reachable_min = reachable_max = 0
+        for entry in spec["items"]:
+            if entry["kind"] == "choice":
+                scores = {}
+                for option in entry["options"]:
+                    reverse = entry.get("reverse_of")
+                    base = reverse - option["value"] if reverse is not None else option["value"]
+                    scores[option["value"]] = base * entry["weight"]
+                low_value = min(scores, key=lambda v: scores[v])
+                high_value = max(scores, key=lambda v: scores[v])
+                low[entry["id"]] = low_value
+                high[entry["id"]] = high_value
+                reachable_min += scores[low_value]
+                reachable_max += scores[high_value]
+            else:
+                values = [e["score"] * entry["weight"] for e in entry["thresholds"]]
+                reachable_min += min(values)
+                reachable_max += max(values)
+                best = min(entry["thresholds"], key=lambda e: e["score"])
+                low[entry["id"]] = best.get("gte", best.get("lt", 1)) + 1
+                high[entry["id"]] = best.get("lt", best.get("gte", 0)) - 1
+        if reachable_min != spec["min"] or reachable_max != spec["max"]:
+            problems.append(
+                f"{item['id']}: 可达 {reachable_min}-{reachable_max} 与声明 "
+                f"{spec['min']}-{spec['max']} 不符"
+            )
+        try:
+            run_scale(spec, low)
+            run_scale(spec, high)
+        except Exception as exc:  # noqa: BLE001
+            problems.append(f"{item['id']}: 极端答案被拒（{exc}）")
+        partial = dict(low)
+        partial.pop(spec["items"][0]["id"])
+        try:
+            run_scale(spec, partial)
+            problems.append(f"{item['id']}: 缺项仍算出结果")
+        except ScaleInputError:
+            pass
+        for band in spec["bands"]:
+            for phrase in BANNED_PHRASES:
+                if phrase in band["label"]:
+                    problems.append(f"{item['id']}: 分档词含禁用表述 {phrase!r}")
+        scales += 1
+
+    # Formulas: published worked examples must reproduce exactly.
+    formulas = 0
+    for key, spec in FORMULAS.items():
+        manifest = next((i for i in items if i["id"] == f"calculate.{key}"), None)
+        if manifest is None:
+            problems.append(f"calculate.{key}: 公式已实现但未注册")
+            continue
+        validated = validate_formula(manifest)
+        for values, expected in spec.audit_cases:
+            got = run_formula(validated, values)["value"]
+            if got != expected:
+                problems.append(f"calculate.{key}: {values} 得 {got}，期望 {expected}")
+        formulas += 1
+
+    ok = not problems
+    print(
+        f"calculations: capabilities={len(items)} scales={scales} formulas={formulas} "
+        f"problems={len(problems)} -> {'PASS' if ok else 'FAIL'}"
+    )
+    for problem in problems[:20]:
+        print("   -", problem)
+    return ok
+
+
 def main() -> int:
     service = TriageService()
     fixtures = ROOT / "tests" / "fixtures"
@@ -384,6 +497,7 @@ def main() -> int:
     results.append(check_web_advisory(fixtures))
     results.append(check_subagents(fixtures))
     results.append(check_report_interpretation(fixtures))
+    results.append(check_calculations())
     print("release gate:", "PASS" if all(results) else "FAIL")
     return 0 if all(results) else 1
 

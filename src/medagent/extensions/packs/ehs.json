@@ -1,0 +1,231 @@
+{
+  "id": "calculate.ehs",
+  "name": "腹壁疝 EHS 分级",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "欧洲疝学会腹壁疝分类（分级型）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["EHS", "腹壁疝分级"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 2,
+      "max": 7,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "size",
+        "label": "缺损大小",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "小于 2 厘米"
+          },
+          {
+            "value": 2,
+            "label": "2 至 4 厘米"
+          },
+          {
+            "value": 3,
+            "label": "大于 4 厘米"
+          }
+        ]
+      },
+      {
+        "id": "site",
+        "label": "位置",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 1,
+            "label": "中线"
+          },
+          {
+            "value": 2,
+            "label": "旁中线"
+          },
+          {
+            "value": 3,
+            "label": "其他"
+          }
+        ]
+      },
+      {
+        "id": "recurrent",
+        "label": "是否复发",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "初发"
+          },
+          {
+            "value": 1,
+            "label": "复发"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 2,
+        "max": 2,
+        "key": "small",
+        "label": "小缺损"
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "key": "medium",
+        "label": "中等缺损"
+      },
+      {
+        "min": 5,
+        "max": 7,
+        "key": "large",
+        "label": "大缺损"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "size": {
+        "type": "number",
+        "title": "缺损大小",
+        "enum": [1, 2, 3]
+      },
+      "site": {
+        "type": "number",
+        "title": "位置",
+        "enum": [1, 2, 3]
+      },
+      "recurrent": {
+        "type": "number",
+        "title": "是否复发",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "EHS classification",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=European+Hernia+Society+classification+abdominal+wall+hernia",
+      "section": "Muysoms FE, et al. 2009；按大小、位置、复发分类",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

@@ -1,0 +1,453 @@
+{
+  "id": "calculate.ibssss",
+  "name": "IBS-SSS 肠易激症状严重度",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "肠易激综合征症状严重度评分（5 项，0–500 分），记录症状强度。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["IBS-SSS", "肠易激严重度"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 500,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "s1",
+        "label": "腹痛程度",
+        "kind": "choice",
+        "weight": 10,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 分"
+          },
+          {
+            "value": 1,
+            "label": "10 分"
+          },
+          {
+            "value": 2,
+            "label": "20 分"
+          },
+          {
+            "value": 3,
+            "label": "30 分"
+          },
+          {
+            "value": 4,
+            "label": "40 分"
+          },
+          {
+            "value": 5,
+            "label": "50 分"
+          },
+          {
+            "value": 6,
+            "label": "60 分"
+          },
+          {
+            "value": 7,
+            "label": "70 分"
+          },
+          {
+            "value": 8,
+            "label": "80 分"
+          },
+          {
+            "value": 9,
+            "label": "90 分"
+          },
+          {
+            "value": 10,
+            "label": "100 分"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "label": "腹痛天数（按百分比）",
+        "kind": "choice",
+        "weight": 10,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 分"
+          },
+          {
+            "value": 1,
+            "label": "10 分"
+          },
+          {
+            "value": 2,
+            "label": "20 分"
+          },
+          {
+            "value": 3,
+            "label": "30 分"
+          },
+          {
+            "value": 4,
+            "label": "40 分"
+          },
+          {
+            "value": 5,
+            "label": "50 分"
+          },
+          {
+            "value": 6,
+            "label": "60 分"
+          },
+          {
+            "value": 7,
+            "label": "70 分"
+          },
+          {
+            "value": 8,
+            "label": "80 分"
+          },
+          {
+            "value": 9,
+            "label": "90 分"
+          },
+          {
+            "value": 10,
+            "label": "100 分"
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "label": "腹胀程度",
+        "kind": "choice",
+        "weight": 10,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 分"
+          },
+          {
+            "value": 1,
+            "label": "10 分"
+          },
+          {
+            "value": 2,
+            "label": "20 分"
+          },
+          {
+            "value": 3,
+            "label": "30 分"
+          },
+          {
+            "value": 4,
+            "label": "40 分"
+          },
+          {
+            "value": 5,
+            "label": "50 分"
+          },
+          {
+            "value": 6,
+            "label": "60 分"
+          },
+          {
+            "value": 7,
+            "label": "70 分"
+          },
+          {
+            "value": 8,
+            "label": "80 分"
+          },
+          {
+            "value": 9,
+            "label": "90 分"
+          },
+          {
+            "value": 10,
+            "label": "100 分"
+          }
+        ]
+      },
+      {
+        "id": "s4",
+        "label": "排便满意度（越低越差）",
+        "kind": "choice",
+        "weight": 10,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 分"
+          },
+          {
+            "value": 1,
+            "label": "10 分"
+          },
+          {
+            "value": 2,
+            "label": "20 分"
+          },
+          {
+            "value": 3,
+            "label": "30 分"
+          },
+          {
+            "value": 4,
+            "label": "40 分"
+          },
+          {
+            "value": 5,
+            "label": "50 分"
+          },
+          {
+            "value": 6,
+            "label": "60 分"
+          },
+          {
+            "value": 7,
+            "label": "70 分"
+          },
+          {
+            "value": 8,
+            "label": "80 分"
+          },
+          {
+            "value": 9,
+            "label": "90 分"
+          },
+          {
+            "value": 10,
+            "label": "100 分"
+          }
+        ],
+        "reverse_of": 10
+      },
+      {
+        "id": "s5",
+        "label": "生活受干扰程度",
+        "kind": "choice",
+        "weight": 10,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 分"
+          },
+          {
+            "value": 1,
+            "label": "10 分"
+          },
+          {
+            "value": 2,
+            "label": "20 分"
+          },
+          {
+            "value": 3,
+            "label": "30 分"
+          },
+          {
+            "value": 4,
+            "label": "40 分"
+          },
+          {
+            "value": 5,
+            "label": "50 分"
+          },
+          {
+            "value": 6,
+            "label": "60 分"
+          },
+          {
+            "value": 7,
+            "label": "70 分"
+          },
+          {
+            "value": 8,
+            "label": "80 分"
+          },
+          {
+            "value": 9,
+            "label": "90 分"
+          },
+          {
+            "value": 10,
+            "label": "100 分"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 74,
+        "key": "remission",
+        "label": "缓解"
+      },
+      {
+        "min": 75,
+        "max": 175,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 176,
+        "max": 300,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 301,
+        "max": 500,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "s1": {
+        "type": "number",
+        "title": "腹痛程度",
+        "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      },
+      "s2": {
+        "type": "number",
+        "title": "腹痛天数（按百分比）",
+        "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      },
+      "s3": {
+        "type": "number",
+        "title": "腹胀程度",
+        "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      },
+      "s4": {
+        "type": "number",
+        "title": "排便满意度（越低越差）",
+        "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      },
+      "s5": {
+        "type": "number",
+        "title": "生活受干扰程度",
+        "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "IBS Symptom Severity Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=IBS+symptom+severity+scale+IBS-SSS",
+      "section": "Francis CY, et al. 1997；5 项各 0–100 分，合计 0–500 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

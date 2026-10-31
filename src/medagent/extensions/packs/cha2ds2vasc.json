@@ -1,0 +1,312 @@
+{
+  "id": "calculate.cha2ds2vasc",
+  "name": "CHA2DS2-VASc 卒中风险评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "房颤患者卒中风险分层（0–9 分），仅作风险记录，不给抗凝或停药建议。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["CHA2DS2-VASc", "房颤卒中风险"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 9,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "c1",
+        "label": "心力衰竭或左室功能不全",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "c2",
+        "label": "高血压",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "c3",
+        "label": "年龄",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "65 岁以下"
+          },
+          {
+            "value": 1,
+            "label": "65 至 74 岁"
+          },
+          {
+            "value": 2,
+            "label": "75 岁及以上"
+          }
+        ]
+      },
+      {
+        "id": "c4",
+        "label": "糖尿病",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "c5",
+        "label": "卒中、短暂性脑缺血或血栓栓塞史",
+        "kind": "choice",
+        "weight": 2,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "c6",
+        "label": "血管疾病（心肌梗死、外周动脉病、主动脉斑块）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "c8",
+        "label": "女性",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 1,
+        "max": 1,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 2,
+        "max": 9,
+        "key": "high",
+        "label": "高风险"
+      }
+    ],
+    "note": "仅风险分层；抗凝决策须结合出血风险与患者意愿，由医生作出。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "c1": {
+        "type": "number",
+        "title": "心力衰竭或左室功能不全",
+        "enum": [0, 1]
+      },
+      "c2": {
+        "type": "number",
+        "title": "高血压",
+        "enum": [0, 1]
+      },
+      "c3": {
+        "type": "number",
+        "title": "年龄",
+        "enum": [0, 1, 2]
+      },
+      "c4": {
+        "type": "number",
+        "title": "糖尿病",
+        "enum": [0, 1]
+      },
+      "c5": {
+        "type": "number",
+        "title": "卒中、短暂性脑缺血或血栓栓塞史",
+        "enum": [0, 1]
+      },
+      "c6": {
+        "type": "number",
+        "title": "血管疾病（心肌梗死、外周动脉病、主动脉斑块）",
+        "enum": [0, 1]
+      },
+      "c8": {
+        "type": "number",
+        "title": "女性",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "CHA2DS2-VASc 卒中风险评分",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=CHA2DS2-VASc+score+atrial+fibrillation+stroke+risk",
+      "section": "Lip GY, et al. 2010；7 项加权合计 0–9 分（年龄合并为单一条目）",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

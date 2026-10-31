@@ -3,6 +3,7 @@ import {
   createObservationCompletionModel,
   verifyObservationCompletion,
 } from "../fixtures/observation-completion.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const [label, width, height] of [
   ["wide", 1440, 1080],
@@ -30,7 +31,7 @@ for (const [label, width, height] of [
       await page.setViewportSize({ width, height });
       await page.goto("/");
       await verifyObservationCompletion(page, model, {
-        shot: `docs/assets/ui/76-${label}-location-clarification.png`,
+        shot: shotPath(`76-${label}-location-clarification.png`),
       });
     } finally {
       await request.post("/api/settings", { data: { backend: "demo" } });

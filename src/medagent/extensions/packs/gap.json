@@ -1,0 +1,249 @@
+{
+  "id": "calculate.gap",
+  "name": "GAP 创伤评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "GAP 评分（年龄、格拉斯哥昏迷评分、收缩压），0–24 分。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["GAP", "GAP 评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 3,
+      "max": 20,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "age",
+        "label": "年龄",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "55 岁以下"
+          },
+          {
+            "value": 1,
+            "label": "55 至 64 岁"
+          },
+          {
+            "value": 2,
+            "label": "65 至 74 岁"
+          },
+          {
+            "value": 3,
+            "label": "75 岁及以上"
+          }
+        ]
+      },
+      {
+        "id": "gcs",
+        "label": "格拉斯哥昏迷评分",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 4,
+            "score": 3
+          },
+          {
+            "gte": 4,
+            "lt": 6,
+            "score": 4
+          },
+          {
+            "gte": 6,
+            "lt": 9,
+            "score": 6
+          },
+          {
+            "gte": 9,
+            "lt": 13,
+            "score": 9
+          },
+          {
+            "gte": 13,
+            "score": 15
+          }
+        ]
+      },
+      {
+        "id": "sbp",
+        "label": "收缩压",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 50,
+            "score": 2
+          },
+          {
+            "gte": 50,
+            "lt": 90,
+            "score": 1
+          },
+          {
+            "gte": 90,
+            "score": 0
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 3,
+        "max": 9,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 10,
+        "max": 16,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 17,
+        "max": 20,
+        "key": "high",
+        "label": "高风险"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "age": {
+        "type": "number",
+        "title": "年龄",
+        "enum": [0, 1, 2, 3]
+      },
+      "gcs": {
+        "type": "number",
+        "title": "格拉斯哥昏迷评分"
+      },
+      "sbp": {
+        "type": "number",
+        "title": "收缩压"
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "GAP score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=GAP+score+trauma+age+Glasgow+coma+scale+systolic+blood+pressure",
+      "section": "GAP 创伤评分；三项相加 0–24 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

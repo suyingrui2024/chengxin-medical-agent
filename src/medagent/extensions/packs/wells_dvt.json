@@ -1,0 +1,350 @@
+{
+  "id": "calculate.wells_dvt",
+  "name": "Wells 深静脉血栓评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "深静脉血栓临床可能性评分（0–9 分），未计入替代诊断减分。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Wells DVT", "深静脉血栓评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 9,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "w1",
+        "label": "活动性肿瘤（治疗中或近 6 个月）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w2",
+        "label": "下肢瘫痪、轻瘫或近期石膏固定",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w3",
+        "label": "卧床 3 天以上或 4 周内大手术",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w4",
+        "label": "沿深静脉走行的局部压痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w5",
+        "label": "整条下肢肿胀",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w6",
+        "label": "小腿肿胀比另一侧粗 3 厘米以上",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w7",
+        "label": "患肢凹陷性水肿",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w8",
+        "label": "患肢浅静脉侧支循环",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "w9",
+        "label": "既往深静脉血栓史",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "low",
+        "label": "低度可能"
+      },
+      {
+        "min": 1,
+        "max": 2,
+        "key": "moderate",
+        "label": "中度可能"
+      },
+      {
+        "min": 3,
+        "max": 9,
+        "key": "high",
+        "label": "高度可能"
+      }
+    ],
+    "note": "原表含「其他诊断可能性不小于深静脉血栓」减 2 分一项，当前引擎不支持负权重，本版未计入。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "w1": {
+        "type": "number",
+        "title": "活动性肿瘤（治疗中或近 6 个月）",
+        "enum": [0, 1]
+      },
+      "w2": {
+        "type": "number",
+        "title": "下肢瘫痪、轻瘫或近期石膏固定",
+        "enum": [0, 1]
+      },
+      "w3": {
+        "type": "number",
+        "title": "卧床 3 天以上或 4 周内大手术",
+        "enum": [0, 1]
+      },
+      "w4": {
+        "type": "number",
+        "title": "沿深静脉走行的局部压痛",
+        "enum": [0, 1]
+      },
+      "w5": {
+        "type": "number",
+        "title": "整条下肢肿胀",
+        "enum": [0, 1]
+      },
+      "w6": {
+        "type": "number",
+        "title": "小腿肿胀比另一侧粗 3 厘米以上",
+        "enum": [0, 1]
+      },
+      "w7": {
+        "type": "number",
+        "title": "患肢凹陷性水肿",
+        "enum": [0, 1]
+      },
+      "w8": {
+        "type": "number",
+        "title": "患肢浅静脉侧支循环",
+        "enum": [0, 1]
+      },
+      "w9": {
+        "type": "number",
+        "title": "既往深静脉血栓史",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Wells score for DVT",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Wells+score+deep+vein+thrombosis",
+      "section": "Wells PS, et al. 1997；9 项合计 0–9 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

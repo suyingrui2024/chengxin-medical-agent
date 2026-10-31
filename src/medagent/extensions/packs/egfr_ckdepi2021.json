@@ -1,0 +1,165 @@
+{
+  "id": "calculate.egfr_ckdepi2021",
+  "name": "eGFR CKD-EPI 2021",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按年龄、性别、血肌酐估算肾小球滤过率。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "clinician",
+  "aliases": ["eGFR", "肾小球滤过率"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "egfr_ckdepi2021",
+    "citation": "CKD-EPI-2021",
+    "inputs": [
+      {
+        "id": "age_years",
+        "label": "年龄",
+        "type": "number",
+        "unit": "岁",
+        "min": "18",
+        "max": "120",
+        "step": "1"
+      },
+      {
+        "id": "sex",
+        "label": "性别",
+        "type": "enum",
+        "options": [
+          {
+            "value": "male",
+            "label": "男"
+          },
+          {
+            "value": "female",
+            "label": "女"
+          }
+        ]
+      },
+      {
+        "id": "creatinine_umol_l",
+        "label": "血肌酐",
+        "type": "number",
+        "unit": "µmol/L",
+        "min": "10",
+        "max": "2000",
+        "step": "1"
+      }
+    ],
+    "output": {
+      "label": "估算肾小球滤过率",
+      "unit": "mL/min/1.73m²",
+      "min": "0",
+      "max": "200",
+      "precision": {
+        "places": 1
+      },
+      "direction": "higher_is_better"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "eGFR CKD-EPI 2021 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=CKD-EPI+2021+creatinine+equation+eGFR",
+      "section": "CKD-EPI-2021：142 × min(Scr/k,1)^a × max(Scr/k,1)^−1.200 × 0.9938^年龄 ×（女性 ×1.012），k 男 0.9、女 0.7，a 男 −0.302、女 −0.241",
+      "accessed": "2026-10-28"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "age_years": {
+        "type": "string",
+        "title": "年龄",
+        "maxLength": 12
+      },
+      "sex": {
+        "type": "string",
+        "title": "性别",
+        "enum": ["male", "female"]
+      },
+      "creatinine_umol_l": {
+        "type": "string",
+        "title": "血肌酐",
+        "maxLength": 12
+      }
+    }
+  }
+}

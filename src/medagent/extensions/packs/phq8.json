@@ -1,0 +1,264 @@
+{
+  "id": "calculate.phq8",
+  "name": "PHQ-8 抑郁症状自评",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "过去两周内 8 项抑郁症状的自评计分（0–24 分）。PHQ-8 是 PHQ-9 去掉自杀意念条目后的版本，用于症状严重度记录，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["PHQ-8", "PHQ8", "抑郁自评", "抑郁量表", "健康问卷"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 24,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "p1",
+        "label": "做事时提不起劲或没有兴趣",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      },
+      {
+        "id": "p2",
+        "label": "感到心情低落、沮丧或绝望",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      },
+      {
+        "id": "p3",
+        "label": "入睡困难、睡不安稳或睡眠过多",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      },
+      {
+        "id": "p4",
+        "label": "感觉疲倦或没有活力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      },
+      {
+        "id": "p5",
+        "label": "食欲不振或吃太多",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      },
+      {
+        "id": "p6",
+        "label": "觉得自己很糟，或觉得自己很失败，或让自己或家人失望",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      },
+      {
+        "id": "p7",
+        "label": "对事物专注有困难，例如阅读报纸或看电视时",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      },
+      {
+        "id": "p8",
+        "label": "动作或说话速度缓慢到别人已经察觉，或正好相反——烦躁或坐立不安、动来动去的情况超过平常",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          { "value": 0, "label": "完全不会" },
+          { "value": 1, "label": "好几天" },
+          { "value": 2, "label": "一半以上的天数" },
+          { "value": 3, "label": "几乎每天" }
+        ]
+      }
+    ],
+    "bands": [
+      { "min": 0, "max": 4, "key": "none_minimal", "label": "无或极轻微" },
+      { "min": 5, "max": 9, "key": "mild", "label": "轻度" },
+      { "min": 10, "max": 14, "key": "moderate", "label": "中度" },
+      { "min": 15, "max": 19, "key": "moderately_severe", "label": "中重度" },
+      { "min": 20, "max": 24, "key": "severe", "label": "重度" }
+    ],
+    "note": "PHQ-8 刻意不含 PHQ-9 的自杀意念条目；涉及自伤念头时请走紧急求助渠道，本量表不承担该判断。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "p1": {
+        "type": "number",
+        "title": "做事时提不起劲或没有兴趣",
+        "enum": [0, 1, 2, 3]
+      },
+      "p2": {
+        "type": "number",
+        "title": "感到心情低落、沮丧或绝望",
+        "enum": [0, 1, 2, 3]
+      },
+      "p3": {
+        "type": "number",
+        "title": "入睡困难、睡不安稳或睡眠过多",
+        "enum": [0, 1, 2, 3]
+      },
+      "p4": {
+        "type": "number",
+        "title": "感觉疲倦或没有活力",
+        "enum": [0, 1, 2, 3]
+      },
+      "p5": {
+        "type": "number",
+        "title": "食欲不振或吃太多",
+        "enum": [0, 1, 2, 3]
+      },
+      "p6": {
+        "type": "number",
+        "title": "觉得自己很糟，或觉得自己很失败，或让自己或家人失望",
+        "enum": [0, 1, 2, 3]
+      },
+      "p7": {
+        "type": "number",
+        "title": "对事物专注有困难，例如阅读报纸或看电视时",
+        "enum": [0, 1, 2, 3]
+      },
+      "p8": {
+        "type": "number",
+        "title": "动作或说话速度缓慢到别人已经察觉，或正好相反——烦躁或坐立不安、动来动去的情况超过平常",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": { "type": "string", "title": "得分" },
+      "unit": { "type": "string", "title": "单位" },
+      "max_score": { "type": "number", "title": "满分" },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": { "type": "string" },
+          "label": { "type": "string" },
+          "range": { "type": "string" }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": { "type": "string" },
+            "label": { "type": "string" },
+            "answer_label": { "type": "string" },
+            "score": { "type": "number" }
+          }
+        }
+      },
+      "formula": { "type": "string", "title": "计算式" },
+      "method": { "type": "string", "title": "计分方式" },
+      "scoring_note": { "type": "string" },
+      "disclaimer": { "type": "string" },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": { "type": "string" }
+      },
+      "result_renderer": { "type": "string", "enum": ["scale/v1"] }
+    }
+  },
+  "example": {
+    "input": {
+      "p1": 1,
+      "p2": 1,
+      "p3": 1,
+      "p4": 1,
+      "p5": 0,
+      "p6": 1,
+      "p7": 1,
+      "p8": 0
+    },
+    "output": {
+      "value": "6",
+      "unit": "分",
+      "band": { "key": "mild", "label": "轻度" }
+    }
+  },
+  "references": [
+    {
+      "title": "The PHQ-8 as a measure of current depression in the general population",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=The+PHQ-8+as+a+measure+of+current+depression+in+the+general+population",
+      "section": "Kroenke K, Strine TW, Spitzer RL, et al. J Affect Disord. 2009;114(1-3):163-173.",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

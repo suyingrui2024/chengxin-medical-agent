@@ -1,0 +1,90 @@
+{
+  "packet": "explicit-calculation-v1",
+  "generated": "2026-10-28",
+  "items": [
+    {
+      "code": "01",
+      "id": "calculate.phq8",
+      "name": "PHQ-8 抑郁症状自评",
+      "audience": "patient",
+      "content_sha256": "6252661646f49b5d"
+    },
+    {
+      "code": "02",
+      "id": "calculate.gad7",
+      "name": "GAD-7 焦虑症状自评",
+      "audience": "patient",
+      "content_sha256": "4282d7f945bec200"
+    },
+    {
+      "code": "03",
+      "id": "calculate.gds15",
+      "name": "GDS-15 老年抑郁筛查",
+      "audience": "patient",
+      "content_sha256": "f2a4eccfefa64690"
+    },
+    {
+      "code": "04",
+      "id": "calculate.odi",
+      "name": "ODI 腰痛功能障碍指数",
+      "audience": "patient",
+      "content_sha256": "5349344887c4386e"
+    },
+    {
+      "code": "05",
+      "id": "calculate.barthel",
+      "name": "Barthel 指数",
+      "audience": "patient",
+      "content_sha256": "0622e55a438ba3c9"
+    },
+    {
+      "code": "06",
+      "id": "calculate.cact",
+      "name": "C-ACT 儿童哮喘控制测试",
+      "audience": "patient",
+      "content_sha256": "e36df5bc32cec11a"
+    },
+    {
+      "code": "07",
+      "id": "calculate.bmi",
+      "name": "BMI 体质指数",
+      "audience": "patient",
+      "content_sha256": "9d5a102f05b3c0da"
+    },
+    {
+      "code": "08",
+      "id": "calculate.egfr_ckdepi2021",
+      "name": "eGFR CKD-EPI 2021",
+      "audience": "clinician",
+      "content_sha256": "eac952d8221f2943"
+    },
+    {
+      "code": "09",
+      "id": "calculate.cha2ds2vasc",
+      "name": "CHA2DS2-VASc 卒中风险评分",
+      "audience": "clinician",
+      "content_sha256": "595f6f38331dfe55"
+    },
+    {
+      "code": "10",
+      "id": "calculate.gcs",
+      "name": "GCS 格拉斯哥昏迷评分",
+      "audience": "clinician",
+      "content_sha256": "d39dc2fa35551692"
+    },
+    {
+      "code": "11",
+      "id": "calculate.sofa",
+      "name": "SOFA 器官衰竭评分",
+      "audience": "clinician",
+      "content_sha256": "bbc07f7af0ebf7a7"
+    },
+    {
+      "code": "12",
+      "id": "calculate.news2",
+      "name": "NEWS2 早期预警评分",
+      "audience": "clinician",
+      "content_sha256": "9b1654e52951072f"
+    }
+  ]
+}

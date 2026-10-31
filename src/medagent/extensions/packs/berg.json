@@ -1,0 +1,623 @@
+{
+  "id": "calculate.berg",
+  "name": "Berg 平衡量表",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Berg 平衡量表（14 项，0–56 分），用于记录静态与动态平衡能力，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["Berg", "平衡量表", "Berg 平衡"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 56,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "g1",
+        "label": "从坐到站",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g2",
+        "label": "无支撑站立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g3",
+        "label": "独立坐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g4",
+        "label": "从站到坐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g5",
+        "label": "床椅转移",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g6",
+        "label": "闭眼站立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g7",
+        "label": "双足并拢站立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g8",
+        "label": "站立时上肢前伸",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g9",
+        "label": "从地上捡物",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g10",
+        "label": "转身向后看",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g11",
+        "label": "原地转身三百六十度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g12",
+        "label": "交替踏台阶",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g13",
+        "label": "双足前后站立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      },
+      {
+        "id": "g14",
+        "label": "单腿站立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不能完成"
+          },
+          {
+            "value": 1,
+            "label": "需大量帮助"
+          },
+          {
+            "value": 2,
+            "label": "需中等帮助"
+          },
+          {
+            "value": 3,
+            "label": "需少量帮助"
+          },
+          {
+            "value": 4,
+            "label": "独立完成"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 20,
+        "key": "wheelchair",
+        "label": "需坐轮椅"
+      },
+      {
+        "min": 21,
+        "max": 40,
+        "key": "assisted",
+        "label": "需辅助行走"
+      },
+      {
+        "min": 41,
+        "max": 56,
+        "key": "independent",
+        "label": "独立行走"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "g1": {
+        "type": "number",
+        "title": "从坐到站",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g2": {
+        "type": "number",
+        "title": "无支撑站立",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g3": {
+        "type": "number",
+        "title": "独立坐",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g4": {
+        "type": "number",
+        "title": "从站到坐",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g5": {
+        "type": "number",
+        "title": "床椅转移",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g6": {
+        "type": "number",
+        "title": "闭眼站立",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g7": {
+        "type": "number",
+        "title": "双足并拢站立",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g8": {
+        "type": "number",
+        "title": "站立时上肢前伸",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g9": {
+        "type": "number",
+        "title": "从地上捡物",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g10": {
+        "type": "number",
+        "title": "转身向后看",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g11": {
+        "type": "number",
+        "title": "原地转身三百六十度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g12": {
+        "type": "number",
+        "title": "交替踏台阶",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g13": {
+        "type": "number",
+        "title": "双足前后站立",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "g14": {
+        "type": "number",
+        "title": "单腿站立",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Berg Balance Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Berg+Balance+Scale+measurement+balance+older",
+      "section": "Berg：Berg K, et al. 1989；14 项各 0–4 分，合计 0–56 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

@@ -1,0 +1,497 @@
+{
+  "id": "calculate.joa",
+  "name": "JOA 腰椎评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "日本骨科学会腰椎功能评分（0–29 分），分数越高功能越好。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["JOA", "腰椎评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 29,
+      "unit": "分",
+      "direction": "higher_is_better"
+    },
+    "items": [
+      {
+        "id": "j1",
+        "label": "腰痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 3,
+            "label": "无"
+          },
+          {
+            "value": 2,
+            "label": "偶有轻度"
+          },
+          {
+            "value": 1,
+            "label": "经常轻度或偶有重度"
+          },
+          {
+            "value": 0,
+            "label": "经常或持续重度"
+          }
+        ]
+      },
+      {
+        "id": "j2",
+        "label": "下肢痛或麻木",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 3,
+            "label": "无"
+          },
+          {
+            "value": 2,
+            "label": "偶有轻度"
+          },
+          {
+            "value": 1,
+            "label": "经常轻度或偶有重度"
+          },
+          {
+            "value": 0,
+            "label": "经常或持续重度"
+          }
+        ]
+      },
+      {
+        "id": "j3",
+        "label": "步行能力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 3,
+            "label": "正常"
+          },
+          {
+            "value": 2,
+            "label": "可行走 500 米以上"
+          },
+          {
+            "value": 1,
+            "label": "可行走 100 至 500 米"
+          },
+          {
+            "value": 0,
+            "label": "行走不足 100 米"
+          }
+        ]
+      },
+      {
+        "id": "j4",
+        "label": "直腿抬高试验",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "30 至 70 度"
+          },
+          {
+            "value": 0,
+            "label": "小于 30 度"
+          }
+        ]
+      },
+      {
+        "id": "j5",
+        "label": "感觉障碍",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 0,
+            "label": "明显"
+          }
+        ]
+      },
+      {
+        "id": "j6",
+        "label": "肌力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "轻度减弱"
+          },
+          {
+            "value": 0,
+            "label": "明显减弱"
+          }
+        ]
+      },
+      {
+        "id": "j7",
+        "label": "卧床翻身",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "容易"
+          },
+          {
+            "value": 1,
+            "label": "困难"
+          },
+          {
+            "value": 0,
+            "label": "不能"
+          }
+        ]
+      },
+      {
+        "id": "j8",
+        "label": "站立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "容易"
+          },
+          {
+            "value": 1,
+            "label": "困难"
+          },
+          {
+            "value": 0,
+            "label": "不能"
+          }
+        ]
+      },
+      {
+        "id": "j9",
+        "label": "洗漱",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "容易"
+          },
+          {
+            "value": 1,
+            "label": "困难"
+          },
+          {
+            "value": 0,
+            "label": "不能"
+          }
+        ]
+      },
+      {
+        "id": "j10",
+        "label": "前屈",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "容易"
+          },
+          {
+            "value": 1,
+            "label": "困难"
+          },
+          {
+            "value": 0,
+            "label": "不能"
+          }
+        ]
+      },
+      {
+        "id": "j11",
+        "label": "长时间坐",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "容易"
+          },
+          {
+            "value": 1,
+            "label": "困难"
+          },
+          {
+            "value": 0,
+            "label": "不能"
+          }
+        ]
+      },
+      {
+        "id": "j12",
+        "label": "提物",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "容易"
+          },
+          {
+            "value": 1,
+            "label": "困难"
+          },
+          {
+            "value": 0,
+            "label": "不能"
+          }
+        ]
+      },
+      {
+        "id": "j13",
+        "label": "行走",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 2,
+            "label": "容易"
+          },
+          {
+            "value": 1,
+            "label": "困难"
+          },
+          {
+            "value": 0,
+            "label": "不能"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 9,
+        "key": "severe",
+        "label": "重度受限"
+      },
+      {
+        "min": 10,
+        "max": 19,
+        "key": "moderate",
+        "label": "中度受限"
+      },
+      {
+        "min": 20,
+        "max": 29,
+        "key": "mild",
+        "label": "轻度受限"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "j1": {
+        "type": "number",
+        "title": "腰痛",
+        "enum": [3, 2, 1, 0]
+      },
+      "j2": {
+        "type": "number",
+        "title": "下肢痛或麻木",
+        "enum": [3, 2, 1, 0]
+      },
+      "j3": {
+        "type": "number",
+        "title": "步行能力",
+        "enum": [3, 2, 1, 0]
+      },
+      "j4": {
+        "type": "number",
+        "title": "直腿抬高试验",
+        "enum": [2, 1, 0]
+      },
+      "j5": {
+        "type": "number",
+        "title": "感觉障碍",
+        "enum": [2, 1, 0]
+      },
+      "j6": {
+        "type": "number",
+        "title": "肌力",
+        "enum": [2, 1, 0]
+      },
+      "j7": {
+        "type": "number",
+        "title": "卧床翻身",
+        "enum": [2, 1, 0]
+      },
+      "j8": {
+        "type": "number",
+        "title": "站立",
+        "enum": [2, 1, 0]
+      },
+      "j9": {
+        "type": "number",
+        "title": "洗漱",
+        "enum": [2, 1, 0]
+      },
+      "j10": {
+        "type": "number",
+        "title": "前屈",
+        "enum": [2, 1, 0]
+      },
+      "j11": {
+        "type": "number",
+        "title": "长时间坐",
+        "enum": [2, 1, 0]
+      },
+      "j12": {
+        "type": "number",
+        "title": "提物",
+        "enum": [2, 1, 0]
+      },
+      "j13": {
+        "type": "number",
+        "title": "行走",
+        "enum": [2, 1, 0]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "JOA score for lumbar spine",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Japanese+Orthopaedic+Association+lumbar+score",
+      "section": "JOA 腰椎评分；13 项合计 0–29 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

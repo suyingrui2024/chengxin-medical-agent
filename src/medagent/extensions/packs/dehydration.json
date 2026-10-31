@@ -1,0 +1,261 @@
+{
+  "id": "calculate.dehydration",
+  "name": "小儿脱水程度评估",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按四项体征评估脱水程度（0–8 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["脱水程度", "小儿脱水"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 8,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "d1",
+        "label": "一般情况",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "烦躁或易激惹"
+          },
+          {
+            "value": 2,
+            "label": "嗜睡或昏迷"
+          }
+        ]
+      },
+      {
+        "id": "d2",
+        "label": "眼窝",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "轻度凹陷"
+          },
+          {
+            "value": 2,
+            "label": "明显凹陷"
+          }
+        ]
+      },
+      {
+        "id": "d3",
+        "label": "口渴",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常饮水"
+          },
+          {
+            "value": 1,
+            "label": "口渴、想喝水"
+          },
+          {
+            "value": 2,
+            "label": "不能饮水或喝不进去"
+          }
+        ]
+      },
+      {
+        "id": "d4",
+        "label": "皮肤弹性",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常"
+          },
+          {
+            "value": 1,
+            "label": "轻度变差"
+          },
+          {
+            "value": 2,
+            "label": "明显变差"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "key": "none",
+        "label": "无脱水"
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "key": "some",
+        "label": "轻中度脱水"
+      },
+      {
+        "min": 5,
+        "max": 8,
+        "key": "severe",
+        "label": "重度脱水"
+      }
+    ],
+    "note": "只做程度归类，不给补液方案。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "d1": {
+        "type": "number",
+        "title": "一般情况",
+        "enum": [0, 1, 2]
+      },
+      "d2": {
+        "type": "number",
+        "title": "眼窝",
+        "enum": [0, 1, 2]
+      },
+      "d3": {
+        "type": "number",
+        "title": "口渴",
+        "enum": [0, 1, 2]
+      },
+      "d4": {
+        "type": "number",
+        "title": "皮肤弹性",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "WHO dehydration assessment",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=WHO+dehydration+assessment+children+diarrhoea",
+      "section": "WHO 儿童腹泻脱水评估四项体征",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

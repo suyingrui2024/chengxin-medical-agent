@@ -3,6 +3,7 @@ import {
   createConsultationSubjectsModel,
   verifyConsultationSubjects,
 } from "../fixtures/consultation-subjects.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 test("unsubmitted patient text stays with its original session", async ({
   page,
@@ -65,6 +66,8 @@ test("choosing an answer does not silently submit or erase a different composer 
   const draft = "我32岁还有咳嗽，这段尚未发送。";
   await page.getByRole("textbox", { name: "输入你的描述" }).fill(draft);
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await expect(page.locator("#active-question h2")).toContainText("多大");
   await expect(page.getByRole("textbox", { name: "输入你的描述" })).toHaveValue(
     draft,
@@ -75,8 +78,11 @@ test("choosing an answer does not silently submit or erase a different composer 
   const inputs = snapshot.events.filter(
     (event) => event.event_type === "turn.user_message",
   );
-  expect(inputs).toHaveLength(1);
+  // Two user messages now: the subject choice and the opening sex choice.
+  // The point of the assertion is that the *draft* was never submitted.
+  expect(inputs).toHaveLength(2);
   expect(inputs[0].payload.text).toBe("我自己");
+  expect(inputs[1].payload.text).toBe("男");
   expect(JSON.stringify(inputs)).not.toContain(draft);
 });
 
@@ -101,7 +107,9 @@ for (const mobile of [false, true])
       ).toBe(true);
       await page.goto("/");
       await verifyConsultationSubjects(page, model, {
-        shots: `docs/assets/ui/68-${mobile ? "mobile" : "wide"}-consultation-subject`,
+        shots: shotPath(
+          `68-${mobile ? "mobile" : "wide"}-consultation-subject`,
+        ),
         mobile,
       });
     } finally {

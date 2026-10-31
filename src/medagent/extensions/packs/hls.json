@@ -1,0 +1,286 @@
+{
+  "id": "calculate.hls",
+  "name": "健康生活方式评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "健康生活方式自评（5 项，0–10 分），记录生活习惯。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["健康生活方式", "生活方式评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 10,
+      "unit": "分",
+      "direction": "higher_is_better"
+    },
+    "items": [
+      {
+        "id": "h1",
+        "label": "每周中等强度运动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不足 1 次"
+          },
+          {
+            "value": 1,
+            "label": "1 至 2 次"
+          },
+          {
+            "value": 2,
+            "label": "3 次及以上"
+          }
+        ]
+      },
+      {
+        "id": "h2",
+        "label": "每天蔬菜水果",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不足 2 份"
+          },
+          {
+            "value": 1,
+            "label": "2 至 4 份"
+          },
+          {
+            "value": 2,
+            "label": "5 份及以上"
+          }
+        ]
+      },
+      {
+        "id": "h3",
+        "label": "睡眠时长",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "不足 6 小时"
+          },
+          {
+            "value": 1,
+            "label": "6 至 7 小时"
+          },
+          {
+            "value": 2,
+            "label": "7 至 9 小时"
+          }
+        ]
+      },
+      {
+        "id": "h4",
+        "label": "吸烟",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "每天吸"
+          },
+          {
+            "value": 1,
+            "label": "偶尔吸"
+          },
+          {
+            "value": 2,
+            "label": "不吸"
+          }
+        ]
+      },
+      {
+        "id": "h5",
+        "label": "饮酒",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "每天饮"
+          },
+          {
+            "value": 1,
+            "label": "偶尔饮"
+          },
+          {
+            "value": 2,
+            "label": "不饮"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "key": "low",
+        "label": "偏低"
+      },
+      {
+        "min": 4,
+        "max": 6,
+        "key": "moderate",
+        "label": "中等"
+      },
+      {
+        "min": 7,
+        "max": 10,
+        "key": "high",
+        "label": "良好"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "h1": {
+        "type": "number",
+        "title": "每周中等强度运动",
+        "enum": [0, 1, 2]
+      },
+      "h2": {
+        "type": "number",
+        "title": "每天蔬菜水果",
+        "enum": [0, 1, 2]
+      },
+      "h3": {
+        "type": "number",
+        "title": "睡眠时长",
+        "enum": [0, 1, 2]
+      },
+      "h4": {
+        "type": "number",
+        "title": "吸烟",
+        "enum": [0, 1, 2]
+      },
+      "h5": {
+        "type": "number",
+        "title": "饮酒",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Healthy lifestyle score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=healthy+lifestyle+score+cohort",
+      "section": "自评条目，用于记录生活习惯，非诊断工具",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

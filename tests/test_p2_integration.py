@@ -113,7 +113,7 @@ class ConclusionAllergyHintTests(unittest.TestCase):
             "course": None,
         }
         with mock.patch(
-            "medagent.conclusion._self_care_group", return_value=fake_care
+            "medagent.conclusion.adjustments._self_care_group", return_value=fake_care
         ):
             sheet = compose_conclusion(
                 state,

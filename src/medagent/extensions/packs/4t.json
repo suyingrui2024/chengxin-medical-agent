@@ -1,0 +1,260 @@
+{
+  "id": "calculate.4t",
+  "name": "4T 肝素诱导血小板减少评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "肝素诱导血小板减少症临床可能性评分（0–8 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["4T", "HIT 评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 8,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "t1",
+        "label": "血小板下降幅度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "下降小于 30% 或未下降"
+          },
+          {
+            "value": 1,
+            "label": "下降 30% 至 50%"
+          },
+          {
+            "value": 2,
+            "label": "下降超过 50%"
+          }
+        ]
+      },
+      {
+        "id": "t2",
+        "label": "血小板下降时间",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "使用肝素 4 天内或 14 天后"
+          },
+          {
+            "value": 1,
+            "label": "使用肝素 5 至 10 天，或 1 天内曾用过"
+          },
+          {
+            "value": 2,
+            "label": "使用肝素 5 至 10 天且无既往暴露"
+          }
+        ]
+      },
+      {
+        "id": "t3",
+        "label": "血栓或其他表现",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "进展或复发性血栓、皮肤坏死"
+          },
+          {
+            "value": 2,
+            "label": "新发血栓、皮肤坏死或急性全身反应"
+          }
+        ]
+      },
+      {
+        "id": "t4",
+        "label": "其他导致血小板减少的原因",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "明确存在"
+          },
+          {
+            "value": 1,
+            "label": "可能存在"
+          },
+          {
+            "value": 2,
+            "label": "不存在"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "key": "low",
+        "label": "低度可能"
+      },
+      {
+        "min": 4,
+        "max": 5,
+        "key": "moderate",
+        "label": "中度可能"
+      },
+      {
+        "min": 6,
+        "max": 8,
+        "key": "high",
+        "label": "高度可能"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "t1": {
+        "type": "number",
+        "title": "血小板下降幅度",
+        "enum": [0, 1, 2]
+      },
+      "t2": {
+        "type": "number",
+        "title": "血小板下降时间",
+        "enum": [0, 1, 2]
+      },
+      "t3": {
+        "type": "number",
+        "title": "血栓或其他表现",
+        "enum": [0, 1, 2]
+      },
+      "t4": {
+        "type": "number",
+        "title": "其他导致血小板减少的原因",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "4T score heparin-induced thrombocytopenia",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=4T+score+heparin+induced+thrombocytopenia",
+      "section": "Lo GK, et al. 2006；4 项合计 0–8 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

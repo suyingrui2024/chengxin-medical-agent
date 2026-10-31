@@ -1,0 +1,336 @@
+{
+  "id": "calculate.tcm_insomnia",
+  "name": "失眠中医证候评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "失眠常见证候要素自评（6 项，0–18 分），用于记录症状，不作辨证结论。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["失眠证候", "中医失眠"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 18,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "c1",
+        "label": "入睡困难",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "c2",
+        "label": "多梦易醒",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "c3",
+        "label": "心烦易怒",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "c4",
+        "label": "口干口苦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "c5",
+        "label": "头晕健忘",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      },
+      {
+        "id": "c6",
+        "label": "疲乏无力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 1,
+            "label": "轻度"
+          },
+          {
+            "value": 2,
+            "label": "中度"
+          },
+          {
+            "value": 3,
+            "label": "重度"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 5,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 6,
+        "max": 11,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 12,
+        "max": 18,
+        "key": "severe",
+        "label": "重度"
+      }
+    ],
+    "note": "这是症状记录工具，不是辨证标准，也不对应任何方剂。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "c1": {
+        "type": "number",
+        "title": "入睡困难",
+        "enum": [0, 1, 2, 3]
+      },
+      "c2": {
+        "type": "number",
+        "title": "多梦易醒",
+        "enum": [0, 1, 2, 3]
+      },
+      "c3": {
+        "type": "number",
+        "title": "心烦易怒",
+        "enum": [0, 1, 2, 3]
+      },
+      "c4": {
+        "type": "number",
+        "title": "口干口苦",
+        "enum": [0, 1, 2, 3]
+      },
+      "c5": {
+        "type": "number",
+        "title": "头晕健忘",
+        "enum": [0, 1, 2, 3]
+      },
+      "c6": {
+        "type": "number",
+        "title": "疲乏无力",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "TCM insomnia syndrome elements",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=traditional+Chinese+medicine+insomnia+syndrome",
+      "section": "证候要素自评条目；仅记录症状，不作辨证结论",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

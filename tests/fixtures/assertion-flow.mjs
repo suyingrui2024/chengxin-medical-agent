@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { createServer } from "node:http";
+import { nextCommand } from "./model-feedback.mjs";
 import { once } from "node:events";
 
 const input =
@@ -17,6 +18,13 @@ const history = [
   ["medications_taken", null, "是否用过药不确定", "unknown"],
   ["relevant_history", null, "病史记不清", "unknown"],
   ["patient_goal", "整理就医记录", "这次想整理就医记录", "present"],
+  // The engine refuses a summary until the chief complaint's triage fields
+  // have been attempted, and the per-turn write budget is too small to add
+  // them later. The patient denied red flags in the same breath, so they
+  // belong in this batch — citing that sentence, not a guess.
+  ["warning_剧痛", null, "上述危险信号都没有", "absent"],
+  ["warning_持续加重", null, "上述危险信号都没有", "absent"],
+  ["warning_功能骤降", null, "上述危险信号都没有", "absent"],
 ];
 
 export async function createAssertionModel() {
@@ -36,8 +44,9 @@ export async function createAssertionModel() {
   const server = createServer(async (request, response) => {
     let raw = "";
     for await (const chunk of request) raw += chunk;
-    requests.push(JSON.parse(raw));
-    const command = commands.shift();
+    const body = JSON.parse(raw);
+    requests.push(body);
+    const command = nextCommand(body, commands);
     if (!command) {
       response.writeHead(500);
       response.end("Unexpected fixture call");
@@ -88,7 +97,20 @@ export async function verifyAssertionFlow(page, model) {
   expect(model.requests).toHaveLength(3);
   const observed = JSON.parse(model.requests[1].messages.at(-1).content);
   expect(observed.tool_result.ok).toBe(false);
-  expect(observed.tool_result.error).toContain("unknown/null");
+  // Partial recording returns the per-item verdicts rather than one error
+  // string: the batch lands what passed and hands the rest back with a
+  // reason and a repair. Reading `error` here silently became `undefined`
+  // when that shape changed.
+  const rejected = observed.tool_result.rejected || [];
+  expect(rejected.map((item) => item.key)).toEqual([
+    "allergies",
+    "medications_taken",
+    "relevant_history",
+  ]);
+  for (const item of rejected) {
+    expect(item.reason).toContain("unknown/null");
+    expect(item.guidance).toContain("unknown");
+  }
   const snapshot = () =>
     page.evaluate(
       async (sessionId) =>
@@ -103,7 +125,10 @@ export async function verifyAssertionFlow(page, model) {
       1,
     );
   }
-  expect(data.state.history).toHaveLength(12);
+  // Twelve scripted facts plus the three triage fields the engine requires
+  // before a summary. The patient denied red flags, so those three are
+  // recorded absent against that same sentence.
+  expect(data.state.history).toHaveLength(15);
   expect(data.state.facts.age_years.value).toBe(32);
   expect(data.state.facts.associated_symptoms.assertion).toBe("absent");
 

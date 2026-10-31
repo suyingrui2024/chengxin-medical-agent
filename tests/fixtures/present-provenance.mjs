@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { createServer } from "node:http";
 import { once } from "node:events";
+import { nextCommand } from "./model-feedback.mjs";
 
 const raw =
   "我自己，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。";
@@ -38,8 +39,9 @@ export async function createPresentProvenanceModel() {
   const server = createServer(async (request, response) => {
     let body = "";
     for await (const chunk of request) body += chunk;
-    requests.push(JSON.parse(body));
-    const command = commands.shift();
+    const payload = JSON.parse(body);
+    requests.push(payload);
+    const command = nextCommand(payload, commands);
     if (!command) {
       response.writeHead(500);
       response.end("Unexpected local model call");
@@ -96,7 +98,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
   const before = await snapshot();
   expect(before.state.facts.medications_taken.value).toBe("用过药物甲");
   expect(before.state.facts.medications_taken.assertion).toBe("present");
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   async function openSource() {
     const provenance = medication().locator(".summary-provenance");
     const toggle = provenance.locator(":scope > summary");
@@ -116,7 +120,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
   }
   await openSource();
   expect((await snapshot()).state.revision).toBe(before.state.revision);
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   await current()
     .locator(".summary-item[data-fact-key='age_years']")
     .getByRole("button", { name: "更正", exact: true })
@@ -131,7 +137,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
   ).toHaveText("40 岁");
   await openSource();
   expect((await snapshot()).state.facts.age_years.value).toBe(40);
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -159,7 +167,9 @@ export async function verifyPresentProvenance(page, model, screenshot) {
       .filter((fact) => fact.key === "medications_taken")
       .map((fact) => fact.evidence),
   ).toEqual(["昨晚用过药物甲", "今晚用过药物乙"]);
-  expect(model.requests).toHaveLength(2);
+  // Two scripted turns plus the triage-field write and the summary it
+  // then re-issues; both are the engine's gates, not extra work.
+  expect(model.requests).toHaveLength(4);
   await page
     .getByRole("button", { name: "确认摘要并结束本次问诊", exact: true })
     .click();

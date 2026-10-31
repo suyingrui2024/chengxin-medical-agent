@@ -15,6 +15,8 @@ from .registry import Capability, CapabilityRegistry
 from ..assertion_evidence import has_uncertainty
 from ..measurement_reports import temperature_report
 from .glucose import convert_glucose
+from .scale_engine import run_scale, validate_scale
+from .formula_engine import run_formula, validate_formula
 
 
 def observation(text, choice, parser):
@@ -105,6 +107,52 @@ IMPLEMENTATIONS = {
     "calculate.glucose": {"execute": convert_glucose},
 }
 
+# Declarative scale packs are admitted from the catalog, not from a
+# hand-maintained tuple: ``catalog.CATALOG`` is the allow-list and only
+# rows with ``status == "delivered"`` are bound here. Editing the catalog
+# is a code change, so adding content still requires review — but the
+# list can no longer drift away from the packs that actually exist.
+from .catalog import DELIVERED_IDS  # noqa: E402
+
+
+def _formula_executor(manifest):
+    """Bind one pack's validated formula spec into an execute callable."""
+    spec = validate_formula(manifest)
+
+    def execute(arguments):
+        return run_formula(spec, arguments)
+
+    return {"execute": execute}
+
+
+def _executor_for(manifest):
+    """Pick the engine for one catalog-delivered pack.
+
+    The catalog says *what* may be delivered; the manifest says which
+    engine executes it. A delivered pack that declares neither is a
+    content bug and must fail loudly rather than load inert.
+    """
+    if isinstance(manifest.get("scale"), dict):
+        return _scale_executor(manifest)
+    if isinstance(manifest.get("formula"), dict):
+        return _formula_executor(manifest)
+    raise ValueError("目录标记为已交付但内容包没有引擎声明")
+
+
+def _scale_executor(manifest):
+    """Bind one pack's validated spec into an execute callable.
+
+    The spec is validated here, at load time, and captured by the
+    closure — so the declaration that passed review is exactly the one
+    that scores a form later.
+    """
+    spec = validate_scale(manifest)
+
+    def execute(arguments):
+        return run_scale(spec, arguments)
+
+    return {"execute": execute}
+
 
 def templates():
     root = resources.files("medagent.extensions").joinpath("templates")
@@ -115,10 +163,24 @@ def templates():
     ]
 
 
-def load_registry(template_id="general"):
+# (template_id, enabled) -> CapabilityRegistry. Safe to share because the
+# registry is immutable; ``with_enabled`` always returns a new instance.
+_REGISTRY_CACHE: dict = {}
+
+
+def load_registry(template_id="general", enabled=None):
     template = next((item for item in templates() if item["id"] == template_id), None)
     if template is None:
         raise ValueError("问诊模板未注册")
+    # Parsing and validating ~80 packs on every server start dominated the
+    # test suite once the catalog grew (50 s -> 76 s, with connection
+    # resets under concurrent servers). Registries are immutable —
+    # ``with_enabled`` returns a new object — so the built instance can be
+    # shared for the process lifetime.
+    cache_key = (template_id, None if enabled is None else tuple(enabled))
+    cached = _REGISTRY_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
     root = resources.files("medagent.extensions").joinpath("packs")
     capabilities = []
     for file in sorted(root.iterdir(), key=lambda p: p.name):
@@ -126,7 +188,11 @@ def load_registry(template_id="general"):
             continue
         manifest = json.loads(file.read_text(encoding="utf-8"))
         implementation = IMPLEMENTATIONS.get(manifest["id"])
+        if implementation is None and manifest["id"] in DELIVERED_IDS:
+            implementation = _executor_for(manifest)
         if implementation is None:
             raise ValueError("内容包未绑定受信实现")
         capabilities.append(Capability(manifest, **implementation))
-    return CapabilityRegistry(capabilities, template)
+    registry = CapabilityRegistry(capabilities, template, enabled)
+    _REGISTRY_CACHE[cache_key] = registry
+    return registry

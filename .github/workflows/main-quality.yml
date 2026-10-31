@@ -13,7 +13,9 @@ jobs:
   patient-safety:
     name: Patient contracts and reflow
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    # The browser suite starts a fresh server per spec file (52 of them), so
+    # it is the long pole: ~20 minutes locally, and CI runners are slower.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -23,6 +25,10 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
+      # Cheap, dependency-free guard against god-modules regrowing. Runs before
+      # the browser install so a structural regression fails fast.
+      - name: Enforce module-size ceiling
+        run: python scripts/lint/module_size.py
       - name: Install locked browser test dependencies
         run: |
           npm ci --ignore-scripts
@@ -35,7 +41,24 @@ jobs:
           python -m pip install --quiet pytest
           python -m pytest tests -q
           python scripts/evaluation/medical/evaluate_release_gate.py
-      - name: Verify patient emergency actions, self-check guidance and 400 percent reflow equivalent
-        run: node node_modules/@playwright/test/cli.js test tests/ui/p0-summary-status.spec.mjs tests/ui/patient-reflow.spec.mjs tests/ui/self-check-visuals.spec.mjs
+      # The three-spec smoke that used to sit here (p0-summary-status,
+      # patient-reflow, self-check-visuals) is gone: the whole suite below
+      # covers it, and a second entry point only creates a second place to
+      # keep in step.
+      #
+      # Running a hand-picked list is how sixteen appearance tests stayed
+      # red for five days: they were never in the workflow. The browser
+      # suite now runs whole, the same way the Python step runs the whole
+      # suite.
+      #
+      # It is a hard gate now. Two things had to change first: the scripted
+      # models obey the engine's machine-readable feedback (so a rejected
+      # proposal no longer desyncs the whole script), and `test:ui:ci` runs
+      # one spec file per server — sharing a single server meant each file
+      # inherited the previous one's patient record and the red set moved
+      # with file order. With those, all 52 spec files pass on a clean
+      # checkout, so a failure here is a real failure.
+      - name: Run the whole browser suite
+        run: npm run test:ui:ci
       - name: Check interface formatting (same list as local format:check)
         run: npm run format:check

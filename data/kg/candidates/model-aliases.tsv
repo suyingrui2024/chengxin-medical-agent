@@ -1,0 +1,15 @@
+# 模型提议的红旗同义词（子智能体 2026-10-28 产出，人工截取子串）
+# 列：concept	alias	confidence	status	source_phrase
+# 标 rejected 即不加载；confidence 保留以便优先复核 low 项。
+昏迷	失去意识	medium	model_proposed	患者失去意识了
+意识明显异常	意识不清	medium	model_proposed	老人现在意识不清
+呼吸困难	喘不上气	high	model_proposed	我喘不上气了
+严重呼吸困难	气短	medium	model_proposed	她气短得说不出完整的话
+呼吸困难	喘气喘得厉害	medium	model_proposed	胸口闷，喘气喘得厉害
+呼吸困难	喘不上气	medium	model_proposed	好像有点喘不上气
+高风险胸痛描述	压了块石头	high	model_proposed	胸口像压了块石头一样疼，还出冷汗
+高风险胸痛描述	往左胳膊窜	high	model_proposed	前胸疼，还往左胳膊窜
+大量或无法控制的出血	血止不住	high	model_proposed	血止不住，一直在流
+上消化道出血	吐了好多血	high	model_proposed	吐了好多血，吐了两回了
+大量或无法控制的出血	血流个不停	high	model_proposed	血流个不停，按都按不住
+高风险胸痛描述	胸口疼	high	model_proposed	胸口疼，还喘不上气，出了一身汗

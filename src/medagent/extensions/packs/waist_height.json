@@ -1,0 +1,146 @@
+{
+  "id": "calculate.waist_height",
+  "name": "腰高比",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "腰围除以身高。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "aliases": ["腰高比", "WHtR"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "waist_height",
+    "citation": "WHtR",
+    "inputs": [
+      {
+        "id": "waist_cm",
+        "label": "腰围",
+        "type": "number",
+        "unit": "cm",
+        "min": "30",
+        "max": "200",
+        "step": "0.1"
+      },
+      {
+        "id": "height_cm",
+        "label": "身高",
+        "type": "number",
+        "unit": "cm",
+        "min": "100",
+        "max": "220",
+        "step": "0.1"
+      }
+    ],
+    "output": {
+      "label": "腰高比",
+      "unit": "",
+      "min": "0.2",
+      "max": "2",
+      "precision": {
+        "places": 2
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "腰高比 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=waist+to+height+ratio",
+      "section": "WHtR：腰围 ÷ 身高",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "formula_form/v1",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "waist_cm": {
+        "type": "string",
+        "title": "腰围",
+        "maxLength": 12
+      },
+      "height_cm": {
+        "type": "string",
+        "title": "身高",
+        "maxLength": 12
+      }
+    }
+  }
+}

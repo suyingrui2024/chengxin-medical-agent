@@ -1,14 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { exerciseUncertainReports } from "../fixtures/uncertainty-flow.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 test("unresolved narratives remain visible and editable through a complete consultation", async ({
   page,
 }) => {
   await page.goto("/");
-  await exerciseUncertainReports(
-    page,
-    "docs/assets/ui/53-uncertain-reports.png",
-  );
+  await exerciseUncertainReports(page, shotPath("53-uncertain-reports.png"));
 });
 
 test("a narrow patient window preserves reports and usable correction controls", async ({
@@ -18,7 +16,7 @@ test("a narrow patient window preserves reports and usable correction controls",
   await page.goto("/");
   await exerciseUncertainReports(
     page,
-    "docs/assets/ui/54-uncertain-reports-narrow.png",
+    shotPath("54-uncertain-reports-narrow.png"),
   );
 });
 

@@ -1,4 +1,11 @@
 import { test, expect } from "@playwright/test";
+import {
+  answerText,
+  answerUntil,
+  chooseChoice,
+  currentQuestion,
+} from "../fixtures/intake.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 async function start(page) {
   await page.goto("/");
@@ -13,13 +20,25 @@ async function answer(page, text) {
   await page.getByRole("button", { name: "发送回答" }).click();
   await expect(page.locator("#send-button")).toBeEnabled();
 }
-async function history(page, chief = "咳嗽发烧两天") {
-  await page.getByRole("button", { name: "我自己", exact: true }).click();
-  await answer(page, "32岁");
-  await answer(page, chief);
-  await expect(page.locator(".signal-grid li")).toHaveCount(6);
-  await page.getByRole("button", { name: "都没有", exact: true }).click();
-  await answer(page, "两天前逐渐出现");
+async function history(
+  page,
+  id,
+  chief = "咳嗽发烧两天",
+  { stopAt = "severity" } = {},
+) {
+  await chooseChoice(page, "我自己");
+  await chooseChoice(page, "男");
+  await expect(page.locator("#active-question h2")).toContainText("多大");
+  await answerText(page, "32岁");
+  await answerText(page, chief);
+  await chooseChoice(page, "都没有");
+  // History order is discrimination-driven: answer whatever is asked until the
+  // requested question is pending instead of assuming onset -> trajectory.
+  await answerUntil(
+    page,
+    id,
+    async () => (await currentQuestion(page, id)) === stopAt,
+  );
 }
 
 test("visual choices show actual questions, keep history available and send one explicit answer", async ({
@@ -30,16 +49,21 @@ test("visual choices show actual questions, keep history available and send one 
   await expect(page.locator("#active-question .visual-choice")).toHaveCount(3);
   await expect(page.locator("#conversation-scroll")).toBeHidden();
   await page.screenshot({
-    path: "docs/assets/ui/14-visual-opening.png",
+    path: shotPath("14-visual-opening.png"),
     fullPage: true,
   });
   const chosen = page.waitForRequest((r) => r.url().endsWith("/messages"));
   await page.getByRole("button", { name: "我自己", exact: true }).focus();
   await page.keyboard.press("Enter");
   expect((await chosen).postDataJSON().choice_value).toBe("self");
-  await expect(page.locator("#active-question h2")).toHaveText("患者多大了？");
+  // Opening order is consult_for -> sex -> age.
+  await expect(page.locator("#active-question h2")).toHaveText(
+    "请问是男是女？",
+  );
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await page.getByRole("button", { name: "展开对话记录" }).click();
-  await expect(page.locator(".message.user").last()).toHaveText("你我自己");
+  await expect(page.locator(".message.user").last()).toHaveText("你男");
   await page.getByRole("button", { name: "返回当前问题" }).click();
   await answer(page, "不清楚");
   await expect(page.locator("#active-question h2")).toContainText(
@@ -56,7 +80,7 @@ test("visual choices show actual questions, keep history available and send one 
   const before = await (await request.get(`/api/sessions/${id}`)).json();
   expect(before.state.facts.emergency_screen).toBeUndefined();
   await page.screenshot({
-    path: "docs/assets/ui/15-visual-safety-screen.png",
+    path: shotPath("15-visual-safety-screen.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "不确定", exact: true }).click();
@@ -69,12 +93,12 @@ test("degree scale confirms one selected answer independently of the text draft"
   request,
 }) => {
   const id = await start(page);
-  await history(page);
+  await history(page, id, undefined, { stopAt: "trajectory" });
   await expect(page.locator("#active-question .visual-choices")).toContainText(
     "在加重",
   );
   await page.screenshot({
-    path: "docs/assets/ui/16-visual-trajectory.png",
+    path: shotPath("16-visual-trajectory.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "变化不大", exact: true }).click();
@@ -86,7 +110,7 @@ test("degree scale confirms one selected answer independently of the text draft"
   const before = await (await request.get(`/api/sessions/${id}`)).json();
   expect(before.state.facts.severity).toBeUndefined();
   await page.screenshot({
-    path: "docs/assets/ui/17-visual-severity.png",
+    path: shotPath("17-visual-severity.png"),
     fullPage: true,
   });
   await page.locator("#message-input").fill("能正常活动");
@@ -108,10 +132,10 @@ test("body location uses a deliberate selection and confirmation, preserving sel
   request,
 }) => {
   const id = await start(page);
-  await history(page, "手臂疼痛两天");
-  await page.getByRole("button", { name: "变化不大", exact: true }).click();
-  await answer(page, "3分");
-  await answer(page, "没有");
+  await history(page, id, "手臂疼痛两天");
+  await page.getByRole("button", { name: "3 分", exact: true }).click();
+  await page.getByRole("button", { name: "确认 3 分", exact: true }).click();
+  await answerUntil(page, id, () => page.locator(".body-map").isVisible());
   await expect(page.locator(".body-map")).toBeVisible();
   await expect(page.locator(".map-confirm")).toBeDisabled();
   await page
@@ -121,7 +145,7 @@ test("body location uses a deliberate selection and confirmation, preserving sel
   const before = await (await request.get(`/api/sessions/${id}`)).json();
   expect(before.state.facts.symptom_location).toBeUndefined();
   await page.screenshot({
-    path: "docs/assets/ui/18-visual-body-map.png",
+    path: shotPath("18-visual-body-map.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "记录：四肢", exact: true }).click();
@@ -138,11 +162,13 @@ test("mobile visual screen and degree scale stay readable without overlapping ta
   await page.setViewportSize({ width: 390, height: 844 });
   await start(page);
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await answer(page, "32岁");
   await answer(page, "咳嗽");
   await expect(page.locator(".signal-grid li")).toHaveCount(6);
   await page.screenshot({
-    path: "docs/assets/ui/19-visual-mobile-screen.png",
+    path: shotPath("19-visual-mobile-screen.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "都没有", exact: true }).click();
@@ -170,7 +196,7 @@ test("mobile visual screen and degree scale stay readable without overlapping ta
     targets.every((target) => target.width >= 44 && target.height >= 44),
   ).toBe(true);
   await page.screenshot({
-    path: "docs/assets/ui/20-visual-mobile-severity.png",
+    path: shotPath("20-visual-mobile-severity.png"),
     fullPage: true,
   });
 });
@@ -213,9 +239,12 @@ test("custom and malformed visual components preserve question meaning and isola
   await expect(page.locator("#visual-contract-test h2")).toHaveText(
     "你说的无法活动，是现在发生的吗？",
   );
+  // The severity scale is an input control and follows the question id, not
+  // `canonical`: a clarification keeps the control (only the title shortcut is
+  // dropped). The malformed second block falls back instead.
   await expect(
     page.locator("#visual-contract-test .severity-scale"),
-  ).toHaveCount(0);
+  ).toHaveCount(1);
   await expect(
     page.locator("#visual-contract-test .structured-fallback"),
   ).toHaveCount(1);
@@ -232,6 +261,7 @@ test("the smallest desktop window keeps the actual response controls inside the 
     .boundingBox();
   expect(send.y + send.height).toBeLessThanOrEqual(680);
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
   await answer(page, "32岁");
   await answer(page, "咳嗽");
   const choice = page.getByRole("button", { name: "不确定", exact: true });
@@ -243,7 +273,7 @@ test("the smallest desktop window keeps the actual response controls inside the 
     ),
   ).toBe(true);
   await page.screenshot({
-    path: "docs/assets/ui/22-compact-desktop.png",
+    path: shotPath("22-compact-desktop.png"),
     fullPage: true,
   });
   await choice.click();

@@ -1,0 +1,589 @@
+{
+  "id": "calculate.pcs",
+  "name": "PCS 疼痛灾难化量表",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "疼痛灾难化量表（13 项，0–52 分），记录对疼痛的灾难化思维。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["PCS", "疼痛灾难化"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 52,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "p1",
+        "label": "我老是想着疼痛会持续下去",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p2",
+        "label": "我担心疼痛会变得更严重",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p3",
+        "label": "我无法停止思考疼痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p4",
+        "label": "我觉得自己无法应对疼痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p5",
+        "label": "我觉得疼痛会毁掉我的人生",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p6",
+        "label": "我害怕疼痛会永远存在",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p7",
+        "label": "我不断想到疼痛带来的其他痛苦",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p8",
+        "label": "我焦虑地等待疼痛消退",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p9",
+        "label": "我无法把疼痛从脑中赶走",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p10",
+        "label": "我不断想着自己有多痛",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p11",
+        "label": "我不断想着疼痛有多折磨人",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p12",
+        "label": "我觉得没有办法减轻疼痛的强度",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "p13",
+        "label": "我怀疑疼痛会不会好转",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "从不"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 20,
+        "key": "low",
+        "label": "低"
+      },
+      {
+        "min": 21,
+        "max": 30,
+        "key": "moderate",
+        "label": "中"
+      },
+      {
+        "min": 31,
+        "max": 52,
+        "key": "high",
+        "label": "高"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "p1": {
+        "type": "number",
+        "title": "我老是想着疼痛会持续下去",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p2": {
+        "type": "number",
+        "title": "我担心疼痛会变得更严重",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p3": {
+        "type": "number",
+        "title": "我无法停止思考疼痛",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p4": {
+        "type": "number",
+        "title": "我觉得自己无法应对疼痛",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p5": {
+        "type": "number",
+        "title": "我觉得疼痛会毁掉我的人生",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p6": {
+        "type": "number",
+        "title": "我害怕疼痛会永远存在",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p7": {
+        "type": "number",
+        "title": "我不断想到疼痛带来的其他痛苦",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p8": {
+        "type": "number",
+        "title": "我焦虑地等待疼痛消退",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p9": {
+        "type": "number",
+        "title": "我无法把疼痛从脑中赶走",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p10": {
+        "type": "number",
+        "title": "我不断想着自己有多痛",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p11": {
+        "type": "number",
+        "title": "我不断想着疼痛有多折磨人",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p12": {
+        "type": "number",
+        "title": "我觉得没有办法减轻疼痛的强度",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "p13": {
+        "type": "number",
+        "title": "我怀疑疼痛会不会好转",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Pain Catastrophizing Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Pain+Catastrophizing+Scale+PCS",
+      "section": "Sullivan MJL, et al. 1995；13 项各 0–4 分，合计 0–52 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

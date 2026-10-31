@@ -1,0 +1,266 @@
+{
+  "id": "calculate.curb65",
+  "name": "CURB-65 肺炎严重度评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "社区获得性肺炎严重度评分（0–5 分），仅作风险分层。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["CURB-65", "CURB65"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 5,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "u1",
+        "label": "意识障碍",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "u2",
+        "label": "血尿素氮高于 7 mmol/L",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "u3",
+        "label": "呼吸频率 30 次/分及以上",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "u4",
+        "label": "低血压（收缩压低于 90 或舒张压不高于 60 mmHg）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "u5",
+        "label": "年龄 65 岁及以上",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 1,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 2,
+        "max": 2,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 3,
+        "max": 5,
+        "key": "high",
+        "label": "高风险"
+      }
+    ],
+    "note": "低血压一项为析取条件，由医生判断后勾选。"
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "u1": {
+        "type": "number",
+        "title": "意识障碍",
+        "enum": [0, 1]
+      },
+      "u2": {
+        "type": "number",
+        "title": "血尿素氮高于 7 mmol/L",
+        "enum": [0, 1]
+      },
+      "u3": {
+        "type": "number",
+        "title": "呼吸频率 30 次/分及以上",
+        "enum": [0, 1]
+      },
+      "u4": {
+        "type": "number",
+        "title": "低血压（收缩压低于 90 或舒张压不高于 60 mmHg）",
+        "enum": [0, 1]
+      },
+      "u5": {
+        "type": "number",
+        "title": "年龄 65 岁及以上",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "CURB-65",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=CURB-65+community+acquired+pneumonia+severity",
+      "section": "Lim WS, et al. 2003；5 项合计 0–5 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

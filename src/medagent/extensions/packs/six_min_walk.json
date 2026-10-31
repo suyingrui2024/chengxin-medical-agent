@@ -1,0 +1,180 @@
+{
+  "id": "calculate.six_min_walk",
+  "name": "6 分钟步行预计距离",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按性别、身高、年龄、体重估算 6 分钟步行距离（m）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "aliases": ["6MWD", "六分钟步行"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "six_min_walk",
+    "citation": "6MWD-ENRIGHT",
+    "inputs": [
+      {
+        "id": "height_cm",
+        "label": "身高",
+        "type": "number",
+        "unit": "cm",
+        "min": "100",
+        "max": "220",
+        "step": "0.1"
+      },
+      {
+        "id": "age_years",
+        "label": "年龄",
+        "type": "number",
+        "unit": "岁",
+        "min": "18",
+        "max": "100",
+        "step": "1"
+      },
+      {
+        "id": "weight_kg",
+        "label": "体重",
+        "type": "number",
+        "unit": "kg",
+        "min": "25",
+        "max": "200",
+        "step": "0.1"
+      },
+      {
+        "id": "sex",
+        "label": "性别",
+        "type": "enum",
+        "options": [
+          {
+            "value": "male",
+            "label": "男"
+          },
+          {
+            "value": "female",
+            "label": "女"
+          }
+        ]
+      }
+    ],
+    "output": {
+      "label": "预计 6 分钟步行距离",
+      "unit": "m",
+      "min": "100",
+      "max": "900",
+      "precision": {
+        "places": 0
+      },
+      "direction": "no_direction"
+    },
+    "bands": []
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "6 分钟步行预计距离 公式来源",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=six+minute+walk+distance+reference+equation",
+      "section": "6MWD-ENRIGHT：男性 7.57×身高−5.02×年龄−1.76×体重−309；女性 2.11×身高−2.29×体重−5.78×年龄+667",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "formula_form/v1",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "height_cm": {
+        "type": "string",
+        "title": "身高",
+        "maxLength": 12
+      },
+      "age_years": {
+        "type": "string",
+        "title": "年龄",
+        "maxLength": 12
+      },
+      "weight_kg": {
+        "type": "string",
+        "title": "体重",
+        "maxLength": 12
+      },
+      "sex": {
+        "type": "string",
+        "title": "性别",
+        "enum": ["male", "female"]
+      }
+    }
+  }
+}

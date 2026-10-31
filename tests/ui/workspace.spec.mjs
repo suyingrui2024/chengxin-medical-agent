@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
+import { setInterfaceMode } from "../fixtures/interface-mode.mjs";
 import { mkdir } from "node:fs/promises";
+import { answerText, answerUntil, chooseChoice } from "../fixtures/intake.mjs";
+import { SHOTS_DIR } from "../fixtures/shots.mjs";
 
-const shots = "docs/assets/ui";
+const shots = SHOTS_DIR;
 test.beforeAll(async () => {
   await mkdir(shots, { recursive: true });
 });
@@ -20,24 +23,42 @@ test("patient conversation, self-check, history, evidence and export use actual 
     path: `${shots}/01-welcome-desktop.png`,
     fullPage: true,
   });
+  const created = page.waitForResponse(
+    (r) => r.request().method() === "POST" && r.url().endsWith("/api/sessions"),
+  );
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await page.getByRole("button", { name: "我自己", exact: true }).click();
+  const id = (await (await created).json()).session_id;
   const input = page.getByRole("textbox", { name: "输入你的描述" });
   async function answer(text) {
     await input.fill(text);
     await page.getByRole("button", { name: "发送回答" }).click();
     await expect(page.locator("#busy-indicator")).toBeHidden();
   }
-  await answer("32岁");
-  await answer("咳嗽发烧两天");
-  await page.getByRole("button", { name: "都没有", exact: true }).click();
-  await answer("两天前逐渐出现");
-  await page.getByRole("button", { name: "变化不大", exact: true }).click();
-  await answer("5分");
-  await answer("喉咙痛");
-  await answer("没有");
-  await answer("干咳，没有咳血");
-  await answer("能正常喝水");
+  await chooseChoice(page, "我自己");
+  await chooseChoice(page, "男");
+  await expect(page.locator("#active-question h2")).toContainText("多大");
+  await answerText(page, "32岁");
+  await answerText(page, "咳嗽发烧两天");
+  await chooseChoice(page, "都没有");
+  // The differential planner decides the history order; keep this test's exact
+  // answers but deliver them by question id instead of by position.
+  await answerUntil(
+    page,
+    id,
+    () => page.locator("#active-task .task-card").isVisible(),
+    {
+      answers: {
+        resp_breathing: "呼吸正常",
+        severity: "5分",
+        associated_symptoms: "喉咙痛",
+        onset: "两天前逐渐出现",
+        resp_cough_details: "干咳，没有咳血",
+        resp_intake: "能正常喝水",
+        reported_temperature: "没量过",
+      },
+      choices: { trajectory: "变化不大" },
+    },
+  );
   await expect(
     page.getByRole("heading", { name: "测一次腋下体温" }),
   ).toBeVisible();
@@ -97,7 +118,7 @@ test("patient conversation, self-check, history, evidence and export use actual 
     .getByRole("button", { name: "确认摘要并结束本次问诊", exact: true })
     .click();
   await expect(page.locator("#composer")).toBeHidden();
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.getByRole("button", { name: "查看本次运行记录" }).click();
   await expect(
     page.getByRole("heading", { name: "看清每一步，才能继续改进。" }),
@@ -184,13 +205,21 @@ test("unknown result components produce a visible fallback instead of disappeari
   page,
 }) => {
   await page.goto("/");
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.locator('.nav-item[data-view="capabilities"]').click();
+  // The point of this test is the renderer's fallback for an unknown block
+  // type, not capability execution, so answer with a synthetic presentation.
   await page.route("**/api/capabilities/preview", async (route) => {
-    const response = await route.fetch();
-    const payload = await response.json();
-    payload.presentation.blocks[0].type = "future-calculation";
-    await route.fulfill({ response, json: payload });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        presentation: {
+          schema_version: "medical-ui/v1",
+          blocks: [{ id: "future", type: "future-calculation", data: {} }],
+        },
+      }),
+    });
   });
   await page.getByRole("button", { name: "执行并查看公式" }).click();
   await expect(
@@ -226,7 +255,8 @@ test("settings are real, keep old sessions, and never return credentials", async
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
+  await page.locator('.nav-item[data-view="settings"]').click();
   await page.getByRole("button", { name: "模型与运行配置" }).click();
   await expect(page.locator("#settings-dialog")).toBeVisible();
   await page.getByRole("radio", { name: /DSH 问诊/ }).check();
@@ -250,6 +280,7 @@ test("settings are real, keep old sessions, and never return credentials", async
   );
   await page.getByRole("button", { name: "应用配置" }).click();
   await expect(page.locator("#settings-dialog")).not.toBeVisible();
+  await page.locator('.nav-item[data-view="consultation"]').click();
   const settings = await (await request.get("/api/settings")).json();
   expect(JSON.stringify(settings)).not.toContain("ui-test-only-secret");
   await expect(
@@ -261,6 +292,7 @@ test("patient can open a simplified DeepSeek preset without exposing a key", asy
   page,
 }) => {
   await page.goto("/");
+  await page.locator('.nav-item[data-view="settings"]').click();
   const trigger = page.getByRole("button", {
     name: "模型与运行配置",
     exact: true,
@@ -291,7 +323,7 @@ test("task library preview cannot write observations and has step navigation", a
   request,
 }) => {
   await page.goto("/");
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.locator('.nav-item[data-view="tasks"]').click();
   await expect(
     page.getByRole("heading", { name: "用图示，把下一步说清楚。" }),
@@ -330,7 +362,7 @@ test("mobile layout has no horizontal overflow and exposes records and navigatio
     fullPage: true,
   });
   await page.getByRole("button", { name: "打开导航" }).click();
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.getByRole("button", { name: "打开导航" }).click();
   await page.locator('.nav-item[data-view="tasks"]').click();
   await expect(
@@ -355,7 +387,21 @@ test("mobile layout has no horizontal overflow and exposes records and navigatio
   await page.getByRole("button", { name: "打开导航" }).click();
   await page.locator('.nav-item[data-view="consultation"]').click();
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await page.getByRole("button", { name: "问诊记录 0" }).click();
+  // Creating the session re-renders the view, and setView() closes the
+  // mobile drawer. Opening it before that lands means the drawer closes
+  // under the next click — and a closed drawer is `display: none`, so the
+  // nav item is not in the accessibility tree at all and getByRole waits
+  // for something that will never appear.
+  await expect(page.locator("#active-question h2")).toBeVisible();
+  await page.getByRole("button", { name: "打开导航" }).click();
+  await expect(page.locator("#sidebar")).toHaveClass(/open/);
+  await page.getByRole("button", { name: /会谈记录/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "每次会谈，都有迹可循。" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "打开导航" }).click();
+  await page.locator('.nav-item[data-view="consultation"]').click();
+  await page.locator("#toggle-facts").click();
   await expect(
     page.getByRole("heading", { name: "已记录的信息" }),
   ).toBeVisible();
@@ -367,8 +413,11 @@ test("editing a fact updates the actual case and retains the previous value", as
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await page.getByRole("textbox", { name: "输入你的描述" }).fill("32岁");
   await page.getByRole("button", { name: "发送回答" }).click();
+  await page.locator("#toggle-facts").click();
   const age = page.locator(".fact-row").filter({ hasText: "年龄" });
   await expect(age).toContainText("32 岁");
   await age.getByRole("button", { name: "更正", exact: true }).click();
@@ -402,9 +451,12 @@ test("a stale fact editor preserves the draft and refreshes the current record",
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const { session_id: id } = await (await created).json();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   await page.getByRole("textbox", { name: "输入你的描述" }).fill("32岁");
   await page.getByRole("button", { name: "发送回答" }).click();
   await expect(page.locator("#busy-indicator")).toBeHidden();
+  await page.locator("#toggle-facts").click();
   const age = page.locator(".fact-row").filter({ hasText: "年龄" });
   await age.getByRole("button", { name: "更正", exact: true }).click();
   await page.getByLabel("更正「年龄」").fill("40岁");
@@ -449,6 +501,9 @@ test("changing the consultation subject opens a separate case and retains the or
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const { session_id: originalId } = await (await created).json();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
+  await page.locator("#toggle-facts").click();
   const subject = page.locator(".fact-row").filter({ hasText: "咨询对象" });
   await subject.getByRole("button", { name: "更正", exact: true }).click();
   await expect(page.locator("#edit-hint")).toContainText("本次咨询对象已固定");
@@ -475,6 +530,8 @@ test("a lost response recovers persisted progress and patient markup stays plain
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   await page.getByRole("button", { name: "我自己", exact: true }).click();
+  await page.getByRole("button", { name: "男", exact: true }).click();
+  await expect(page.locator("#active-question h2")).toContainText("多大");
   const input = page.getByRole("textbox", { name: "输入你的描述" });
   await input.fill("32岁");
   await page.getByRole("button", { name: "发送回答" }).click();

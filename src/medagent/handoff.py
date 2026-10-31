@@ -69,6 +69,18 @@ LABELS = {
     "eye_warning_signs": "眼部警示表现",
     "emergency_screen": "急症筛查",
     "patient_goal": "本次咨询目标",
+    # P3 off-pathway symptom-domain warning screen (out_of_pathway.py).
+    # Labels only: these keys are not in REGISTERED_FACT_KEYS because
+    # that registry is derived from questions.json + capability packs,
+    # and the P3 contract keeps warning content out of both. They still
+    # reach the handoff whenever an off-pathway consultation records
+    # them, and an unlabelled key would render as its raw id.
+    "warning_意识": "危险信号：意识",
+    "warning_呼吸": "危险信号：呼吸",
+    "warning_出血": "危险信号：出血",
+    "warning_剧痛": "危险信号：剧痛",
+    "warning_持续加重": "危险信号：持续加重",
+    "warning_功能骤降": "危险信号：功能骤降",
 }
 
 # The fact-key registry the drift-guard test checks LABELS against:

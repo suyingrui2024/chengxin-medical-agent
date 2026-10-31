@@ -4,6 +4,7 @@ import { writeFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { expect } from "@playwright/test";
+import { setInterfaceMode } from "./interface-mode.mjs";
 
 export async function verifyNativeArtifactChart(page, executionRoot) {
   const snapshot = await page.evaluate(async () => {
@@ -22,7 +23,7 @@ export async function verifyNativeArtifactChart(page, executionRoot) {
   );
   const csv = "样本,质量 (g)\nA,1250\nB,2000\nC,750\n";
   await writeFile(path.join(snapshot.directory, "measured.csv"), csv, "utf8");
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
   await page.getByRole("button", { name: "执行工作台", exact: true }).click();
   await page.locator("#execution-refresh").click();
   await expect(

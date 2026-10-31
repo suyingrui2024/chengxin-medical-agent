@@ -124,6 +124,22 @@ def question_fact_gates_pass(question: "Question", facts: Mapping[str, Fact]) ->
     return True
 
 
+def _emergency_screen_absent(state) -> bool:
+    """Whether the combined emergency screen was explicitly answered 「没有」.
+
+    Only an explicit absent answer subsumes the covered warning domains
+    (see ``out_of_pathway.SUBSUMED_BY_EMERGENCY_SCREEN``). An unanswered
+    screen, or one answered 「不确定」, leaves those domains to be asked:
+    uncertainty is not a negative, which is the same rule the rest of
+    the engine applies to denied vs. unconfirmed mentions.
+    """
+    facts = getattr(state, "facts", None) or {}
+    fact = facts.get("emergency_screen")
+    if fact is None:
+        return False
+    return getattr(fact.assertion, "value", fact.assertion) == "absent"
+
+
 @dataclass(frozen=True)
 class Question:
     id: str
@@ -159,10 +175,52 @@ class ContentRepository:
         package = resources.files("medagent.content")
         self._questions_raw = json.loads(package.joinpath("questions.json").read_text(encoding="utf-8"))
         self.registry = registry or load_registry()
-        self.questions = [self._make_question(item) for item in self._questions_raw["questions"]]
+        # P3 off-pathway warning domains are compiled from their own
+        # content file and appended to the askable catalog. They stay
+        # out of ``questions.json`` (the P3 contract), and their
+        # ``applies_when={"off_pathway": True}`` marker makes them
+        # inapplicable for every pathway chief, so both engines see
+        # them only where the pathway model has nothing to offer.
+        self.warning_questions = self._make_warning_questions()
+        self.questions = [
+            self._make_question(item) for item in self._questions_raw["questions"]
+        ] + self.warning_questions
         self.tasks = self.registry.tasks
         if {task["result_key"] for task in self.tasks.values()} & {q.fact_key for q in self.questions}:
             raise ValueError("观察结果不能覆盖核心问诊字段")
+
+    @staticmethod
+    def _make_warning_questions() -> List["Question"]:
+        """Compile the P3 warning domains into askable questions.
+
+        Input is ``yes_no_unknown`` with the same three options as the
+        combined emergency screen, so intake records them through the
+        existing interpreter path. ``blocking=True`` is deliberate: an
+        off-pathway consultation has no pathway-specific red-flag
+        screen, so these are its safety net and must be asked before
+        the summary gate opens (design §4 rule 2).
+        """
+        try:
+            from .out_of_pathway import warning_domain_specs
+        except Exception:  # pragma: no cover - content always ships
+            return []
+        return [
+            Question(
+                id=spec["id"],
+                phase=Phase.HISTORY,
+                fact_key=spec["fact_key"],
+                prompt=spec["question"],
+                input="yes_no_unknown",
+                options=[
+                    QuickReply("有", "yes"),
+                    QuickReply("没有", "no"),
+                    QuickReply("不确定", "unknown"),
+                ],
+                applies_when={"off_pathway": True},
+                blocking=True,
+            )
+            for spec in warning_domain_specs()
+        ]
 
     @staticmethod
     def _make_question(raw: Dict[str, Any]) -> Question:
@@ -211,6 +269,15 @@ class ContentRepository:
 
     @staticmethod
     def question_applies(question: Question, chief_complaint: str) -> bool:
+        # P3 off-pathway warnings are decidable from the chief text
+        # alone: they apply exactly when no pathway matches. Without
+        # this branch the marker key would be ignored and the warnings
+        # would look applicable to every chief, including pathway ones.
+        if question.applies_when.get("off_pathway"):
+            from .conclusion import chief_matches_pathway
+
+            chief = (chief_complaint or "").strip()
+            return bool(chief) and not chief_matches_pathway(chief)
         terms = question.applies_when.get("chief_complaint_contains_any", [])
         if not terms:
             return True
@@ -321,6 +388,29 @@ class ContentRepository:
                     return False
             elif consult_value != "child":
                 return False
+        # P3 off-pathway warning domains: applicability is the *absence*
+        # of a pathway, not a chief term, so it cannot be expressed in
+        # ``applies_when.chief_complaint_contains_any``. Evaluated on the
+        # same chief-complaint corpus as everything else (value +
+        # verbatim patient utterances), and narrowed by the emergency
+        # screen's explicit negative — see
+        # ``out_of_pathway.warning_domain_specs``.
+        if question.applies_when.get("off_pathway"):
+            if state is None:
+                return False
+            texts = [text for text in self.chief_complaint_texts(state) if text]
+            if not texts:
+                return False
+            from .conclusion import chief_matches_pathway
+            from .out_of_pathway import warning_domain_specs
+
+            if any(chief_matches_pathway(text) for text in texts):
+                return False
+            allowed = {
+                spec["id"]
+                for spec in warning_domain_specs(_emergency_screen_absent(state))
+            }
+            return question.id in allowed
         terms = question.applies_when.get("chief_complaint_contains_any", [])
         if not terms:
             return True

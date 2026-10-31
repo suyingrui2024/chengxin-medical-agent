@@ -17,6 +17,8 @@ test("workspace mode cannot lose an interaction before module hydration", async 
     await expect(mode).toBeDisabled();
     ready();
     await expect(mode).toBeEnabled();
+    // The mode control lives inside the settings view now.
+    await page.locator('.nav-item[data-view="settings"]').click();
     await mode.selectOption("developer");
     await expect(page.locator("body")).toHaveAttribute(
       "data-mode",

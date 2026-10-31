@@ -11,6 +11,7 @@
 """
 import json
 import os
+import socket
 import tempfile
 import threading
 import unittest
@@ -269,13 +270,54 @@ class ServerHardeningTests(unittest.TestCase):
         original = self.server.enricher
         self.server.enricher = BareEnricher()
         try:
-            with patch("medagent.server.education_module") as module:
+            with patch("medagent.server.consultation.education_module") as module:
                 module.needs_enrichment = None
                 status, payload = self.request(f"/api/sessions/{session_id}/snapshot")
             self.assertEqual(status, 200)
             self.assertEqual(payload["state"]["session_id"], session_id)
         finally:
             self.server.enricher = original
+
+    def test_a_route_that_ignores_its_body_still_closes_cleanly(self):
+        """POST /api/sessions answers without parsing its body, and the
+        browser sends ``{}`` with it (app-flow.js). Those bytes used to sit
+        unread in the socket, and closing a socket with unread data sends
+        RST instead of FIN — a client that had not finished reading lost the
+        201, surfacing as an intermittent ConnectionResetError and an
+        intermittently failed 「开始问诊」. Idle loopback usually won the race,
+        which is why only CI saw it.
+
+        Read the response to EOF here: a drained body closes with FIN and the
+        loop ends on an empty chunk; an undrained one resets the connection
+        and ``recv`` raises.
+        """
+        # Just under MAX_BODY_BYTES: big enough that the unread tail
+        # survives in the socket at close time, small enough to be drained.
+        body = b"{" + b" " * 60000 + b"}"
+        request = (
+            b"POST /api/sessions HTTP/1.1\r\n"
+            b"Host: 127.0.0.1\r\n"
+            b"Content-Type: application/json\r\n"
+            b"Connection: close\r\n"
+            + f"Content-Length: {len(body)}\r\n".encode()
+            + b"\r\n"
+            + body
+        )
+        with socket.create_connection(
+            ("127.0.0.1", self.server.server_port), timeout=5
+        ) as connection:
+            connection.sendall(request)
+            received = b""
+            while True:
+                chunk = connection.recv(65536)
+                if not chunk:
+                    break
+                received += chunk
+        self.assertTrue(
+            received.startswith(b"HTTP/1.0 201") or received.startswith(b"HTTP/1.1 201"),
+            f"expected a 201 response, got {received[:80]!r}",
+        )
+        self.assertTrue(received.rstrip().endswith(b"}"), "response body truncated")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,1244 @@
+[
+  {
+    "id": "calculate.abcd2",
+    "audience": "patient",
+    "name": "ABCD2 TIA 短期风险评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["ABCD2", "TIA 风险"],
+    "inputs": null,
+    "sample": {
+      "a1": 0,
+      "a2": 0,
+      "a3": 0,
+      "a4": 0,
+      "a5": 0
+    }
+  },
+  {
+    "id": "calculate.abi",
+    "audience": "patient",
+    "name": "踝肱指数 ABI",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["ABI", "踝肱指数"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "20",
+        "max": "300"
+      },
+      {
+        "type": "number",
+        "min": "20",
+        "max": "300"
+      }
+    ],
+    "sample": {
+      "ankle_sbp": "48.0000",
+      "brachial_sbp": "48.0000"
+    }
+  },
+  {
+    "id": "calculate.act",
+    "audience": "patient",
+    "name": "ACT 哮喘控制测试",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["ACT", "哮喘控制测试"],
+    "inputs": null,
+    "sample": {
+      "a1": 1,
+      "a2": 1,
+      "a3": 1,
+      "a4": 1,
+      "a5": 1
+    }
+  },
+  {
+    "id": "calculate.anion_gap",
+    "audience": "patient",
+    "name": "阴离子间隙",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["阴离子间隙", "AG"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "100",
+        "max": "180"
+      },
+      {
+        "type": "number",
+        "min": "60",
+        "max": "140"
+      },
+      {
+        "type": "number",
+        "min": "5",
+        "max": "50"
+      }
+    ],
+    "sample": {
+      "sodium": "108.0000",
+      "chloride": "68.0000",
+      "bicarbonate": "9.5000"
+    }
+  },
+  {
+    "id": "calculate.barthel",
+    "audience": "patient",
+    "name": "Barthel 指数",
+    "kind": "scale",
+    "size": 10,
+    "aliases": ["Barthel", "巴氏指数", "日常生活能力"],
+    "inputs": null,
+    "sample": {
+      "b1": 10,
+      "b2": 5,
+      "b3": 5,
+      "b4": 10,
+      "b5": 10,
+      "b6": 10,
+      "b7": 10,
+      "b8": 15,
+      "b9": 15,
+      "b10": 10
+    }
+  },
+  {
+    "id": "calculate.berg",
+    "audience": "patient",
+    "name": "Berg 平衡量表",
+    "kind": "scale",
+    "size": 14,
+    "aliases": ["Berg", "平衡量表", "Berg 平衡"],
+    "inputs": null,
+    "sample": {
+      "g1": 0,
+      "g2": 0,
+      "g3": 0,
+      "g4": 0,
+      "g5": 0,
+      "g6": 0,
+      "g7": 0,
+      "g8": 0,
+      "g9": 0,
+      "g10": 0,
+      "g11": 0,
+      "g12": 0,
+      "g13": 0,
+      "g14": 0
+    }
+  },
+  {
+    "id": "calculate.bmi",
+    "audience": "patient",
+    "name": "BMI 体质指数",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["BMI", "体质指数", "体重指数"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "50",
+        "max": "250"
+      },
+      {
+        "type": "number",
+        "min": "2",
+        "max": "400"
+      }
+    ],
+    "sample": {
+      "height_cm": "70.0000",
+      "weight_kg": "41.8000"
+    }
+  },
+  {
+    "id": "calculate.bsa",
+    "audience": "patient",
+    "name": "BSA 体表面积",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["BSA", "体表面积"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "50",
+        "max": "250"
+      },
+      {
+        "type": "number",
+        "min": "2",
+        "max": "400"
+      }
+    ],
+    "sample": {
+      "height_cm": "70.0000",
+      "weight_kg": "41.8000"
+    }
+  },
+  {
+    "id": "calculate.burn_area",
+    "audience": "patient",
+    "name": "烧伤面积九分法",
+    "kind": "formula",
+    "size": 9,
+    "aliases": ["烧伤面积", "九分法"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "100"
+      }
+    ],
+    "sample": {
+      "head": "10.0000",
+      "trunk_front": "10.0000",
+      "trunk_back": "10.0000",
+      "arm_left": "10.0000",
+      "arm_right": "10.0000",
+      "leg_left": "10.0000",
+      "leg_right": "10.0000",
+      "perineum": "10.0000",
+      "other": "10.0000"
+    }
+  },
+  {
+    "id": "calculate.cact",
+    "audience": "patient",
+    "name": "C-ACT 儿童哮喘控制测试",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["C-ACT", "儿童哮喘控制", "儿童哮喘控制测试"],
+    "inputs": null,
+    "sample": {
+      "c1": 0,
+      "c2": 0,
+      "c3": 0,
+      "c4": 0,
+      "c5": 0,
+      "c6": 0,
+      "c7": 0
+    }
+  },
+  {
+    "id": "calculate.cat",
+    "audience": "patient",
+    "name": "CAT 慢阻肺评估测试",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["CAT", "慢阻肺评估"],
+    "inputs": null,
+    "sample": {
+      "c1": 0,
+      "c2": 0,
+      "c3": 0,
+      "c4": 0,
+      "c5": 0,
+      "c6": 0,
+      "c7": 0,
+      "c8": 0
+    }
+  },
+  {
+    "id": "calculate.child_height",
+    "audience": "patient",
+    "name": "儿童身高估算",
+    "kind": "formula",
+    "size": 1,
+    "aliases": ["儿童身高"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "2",
+        "max": "12"
+      }
+    ],
+    "sample": {
+      "age_years": "3.0000"
+    }
+  },
+  {
+    "id": "calculate.child_weight",
+    "audience": "patient",
+    "name": "儿童体重估算",
+    "kind": "formula",
+    "size": 1,
+    "aliases": ["儿童体重", "小儿体重"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "1",
+        "max": "12"
+      }
+    ],
+    "sample": {
+      "age_years": "2.1000"
+    }
+  },
+  {
+    "id": "calculate.corrected_calcium",
+    "audience": "patient",
+    "name": "白蛋白校正血钙",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["校正血钙", "校正钙"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "1",
+        "max": "4"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "60"
+      }
+    ],
+    "sample": {
+      "calcium_mmol_l": "1.3000",
+      "albumin_g_l": "15.0000"
+    }
+  },
+  {
+    "id": "calculate.dn4",
+    "audience": "patient",
+    "name": "DN4 神经病理性疼痛问卷",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["DN4", "神经病理性疼痛"],
+    "inputs": null,
+    "sample": {
+      "n1": 0,
+      "n2": 0,
+      "n3": 0,
+      "n4": 0,
+      "n5": 0,
+      "n6": 0,
+      "n7": 0
+    }
+  },
+  {
+    "id": "calculate.edd",
+    "audience": "patient",
+    "name": "孕周计算",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["孕周", "预产期"],
+    "inputs": [
+      {
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      },
+      {
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      }
+    ],
+    "sample": {
+      "lmp": "2000-01-01",
+      "today": "2000-01-01"
+    }
+  },
+  {
+    "id": "calculate.fever_days",
+    "audience": "patient",
+    "name": "发热持续天数",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["发热天数"],
+    "inputs": [
+      {
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      },
+      {
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      }
+    ],
+    "sample": {
+      "onset": "2000-01-01",
+      "measure": "2000-01-01"
+    }
+  },
+  {
+    "id": "calculate.fib4",
+    "audience": "patient",
+    "name": "FIB-4 肝纤维化指数",
+    "kind": "formula",
+    "size": 4,
+    "aliases": ["FIB-4", "FIB4"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "18",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "2000"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "2000"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "1000"
+      }
+    ],
+    "sample": {
+      "age_years": "26.2000",
+      "ast": "200.9000",
+      "alt": "200.9000",
+      "platelet": "100.9000"
+    }
+  },
+  {
+    "id": "calculate.findrisc",
+    "audience": "patient",
+    "name": "FINDRISC 糖尿病风险评分",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["FINDRISC", "糖尿病风险"],
+    "inputs": null,
+    "sample": {
+      "f1": 0,
+      "f2": 0,
+      "f3": 0,
+      "f4": 0,
+      "f5": 0,
+      "f6": 0,
+      "f7": 0,
+      "f8": 0
+    }
+  },
+  {
+    "id": "calculate.gad7",
+    "audience": "patient",
+    "name": "GAD-7 焦虑症状自评",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["GAD-7", "GAD7", "焦虑自评", "焦虑量表"],
+    "inputs": null,
+    "sample": {
+      "g1": 0,
+      "g2": 0,
+      "g3": 0,
+      "g4": 0,
+      "g5": 0,
+      "g6": 0,
+      "g7": 0
+    }
+  },
+  {
+    "id": "calculate.gds15",
+    "audience": "patient",
+    "name": "GDS-15 老年抑郁筛查",
+    "kind": "scale",
+    "size": 15,
+    "aliases": ["GDS-15", "GDS15", "老年抑郁", "老年抑郁量表"],
+    "inputs": null,
+    "sample": {
+      "q1": 1,
+      "q2": 1,
+      "q3": 1,
+      "q4": 1,
+      "q5": 1,
+      "q6": 1,
+      "q7": 1,
+      "q8": 1,
+      "q9": 1,
+      "q10": 1,
+      "q11": 1,
+      "q12": 1,
+      "q13": 1,
+      "q14": 1,
+      "q15": 1
+    }
+  },
+  {
+    "id": "calculate.gerdq",
+    "audience": "patient",
+    "name": "GerdQ 胃食管反流问卷",
+    "kind": "scale",
+    "size": 6,
+    "aliases": ["GerdQ", "胃食管反流"],
+    "inputs": null,
+    "sample": {
+      "g1": 0,
+      "g2": 0,
+      "g3": 0,
+      "g4": 0,
+      "g5": 0,
+      "g6": 0
+    }
+  },
+  {
+    "id": "calculate.grip_strength",
+    "audience": "patient",
+    "name": "握力判读",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["握力", "握力判读"],
+    "inputs": null,
+    "sample": {
+      "level": 0
+    }
+  },
+  {
+    "id": "calculate.haq",
+    "audience": "patient",
+    "name": "HAQ 健康评估问卷",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["HAQ", "健康评估问卷"],
+    "inputs": null,
+    "sample": {
+      "h1": 0,
+      "h2": 0,
+      "h3": 0,
+      "h4": 0,
+      "h5": 0,
+      "h6": 0,
+      "h7": 0,
+      "h8": 0
+    }
+  },
+  {
+    "id": "calculate.hit6",
+    "audience": "patient",
+    "name": "HIT-6 头痛影响测试",
+    "kind": "scale",
+    "size": 6,
+    "aliases": ["HIT-6", "HIT6", "头痛影响"],
+    "inputs": null,
+    "sample": {
+      "h1": 6,
+      "h2": 6,
+      "h3": 6,
+      "h4": 6,
+      "h5": 6,
+      "h6": 6
+    }
+  },
+  {
+    "id": "calculate.hls",
+    "audience": "patient",
+    "name": "健康生活方式评分",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["健康生活方式", "生活方式评分"],
+    "inputs": null,
+    "sample": {
+      "h1": 0,
+      "h2": 0,
+      "h3": 0,
+      "h4": 0,
+      "h5": 0
+    }
+  },
+  {
+    "id": "calculate.ibssss",
+    "audience": "patient",
+    "name": "IBS-SSS 肠易激症状严重度",
+    "kind": "scale",
+    "size": 5,
+    "aliases": ["IBS-SSS", "肠易激严重度"],
+    "inputs": null,
+    "sample": {
+      "s1": 0,
+      "s2": 0,
+      "s3": 0,
+      "s4": 0,
+      "s5": 0
+    }
+  },
+  {
+    "id": "calculate.ipss",
+    "audience": "patient",
+    "name": "IPSS 前列腺症状评分",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["IPSS", "前列腺症状", "国际前列腺症状评分"],
+    "inputs": null,
+    "sample": {
+      "i1": 0,
+      "i2": 0,
+      "i3": 0,
+      "i4": 0,
+      "i5": 0,
+      "i6": 0,
+      "i7": 0
+    }
+  },
+  {
+    "id": "calculate.isi",
+    "audience": "patient",
+    "name": "ISI 失眠严重度指数",
+    "kind": "scale",
+    "size": 7,
+    "aliases": ["ISI", "失眠严重度", "失眠指数"],
+    "inputs": null,
+    "sample": {
+      "i1": 0,
+      "i2": 0,
+      "i3": 0,
+      "i4": 0,
+      "i5": 0,
+      "i6": 0,
+      "i7": 0
+    }
+  },
+  {
+    "id": "calculate.map",
+    "audience": "patient",
+    "name": "平均动脉压 MAP",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["MAP", "平均动脉压"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "50",
+        "max": "300"
+      },
+      {
+        "type": "number",
+        "min": "30",
+        "max": "200"
+      }
+    ],
+    "sample": {
+      "sbp": "75.0000",
+      "dbp": "47.0000"
+    }
+  },
+  {
+    "id": "calculate.mmrc",
+    "audience": "patient",
+    "name": "mMRC 呼吸困难分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["mMRC", "呼吸困难分级", "呼吸困难量表"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.mrs",
+    "audience": "patient",
+    "name": "mRS 改良 Rankin 量表",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["mRS", "改良Rankin"],
+    "inputs": null,
+    "sample": {
+      "grade": 0
+    }
+  },
+  {
+    "id": "calculate.ndi",
+    "audience": "patient",
+    "name": "NDI 颈痛功能障碍指数",
+    "kind": "scale",
+    "size": 10,
+    "aliases": ["NDI", "颈痛功能障碍", "Neck Disability Index"],
+    "inputs": null,
+    "sample": {
+      "n1": 0,
+      "n2": 0,
+      "n3": 0,
+      "n4": 0,
+      "n5": 0,
+      "n6": 0,
+      "n7": 0,
+      "n8": 0,
+      "n9": 0,
+      "n10": 0
+    }
+  },
+  {
+    "id": "calculate.nyha",
+    "audience": "patient",
+    "name": "NYHA 心功能分级",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["NYHA", "心功能分级"],
+    "inputs": null,
+    "sample": {
+      "grade": 1
+    }
+  },
+  {
+    "id": "calculate.oabss",
+    "audience": "patient",
+    "name": "OABSS 膀胱过度活动评分",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["OABSS", "膀胱过度活动", "尿急评分"],
+    "inputs": null,
+    "sample": {
+      "a1": 0,
+      "a2": 0,
+      "a3": 0,
+      "a4": 0
+    }
+  },
+  {
+    "id": "calculate.odi",
+    "audience": "patient",
+    "name": "ODI 腰痛功能障碍指数",
+    "kind": "scale",
+    "size": 10,
+    "aliases": ["ODI", "腰痛功能障碍", "Oswestry"],
+    "inputs": null,
+    "sample": {
+      "o1": 0,
+      "o2": 0,
+      "o3": 0,
+      "o4": 0,
+      "o5": 0,
+      "o6": 0,
+      "o7": 0,
+      "o8": 0,
+      "o9": 0,
+      "o10": 0
+    }
+  },
+  {
+    "id": "calculate.osmolality",
+    "audience": "patient",
+    "name": "血浆渗透压",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["血浆渗透压", "渗透压"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "100",
+        "max": "180"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "60"
+      },
+      {
+        "type": "number",
+        "min": "0",
+        "max": "60"
+      }
+    ],
+    "sample": {
+      "sodium": "108.0000",
+      "glucose_mmol_l": "6.0000",
+      "urea_mmol_l": "6.0000"
+    }
+  },
+  {
+    "id": "calculate.osta",
+    "audience": "patient",
+    "name": "OSTA 骨质疏松风险指数",
+    "kind": "scale",
+    "size": 2,
+    "aliases": ["OSTA", "骨质疏松风险"],
+    "inputs": null,
+    "sample": {
+      "age": 0,
+      "weight": 0
+    }
+  },
+  {
+    "id": "calculate.pf_ratio",
+    "audience": "patient",
+    "name": "氧合指数 P/F",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["氧合指数", "P/F"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "20",
+        "max": "600"
+      },
+      {
+        "type": "number",
+        "min": "0.21",
+        "max": "1"
+      }
+    ],
+    "sample": {
+      "pao2": "78.0000",
+      "fio2": "0.2890"
+    }
+  },
+  {
+    "id": "calculate.phq8",
+    "audience": "patient",
+    "name": "PHQ-8 抑郁症状自评",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["PHQ-8", "PHQ8", "抑郁自评", "抑郁量表", "健康问卷"],
+    "inputs": null,
+    "sample": {
+      "p1": 0,
+      "p2": 0,
+      "p3": 0,
+      "p4": 0,
+      "p5": 0,
+      "p6": 0,
+      "p7": 0,
+      "p8": 0
+    }
+  },
+  {
+    "id": "calculate.pruritus_nrs",
+    "audience": "patient",
+    "name": "瘙痒数字评分",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["瘙痒评分", "瘙痒 NRS"],
+    "inputs": null,
+    "sample": {
+      "score": 0
+    }
+  },
+  {
+    "id": "calculate.puqe",
+    "audience": "patient",
+    "name": "PUQE 妊娠恶心呕吐评分",
+    "kind": "scale",
+    "size": 3,
+    "aliases": ["PUQE", "妊娠恶心", "孕吐评分"],
+    "inputs": null,
+    "sample": {
+      "p1": 1,
+      "p2": 1,
+      "p3": 1
+    }
+  },
+  {
+    "id": "calculate.retic_corrected",
+    "audience": "patient",
+    "name": "校正网织红细胞",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["校正网织红细胞"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "30"
+      },
+      {
+        "type": "number",
+        "min": "10",
+        "max": "70"
+      }
+    ],
+    "sample": {
+      "retic_percent": "3.0000",
+      "hematocrit": "16.0000"
+    }
+  },
+  {
+    "id": "calculate.rpp",
+    "audience": "patient",
+    "name": "心率血压乘积 RPP",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["RPP", "心率血压乘积"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "20",
+        "max": "250"
+      },
+      {
+        "type": "number",
+        "min": "50",
+        "max": "300"
+      }
+    ],
+    "sample": {
+      "heart_rate": "43.0000",
+      "sbp": "75.0000"
+    }
+  },
+  {
+    "id": "calculate.sas",
+    "audience": "patient",
+    "name": "SAS 焦虑自评量表",
+    "kind": "scale",
+    "size": 20,
+    "aliases": ["SAS", "Zung 焦虑自评", "焦虑自评量表"],
+    "inputs": null,
+    "sample": {
+      "s1": 1,
+      "s2": 1,
+      "s3": 1,
+      "s4": 1,
+      "s5": 1,
+      "s6": 1,
+      "s7": 1,
+      "s8": 1,
+      "s9": 1,
+      "s10": 1,
+      "s11": 1,
+      "s12": 1,
+      "s13": 1,
+      "s14": 1,
+      "s15": 1,
+      "s16": 1,
+      "s17": 1,
+      "s18": 1,
+      "s19": 1,
+      "s20": 1
+    }
+  },
+  {
+    "id": "calculate.sds",
+    "audience": "patient",
+    "name": "SDS 抑郁自评量表",
+    "kind": "scale",
+    "size": 20,
+    "aliases": ["SDS", "Zung 抑郁自评", "抑郁自评量表"],
+    "inputs": null,
+    "sample": {
+      "d1": 1,
+      "d2": 1,
+      "d3": 1,
+      "d4": 1,
+      "d5": 1,
+      "d6": 1,
+      "d7": 1,
+      "d8": 1,
+      "d9": 1,
+      "d10": 1,
+      "d11": 1,
+      "d12": 1,
+      "d13": 1,
+      "d14": 1,
+      "d15": 1,
+      "d16": 1,
+      "d17": 1,
+      "d18": 1,
+      "d19": 1,
+      "d20": 1
+    }
+  },
+  {
+    "id": "calculate.shock_index",
+    "audience": "patient",
+    "name": "休克指数",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["休克指数", "SI"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "20",
+        "max": "250"
+      },
+      {
+        "type": "number",
+        "min": "50",
+        "max": "300"
+      }
+    ],
+    "sample": {
+      "heart_rate": "43.0000",
+      "sbp": "75.0000"
+    }
+  },
+  {
+    "id": "calculate.six_min_walk",
+    "audience": "patient",
+    "name": "6 分钟步行预计距离",
+    "kind": "formula",
+    "size": 4,
+    "aliases": ["6MWD", "六分钟步行"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "100",
+        "max": "220"
+      },
+      {
+        "type": "number",
+        "min": "18",
+        "max": "100"
+      },
+      {
+        "type": "number",
+        "min": "25",
+        "max": "200"
+      },
+      {
+        "type": "enum",
+        "min": null,
+        "max": null
+      }
+    ],
+    "sample": {
+      "height_cm": "112.0000",
+      "age_years": "26.2000",
+      "weight_kg": "42.5000",
+      "sex": "male"
+    }
+  },
+  {
+    "id": "calculate.symptom_diary",
+    "audience": "patient",
+    "name": "症状日记评分",
+    "kind": "scale",
+    "size": 4,
+    "aliases": ["症状日记"],
+    "inputs": null,
+    "sample": {
+      "s1": 0,
+      "s2": 0,
+      "s3": 0,
+      "s4": 0
+    }
+  },
+  {
+    "id": "calculate.tcm_insomnia",
+    "audience": "patient",
+    "name": "失眠中医证候评分",
+    "kind": "scale",
+    "size": 6,
+    "aliases": ["失眠证候", "中医失眠"],
+    "inputs": null,
+    "sample": {
+      "c1": 0,
+      "c2": 0,
+      "c3": 0,
+      "c4": 0,
+      "c5": 0,
+      "c6": 0
+    }
+  },
+  {
+    "id": "calculate.thi",
+    "audience": "patient",
+    "name": "THI 耳鸣致残量表",
+    "kind": "scale",
+    "size": 25,
+    "aliases": ["THI", "耳鸣致残"],
+    "inputs": null,
+    "sample": {
+      "t1": 0,
+      "t2": 0,
+      "t3": 0,
+      "t4": 0,
+      "t5": 0,
+      "t6": 0,
+      "t7": 0,
+      "t8": 0,
+      "t9": 0,
+      "t10": 0,
+      "t11": 0,
+      "t12": 0,
+      "t13": 0,
+      "t14": 0,
+      "t15": 0,
+      "t16": 0,
+      "t17": 0,
+      "t18": 0,
+      "t19": 0,
+      "t20": 0,
+      "t21": 0,
+      "t22": 0,
+      "t23": 0,
+      "t24": 0,
+      "t25": 0
+    }
+  },
+  {
+    "id": "calculate.uas7",
+    "audience": "patient",
+    "name": "UAS7 荨麻疹活动度评分",
+    "kind": "scale",
+    "size": 14,
+    "aliases": ["UAS7", "荨麻疹活动度"],
+    "inputs": null,
+    "sample": {
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "w5": 0,
+      "w6": 0,
+      "w7": 0,
+      "i1": 0,
+      "i2": 0,
+      "i3": 0,
+      "i4": 0,
+      "i5": 0,
+      "i6": 0,
+      "i7": 0
+    }
+  },
+  {
+    "id": "calculate.upcr",
+    "audience": "patient",
+    "name": "尿蛋白肌酐比 UPCR",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["UPCR", "尿蛋白肌酐比"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "0",
+        "max": "2000"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "500"
+      }
+    ],
+    "sample": {
+      "urine_protein_mg_dl": "200.0000",
+      "urine_creatinine_mg_dl": "50.9000"
+    }
+  },
+  {
+    "id": "calculate.vaccine_due",
+    "audience": "patient",
+    "name": "疫苗接种到期提醒",
+    "kind": "formula",
+    "size": 3,
+    "aliases": ["疫苗到期"],
+    "inputs": [
+      {
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "max": "120"
+      },
+      {
+        "type": "date",
+        "min": "2000-01-01",
+        "max": "2100-12-31"
+      }
+    ],
+    "sample": {
+      "last_dose": "2000-01-01",
+      "interval_months": "12.9000",
+      "today": "2000-01-01"
+    }
+  },
+  {
+    "id": "calculate.vas",
+    "audience": "patient",
+    "name": "VAS 疼痛评分",
+    "kind": "scale",
+    "size": 1,
+    "aliases": ["VAS", "疼痛评分"],
+    "inputs": null,
+    "sample": {
+      "score": 0
+    }
+  },
+  {
+    "id": "calculate.waist_height",
+    "audience": "patient",
+    "name": "腰高比",
+    "kind": "formula",
+    "size": 2,
+    "aliases": ["腰高比", "WHtR"],
+    "inputs": [
+      {
+        "type": "number",
+        "min": "30",
+        "max": "200"
+      },
+      {
+        "type": "number",
+        "min": "100",
+        "max": "220"
+      }
+    ],
+    "sample": {
+      "waist_cm": "47.0000",
+      "height_cm": "112.0000"
+    }
+  },
+  {
+    "id": "calculate.wexner",
+    "audience": "patient",
+    "name": "Wexner 便秘评分",
+    "kind": "scale",
+    "size": 8,
+    "aliases": ["Wexner", "便秘评分", "Cleveland"],
+    "inputs": null,
+    "sample": {
+      "w1": 0,
+      "w2": 0,
+      "w3": 0,
+      "w4": 0,
+      "w5": 0,
+      "w6": 0,
+      "w7": 0,
+      "w8": 0
+    }
+  }
+]

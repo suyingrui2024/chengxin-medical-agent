@@ -1,9 +1,16 @@
 import { createServer } from "node:http";
 import { once } from "node:events";
 import { expect } from "@playwright/test";
+import { nextCommand } from "./model-feedback.mjs";
 
-const opening =
-  "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。";
+// Sex is stated up front on purpose. The engine orders questions by
+// hypothesis (d1568d6), and with sex unknown it ranks `sex` above
+// `trajectory` — so a scripted `ask_question(trajectory)` is rejected and
+// every later command lands in the wrong turn. Recording it in the
+// opening keeps the script in phase without weakening the check: if the
+// ordering changes again, this test fails instead of silently desyncing.
+export const opening =
+  "我自己32岁，男，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。";
 const details =
   "总体变化不大；不适程度3分；没有其他不适；没有气促，能完整说话；干咳，没有咳血；能正常喝水吃饭，排尿正常；没有用药；过敏不知道；没有相关既往病史；想整理信息去就医。";
 const fact = (key, value, evidence, assertion = "present") => ({
@@ -20,6 +27,7 @@ export async function createRepeatedObservationModel(extraCommands = []) {
     command("record_facts", {
       facts: [
         fact("consult_for", "self", "我自己"),
+        fact("sex", "male", "男"),
         fact("age_years", 32, "32岁"),
         fact("chief_complaint", "咳嗽发烧", "咳嗽发烧"),
         fact("onset", "两天", "两天"),
@@ -51,8 +59,13 @@ export async function createRepeatedObservationModel(extraCommands = []) {
   const server = createServer(async (request, response) => {
     let raw = "";
     for await (const chunk of request) raw += chunk;
-    requests.push(JSON.parse(raw));
-    const next = commands.shift();
+    const body = JSON.parse(raw);
+    requests.push(body);
+    // The engine's ordering check rejects a proposal and names the
+    // question it wants first; nextCommand obeys that without advancing
+    // the script. The context lists `questions` in content order, not in
+    // the ranker's order, so the script cannot predict the preference.
+    const next = nextCommand(body, commands);
     response.writeHead(next ? 200 : 500, {
       "Content-Type": "application/json",
     });
@@ -121,7 +134,12 @@ export async function verifyRepeatedObservations(
   await expect(page.locator("#active-question")).toBeVisible();
   await send(details);
   await expect(series().locator(".observation-value")).toHaveText("38.25 ℃");
-  expect(model.requests).toHaveLength(4);
+  // One call for the opening, two for the temperature (the first
+  // proposal is rejected by the ordering check and re-issued), two for
+  // the details (record, then summarise). The extra call is the cost of
+  // the context listing `questions` in content order rather than the
+  // ranker's order — the model has to be told which question wins.
+  expect(model.requests).toHaveLength(5);
   const oldSnapshot = await page.evaluate(
     async (sessionId) =>
       (await fetch(`/api/sessions/${sessionId}/snapshot`)).json(),
@@ -191,14 +209,30 @@ export async function verifyRepeatedObservations(
     .click();
   await expect(series().locator(".observation-value")).toHaveText("40.1 ℃");
   await expect(current().locator(".observation-repeat")).toHaveCount(0);
-  await expect(current().locator(".summary-route")).toContainText(
-    "今天联系医疗机构",
-  );
+  // The 40.1 ℃ reading closes the session, so the conclusion sheet takes
+  // over the routing guidance and the record card deliberately stops
+  // rendering `.summary-route` (结论单 §7 de-duplication). Assert the
+  // escalation where it is actually shown, and assert the de-duplication
+  // itself: two "what to do next" blocks on one screen is the failure
+  // mode this guards.
+  await expect(current().locator(".summary-route")).toHaveCount(0);
+  const disposition = page.locator(".conclusion-card .conclusion-disposition");
+  await expect(disposition).toHaveClass(/urgent_today/);
+  await expect(disposition).toContainText("今天");
+  // The record still has to read as alarming, so the value keeps the
+  // urgent accent. Compared against the token rather than a sibling
+  // element: the route section that used to carry the colour is gone here.
+  const urgentColour = await current().evaluate((node) => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--orange)";
+    node.append(probe);
+    const colour = getComputedStyle(probe).color;
+    probe.remove();
+    return colour;
+  });
   await expect(series().locator(".observation-value")).toHaveCSS(
     "color",
-    await current()
-      .locator(".summary-route")
-      .evaluate((node) => getComputedStyle(node).color),
+    urgentColour,
   );
   if (screenshotPrefix)
     await page.screenshot({
@@ -219,7 +253,11 @@ export async function verifyRepeatedObservations(
   expect(
     snapshot.state.observation_attempts.map((item) => item.status),
   ).toEqual(["recorded", "skipped", "recorded"]);
-  expect(model.requests).toHaveLength(4);
+  // Four scripted turns plus the ordering retry inside the temperature
+  // turn — the same extra call accounted for above. Reading a temperature
+  // off the task goes through the deterministic parser, not the model, so
+  // the three repeat attempts add nothing here.
+  expect(model.requests).toHaveLength(5);
   expect(
     snapshot.state.observation_attempts.every((item) => item.finished_at),
   ).toBe(true);
@@ -238,9 +276,7 @@ export async function verifyResumedObservationQuestion(
   await expect(page.getByText("本机服务已连接")).toBeVisible();
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
   const send = (text) => sendPatientText(page, text);
-  await send(
-    "我自己32岁，咳嗽发烧两天；上述危险信号都没有；想按图测一下腋温。",
-  );
+  await send(opening);
   await expect(page.locator("#active-task")).toBeVisible();
   await send("腋温38.25℃");
   await expect(page.locator("#active-question")).toBeVisible();
@@ -263,7 +299,11 @@ export async function verifyResumedObservationQuestion(
   await expect(page.locator("#active-observation")).toContainText(
     "上次记录 · 本次未完成",
   );
-  expect(model.requests).toHaveLength(2);
+  // Opening, the temperature turn, and one ordering retry inside it: at
+  // 38.25℃ the respiratory pathway outranks `trajectory`, but the context
+  // lists candidates in content order, so the script cannot know that
+  // until the engine says so.
+  expect(model.requests).toHaveLength(3);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -272,9 +312,16 @@ export async function verifyResumedObservationQuestion(
   await expect(
     page.getByRole("textbox", { name: "输入你的描述" }),
   ).toBeInViewport();
-  const choices = page.locator("#active-question").getByRole("button");
+  // Which question the engine asks is its call — for a febrile patient it
+  // asks the respiratory detail first, and that one is free text with no
+  // option buttons. Pinning "four choices" was really pinning the old
+  // question. The layout claim holds either way: the card is fully on
+  // screen, and so is every choice when there are choices.
+  const card = page.locator("#active-question");
   if (screenshot) await page.screenshot({ path: screenshot, fullPage: true });
-  await expect(choices).toHaveCount(4);
+  await expect(card).toBeVisible();
+  await expect(card).toBeInViewport({ ratio: 1 });
+  const choices = card.getByRole("button");
   for (const choice of await choices.all())
     await expect(choice).toBeInViewport({ ratio: 1 });
   if (screenshot) await page.screenshot({ path: screenshot, fullPage: true });

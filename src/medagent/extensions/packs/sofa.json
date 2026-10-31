@@ -1,0 +1,374 @@
+{
+  "id": "calculate.sofa",
+  "name": "SOFA 器官衰竭评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "序贯器官衰竭评分（6 个系统，0–24 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["SOFA", "器官衰竭评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 24,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "pf",
+        "label": "氧合指数 PaO2/FiO2",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 100,
+            "score": 4
+          },
+          {
+            "gte": 100,
+            "lt": 200,
+            "score": 3
+          },
+          {
+            "gte": 200,
+            "lt": 300,
+            "score": 2
+          },
+          {
+            "gte": 300,
+            "lt": 400,
+            "score": 1
+          },
+          {
+            "gte": 400,
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "plt",
+        "label": "血小板",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 20,
+            "score": 4
+          },
+          {
+            "gte": 20,
+            "lt": 50,
+            "score": 3
+          },
+          {
+            "gte": 50,
+            "lt": 100,
+            "score": 2
+          },
+          {
+            "gte": 100,
+            "lt": 150,
+            "score": 1
+          },
+          {
+            "gte": 150,
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "bili",
+        "label": "总胆红素",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 20,
+            "score": 0
+          },
+          {
+            "gte": 20,
+            "lt": 33,
+            "score": 1
+          },
+          {
+            "gte": 33,
+            "lt": 102,
+            "score": 2
+          },
+          {
+            "gte": 102,
+            "lt": 204,
+            "score": 3
+          },
+          {
+            "gte": 204,
+            "score": 4
+          }
+        ]
+      },
+      {
+        "id": "cv",
+        "label": "循环",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "平均动脉压 70 及以上"
+          },
+          {
+            "value": 1,
+            "label": "平均动脉压低于 70"
+          },
+          {
+            "value": 2,
+            "label": "多巴胺不超过 5 或任意剂量多巴酚丁胺"
+          },
+          {
+            "value": 3,
+            "label": "多巴胺大于 5 或去甲肾上腺素不超过 0.1"
+          },
+          {
+            "value": 4,
+            "label": "多巴胺大于 15 或去甲肾上腺素大于 0.1"
+          }
+        ]
+      },
+      {
+        "id": "gcs",
+        "label": "格拉斯哥昏迷评分",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 6,
+            "score": 4
+          },
+          {
+            "gte": 6,
+            "lt": 10,
+            "score": 3
+          },
+          {
+            "gte": 10,
+            "lt": 13,
+            "score": 2
+          },
+          {
+            "gte": 13,
+            "lt": 15,
+            "score": 1
+          },
+          {
+            "gte": 15,
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "creatinine",
+        "label": "血肌酐",
+        "kind": "threshold_table",
+        "weight": 1,
+        "thresholds": [
+          {
+            "lt": 110,
+            "score": 0
+          },
+          {
+            "gte": 110,
+            "lt": 171,
+            "score": 1
+          },
+          {
+            "gte": 171,
+            "lt": 300,
+            "score": 2
+          },
+          {
+            "gte": 300,
+            "lt": 440,
+            "score": 3
+          },
+          {
+            "gte": 440,
+            "score": 4
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 1,
+        "key": "low",
+        "label": "低"
+      },
+      {
+        "min": 2,
+        "max": 3,
+        "key": "moderate",
+        "label": "中"
+      },
+      {
+        "min": 4,
+        "max": 7,
+        "key": "high",
+        "label": "高"
+      },
+      {
+        "min": 8,
+        "max": 24,
+        "key": "very_high",
+        "label": "很高"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "pf": {
+        "type": "number",
+        "title": "氧合指数 PaO2/FiO2"
+      },
+      "plt": {
+        "type": "number",
+        "title": "血小板"
+      },
+      "bili": {
+        "type": "number",
+        "title": "总胆红素"
+      },
+      "cv": {
+        "type": "number",
+        "title": "循环",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "gcs": {
+        "type": "number",
+        "title": "格拉斯哥昏迷评分"
+      },
+      "creatinine": {
+        "type": "number",
+        "title": "血肌酐"
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Sequential Organ Failure Assessment",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Sequential+Organ+Failure+Assessment+SOFA+score",
+      "section": "Vincent JL, et al. 1996；6 个系统各 0–4 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

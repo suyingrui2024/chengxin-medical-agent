@@ -3,6 +3,7 @@ import {
   createCalculationSupplementsModel,
   verifyCalculationSupplements,
 } from "../fixtures/calculation-supplements.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const mobile of [false, true])
   test(`calculation supplements survive retries and later corrections${mobile ? " on a narrow screen" : ""}`, async ({
@@ -25,7 +26,9 @@ for (const mobile of [false, true])
       ).toBe(true);
       await page.goto("/");
       await verifyCalculationSupplements(page, model, {
-        shots: `docs/assets/ui/66-${mobile ? "mobile" : "wide"}-calculation-supplement`,
+        shots: shotPath(
+          `66-${mobile ? "mobile" : "wide"}-calculation-supplement`,
+        ),
         mobile,
       });
     } finally {

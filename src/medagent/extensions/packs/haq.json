@@ -1,0 +1,399 @@
+{
+  "id": "calculate.haq",
+  "name": "HAQ 健康评估问卷",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "健康评估问卷（8 类日常活动，0–24 分），记录功能受限。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["HAQ", "健康评估问卷"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 24,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "h1",
+        "label": "穿衣与修饰",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      },
+      {
+        "id": "h2",
+        "label": "起身",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      },
+      {
+        "id": "h3",
+        "label": "进食",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      },
+      {
+        "id": "h4",
+        "label": "行走",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      },
+      {
+        "id": "h5",
+        "label": "卫生",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      },
+      {
+        "id": "h6",
+        "label": "伸手取物",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      },
+      {
+        "id": "h7",
+        "label": "握持",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      },
+      {
+        "id": "h8",
+        "label": "日常活动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无困难"
+          },
+          {
+            "value": 1,
+            "label": "有些困难"
+          },
+          {
+            "value": 2,
+            "label": "很困难"
+          },
+          {
+            "value": 3,
+            "label": "不能完成"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "key": "none",
+        "label": "无困难"
+      },
+      {
+        "min": 1,
+        "max": 8,
+        "key": "mild",
+        "label": "轻度受限"
+      },
+      {
+        "min": 9,
+        "max": 16,
+        "key": "moderate",
+        "label": "中度受限"
+      },
+      {
+        "min": 17,
+        "max": 24,
+        "key": "severe",
+        "label": "重度受限"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "h1": {
+        "type": "number",
+        "title": "穿衣与修饰",
+        "enum": [0, 1, 2, 3]
+      },
+      "h2": {
+        "type": "number",
+        "title": "起身",
+        "enum": [0, 1, 2, 3]
+      },
+      "h3": {
+        "type": "number",
+        "title": "进食",
+        "enum": [0, 1, 2, 3]
+      },
+      "h4": {
+        "type": "number",
+        "title": "行走",
+        "enum": [0, 1, 2, 3]
+      },
+      "h5": {
+        "type": "number",
+        "title": "卫生",
+        "enum": [0, 1, 2, 3]
+      },
+      "h6": {
+        "type": "number",
+        "title": "伸手取物",
+        "enum": [0, 1, 2, 3]
+      },
+      "h7": {
+        "type": "number",
+        "title": "握持",
+        "enum": [0, 1, 2, 3]
+      },
+      "h8": {
+        "type": "number",
+        "title": "日常活动",
+        "enum": [0, 1, 2, 3]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Health Assessment Questionnaire",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Health+Assessment+Questionnaire+HAQ+disability",
+      "section": "Fries JF, et al. 1980；8 类各 0–3 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}

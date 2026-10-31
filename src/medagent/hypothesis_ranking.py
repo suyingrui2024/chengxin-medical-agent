@@ -270,7 +270,12 @@ class HypothesisRanker:
         candidate_ids = {question.id for question in candidates}
         ordered: List[str] = []
         for item in self.off_pathway_warnings(chief):
-            wid = item.get("id")
+            # Same derived-id convention as bridging._p3_warning_ids:
+            # ``warning_questions`` keeps its frozen ``{domain,
+            # question}`` contract, so the id comes from the domain.
+            wid = item.get("id") or (
+                f"warning_{item['domain']}" if item.get("domain") else None
+            )
             if wid and str(wid) in candidate_ids and str(wid) not in ordered:
                 ordered.append(str(wid))
         return ordered

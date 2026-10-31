@@ -1,0 +1,307 @@
+{
+  "id": "calculate.timi",
+  "name": "TIMI 风险评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "不稳定心绞痛或非 ST 段抬高心梗的短期风险评分（0–7 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["TIMI", "TIMI 评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 7,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "t1",
+        "label": "年龄 65 岁及以上",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "t2",
+        "label": "三个及以上冠心病危险因素",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "t3",
+        "label": "已知冠心病（狭窄 50% 以上）",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "t4",
+        "label": "7 天内使用过阿司匹林",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "t5",
+        "label": "24 小时内严重心绞痛发作",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "t6",
+        "label": "心电图 ST 段偏移 0.5 mm 以上",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      },
+      {
+        "id": "t7",
+        "label": "心肌标志物升高",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "否"
+          },
+          {
+            "value": 1,
+            "label": "是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 5,
+        "max": 7,
+        "key": "high",
+        "label": "高风险"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "t1": {
+        "type": "number",
+        "title": "年龄 65 岁及以上",
+        "enum": [0, 1]
+      },
+      "t2": {
+        "type": "number",
+        "title": "三个及以上冠心病危险因素",
+        "enum": [0, 1]
+      },
+      "t3": {
+        "type": "number",
+        "title": "已知冠心病（狭窄 50% 以上）",
+        "enum": [0, 1]
+      },
+      "t4": {
+        "type": "number",
+        "title": "7 天内使用过阿司匹林",
+        "enum": [0, 1]
+      },
+      "t5": {
+        "type": "number",
+        "title": "24 小时内严重心绞痛发作",
+        "enum": [0, 1]
+      },
+      "t6": {
+        "type": "number",
+        "title": "心电图 ST 段偏移 0.5 mm 以上",
+        "enum": [0, 1]
+      },
+      "t7": {
+        "type": "number",
+        "title": "心肌标志物升高",
+        "enum": [0, 1]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "TIMI risk score for UA/NSTEMI",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=TIMI+risk+score+unstable+angina+NSTEMI",
+      "section": "Antman EM, et al. 2000；7 项合计 0–7 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

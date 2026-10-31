@@ -3,6 +3,7 @@ import {
   createPatientCalculationModel,
   verifyPatientCalculation,
 } from "../fixtures/patient-calculation.mjs";
+import { SHOTS_DIR } from "../fixtures/shots.mjs";
 
 test("patient calculation confirms editable inputs, recovers a lost response and stays readable on mobile", async ({
   page,
@@ -24,7 +25,7 @@ test("patient calculation confirms editable inputs, recovers a lost response and
     ).toBe(true);
     await page.goto("/");
     await verifyPatientCalculation(page, model, {
-      shots: "docs/assets/ui",
+      shots: SHOTS_DIR,
       mobile: true,
     });
   } finally {

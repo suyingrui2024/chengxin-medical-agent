@@ -1,0 +1,294 @@
+{
+  "id": "calculate.morse",
+  "name": "Morse 跌倒风险评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "Morse 跌倒风险评分（6 项，0–125 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Morse", "跌倒风险"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 125,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "m1",
+        "label": "跌倒史",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 25,
+            "label": "有"
+          }
+        ]
+      },
+      {
+        "id": "m2",
+        "label": "次要诊断",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 15,
+            "label": "有"
+          }
+        ]
+      },
+      {
+        "id": "m3",
+        "label": "行走辅助",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无或卧床"
+          },
+          {
+            "value": 15,
+            "label": "拐杖或助行器"
+          },
+          {
+            "value": 30,
+            "label": "扶家具行走"
+          }
+        ]
+      },
+      {
+        "id": "m4",
+        "label": "静脉输液或肝素锁",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无"
+          },
+          {
+            "value": 20,
+            "label": "有"
+          }
+        ]
+      },
+      {
+        "id": "m5",
+        "label": "步态",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "正常或卧床"
+          },
+          {
+            "value": 10,
+            "label": "虚弱"
+          },
+          {
+            "value": 20,
+            "label": "步态障碍"
+          }
+        ]
+      },
+      {
+        "id": "m6",
+        "label": "精神状态",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "认知正常"
+          },
+          {
+            "value": 15,
+            "label": "高估或忘记自身限制"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 24,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 25,
+        "max": 44,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 45,
+        "max": 125,
+        "key": "high",
+        "label": "高风险"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "m1": {
+        "type": "number",
+        "title": "跌倒史",
+        "enum": [0, 25]
+      },
+      "m2": {
+        "type": "number",
+        "title": "次要诊断",
+        "enum": [0, 15]
+      },
+      "m3": {
+        "type": "number",
+        "title": "行走辅助",
+        "enum": [0, 15, 30]
+      },
+      "m4": {
+        "type": "number",
+        "title": "静脉输液或肝素锁",
+        "enum": [0, 20]
+      },
+      "m5": {
+        "type": "number",
+        "title": "步态",
+        "enum": [0, 10, 20]
+      },
+      "m6": {
+        "type": "number",
+        "title": "精神状态",
+        "enum": [0, 15]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Morse Fall Scale",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Morse+Fall+Scale",
+      "section": "Morse JM, et al. 1989；6 项加权合计 0–125 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

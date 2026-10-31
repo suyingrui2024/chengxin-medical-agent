@@ -4,6 +4,7 @@ import {
   verifyRepeatedObservations,
   verifyResumedObservationQuestion,
 } from "../fixtures/repeated-observations.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const mobile of [false, true]) {
   test(`repeated temperatures retain history, distinguish skipped attempts and reassess risk${mobile ? " on a narrow screen" : ""}`, async ({
@@ -29,7 +30,9 @@ for (const mobile of [false, true]) {
       await verifyRepeatedObservations(
         page,
         model,
-        `docs/assets/ui/${mobile ? "58-repeated-observation-narrow" : "57-repeated-observation"}`,
+        shotPath(
+          `${mobile ? "58-repeated-observation-narrow" : "57-repeated-observation"}`,
+        ),
       );
     } finally {
       await request.post("/api/settings", { data: { backend: "demo" } });
@@ -123,7 +126,7 @@ test("a narrow-screen repeat returns to the same question with its measurement v
     await verifyResumedObservationQuestion(
       page,
       model,
-      "docs/assets/ui/59-repeated-observation-resumed-question.png",
+      shotPath("59-repeated-observation-resumed-question.png"),
     );
   } finally {
     await request.post("/api/settings", { data: { backend: "demo" } });
@@ -152,7 +155,7 @@ for (const height of [680, 760])
         page,
         model,
         height === 680
-          ? "docs/assets/ui/60-repeated-observation-small-window.png"
+          ? shotPath("60-repeated-observation-small-window.png")
           : undefined,
       );
     } finally {

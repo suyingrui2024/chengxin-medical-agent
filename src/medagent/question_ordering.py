@@ -419,7 +419,16 @@ class HypothesisOrdering:
         candidate_ids = {question.id for question in candidates}
         ordered: List[str] = []
         for item in self.off_pathway_warnings(chief):
-            wid = item.get("id")
+            # ``warning_questions`` keeps its frozen ``{domain,
+            # question}`` contract (tests/test_out_of_pathway.py), so
+            # the id is derived the same way bridging._p3_warning_ids
+            # derives it. Without this fallback every warning question
+            # is id-less and can never enter the id stream — which is
+            # exactly why the P3 hook returned [] before the question
+            # layer compiled them.
+            wid = item.get("id") or (
+                f"warning_{item['domain']}" if item.get("domain") else None
+            )
             if wid and str(wid) in candidate_ids and str(wid) not in ordered:
                 ordered.append(str(wid))
         return ordered

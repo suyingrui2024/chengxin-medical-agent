@@ -5,6 +5,7 @@ import {
   reachSelfCheck,
 } from "../fixtures/self-check-drafts.mjs";
 import { degreeSnapshot } from "../fixtures/visual-answer-drafts.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const mobile of [false, true])
   test(`unconfirmed location and steps survive switching sessions${mobile ? " on mobile" : ""}`, async ({
@@ -15,7 +16,7 @@ for (const mobile of [false, true])
     if (mobile) await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
     await verifyLocationDraft(page, {
-      shot: `docs/assets/ui/72-${mobile ? "mobile" : "wide"}-location-draft.png`,
+      shot: shotPath(`72-${mobile ? "mobile" : "wide"}-location-draft.png`),
     });
   });
 

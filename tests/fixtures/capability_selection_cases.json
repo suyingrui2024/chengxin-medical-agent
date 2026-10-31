@@ -1,0 +1,221 @@
+{
+  "version": "1.0.0",
+  "note": "能力选择评测用例。expected 为 null 表示不应调用任何能力。",
+  "cases": [
+    {
+      "id": "sel-01",
+      "utterance": "帮我做个 GDS-15 量表",
+      "expected": "calculate.gds15"
+    },
+    {
+      "id": "sel-02",
+      "utterance": "我想测一下焦虑，用 GAD-7",
+      "expected": "calculate.gad7"
+    },
+    {
+      "id": "sel-03",
+      "utterance": "最近睡不好，帮我做个失眠严重度评估",
+      "expected": "calculate.isi"
+    },
+    {
+      "id": "sel-04",
+      "utterance": "我走路老觉得喘，想评一下呼吸困难分级",
+      "expected": "calculate.mmrc"
+    },
+    {
+      "id": "sel-05",
+      "utterance": "帮我算个 BMI，身高 170 体重 65",
+      "expected": "calculate.bmi"
+    },
+    {
+      "id": "sel-06",
+      "utterance": "帮我算体表面积",
+      "expected": "calculate.bsa"
+    },
+    {
+      "id": "sel-07",
+      "utterance": "血压 120/80，帮我算平均动脉压",
+      "expected": "calculate.map"
+    },
+    {
+      "id": "sel-08",
+      "utterance": "心率 100 收缩压 100，算一下休克指数",
+      "expected": "calculate.shock_index"
+    },
+    {
+      "id": "sel-09",
+      "utterance": "血钙 2.0，白蛋白 30，帮我算校正血钙",
+      "expected": "calculate.corrected_calcium"
+    },
+    {
+      "id": "sel-10",
+      "utterance": "帮我算阴离子间隙",
+      "expected": "calculate.anion_gap"
+    },
+    {
+      "id": "sel-11",
+      "utterance": "帮我算血浆渗透压",
+      "expected": "calculate.osmolality"
+    },
+    {
+      "id": "sel-12",
+      "utterance": "孩子 5 岁，帮我估算体重",
+      "expected": "calculate.child_weight"
+    },
+    {
+      "id": "sel-13",
+      "utterance": "孩子 8 岁，估算一下身高",
+      "expected": "calculate.child_height"
+    },
+    {
+      "id": "sel-14",
+      "utterance": "帮我算 FIB-4",
+      "expected": "calculate.fib4"
+    },
+    {
+      "id": "sel-15",
+      "utterance": "腰围 80 身高 170，算腰高比",
+      "expected": "calculate.waist_height"
+    },
+    {
+      "id": "sel-16",
+      "utterance": "帮我做个 ODI 腰痛量表",
+      "expected": "calculate.odi"
+    },
+    {
+      "id": "sel-17",
+      "utterance": "脖子痛，做个 NDI",
+      "expected": "calculate.ndi"
+    },
+    {
+      "id": "sel-18",
+      "utterance": "帮我做个 IPSS 前列腺评分",
+      "expected": "calculate.ipss"
+    },
+    {
+      "id": "sel-19",
+      "utterance": "帮我算 Barthel 指数",
+      "expected": "calculate.barthel"
+    },
+    {
+      "id": "sel-20",
+      "utterance": "做个 Berg 平衡量表",
+      "expected": "calculate.berg"
+    },
+    {
+      "id": "sel-21",
+      "utterance": "帮我做 OABSS 膀胱评分",
+      "expected": "calculate.oabss"
+    },
+    {
+      "id": "sel-22",
+      "utterance": "孕吐厉害，做个 PUQE",
+      "expected": "calculate.puqe"
+    },
+    {
+      "id": "sel-23",
+      "utterance": "孩子哮喘，做个 C-ACT",
+      "expected": "calculate.cact"
+    },
+    {
+      "id": "sel-24",
+      "utterance": "帮我做 HIT-6 头痛影响测试",
+      "expected": "calculate.hit6"
+    },
+    {
+      "id": "sel-25",
+      "utterance": "帮我做 PHQ-8",
+      "expected": "calculate.phq8"
+    },
+    {
+      "id": "sel-26",
+      "utterance": "做个 SAS 焦虑自评量表",
+      "expected": "calculate.sas"
+    },
+    {
+      "id": "sel-27",
+      "utterance": "做个 SDS 抑郁自评量表",
+      "expected": "calculate.sds"
+    },
+    {
+      "id": "sel-28",
+      "utterance": "算一下踝肱指数",
+      "expected": "calculate.abi"
+    },
+    {
+      "id": "sel-29",
+      "utterance": "帮我算孕周",
+      "expected": "calculate.edd"
+    },
+    {
+      "id": "sel-30",
+      "utterance": "帮我算网织红细胞校正",
+      "expected": "calculate.retic_corrected"
+    },
+    {
+      "id": "sel-31",
+      "utterance": "我头疼三天了",
+      "expected": null
+    },
+    {
+      "id": "sel-32",
+      "utterance": "这个药一天吃几次",
+      "expected": null
+    },
+    {
+      "id": "sel-33",
+      "utterance": "我血糖 7.8，正常吗",
+      "expected": null
+    },
+    {
+      "id": "sel-34",
+      "utterance": "帮我预约挂号",
+      "expected": null
+    },
+    {
+      "id": "sel-35",
+      "utterance": "什么是 BMI",
+      "expected": null
+    },
+    {
+      "id": "sel-36",
+      "utterance": "做个儿童哮喘控制测试",
+      "expected": "calculate.cact"
+    },
+    {
+      "id": "sel-37",
+      "utterance": "帮我做 Zung 焦虑自评",
+      "expected": "calculate.sas"
+    },
+    {
+      "id": "sel-38",
+      "utterance": "帮我做 Zung 抑郁自评",
+      "expected": "calculate.sds"
+    },
+    {
+      "id": "sel-39",
+      "utterance": "帮我做个前列腺症状评分",
+      "expected": "calculate.ipss"
+    },
+    {
+      "id": "sel-40",
+      "utterance": "最近老起夜，白天也总想上厕所，想评一下膀胱过度活动",
+      "expected": "calculate.oabss"
+    },
+    {
+      "id": "sel-41",
+      "utterance": "最近两周总是提不起劲，什么都不想干",
+      "expected": null
+    },
+    {
+      "id": "sel-42",
+      "utterance": "我膝盖疼，走路费劲",
+      "expected": null
+    },
+    {
+      "id": "sel-43",
+      "utterance": "老是咳嗽咳痰，早上厉害",
+      "expected": null
+    }
+  ]
+}

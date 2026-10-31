@@ -1,0 +1,285 @@
+{
+  "id": "calculate.rockall",
+  "name": "Rockall 再出血风险评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "上消化道出血再出血与死亡风险评分（0–11 分）。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "clinician",
+  "aliases": ["Rockall", "再出血风险"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 10,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "r1",
+        "label": "年龄",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "60 岁以下"
+          },
+          {
+            "value": 1,
+            "label": "60 至 79 岁"
+          },
+          {
+            "value": 2,
+            "label": "80 岁及以上"
+          }
+        ]
+      },
+      {
+        "id": "r2",
+        "label": "休克",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无休克"
+          },
+          {
+            "value": 1,
+            "label": "心动过速"
+          },
+          {
+            "value": 2,
+            "label": "低血压"
+          }
+        ]
+      },
+      {
+        "id": "r3",
+        "label": "合并症",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无重大合并症"
+          },
+          {
+            "value": 1,
+            "label": "心力衰竭、缺血性心脏病或其他重大合并症"
+          },
+          {
+            "value": 2,
+            "label": "肾功能衰竭、肝功能衰竭或播散性肿瘤"
+          }
+        ]
+      },
+      {
+        "id": "r4",
+        "label": "内镜诊断",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "Mallory-Weiss 综合征或无病灶"
+          },
+          {
+            "value": 1,
+            "label": "溃疡、糜烂等其他诊断"
+          },
+          {
+            "value": 2,
+            "label": "消化道恶性肿瘤"
+          }
+        ]
+      },
+      {
+        "id": "r5",
+        "label": "内镜出血征象",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "无或仅有暗色斑点"
+          },
+          {
+            "value": 1,
+            "label": "可见血凝块、血管显露或活动性渗血"
+          },
+          {
+            "value": 2,
+            "label": "活动性喷血"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "key": "low",
+        "label": "低风险"
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "key": "moderate",
+        "label": "中等风险"
+      },
+      {
+        "min": 5,
+        "max": 10,
+        "key": "high",
+        "label": "高风险"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "r1": {
+        "type": "number",
+        "title": "年龄",
+        "enum": [0, 1, 2]
+      },
+      "r2": {
+        "type": "number",
+        "title": "休克",
+        "enum": [0, 1, 2]
+      },
+      "r3": {
+        "type": "number",
+        "title": "合并症",
+        "enum": [0, 1, 2]
+      },
+      "r4": {
+        "type": "number",
+        "title": "内镜诊断",
+        "enum": [0, 1, 2]
+      },
+      "r5": {
+        "type": "number",
+        "title": "内镜出血征象",
+        "enum": [0, 1, 2]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Rockall score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Rockall+score+upper+gastrointestinal+bleeding",
+      "section": "Rockall TA, et al. 1996；5 项合计 0–11 分",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

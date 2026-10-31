@@ -1,0 +1,170 @@
+{
+  "id": "calculate.bmi",
+  "name": "BMI 体质指数",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "按身高体重计算体质指数（kg/m²），仅作记录与参考，不构成肥胖诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "formula/v1",
+  "audience": "patient",
+  "patient_form": "formula_form/v1",
+  "aliases": ["BMI", "体质指数", "体重指数"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按标注来源做算术计算，不评价结果、不作诊断、不给处理建议。"
+  },
+  "formula": {
+    "engine": "formula-engine/v1",
+    "function": "bmi",
+    "citation": "WHO-BMI-2004",
+    "inputs": [
+      {
+        "id": "height_cm",
+        "label": "身高",
+        "type": "number",
+        "unit": "cm",
+        "min": "50",
+        "max": "250",
+        "step": "0.1"
+      },
+      {
+        "id": "weight_kg",
+        "label": "体重",
+        "type": "number",
+        "unit": "kg",
+        "min": "2",
+        "max": "400",
+        "step": "0.1"
+      }
+    ],
+    "output": {
+      "label": "体质指数",
+      "unit": "kg/m²",
+      "min": "5",
+      "max": "200",
+      "precision": {
+        "places": 1
+      },
+      "direction": "higher_is_worse"
+    },
+    "bands": [
+      {
+        "lt": "18.5",
+        "key": "low",
+        "label": "偏低"
+      },
+      {
+        "gte": "18.5",
+        "lt": "24",
+        "key": "normal",
+        "label": "正常范围"
+      },
+      {
+        "gte": "24",
+        "lt": "28",
+        "key": "high",
+        "label": "偏高"
+      },
+      {
+        "gte": "28",
+        "key": "very_high",
+        "label": "明显偏高"
+      }
+    ],
+    "note": "仅成人；孕妇、儿童、运动员不适用。"
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "band",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "结果"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计算方法"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["formula/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "WHO BMI classification",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+      "section": "WHO-BMI-2004：成人 BMI 分类（低于18.5 偏低 / 18.5–23.9 正常 / 24–27.9 偏高 / ≥28 明显偏高，采用中国成人标准）",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "height_cm": {
+        "type": "string",
+        "title": "身高",
+        "maxLength": 12
+      },
+      "weight_kg": {
+        "type": "string",
+        "title": "体重",
+        "maxLength": 12
+      }
+    }
+  }
+}

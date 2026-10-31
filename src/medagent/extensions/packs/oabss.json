@@ -1,0 +1,289 @@
+{
+  "id": "calculate.oabss",
+  "name": "OABSS 膀胱过度活动评分",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "膀胱过度活动症症状评分（4 项，0–15 分），用于记录尿急与尿频程度，不作诊断。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "patient_form": "scale_form/v1",
+  "aliases": ["OABSS", "膀胱过度活动", "尿急评分"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 15,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "a1",
+        "label": "白天排尿次数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "7 次及以下"
+          },
+          {
+            "value": 1,
+            "label": "8 到 14 次"
+          },
+          {
+            "value": 2,
+            "label": "15 次及以上"
+          }
+        ]
+      },
+      {
+        "id": "a2",
+        "label": "夜间起夜排尿次数",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "0 次"
+          },
+          {
+            "value": 1,
+            "label": "1 次"
+          },
+          {
+            "value": 2,
+            "label": "2 次"
+          },
+          {
+            "value": 3,
+            "label": "3 次及以上"
+          }
+        ]
+      },
+      {
+        "id": "a3",
+        "label": "突然想排尿、难以忍住",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "每周少于一次"
+          },
+          {
+            "value": 2,
+            "label": "每周一次以上"
+          },
+          {
+            "value": 3,
+            "label": "每天一次"
+          },
+          {
+            "value": 4,
+            "label": "每天两到四次"
+          },
+          {
+            "value": 5,
+            "label": "每天五次以上"
+          }
+        ]
+      },
+      {
+        "id": "a4",
+        "label": "来不及上厕所就漏尿",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "每周少于一次"
+          },
+          {
+            "value": 2,
+            "label": "每周一次以上"
+          },
+          {
+            "value": 3,
+            "label": "每天一次"
+          },
+          {
+            "value": 4,
+            "label": "每天两到四次"
+          },
+          {
+            "value": 5,
+            "label": "每天五次以上"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 5,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 6,
+        "max": 11,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 12,
+        "max": 15,
+        "key": "severe",
+        "label": "重度"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "a1": {
+        "type": "number",
+        "title": "白天排尿次数",
+        "enum": [0, 1, 2]
+      },
+      "a2": {
+        "type": "number",
+        "title": "夜间起夜排尿次数",
+        "enum": [0, 1, 2, 3]
+      },
+      "a3": {
+        "type": "number",
+        "title": "突然想排尿、难以忍住",
+        "enum": [0, 1, 2, 3, 4, 5]
+      },
+      "a4": {
+        "type": "number",
+        "title": "来不及上厕所就漏尿",
+        "enum": [0, 1, 2, 3, 4, 5]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Overactive Bladder Symptom Score",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Overactive+Bladder+Symptom+Score+OABSS",
+      "section": "OABSS：4 项合计 0–15 分（日间 0–2、夜间 0–3、尿急 0–5、急迫性尿失禁 0–5）",
+      "accessed": "2026-10-27"
+    }
+  ]
+}

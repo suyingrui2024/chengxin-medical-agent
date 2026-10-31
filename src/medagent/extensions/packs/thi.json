@@ -1,0 +1,998 @@
+{
+  "id": "calculate.thi",
+  "name": "THI 耳鸣致残量表",
+  "version": "1.0.0",
+  "api_version": "medical-capability/v1",
+  "kind": "calculation",
+  "description": "耳鸣致残量表（25 项，0–100 分），记录耳鸣对生活的影响。",
+  "permissions": [],
+  "review_status": "engineering_verified_not_clinical",
+  "ui": "calculation",
+  "result_renderer": "scale/v1",
+  "audience": "patient",
+  "aliases": ["THI", "耳鸣致残"],
+  "validation": {
+    "status": "engineering_prototype_requires_review",
+    "scope": "只按公开量表规则计分与分档，不判断是否患病，不给治疗或用药建议。"
+  },
+  "scale": {
+    "engine": "scale-engine/v1",
+    "aggregate": {
+      "mode": "sum",
+      "min": 0,
+      "max": 100,
+      "unit": "分",
+      "direction": "higher_is_worse"
+    },
+    "items": [
+      {
+        "id": "t1",
+        "label": "耳鸣让你难以集中注意力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t2",
+        "label": "耳鸣声太大，难以听清他人说话",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t3",
+        "label": "耳鸣让你容易发怒",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t4",
+        "label": "耳鸣让你难以入睡",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t5",
+        "label": "耳鸣让你感到无助",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t6",
+        "label": "耳鸣让你难以享受生活",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t7",
+        "label": "耳鸣影响工作或家务",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t8",
+        "label": "耳鸣让你不愿参加社交活动",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t9",
+        "label": "耳鸣让你感到疲惫",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t10",
+        "label": "耳鸣让你感到紧张",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t11",
+        "label": "耳鸣让你难以安静休息",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t12",
+        "label": "耳鸣让你觉得生活失去意义",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t13",
+        "label": "耳鸣让你难以阅读",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t14",
+        "label": "耳鸣让你难以放松",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t15",
+        "label": "耳鸣让你难以与家人相处",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t16",
+        "label": "耳鸣让你难以完成日常事务",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t17",
+        "label": "耳鸣让你感到沮丧",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t18",
+        "label": "耳鸣让你难以专心工作",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t19",
+        "label": "耳鸣让你觉得无法摆脱",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t20",
+        "label": "耳鸣让你感到烦躁",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t21",
+        "label": "耳鸣影响你的睡眠质量",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t22",
+        "label": "耳鸣让你难以与人交谈",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t23",
+        "label": "耳鸣让你感到孤立",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t24",
+        "label": "耳鸣让你难以应对日常压力",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      },
+      {
+        "id": "t25",
+        "label": "耳鸣让你觉得难以忍受",
+        "kind": "choice",
+        "weight": 1,
+        "options": [
+          {
+            "value": 0,
+            "label": "没有"
+          },
+          {
+            "value": 1,
+            "label": "很少"
+          },
+          {
+            "value": 2,
+            "label": "有时"
+          },
+          {
+            "value": 3,
+            "label": "经常"
+          },
+          {
+            "value": 4,
+            "label": "总是"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "min": 0,
+        "max": 16,
+        "key": "slight",
+        "label": "轻微"
+      },
+      {
+        "min": 17,
+        "max": 36,
+        "key": "mild",
+        "label": "轻度"
+      },
+      {
+        "min": 37,
+        "max": 56,
+        "key": "moderate",
+        "label": "中度"
+      },
+      {
+        "min": 57,
+        "max": 76,
+        "key": "severe",
+        "label": "重度"
+      },
+      {
+        "min": 77,
+        "max": 100,
+        "key": "catastrophic",
+        "label": "极重"
+      }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {
+      "t1": {
+        "type": "number",
+        "title": "耳鸣让你难以集中注意力",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t2": {
+        "type": "number",
+        "title": "耳鸣声太大，难以听清他人说话",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t3": {
+        "type": "number",
+        "title": "耳鸣让你容易发怒",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t4": {
+        "type": "number",
+        "title": "耳鸣让你难以入睡",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t5": {
+        "type": "number",
+        "title": "耳鸣让你感到无助",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t6": {
+        "type": "number",
+        "title": "耳鸣让你难以享受生活",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t7": {
+        "type": "number",
+        "title": "耳鸣影响工作或家务",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t8": {
+        "type": "number",
+        "title": "耳鸣让你不愿参加社交活动",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t9": {
+        "type": "number",
+        "title": "耳鸣让你感到疲惫",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t10": {
+        "type": "number",
+        "title": "耳鸣让你感到紧张",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t11": {
+        "type": "number",
+        "title": "耳鸣让你难以安静休息",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t12": {
+        "type": "number",
+        "title": "耳鸣让你觉得生活失去意义",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t13": {
+        "type": "number",
+        "title": "耳鸣让你难以阅读",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t14": {
+        "type": "number",
+        "title": "耳鸣让你难以放松",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t15": {
+        "type": "number",
+        "title": "耳鸣让你难以与家人相处",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t16": {
+        "type": "number",
+        "title": "耳鸣让你难以完成日常事务",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t17": {
+        "type": "number",
+        "title": "耳鸣让你感到沮丧",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t18": {
+        "type": "number",
+        "title": "耳鸣让你难以专心工作",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t19": {
+        "type": "number",
+        "title": "耳鸣让你觉得无法摆脱",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t20": {
+        "type": "number",
+        "title": "耳鸣让你感到烦躁",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t21": {
+        "type": "number",
+        "title": "耳鸣影响你的睡眠质量",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t22": {
+        "type": "number",
+        "title": "耳鸣让你难以与人交谈",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t23": {
+        "type": "number",
+        "title": "耳鸣让你感到孤立",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t24": {
+        "type": "number",
+        "title": "耳鸣让你难以应对日常压力",
+        "enum": [0, 1, 2, 3, 4]
+      },
+      "t25": {
+        "type": "number",
+        "title": "耳鸣让你觉得难以忍受",
+        "enum": [0, 1, 2, 3, 4]
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "value",
+      "unit",
+      "max_score",
+      "band",
+      "items",
+      "formula",
+      "method",
+      "scoring_note",
+      "disclaimer",
+      "limitations",
+      "result_renderer"
+    ],
+    "properties": {
+      "value": {
+        "type": "string",
+        "title": "得分"
+      },
+      "unit": {
+        "type": "string",
+        "title": "单位"
+      },
+      "max_score": {
+        "type": "number",
+        "title": "满分"
+      },
+      "band": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          }
+        }
+      },
+      "items": {
+        "type": "array",
+        "maxItems": 60,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "label", "answer_label", "score"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "answer_label": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "formula": {
+        "type": "string",
+        "title": "计算式"
+      },
+      "method": {
+        "type": "string",
+        "title": "计分方式"
+      },
+      "scoring_note": {
+        "type": "string"
+      },
+      "disclaimer": {
+        "type": "string"
+      },
+      "limitations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "string"
+        }
+      },
+      "result_renderer": {
+        "type": "string",
+        "enum": ["scale/v1"]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Tinnitus Handicap Inventory",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Tinnitus+Handicap+Inventory+THI",
+      "section": "Newman CW, et al. 1996；25 项各 0–4 分，合计 0–100 分",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "patient_form": "scale_form/v1"
+}
