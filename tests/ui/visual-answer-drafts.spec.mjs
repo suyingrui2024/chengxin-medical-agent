@@ -4,6 +4,7 @@ import {
   degreeSnapshot,
   verifyDegreeDraft,
 } from "../fixtures/visual-answer-drafts.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const mobile of [false, true])
   test(`visual degree confirms one answer and preserves independent text${mobile ? " on a narrow screen" : ""}`, async ({
@@ -14,7 +15,7 @@ for (const mobile of [false, true])
     if (mobile) await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
     await verifyDegreeDraft(page, {
-      shot: `docs/assets/ui/70-${mobile ? "mobile" : "wide"}-degree-draft.png`,
+      shot: shotPath(`70-${mobile ? "mobile" : "wide"}-degree-draft.png`),
     });
   });
 

@@ -3,6 +3,7 @@ import { createLocationAnswersModel } from "../fixtures/location-answers.mjs";
 import { verifyLocationRevision } from "../fixtures/location-revisions.mjs";
 import { verifyLocationAnswers } from "../fixtures/location-answers.mjs";
 import { degreeSnapshot } from "../fixtures/visual-answer-drafts.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const [label, width, height] of [
   ["wide", 1440, 1080],
@@ -30,7 +31,7 @@ for (const [label, width, height] of [
       await page.setViewportSize({ width, height });
       await page.goto("/");
       await verifyLocationRevision(page, model, {
-        shot: `docs/assets/ui/78-${label}-location-revision.png`,
+        shot: shotPath(`78-${label}-location-revision.png`),
       });
     } finally {
       await request.post("/api/settings", { data: { backend: "demo" } });

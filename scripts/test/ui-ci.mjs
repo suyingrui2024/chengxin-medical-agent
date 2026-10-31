@@ -26,10 +26,18 @@ import process from "node:process";
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const UI_DIR = path.join(ROOT, "tests/ui");
 const OUTPUT_DIR = path.join(ROOT, "test-results/ui");
+const SHOTS_DIR = path.join(ROOT, "test-results/shots");
 const PORT = 18766;
+/**
+ * `--shots` writes the acceptance screenshots into `docs/assets/ui`
+ * (the committed set) instead of the throwaway output directory. Set as an
+ * env var on the child rather than as a shell prefix so the npm script also
+ * works on Windows.
+ */
+const updateShots = process.argv.includes("--shots");
 
 /**
- * Clear the Playwright output directory with Python.
+ * Clear a directory with Python.
  *
  * Playwright empties `outputDir` itself at the start of every run, but this
  * sandbox wraps `fs.rm` in a bulk-delete guard that refuses trees over 50
@@ -37,13 +45,13 @@ const PORT = 18766;
  * every later invocation dies inside the shim before running a test.
  * Python's shutil is not wrapped, so the cleanup happens here instead.
  */
-function cleanOutput() {
+function clean(dir) {
   return new Promise((resolve) => {
     const child = spawn(
       "python3",
       [
         "-c",
-        `import shutil; shutil.rmtree(${JSON.stringify(OUTPUT_DIR)}, ignore_errors=True)`,
+        `import shutil; shutil.rmtree(${JSON.stringify(dir)}, ignore_errors=True)`,
       ],
       { cwd: ROOT, stdio: "ignore" },
     );
@@ -81,7 +89,7 @@ async function waitForPortFree(timeoutMs = 20000) {
 function specFiles() {
   // Optional argument filters by file name, so a single spec can be run
   // through the same isolated path while iterating on it.
-  const filter = process.argv[2];
+  const filter = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
   return readdirSync(UI_DIR)
     .filter((name) => name.endsWith(".spec.mjs"))
     .filter((name) => !filter || name.includes(filter))
@@ -94,7 +102,13 @@ function run(file) {
     const child = spawn(
       "npx",
       ["playwright", "test", file, "--config", "playwright.ci.config.mjs"],
-      { cwd: ROOT, stdio: ["ignore", "pipe", "pipe"] },
+      {
+        cwd: ROOT,
+        stdio: ["ignore", "pipe", "pipe"],
+        env: updateShots
+          ? { ...process.env, UPDATE_DOC_SHOTS: "1" }
+          : process.env,
+      },
     );
     let output = "";
     child.stdout.on("data", (chunk) => (output += chunk));
@@ -116,6 +130,10 @@ if (files.length === 0) {
 }
 
 const failures = [];
+// Screenshots from a previous run would otherwise mix with this one's.
+// With `--shots` they go to docs/assets/ui instead, which must not be
+// emptied — the run is rewriting the committed set file by file.
+if (!updateShots) await clean(SHOTS_DIR);
 for (const [index, file] of files.entries()) {
   if (!(await waitForPortFree())) {
     console.error(`port ${PORT} never freed before ${file}`);
@@ -123,7 +141,7 @@ for (const [index, file] of files.entries()) {
   }
   // A clean store per file: the server reads this directory at startup,
   // and Playwright needs an output directory it can empty itself.
-  await cleanOutput();
+  await clean(OUTPUT_DIR);
   const result = await run(file);
   const label = `${index + 1}/${files.length} ${path.basename(file)}`;
   if (result.code === 0) {

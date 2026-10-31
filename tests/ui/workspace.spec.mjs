@@ -2,8 +2,9 @@ import { test, expect } from "@playwright/test";
 import { setInterfaceMode } from "../fixtures/interface-mode.mjs";
 import { mkdir } from "node:fs/promises";
 import { answerText, answerUntil, chooseChoice } from "../fixtures/intake.mjs";
+import { SHOTS_DIR } from "../fixtures/shots.mjs";
 
-const shots = "docs/assets/ui";
+const shots = SHOTS_DIR;
 test.beforeAll(async () => {
   await mkdir(shots, { recursive: true });
 });

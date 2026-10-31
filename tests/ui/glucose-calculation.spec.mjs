@@ -3,6 +3,7 @@ import {
   createGlucoseModel,
   verifyGlucoseCalculation,
 } from "../fixtures/glucose-calculation.mjs";
+import { SHOTS_DIR } from "../fixtures/shots.mjs";
 
 test("glucose renderer rejects missing basis and unsafe links while preserving legacy results", async ({
   page,
@@ -119,7 +120,7 @@ test("sourced glucose conversion uses a scoped form, approximate result and orig
     ).toBe(true);
     await page.goto("/");
     await verifyGlucoseCalculation(page, model, {
-      shots: "docs/assets/ui",
+      shots: SHOTS_DIR,
       mobile: true,
     });
   } finally {

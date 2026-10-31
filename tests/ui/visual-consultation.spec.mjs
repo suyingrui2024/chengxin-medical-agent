@@ -5,6 +5,7 @@ import {
   chooseChoice,
   currentQuestion,
 } from "../fixtures/intake.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 async function start(page) {
   await page.goto("/");
@@ -48,7 +49,7 @@ test("visual choices show actual questions, keep history available and send one 
   await expect(page.locator("#active-question .visual-choice")).toHaveCount(3);
   await expect(page.locator("#conversation-scroll")).toBeHidden();
   await page.screenshot({
-    path: "docs/assets/ui/14-visual-opening.png",
+    path: shotPath("14-visual-opening.png"),
     fullPage: true,
   });
   const chosen = page.waitForRequest((r) => r.url().endsWith("/messages"));
@@ -79,7 +80,7 @@ test("visual choices show actual questions, keep history available and send one 
   const before = await (await request.get(`/api/sessions/${id}`)).json();
   expect(before.state.facts.emergency_screen).toBeUndefined();
   await page.screenshot({
-    path: "docs/assets/ui/15-visual-safety-screen.png",
+    path: shotPath("15-visual-safety-screen.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "不确定", exact: true }).click();
@@ -97,7 +98,7 @@ test("degree scale confirms one selected answer independently of the text draft"
     "在加重",
   );
   await page.screenshot({
-    path: "docs/assets/ui/16-visual-trajectory.png",
+    path: shotPath("16-visual-trajectory.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "变化不大", exact: true }).click();
@@ -109,7 +110,7 @@ test("degree scale confirms one selected answer independently of the text draft"
   const before = await (await request.get(`/api/sessions/${id}`)).json();
   expect(before.state.facts.severity).toBeUndefined();
   await page.screenshot({
-    path: "docs/assets/ui/17-visual-severity.png",
+    path: shotPath("17-visual-severity.png"),
     fullPage: true,
   });
   await page.locator("#message-input").fill("能正常活动");
@@ -144,7 +145,7 @@ test("body location uses a deliberate selection and confirmation, preserving sel
   const before = await (await request.get(`/api/sessions/${id}`)).json();
   expect(before.state.facts.symptom_location).toBeUndefined();
   await page.screenshot({
-    path: "docs/assets/ui/18-visual-body-map.png",
+    path: shotPath("18-visual-body-map.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "记录：四肢", exact: true }).click();
@@ -167,7 +168,7 @@ test("mobile visual screen and degree scale stay readable without overlapping ta
   await answer(page, "咳嗽");
   await expect(page.locator(".signal-grid li")).toHaveCount(6);
   await page.screenshot({
-    path: "docs/assets/ui/19-visual-mobile-screen.png",
+    path: shotPath("19-visual-mobile-screen.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "都没有", exact: true }).click();
@@ -195,7 +196,7 @@ test("mobile visual screen and degree scale stay readable without overlapping ta
     targets.every((target) => target.width >= 44 && target.height >= 44),
   ).toBe(true);
   await page.screenshot({
-    path: "docs/assets/ui/20-visual-mobile-severity.png",
+    path: shotPath("20-visual-mobile-severity.png"),
     fullPage: true,
   });
 });
@@ -272,7 +273,7 @@ test("the smallest desktop window keeps the actual response controls inside the 
     ),
   ).toBe(true);
   await page.screenshot({
-    path: "docs/assets/ui/22-compact-desktop.png",
+    path: shotPath("22-compact-desktop.png"),
     fullPage: true,
   });
   await choice.click();

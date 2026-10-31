@@ -3,6 +3,7 @@ import {
   createConsultationSubjectsModel,
   verifyConsultationSubjects,
 } from "../fixtures/consultation-subjects.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 test("unsubmitted patient text stays with its original session", async ({
   page,
@@ -106,7 +107,9 @@ for (const mobile of [false, true])
       ).toBe(true);
       await page.goto("/");
       await verifyConsultationSubjects(page, model, {
-        shots: `docs/assets/ui/68-${mobile ? "mobile" : "wide"}-consultation-subject`,
+        shots: shotPath(
+          `68-${mobile ? "mobile" : "wide"}-consultation-subject`,
+        ),
         mobile,
       });
     } finally {

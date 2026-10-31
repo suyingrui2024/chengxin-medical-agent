@@ -3,6 +3,7 @@ import {
   createLocationAnswersModel,
   verifyLocationAnswers,
 } from "../fixtures/location-answers.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 for (const [label, width, height, prefill] of [
   ["wide", 1440, 1080, false],
   ["mobile", 390, 844, false],
@@ -31,7 +32,7 @@ for (const [label, width, height, prefill] of [
       await page.setViewportSize({ width, height });
       await page.goto("/");
       await verifyLocationAnswers(page, model, {
-        shotPrefix: `docs/assets/ui/77-${label}-location-answers`,
+        shotPrefix: shotPath(`77-${label}-location-answers`),
         custom: label === "custom",
       });
     } finally {

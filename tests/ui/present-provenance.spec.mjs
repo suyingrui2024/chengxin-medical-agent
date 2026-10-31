@@ -3,6 +3,7 @@ import {
   createPresentProvenanceModel,
   verifyPresentProvenance,
 } from "../fixtures/present-provenance.mjs";
+import { shotPath } from "../fixtures/shots.mjs";
 
 for (const mobile of [false, true]) {
   test(`recorded reports expose scoped original evidence without changing facts${mobile ? " on a narrow screen" : ""}`, async ({
@@ -28,7 +29,9 @@ for (const mobile of [false, true]) {
       await verifyPresentProvenance(
         page,
         model,
-        `docs/assets/ui/${mobile ? "56-present-provenance-narrow" : "55-present-provenance"}.png`,
+        shotPath(
+          `${mobile ? "56-present-provenance-narrow" : "55-present-provenance"}.png`,
+        ),
       );
     } finally {
       await request.post("/api/settings", { data: { backend: "demo" } });
