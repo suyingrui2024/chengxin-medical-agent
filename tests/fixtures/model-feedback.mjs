@@ -48,7 +48,16 @@ function readContext(body) {
     return {};
   }
   if (parsed.latest_user_text) {
-    if (parsed.latest_user_text !== lastFullContext.latest_user_text) {
+    // A new consultation always arrives with no facts recorded yet. Using
+    // that as the reset signal means the module-level bookkeeping cannot
+    // leak from one test into the next when two tests happen to open with
+    // the same sentence — the suite runs on one worker, so the module is
+    // shared for the whole file.
+    const freshSession = Object.keys(parsed.facts || {}).length === 0;
+    if (
+      freshSession ||
+      parsed.latest_user_text !== lastFullContext.latest_user_text
+    ) {
       writeBudgetSpent = false;
       summaryPending = false;
     }
@@ -57,8 +66,33 @@ function readContext(body) {
   return parsed;
 }
 
+/**
+ * The turn context, for a harness that needs to answer the question the
+ * engine is actually asking rather than the next line of a script.
+ *
+ * The hypothesis ranker decides the order, so a script that assumes
+ * `onset -> trajectory -> severity` desyncs the moment the ranking
+ * changes. Reading `active_question` lets a harness answer by identity
+ * and stay correct through reordering.
+ */
+export function readTurnContext(body) {
+  return readContext(body);
+}
+
 function errorOf(context) {
-  return String(context.tool_result?.error ?? "");
+  const result = context.tool_result;
+  if (!result) return "";
+  // Partial recording does not set `error`: the items that passed land and
+  // the rest come back in `rejected`, each with a reason and a repair. A
+  // helper that only reads `error` is blind to exactly the feedback the
+  // model is meant to act on.
+  const parts = [];
+  if (result.error) parts.push(String(result.error));
+  for (const item of result.rejected || []) {
+    if (item?.reason) parts.push(String(item.reason));
+    if (item?.guidance) parts.push(String(item.guidance));
+  }
+  return parts.join("\n");
 }
 
 /**
@@ -131,6 +165,19 @@ export function denialClause() {
   const clause = match[0].trim();
   if (!/没有|无|未/.test(clause)) return null;
   return text.includes(clause) ? clause : null;
+}
+
+/**
+ * A `null` at the head of the queue is a deliberate backend failure, not a
+ * missing line: the harnesses push it to exercise the retry UI.
+ *
+ * One is not enough. `CompatibleBackend` retries HTTP 5xx exactly once
+ * (backends.py, `_transient_retry_reason`), so a single 503 is absorbed
+ * and the patient never sees the failure. Push both entries to make the
+ * turn actually fail.
+ */
+export function outage() {
+  return [null, null];
 }
 
 /**
@@ -213,7 +260,13 @@ function decide(context, commands, { abstainPathway }) {
   return commands.shift();
 }
 
-/** Forget the remembered turn. Only needed if a test swaps servers. */
+/**
+ * Forget the remembered turn. `readContext` already resets on a new
+ * consultation, so this is only needed when a test swaps servers without
+ * starting a new session.
+ */
 export function resetFeedback() {
   lastFullContext = {};
+  writeBudgetSpent = false;
+  summaryPending = false;
 }

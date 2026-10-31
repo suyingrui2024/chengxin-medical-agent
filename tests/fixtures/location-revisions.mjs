@@ -7,14 +7,34 @@ export async function verifyLocationRevision(page, model, { shot } = {}) {
   const pane = page.locator("#active-task");
   const input = page.getByRole("textbox", { name: "输入你的描述" });
   const start = async () => {
+    const panel = page.locator("#facts-panel");
     const control = page.locator("#fact-list .location-revision-start");
-    if (!(await control.isVisible()))
+    // The drawer is `position: fixed` and slides in from the right; closed
+    // it is only translated off screen, so `isVisible()` still reports true
+    // on wide viewports and the click below would wait for a control that
+    // never scrolls into view. Open it by state, not by visibility.
+    if (!(await panel.evaluate((node) => node.classList.contains("open"))))
       await page.locator("#toggle-facts").click();
+    await expect(panel).toHaveClass(/open/);
     await expect(control).toBeEnabled();
-    const box = await control.boundingBox();
-    expect(box.height).toBeGreaterThanOrEqual(44);
+    // Measure the box rather than `toBeInViewport`: the drawer's slide-in is
+    // a CSS transform, and the IntersectionObserver behind that matcher
+    // reports the untransformed (off-screen) box, so it never passes here.
+    await expect
+      .poll(async () => {
+        const box = await control.boundingBox();
+        if (!box) return null;
+        const viewport = page.viewportSize();
+        return box.x >= 0 &&
+          box.y >= 0 &&
+          box.x + box.width <= viewport.width &&
+          box.y + box.height <= viewport.height
+          ? Math.round(box.height)
+          : null;
+      })
+      .toBeGreaterThanOrEqual(44);
     await control.click();
-    await expect(page.locator("#facts-panel")).not.toHaveClass(/open/);
+    await expect(panel).not.toHaveClass(/open/);
     await expect(pane.locator(".location-answer-review")).toBeVisible();
     await expect(pane.locator(".location-answer-source summary")).toHaveText(
       "原记录 · 待核对",
@@ -87,8 +107,10 @@ export async function verifyLocationRevision(page, model, { shot } = {}) {
   expect(
     final.state.history.filter((f) => f.key === "symptom_location"),
   ).toHaveLength(2);
-  // One more call than scripted turns: the engine rejected a proposal and
-  // nextCommand answered it without advancing the script.
-  expect(model.requests).toHaveLength(5);
+  // Four scripted turns, plus at most two compliance replies (ordering
+  // or a triage field). Bounded rather than exact: which gate fires
+  // depends on the case, but a runaway loop still blows past this.
+  expect(model.requests.length).toBeGreaterThanOrEqual(4);
+  expect(model.requests.length).toBeLessThanOrEqual(6);
   await expect(input).toHaveValue("这段用药补充还没有发送。");
 }

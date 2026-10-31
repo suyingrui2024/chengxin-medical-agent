@@ -5,7 +5,7 @@ import { expect } from "@playwright/test";
 
 const firstText = "我父亲68岁，头疼。";
 const nextText = "改问我母亲，她65岁，肚子痛。";
-const record = (person, age, complaint) => ({
+const record = (person, age, complaint, sex) => ({
   tool: "record_facts",
   arguments: {
     facts: [
@@ -27,6 +27,10 @@ const record = (person, age, complaint) => ({
         assertion: "present",
         evidence: complaint,
       },
+      // 「父亲」「母亲」 already says it. Leaving sex unrecorded makes the
+      // engine rank it ahead of the scripted question, and the flow then
+      // asks a different question than the test describes.
+      { key: "sex", value: sex, assertion: "present", evidence: person },
     ],
   },
 });
@@ -38,9 +42,9 @@ const ask = {
 export async function createConsultationSubjectsModel() {
   const requests = [],
     commands = [
-      record("我父亲", 68, "头疼"),
+      record("我父亲", 68, "头疼", "male"),
       ask,
-      record("我母亲", 65, "肚子痛"),
+      record("我母亲", 65, "肚子痛", "female"),
       ask,
     ];
   const server = createServer(async (request, response) => {
@@ -110,7 +114,7 @@ export async function verifyConsultationSubjects(
   const facts = first.state.facts;
   expect((await snapshot(fatherId)).state.consultation_subject).toMatchObject({
     label: "父亲",
-    category: "proxy",
+    category: "other_adult",
   });
   const question = await page.locator("#active-question h2").textContent();
   const changed = await send(nextText);
@@ -195,10 +199,19 @@ export async function verifyConsultationSubjects(
     "核对母亲的原话",
   );
   expect(model.requests).toHaveLength(2);
+  // Wait for the turn to land: the subject is recorded by the model's
+  // record_facts reply, so snapshotting straight after the click races the
+  // request and reads a session that has not been attributed yet.
+  const submitted = page.waitForResponse(
+    (r) =>
+      r.request().method() === "POST" &&
+      r.url().endsWith(`/sessions/${motherId}/messages`),
+  );
   await page.getByRole("button", { name: "发送回答" }).click();
+  await submitted;
   expect((await snapshot(motherId)).state.consultation_subject).toMatchObject({
     label: "母亲",
-    category: "proxy",
+    category: "other_adult",
   });
   expect(model.requests).toHaveLength(4);
   const father = await snapshot(fatherId),
@@ -223,7 +236,7 @@ export async function verifyConsultationSubjects(
   await expect(card).toBeVisible();
   expect((await snapshot(fatherId)).state.consultation_subject).toMatchObject({
     label: "父亲",
-    category: "proxy",
+    category: "other_adult",
   });
   await resume.click();
   await expect(page.locator("#active-question h2")).toHaveText(question);

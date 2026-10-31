@@ -65,12 +65,6 @@ main:has(#view-consultation:not([hidden])) #connection-alert {
   height: 100%;
   min-height: 0;
 }
-#view-consultation .conversation-panel {
-  /* The narrow-width rule sets height:auto, which lets the panel grow past
-     the grid row and push the composer under the fold. */
-  height: 100%;
-  min-height: 0;
-}
 #view-consultation .page-heading {
   padding: 30px 34px 4px;
 }
@@ -88,6 +82,20 @@ main:has(#view-consultation:not([hidden])) #connection-alert {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+@media (max-width: 700px) {
+  /* The action row floats over the surface's top-right corner. On a phone
+     the four buttons wrap across the whole width and, because the row is
+     absolutely positioned, they sit on top of the 「当前这一步 · 展开对话
+     记录」 bar underneath instead of above it — the bar becomes
+     unclickable. Put the row back in flow so it reserves its own height. */
+  .surface-actions {
+    position: static;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    padding: 12px 18px 0;
+    gap: 8px;
+  }
 }
 body.task-focused .surface-actions {
   display: none;

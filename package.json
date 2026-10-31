@@ -27,7 +27,8 @@
     "test:kg": "PYTHONPATH=src python3 -m pytest tests/test_kg.py -q",
     "build:kg": "PYTHONPATH=src python3 scripts/build/build_kg.py",
     "audit:kg": "PYTHONPATH=src python3 scripts/evaluation/medical/audit_kg.py",
-    "test:ui:ci": "playwright test --config playwright.ci.config.mjs"
+    "test:ui:ci": "node scripts/test/ui-ci.mjs",
+    "test:ui:all": "playwright test --config playwright.ci.config.mjs"
   },
   "dependencies": {
     "@deepseek-ai/dsh": "0.2.1-rc.2",
