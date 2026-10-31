@@ -143,6 +143,44 @@ export async function verifySelfCheckConversation(
     exact: true,
   });
   await expect(confirm).toBeEnabled();
+  // Set LAYOUT_DIAG=1 to dump the box chain when the visibility check
+  // below fails. The assertion says "off screen"; it does not say which
+  // box grew or where the space went.
+  if (process.env.LAYOUT_DIAG) {
+    const chain = await page.evaluate(() => {
+      const box = (selector) => {
+        const node = document.querySelector(selector);
+        if (!node) return null;
+        const r = node.getBoundingClientRect();
+        const style = getComputedStyle(node);
+        return {
+          selector,
+          top: Math.round(r.top * 100) / 100,
+          bottom: Math.round(r.bottom * 100) / 100,
+          height: Math.round(r.height * 100) / 100,
+          minHeight: style.minHeight,
+          overflowY: style.overflowY,
+          padding: style.padding,
+        };
+      };
+      return {
+        innerHeight,
+        scrollY,
+        docScroll: document.documentElement.scrollHeight,
+        body: box("body"),
+        main: box("main"),
+        view: box("#view-consultation"),
+        grid: box(".consult-grid"),
+        panel: box(".conversation-panel"),
+        activeTask: box("#active-task"),
+        scroll: box("#conversation-scroll"),
+        footer: box(".conversation-footer"),
+        input: box("#message-input"),
+        urgent: box("#urgent-help"),
+      };
+    });
+    console.error("LAYOUT", JSON.stringify(chain, null, 1));
+  }
   const geometries = await page.evaluate(() => {
     const pane = document.querySelector("#active-task").getBoundingClientRect();
     return [

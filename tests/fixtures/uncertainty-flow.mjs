@@ -25,6 +25,11 @@ export async function exerciseUncertainReports(page, screenshot) {
   const answers = {
     consult_for: "我自己",
     age: "32岁",
+    // Sex is a blocking field, so the ranker asks it before the chief
+    // complaint can be explored. This flow answers whatever comes next
+    // rather than pinning an order; the table just has to cover the
+    // questions the engine can legitimately ask.
+    sex: "男",
     chief_complaint: "手臂疼痛",
     emergency_screen: "都没有",
     onset: "昨天",
@@ -50,9 +55,23 @@ export async function exerciseUncertainReports(page, screenshot) {
       if (!skip) throw new Error("Active task has no registered skip option");
       await page.getByRole("button", { name: skip.label, exact: true }).click();
     } else {
-      const text = answers[data.state.active_question];
+      // Triage warning fields (warning_剧痛 …) belong to the same red-flag
+      // screen this patient already answered "都没有" to, so they get the
+      // same answer. Everything else has to be listed explicitly: an
+      // unlisted question is a real change in the dialogue, not something
+      // to paper over with a default.
+      const text =
+        answers[data.state.active_question] ??
+        (/^warning_/.test(data.state.active_question || "") ? "没有" : null);
       if (!text)
         throw new Error(`Unexpected question: ${data.state.active_question}`);
+      if (process.env.FLOW_DIAG)
+        console.error(
+          "FLOW",
+          turn,
+          data.state.active_question,
+          JSON.stringify(text),
+        );
       await page.getByRole("textbox", { name: "输入你的描述" }).fill(text);
       await page.getByRole("button", { name: "发送回答" }).click();
     }
