@@ -41,8 +41,11 @@ jobs:
           python -m pip install --quiet pytest
           python -m pytest tests -q
           python scripts/evaluation/medical/evaluate_release_gate.py
-      - name: Verify patient emergency actions, self-check guidance and 400 percent reflow equivalent
-        run: node node_modules/@playwright/test/cli.js test tests/ui/p0-summary-status.spec.mjs tests/ui/patient-reflow.spec.mjs tests/ui/self-check-visuals.spec.mjs
+      # The three-spec smoke that used to sit here (p0-summary-status,
+      # patient-reflow, self-check-visuals) is gone: the whole suite below
+      # covers it, and a second entry point only creates a second place to
+      # keep in step.
+      #
       # Running a hand-picked list is how sixteen appearance tests stayed
       # red for five days: they were never in the workflow. The browser
       # suite now runs whole, the same way the Python step runs the whole

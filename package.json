@@ -18,7 +18,7 @@
     "test:execution:benchmark": "PYTHONPATH=src python3 scripts/benchmarks/benchmark_execution.py",
     "test:execution:persistence": "PYTHONPATH=src python3 scripts/evaluation/execution/evaluate_persistence.py",
     "test:ui": "node scripts/test/ui-ci.mjs",
-    "format:check": "prettier --check src/medagent/web/index.html src/medagent/web/*.css src/medagent/web/*.js src/medagent/extensions/**/*.json playwright*.mjs tests/fixtures/*.mjs tests/ui/*.mjs tests/desktop/*.mjs tests/live/*.mjs desktop/*.{cjs,html,css} scripts/build/*desktop*.mjs scripts/build/check-bundled-fonts.mjs",
+    "format:check": "prettier --check src/medagent/web/index.html src/medagent/web/*.css src/medagent/web/*.js src/medagent/extensions/**/*.json playwright*.mjs tests/fixtures/*.mjs tests/ui/*.mjs tests/desktop/*.mjs tests/live/*.mjs desktop/*.{cjs,html,css} \"scripts/**/*.mjs\"",
     "dsh:check": "node integrations/dsh/check.mjs",
     "test:dsh": "node --test integrations/dsh/tests/*.test.mjs",
     "test:dsh:integration": "node integrations/dsh/tests/runtime-smoke.mjs",
