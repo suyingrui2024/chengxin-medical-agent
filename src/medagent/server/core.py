@@ -36,22 +36,68 @@ class HandlerCore:
             self._io_error()
 
     def do_POST(self) -> None:
+        self._body_remaining = self._body_length()
         try:
             self._do_POST()
         except OSError:
             self._io_error()
+        finally:
+            self._drain_body()
 
     def do_DELETE(self) -> None:
+        self._body_remaining = self._body_length()
         try:
             self._do_DELETE()
         except OSError:
             self._io_error()
+        finally:
+            self._drain_body()
 
     def do_PATCH(self) -> None:
+        self._body_remaining = self._body_length()
         try:
             self._do_PATCH()
         except OSError:
             self._io_error()
+        finally:
+            self._drain_body()
+
+    def _body_length(self) -> int:
+        try:
+            return max(0, int(self.headers.get("Content-Length", "0")))
+        except (TypeError, ValueError):
+            return 0
+
+    def _drain_body(self) -> None:
+        """Consume whatever is left of the request body before closing.
+
+        A route that answers without parsing its body — ``POST /api/sessions``
+        is one, and the browser sends ``{}`` with it — leaves those bytes in
+        the socket. Closing a socket that still has unread data makes the
+        kernel send RST instead of FIN, and a client that has not finished
+        reading the response loses it: ``ConnectionResetError`` on the client,
+        an intermittently failed 「开始问诊」 in the browser.
+
+        Loopback on an idle machine usually delivers the response before the
+        RST, which is why this only ever surfaced as a flaky CI failure.
+        Reading the remainder costs two bytes here and makes the close clean.
+        """
+        remaining = getattr(self, "_body_remaining", 0)
+        if remaining <= 0:
+            return
+        if remaining > MAX_BODY_BYTES:
+            # A rejected oversized body is not worth reading out; the reset
+            # that follows is the correct answer to it.
+            return
+        try:
+            while remaining > 0:
+                chunk = self.rfile.read(min(remaining, 65536))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+        except OSError:
+            pass
+        self._body_remaining = 0
 
     def _io_error(self) -> None:
         try:
@@ -119,8 +165,12 @@ class HandlerCore:
         try:
             payload = json.loads(self.rfile.read(length))
         except (json.JSONDecodeError, UnicodeDecodeError):
+            # The bytes are gone from the socket either way; a body that
+            # failed to parse must not leave the drain waiting for them.
+            self._body_remaining = 0
             self._error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求不是有效 JSON")
             return None
+        self._body_remaining = 0
         if not isinstance(payload, dict):
             self._error(HTTPStatus.BAD_REQUEST, "invalid_json", "请求必须是 JSON 对象")
             return None
