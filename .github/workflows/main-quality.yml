@@ -13,7 +13,9 @@ jobs:
   patient-safety:
     name: Patient contracts and reflow
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    # The browser suite starts a fresh server per spec file (52 of them), so
+    # it is the long pole: ~20 minutes locally, and CI runners are slower.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -46,14 +48,14 @@ jobs:
       # suite now runs whole, the same way the Python step runs the whole
       # suite.
       #
-      # It does not block yet. d1568d6 made question order hypothesis-
-      # driven, and every scripted-model harness still replays a fixed
-      # command queue that ignores the engine's feedback — so a proposal
-      # the engine rejects shifts the whole script by one turn. Those
-      # harnesses have to learn to comply before this can be a hard gate;
-      # until then the run is reported rather than enforced.
+      # It is a hard gate now. Two things had to change first: the scripted
+      # models obey the engine's machine-readable feedback (so a rejected
+      # proposal no longer desyncs the whole script), and `test:ui:ci` runs
+      # one spec file per server — sharing a single server meant each file
+      # inherited the previous one's patient record and the red set moved
+      # with file order. With those, all 52 spec files pass on a clean
+      # checkout, so a failure here is a real failure.
       - name: Run the whole browser suite
-        continue-on-error: true
         run: npm run test:ui:ci
       - name: Check interface formatting (same list as local format:check)
         run: npm run format:check
