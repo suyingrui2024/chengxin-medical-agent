@@ -387,7 +387,14 @@ test("mobile layout has no horizontal overflow and exposes records and navigatio
   await page.getByRole("button", { name: "打开导航" }).click();
   await page.locator('.nav-item[data-view="consultation"]').click();
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
+  // Creating the session re-renders the view, and setView() closes the
+  // mobile drawer. Opening it before that lands means the drawer closes
+  // under the next click — and a closed drawer is `display: none`, so the
+  // nav item is not in the accessibility tree at all and getByRole waits
+  // for something that will never appear.
+  await expect(page.locator("#active-question h2")).toBeVisible();
   await page.getByRole("button", { name: "打开导航" }).click();
+  await expect(page.locator("#sidebar")).toHaveClass(/open/);
   await page.getByRole("button", { name: /会谈记录/ }).click();
   await expect(
     page.getByRole("heading", { name: "每次会谈，都有迹可循。" }),
