@@ -3,7 +3,6 @@ import json
 import os
 import re
 import sqlite3
-import sys
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
@@ -44,16 +43,10 @@ def utc_now() -> str:
 
 
 def default_patient_data_root() -> Path:
-    override = os.environ.get("MEDAGENT_PATIENT_DATA_DIR", "").strip()
-    if override:
-        return Path(override).expanduser()
-    if os.name == "nt":
-        base = Path(os.environ.get("LOCALAPPDATA") or Path.home() / "AppData" / "Local")
-        return base / "Chengxin" / "patient-data"
-    if sys.platform == "darwin":
-        return Path.home() / "Library" / "Application Support" / "Chengxin" / "patient-data"
-    base = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share")
-    return base / "chengxin" / "patient-data"
+    """Per-platform patient-data directory; see ``infra.platform``."""
+    from ..infra.platform import patient_data_root
+
+    return patient_data_root()
 
 
 def _clean_text(value: Any, name: str, maximum: int, *, required: bool = True) -> str:

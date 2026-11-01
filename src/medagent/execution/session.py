@@ -1,5 +1,6 @@
 """Owned full-DSH workspace session."""
 from ._preamble import *  # noqa: F401,F403
+from ..infra.platform import isolation_kind, startup_timeout_seconds, supports_sandbox
 
 
 class ExecutionSession:
@@ -517,7 +518,7 @@ class ExecutionSession:
     def _start(self):
         if self.process and self.process.poll() is None:
             return
-        if (os.name != "nt" and not shutil.which("bwrap")) or not shutil.which("node"):
+        if not supports_sandbox():
             raise ExecutionError("执行工作台需要 Linux bubblewrap 和 Node")
         self.ready.clear()
         environment = {
@@ -584,8 +585,8 @@ class ExecutionSession:
         # while Defender inspects the bundled native runtime.  Keep a bounded,
         # platform-specific owner timeout that leaves the SDK enough time to
         # report its own initialization result.
-        startup_timeout_seconds = 45 if os.name == "nt" else 25
-        if not self.ready.wait(startup_timeout_seconds):
+        timeout = startup_timeout_seconds()
+        if not self.ready.wait(timeout):
             raise ExecutionError("隔离执行环境未能就绪")
         if process.poll() is not None or self.error:
             raise ExecutionError(self.error or "隔离执行环境启动失败")
@@ -860,11 +861,9 @@ class ExecutionSession:
                 try:
                     process.wait(timeout=6)
                 except subprocess.TimeoutExpired:
-                    if os.name == "nt":
-                        from ..infra.processes import terminate
-                        terminate(process)
-                    else:
-                        os.killpg(process.pid, signal.SIGTERM)
+                    from ..infra.processes import terminate_gracefully
+
+                    terminate_gracefully(process)
                     try:
                         process.wait(timeout=3)
                     except subprocess.TimeoutExpired:
@@ -1136,9 +1135,7 @@ class ExecutionSession:
                 "restored": self.restored,
                 "history_trimmed": self.history_trimmed,
                 "title": self.title,
-                "isolation": "windows-processcontainer"
-                if os.name == "nt"
-                else "bubblewrap-filesystem",
+                "isolation": isolation_kind(),
                 "network": "enabled",
                 "storage": "workspace_files_and_dsh_history_persist",
                 "capability_binding": self.capability_binding,

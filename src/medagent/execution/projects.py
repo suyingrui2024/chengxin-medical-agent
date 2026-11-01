@@ -5,6 +5,8 @@ from pathlib import Path
 import shutil
 import sys
 
+from ..infra.platform import protected_roots
+
 
 def project_path(value, storage_root, source_root):
     if not isinstance(value, (str, Path)):
@@ -34,36 +36,7 @@ def project_path(value, storage_root, source_root):
     node = shutil.which("node")
     if node:
         protected.append(Path(node).resolve().parent.parent)
-    protected += (
-        [
-            Path(name)
-            for name in [
-                "/usr",
-                "/etc",
-                "/proc",
-                "/sys",
-                "/dev",
-                "/lib",
-                "/lib64",
-                "/bin",
-                "/sbin",
-                "/boot",
-                "/run",
-            ]
-        ]
-        if os.name != "nt"
-        else [
-            Path(os.environ[name]).resolve()
-            for name in (
-                "SystemRoot",
-                "ProgramFiles",
-                "ProgramFiles(x86)",
-                "APPDATA",
-                "LOCALAPPDATA",
-            )
-            if os.environ.get(name)
-        ]
-    )
+    protected += protected_roots()
     if candidate in {
         Path(candidate.anchor),
         Path("/home"),

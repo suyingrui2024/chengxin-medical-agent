@@ -31,9 +31,9 @@ class DesktopHandler(Handler):
 
 
 def main():
-    if os.name == "nt":
-        from .infra.windows_process import own_process_tree
-        own_process_tree()
+    from .infra.processes import own_process_tree
+
+    own_process_tree()
     message = json.loads(sys.stdin.readline(8192))
     token = message.get("token")
     if not isinstance(token, str) or len(token) != 64:
