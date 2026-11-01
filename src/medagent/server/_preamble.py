@@ -39,7 +39,7 @@ from ..medical_images import (
 from .. import education as education_module
 from ..baseline_projection import build_baseline_projection
 from ..medication_reminders import build_medication_reminders
-from ..recognition_jobs import (
+from ..patient_records.recognition_jobs import (
     RecognitionJobError,
     RecognitionJobStore,
     get_job,

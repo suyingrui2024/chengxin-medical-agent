@@ -71,7 +71,8 @@ from datetime import date
 from importlib import resources
 from typing import Any, Dict, List, Optional, Tuple
 
-from .conclusion import PRIOR_RANK, chief_matches_pathway
+from .facts import PRIOR_RANK
+from .reasoning import chief_matches_pathway
 from .domain import CaseState, Phase, RiskLevel
 from .knowledge import Question
 from .reasoning import RuleBasedProposer, load_pathways

@@ -26,7 +26,7 @@ from medagent.medical_images import (
     vision_configuration_status,
 )
 from medagent.patient_records import PatientRecordStore
-from medagent.recognition_jobs import (
+from medagent.patient_records.recognition_jobs import (
     RecognitionJobError,
     RecognitionJobStore,
     get_job,

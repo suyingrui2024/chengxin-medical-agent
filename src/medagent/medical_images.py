@@ -500,8 +500,9 @@ class BackgroundRecognition:
     synchronous ``recognizer.recognize`` path: it does not change the
     prompt, the validation contract, or the offline demo semantics.
     Callers that also need entry bookkeeping (queued/running/succeeded/
-    failed, failure rollback) should use ``medagent.recognition_jobs``
-    instead of driving this handle directly.
+    failed, failure rollback) should use
+    ``medagent.patient_records.recognition_jobs`` instead of driving this
+    handle directly.
 
     ``join()`` returns the validated recognition dict, or re-raises the
     exception the worker thread captured (typically ``RecognitionError``).

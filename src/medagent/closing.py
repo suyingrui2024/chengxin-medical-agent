@@ -213,7 +213,7 @@ def append_scope_note(state: CaseState, reply: AgentReply) -> None:
     recorded chief value + evidence; a missing chief never
     triggers the note."""
     try:
-        from .conclusion import chief_matches_pathway
+        from .reasoning import chief_matches_pathway
         from .out_of_pathway import SCOPE_NOTE
     except Exception:
         return

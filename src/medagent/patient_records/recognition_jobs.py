@@ -3,13 +3,19 @@
 This module owns only the job record and its state transitions. It does
 not rewrite the transcription prompt or the validation contract (both
 stay in ``medical_images``), and it does not own entry persistence (that
-stays in ``patient_records``: ``start_recognition`` /
+stays in ``patient_records``'s store: ``start_recognition`` /
 ``finish_recognition`` / ``fail_recognition``). A job drives exactly the
 same store calls the synchronous server route drives today, so the entry
 state machine is unchanged:
 
     awaiting_recognition -> recognizing -> ready / needs_confirmation
     recognizing -> recognition_failed   (only when a started run fails)
+
+It lives inside the ``patient_records`` package because that is what it is:
+it drives the patient-record store and reports patient-record conflicts.  It
+used to sit at the top level, where it had to import ``patient_records`` to
+reach its own domain errors — a shared-kernel module depending on a feature
+package, which the layering rules (R6) forbid.
 
 Job statuses are a superset of the store's run statuses: a job is
 ``queued`` before its worker thread starts, then ``running`` while the
@@ -73,8 +79,8 @@ from datetime import datetime, timezone
 from typing import Any, Iterator
 from uuid import uuid4
 
-from .medical_images import recognize_in_background
-from .patient_records import PatientRecordConflict, PatientRecordError
+from ..medical_images import recognize_in_background
+from .validation import PatientRecordConflict, PatientRecordError
 
 JOB_STATUSES = ("queued", "running", "succeeded", "failed")
 

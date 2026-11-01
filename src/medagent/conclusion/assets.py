@@ -16,6 +16,7 @@ import json
 from importlib import resources
 from typing import Any, Dict
 
+from ..reasoning import chief_matches_pathway
 from ..text_match import contains_unnegated
 
 from .constants import _cache
@@ -60,30 +61,3 @@ def _narrative_templates() -> Dict[str, Any]:
     carries narrative=None (fail-open)."""
     data = _load_json_optional("conclusion_narrative.json")
     return data if data.get("reviewed_by") else {}
-
-
-def chief_matches_pathway(chief_complaint: str) -> bool:
-    """Whether a chief complaint triggers any differential pathway.
-
-    Same matching semantics as the reasoning proposer (negation-aware
-    substring match against differentials.json pathway terms). Used to
-    decide whether a direction-less sheet is genuinely off-pathway:
-    a chief that triggers no pathway at all (sudden flashes/floaters,
-    sudden single-ear deafness, knee pain, gum bleeding once the bare
-    「红肿」 skin term was narrowed) must not borrow the nearest
-    probed pathway's language. A chief that does trigger a pathway
-    keeps the existing explored-pathway safety net (pinned by the
-    run3-case3 test), even when directions abstain.
-
-    Lives here rather than in ``sheet`` so that ``knowledge`` and
-    ``out_of_pathway`` can ask the question without importing the whole
-    conclusion package, which imports them back.
-    """
-    chief = (chief_complaint or "").strip()
-    if not chief:
-        return False
-    for pathway in _load_json("differentials.json").get("pathways", []):
-        terms = pathway.get("chief_complaint_contains_any", [])
-        if any(contains_unnegated(chief, term) for term in terms):
-            return True
-    return False

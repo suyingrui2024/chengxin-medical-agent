@@ -50,7 +50,8 @@ from datetime import date
 from importlib import resources
 from typing import Any, Callable, Dict, List, Optional, Protocol, Tuple
 
-from .conclusion import PRIOR_RANK, chief_matches_pathway
+from .facts import PRIOR_RANK
+from .reasoning import chief_matches_pathway
 from .domain import CaseState, Phase, RiskLevel
 from .hypothesis_ranking import HypothesisRanker
 from .knowledge import Question, question_fact_gates_pass  # noqa: F401  (re-exported for callers adapting gates)

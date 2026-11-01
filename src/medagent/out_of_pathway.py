@@ -25,7 +25,7 @@ import json
 from importlib import resources
 from typing import Any, Dict, List, Optional
 
-from .conclusion.assets import chief_matches_pathway
+from .reasoning import chief_matches_pathway
 
 # Verbatim scope disclosure (P3 contract). Wired into the off-pathway
 # close by P2; this module only owns the constant text.

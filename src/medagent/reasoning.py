@@ -142,6 +142,55 @@ def load_pathways() -> List[Dict[str, Any]]:
     return json.loads(raw)["pathways"]
 
 
+_CHIEF_PATHWAY_TERMS: Optional[List[Tuple[str, ...]]] = None
+
+
+def _chief_pathway_terms() -> List[Tuple[str, ...]]:
+    """Chief-complaint trigger terms, one tuple per pathway, cached.
+
+    ``load_pathways`` re-reads the content file on every call, which is fine
+    for the proposer but wasteful for a predicate asked once per hypothesis
+    and once per question.  The terms are static content, so they are
+    extracted once and kept.
+    """
+    global _CHIEF_PATHWAY_TERMS
+    if _CHIEF_PATHWAY_TERMS is None:
+        _CHIEF_PATHWAY_TERMS = [
+            tuple(pathway.get("chief_complaint_contains_any", []))
+            for pathway in load_pathways()
+        ]
+    return _CHIEF_PATHWAY_TERMS
+
+
+def chief_matches_pathway(chief_complaint: str) -> bool:
+    """Whether a chief complaint triggers any differential pathway.
+
+    Negation-aware substring match against the ``chief_complaint_contains_any``
+    terms of every pathway, using the same semantics as the rule-based
+    proposer.  Used to decide whether a direction-less sheet is genuinely
+    off-pathway: a chief that triggers no pathway at all (sudden flashes,
+    floaters, sudden single-ear deafness, knee pain, gum bleeding once the
+    bare 「红肿」 skin term was narrowed) must not borrow the nearest probed
+    pathway's language.  A chief that does trigger a pathway keeps the
+    existing explored-pathway safety net (pinned by the run3-case3 test),
+    even when directions abstain.
+
+    This lives in the kernel rather than in ``conclusion`` because the kernel
+    needs to ask the question too — the hypothesis ranker, the question
+    orderer and the off-pathway hook are all kernel modules, and having them
+    import a feature package for one predicate is exactly the coupling R6
+    forbids.
+    """
+    chief = (chief_complaint or "").strip()
+    if not chief:
+        return False
+    return any(
+        contains_unnegated(chief, term)
+        for terms in _chief_pathway_terms()
+        for term in terms
+    )
+
+
 # Encoded fact values that must never pose as patient quotes. This
 # mirrors conclusion._ENCODING_QUOTES (conclusion cannot be imported
 # here — it imports this module); keep the two sets in sync.

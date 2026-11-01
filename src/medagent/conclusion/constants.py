@@ -27,6 +27,7 @@ from ..facts import (
     DEFAULT_GAP_IMPACT,
     GAP_IMPACTS,
     MEASUREMENT_FACTS,
+    PRIOR_RANK,
 )
 
 RETURN_NOW_IF = [
@@ -74,9 +75,6 @@ PATHWAY_GROUPS = {
     "dermatitis": "skin",
     "skin_infection": "skin",
 }
-
-
-PRIOR_RANK = {"high": 3, "medium": 2, "low": 1}
 
 
 _cache: Dict[str, Any] = {}

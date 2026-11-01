@@ -59,3 +59,10 @@ DEFAULT_GAP_IMPACT = "这项信息会影响判断"
 # Fact keys that carry a numeric measurement (as opposed to a categorical or
 # free-text observation).
 MEASUREMENT_FACTS = {"temperature_c"}
+
+
+# How much a hypothesis's prior band contributes to its score.  Read by the
+# hypothesis ranker and the question orderer (both kernel), and by the
+# conclusion sheet's certainty copy — the same table, so it lives here rather
+# than in whichever package happened to define it first.
+PRIOR_RANK = {"high": 3, "medium": 2, "low": 1}

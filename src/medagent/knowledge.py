@@ -282,7 +282,7 @@ class ContentRepository:
         # this branch the marker key would be ignored and the warnings
         # would look applicable to every chief, including pathway ones.
         if question.applies_when.get("off_pathway"):
-            from .conclusion.assets import chief_matches_pathway
+            from .reasoning import chief_matches_pathway
 
             chief = (chief_complaint or "").strip()
             return bool(chief) and not chief_matches_pathway(chief)
@@ -409,7 +409,7 @@ class ContentRepository:
             texts = [text for text in self.chief_complaint_texts(state) if text]
             if not texts:
                 return False
-            from .conclusion.assets import chief_matches_pathway
+            from .reasoning import chief_matches_pathway
             from .out_of_pathway import warning_domain_specs
 
             if any(chief_matches_pathway(text) for text in texts):
