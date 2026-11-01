@@ -113,6 +113,10 @@ def safe_bytes(root: Path, relative: str, limit=128_000, root_identity=None):
         or path.is_absolute()
         or any(p in {"..", ".", ""} for p in relative.split("/"))
         or "\\" in relative
+        # A NUL byte is rejected here rather than left to `open`, which raises a
+        # bare ValueError. Every other refusal from this guard is an
+        # ExecutionError, and callers are entitled to rely on that.
+        or "\x00" in relative
     ):
         raise ExecutionError("文件路径无效")
     directory = open_workspace_directory(root, root_identity)

@@ -9,8 +9,14 @@
 #
 # 或 npm run test:python
 #
-# 覆盖率（`npm run test:coverage`）用 branch 模式统计。注意：
-# 覆盖率只说明「哪些行跑过」，不说明「哪些行被验证」——一行执行过一万次，
-# 没有断言也证明不了任何事。它的价值在反面：精确指出从没被测试碰过的代码。
+# 属性测试（tests/test_properties.py）。这套代码有大量「拒绝非法输入」的纯函数，
+# 手写用例只能覆盖想到的情况；hypothesis 会去找没想到的。目前用在两处：
+# `validate_adaptive_question`（模型能对患者说什么）和 `safe_bytes`（路径穿越守卫）。
+# 第一次跑就找到一个真 bug：路径含 NUL 字节时抛的是 ValueError 而不是 ExecutionError。
+hypothesis>=6
+#
+# 覆盖率（`npm run test:coverage`）用 branch 模式统计。注意：覆盖率只说明
+# 「哪些行跑过」，不说明「哪些行被验证」——一行执行过一万次，没有断言也证明不了
+# 任何事。它的价值在反面：精确指出从没被测试碰过的代码。
 coverage>=7
 pytest>=8
