@@ -31,7 +31,7 @@ from medagent.guards.self_checks import SelfCheckService
 from medagent.subagents import SubagentCoordinator
 from medagent.clinical.triage import TriageService
 from medagent.server.workspace import Workspace
-from tests.test_agent import ScriptBackend
+from tests.support.scripted import ScriptBackend
 
 COMPATIBLE_CONFIG = {
     "MEDAGENT_LLM_BASE_URL": "https://model.invalid/v1",

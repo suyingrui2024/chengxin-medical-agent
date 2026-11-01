@@ -28,8 +28,8 @@ from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
-from tests.test_agent import ScriptBackend, cmd, fact
-from tests.test_agent_wave2_engine import make_engine
+from tests.support.scripted import ScriptBackend, cmd, fact
+from tests.support.scripted import make_engine
 
 
 def _engine(backend=None, coordinator=None):

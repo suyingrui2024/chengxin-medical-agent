@@ -12,7 +12,7 @@ from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
-from tests.test_agent import ScriptBackend, cmd, fact
+from tests.support.scripted import ScriptBackend, cmd, fact
 
 
 MEDICATION = "昨晚用过药物甲，用量不清楚"

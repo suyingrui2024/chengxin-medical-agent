@@ -5,7 +5,7 @@ import unittest
 from medagent.consultation import StaleActionError, UserInput
 from medagent.extensions.builtin import observation
 from medagent.clinical.interpreter import ObservationInputError
-from tests.test_agent import cmd, fact
+from tests.support.scripted import cmd, fact
 from tests.test_calculation_supplements import Backend
 from tests import test_patient_calculations as calculation_fixture
 

@@ -38,8 +38,8 @@ from medagent.server.runtime import build_runtime
 from medagent.guards.self_checks import SelfCheckService
 from medagent.subagents import SubagentCoordinator
 from medagent.clinical.triage import TriageService
-from tests.test_agent import ScriptBackend
-from tests.test_agent_wave2_engine import make_engine as make_adaptive_engine
+from tests.support.scripted import ScriptBackend
+from tests.support.scripted import make_engine as make_adaptive_engine
 from tests.test_conclusion import ANSWERS
 from tests.test_education import (
     FakeEngine,

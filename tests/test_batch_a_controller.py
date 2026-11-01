@@ -41,8 +41,8 @@ from medagent.core.domain import (
 )
 from medagent.core.events import Event
 from medagent.server.runtime import build_runtime
-from tests.test_agent import cmd, fact
-from tests.test_agent_wave2_engine import make_engine, record
+from tests.support.scripted import cmd, fact
+from tests.support.scripted import make_engine, record
 
 
 def _events_of(events, session_id, event_type):

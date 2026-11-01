@@ -12,7 +12,7 @@ from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
 from medagent.clinical.interpreter import Interpreter
-from tests.test_agent import ScriptBackend, cmd, fact
+from tests.support.scripted import ScriptBackend, cmd, fact
 
 
 class AssertionEvidenceTests(unittest.TestCase):

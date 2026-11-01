@@ -21,25 +21,8 @@ from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
-from tests.test_agent import ScriptBackend, cmd, fact
-
-
-def make_engine():
-    backend = ScriptBackend()
-    events = EventStore()
-    engine = AdaptiveConsultationEngine(
-        content=ContentRepository(),
-        triage=TriageService(),
-        self_checks=SelfCheckService(),
-        events=events,
-        ranker=OrderedQuestionRanker(),
-        backend=backend,
-    )
-    return engine, backend, events
-
-
-def record(engine, state, text, facts, turn="t-record"):
-    return engine._execute(state, cmd("record_facts", facts=facts), text, turn)
+from tests.support.scripted import ScriptBackend, cmd, fact
+from tests.support.scripted import make_engine, record
 
 
 def ask_patient_cmd(topic, question="请具体说说这方面的情况？"):

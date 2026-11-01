@@ -41,8 +41,8 @@ from medagent.core.domain import (
     RiskAssessment,
     RiskLevel,
 )
-from tests.test_agent import fact
-from tests.test_agent_wave2_engine import make_engine, record
+from tests.support.scripted import fact
+from tests.support.scripted import make_engine, record
 
 
 SOOTHING = "我听到你说的这些了，先别慌，按下面的步骤来就可以。"

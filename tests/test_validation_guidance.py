@@ -11,7 +11,7 @@ import unittest
 from medagent.infra.agent_tools import ProposalError, validate_command, validate_proposals
 from medagent.core.domain import Assertion, CaseState, Fact, Source
 from medagent.clinical.knowledge import ContentRepository
-from tests.test_agent import fact
+from tests.support.scripted import fact
 
 
 class ActionableErrorTests(unittest.TestCase):

@@ -14,53 +14,15 @@ path:
 from __future__ import annotations
 
 import json
-import os
-import tempfile
-import threading
-from pathlib import Path
-from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 import pytest
 
-from medagent.server import Handler, MedicalAgentServer
-from medagent.server.runtime import build_runtime
 
 FOREIGN_ORIGIN = {"Origin": "http://evil.example"}
 
 
-@pytest.fixture(scope="module")
-def server():
-    scrubbed = {k: v for k, v in os.environ.items() if not k.startswith("MEDAGENT_")}
-    env = patch.dict(os.environ, scrubbed, clear=True)
-    env.start()
-    tmp = tempfile.TemporaryDirectory()
-    root = Path(tmp.name)
-    runtime = build_runtime(
-        backend="demo",
-        session_dir=root / "sessions",
-        event_path=root / "events.jsonl",
-    )
-    context = runtime.start()
-    httpd = MedicalAgentServer(
-        ("127.0.0.1", 0),
-        Handler,
-        context.services.require("consultation"),
-        context.services.require("events"),
-        "demo",
-    )
-    worker = threading.Thread(target=httpd.serve_forever, daemon=True)
-    worker.start()
-    try:
-        yield f"http://127.0.0.1:{httpd.server_address[1]}"
-    finally:
-        httpd.shutdown()
-        worker.join(timeout=2)
-        httpd.server_close()
-        runtime.stop()
-        tmp.cleanup()
-        env.stop()
 
 
 def post(base, path, payload=None, headers=None):
@@ -89,9 +51,9 @@ def post(base, path, payload=None, headers=None):
         ("/api/reviews/enabled", {"enabled": True}),
     ],
 )
-def test_a_request_from_another_origin_cannot_change_host_config(server, path, payload):
+def test_a_request_from_another_origin_cannot_change_host_config(demo_server_factory, path, payload):
     """These routes carry model credentials, so the origin check is the guard."""
-    status, body = post(server, path, payload, FOREIGN_ORIGIN)
+    status, body = post(demo_server_factory, path, payload, FOREIGN_ORIGIN)
     assert status == 403
     assert body["error"]["code"] == "invalid_origin"
 
@@ -99,15 +61,15 @@ def test_a_request_from_another_origin_cannot_change_host_config(server, path, p
 # --- capability preview ----------------------------------------------------
 
 
-def test_a_preview_without_the_expected_fields_is_refused(server):
-    status, body = post(server, "/api/capabilities/preview", {"id": "calculate.units"})
+def test_a_preview_without_the_expected_fields_is_refused(demo_server_factory):
+    status, body = post(demo_server_factory, "/api/capabilities/preview", {"id": "calculate.units"})
     assert status == 400
     assert body["error"]["code"] == "invalid_capability"
 
 
-def test_a_preview_whose_id_is_not_a_string_is_refused(server):
+def test_a_preview_whose_id_is_not_a_string_is_refused(demo_server_factory):
     status, body = post(
-        server,
+        demo_server_factory,
         "/api/capabilities/preview",
         {"id": 7, "input": {}, "expected_revision": "r1"},
     )
@@ -126,18 +88,18 @@ def test_a_preview_whose_id_is_not_a_string_is_refused(server):
         {"enabled": True, "extra": 1},   # an unknown key is a mistake, not noise
     ],
 )
-def test_a_malformed_review_toggle_is_refused(server, payload):
-    status, body = post(server, "/api/reviews/enabled", payload)
+def test_a_malformed_review_toggle_is_refused(demo_server_factory, payload):
+    status, body = post(demo_server_factory, "/api/reviews/enabled", payload)
     assert status == 400
     assert body["error"]["code"] == "invalid_review_setting"
 
 
-def test_the_review_toggle_round_trips(server):
-    status, body = post(server, "/api/reviews/enabled", {"enabled": True})
+def test_the_review_toggle_round_trips(demo_server_factory):
+    status, body = post(demo_server_factory, "/api/reviews/enabled", {"enabled": True})
     assert status == 200
     assert body == {"enabled": True}
 
-    status, body = post(server, "/api/reviews/enabled", {"enabled": False})
+    status, body = post(demo_server_factory, "/api/reviews/enabled", {"enabled": False})
     assert status == 200
     assert body == {"enabled": False}
 
@@ -155,16 +117,16 @@ def test_the_review_toggle_round_trips(server):
         {"medication_name": "降压药", "times": ["08:00"], "dose": "1片"},  # no dose accepted
     ],
 )
-def test_a_malformed_medication_schedule_is_refused(server, payload):
+def test_a_malformed_medication_schedule_is_refused(demo_server_factory, payload):
     """A reminder that is silently dropped is worse than one that refuses."""
-    status, body = post(server, "/api/medication-reminders/schedule", payload)
+    status, body = post(demo_server_factory, "/api/medication-reminders/schedule", payload)
     assert status == 400
     assert body["error"]["code"] == "invalid_medication_schedule"
 
 
-def test_a_medication_schedule_dedupes_and_trims(server):
+def test_a_medication_schedule_dedupes_and_trims(demo_server_factory):
     status, body = post(
-        server,
+        demo_server_factory,
         "/api/medication-reminders/schedule",
         {"medication_name": " 降压药 ", "times": ["08:00", " 08:00 ", "20:00"]},
     )
@@ -174,10 +136,10 @@ def test_a_medication_schedule_dedupes_and_trims(server):
     assert body["status"] == "scheduled"
 
 
-def test_an_empty_time_list_clears_the_schedule(server):
+def test_an_empty_time_list_clears_the_schedule(demo_server_factory):
     """Clearing is a real state: the medication exists but has no reminder yet."""
     status, body = post(
-        server,
+        demo_server_factory,
         "/api/medication-reminders/schedule",
         {"medication_name": "降压药", "times": []},
     )

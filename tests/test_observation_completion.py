@@ -4,7 +4,7 @@ import unittest
 
 from medagent.consultation import UserInput
 from tests import test_self_check_conversation as conversation
-from tests.test_agent import cmd, fact
+from tests.support.scripted import cmd, fact
 
 
 class ObservationCompletionTests(unittest.TestCase):

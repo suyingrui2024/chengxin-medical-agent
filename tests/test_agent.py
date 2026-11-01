@@ -8,34 +8,7 @@ from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
-
-
-def fact(key, value, evidence, assertion="present", correction=False):
-    return dict(
-        key=key,
-        value=value,
-        assertion=assertion,
-        evidence=evidence,
-        correction=correction,
-    )
-
-
-def cmd(tool, **args):
-    return dict(tool=tool, arguments=args)
-
-
-class ScriptBackend:
-    name = "scripted-test-only"
-
-    def __init__(self):
-        self.commands = []
-        self.calls = []
-
-    def decide(self, session_id, messages):
-        self.calls.append(messages.copy())
-        if not self.commands:
-            raise RuntimeError("No scripted command")
-        return self.commands.pop(0)
+from tests.support.scripted import ScriptBackend, cmd, fact
 
 
 class AdaptiveAgentTests(unittest.TestCase):

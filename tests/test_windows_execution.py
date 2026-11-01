@@ -7,7 +7,7 @@ import time
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tests.test_execution_delivery import Provider, tool, final
+from tests.support.scripted import Provider, tool, final
 from tests.windows_process_container_temp import process_container_temporary_directory
 from medagent.execution import ExecutionManager
 

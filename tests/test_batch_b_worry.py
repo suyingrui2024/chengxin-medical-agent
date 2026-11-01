@@ -38,8 +38,8 @@ from medagent.core.domain import (
 from medagent.infra.agent_tools import ProposalError
 from medagent.clinical.knowledge import ContentRepository
 from medagent.server.runtime import build_runtime
-from tests.test_agent import cmd, fact
-from tests.test_agent_wave2_engine import make_engine
+from tests.support.scripted import cmd, fact
+from tests.support.scripted import make_engine
 
 WORRY_1 = "我这是不是食物中毒？"
 WORRY_2 = "我这是不是阑尾炎？"
@@ -359,7 +359,7 @@ class GoalGateTests(unittest.TestCase):
         # test to the new contract rather than deleting the coverage.
         engine, _, _ = make_engine()
         state, _ = engine.create_session()
-        from tests.test_agent_wave2_engine import record
+        from tests.support.scripted import record
 
         record(
             engine,

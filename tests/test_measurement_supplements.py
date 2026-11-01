@@ -7,7 +7,7 @@ from medagent.core.domain import Assertion, ObservationQuality, Phase
 from medagent.extensions.builtin import observation
 from medagent.clinical.interpreter import ObservationInputError
 from medagent.reports.measurement_reports import temperature_report
-from tests.test_agent import cmd, fact
+from tests.support.scripted import cmd, fact
 from tests.test_repeated_observations import measured_case, repeat, OPENING
 
 

@@ -5,7 +5,7 @@ import unittest
 from medagent.consultation import StaleActionError, UserInput
 from medagent.core.domain import Phase
 from tests import test_location_answers as fixture
-from tests.test_agent import cmd
+from tests.support.scripted import cmd
 
 
 class LocationRevisionTests(unittest.TestCase):
@@ -344,7 +344,7 @@ class LocationRevisionTests(unittest.TestCase):
         )
 
     def test_answering_history_during_revision_resumes_the_newer_question(self):
-        from tests.test_agent import fact
+        from tests.support.scripted import fact
 
         # Recover the host question first: setUp's scripted onset is
         # refused under the new order (pick is sex), leaving pending

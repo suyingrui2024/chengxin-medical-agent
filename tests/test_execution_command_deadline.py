@@ -8,7 +8,7 @@ import time
 import unittest
 
 from medagent.execution import ExecutionManager
-from tests.test_execution_delivery import Provider, tool, final
+from tests.support.scripted import Provider, tool, final
 
 
 def exercise_command_deadline(owner):

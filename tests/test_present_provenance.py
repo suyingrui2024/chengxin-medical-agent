@@ -10,7 +10,7 @@ from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
-from tests.test_agent import ScriptBackend, cmd, fact
+from tests.support.scripted import ScriptBackend, cmd, fact
 
 
 RAW = "我自己，男，32岁。手臂不舒服，从昨天开始，变化不大，影响程度3分。没有其他不适；上述危险信号都没有。没有剧烈疼痛，没有持续加重，也没有不能活动。昨晚用过药物甲，用量不清楚。没有过敏；没有相关既往病史。这次想整理就医记录。"

@@ -9,7 +9,7 @@ from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.guards.self_checks import SelfCheckService
 from medagent.dialogue.task_intents import task_intent
 from medagent.clinical.triage import TriageService
-from tests.test_agent import ScriptBackend, cmd, fact
+from tests.support.scripted import ScriptBackend, cmd, fact
 
 
 class TaskIntentTests(unittest.TestCase):

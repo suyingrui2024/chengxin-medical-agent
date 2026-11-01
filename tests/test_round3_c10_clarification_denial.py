@@ -25,8 +25,8 @@ import unittest
 
 from medagent.consultation import UserInput
 from medagent.core.domain import Phase
-from tests.test_agent import cmd, fact
-from tests.test_agent_wave2_engine import make_engine
+from tests.support.scripted import cmd, fact
+from tests.support.scripted import make_engine
 
 CHIEF = "我自己咨询。我快走一段路就胸闷，停下来歇会儿就好。开始大概近一个月了。"
 PARAPHRASE = "快走一段路就胸闷，停下来歇会儿就好。"

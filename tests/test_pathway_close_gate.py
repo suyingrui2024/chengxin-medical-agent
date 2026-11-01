@@ -18,8 +18,8 @@ import unittest
 from medagent.infra.agent_tools import ProposalError
 from medagent.consultation import UserInput
 from medagent.core.domain import Phase
-from tests.test_agent import cmd, fact
-from tests.test_agent_wave2_engine import make_engine, record
+from tests.support.scripted import cmd, fact
+from tests.support.scripted import make_engine, record
 
 KNOWN = {
     "consult_for": ("self", "我自己"),

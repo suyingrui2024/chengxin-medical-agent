@@ -12,14 +12,7 @@ import unittest
 
 from medagent.execution import ExecutionManager
 from medagent.execution.observations import validate_observation
-
-
-def tool(name, **arguments):
-    return {"type": "tool_use", "name": name, "input": arguments}
-
-
-def final(text="本机确定模型结束当前步骤。"):
-    return {"type": "text", "text": text}
+from tests.support.scripted import Provider, final, tool
 
 
 def wait_until(predicate, timeout=10):
@@ -30,86 +23,6 @@ def wait_until(predicate, timeout=10):
             return value
         time.sleep(0.02)
     raise AssertionError("Expected bounded execution transition did not occur")
-
-
-class Provider(ThreadingHTTPServer):
-    daemon_threads = True
-
-    def __init__(self, responses, json_reply=None):
-        self.responses, self.requests = responses, []
-        self.json_reply = json_reply
-
-        class Handler(BaseHTTPRequestHandler):
-            def log_message(self, *args):
-                pass
-
-            def do_POST(self):
-                body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
-                self.server.requests.append(body)
-                if self.server.json_reply is not None:
-                    reply = self.server.json_reply(body)
-                    if reply is not None:
-                        data = json.dumps(reply).encode()
-                        self.send_response(200)
-                        self.send_header("Content-Type", "application/json")
-                        self.send_header("Content-Length", str(len(data)))
-                        self.end_headers()
-                        try:
-                            self.wfile.write(data)
-                        except (BrokenPipeError, ConnectionResetError):
-                            pass
-                        return
-                index = len(self.server.requests)
-                content = dict(
-                    self.server.responses(index, body)
-                    if callable(self.server.responses)
-                    else self.server.responses[index - 1]
-                    if index <= len(self.server.responses)
-                    else final("Unexpected additional model request")
-                )
-                if content["type"] == "tool_use":
-                    content["id"] = f"delivery-{index}"
-                events = [
-                    {
-                        "type": "message_start",
-                        "message": {
-                            "id": f"fixture-{index}",
-                            "model": "fixture",
-                            "usage": {"input_tokens": 10, "output_tokens": 1},
-                        },
-                    },
-                    {
-                        "type": "content_block_start",
-                        "index": 0,
-                        "content_block": content,
-                    },
-                    {"type": "content_block_stop", "index": 0},
-                    {
-                        "type": "message_delta",
-                        "delta": {
-                            "stop_reason": "tool_use"
-                            if content["type"] == "tool_use"
-                            else "end_turn"
-                        },
-                        "usage": {"output_tokens": 10},
-                    },
-                    {"type": "message_stop"},
-                ]
-                data = "".join(
-                    f"event: {event['type']}\ndata: {json.dumps(event)}\n\n"
-                    for event in events
-                ).encode()
-                try:
-                    self.send_response(200)
-                    self.send_header("Content-Type", "text/event-stream")
-                    self.send_header("Content-Length", str(len(data)))
-                    self.end_headers()
-                    self.wfile.write(data)
-                except (BrokenPipeError, ConnectionResetError):
-                    pass
-
-        super().__init__(("127.0.0.1", 0), Handler)
-        threading.Thread(target=self.serve_forever, daemon=True).start()
 
 
 @unittest.skipUnless(
