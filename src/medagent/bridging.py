@@ -44,7 +44,7 @@ import json
 from importlib import resources
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from .conclusion import BANNED_PHRASES
+from .facts import BANNED_PHRASES
 from .domain import Assertion, CaseState, Fact
 from .text_match import find_unnegated
 

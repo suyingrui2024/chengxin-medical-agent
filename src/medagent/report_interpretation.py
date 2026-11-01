@@ -62,7 +62,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Mapping
 
-from medagent.conclusion import BANNED_PHRASES
+from medagent.facts import BANNED_PHRASES
 
 CONTRACT_VERSION = "report-interpretation/v1"
 DISCLAIMER = "由 AI 生成，未经医生审核；分级依据为工程版参考区间"

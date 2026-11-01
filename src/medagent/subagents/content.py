@@ -11,7 +11,7 @@ from time import monotonic
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 from ..backends import parse_decision
-from ..conclusion import BANNED_PHRASES, GAP_IMPACTS, MEASUREMENT_FACTS
+from ..facts import BANNED_PHRASES, GAP_IMPACTS, MEASUREMENT_FACTS
 from ..decision_wait import DecisionInterrupted
 from ..domain import CaseState, utc_now
 from ..events import Event

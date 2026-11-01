@@ -67,20 +67,21 @@ ENTRY_MODULES = frozenset({"cli", "desktop_service", "__main__"})
 # hard coupling, not late-bound imports: the target loads whenever the importer
 # loads, so neither side can be changed or tested alone.
 #
-# R2 is deliberately stricter than the codebase currently is.  Zero cross-feature
-# coupling is the goal, not the state: ``agent`` drives ``ConsultationEngine``,
-# and five ``subagents`` modules share three fact tables that live in
-# ``conclusion``.  Both need the shared part lifted into a capability package
-# before the edge can go.  Until then the edge is frozen here, so new coupling
-# is rejected while the known coupling stays visible on every run.
+# R2 is stricter than the codebase currently is.  Five ``subagents`` modules used
+# to import three fact tables that lived in ``conclusion``; that edge was broken
+# by lifting the tables into the dependency-free ``facts`` package (see
+# ``src/medagent/facts/__init__.py``), so ``subagents -> conclusion`` is gone.
+#
+# One edge remains: ``agent`` composes the ``ConsultationEngine`` and reuses its
+# public API (exception types, ``UserInput``, helper functions).  That is engine
+# *orchestration*, not shared data, and the shared surface is inherently a
+# ``consultation`` concern — inverting it cleanly means carving a contract
+# package out of ``consultation``, a larger, riskier change deferred on purpose.
+# The edge stays frozen here: new coupling is rejected, the known coupling stays
+# visible on every run.
 EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset(
     {
         ("agent._preamble", "consultation"),
-        ("subagents", "conclusion"),
-        ("subagents.constants", "conclusion"),
-        ("subagents.content", "conclusion"),
-        ("subagents.coordinator._preamble", "conclusion"),
-        ("subagents.token_est", "conclusion"),
     }
 )
 

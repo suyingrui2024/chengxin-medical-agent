@@ -17,6 +17,17 @@ from ..followups import build_follow_up_plan
 from ..handoff import LABELS as FACT_LABELS
 from ..text_match import contains_unnegated, find_unnegated_certain
 from ..worry import extract_worry_object, is_worry_sentence
+# The three fact tables (BANNED_PHRASES / GAP_IMPACTS / MEASUREMENT_FACTS) and
+# their fallback live in the shared ``facts`` package so that ``subagents`` and
+# other consumers can read them without importing the whole ``conclusion``
+# feature package.  They are re-exported from here so existing
+# ``medagent.conclusion.*`` references keep working.
+from ..facts import (
+    BANNED_PHRASES,
+    DEFAULT_GAP_IMPACT,
+    GAP_IMPACTS,
+    MEASUREMENT_FACTS,
+)
 
 RETURN_NOW_IF = [
     "意识异常或抽搐",
@@ -24,18 +35,6 @@ RETURN_NOW_IF = [
     "持续压榨样胸痛",
     "大量或无法控制的出血",
 ]
-
-
-BANNED_PHRASES = (
-    "确诊",
-    "可以排除",
-    "没事",
-    "不用担心",
-    "保证",
-    "肯定是",
-    "一定是",
-    "必须吃药",
-)
 
 
 CERTAINTY_TEMPLATES = {
@@ -78,26 +77,6 @@ PATHWAY_GROUPS = {
 
 
 PRIOR_RANK = {"high": 3, "medium": 2, "low": 1}
-
-
-GAP_IMPACTS = {
-    "temperature_c": "体温读数会影响对感染程度的判断",
-    "severity": "难受程度会影响对紧急程度的判断",
-    "trajectory": "变化趋势会影响对病情走向的判断",
-    "resp_breathing": "呼吸情况会影响对严重程度的判断",
-    "gi_details": "腹痛的部位和性质会影响对腹部急症的判断",
-    "head_details": "头痛的发作方式和伴随表现会影响对颅内急症的判断",
-    "dizzy_details": "头晕的类型和伴随表现会影响对脑部供血问题的判断",
-    "back_details": "腰痛是否影响腿部和大小便会影响对腰椎严重问题的判断",
-    "urinary_details": "排尿表现和尿色会影响对尿路感染部位的判断",
-    "skin_details": "皮疹的形态和诱因会影响对过敏与感染的判断",
-}
-
-
-DEFAULT_GAP_IMPACT = "这项信息会影响判断"
-
-
-MEASUREMENT_FACTS = {"temperature_c"}
 
 
 _cache: Dict[str, Any] = {}
