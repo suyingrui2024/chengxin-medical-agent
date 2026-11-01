@@ -241,6 +241,66 @@ def test_type_checking_imports_still_count(tmp_path):
     assert any(f.startswith("R1") for f in failures), failures
 
 
+def test_kernel_may_not_import_a_feature(tmp_path):
+    """The shared kernel must not reach into a clinical workflow."""
+    build(
+        tmp_path,
+        {
+            "planner.py": "from .consultation import core\n",
+            "consultation/__init__.py": "",
+            "consultation/core.py": "",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert any(f.startswith("R6") for f in failures), failures
+
+
+def test_a_baselined_kernel_edge_is_tolerated(tmp_path, monkeypatch):
+    """Known kernel debt stays visible but does not fail; new debt does."""
+    monkeypatch.setattr(
+        rules, "KERNEL_EDGE_BASELINE", frozenset({("planner", "consultation")})
+    )
+    build(
+        tmp_path,
+        {
+            "planner.py": "from .consultation import core\n",
+            "consultation/__init__.py": "",
+            "consultation/core.py": "",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert not failures, failures
+
+
+def test_entry_points_may_drive_feature_packages(tmp_path):
+    """``cli`` / ``desktop_service`` are the app surface: R6 must not fire."""
+    build(
+        tmp_path,
+        {
+            "desktop_service.py": "from .consultation import core\n",
+            "consultation/__init__.py": "",
+            "consultation/core.py": "",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert not [f for f in failures if f.startswith("R6")], failures
+
+
+def test_a_late_bound_kernel_edge_is_only_a_warning(tmp_path):
+    """A deliberate late binding is reported but not failed, like R1/R2."""
+    build(
+        tmp_path,
+        {
+            "planner.py": "def f():\n    from .consultation import core\n",
+            "consultation/__init__.py": "",
+            "consultation/core.py": "",
+        },
+    )
+    failures, warnings, _ = rules.run(tmp_path, ceiling=99)
+    assert not failures, failures
+    assert any(w.startswith("R6") for w in warnings), warnings
+
+
 def test_the_real_tree_passes():
     failures, _, stats = rules.run(rules.PACKAGE_ROOT, rules.TOP_LEVEL_CEILING)
     assert not failures, failures

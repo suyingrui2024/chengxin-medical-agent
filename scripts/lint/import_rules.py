@@ -38,6 +38,11 @@ R4  no import cycles.  Cycles are detected on *module-level* edges only: a
     there is no tolerated baseline left.
 R5  the flat top-level module count must not grow.  It is the shared kernel and
     the natural place for new debt to accumulate.
+R6  the shared kernel must not import feature packages.  The kernel is the
+    vocabulary every layer depends on, so a kernel module that reaches into a
+    clinical workflow stops being reusable by the other workflows — and the
+    kernel is precisely where new coupling accumulates.  Entry points are
+    exempt: they are the app surface and drive the workflows on purpose.
 
 Run locally::
 
@@ -82,6 +87,32 @@ ENTRY_MODULES = frozenset({"cli", "desktop_service", "__main__"})
 EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset(
     {
         ("agent._preamble", "consultation"),
+    }
+)
+
+# Kernel modules that import a feature package at module level.  The kernel is
+# the shared vocabulary every layer depends on, so a kernel module reaching
+# into a clinical workflow is a primitive that is no longer reusable by any
+# other workflow — and the kernel is exactly where new coupling accumulates,
+# because it is where new code naturally lands.
+#
+# R6 is therefore stated as "must not grow", not "must be zero": these seven
+# edges are the current debt and are frozen so they stay visible on every run,
+# while any *new* kernel -> feature edge is rejected.  Two of them
+# (``runtime``, ``workspace``) are orchestration seams rather than shared
+# primitives — they dispatch into the workflows on purpose.
+#
+# The entry points (``cli``, ``desktop_service``, ``__main__``) are exempt: they
+# are the app surface and are *supposed* to drive the workflows.
+KERNEL_EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset(
+    {
+        ("hypothesis_ranking", "conclusion"),
+        ("out_of_pathway", "conclusion.assets"),
+        ("question_ordering", "conclusion"),
+        ("recognition_jobs", "patient_records"),
+        ("runtime", "agent"),
+        ("runtime", "consultation"),
+        ("workspace", "agent"),
     }
 )
 
@@ -262,9 +293,21 @@ def check_layering(
                 if package_of(source, known) != package_of(target, known):
                     rule = "R3"
                     detail = f"only {sorted(ENTRY_MODULES)} may depend on the app layer"
+            elif (
+                src_layer == "kernel"
+                and dst_layer == "feature"
+                and source not in ENTRY_MODULES
+            ):
+                rule = "R6"
+                detail = (
+                    "the shared kernel must not depend on a feature package; "
+                    "lift the shared part into the kernel instead"
+                )
             if rule is None:
                 continue
             if (source, target) in EDGE_BASELINE:
+                continue
+            if (source, target) in KERNEL_EDGE_BASELINE:
                 continue
             message = f"{rule} {source} imports {target}: {detail}"
             if module_level:
@@ -388,6 +431,11 @@ def run(
         "frozen_edges": sum(
             1 for source, target in EDGE_BASELINE if target in graph.get(source, {})
         ),
+        "frozen_kernel_edges": sum(
+            1
+            for source, target in KERNEL_EDGE_BASELINE
+            if target in graph.get(source, {})
+        ),
     }
     return failures, notes, stats
 
@@ -428,6 +476,7 @@ def main(argv: list[str]) -> int:
         f"import-rules check passed: {stats['modules']} modules, "
         f"{stats['cycles']} baselined cycle(s), "
         f"{stats['frozen_edges']} frozen cross-package edge(s), "
+        f"{stats['frozen_kernel_edges']} frozen kernel edge(s), "
         f"{stats['flat']} flat modules (ceiling {args.ceiling})."
     )
     return 0
