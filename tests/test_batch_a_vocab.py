@@ -39,37 +39,17 @@ from medagent.core.domain import (
 )
 from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoning import RuleBasedProposer, validate_workspace
+from tests.support.builders import closed_state as _build_closed_state
 
 
 def closed_state(chief, facts=()):
     """facts: (key, value) PRESENT pairs, or (key, value, assertion)."""
-    state = CaseState(session_id="batch-a-vocab-test")
-    state.phase = Phase.CLOSED
-    state.closed_reason = "confirmed_by_user"
-    state.risk = RiskAssessment(RiskLevel.ROUTINE)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value=chief,
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence=chief,
-        )
-    )
+    state = _build_closed_state(chief, session_id='batch-a-vocab-test', transcript=False)
     for item in facts:
         key, value = item[0], item[1]
         assertion = item[2] if len(item) > 2 else Assertion.PRESENT
-        state.record(
-            Fact(
-                key=key,
-                value=value,
-                assertion=assertion,
-                source=Source.PATIENT,
-                turn_id="t1",
-                evidence=value if isinstance(value, str) else "",
-            )
-        )
+        state.record(Fact(key=key, value=value, assertion=assertion, source=Source.PATIENT,
+                          turn_id='t1', evidence=value if isinstance(value, str) else ''))
     return state
 
 

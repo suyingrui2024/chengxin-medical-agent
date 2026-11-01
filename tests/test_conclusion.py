@@ -26,25 +26,11 @@ from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
+from tests.support.builders import closed_state as _build_closed_state
 
 
-def closed_state(chief="发烧两天", risk=RiskLevel.ROUTINE, reason="confirmed_by_user"):
-    state = CaseState(session_id="unit-test")
-    state.phase = Phase.CLOSED
-    state.closed_reason = reason
-    state.risk = RiskAssessment(risk)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value=chief,
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence=chief,
-        )
-    )
-    state.transcript.append({"role": "user", "content": chief})
-    return state
+def closed_state(chief='发烧两天', risk=RiskLevel.ROUTINE, reason='confirmed_by_user'):
+    return _build_closed_state(chief, risk=risk, reason=reason, session_id='unit-test')
 
 
 class ComposerUnitTests(unittest.TestCase):

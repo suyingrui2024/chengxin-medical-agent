@@ -30,6 +30,7 @@ from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.guards.self_checks import SelfCheckService
 from medagent.server import _consultation_patient_id
 from medagent.clinical.triage import TriageService
+from tests.support.builders import closed_state as _build_closed_state
 
 
 def _state_with_consult_for(value):
@@ -48,22 +49,7 @@ def _state_with_consult_for(value):
 
 
 def _closed_state():
-    state = CaseState(session_id="p2-conclusion")
-    state.phase = Phase.CLOSED
-    state.closed_reason = "confirmed_by_user"
-    state.risk = RiskAssessment(RiskLevel.ROUTINE)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value="发烧两天",
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence="发烧两天",
-        )
-    )
-    state.transcript.append({"role": "user", "content": "发烧两天"})
-    return state
+    return _build_closed_state(session_id='p2-conclusion')
 
 
 class AttachGateTests(unittest.TestCase):

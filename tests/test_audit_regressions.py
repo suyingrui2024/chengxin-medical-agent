@@ -5,6 +5,7 @@ import unittest
 
 from medagent.core.domain import Assertion, CaseState, Fact, Phase, RiskAssessment, RiskLevel, Source
 from medagent.server.runtime import build_runtime
+from tests.support.builders import closed_state as _build_closed_state
 
 
 def _engine():
@@ -13,22 +14,8 @@ def _engine():
     return host, context.services.require("consultation")
 
 
-def _closed_state(engine, session_id="audit-case"):
-    state = CaseState(session_id=session_id)
-    state.phase = Phase.CLOSED
-    state.closed_reason = "confirmed_by_user"
-    state.risk = RiskAssessment(RiskLevel.ROUTINE)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value="咳嗽两天",
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence="咳嗽两天",
-        )
-    )
-    return state
+def _closed_state(engine, session_id='audit-case'):
+    return _build_closed_state('咳嗽两天', session_id=session_id, transcript=False)
 
 
 class ClosedSessionCorrectionGuardTests(unittest.TestCase):

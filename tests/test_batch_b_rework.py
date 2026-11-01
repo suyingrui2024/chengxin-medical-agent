@@ -46,43 +46,14 @@ from medagent.clinical.reasoning import (
     ReasoningWorkspace,
     RuleBasedProposer,
 )
+from tests.support.builders import closed_state as _build_closed_state
+from tests.support.builders import add_fact
 
 
 def closed_state(chief):
-    state = CaseState(session_id="batch-b-rework-test")
-    state.phase = Phase.CLOSED
-    state.closed_reason = "confirmed_by_user"
-    state.risk = RiskAssessment(RiskLevel.ROUTINE)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value=chief,
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence=chief,
-        )
-    )
-    state.transcript.append({"role": "user", "content": chief})
-    return state
+    return _build_closed_state(chief, session_id='batch-b-rework-test')
 
 
-def add_fact(state, key, value, assertion=Assertion.PRESENT, evidence=None):
-    fact = Fact(
-        key=key,
-        value=value,
-        assertion=assertion,
-        source=Source.PATIENT,
-        turn_id="t2",
-        evidence=(
-            evidence
-            if evidence is not None
-            else (str(value) if value is not None else None)
-        ),
-    )
-    state.record(fact)
-    state.transcript.append({"role": "user", "content": fact.evidence or ""})
-    return fact
 
 
 def propose_one(state, fact_key, condition, chief_terms=("胸口",)):

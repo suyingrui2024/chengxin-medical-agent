@@ -8,4 +8,9 @@
 #   PYTHONPATH=src python3 -m pytest tests/ -q
 #
 # 或 npm run test:python
+#
+# 覆盖率（`npm run test:coverage`）用 branch 模式统计。注意：
+# 覆盖率只说明「哪些行跑过」，不说明「哪些行被验证」——一行执行过一万次，
+# 没有断言也证明不了任何事。它的价值在反面：精确指出从没被测试碰过的代码。
+coverage>=7
 pytest>=8

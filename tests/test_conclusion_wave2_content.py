@@ -27,6 +27,7 @@ from medagent.core.domain import (
     Source,
 )
 from medagent.clinical.reasoning import RuleBasedProposer
+from tests.support.builders import closed_state as _build_closed_state
 
 # Verbatim back_details from live-eval case5: documented radicular
 # features (radiating pain, numbness, electric-shock sensation) with
@@ -38,34 +39,12 @@ CASE5_BACK_DETAILS = (
 
 
 def closed_state(chief, facts=()):
-    state = CaseState(session_id="wave2-test")
-    state.phase = Phase.CLOSED
-    state.closed_reason = "confirmed_by_user"
-    state.risk = RiskAssessment(RiskLevel.ROUTINE)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value=chief,
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence=chief,
-        )
-    )
-    state.transcript.append({"role": "user", "content": chief})
+    state = _build_closed_state(chief, session_id='wave2-test')
     for key, value in facts:
-        state.record(
-            Fact(
-                key=key,
-                value=value,
-                assertion=Assertion.PRESENT,
-                source=Source.PATIENT,
-                turn_id="t1",
-                evidence=value if isinstance(value, str) else "",
-            )
-        )
+        state.record(Fact(key=key, value=value, assertion=Assertion.PRESENT, source=Source.PATIENT,
+                          turn_id='t1', evidence=value if isinstance(value, str) else ''))
         if isinstance(value, str):
-            state.transcript.append({"role": "user", "content": value})
+            state.transcript.append({'role': 'user', 'content': value})
     return state
 
 

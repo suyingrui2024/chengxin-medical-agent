@@ -46,42 +46,14 @@ from medagent.core.domain import (
     Source,
 )
 from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
+from tests.support.builders import closed_state as _build_closed_state
+from tests.support.builders import add_fact
 
 
-def closed_state(chief="发烧两天"):
-    state = CaseState(session_id="v13-test")
-    state.phase = Phase.CLOSED
-    state.closed_reason = "confirmed_by_user"
-    state.risk = RiskAssessment(RiskLevel.ROUTINE)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value=chief,
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence=chief,
-        )
-    )
-    state.transcript.append({"role": "user", "content": chief})
-    return state
+def closed_state(chief='发烧两天'):
+    return _build_closed_state(chief, session_id='v13-test')
 
 
-def add_fact(state, key, value, assertion=Assertion.PRESENT, evidence=None):
-    fact = Fact(
-        key=key,
-        value=value,
-        assertion=assertion,
-        source=Source.PATIENT,
-        turn_id="t2",
-        evidence=(
-            evidence
-            if evidence is not None
-            else (str(value) if value is not None else None)
-        ),
-    )
-    state.record(fact)
-    return fact
 
 
 @contextlib.contextmanager

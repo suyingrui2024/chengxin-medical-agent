@@ -33,35 +33,14 @@ from medagent.core.domain import (
     Source,
 )
 from medagent.clinical.knowledge import ContentRepository, question_fact_gates_pass
+from tests.support.builders import closed_state as _build_closed_state
 
 
 def closed_state(chief, extra=None):
-    state = CaseState(session_id="batch-c-content")
-    state.phase = Phase.CLOSED
-    state.closed_reason = "confirmed_by_user"
-    state.risk = RiskAssessment(RiskLevel.ROUTINE)
-    state.record(
-        Fact(
-            key="chief_complaint",
-            value=chief,
-            assertion=Assertion.PRESENT,
-            source=Source.PATIENT,
-            turn_id="t1",
-            evidence=chief,
-        )
-    )
-    state.transcript.append({"role": "user", "content": chief})
+    state = _build_closed_state(chief, session_id='batch-c-content')
     for key, value, assertion, evidence in extra or []:
-        state.record(
-            Fact(
-                key=key,
-                value=value,
-                assertion=assertion,
-                source=Source.PATIENT,
-                turn_id="t1",
-                evidence=evidence if evidence is not None else value,
-            )
-        )
+        state.record(Fact(key=key, value=value, assertion=assertion, source=Source.PATIENT,
+                          turn_id='t1', evidence=evidence if evidence is not None else value))
     return state
 
 
