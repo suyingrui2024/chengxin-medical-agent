@@ -303,8 +303,17 @@ flowchart TD
 ## 验证
 
 ```bash
-# Python 行为测试，真实 DSH 测试默认跳过
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+# Python 行为测试（1910 个），真实 DSH 与隔离沙箱测试默认跳过
+npm run test:python          # 等价于 PYTHONPATH=src python3 -m pytest tests -q
+
+# 同上 + branch 覆盖率（当前 85%）
+npm run test:coverage
+
+# 架构门禁：单文件行数 + 依赖方向（CI 第一步，失败即停）
+npm run lint:structure
+
+# 发布门禁：红旗召回率 / 结论单 / 联网语料阈值
+PYTHONPATH=src python3 scripts/evaluation/medical/evaluate_release_gate.py
 
 # DSH 配置与桥接测试
 npm run dsh:check
@@ -321,8 +330,15 @@ npm run test:desktop
 npm run test:dsh:integration
 
 # 患者 HTTP API → 医疗控制器 → 真实 DSH → 本机模型 → 工具执行
-RUN_DSH_INTEGRATION=1 PYTHONPATH=src python3 -m unittest tests.integration.test_dsh_e2e -v
+RUN_DSH_INTEGRATION=1 PYTHONPATH=src python3 -m pytest tests/integration/test_dsh_e2e.py -v
 ```
+
+**不要用 `python -m unittest discover`**：它只收集 `unittest.TestCase`，会静默跳过
+pytest 风格的模块（历史上 84 项因此从未执行）。测试统一用 pytest 跑。
+
+本地有 71 项跳过（执行沙箱需要 Linux bubblewrap、Windows 内核专属、长耗时检查等），
+**本地全绿只代表"不依赖隔离沙箱的那部分是对的"**。跳过项的完整构成、测试文件地图和
+新增测试的约定见 [tests/README.md](tests/README.md)。
 
 上述集成测试使用合成病例及本机确定响应，不需要真实模型密钥，也不证明模型的临床性能。尚未使用真实模型完成问诊质量评价或临床验证。
 
@@ -330,19 +346,22 @@ RUN_DSH_INTEGRATION=1 PYTHONPATH=src python3 -m unittest tests.integration.test_
 
 | 文件 | 职责 |
 | --- | --- |
-| `src/medagent/agent.py` | 模型驱动的医疗工具循环、终止条件、重试与核对 |
-| `src/medagent/agent_tools.py` | 工具参数与原文证据校验 |
-| `src/medagent/backends.py` | DSH 和直接模型后端 |
+| `src/medagent/consultation/agent/` | 模型驱动的医疗工具循环、终止条件、重试与核对（自适应引擎，是 `ConsultationEngine` 的子类） |
+| `src/medagent/infra/agent_tools.py` | 工具参数与原文证据校验 |
+| `src/medagent/infra/backends.py` | DSH 和直接模型后端 |
 | `src/medagent/web/` | 响应式图形工作台、配置、图示步骤与检查面板 |
 | `desktop/` | 独立应用窗口、菜单、实例隔离和进程生命周期 |
 | `src/medagent/desktop_service.py` | 桌面专用私有本地服务 |
-| `src/medagent/workspace.py` | 进程内连接配置、会谈索引与后端切换 |
-| `src/medagent/consultation.py` | 通用会谈状态操作与离线演示 |
+| `src/medagent/server/workspace.py` | 进程内连接配置、会谈索引与后端切换 |
+| `src/medagent/consultation/` | 通用会谈状态操作与离线演示 |
 | `src/medagent/extensions/` | 受信能力、内容清单、组合模板和契约校验 |
-| `src/medagent/domain.py` | 事实、来源、质量、阶段与动作版本 |
+| `src/medagent/core/domain.py` | 事实、来源、质量、阶段与动作版本 |
 | `src/medagent/content/` | 提示、固定问题与图示任务 |
+| `src/medagent/infra/platform.py` | 平台差异（启动预算、隔离机制、数据目录、保护目录） |
 | `integrations/dsh/` | 官方 SDK 桥接、医疗覆盖配置与检查 |
 | `vendor/upstream.lock.json` | 源码检查提交及运行发行版 |
+
+包的完整职责划分见 [架构分层规则](docs/架构分层规则.md) §9。
 
 继续阅读 [现行产品与技术设计](docs/首版产品与技术设计.md)、[实验与验收方案](docs/实验与验收方案.md)、[研究背调](docs/门诊式问诊与图示自查背调.md)。
 

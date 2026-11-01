@@ -18,7 +18,7 @@
 - `isolated-entry.mjs`：在 bubblewrap 内启动官方 CLI，只挂载当前工作区及必要运行资料。
 - `execution-delivery.mjs`：注册 `delivery_check`，嵌套调用官方 Bash/job_output，沿用同一任务、取消和隔离。必需／参考检查分别处理，同一用户回合的同一命令不可降级；typed 结果投影到运行观察，不能由 stdout 冒充退出状态。
 - `execution-delivery-contract.mjs`：工具与宿主共用参数校验；未接受的提议不提交验收，有效调用缺失结果仍为未知。长检查持续读取同一作业，受原截止时间与取消约束。
-- `execution-checkpoints.mjs`：范围合并、覆盖与规范顺序；保留显式缓存例外，使用与Python一致的Unicode顺序。宿主摘要实现见 `src/medagent/execution_checkpoints.py`。
+- `execution-checkpoints.mjs`：范围合并、覆盖与规范顺序；保留显式缓存例外，使用与Python一致的Unicode顺序。宿主摘要实现见 `src/medagent/execution/checkpoints.py`。
 - `execution-control.mjs`：私有控制 socket、取消及后台状态、动态预算提示。
 - `execution-sdk.mjs`：复用官方 SDK 服务器，在原会话存在时调用官方 `agents.resume`；需要恢复却缺失历史时拒绝新建空白替代。只用于执行工作台，医疗最小桥接仍保留原配置。
 - `execution-observations.mjs`：读取 SDK 规范工具结果，分开记录进程状态和终端文字；与主/子会话、SDK 回合及调用标识关联，经控制 socket 分页传给宿主。属于研发运行观察，不是医疗计算回执。
@@ -32,7 +32,7 @@
 模型调用、联网与子智能体派生共享同一个预算池，不存在各自独立的额度：
 
 - **拦截点**：`execution-worker.mjs` 把 SDK 的模型端点改写为本机回环网关，一切模型流量（含子智能体后代、搜索的内层 LLM 请求）必经网关的 `/model/messages` 处理器；无主、已取消、过截止或超调用数一律返回 429，且先预留计数再放行，根与并发后代共享同一硬上限。运行时可经 `GET /model/budget` 自查剩余额度。
-- **回合与终身**：每回合模型调用上限 `max_calls` 默认 24、合法域 1–64（`src/medagent/execution.py`）；每回合时限默认 180 秒、上限 1800 秒（`src/medagent/execution_limits.py`）；worker 进程终身模型调用硬顶 200 次。注册能力（capabilities）另有独立预算：32 次/回合、256 次/进程终身。
+- **回合与终身**：每回合模型调用上限 `max_calls` 默认 24、合法域 1–64（`src/medagent/execution/`）；每回合时限默认 180 秒、上限 1800 秒（`src/medagent/execution/limits.py`）；worker 进程终身模型调用硬顶 200 次。注册能力（capabilities）另有独立预算：32 次/回合、256 次/进程终身。
 - **联网归因与上限**：搜索走 `execution-search.mjs` 注册的官方 `DeepSeekSearchProvider`——其内层 LLM 请求经网关的 `/sessions/<发起者会话>` 作用域路由发出（按会话归因、计入同一预算池），并由 `recordRequest` 把请求落为会话事件 `web/deepseek-search-llm-request`；抓取经 chengxin web 插件包装上游 fetch provider，同样归因到发起会话并落 session 事件。搜索 provider 的 `maxUses` 为 3（`execution-search.mjs` 与 `execution.patch.yml`）；此外 chengxin web 插件设每会话上限：同一会话内 search 与 fetch 合计不超过 30 次，超限抛 `WEB_SESSION_BUDGET_EXCEEDED` 并落 `web/budget-exceeded` 事件。
 - **子智能体**：`execution.patch.yml` 中 `tool-subagent`（spawn）与 `tool-subagent-fork`（fork）的 `maxDepth` 同为 2；后代不另设预算，其全部模型调用计入上述共享池。
 - **不在此口径内**：医疗决策桥（`bridge.mjs` + `medical.patch.yml`）是零工具面——无联网、无子智能体、无宿主工具，不适用本节预算；临床问诊的限额独立于执行工作台、另行规定。
