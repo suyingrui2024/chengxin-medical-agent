@@ -15,11 +15,11 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 from urllib.parse import urlparse, parse_qs
 
-from ..consultation import (
-    ConsultationEngine,
+from ..consultation import ConsultationEngine
+from ..shared_types import (
+    ConsultationBusyError,
     StaleActionError,
     UserInput,
-    ConsultationBusyError,
 )
 from ..domain import utc_now
 from ..events import Event, EventStore

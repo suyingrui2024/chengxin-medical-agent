@@ -7,6 +7,7 @@ from .domain import AgentReply, Phase, QuickReply
 from .events import Event
 from .measurement_reports import temperature_report
 from .location_revisions import LocationRevisionMixin
+from .shared_types import StaleActionError
 from .task_interactions import task_with_interaction
 from .assertion_evidence import has_uncertainty, UNCERTAIN_TERMS
 from .location_answers import (
@@ -409,8 +410,6 @@ class TaskConversationMixin(LocationRevisionMixin):
         choice = user_input.choice_value or ""
         if not choice.startswith(("resume_self_check:", "confirm_self_check:")):
             return
-        # Import lazily: consultation owns the public exception and mixes us in.
-        from .consultation import StaleActionError
 
         frame = state.self_check_conversation
         expected = f"{state.session_id}:{state.revision}"
@@ -468,8 +467,6 @@ class TaskConversationMixin(LocationRevisionMixin):
         return None
 
     def _prepare_location_answer(self, state, user_input):
-        from .consultation import StaleActionError
-
         frame = state.self_check_conversation
         spec = frame.get("answer_request") if frame else None
         choice = user_input.choice_value

@@ -6,6 +6,7 @@ from uuid import uuid4
 from .assertion_evidence import has_uncertainty
 from .domain import AgentReply, Assertion, Phase, QuickReply, RiskLevel, utc_now
 from .events import Event
+from .shared_types import ModelBackedEngine, StaleActionError
 from .task_intents import task_intent
 from .measurement_reports import temperature_report
 
@@ -32,12 +33,11 @@ class ObservationMixin:
         ...`` setattr on a deterministic engine silently divert it into the
         model-backed branches below (task-conversation suspend, supplement
         re-request). Judging by class makes "deterministic engine takes no
-        model path" structural instead of conventional. The import is lazy
-        because agent.py imports consultation.py, which owns this mixin.
+        model path" structural instead of conventional. The marker lives in the
+        kernel (``shared_types.ModelBackedEngine``) so that asking the question
+        does not make this mixin depend on the ``agent`` feature package.
         """
-        from .agent import AdaptiveConsultationEngine
-
-        return isinstance(self, AdaptiveConsultationEngine)
+        return isinstance(self, ModelBackedEngine)
 
     def _repeat_task(self, state, identity):
         task = next(
@@ -64,7 +64,6 @@ class ObservationMixin:
         choice = user_input.choice_value or ""
         if not choice.startswith(("repeat_self_check:", "confirm_observation:")):
             return
-        from .consultation import StaleActionError
 
         if user_input.expected_action_id != f"{state.session_id}:{state.revision}":
             raise StaleActionError("测量页面已经更新，请使用当前记录或图示卡片")

@@ -6,6 +6,7 @@ from uuid import uuid4
 from .domain import Phase, RiskLevel
 from .events import Event
 from .location_answers import answer_spec
+from .shared_types import StaleActionError
 from .task_interactions import task_with_interaction
 from .task_intents import task_intent
 
@@ -54,8 +55,6 @@ class LocationRevisionMixin:
         return {"fact_id": fact.fact_id, "choice": f"revise_location:{fact.fact_id}"}
 
     def _check_location_revision_action(self, state, user_input):
-        from .consultation import StaleActionError
-
         choice = user_input.choice_value or ""
         frame = state.self_check_conversation or {}
         editing = frame.get("revision_resume")

@@ -8,6 +8,7 @@ from .submit import AdaptiveConsultationEngineSubmit
 from .run import AdaptiveConsultationEngineRun
 from .execute import AdaptiveConsultationEngineExecute
 from ._preamble import ConsultationEngine
+from ..shared_types import ModelBackedEngine
 
 
 class AdaptiveConsultationEngine(
@@ -17,7 +18,8 @@ class AdaptiveConsultationEngine(
     AdaptiveConsultationEngineSubmit,
     AdaptiveConsultationEngineRun,
     AdaptiveConsultationEngineExecute,
-    ConsultationEngine
+    ConsultationEngine,
+    ModelBackedEngine
 ):
     """LLM proposes actions; evidence/type/eligibility gates own every effect."""
 

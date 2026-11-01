@@ -19,14 +19,19 @@ from ..backends import DecisionBackend
 from ..consultation import (
     SELF_CHECK_SUSPEND_CAP,
     ConsultationEngine,
-    StaleActionError,
-    SubjectBoundaryError,
-    UserInput,
-    ConsultationBusyError,
     is_refusal_text,
     is_steady_not_improving_evidence,
     is_summary_confirmation_text,
     merge_preserving_denials,
+)
+# The input/error contract lives in the kernel, not in ``consultation``: these
+# four names are what a transport layer and an engine agree on, and the kernel
+# modules that raise them must not have to import a feature package.
+from ..shared_types import (
+    ConsultationBusyError,
+    StaleActionError,
+    SubjectBoundaryError,
+    UserInput,
 )
 from ..decision_wait import DecisionWaiter, DecisionTurn, DecisionInterrupted
 from ..domain import (
