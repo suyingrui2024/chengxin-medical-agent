@@ -8,7 +8,7 @@ from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.events import EventStore
 from medagent.handoff import build_handoff
 from medagent.report_drafts import parse_report_draft
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 
 

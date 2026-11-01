@@ -22,7 +22,7 @@ from urllib.request import Request, urlopen
 
 from medagent.consultation import UserInput
 from medagent.domain import Phase
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 
 ANSWERS = {

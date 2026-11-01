@@ -3,8 +3,8 @@ import os
 import unittest
 from unittest.mock import patch
 
-from medagent.runtime import build_runtime
-from medagent.workspace import Workspace
+from medagent.server.runtime import build_runtime
+from medagent.server.workspace import Workspace
 
 
 class WorkspaceTests(unittest.TestCase):
@@ -82,7 +82,7 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(result["model"], "")
         self.assertEqual(result["vision_model"], "")
 
-    @patch("medagent.workspace.CompatibleBackend")
+    @patch("medagent.server.workspace.CompatibleBackend")
     def test_connection_probe_reports_text_dsh_and_vision_separately(self, backend):
         backend.return_value.decide.return_value = {
             "tool": "inspect_case",

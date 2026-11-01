@@ -17,8 +17,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from medagent.runtime import build_runtime
-from medagent.workspace import Workspace
+from medagent.server.runtime import build_runtime
+from medagent.server.workspace import Workspace
 
 
 class WorkspaceFailureIsolationTests(unittest.TestCase):

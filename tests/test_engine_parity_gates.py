@@ -21,7 +21,7 @@ from medagent.domain import Assertion, Fact, Phase, Source
 from medagent.knowledge import ADULT_AGE_PROMPT, question_fact_gates_pass
 from medagent.planner import RulePlanner
 from medagent.reasoning import DifferentialPlanner
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),

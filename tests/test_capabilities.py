@@ -10,10 +10,10 @@ from medagent.interpreter import Interpretation
 from medagent.extensions.registry import Capability, CapabilityRegistry
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.self_checks import SelfCheckService
 from medagent.triage import TriageService
-from medagent.workspace import Workspace, StaleCompositionError
+from medagent.server.workspace import Workspace, StaleCompositionError
 
 
 class CapabilityTests(unittest.TestCase):

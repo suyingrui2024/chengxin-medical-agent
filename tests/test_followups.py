@@ -10,7 +10,7 @@ from medagent.consultation import UserInput
 from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.followups import build_follow_up_plan, routine_hours_for
 from medagent.flywheel import build_candidate, merge_candidates
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),

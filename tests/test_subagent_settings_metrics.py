@@ -31,10 +31,10 @@ from urllib.request import Request, urlopen
 from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.events import Event, EventStore
 from medagent.reasoning import Hypothesis, ReasoningWorkspace
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 from medagent.subagents import SubagentCoordinator
-from medagent.workspace import Workspace
+from medagent.server.workspace import Workspace
 
 CHIEF_EVIDENCE = "我咳嗽三天了，还有点嗓子疼"
 COUGH_EVIDENCE = "主要是干咳，没有痰"

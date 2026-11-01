@@ -23,7 +23,7 @@ from medagent.domain import (
 from medagent.events import EventStore
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.self_checks import SelfCheckService
 from medagent.triage import TriageService
 

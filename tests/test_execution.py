@@ -173,7 +173,7 @@ class WorkspaceFileTests(unittest.TestCase):
 )
 class FullDshExecutionTests(unittest.TestCase):
     def test_unauthed_development_server_cannot_expose_execution(self):
-        from medagent.runtime import build_runtime
+        from medagent.server.runtime import build_runtime
         from medagent.server import Handler, MedicalAgentServer
         from urllib.request import Request, urlopen
         from urllib.error import HTTPError

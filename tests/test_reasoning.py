@@ -16,7 +16,7 @@ from medagent.reasoning import (
     enable_differential_planning,
     validate_workspace,
 )
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.triage import TriageService
 from medagent.triage_review import ReasoningReviewProvider
 

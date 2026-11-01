@@ -56,7 +56,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 FIXED_HANDLING = "这一点这次问诊的信息还不足以直接回答，需当面评估后决定"
 

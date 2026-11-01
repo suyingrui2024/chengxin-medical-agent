@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.request import Request, urlopen
 from unittest.mock import patch
 
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 
 

@@ -4,7 +4,7 @@ engine + conclusion chain). Each test names the audit finding it pins.
 import unittest
 
 from medagent.domain import Assertion, CaseState, Fact, Phase, RiskAssessment, RiskLevel, Source
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 
 def _engine():

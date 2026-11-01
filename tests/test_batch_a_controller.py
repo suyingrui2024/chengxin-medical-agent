@@ -40,7 +40,7 @@ from medagent.domain import (
     Source,
 )
 from medagent.events import Event
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from tests.test_agent import cmd, fact
 from tests.test_agent_wave2_engine import make_engine, record
 

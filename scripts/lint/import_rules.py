@@ -96,26 +96,24 @@ EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset(
 # other workflow — and the kernel is exactly where new coupling accumulates,
 # because it is where new code naturally lands.
 #
-# R6 is therefore stated as "must not grow", not "must be zero": these three
-# edges are the current debt and are frozen so they stay visible on every run,
-# while any *new* kernel -> feature edge is rejected.  All three are
-# orchestration seams: they dispatch into the workflows on purpose.
+# R6 is therefore stated as "must not grow", not "must be zero".  Every edge
+# that used to be here has been paid off:
 #
-# The entry points (``cli``, ``desktop_service``, ``__main__``) are exempt: they
+#   * ``hypothesis_ranking`` / ``question_ordering`` / ``out_of_pathway``
+#     reached into ``conclusion`` for one predicate
+#     (``chief_matches_pathway``, now in the kernel's ``reasoning``) and one
+#     table (``PRIOR_RANK``, now in ``facts``).
+#   * ``recognition_jobs`` drove the ``patient_records`` store, so it moved
+#     into that package where it belongs.
+#   * ``runtime`` and ``workspace`` are composition roots that assemble the
+#     feature packages, so they moved into ``server`` — the app layer that
+#     already depends on every feature.
+#
+# The baseline is empty on purpose: the kernel now has no feature dependency
+# at all, so any kernel -> feature edge is a new violation and must fail.
+# Entry points (``cli``, ``desktop_service``, ``__main__``) are exempt: they
 # are the app surface and are *supposed* to drive the workflows.
-#
-# Four edges were paid off here: ``hypothesis_ranking`` / ``question_ordering``
-# / ``out_of_pathway`` reached into ``conclusion`` for one predicate
-# (``chief_matches_pathway``, now in the kernel's ``reasoning``) and one table
-# (``PRIOR_RANK``, now in ``facts``); ``recognition_jobs`` drove the
-# ``patient_records`` store, so it moved into that package where it belongs.
-KERNEL_EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset(
-    {
-        ("runtime", "agent"),
-        ("runtime", "consultation"),
-        ("workspace", "agent"),
-    }
-)
+KERNEL_EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset()
 
 # Existing cycles, as member sets.  Each entry should disappear as the cycle is
 # broken.  Historically this held five member sets; all have been broken by
@@ -127,7 +125,7 @@ CYCLE_BASELINE: tuple[frozenset[str], ...] = ()
 
 # Flat modules directly under src/medagent/.  Frozen: new code belongs in a
 # package, not in the shared kernel.  Lower this number as modules move out.
-TOP_LEVEL_CEILING = 64
+TOP_LEVEL_CEILING = 62
 
 
 def module_name(path: pathlib.Path, root: pathlib.Path) -> str:

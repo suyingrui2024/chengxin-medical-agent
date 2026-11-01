@@ -46,7 +46,7 @@ from medagent.hypothesis_ranking import (
 from medagent.knowledge import ContentRepository, Question
 from medagent.planner import RulePlanner
 from medagent.reasoner import OrderedQuestionRanker
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.self_checks import SelfCheckService
 from medagent.triage import TriageService
 

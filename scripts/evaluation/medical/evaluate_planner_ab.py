@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from medagent.consultation import UserInput  # noqa: E402
 from medagent.reasoning import RuleBasedProposer, enable_differential_planning  # noqa: E402
-from medagent.runtime import build_runtime  # noqa: E402
+from medagent.server.runtime import build_runtime  # noqa: E402
 
 COMMON = {
     "consult_for": ("我自己", "self"),

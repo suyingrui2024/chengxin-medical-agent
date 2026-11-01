@@ -33,10 +33,10 @@ from medagent.background_review import (
 from medagent.consultation import UserInput
 from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.events import Event, EventStore
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 from medagent.subagents import SubagentCoordinator
-from medagent.workspace import Workspace
+from medagent.server.workspace import Workspace
 
 PAST = "2000-01-01T00:00:00+00:00"
 FUTURE = "2999-01-01T00:00:00+00:00"

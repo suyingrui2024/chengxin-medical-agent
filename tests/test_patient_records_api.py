@@ -12,7 +12,7 @@ from urllib.request import Request, urlopen
 
 from medagent.medical_images import inspect_image
 from medagent.patient_records import PatientRecordStore
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 from tests.test_patient_records import recognition
 

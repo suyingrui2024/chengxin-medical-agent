@@ -2,7 +2,7 @@ import unittest
 
 from medagent.consultation import StaleActionError, UserInput
 from medagent.domain import Assertion, ObservationQuality, Phase, RiskLevel, Source
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 
 class ConsultationTestCase(unittest.TestCase):

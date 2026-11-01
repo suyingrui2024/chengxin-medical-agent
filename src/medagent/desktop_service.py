@@ -7,7 +7,7 @@ import threading
 import os
 
 from .patient_records import default_patient_data_root
-from .runtime import build_runtime
+from .server.runtime import build_runtime
 from .server import Handler, MedicalAgentServer
 
 

@@ -13,7 +13,7 @@ from urllib.request import Request, urlopen
 
 from medagent.execution import ExecutionManager, ExecutionError
 from medagent.execution.files import directory_page, DirectoryChanged
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import MedicalAgentServer, Handler
 
 CONFIG = {

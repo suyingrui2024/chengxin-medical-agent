@@ -12,7 +12,7 @@ from medagent.reasoner import OrderedQuestionRanker
 from medagent.release_evaluation import SCHEMA, evaluate_cases
 from medagent.self_checks import SelfCheckService
 from medagent.triage import TriageService
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 
 

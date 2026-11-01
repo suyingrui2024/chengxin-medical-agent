@@ -37,7 +37,7 @@ from medagent.domain import (
 )
 from medagent.agent_tools import ProposalError
 from medagent.knowledge import ContentRepository
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from tests.test_agent import cmd, fact
 from tests.test_agent_wave2_engine import make_engine
 

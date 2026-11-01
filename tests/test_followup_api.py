@@ -13,7 +13,7 @@ import threading
 import unittest
 
 from medagent.consultation import UserInput
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 
 ANSWERS = {

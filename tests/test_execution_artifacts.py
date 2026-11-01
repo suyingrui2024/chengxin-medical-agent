@@ -14,7 +14,7 @@ import zlib
 
 from medagent.execution import ExecutionManager, ExecutionError, safe_bytes
 from medagent.execution.artifacts import projection, IMAGE_LIMIT
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 
 CONFIG = {

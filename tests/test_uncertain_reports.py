@@ -9,7 +9,7 @@ from medagent.events import Event, EventStore
 from medagent.knowledge import ContentRepository
 from medagent.interpreter import Interpretation
 from medagent.reasoner import OrderedQuestionRanker
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.self_checks import SelfCheckService
 from medagent.triage import TriageService
 from tests.test_agent import ScriptBackend, cmd, fact

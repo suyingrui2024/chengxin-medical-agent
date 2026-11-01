@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 from medagent.consultation import UserInput
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.session_store import SessionStore
 
 ANSWERS = {

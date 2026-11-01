@@ -4,20 +4,20 @@ from pathlib import Path
 import os
 from typing import Callable, Optional
 
-from .consultation import ConsultationEngine
-from .events import EventStore
-from .knowledge import ContentRepository
-from .plugins import PluginHost, RuntimeContext
-from .self_checks import SelfCheckService
-from .triage import TriageService
-from .hypothesis_ranking import HypothesisRanker
-from .agent import AdaptiveConsultationEngine
-from .backends import (
+from ..consultation import ConsultationEngine
+from ..events import EventStore
+from ..knowledge import ContentRepository
+from ..plugins import PluginHost, RuntimeContext
+from ..self_checks import SelfCheckService
+from ..triage import TriageService
+from ..hypothesis_ranking import HypothesisRanker
+from ..agent import AdaptiveConsultationEngine
+from ..backends import (
     CompatibleBackend,
     DshBackend,
     require_https_or_loopback_endpoint,
 )
-from .extensions.builtin import load_registry
+from ..extensions.builtin import load_registry
 
 
 class ServicePlugin:
@@ -64,7 +64,7 @@ def build_runtime(event_path: Optional[Path] = None, backend: Optional[str] = No
             elif event_path is not None:
                 store_dir = Path(event_path).parent / "sessions"
         if store_dir is not None:
-            from .session_store import SessionStore
+            from ..session_store import SessionStore
 
             kwargs["session_store"] = SessionStore(store_dir)
         if mode == "demo":

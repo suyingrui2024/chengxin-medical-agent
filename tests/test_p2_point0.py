@@ -24,10 +24,10 @@ from medagent.events import EventStore
 from medagent.handoff import build_handoff, handoff_lines
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 from medagent.self_checks import SelfCheckService
 from medagent.triage import TriageService
-from medagent.workspace import Workspace
+from medagent.server.workspace import Workspace
 from tests.test_handoff import _sheet, _state
 from tests.test_repeated_observations import measured_case, repeat
 

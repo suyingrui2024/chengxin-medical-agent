@@ -24,7 +24,7 @@ from medagent.consultation import UserInput
 from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.handoff import LABELS
 from medagent.knowledge import ContentRepository
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 # Off-pathway chiefs (no differentials.json pathway term matches) and
 # pathway chiefs (they do), used only as applicability fixtures.

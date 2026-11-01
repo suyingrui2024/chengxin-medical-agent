@@ -50,7 +50,7 @@ import unittest
 
 from medagent.domain import Assertion, Fact, Phase, Source
 from medagent.events import Event
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 SCREEN_EVIDENCE = (
     "不确定算不算大出血，我就是拉黑便两次、"

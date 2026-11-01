@@ -12,7 +12,7 @@ from medagent.backends import (
     sanitize_dsh_events,
 )
 from medagent.events import EventStore
-from medagent.runtime import build_runtime
+from medagent.server.runtime import build_runtime
 
 
 class Response:
