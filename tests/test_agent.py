@@ -1,6 +1,6 @@
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import StaleActionError, UserInput
 from medagent.domain import Assertion, Phase, RiskLevel
 from medagent.events import EventStore

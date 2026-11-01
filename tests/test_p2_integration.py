@@ -13,7 +13,7 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import compose_conclusion
 from medagent.domain import (
     Assertion,

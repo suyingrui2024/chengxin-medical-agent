@@ -3,7 +3,7 @@
 import unittest
 
 from medagent.consultation import UserInput
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.domain import Assertion, Source
 from medagent.events import Event, EventStore
 from medagent.knowledge import ContentRepository

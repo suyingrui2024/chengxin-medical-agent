@@ -1,6 +1,6 @@
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
 from medagent.domain import Assertion, ObservationQuality
 from medagent.events import EventStore

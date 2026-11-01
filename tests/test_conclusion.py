@@ -8,7 +8,7 @@ import unittest
 from unittest import mock
 
 from medagent import conclusion as conclusion_module
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import compose_conclusion, spoken_close_line
 from medagent.consultation import UserInput
 from medagent.domain import (

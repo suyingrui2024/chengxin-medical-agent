@@ -28,7 +28,7 @@ from pathlib import Path
 
 from medagent.consultation import UserInput
 from medagent.events import EventStore
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.extensions.builtin import load_registry
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker

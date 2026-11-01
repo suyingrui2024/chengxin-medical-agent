@@ -72,23 +72,19 @@ ENTRY_MODULES = frozenset({"cli", "desktop_service", "__main__"})
 # hard coupling, not late-bound imports: the target loads whenever the importer
 # loads, so neither side can be changed or tested alone.
 #
-# R2 is stricter than the codebase currently is.  Five ``subagents`` modules used
-# to import three fact tables that lived in ``conclusion``; that edge was broken
-# by lifting the tables into the dependency-free ``facts`` package (see
-# ``src/medagent/facts/__init__.py``), so ``subagents -> conclusion`` is gone.
+# Empty on purpose.  Every edge that used to be here has been paid off:
 #
-# One edge remains: ``agent`` composes the ``ConsultationEngine`` and reuses its
-# public API (exception types, ``UserInput``, helper functions).  That is engine
-# *orchestration*, not shared data, and the shared surface is inherently a
-# ``consultation`` concern — inverting it cleanly means carving a contract
-# package out of ``consultation``, a larger, riskier change deferred on purpose.
-# The edge stays frozen here: new coupling is rejected, the known coupling stays
-# visible on every run.
-EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset(
-    {
-        ("agent._preamble", "consultation"),
-    }
-)
+#   * five ``subagents`` modules imported three fact tables that lived in
+#     ``conclusion``; the tables moved to the dependency-free ``facts``
+#     package, so ``subagents -> conclusion`` is gone;
+#   * ``agent -> consultation`` was not a workflow coupling at all: the
+#     adaptive engine *subclasses* the deterministic one, so the two packages
+#     were one feature split in two.  ``agent`` is now
+#     ``consultation.agent``, a subpackage, and the edge is intra-package.
+#
+# Any feature -> feature edge the graph now contains is a new violation and
+# fails the check.
+EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset()
 
 # Kernel modules that import a feature package at module level.  The kernel is
 # the shared vocabulary every layer depends on, so a kernel module reaching

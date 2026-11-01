@@ -25,7 +25,7 @@ import argparse
 import json
 from pathlib import Path
 
-from medagent.agent import _capability_advertisement
+from medagent.consultation.agent import _capability_advertisement
 from medagent.extensions.builtin import load_registry
 
 ROOT = Path(__file__).resolve().parents[3]

@@ -18,7 +18,7 @@ text allows:
 
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import ConsultationEngine, UserInput
 from medagent.events import EventStore
 from medagent.handoff import build_handoff, handoff_lines

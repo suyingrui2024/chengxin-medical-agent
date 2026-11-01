@@ -3,7 +3,7 @@ import json
 import threading
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import (
     ConsultationEngine,
     StaleActionError,

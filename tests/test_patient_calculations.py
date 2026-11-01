@@ -5,7 +5,7 @@ import unittest
 from medagent.consultation import StaleActionError, UserInput
 from medagent.domain import Assertion, Fact, Phase, Source
 from medagent.events import EventStore
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.extensions.builtin import load_registry
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker

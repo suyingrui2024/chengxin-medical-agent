@@ -12,7 +12,7 @@ the spoken close line and the emergency explanation exactly once.
 import json
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.agent_tools import ProposalError
 from medagent.conclusion import spoken_close_line
 from medagent.consultation import UserInput

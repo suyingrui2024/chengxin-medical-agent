@@ -22,7 +22,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.events import EventStore
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker

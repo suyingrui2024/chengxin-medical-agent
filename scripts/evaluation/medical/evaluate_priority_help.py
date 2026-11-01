@@ -14,7 +14,7 @@ import threading
 import time
 
 from scripts.benchmarks.benchmark_execution import BoundedGateway, BenchmarkGatewayHandler
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.backends import DshBackend
 from medagent.consultation import UserInput
 from medagent.env_config import read_env, for_backend

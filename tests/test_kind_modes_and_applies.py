@@ -21,7 +21,7 @@ count as support.
 """
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
 from medagent.domain import Assertion, CaseState, Fact, RiskLevel, Source
 from medagent.events import EventStore

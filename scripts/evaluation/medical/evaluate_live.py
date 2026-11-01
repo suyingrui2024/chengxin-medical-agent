@@ -9,7 +9,7 @@ from pathlib import Path
 import statistics
 import time
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.agent_tools import TOOL_DEFINITIONS
 from medagent.backends import CompatibleBackend, DshBackend
 from medagent.consultation import UserInput

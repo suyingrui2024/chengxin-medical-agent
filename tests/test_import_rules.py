@@ -135,8 +135,11 @@ def test_a_late_bound_cross_package_import_only_warns(tmp_path):
     assert any("late-bound" in n for n in notes), notes
 
 
-def test_a_baselined_edge_is_frozen_not_banned(tmp_path):
-    """The known agent -> consultation coupling passes; a new one does not."""
+def test_a_baselined_edge_is_frozen_not_banned(tmp_path, monkeypatch):
+    """The baseline mechanism, not a particular edge: a frozen one passes, a new one fails."""
+    monkeypatch.setattr(
+        rules, "EDGE_BASELINE", frozenset({("agent._preamble", "consultation")})
+    )
     build(
         tmp_path,
         {

@@ -2,7 +2,7 @@
 
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
 from medagent.domain import Assertion, CaseState, Fact, Source
 from medagent.events import Event, EventStore

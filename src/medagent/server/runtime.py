@@ -11,7 +11,7 @@ from ..plugins import PluginHost, RuntimeContext
 from ..self_checks import SelfCheckService
 from ..triage import TriageService
 from ..hypothesis_ranking import HypothesisRanker
-from ..agent import AdaptiveConsultationEngine
+from ..consultation.agent import AdaptiveConsultationEngine
 from ..backends import (
     CompatibleBackend,
     DshBackend,

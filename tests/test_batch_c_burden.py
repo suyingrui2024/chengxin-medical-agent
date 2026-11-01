@@ -11,7 +11,7 @@ Each test names the issue it covers. Scope notes:
 
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.agent_tools import ProposalError
 from medagent.bridging import build_bridging_sentence
 from medagent.consultation import UserInput  # noqa: F401  (parity import)

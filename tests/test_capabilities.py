@@ -1,7 +1,7 @@
 from copy import deepcopy
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
 from medagent.domain import Assertion, Phase, Source, ObservationQuality
 from medagent.events import EventStore

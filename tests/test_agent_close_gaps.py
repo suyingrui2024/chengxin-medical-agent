@@ -5,7 +5,7 @@ New tests only. No existing test file is modified here.
 
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.agent_tools import ProposalError, validate_proposals
 from medagent.consultation import UserInput
 from medagent.domain import Assertion

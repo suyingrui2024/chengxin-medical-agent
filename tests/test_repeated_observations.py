@@ -1,7 +1,7 @@
 """Real controller transitions, source identity and observation interruption boundaries."""
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import ConsultationEngine, StaleActionError, UserInput
 from medagent.domain import Assertion, ObservationQuality, Phase, Source
 from medagent.events import EventStore

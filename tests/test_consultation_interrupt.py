@@ -12,7 +12,7 @@ from tempfile import TemporaryDirectory
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.backends import CompatibleBackend, DshBackend
 from medagent.consultation import UserInput, ConsultationBusyError
 from medagent.events import EventStore

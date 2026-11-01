@@ -1,6 +1,6 @@
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.bridging import (
     build_bridging_sentence,
     lint_bridging_sentence,

@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.backends import dsh_usage
 from medagent.consultation import UserInput
 from medagent.env_config import read_env, for_backend

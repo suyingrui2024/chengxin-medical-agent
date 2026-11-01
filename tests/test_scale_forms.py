@@ -5,7 +5,7 @@ import unittest
 
 from medagent.consultation import UserInput
 from medagent.events import EventStore
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.extensions.builtin import load_registry
 from medagent.extensions.scale_forms import ScaleSpecError, scale_form_spec
 from medagent.knowledge import ContentRepository

@@ -5,7 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.events import EventStore
 from medagent.knowledge import ContentRepository
 from medagent.reasoner import OrderedQuestionRanker

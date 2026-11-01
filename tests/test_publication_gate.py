@@ -3,7 +3,7 @@ import json
 import threading
 from urllib.request import Request, urlopen
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
 from medagent.domain import AgentReply, CaseState, Phase, RiskLevel
 from medagent.events import EventStore

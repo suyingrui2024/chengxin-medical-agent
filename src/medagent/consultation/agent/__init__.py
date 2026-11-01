@@ -8,7 +8,7 @@ from .submit import AdaptiveConsultationEngineSubmit
 from .run import AdaptiveConsultationEngineRun
 from .execute import AdaptiveConsultationEngineExecute
 from ._preamble import ConsultationEngine
-from ..shared_types import ModelBackedEngine
+from ...shared_types import ModelBackedEngine
 
 
 class AdaptiveConsultationEngine(

@@ -25,7 +25,7 @@ from importlib import resources
 
 from medagent import consultation as consultation_module
 from medagent import hypothesis_ranking as hr_module
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.agent_tools import ProposalError
 from medagent.conclusion import chief_matches_pathway
 from medagent.consultation import ConsultationEngine, UserInput

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
 from medagent.domain import Phase
 from medagent.events import EventStore

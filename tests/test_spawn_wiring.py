@@ -9,7 +9,7 @@ the case's current one is flagged for the main model.
 
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.domain import RiskLevel
 from medagent.events import EventStore
 from medagent.knowledge import ContentRepository

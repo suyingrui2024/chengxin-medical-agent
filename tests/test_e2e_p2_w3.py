@@ -20,7 +20,7 @@ visit 目标不进 goal_response 已由 test_batch_b_worry pin 住
 
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import _adjust_assertion_wording
 from medagent.consultation import VALUE_LABELS
 from medagent.domain import Assertion, CaseState, Fact, Source

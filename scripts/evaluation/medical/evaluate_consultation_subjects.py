@@ -13,7 +13,7 @@ from pathlib import Path
 import secrets
 import threading
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.backends import DshBackend
 from medagent.consultation import UserInput
 from medagent.env_config import for_backend, read_env

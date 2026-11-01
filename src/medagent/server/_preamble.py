@@ -23,7 +23,7 @@ from ..shared_types import (
 )
 from ..domain import utc_now
 from ..events import Event, EventStore
-from ..agent import AdaptiveConsultationEngine
+from ..consultation.agent import AdaptiveConsultationEngine
 from ..background_review import BackgroundReviewCoordinator
 from ..education import EducationEnricher
 from ..subagents import SubagentCoordinator

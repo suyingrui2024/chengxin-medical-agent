@@ -275,7 +275,7 @@ class ShadowObservationTests(unittest.TestCase):
     """
 
     def make_engine(self):
-        from medagent.agent import AdaptiveConsultationEngine
+        from medagent.consultation.agent import AdaptiveConsultationEngine
         from medagent.events import EventStore
         from medagent.knowledge import ContentRepository
         from medagent.reasoner import OrderedQuestionRanker

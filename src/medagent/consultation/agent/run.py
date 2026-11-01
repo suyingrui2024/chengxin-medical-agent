@@ -33,7 +33,7 @@ class AdaptiveConsultationEngineRun:
                 state, session_id=state.session_id, cancelled=turn.cancelled
             )
             if digest is not None:
-                from ..subagents import watermark
+                from ...subagents import watermark
 
                 state.subagent_digest = {
                     "watermark": watermark(state),

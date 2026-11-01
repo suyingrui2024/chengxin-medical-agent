@@ -18,7 +18,7 @@ from types import SimpleNamespace
 
 sys.path.insert(0, "src")
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.audit_recording import TokenCounter, measure_messages
 from medagent.knowledge import ContentRepository
 from medagent.triage import TriageService

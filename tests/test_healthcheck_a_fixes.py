@@ -19,7 +19,7 @@ healthcheck (point A: adaptive decision loop).
 import json
 import unittest
 
-from medagent.agent import AdaptiveConsultationEngine
+from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.agent_tools import ProposalError
 from medagent.consultation import UserInput
 from medagent.domain import Assertion, Phase, RiskLevel

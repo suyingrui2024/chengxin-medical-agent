@@ -7,7 +7,7 @@ from collections import OrderedDict
 from threading import RLock, Thread
 from urllib.parse import urlparse
 
-from ..agent import AdaptiveConsultationEngine
+from ..consultation.agent import AdaptiveConsultationEngine
 from ..domain import utc_now
 from ..events import EventStore
 from ..consultation_subject import subject_profile
