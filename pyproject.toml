@@ -24,3 +24,28 @@ where = ["src"]
 medagent = ["web/*", "content/*.json", "content/*.txt"]
 "medagent.extensions" = ["packs/*.json", "templates/*.json"]
 
+[tool.coverage.run]
+source = ["src/medagent"]
+branch = true
+# Coverage measures one platform at a time, and two modules are almost entirely
+# the *other* platform:
+#
+#   * `infra/windows_process.py` cannot even be imported on POSIX (it calls
+#     `ctypes.WinDLL` at module scope), so omitting it keeps a POSIX run from
+#     reporting a file it can never touch;
+#   * `infra/platform_fs.py` is a three-line re-export on POSIX and a 355-line
+#     ctypes Win32 implementation otherwise, so its POSIX number is structural,
+#     not a gap. It stays in the count (the POSIX branch is real code) but do
+#     not read its percentage as coverage of the module.
+#
+# Both are exercised by the Windows job:
+# `scripts/platform/windows/windows.ps1 -Mode Test` and `-Mode ExecutionTest`
+# run `tests/test_windows_native.py` and `tests/test_windows_execution.py`.
+omit = ["src/medagent/infra/windows_process.py"]
+
+[tool.coverage.report]
+# A partial branch is more interesting than a missing line: the line ran, but
+# one side of a decision never did.
+skip_covered = false
+show_missing = true
+
