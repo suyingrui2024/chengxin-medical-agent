@@ -90,6 +90,7 @@ tests/
 | `test_round3_g12_close` | `test_close_discriminators` |
 | `test_round3_infant_gi` | `test_infant_gi_gate` |
 | `test_round4_fix_j09_n12` | `test_residual_filter_and_transcript_denial` |
+| `test_e2e_p2_w3` | `test_conclusion_course_and_intermittent` |
 
 批次号保留在各文件的模块 docstring 里（例如 `test_triage_scan_gating.py` 开头写着
 "Batch A scan layer (W1)"），所以 `git log --follow` 之外还有文字线索。

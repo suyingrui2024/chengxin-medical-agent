@@ -1,4 +1,6 @@
-"""诚信 E2E 修复批 W3（结论引擎侧）: P2-4 / P2-5 回归测试。
+"""Conclusion composer: reverse-order course wording and intermittent trajectory.
+
+诚信 E2E 修复批 W3（结论引擎侧）: P2-4 / P2-5 回归测试。
 
 P2-4: 口腔组 course 为 "<症状>有没有新出现或加重" 倒序写法时，
 composer 的 T-04 改写不得把限定词 "加重" 当成症状枚举处理——
