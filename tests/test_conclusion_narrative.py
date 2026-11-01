@@ -146,14 +146,17 @@ class NarrativeTests(unittest.TestCase):
         self.assertNotIn("发烧", rendered)
 
     def test_missing_narrative_asset_fails_open(self):
-        original = conclusion_module.sheet._load_json
+        # Patch the loader where it is defined: ``_load_json_optional`` looks
+        # ``_load_json`` up in its own module globals, so this covers both
+        # the narrative and department paths without patching each consumer.
+        original = conclusion_module.assets._load_json
 
         def flaky(name):
             if name == "conclusion_narrative.json":
                 raise FileNotFoundError(name)
             return original(name)
 
-        with mock.patch.object(conclusion_module.sheet, "_load_json", flaky):
+        with mock.patch.object(conclusion_module.assets, "_load_json", flaky):
             sheet = compose_conclusion(closed_state())
         self.assertIsNotNone(sheet)
         self.assertIsNone(sheet["narrative"])
@@ -207,14 +210,17 @@ class DepartmentHintTests(unittest.TestCase):
 
     def test_missing_departments_file_gives_none(self):
         conclusion_module._cache.pop("departments.json", None)
-        original = conclusion_module.sheet._load_json
+        # Patch the loader where it is defined: ``_load_json_optional`` looks
+        # ``_load_json`` up in its own module globals, so this covers both
+        # the narrative and department paths without patching each consumer.
+        original = conclusion_module.assets._load_json
 
         def flaky(name):
             if name == "departments.json":
                 raise FileNotFoundError(name)
             return original(name)
 
-        with mock.patch.object(conclusion_module.sheet, "_load_json", flaky):
+        with mock.patch.object(conclusion_module.assets, "_load_json", flaky):
             sheet = compose_conclusion(closed_state())
         self.assertIsNone(sheet["disposition"]["department_hint"])
         self.assertIsNone(sheet["content_versions"]["departments"])

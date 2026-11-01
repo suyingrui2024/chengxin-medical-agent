@@ -7,7 +7,6 @@ from importlib import resources
 from typing import Any, Dict, List, Mapping, Optional
 
 from .domain import Assertion, Fact, Phase, QuickReply
-from .extensions.builtin import load_registry
 from .text_match import find_unnegated
 
 # Patient-facing age prompt for non-child subjects, shared by both engines.
@@ -172,6 +171,15 @@ class Question:
 
 class ContentRepository:
     def __init__(self, registry=None) -> None:
+        # Late-bound on purpose: ``load_registry`` lives in the
+        # ``extensions`` capability package, and importing it at module
+        # level would wire ``knowledge`` (kernel) -> ``extensions.builtin``
+        # (capability) and close a 5-module import cycle
+        # (knowledge <-> builtin <-> interpreter <-> knowledge, plus
+        # measurement_reports / extensions.registry).  Sinking the import
+        # here breaks the cycle while keeping the convenience default.
+        from .extensions.builtin import load_registry
+
         package = resources.files("medagent.content")
         self._questions_raw = json.loads(package.joinpath("questions.json").read_text(encoding="utf-8"))
         self.registry = registry or load_registry()
@@ -274,7 +282,7 @@ class ContentRepository:
         # this branch the marker key would be ignored and the warnings
         # would look applicable to every chief, including pathway ones.
         if question.applies_when.get("off_pathway"):
-            from .conclusion import chief_matches_pathway
+            from .conclusion.assets import chief_matches_pathway
 
             chief = (chief_complaint or "").strip()
             return bool(chief) and not chief_matches_pathway(chief)
@@ -401,7 +409,7 @@ class ContentRepository:
             texts = [text for text in self.chief_complaint_texts(state) if text]
             if not texts:
                 return False
-            from .conclusion import chief_matches_pathway
+            from .conclusion.assets import chief_matches_pathway
             from .out_of_pathway import warning_domain_specs
 
             if any(chief_matches_pathway(text) for text in texts):

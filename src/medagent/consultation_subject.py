@@ -3,6 +3,12 @@ from copy import deepcopy
 import re
 
 
+# ``domain.CaseState.to_dict`` derives this profile, so importing ``domain`` here
+# would close a cycle.  ``Assertion`` is a ``str`` enum, so the literal compares
+# equal to ``Assertion.PRESENT`` and the dependency stays one-way.
+ASSERTION_PRESENT = "present"
+
+
 # Attributes are relationship, child descriptor and order. '*' is unspecified.
 GROUPS = [
     (("self", "*", "*"), "本人", ("我自己", "我本人", "本人")),
@@ -99,16 +105,14 @@ def proposed_profile(category, evidence):
 
 
 def subject_profile(state):
-    from .domain import Assertion
-
     current = state.facts.get("consult_for")
-    if current is None or current.assertion != Assertion.PRESENT:
+    if current is None or current.assertion != ASSERTION_PRESENT:
         return None
     selected = None
     for fact in [*state.history, current]:
         if (
             fact.key != "consult_for"
-            or fact.assertion != Assertion.PRESENT
+            or fact.assertion != ASSERTION_PRESENT
             or fact.value != current.value
         ):
             continue

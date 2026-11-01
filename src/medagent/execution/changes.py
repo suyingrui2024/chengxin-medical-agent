@@ -15,47 +15,24 @@ from uuid import uuid4
 
 from .store import identifier
 from .identity import decode_identity
+from .paths import (
+    ChangeError,
+    IGNORED_DIRECTORIES,
+    relative_path,
+    watch_path_covers,
+)
 
 FORMAT = "workspace-baseline/v1"
 MAX_RECORD_BYTES = 4_000_000
-IGNORED_DIRECTORIES = {
-    ".git",
-    "node_modules",
-    "__pycache__",
-    ".pytest_cache",
-    ".mypy_cache",
-    ".ruff_cache",
-}
 
-
-class ChangeError(ValueError):
-    pass
-
-
-def watch_path_covers(parent, path):
-    if parent == path:
-        return True
-    if parent == ".":
-        suffix = path
-    elif path.startswith(parent + "/"):
-        suffix = path[len(parent) + 1 :]
-    else:
-        return False
-    return not any(part in IGNORED_DIRECTORIES for part in suffix.split("/"))
-
-
-def relative_path(value):
-    if (
-        not isinstance(value, str)
-        or not value
-        or len(value.encode("utf-8")) > 1024
-        or "\\" in value
-        or value.startswith("/")
-        or any(part in {"", ".", ".."} for part in value.split("/"))
-        or any(ord(c) < 32 for c in value)
-    ):
-        raise ChangeError("文件路径无效")
-    return PurePosixPath(value)
+# Re-exported: ``checkpoints`` and ``observations`` used to import these from
+# here, and callers outside the package still do.
+__all__ = [
+    "ChangeError",
+    "IGNORED_DIRECTORIES",
+    "relative_path",
+    "watch_path_covers",
+]
 
 
 def fingerprint(info):

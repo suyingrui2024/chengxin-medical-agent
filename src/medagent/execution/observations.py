@@ -3,6 +3,8 @@
 import math
 from uuid import UUID
 
+from .paths import IGNORED_DIRECTORIES, normalize_paths
+
 ACTIVE_JOB_STATES = {"starting", "running", "stopping"}
 FIELDS = {
     "schema",
@@ -78,8 +80,6 @@ def validate_observation(value):
         ):
             raise ValueError("Invalid delivery check identity")
     if "check_snapshot" in value and value["check_snapshot"] is not None:
-        from .checkpoints import normalize_paths
-        from .changes import IGNORED_DIRECTORIES
 
         snapshot = value["check_snapshot"]
         if (
@@ -121,7 +121,6 @@ def validate_observation(value):
     ):
         raise ValueError("Check snapshot requires delivery identity")
     if "check_inputs" in value:
-        from .checkpoints import normalize_paths
         paths = value["check_inputs"]
         if (
             value["tool"] != "delivery_check"

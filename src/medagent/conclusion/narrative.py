@@ -20,15 +20,7 @@ from ..text_match import contains_unnegated, find_unnegated_certain
 from ..worry import extract_worry_object, is_worry_sentence
 
 from .constants import BANNED_PHRASES, CERTAINTY_TEMPLATES, _VISIT_GOAL_KEYWORDS, _WORRY_FALLBACK_OBJECT
-
-def _narrative_templates() -> Dict[str, Any]:
-    """Curated narrative templates (content/conclusion_narrative.json).
-    Like the self-care groups, the asset counts as absent unless it
-    carries review metadata; absent/corrupt -> {} and the sheet simply
-    carries narrative=None (fail-open)."""
-    data = _load_json_optional("conclusion_narrative.json")
-    return data if data.get("reviewed_by") else {}
-
+from .assets import _load_json_optional, _narrative_templates
 
 def _narrative_reasoning(
     templates: Dict[str, Any],
@@ -255,4 +247,3 @@ def _build_goal_response(goal_line: Optional[str]) -> Optional[str]:
         )
     return response
 
-from .sheet import _load_json_optional

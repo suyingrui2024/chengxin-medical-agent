@@ -1,102 +1,34 @@
 """Trusted formula implementations. Content may name them, never define them.
 
-Each entry declares the exact input/output signature a pack must
-reproduce, the arithmetic itself, and the audit cases used by tests.
-Constants are written as ``Decimal`` literals so results are identical on
-every platform; ``audit_cases`` are string-equality fixtures, not
-``assertAlmostEqual``.
+Each entry declares the exact input/output signature a pack must reproduce, the
+arithmetic itself, and the audit cases used by tests.
+
+The shared vocabulary — ``FormulaSpec`` and the field helpers — lives in
+``formulas_core``.  It used to live here, with the department catalog merged in
+at the bottom of this module while that catalog imported ``FormulaSpec`` back
+from here; the cycle only worked because of import order.  Both sides now depend
+on the core instead, so either can be read on its own.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Mapping, Sequence, Tuple
+from typing import Dict
 
-DISCLAIMER = (
-    "本结果由公式程序按标注来源计算，仅作记录与参考，"
-    "不构成诊断，也不替代医生判断。"
+from .formulas_core import (
+    DISCLAIMER,
+    FormulaSpec,
+    _anion_gap,
+    _bmi,
+    _bsa,
+    _child_weight,
+    _corrected_calcium,
+    _map,
+    _number,
+    _osmolality,
+    _output,
+    _shock_index,
 )
-
-
-@dataclass(frozen=True)
-class FormulaSpec:
-    key: str
-    citation: str
-    inputs: List[Dict[str, Any]]
-    output: Dict[str, Any]
-    method: str
-    limitations: Sequence[str]
-    fn: Callable[[Mapping[str, Any]], Decimal]
-    render: Callable[[Mapping[str, Any], str], str]
-    audit_cases: Sequence[Tuple[Dict[str, str], str]]
-    disclaimer: str = DISCLAIMER
-
-
-def _number(identity, label, unit, low, high, step="0.1"):
-    return {
-        "id": identity,
-        "label": label,
-        "type": "number",
-        "unit": unit,
-        "min": low,
-        "max": high,
-        "step": step,
-    }
-
-
-def _output(label, unit, low, high, places, direction):
-    return {
-        "label": label,
-        "unit": unit,
-        "min": low,
-        "max": high,
-        "precision": {"places": places},
-        "direction": direction,
-    }
-
-
-def _bmi(values):
-    height = values["height_cm"] / Decimal(100)
-    return values["weight_kg"] / (height * height)
-
-
-def _bsa(values):
-    return (
-        Decimal("0.0061") * values["height_cm"]
-        + Decimal("0.0128") * values["weight_kg"]
-        - Decimal("0.1529")
-    )
-
-
-def _map(values):
-    return (values["sbp"] + Decimal(2) * values["dbp"]) / Decimal(3)
-
-
-def _corrected_calcium(values):
-    return values["calcium_mmol_l"] + Decimal("0.02") * (
-        Decimal(40) - values["albumin_g_l"]
-    )
-
-
-def _anion_gap(values):
-    return values["sodium"] - values["chloride"] - values["bicarbonate"]
-
-
-def _osmolality(values):
-    return (
-        Decimal(2) * values["sodium"]
-        + values["glucose_mmol_l"]
-        + values["urea_mmol_l"]
-    )
-
-
-def _shock_index(values):
-    return values["heart_rate"] / values["sbp"]
-
-
-def _child_weight(values):
-    return values["age_years"] * Decimal(2) + Decimal(8)
 
 
 FORMULAS: Dict[str, FormulaSpec] = {

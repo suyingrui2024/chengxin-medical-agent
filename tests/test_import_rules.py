@@ -164,28 +164,29 @@ def test_a_new_cycle_is_rejected(tmp_path):
     assert any(f.startswith("R4") for f in failures), failures
 
 
-def test_a_baselined_cycle_is_tolerated(tmp_path):
+def test_a_baselined_cycle_is_tolerated(tmp_path, monkeypatch):
+    """The baseline mechanism, not a particular cycle: entries get paid off."""
+    monkeypatch.setattr(rules, "CYCLE_BASELINE", (frozenset({"alpha", "beta"}),))
     build(
         tmp_path,
         {
-            "domain.py": "from . import consultation_subject\n",
-            "consultation_subject.py": "from . import domain\n",
+            "alpha.py": "from . import beta\n",
+            "beta.py": "from . import alpha\n",
         },
     )
     failures, notes, _ = rules.run(tmp_path, ceiling=99)
     assert not failures, failures
-    # The fixture is tiny, so the other baselined cycles legitimately report as
-    # gone.  Only this pair must stay quiet.
-    assert not [n for n in notes if "consultation_subject, domain" in n], notes
+    assert not [n for n in notes if "alpha, beta" in n], notes
 
 
-def test_a_shrunken_baselined_cycle_is_reported_for_tightening(tmp_path):
-    """One edge of the baselined domain pair is gone: say so, do not fail."""
+def test_a_shrunken_baselined_cycle_is_reported_for_tightening(tmp_path, monkeypatch):
+    """One edge of a baselined pair is gone: say so, do not fail."""
+    monkeypatch.setattr(rules, "CYCLE_BASELINE", (frozenset({"alpha", "beta"}),))
     build(
         tmp_path,
         {
-            "domain.py": "from . import consultation_subject\n",
-            "consultation_subject.py": "",
+            "alpha.py": "from . import beta\n",
+            "beta.py": "",
         },
     )
     failures, notes, _ = rules.run(tmp_path, ceiling=99)

@@ -11,7 +11,7 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
-from .formulas import FormulaSpec, _number, _output
+from .formulas_core import FormulaSpec, _number, _output
 
 D = Decimal
 

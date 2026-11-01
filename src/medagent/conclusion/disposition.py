@@ -297,4 +297,4 @@ def emergency_explanation(triggers) -> str:
             return line
     return "你描述的情况包含需要立即处理的危险信号。" + guidance
 
-from .narrative import _narrative_templates
+from .assets import _narrative_templates

@@ -563,6 +563,7 @@ def compose_conclusion(
     return sheet
 
 from .disposition import _disposition, _gaps, format_window_text
-from .narrative import _build_goal_response, _build_narrative, _build_worry, _narrative_templates
+from .narrative import _build_goal_response, _build_narrative, _build_worry
+from .assets import _narrative_templates
 from .sheet import _explored_pathway_group, _load_json, _load_json_optional, _pathway_return_now_if, _self_care_group, apply_neutral_fallback, chief_matches_pathway, department_visible, directions_mode, directions_restricted_visible, directions_visible
 from .support import _adjust_assertion_wording, _is_infant_case, _is_undetermined_unknown_screen, _onset_is_chronic_gradual, _select_directions, _sheet_evidence_count

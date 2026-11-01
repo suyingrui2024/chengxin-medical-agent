@@ -15,7 +15,6 @@ from ..direction_guards import (
 from ..domain import Assertion, CaseState, Phase, RiskLevel
 from ..followups import build_follow_up_plan
 from ..handoff import LABELS as FACT_LABELS
-from ..reasoning import RuleBasedProposer, validate_workspace
 from ..text_match import contains_unnegated, find_unnegated_certain
 from ..worry import extract_worry_object, is_worry_sentence
 

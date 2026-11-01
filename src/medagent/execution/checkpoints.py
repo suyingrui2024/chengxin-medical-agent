@@ -7,25 +7,15 @@ import stat
 import time
 import unicodedata
 
-from .changes import (
-    capture, relative_path, watch_path_covers, IGNORED_DIRECTORIES,
-)
+from .changes import capture
 from .identity import decode_identity
+from .paths import (
+    IGNORED_DIRECTORIES,
+    normalize_paths,
+    relative_path,
+    watch_path_covers,
+)
 from ..platform_fs import os
-
-
-def normalize_paths(paths):
-    if not isinstance(paths, list) or not 1 <= len(paths) <= 16:
-        raise ValueError("Invalid checkpoint paths")
-    for path in paths:
-        if path != ".":
-            relative_path(path)
-    ordered = sorted(set(paths))
-    return [
-        p
-        for p in ordered
-        if not any(watch_path_covers(q, p) for q in ordered if q != p)
-    ]
 
 
 def _capture_paths(directory, identity, paths):

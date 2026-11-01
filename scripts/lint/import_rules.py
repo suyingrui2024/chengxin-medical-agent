@@ -31,9 +31,11 @@ R1  capability packages must not import feature or app packages.
 R2  feature packages must not import each other (capabilities and the flat
     kernel are fair game).
 R3  only entry points (``cli``, ``desktop_service``) may import ``server``.
-R4  no import cycles.  The five existing cycles are baselined as member sets;
-    a detected cycle is tolerated only while it is a *subset* of a baselined
-    one, so breaking a cycle never re-trips the check.
+R4  no import cycles.  Cycles are detected on *module-level* edges only: a
+    function-level (late-bound) import is the canonical cycle-break and cannot
+    trigger a circular-import error, so it is not counted as a cycle.  Every
+    cycle the graph now contains is a genuine violation and fails the check;
+    there is no tolerated baseline left.
 R5  the flat top-level module count must not grow.  It is the shared kernel and
     the natural place for new debt to accumulate.
 
@@ -82,41 +84,13 @@ EDGE_BASELINE: frozenset[tuple[str, str]] = frozenset(
     }
 )
 
-# Existing cycles, as member sets.  Each entry should shrink or disappear as the
-# cycle is broken.
-CYCLE_BASELINE: tuple[frozenset[str], ...] = (
-    frozenset(
-        {
-            "conclusion",
-            "extensions.builtin",
-            "extensions.registry",
-            "interpreter",
-            "knowledge",
-            "measurement_reports",
-            "out_of_pathway",
-            "reasoning",
-        }
-    ),
-    frozenset(
-        {
-            "conclusion.adjustments",
-            "conclusion.disposition",
-            "conclusion.narrative",
-            "conclusion.sheet",
-            "conclusion.support",
-        }
-    ),
-    frozenset(
-        {
-            "execution.changes",
-            "execution.checkpoints",
-            "execution.observations",
-            "execution.store",
-        }
-    ),
-    frozenset({"consultation_subject", "domain"}),
-    frozenset({"extensions.formulas", "extensions.formulas_extra"}),
-)
+# Existing cycles, as member sets.  Each entry should disappear as the cycle is
+# broken.  Historically this held five member sets; all have been broken by
+# extracting shared low-level modules (formulas_core, execution/paths,
+# conclusion/assets) and late-binding the last kernel<->capability edge
+# (knowledge -> extensions.builtin).  It is kept empty on purpose: any cycle the
+# graph now contains is a *new* violation and must fail, not be tolerated.
+CYCLE_BASELINE: tuple[frozenset[str], ...] = ()
 
 # Flat modules directly under src/medagent/.  Frozen: new code belongs in a
 # package, not in the shared kernel.  Lower this number as modules move out.
@@ -387,7 +361,16 @@ def run(
     failures: list[str] = []
     layering_failures, layering_warnings = check_layering(graph, known)
     failures.extend(layering_failures)
-    cycle_failures, notes = check_cycles(graph)
+    # Cycle detection runs on the *module-level* graph only.  A function-level
+    # (late-bound) import is the canonical cycle-break: it does not load the
+    # target when this module loads, so it cannot trigger a circular-import
+    # error and must not count as an architecture cycle.  ``check_layering``
+    # already treats such edges as warnings; the SCC pass must agree.
+    module_level_graph = {
+        src: {dst for dst, module_level in edges.items() if module_level}
+        for src, edges in graph.items()
+    }
+    cycle_failures, notes = check_cycles(module_level_graph)
     failures.extend(cycle_failures)
     notes.extend(layering_warnings)
 
@@ -399,7 +382,7 @@ def run(
         )
     stats = {
         "modules": len(graph),
-        "cycles": len(find_cycles(graph)),
+        "cycles": len(find_cycles(module_level_graph)),
         "flat": top_level,
         "frozen_edges": sum(
             1 for source, target in EDGE_BASELINE if target in graph.get(source, {})

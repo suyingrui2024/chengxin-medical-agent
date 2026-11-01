@@ -500,4 +500,4 @@ def _sheet_evidence_count(accepted, state: CaseState, direction) -> int:
                     attested.add(term)
     return len(valid | attested)
 
-from .sheet import _load_json, _patient_labels
+from .assets import _load_json, _patient_labels
