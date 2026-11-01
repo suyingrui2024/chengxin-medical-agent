@@ -22,15 +22,7 @@ from medagent.conclusion import (
     compose_conclusion,
 )
 from medagent.guards.direction_guards import is_affirmed_in_text
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion, RiskLevel
 from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 from tests.support.builders import closed_state as _build_closed_state

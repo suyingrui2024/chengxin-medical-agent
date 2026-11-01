@@ -17,15 +17,7 @@ from medagent.conclusion import (
     emergency_explanation,
     spoken_close_line,
 )
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion, Fact, Source
 from medagent.clinical.reasoning import RuleBasedProposer
 from tests.support.builders import closed_state as _build_closed_state
 

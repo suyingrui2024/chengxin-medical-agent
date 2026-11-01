@@ -3,7 +3,7 @@ engine + conclusion chain). Each test names the audit finding it pins.
 """
 import unittest
 
-from medagent.core.domain import Assertion, CaseState, Fact, Phase, RiskAssessment, RiskLevel, Source
+from medagent.core.domain import Assertion, CaseState, Fact, Phase, Source
 from medagent.server.runtime import build_runtime
 from tests.support.builders import closed_state as _build_closed_state
 

@@ -31,15 +31,7 @@ from medagent.conclusion import (
     _valid_support_quote,
     compose_conclusion,
 )
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion
 from medagent.clinical.reasoning import (
     EvidenceRef,
     Hypothesis,

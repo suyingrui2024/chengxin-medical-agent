@@ -15,15 +15,7 @@ from unittest import mock
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import compose_conclusion
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion, CaseState, Fact, Source
 from medagent.core.events import EventStore
 from medagent.clinical.knowledge import ADULT_AGE_PROMPT, ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker

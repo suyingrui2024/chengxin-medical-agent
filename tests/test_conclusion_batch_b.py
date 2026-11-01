@@ -30,15 +30,7 @@ from medagent.conclusion import (
     _gaps,
     compose_conclusion,
 )
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion
 from medagent.reports.handoff import REGISTERED_FACT_KEYS
 from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 from tests.support.builders import closed_state as _build_closed_state

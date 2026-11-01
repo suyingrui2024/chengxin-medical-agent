@@ -23,15 +23,7 @@ from medagent.conclusion import (
     format_window_text,
     spoken_close_line,
 )
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion, Fact, Source
 from medagent.clinical.knowledge import ContentRepository, question_fact_gates_pass
 from tests.support.builders import closed_state as _build_closed_state
 

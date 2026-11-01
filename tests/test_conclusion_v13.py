@@ -36,15 +36,6 @@ from medagent.conclusion import (
     directions_restricted_visible,
     directions_visible,
 )
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
 from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 from tests.support.builders import closed_state as _build_closed_state
 from tests.support.builders import add_fact

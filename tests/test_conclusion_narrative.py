@@ -16,15 +16,7 @@ from unittest import mock
 
 from medagent import conclusion as conclusion_module
 from medagent.conclusion import compose_conclusion, spoken_close_line
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion, RiskLevel
 from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 from tests.support.builders import closed_state as _build_closed_state
 from tests.support.builders import add_fact

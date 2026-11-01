@@ -20,7 +20,6 @@ import json
 import unittest
 from importlib import resources
 
-from medagent import conclusion as conclusion_module
 from medagent.conclusion import (
     RETURN_NOW_IF,
     apply_neutral_fallback,
@@ -28,15 +27,7 @@ from medagent.conclusion import (
     compose_conclusion,
     emergency_explanation,
 )
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Assertion, Fact, Source
 from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoning import RuleBasedProposer, validate_workspace
 from tests.support.builders import closed_state as _build_closed_state

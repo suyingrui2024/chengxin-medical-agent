@@ -11,15 +11,7 @@ from medagent import conclusion as conclusion_module
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import compose_conclusion, spoken_close_line
 from medagent.consultation import UserInput
-from medagent.core.domain import (
-    Assertion,
-    CaseState,
-    Fact,
-    Phase,
-    RiskAssessment,
-    RiskLevel,
-    Source,
-)
+from medagent.core.domain import Phase, RiskLevel
 from medagent.core.events import EventStore
 from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker
