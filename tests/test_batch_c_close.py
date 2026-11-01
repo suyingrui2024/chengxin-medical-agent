@@ -33,7 +33,7 @@ Hard constraints honoured here and in the implementation:
 import unittest
 
 import medagent.conclusion as conclusion_module
-from medagent import closing
+from medagent.consultation import closing
 from medagent.consultation import ConsultationEngine
 from medagent.domain import (
     AgentReply,

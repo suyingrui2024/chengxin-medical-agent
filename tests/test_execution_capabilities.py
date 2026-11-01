@@ -10,10 +10,30 @@ import time
 import unittest
 from uuid import uuid4
 
+import medagent
 from medagent.execution import ExecutionManager, ExecutionError
-from medagent.execution.capabilities import CapabilityError, dispatch, freeze_binding
+from medagent.execution.capabilities import (
+    IMPLEMENTATION_FILES,
+    CapabilityError,
+    dispatch,
+    freeze_binding,
+)
 from medagent.extensions.builtin import load_registry
 from medagent.presentation import calculation_presentation
+
+
+def test_implementation_files_all_exist():
+    """Every path in the hash list must still resolve.
+
+    ``implementation_sha256`` hashes a hardcoded list of files by path, so
+    moving or renaming one silently changes the digest — and a stale entry
+    makes every persisted capability binding fail with "能力清单或实现已变化；
+    拒绝替换原版本计算，请新建工作区".  This has already bitten once, when the
+    flat ``execution_*`` modules were folded into a package.
+    """
+    root = Path(medagent.__file__).resolve().parent
+    missing = [name for name in IMPLEMENTATION_FILES if not (root / name).is_file()]
+    assert not missing, f"implementation hash list points at missing files: {missing}"
 
 
 def payload(

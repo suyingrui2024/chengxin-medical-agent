@@ -19,6 +19,32 @@ from ..presentation import calculation_presentation
 PROTOCOL = "execution-capabilities/v1"
 HASH = re.compile(r"[0-9a-f]{64}")
 
+# The files whose bytes define "the implementation" of the capability layer.
+#
+# Paths are relative to ``src/medagent`` and they are hashed *by name*, so
+# moving or renaming any of them changes the digest and invalidates every
+# persisted capability binding — the user then sees "能力清单或实现已变化；
+# 拒绝替换原版本计算，请新建工作区".  That is the intended behaviour for a real
+# implementation change, but it makes a stale entry here an operational hazard:
+# a path that no longer exists raises on read, and a path that now points at
+# different code silently hashes the wrong bytes.
+#
+# ``tests/test_execution_capabilities.py::test_implementation_files_all_exist``
+# asserts every entry still resolves, so a move cannot slip through unnoticed.
+IMPLEMENTATION_FILES = (
+    "execution/capabilities.py",
+    "extensions/builtin.py",
+    "extensions/registry.py",
+    "extensions/contracts.py",
+    "extensions/input_evidence.py",
+    "extensions/glucose.py",
+    "extensions/conversion_forms.py",
+    "presentation.py",
+    "domain.py",
+    "location_answers.py",
+    "interpreter.py",
+)
+
 
 def implementation_sha256():
     # This module lives in the ``execution`` package, so the hash root is the
@@ -26,19 +52,7 @@ def implementation_sha256():
     # the package path.  Getting either wrong silently hashes the wrong bytes.
     root = Path(__file__).resolve().parents[1]
     digest = hashlib.sha256()
-    for name in [
-        "execution/capabilities.py",
-        "extensions/builtin.py",
-        "extensions/registry.py",
-        "extensions/contracts.py",
-        "extensions/input_evidence.py",
-        "extensions/glucose.py",
-        "extensions/conversion_forms.py",
-        "presentation.py",
-        "domain.py",
-        "location_answers.py",
-        "interpreter.py",
-    ]:
+    for name in IMPLEMENTATION_FILES:
         digest.update(name.encode() + b"\0" + (root / name).read_bytes() + b"\0")
     return digest.hexdigest()
 

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from .domain import AgentReply, CaseState
+from ..domain import AgentReply, CaseState
 
 def _sheet_worry_goal_text(sheet: Dict[str, Any], include_goal: bool = True) -> str:
     """Single source of the worry/goal append rule (was inline in
@@ -109,7 +109,7 @@ def _append_unaddressed_goals(
     时 part 被误判为已回应——基线行为如此，新模块亦然，
     故调用方必须先去引文）。"""
     try:
-        from .conclusion import (
+        from ..conclusion import (
             _GOAL_PART_FIXED_HANDLING,
             _keyword_addressed,
             _part_keywords,
@@ -213,8 +213,8 @@ def append_scope_note(state: CaseState, reply: AgentReply) -> None:
     recorded chief value + evidence; a missing chief never
     triggers the note."""
     try:
-        from .reasoning import chief_matches_pathway
-        from .out_of_pathway import SCOPE_NOTE
+        from ..reasoning import chief_matches_pathway
+        from ..out_of_pathway import SCOPE_NOTE
     except Exception:
         return
     if SCOPE_NOTE in reply.message:
@@ -247,7 +247,7 @@ def _close_window_text(disposition: Dict[str, Any], window_hours) -> Optional[st
     only the returned window string is ever rendered.
     """
     try:
-        from .conclusion import format_window_text
+        from ..conclusion import format_window_text
     except Exception:
         return None
     level = disposition.get("level") if isinstance(disposition, dict) else disposition
@@ -327,7 +327,7 @@ def render_confirmed_close(
     ):
         return
     try:
-        from .conclusion import spoken_close_line
+        from ..conclusion import spoken_close_line
 
         line = spoken_close_line(sheet)
     except Exception:

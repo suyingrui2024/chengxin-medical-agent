@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import unittest
 
-from medagent import closing
+from medagent.consultation import closing
 from medagent.conclusion import (
     _GOAL_PART_FIXED_HANDLING,
     _visit_part_residual,

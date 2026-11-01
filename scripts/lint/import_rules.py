@@ -121,7 +121,7 @@ CYCLE_BASELINE: tuple[frozenset[str], ...] = ()
 
 # Flat modules directly under src/medagent/.  Frozen: new code belongs in a
 # package, not in the shared kernel.  Lower this number as modules move out.
-TOP_LEVEL_CEILING = 62
+TOP_LEVEL_CEILING = 61
 
 
 def module_name(path: pathlib.Path, root: pathlib.Path) -> str:

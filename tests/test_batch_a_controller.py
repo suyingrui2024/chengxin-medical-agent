@@ -27,7 +27,7 @@ emergency close, bare "下面是已采集的信息" promise).
 import unittest
 from copy import deepcopy
 
-from medagent import closing
+from medagent.consultation import closing
 from medagent.agent_tools import ProposalError
 from medagent.consultation import UserInput
 from medagent.domain import (

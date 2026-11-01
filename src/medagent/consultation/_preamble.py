@@ -45,7 +45,10 @@ from ..session_store import SessionStore
 from ..phase_graph import planning_rank
 from ..followups import RETRIAGE_OUTCOMES, apply_outcome, build_follow_up_plan
 from ..reasoner import QuestionRanker
-from .. import __version__, closing
+from .. import __version__
+# ``closing`` used to be a top-level kernel module; the close-rendering bodies
+# live in this package now, so it is a sibling rather than a parent import.
+from . import closing
 from ..bridging import build_bridging_sentence
 from ..handoff import LABELS as HANDOFF_LABELS
 from ..worry import extract_worry_object

@@ -47,7 +47,7 @@ no code change here; agent.py findings go to the coordinator):
 
 import unittest
 
-from medagent import closing
+from medagent.consultation import closing
 from medagent.bridging import GROUP_BRIDGES, lint_group_bridge
 from medagent.conclusion import (
     UNCERTAINTY_NOTE,

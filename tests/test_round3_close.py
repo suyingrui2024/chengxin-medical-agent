@@ -35,7 +35,7 @@ wording — never invented clinical content:
 
 import unittest
 
-from medagent import closing
+from medagent.consultation import closing
 from medagent.conclusion import (
     _CHRONIC_OUTLOOK,
     _adjust_chronic_outlook,
