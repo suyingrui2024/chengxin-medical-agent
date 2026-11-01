@@ -1,3 +1,11 @@
+"""Patient-record integration seams: timeline flags and attach notes,
+per-member measurement isolation, medication-reminder scheduling, and the
+recognition job lifecycle.
+
+Store-level measurement generalization lives in test_patient_records.py and
+the HTTP routes in test_patient_records_api.py; this file covers what neither
+of those reaches. (Formerly ``test_p3_p4_integration``.)
+"""
 import base64
 import binascii
 import json

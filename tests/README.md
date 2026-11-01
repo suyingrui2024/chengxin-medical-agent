@@ -46,24 +46,53 @@ tests/
 
 `conftest.py` 的 fixture **不是 autouse**：`clean_medagent_env` 会清掉 `MEDAGENT_*`，如果全局生效，会改变那些自己设置这些变量的测试。
 
-## 文件名的历史包袱
+## 按领域找测试
 
-文件名里有 `test_batch_a_vocab`、`test_round3_close`、`test_hypothesis_close` 这种——**它们对应设计文档的验收批次，不是目录结构**。
-
-按领域找测试：
+文件名现在描述**测什么**。少数仍带批次号的文件，对照表见下一节。
 
 | 领域 | 代表文件 |
 |---|---|
-| 结论单 | `test_conclusion*.py`、`test_batch_a/b/c_*.py`、`test_round3/4_*.py`、`test_self_care_oral.py` |
-| 问诊引擎 | `test_agent*.py`、`test_consultation*.py`、`test_turn_pipeline.py`、`test_dual_engine_safety.py` |
-| 知识与推理 | `test_kg.py`、`test_reasoning.py`、`test_hypothesis_ranking.py`、`test_question_ordering_contract.py` |
+| 结论单 | `test_conclusion*.py`、`test_close_*.py`、`test_denied_clarification_memory.py`、`test_self_care_oral.py` |
+| 问诊引擎 | `test_agent*.py`、`test_consultation*.py`、`test_engine_question_gating.py`、`test_controller_safety_gates.py`、`test_turn_pipeline.py`、`test_dual_engine_safety.py` |
+| 知识与推理 | `test_kg.py`、`test_reasoning.py`、`test_triage_scan_gating.py`、`test_pathway_vocabulary.py`、`test_hypothesis_ranking.py`、`test_question_ordering_contract.py` |
 | 计算与执行 | `test_formula_engine.py`、`test_scale_engine.py`、`test_capabilities.py`、`test_execution*.py` |
-| 病历与会话 | `test_patient_records*.py`、`test_workspace*.py`、`test_session_persistence.py` |
+| 病历与会话 | `test_patient_records*.py`、`test_records_measurements_and_reminders.py`、`test_attachment_and_baseline.py`、`test_workspace*.py` |
 | 联网与报告 | `test_web_tools.py`、`test_report_interpretation*.py`、`test_education.py` |
-| 内核单测 | `test_text_match.py`、`test_presentation.py`、`test_task_intents.py`、`test_location_answers.py` |
+| 内核单测 | `test_text_match.py`、`test_presentation.py`、`test_task_intents.py`、`test_location_answers.py`、`test_worry_and_goal.py` |
 | 架构门禁 | `test_import_rules.py` |
 | 平台差异 | `test_platform.py`（翻转 `_WINDOWS`/`_MACOS`，两个分支都能测） |
 | 属性测试 | `test_properties.py`（hypothesis） |
+
+## 文件名的历史包袱
+
+文件名里的批次号（`batch_a`、`round3`、`wave2`）记录的是**设计文档的验收批次**，
+不是目录结构。2026-11 把 20 个只有批次号的文件按内容重命名了：
+
+| 旧名 | 新名 |
+| --- | --- |
+| `test_batch_a_controller` | `test_controller_safety_gates` |
+| `test_batch_a_scan` | `test_triage_scan_gating` |
+| `test_batch_a_vocab` | `test_pathway_vocabulary` |
+| `test_batch_b_rework` | `test_evidence_encoding_and_groups` |
+| `test_batch_b_worry` | `test_worry_and_goal` |
+| `test_batch_c_burden` | `test_burden_screening` |
+| `test_batch_c_close` | `test_close_copy` |
+| `test_batch_c_content` | `test_conclusion_framing` |
+| `test_conclusion_batch_b` | `test_conclusion_worry_evidence` |
+| `test_conclusion_v13` | `test_conclusion_directions` |
+| `test_conclusion_wave2_content` | `test_conclusion_pathway_gaps` |
+| `test_agent_wave2_engine` | `test_engine_question_gating` |
+| `test_p2_integration` | `test_attachment_and_baseline` |
+| `test_p2_point0` | `test_backend_switch_and_handoff` |
+| `test_p3_p4_integration` | `test_records_measurements_and_reminders` |
+| `test_round3_c10_clarification_denial` | `test_denied_clarification_memory` |
+| `test_round3_close` | `test_close_contradiction_and_walkthrough` |
+| `test_round3_g12_close` | `test_close_discriminators` |
+| `test_round3_infant_gi` | `test_infant_gi_gate` |
+| `test_round4_fix_j09_n12` | `test_residual_filter_and_transcript_denial` |
+
+批次号保留在各文件的模块 docstring 里（例如 `test_triage_scan_gating.py` 开头写着
+"Batch A scan layer (W1)"），所以 `git log --follow` 之外还有文字线索。
 
 ## 两类"不只是例子"的测试
 

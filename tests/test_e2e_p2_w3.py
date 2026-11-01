@@ -14,7 +14,7 @@ P2-5: trajectory 新增 intermittent（阵发性/间歇）合法落账。
   urgent（triage 只认 worsening），与修前 stable 的处置一致。
 
 P2-6 在本批只做溯源、不改 sheet 契约，故本文件不含 P2-6 用例：
-visit 目标不进 goal_response 已由 test_batch_b_worry pin 住
+visit 目标不进 goal_response 已由 test_worry_and_goal pin 住
 （关闭文本的 batch-A 句拥有该答案）。
 """
 
