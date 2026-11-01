@@ -304,6 +304,29 @@ def test_a_late_bound_kernel_edge_is_only_a_warning(tmp_path):
     assert any(w.startswith("R6") for w in warnings), warnings
 
 
+def test_a_package_with_no_submodules_is_still_a_package(tmp_path, monkeypatch):
+    """A single-module package must not be mistaken for a flat kernel module.
+
+    ``module_name`` keys a package's own ``__init__`` by the bare package name,
+    so ``facts/__init__.py`` with no siblings used to be indistinguishable from
+    a flat ``facts.py``.  That made ``facts`` a kernel module until the day
+    someone added ``facts/extra.py``, at which point it would silently become a
+    capability — and the rule that fires on it would change.
+    """
+    monkeypatch.setattr(rules, "CAPABILITY_PACKAGES", frozenset({"facts"}))
+    build(
+        tmp_path,
+        {
+            "facts/__init__.py": "",
+            "feature/__init__.py": "",
+            "feature/mod.py": "from ..facts import table\n",
+        },
+    )
+    _, _, known = rules.collect_modules(tmp_path)
+    assert rules.package_of("facts", known) == "facts"
+    assert rules.layer_of("facts", known) == "capability"
+
+
 def test_the_real_tree_passes():
     failures, _, stats = rules.run(rules.PACKAGE_ROOT, rules.TOP_LEVEL_CEILING)
     assert not failures, failures

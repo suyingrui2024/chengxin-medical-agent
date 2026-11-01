@@ -222,6 +222,15 @@ def collect_modules(
         files.append(path)
         trees[module_name(path, root)] = ast.parse(path.read_text(encoding="utf-8"))
     known = set(trees)
+    # ``module_name`` keys a package's own ``__init__`` by the bare package
+    # name, so a package with no submodules (``facts/``, ``shared_types/``)
+    # looks exactly like a flat kernel module and ``package_of`` cannot tell
+    # them apart.  Register the ``<pkg>.__init__`` spelling as well so the
+    # distinction survives — otherwise ``facts`` silently flips from
+    # "kernel" to "capability" the day someone adds ``facts/extra.py``.
+    for path in files:
+        if path.name == "__init__.py" and path.parent != root:
+            known.add(".".join(path.parent.relative_to(root).parts) + ".__init__")
     graph: dict[str, dict[str, bool]] = {}
     for name, tree in trees.items():
         edges: dict[str, bool] = {}
