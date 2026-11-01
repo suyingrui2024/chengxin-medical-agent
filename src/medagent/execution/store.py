@@ -5,7 +5,7 @@ from .observations import validate_observation
 from .limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
 from .clarifications import validate_clarification
 import math
-from ..platform_fs import os, fcntl
+from ..infra.platform_fs import os, fcntl
 from pathlib import Path
 import stat
 from uuid import UUID, uuid4

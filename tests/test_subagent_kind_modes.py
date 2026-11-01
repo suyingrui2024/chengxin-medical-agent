@@ -8,10 +8,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.env_config import read_env, subagent_kind_modes
-from medagent.events import EventStore
-from medagent.reasoning import Hypothesis, ReasoningWorkspace
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.infra.env_config import read_env, subagent_kind_modes
+from medagent.core.events import EventStore
+from medagent.clinical.reasoning import Hypothesis, ReasoningWorkspace
 from medagent.subagents import KINDS, SubagentCoordinator
 
 

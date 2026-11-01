@@ -24,14 +24,14 @@ import unittest
 from unittest import mock
 
 from medagent import conclusion as conclusion_module
-from medagent import text_match as text_match_module
+from medagent.core import text_match as text_match_module
 from medagent.conclusion import (
     RETURN_NOW_IF,
     _sheet_evidence_count,
     _valid_support_quote,
     compose_conclusion,
 )
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -40,7 +40,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.reasoning import (
+from medagent.clinical.reasoning import (
     EvidenceRef,
     Hypothesis,
     ReasoningWorkspace,

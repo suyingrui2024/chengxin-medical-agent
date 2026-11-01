@@ -237,7 +237,7 @@ class LocationAnswerTests(unittest.TestCase):
         self.assertNotIn("symptom_location", self.state.facts)
 
     def test_unsupported_registered_contract_fails_before_a_patient_can_use_it(self):
-        from medagent.location_answers import validate_answer_contract
+        from medagent.dialogue.location_answers import validate_answer_contract
 
         task = deepcopy(self.engine.content.tasks["body_location"])
         task["answer_contract"]["area_presets"]["head"].append(

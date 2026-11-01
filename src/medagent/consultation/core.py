@@ -28,7 +28,7 @@ class ConsultationEngineCore:
         if os.environ.get("MEDAGENT_PLANNER", "differential").strip().lower() == "rule":
             self.planner = RulePlanner(self)
         else:
-            from ..reasoning import DifferentialPlanner
+            from ..clinical.reasoning import DifferentialPlanner
 
             self.planner = DifferentialPlanner(self)
         self._turn_pipeline = (

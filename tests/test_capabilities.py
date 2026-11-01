@@ -3,16 +3,16 @@ import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
-from medagent.domain import Assertion, Phase, Source, ObservationQuality
-from medagent.events import EventStore
+from medagent.core.domain import Assertion, Phase, Source, ObservationQuality
+from medagent.core.events import EventStore
 from medagent.extensions.builtin import load_registry, convert_units, observation
-from medagent.interpreter import Interpretation
+from medagent.clinical.interpreter import Interpretation
 from medagent.extensions.registry import Capability, CapabilityRegistry
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 from medagent.server.workspace import Workspace, StaleCompositionError
 
 

@@ -12,8 +12,8 @@ from datetime import datetime
 
 import pytest
 
-from medagent.events import EventStore
-from medagent.web_tools import (
+from medagent.core.events import EventStore
+from medagent.infra.web_tools import (
     WebTools,
     build_education_query,
     load_web_sources,

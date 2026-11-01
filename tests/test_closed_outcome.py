@@ -9,13 +9,13 @@ import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
-from medagent.domain import Phase
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.core.domain import Phase
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),

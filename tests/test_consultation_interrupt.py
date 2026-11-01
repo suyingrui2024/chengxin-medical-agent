@@ -13,15 +13,15 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.backends import CompatibleBackend, DshBackend
+from medagent.infra.backends import CompatibleBackend, DshBackend
 from medagent.consultation import UserInput, ConsultationBusyError
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 from medagent.server import Handler, MedicalAgentServer
-from medagent.decision_wait import DecisionWaiter
+from medagent.core.decision_wait import DecisionWaiter
 
 
 def wait_for(predicate, seconds=2):
@@ -381,7 +381,7 @@ class HttpInterruptTests(unittest.TestCase):
             return value
 
         tracker = patch(
-            "medagent.backends.TemporaryDirectory", side_effect=owned_temporary
+            "medagent.infra.backends.TemporaryDirectory", side_effect=owned_temporary
         )
         tracker.start()
         thread.start()

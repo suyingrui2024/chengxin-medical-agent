@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import unittest
 
-from medagent.red_flags import RedFlagScanner, span_trailing_denied
-from medagent.triage import TriageService
+from medagent.guards.red_flags import RedFlagScanner, span_trailing_denied
+from medagent.clinical.triage import TriageService
 
 CASE6_TEXT = (
     "还有尿急，老是憋不住的感觉，每次去又尿不多，尿的颜色有点黄。"

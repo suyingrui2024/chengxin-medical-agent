@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "src"))
 
-from medagent.triage import TriageService  # noqa: E402
+from medagent.clinical.triage import TriageService  # noqa: E402
 
 CORPORA = ["red_flag_corpus_v0.json", "red_flag_probe_v1.json"]
 MIN_RECALL = 0.99
@@ -233,7 +233,7 @@ def check_web_advisory(fixtures: Path) -> bool:
     bound_version = corpus.get("web_sources_version")
     actual_version = None
     try:
-        from medagent import web_tools
+        from medagent.infra import web_tools
 
         actual_version = web_tools.sources_version()
     except Exception:
@@ -311,7 +311,7 @@ def check_report_interpretation(fixtures: Path) -> bool:
     against itself. A single expected-grade mismatch flips the gate.
     Unconfirmed observations must land in `excluded`, never in `items`.
     """
-    from medagent.report_interpretation import build_interpretation
+    from medagent.reports.report_interpretation import build_interpretation
 
     fixture = json.loads(
         (fixtures / "report_interpretation_cases.json").read_text(encoding="utf-8")

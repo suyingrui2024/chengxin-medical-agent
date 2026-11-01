@@ -76,7 +76,7 @@ class SetupFailure(Exception):
 
 def _load_web_tools():
     try:
-        from medagent import web_tools
+        from medagent.infra import web_tools
     except Exception as exc:  # noqa: BLE001 - reported, not raised
         raise SetupFailure(
             f"medagent.web_tools is not available ({type(exc).__name__}: {exc}); "
@@ -91,7 +91,7 @@ def _load_web_tools():
 def _dose_search():
     """Return a text->bool dosage predicate (education caliber if present)."""
     try:
-        from medagent import education
+        from medagent.reports import education
 
         pattern = getattr(education, "DOSE_PATTERN", None)
         if pattern is not None:
@@ -112,7 +112,7 @@ def _dose_search():
 
 def _conflict_phrases():
     try:
-        from medagent import education
+        from medagent.reports import education
 
         phrases = getattr(education, "CONFLICT_PHRASES", None)
         if phrases:

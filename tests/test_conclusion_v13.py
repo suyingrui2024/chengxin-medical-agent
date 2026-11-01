@@ -36,7 +36,7 @@ from medagent.conclusion import (
     directions_restricted_visible,
     directions_visible,
 )
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -45,7 +45,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
+from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 
 
 def closed_state(chief="发烧两天"):

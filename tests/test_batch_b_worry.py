@@ -28,15 +28,15 @@ import unittest
 from medagent.consultation import closing
 from medagent.conclusion import compose_conclusion, spoken_close_line
 from medagent.consultation import UserInput
-from medagent.domain import (
+from medagent.core.domain import (
     AgentReply,
     Assertion,
     Fact,
     Phase,
     Source,
 )
-from medagent.agent_tools import ProposalError
-from medagent.knowledge import ContentRepository
+from medagent.infra.agent_tools import ProposalError
+from medagent.clinical.knowledge import ContentRepository
 from medagent.server.runtime import build_runtime
 from tests.test_agent import cmd, fact
 from tests.test_agent_wave2_engine import make_engine

@@ -207,7 +207,7 @@ def test_grade_case_against_p3a_module(case) -> None:
     loudly here instead of being masked.
     """
     module = pytest.importorskip(
-        "medagent.report_interpretation",
+        "medagent.reports.report_interpretation",
         reason="P3-A report_interpretation module not landed yet",
     )
     ranges = _load_json(RANGES_PATH)

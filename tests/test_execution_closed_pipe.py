@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 from medagent.execution import ExecutionManager
-from medagent.processes import popen, terminate, release
+from medagent.infra.processes import popen, terminate, release
 
 
 class ClosedPipeTests(unittest.TestCase):

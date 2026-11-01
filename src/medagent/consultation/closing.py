@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from ..domain import AgentReply, CaseState
+from ..core.domain import AgentReply, CaseState
 
 def _sheet_worry_goal_text(sheet: Dict[str, Any], include_goal: bool = True) -> str:
     """Single source of the worry/goal append rule (was inline in
@@ -213,8 +213,8 @@ def append_scope_note(state: CaseState, reply: AgentReply) -> None:
     recorded chief value + evidence; a missing chief never
     triggers the note."""
     try:
-        from ..reasoning import chief_matches_pathway
-        from ..out_of_pathway import SCOPE_NOTE
+        from ..clinical.reasoning import chief_matches_pathway
+        from ..clinical.out_of_pathway import SCOPE_NOTE
     except Exception:
         return
     if SCOPE_NOTE in reply.message:

@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 
 from medagent.consultation import StaleActionError, UserInput
-from medagent.domain import Phase
+from medagent.core.domain import Phase
 from tests import test_location_answers as fixture
 from tests.test_agent import cmd
 

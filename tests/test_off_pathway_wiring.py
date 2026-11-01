@@ -21,9 +21,9 @@ from __future__ import annotations
 import unittest
 
 from medagent.consultation import UserInput
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.handoff import LABELS
-from medagent.knowledge import ContentRepository
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.reports.handoff import LABELS
+from medagent.clinical.knowledge import ContentRepository
 from medagent.server.runtime import build_runtime
 
 # Off-pathway chiefs (no differentials.json pathway term matches) and

@@ -5,13 +5,13 @@ from urllib.request import Request, urlopen
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
-from medagent.domain import AgentReply, CaseState, Phase, RiskLevel
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.release_evaluation import SCHEMA, evaluate_cases
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.core.domain import AgentReply, CaseState, Phase, RiskLevel
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.review.release_evaluation import SCHEMA, evaluate_cases
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 

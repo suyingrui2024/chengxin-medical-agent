@@ -15,9 +15,9 @@ controller's own auto-summary (which asks the detail question instead).
 
 import unittest
 
-from medagent.agent_tools import ProposalError
+from medagent.infra.agent_tools import ProposalError
 from medagent.consultation import UserInput
-from medagent.domain import Phase
+from medagent.core.domain import Phase
 from tests.test_agent import cmd, fact
 from tests.test_agent_wave2_engine import make_engine, record
 

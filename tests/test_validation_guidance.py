@@ -8,9 +8,9 @@ turn. The verbatim-quote and assertion contracts themselves are unchanged.
 
 import unittest
 
-from medagent.agent_tools import ProposalError, validate_command, validate_proposals
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.knowledge import ContentRepository
+from medagent.infra.agent_tools import ProposalError, validate_command, validate_proposals
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.clinical.knowledge import ContentRepository
 from tests.test_agent import fact
 
 

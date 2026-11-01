@@ -13,14 +13,14 @@ from threading import RLock
 from typing import Any, Iterator
 from uuid import uuid4
 from ..extensions.glucose import convert_glucose
-from ..measurement_kinds import (
+from ..core.measurement_kinds import (
     KNOWN_KINDS,
     MeasurementKindError,
     kind_spec,
     normalize_measurement,
     trend_summary,
 )
-from ..medical_images import InspectedImage, validate_recognition
+from ..infra.medical_images import InspectedImage, validate_recognition
 
 from .constants import BASELINE_FIELDS, BASELINE_LIST_LIMIT, BASELINE_STRING_LIMIT, _ALLERGY_KINDS
 

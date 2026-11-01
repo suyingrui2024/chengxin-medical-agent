@@ -21,7 +21,7 @@ from scripts.benchmarks.public.benchmark_public_execution import (
 )
 from scripts.benchmarks.execution_task_contract import CONTRACT, compliance, prompt_for
 from medagent import __version__
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 from scripts.benchmarks.public.public_execution_cases import load_cases, sha256
 
 

@@ -77,4 +77,4 @@ PYTHONPATH=src python3 scripts/evaluation/medical/evaluate_background_review.py 
   --output /tmp/shadow-review-report.json
 ```
 
-`medagent.report_drafts.parse_report_draft` 目前支持粘贴的文本行和 CSV，保留每项原文摘录、数值、单位和报告中给出的参考范围。它不会判断异常、不会生成诊断或治疗建议，也不会直接写入病例。扫描件、图片和 PDF 仍需要文字层与逐项人工核对后才能接入。
+`medagent.reports.report_drafts.parse_report_draft` 目前支持粘贴的文本行和 CSV，保留每项原文摘录、数值、单位和报告中给出的参考范围。它不会判断异常、不会生成诊断或治疗建议，也不会直接写入病例。扫描件、图片和 PDF 仍需要文字层与逐项人工核对后才能接入。

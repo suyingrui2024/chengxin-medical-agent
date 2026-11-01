@@ -3,9 +3,9 @@ from copy import deepcopy
 import json
 import unittest
 
-from medagent.calculation_followup import simple_conversion_request
+from medagent.reports.calculation_followup import simple_conversion_request
 from medagent.consultation import StaleActionError, UserInput
-from medagent.domain import Assertion, Fact, Source
+from medagent.core.domain import Assertion, Fact, Source
 from tests import test_patient_calculations as fixture
 from tests import test_repeated_observations as observation_fixture
 

@@ -27,13 +27,13 @@ import unittest
 from pathlib import Path
 
 from medagent.consultation import UserInput
-from medagent.events import EventStore
+from medagent.core.events import EventStore
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.extensions.builtin import load_registry
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "agent-tool-calls.json"
@@ -321,7 +321,7 @@ class PathwayGateTests(unittest.TestCase):
         self.assertFalse(pathway[0]["explored"])
 
     def test_summary_is_refused_while_the_pathway_is_unexplored(self):
-        from medagent.agent_tools import ProposalError
+        from medagent.infra.agent_tools import ProposalError
 
         engine, state = self.open_case()
         with self.assertRaises(ProposalError) as raised:
@@ -332,7 +332,7 @@ class PathwayGateTests(unittest.TestCase):
         self.assertIn("resp_breathing", str(raised.exception))
 
     def test_abstaining_lets_the_summary_through(self):
-        from medagent.agent_tools import ProposalError
+        from medagent.infra.agent_tools import ProposalError
 
         engine, state = self.open_case()
         try:
@@ -351,7 +351,7 @@ class PathwayGateTests(unittest.TestCase):
             self.fail(f"弃权后仍被拒：{error}")
 
     def test_an_empty_abstain_reason_is_not_an_escape(self):
-        from medagent.agent_tools import ProposalError
+        from medagent.infra.agent_tools import ProposalError
 
         engine, state = self.open_case()
         for reason in ("", "   ", "x" * 201):

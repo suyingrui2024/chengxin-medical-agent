@@ -7,8 +7,8 @@ import unittest
 from pathlib import Path
 from time import monotonic
 
-from medagent.backends import DshBackend
-from medagent.events import EventStore
+from medagent.infra.backends import DshBackend
+from medagent.core.events import EventStore
 
 
 @unittest.skipUnless(os.name == "posix" and shutil.which("node"), "requires POSIX and Node")

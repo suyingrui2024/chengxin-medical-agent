@@ -9,7 +9,7 @@ import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from medagent.medical_images import (
+from medagent.infra.medical_images import (
     DeepSeekVisionRecognizer,
     MedicalImageError,
     decode_image_data_url,

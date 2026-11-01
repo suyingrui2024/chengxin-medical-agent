@@ -3,14 +3,14 @@ from copy import deepcopy
 import unittest
 
 from medagent.consultation import StaleActionError, UserInput
-from medagent.domain import Assertion, Fact, Phase, Source
-from medagent.events import EventStore
+from medagent.core.domain import Assertion, Fact, Phase, Source
+from medagent.core.events import EventStore
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.extensions.builtin import load_registry
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 
 class Backend:

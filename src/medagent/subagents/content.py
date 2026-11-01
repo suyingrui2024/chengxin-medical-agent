@@ -10,12 +10,12 @@ from threading import BoundedSemaphore, Event as ThreadEvent, Lock, Thread
 from time import monotonic
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
-from ..backends import parse_decision
+from ..infra.backends import parse_decision
 from ..facts import BANNED_PHRASES, GAP_IMPACTS, MEASUREMENT_FACTS
-from ..decision_wait import DecisionInterrupted
-from ..domain import CaseState, utc_now
-from ..events import Event
-from ..reasoning import ReasoningWorkspace, load_pathways
+from ..core.decision_wait import DecisionInterrupted
+from ..core.domain import CaseState, utc_now
+from ..core.events import Event
+from ..clinical.reasoning import ReasoningWorkspace, load_pathways
 
 from .constants import _content_index_cache
 

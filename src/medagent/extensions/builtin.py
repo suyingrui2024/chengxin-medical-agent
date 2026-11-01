@@ -4,16 +4,16 @@ from importlib import resources
 import json
 import re
 
-from ..domain import Assertion, ObservationQuality, Source
-from ..interpreter import (
+from ..core.domain import Assertion, ObservationQuality, Source
+from ..clinical.interpreter import (
     Interpretation,
     Interpreter,
     ObservationInputError,
     UNKNOWN_PHRASES,
 )
 from .registry import Capability, CapabilityRegistry
-from ..assertion_evidence import has_uncertainty
-from ..measurement_reports import temperature_report
+from ..guards.assertion_evidence import has_uncertainty
+from ..reports.measurement_reports import temperature_report
 from .glucose import convert_glucose
 from .scale_engine import run_scale, validate_scale
 from .formula_engine import run_formula, validate_formula

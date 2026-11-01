@@ -3,7 +3,7 @@ engine + conclusion chain). Each test names the audit finding it pins.
 """
 import unittest
 
-from medagent.domain import Assertion, CaseState, Fact, Phase, RiskAssessment, RiskLevel, Source
+from medagent.core.domain import Assertion, CaseState, Fact, Phase, RiskAssessment, RiskLevel, Source
 from medagent.server.runtime import build_runtime
 
 
@@ -115,7 +115,7 @@ class AssertionQuoteTests(unittest.TestCase):
     writes the literal "None" into the evidence chain for ABSENT facts."""
 
     def test_absent_fact_quote_is_the_denial_text(self):
-        from medagent.reasoning import RuleBasedProposer
+        from medagent.clinical.reasoning import RuleBasedProposer
 
         state = CaseState(session_id="audit-quote")
         state.record(
@@ -162,7 +162,7 @@ class EventStoreCorruptionToleranceTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
 
-        from medagent.events import Event, EventStore
+        from medagent.core.events import Event, EventStore
 
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "events.jsonl"
@@ -183,7 +183,7 @@ class EventStoreCorruptionToleranceTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
 
-        from medagent.events import Event, EventStore
+        from medagent.core.events import Event, EventStore
 
         def line(event):
             return json.dumps(event.to_dict(), ensure_ascii=False).encode()
@@ -225,7 +225,7 @@ class EventStoreAppendFailureTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
 
-        from medagent.events import Event, EventStore
+        from medagent.core.events import Event, EventStore
 
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "events.jsonl"
@@ -253,7 +253,7 @@ class SessionStoreIdSafetyTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
 
-        from medagent.session_store import SessionStore
+        from medagent.infra.session_store import SessionStore
 
         with tempfile.TemporaryDirectory() as tmp:
             store = SessionStore(Path(tmp))

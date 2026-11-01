@@ -14,14 +14,14 @@ import secrets
 import threading
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.backends import DshBackend
+from medagent.infra.backends import DshBackend
 from medagent.consultation import UserInput
-from medagent.env_config import for_backend, read_env
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.infra.env_config import for_backend, read_env
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 from scripts.evaluation.medical.test_live_desktop import EvaluationGateway
 
 

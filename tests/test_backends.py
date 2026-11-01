@@ -3,7 +3,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from medagent.backends import (
+from medagent.infra.backends import (
     BRIDGE_STDOUT_LIMIT_CHARS,
     CompatibleBackend,
     DshBackend,
@@ -11,7 +11,7 @@ from medagent.backends import (
     parse_decision,
     sanitize_dsh_events,
 )
-from medagent.events import EventStore
+from medagent.core.events import EventStore
 from medagent.server.runtime import build_runtime
 
 
@@ -40,7 +40,7 @@ class BackendTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_decision("not json")
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_compatible_transport_logs_actual_request_and_response(self, urlopen):
         command = {"tool": "ask_question", "arguments": {"question_id": "onset"}}
         urlopen.return_value = Response(
@@ -69,7 +69,7 @@ class BackendTests(unittest.TestCase):
             json.dumps([e.to_dict() for e in events.for_session("s")]),
         )
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_official_deepseek_records_cache_usage_without_reasoning_or_keys(
         self, urlopen
     ):
@@ -140,7 +140,7 @@ class NewModelParameterTests(unittest.TestCase):
         with patch.dict(os.environ, env):
             return CompatibleBackend(events)
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_reasoning_effort_sent_when_thinking_enabled(self, urlopen):
         command = {"tool": "inspect_case", "arguments": {}}
         urlopen.return_value = Response(
@@ -160,7 +160,7 @@ class NewModelParameterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self._compatible(EventStore(), MEDAGENT_LLM_REASONING_EFFORT="ultra")
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_empty_content_retried_once(self, urlopen):
         command = {"tool": "inspect_case", "arguments": {}}
         urlopen.side_effect = [
@@ -177,7 +177,7 @@ class NewModelParameterTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
 
-        from medagent.backends import DshBackend
+        from medagent.infra.backends import DshBackend
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -257,7 +257,7 @@ class RequestEventMetadataTests(unittest.TestCase):
         encoded = json.dumps([e.to_dict() for e in events.for_session("s")])
         self.assertNotIn("不应落盘", encoded)
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_compatible_request_event_is_metadata_only(self, urlopen):
         command = {"tool": "inspect_case", "arguments": {}}
         urlopen.return_value = Response(
@@ -280,7 +280,7 @@ class RequestEventMetadataTests(unittest.TestCase):
         from pathlib import Path
         from unittest.mock import patch as mock_patch
 
-        from medagent.backends import DshBackend
+        from medagent.infra.backends import DshBackend
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -332,7 +332,7 @@ class TransientRetryTests(unittest.TestCase):
             if e.event_type == "model.retry"
         ]
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_http_429_retried_once(self, urlopen):
         from urllib.error import HTTPError
 
@@ -347,7 +347,7 @@ class TransientRetryTests(unittest.TestCase):
         self.assertEqual(urlopen.call_count, 2)
         self.assertEqual(self._retry_reasons(events), ["http_429"])
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_http_5xx_retried_once(self, urlopen):
         from urllib.error import HTTPError
 
@@ -362,7 +362,7 @@ class TransientRetryTests(unittest.TestCase):
         self.assertEqual(urlopen.call_count, 2)
         self.assertEqual(self._retry_reasons(events), ["http_5xx"])
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_network_error_retried_once(self, urlopen):
         from urllib.error import URLError
 
@@ -374,7 +374,7 @@ class TransientRetryTests(unittest.TestCase):
         self.assertEqual(urlopen.call_count, 2)
         self.assertEqual(self._retry_reasons(events), ["network_error"])
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_timeout_retried_once(self, urlopen):
         ok, command = self._ok_response()
         urlopen.side_effect = [TimeoutError("timed out"), ok]
@@ -384,7 +384,7 @@ class TransientRetryTests(unittest.TestCase):
         self.assertEqual(urlopen.call_count, 2)
         self.assertEqual(self._retry_reasons(events), ["timeout"])
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_http_4xx_not_retried(self, urlopen):
         from urllib.error import HTTPError
 
@@ -398,7 +398,7 @@ class TransientRetryTests(unittest.TestCase):
         self.assertEqual(urlopen.call_count, 1)
         self.assertEqual(self._retry_reasons(events), [])
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_transient_failure_bounded_at_two_attempts(self, urlopen):
         from urllib.error import HTTPError
 
@@ -480,9 +480,9 @@ class DshEnvelopeGuardTests(unittest.TestCase):
         import tempfile
 
         with tempfile.TemporaryDirectory() as scratch, patch(
-            "medagent.processes.popen",
+            "medagent.infra.processes.popen",
             return_value=self._FakeChild(envelope_stdout),
-        ), patch("medagent.processes.release", return_value=None):
+        ), patch("medagent.infra.processes.release", return_value=None):
             return backend._bridge_decision("s", [], None, 0.0, scratch)
 
     def _responded(self, events):
@@ -636,9 +636,9 @@ class DshBridgeTransportP2Tests(unittest.TestCase):
         import tempfile
 
         with tempfile.TemporaryDirectory() as scratch, patch(
-            "medagent.processes.popen",
+            "medagent.infra.processes.popen",
             return_value=child,
-        ), patch("medagent.processes.release", return_value=None), patch.dict(
+        ), patch("medagent.infra.processes.release", return_value=None), patch.dict(
             os.environ, extra_env or {}
         ):
             return backend._bridge_decision("s", [], None, 0.0, scratch)
@@ -653,8 +653,8 @@ class DshBridgeTransportP2Tests(unittest.TestCase):
             return child
 
         with tempfile.TemporaryDirectory() as scratch, patch(
-            "medagent.processes.popen", side_effect=fake_popen
-        ), patch("medagent.processes.release", return_value=None), patch.dict(
+            "medagent.infra.processes.popen", side_effect=fake_popen
+        ), patch("medagent.infra.processes.release", return_value=None), patch.dict(
             os.environ, {"UNRELATED_SECRET_TEST": "must-not-inherit"}
         ):
             result = backend._bridge_decision("s", [], None, 0.0, scratch)
@@ -690,8 +690,8 @@ class DshBridgeTransportP2Tests(unittest.TestCase):
             backend = self._backend(events, tmp)
             with tempfile.TemporaryDirectory() as scratch, patch.dict(
                 os.environ, {}, clear=True
-            ), patch("medagent.processes.popen") as popen, patch(
-                "medagent.processes.release", return_value=None
+            ), patch("medagent.infra.processes.popen") as popen, patch(
+                "medagent.infra.processes.release", return_value=None
             ):
                 with self.assertRaisesRegex(
                     RuntimeError, "DSH bridge requires PATH"
@@ -1010,7 +1010,7 @@ class CompatibleP2FixTests(unittest.TestCase):
         return [e.event_type for e in events.for_session("s")]
 
     # -- E-P2-1: malformed envelope -> ValueError only, no responded --
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_malformed_envelope_raises_value_error_only(self, urlopen):
         command = {"tool": "inspect_case", "arguments": {}}
         good = {"choices": [{"message": {"content": json.dumps(command)}}]}
@@ -1067,7 +1067,7 @@ class CompatibleP2FixTests(unittest.TestCase):
         self.assertEqual(len(over), 256001)
         exact = envelope + b" " * (256000 - len(envelope))
         self.assertEqual(len(exact), 256000)
-        with patch("medagent.backends._open_request") as urlopen:
+        with patch("medagent.infra.backends._open_request") as urlopen:
             urlopen.return_value = SizedResponse(over)
             events = EventStore()
             backend = self._backend(events)
@@ -1075,7 +1075,7 @@ class CompatibleP2FixTests(unittest.TestCase):
                 backend.decide("s", [])
             self.assertEqual(urlopen.call_count, 1)
             self.assertEqual(self._event_types(events), ["model.requested"])
-        with patch("medagent.backends._open_request") as urlopen:
+        with patch("medagent.infra.backends._open_request") as urlopen:
             urlopen.return_value = SizedResponse(exact)
             backend = self._backend(EventStore())
             self.assertEqual(backend.decide("s", []), command)
@@ -1083,11 +1083,11 @@ class CompatibleP2FixTests(unittest.TestCase):
     # -- E-P2-3: non-deepseek thinking/effort drop is logged, not silent --
     def test_non_deepseek_thinking_drop_logged_and_not_sent(self):
         command = {"tool": "inspect_case", "arguments": {}}
-        with patch("medagent.backends._open_request") as urlopen:
+        with patch("medagent.infra.backends._open_request") as urlopen:
             urlopen.return_value = Response(
                 {"choices": [{"message": {"content": json.dumps(command)}}]}
             )
-            with self.assertLogs("medagent.backends", level="WARNING") as logs:
+            with self.assertLogs("medagent.infra.backends", level="WARNING") as logs:
                 events = EventStore()
                 backend = self._backend(
                     events,
@@ -1104,11 +1104,11 @@ class CompatibleP2FixTests(unittest.TestCase):
             self.assertNotIn("reasoning_effort", payload)
 
     def test_non_deepseek_effort_only_drop_logged(self):
-        with self.assertLogs("medagent.backends", level="WARNING"):
+        with self.assertLogs("medagent.infra.backends", level="WARNING"):
             self._backend(EventStore(), MEDAGENT_LLM_REASONING_EFFORT="high")
 
     def test_deepseek_thinking_drop_not_logged(self):
-        with self.assertNoLogs("medagent.backends", level="WARNING"):
+        with self.assertNoLogs("medagent.infra.backends", level="WARNING"):
             self._backend(
                 EventStore(),
                 base_url="https://api.deepseek.com",
@@ -1117,7 +1117,7 @@ class CompatibleP2FixTests(unittest.TestCase):
             )
 
     # -- E-P2-4: responded only after parse_decision passes --
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_invalid_decision_records_no_responded(self, urlopen):
         bad = {"tool": "ask_question", "arguments": {}, "extra": 1}
         urlopen.return_value = Response(
@@ -1129,7 +1129,7 @@ class CompatibleP2FixTests(unittest.TestCase):
             backend.decide("s", [])
         self.assertEqual(self._event_types(events), ["model.requested"])
 
-    @patch("medagent.backends._open_request")
+    @patch("medagent.infra.backends._open_request")
     def test_empty_content_twice_records_no_responded(self, urlopen):
         urlopen.side_effect = [
             Response({"choices": [{"message": {"content": ""}}]}),

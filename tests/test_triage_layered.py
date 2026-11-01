@@ -7,9 +7,9 @@ import json
 import unittest
 from pathlib import Path
 
-from medagent.domain import CaseState, RiskLevel
-from medagent.red_flags import FlagHit, RedFlagScanner, load_definitions
-from medagent.triage import TriageService
+from medagent.core.domain import CaseState, RiskLevel
+from medagent.guards.red_flags import FlagHit, RedFlagScanner, load_definitions
+from medagent.clinical.triage import TriageService
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

@@ -17,7 +17,7 @@ import time
 from urllib import error, request
 from urllib.parse import urlsplit
 
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 
 
 class EvaluationGateway(ThreadingHTTPServer):

@@ -276,11 +276,11 @@ class ShadowObservationTests(unittest.TestCase):
 
     def make_engine(self):
         from medagent.consultation.agent import AdaptiveConsultationEngine
-        from medagent.events import EventStore
-        from medagent.knowledge import ContentRepository
-        from medagent.reasoner import OrderedQuestionRanker
-        from medagent.self_checks import SelfCheckService
-        from medagent.triage import TriageService
+        from medagent.core.events import EventStore
+        from medagent.clinical.knowledge import ContentRepository
+        from medagent.clinical.reasoner import OrderedQuestionRanker
+        from medagent.guards.self_checks import SelfCheckService
+        from medagent.clinical.triage import TriageService
 
         class Backend:
             name = "fixture"

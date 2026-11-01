@@ -21,7 +21,7 @@ import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import ConsultationEngine, UserInput
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -30,14 +30,14 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.education import needs_enrichment
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.reports.education import needs_enrichment
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
+from medagent.guards.self_checks import SelfCheckService
 from medagent.subagents import SubagentCoordinator
-from medagent.triage import TriageService
+from medagent.clinical.triage import TriageService
 from tests.test_agent import ScriptBackend
 from tests.test_agent_wave2_engine import make_engine as make_adaptive_engine
 from tests.test_conclusion import ANSWERS

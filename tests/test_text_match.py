@@ -6,7 +6,7 @@ T-06 (denial list), N-03 (不是…), S-09 (不敢…), N-05 / O-13
 (uncertain mentions), G-06 / T-02 (denial-list support quotes).
 """
 
-from medagent.text_match import (
+from medagent.core.text_match import (
     UNCERTAINTY_MARKERS,
     contains_unnegated,
     find_unnegated,

@@ -6,15 +6,15 @@ New tests only. No existing test file is modified here.
 import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.agent_tools import ProposalError, validate_proposals
+from medagent.infra.agent_tools import ProposalError, validate_proposals
 from medagent.consultation import UserInput
-from medagent.domain import Assertion
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
-from medagent.worry import extract_worry_object, is_worry_sentence
+from medagent.core.domain import Assertion
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
+from medagent.core.worry import extract_worry_object, is_worry_sentence
 
 
 def fact(key, value, evidence, assertion="present", correction=False):

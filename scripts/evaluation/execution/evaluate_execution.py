@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 import time
 
-from medagent.env_config import read_env
+from medagent.infra.env_config import read_env
 from medagent.execution import ExecutionManager, safe_file
 
 

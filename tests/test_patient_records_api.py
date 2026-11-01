@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from medagent.medical_images import inspect_image
+from medagent.infra.medical_images import inspect_image
 from medagent.patient_records import PatientRecordStore
 from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer

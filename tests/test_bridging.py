@@ -1,13 +1,13 @@
 import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.bridging import (
+from medagent.reports.bridging import (
     build_bridging_sentence,
     lint_bridging_sentence,
     model_question_bridging_status,
 )
 from medagent.consultation import UserInput
-from medagent.domain import (
+from medagent.core.domain import (
     AgentReply,
     Assertion,
     Fact,
@@ -15,11 +15,11 @@ from medagent.domain import (
     Source,
 )
 from medagent.server.runtime import build_runtime
-from medagent.knowledge import ContentRepository
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
-from medagent.events import EventStore
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.clinical.knowledge import ContentRepository
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
+from medagent.core.events import EventStore
+from medagent.clinical.reasoner import OrderedQuestionRanker
 
 
 def fact(key, value, assertion=Assertion.PRESENT):
@@ -231,7 +231,7 @@ class BridgingAdaptiveEngineTests(unittest.TestCase):
         # old bytes pinned the anchor alone because the group bridge
         # was skipped whenever the anchor applied. Each renders once,
         # and the anchor's trace kind is preserved, not clobbered.
-        from medagent.bridging import GROUP_BRIDGES
+        from medagent.reports.bridging import GROUP_BRIDGES
 
         self.assertEqual(
             reply.message,
@@ -419,7 +419,7 @@ class BridgingP23OnsetDedupTests(unittest.TestCase):
         # stacks the verb is skipped in favour of the next generic
         # anchor, and when every candidate stacks the question is
         # shown unadorned rather than doubled.
-        from medagent.bridging import _has_verb_stacking
+        from medagent.reports.bridging import _has_verb_stacking
 
         self.assertTrue(_has_verb_stacking("从昨天开始拉肚子的开始到现在，再问一句："))
         self.assertFalse(_has_verb_stacking("你说昨天开始拉肚子，再问一句："))
@@ -542,7 +542,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
         )
 
     def test_plain_ask_patient_is_rejected_when_anchorable_fact_exists(self):
-        from medagent.agent_tools import ProposalError
+        from medagent.infra.agent_tools import ProposalError
 
         self.state.facts["chief_complaint"] = fact("chief_complaint", "头痛")
         with self.assertRaises(ProposalError):
@@ -559,7 +559,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
         # 好判断接下来哪些筛查适用" already says why the question is
         # asked, so it must pass the B-route check instead of burning
         # one self-correction round.
-        from medagent.bridging import WHY_MARKERS
+        from medagent.reports.bridging import WHY_MARKERS
 
         self.assertIn("先确认", WHY_MARKERS)
         self.assertIn("好判断", WHY_MARKERS)
@@ -579,7 +579,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
         # question that opens with a bridge but never says why it is
         # asked is still rejected by both the status function and the
         # ask_patient gate.
-        from medagent.agent_tools import ProposalError
+        from medagent.infra.agent_tools import ProposalError
 
         question = "你说头痛两天了，请问什么时候开始的？"
         self.assertEqual(
@@ -590,7 +590,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
             self._ask_patient("onset", question)
 
     def test_ask_patient_without_bridge_but_with_why_is_rejected(self):
-        from medagent.agent_tools import ProposalError
+        from medagent.infra.agent_tools import ProposalError
 
         self.state.facts["chief_complaint"] = fact("chief_complaint", "头痛")
         with self.assertRaises(ProposalError):
@@ -602,7 +602,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
         self.assertEqual(reply.message, "哪里不舒服？")
 
     def test_plain_clarify_is_rejected_when_anchorable_fact_exists(self):
-        from medagent.agent_tools import ProposalError
+        from medagent.infra.agent_tools import ProposalError
 
         self.state.facts["chief_complaint"] = fact("chief_complaint", "头痛")
         with self.assertRaises(ProposalError):
@@ -615,7 +615,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
         self.assertEqual(reply.message, message)
 
     def test_prohibited_phrase_still_rejected_before_bridge_check(self):
-        from medagent.adaptive_questions import AdaptiveQuestionError
+        from medagent.dialogue.adaptive_questions import AdaptiveQuestionError
 
         self.state.facts["chief_complaint"] = fact("chief_complaint", "头痛")
         with self.assertRaises(AdaptiveQuestionError):

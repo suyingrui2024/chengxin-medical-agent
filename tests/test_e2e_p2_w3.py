@@ -23,13 +23,13 @@ import unittest
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import _adjust_assertion_wording
 from medagent.consultation import VALUE_LABELS
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.events import EventStore
-from medagent.interpreter import Interpreter
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.core.events import EventStore
+from medagent.clinical.interpreter import Interpreter
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 ORAL_COURSE = (
     "这类口腔不适多数会在数天内逐渐缓解或出现明确变化，"

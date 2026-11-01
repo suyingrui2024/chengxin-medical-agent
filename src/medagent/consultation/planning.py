@@ -51,7 +51,7 @@ class ConsultationEnginePlanning:
     ) -> None:
         task_result = decoded or self.self_checks.interpret(task_id, text, choice_value)
         result = task_result.interpretation
-        from ..measurement_reports import temperature_report
+        from ..reports.measurement_reports import temperature_report
 
         report = (
             temperature_report(text)
@@ -77,7 +77,7 @@ class ConsultationEnginePlanning:
                 structured_input,
             )
         if resume:
-            from ..domain import utc_now
+            from ..core.domain import utc_now
 
             attempt = next(
                 a for a in state.observation_attempts if a["id"] == resume["attempt_id"]

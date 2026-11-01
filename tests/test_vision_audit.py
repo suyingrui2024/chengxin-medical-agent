@@ -14,7 +14,7 @@ import zlib
 from unittest import mock
 from urllib.error import HTTPError, URLError
 
-from medagent.medical_images import (
+from medagent.infra.medical_images import (
     DeepSeekVisionRecognizer,
     RecognitionError,
     inspect_image,
@@ -88,7 +88,7 @@ class VisionAuditTests(unittest.TestCase):
 
     def test_success_records_usage_and_duration(self):
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse(recognition_payload()),
         ) as urlopen:
             result = self.recognizer.recognize(self.image)
@@ -107,7 +107,7 @@ class VisionAuditTests(unittest.TestCase):
                 raise URLError("connection reset")
             return FakeResponse(recognition_payload())
 
-        with mock.patch("medagent.medical_images.urlopen", side_effect=flaky):
+        with mock.patch("medagent.infra.medical_images.urlopen", side_effect=flaky):
             result = self.recognizer.recognize(self.image)
         self.assertEqual(calls["n"], 2)
         self.assertTrue(self.recognizer.last_retried)
@@ -115,7 +115,7 @@ class VisionAuditTests(unittest.TestCase):
 
     def test_persistent_network_failure_fails_after_two_attempts(self):
         with mock.patch(
-            "medagent.medical_images.urlopen", side_effect=URLError("down")
+            "medagent.infra.medical_images.urlopen", side_effect=URLError("down")
         ) as urlopen:
             with self.assertRaises(RecognitionError):
                 self.recognizer.recognize(self.image)
@@ -126,13 +126,13 @@ class VisionAuditTests(unittest.TestCase):
         # same instance must not leave the previous success's usage
         # or duration behind.
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse(recognition_payload()),
         ):
             self.recognizer.recognize(self.image)
         self.assertEqual(self.recognizer.last_usage["total_tokens"], 1280)
         with mock.patch(
-            "medagent.medical_images.urlopen", side_effect=URLError("down")
+            "medagent.infra.medical_images.urlopen", side_effect=URLError("down")
         ) as urlopen:
             with self.assertRaises(RecognitionError):
                 self.recognizer.recognize(self.image)
@@ -144,13 +144,13 @@ class VisionAuditTests(unittest.TestCase):
     def test_stale_telemetry_cleared_after_provider_error(self):
         # P1-D-1, provider-error branch: same staleness, no retry.
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse(recognition_payload()),
         ):
             self.recognizer.recognize(self.image)
         error = HTTPError("https://x", 500, "server error", {}, None)
         with mock.patch(
-            "medagent.medical_images.urlopen", side_effect=error
+            "medagent.infra.medical_images.urlopen", side_effect=error
         ) as urlopen:
             with self.assertRaises(RecognitionError):
                 self.recognizer.recognize(self.image)
@@ -163,7 +163,7 @@ class VisionAuditTests(unittest.TestCase):
         # Resetting at call start must not break the normal path: a
         # second success re-assigns its own fresh values.
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse(recognition_payload()),
         ):
             self.recognizer.recognize(self.image)
@@ -174,7 +174,7 @@ class VisionAuditTests(unittest.TestCase):
             "total_tokens": 2000,
         }
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse(second),
         ):
             self.recognizer.recognize(self.image)
@@ -185,7 +185,7 @@ class VisionAuditTests(unittest.TestCase):
     def test_provider_error_is_not_retried(self):
         error = HTTPError("https://x", 429, "rate limited", {}, None)
         with mock.patch(
-            "medagent.medical_images.urlopen", side_effect=error
+            "medagent.infra.medical_images.urlopen", side_effect=error
         ) as urlopen:
             with self.assertRaises(RecognitionError) as ctx:
                 self.recognizer.recognize(self.image)

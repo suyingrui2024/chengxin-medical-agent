@@ -5,8 +5,8 @@ from __future__ import annotations
 import unittest
 
 from medagent.consultation import StaleActionError, UserInput
-from medagent.domain import AgentReply, Phase
-from medagent.phase_graph import can_transition, planning_rank
+from medagent.core.domain import AgentReply, Phase
+from medagent.core.phase_graph import can_transition, planning_rank
 from medagent.server.runtime import build_runtime
 
 EXPECTED_ORDER = [

@@ -17,10 +17,10 @@ import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
-from medagent.domain import Assertion, Fact, Phase, Source
-from medagent.knowledge import ADULT_AGE_PROMPT, question_fact_gates_pass
-from medagent.planner import RulePlanner
-from medagent.reasoning import DifferentialPlanner
+from medagent.core.domain import Assertion, Fact, Phase, Source
+from medagent.clinical.knowledge import ADULT_AGE_PROMPT, question_fact_gates_pass
+from medagent.clinical.planner import RulePlanner
+from medagent.clinical.reasoning import DifferentialPlanner
 from medagent.server.runtime import build_runtime
 
 ANSWERS = {

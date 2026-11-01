@@ -28,9 +28,9 @@ import unittest
 from copy import deepcopy
 
 from medagent.consultation import closing
-from medagent.agent_tools import ProposalError
+from medagent.infra.agent_tools import ProposalError
 from medagent.consultation import UserInput
-from medagent.domain import (
+from medagent.core.domain import (
     AgentReply,
     Assertion,
     Fact,
@@ -39,7 +39,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.events import Event
+from medagent.core.events import Event
 from medagent.server.runtime import build_runtime
 from tests.test_agent import cmd, fact
 from tests.test_agent_wave2_engine import make_engine, record
@@ -929,7 +929,7 @@ class BypassClosureTests(unittest.TestCase):
         self.assertIn("deny_emergency_clarification", values)
 
     def test_planner_stuck_with_downgraded_risk_finishes_not_urgent(self):
-        from medagent.reasoning import DifferentialPlanner, ReasoningWorkspace
+        from medagent.clinical.reasoning import DifferentialPlanner, ReasoningWorkspace
 
         class _StaticProposer:
             def __init__(self, raw):

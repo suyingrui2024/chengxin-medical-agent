@@ -342,7 +342,7 @@ class ConsultationEngineClosing:
         if reply.kind != "question" or not reply.question_id:
             return
         try:
-            from ..bridging import (
+            from ..reports.bridging import (
                 build_group_bridge,
                 lint_group_bridge,
                 question_group,
@@ -456,7 +456,7 @@ class ConsultationEngineClosing:
             reply.location_revision_action = self._location_revision_entry(state)
             self._remember_location_revision_question(state, reply)
             if reply.task:
-                from ..task_interactions import task_with_interaction
+                from ..dialogue.task_interactions import task_with_interaction
 
                 reply.task = task_with_interaction(
                     reply.task,

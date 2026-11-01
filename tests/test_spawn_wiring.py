@@ -10,12 +10,12 @@ the case's current one is flagged for the main model.
 import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.domain import RiskLevel
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.core.domain import RiskLevel
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 
 class _ScriptBackend:

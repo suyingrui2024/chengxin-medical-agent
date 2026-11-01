@@ -9,7 +9,7 @@ import shutil
 import subprocess
 from urllib.parse import urlsplit
 
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 
 
 def require_dsh_node():

@@ -2,11 +2,11 @@ from copy import deepcopy
 import json
 import unittest
 
-from medagent.domain import AgentReply, Phase
+from medagent.core.domain import AgentReply, Phase
 from medagent.extensions.builtin import load_registry
 from medagent.extensions.registry import Capability, CapabilityRegistry
-from medagent.presentation import UI_VERSION, calculation_presentation
-from medagent.knowledge import ContentRepository
+from medagent.core.presentation import UI_VERSION, calculation_presentation
+from medagent.clinical.knowledge import ContentRepository
 
 
 class PresentationTests(unittest.TestCase):

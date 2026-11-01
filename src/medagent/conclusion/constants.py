@@ -6,17 +6,17 @@ from copy import deepcopy
 from datetime import datetime
 from importlib import resources
 from typing import Any, Dict, List, Optional
-from ..baseline_projection import build_allergy_hint
-from ..direction_guards import (
+from ..guards.baseline_projection import build_allergy_hint
+from ..guards.direction_guards import (
     direction_kept,
     is_affirmed_in_text,
     severity_consistent_text,
 )
-from ..domain import Assertion, CaseState, Phase, RiskLevel
-from ..followups import build_follow_up_plan
-from ..handoff import LABELS as FACT_LABELS
-from ..text_match import contains_unnegated, find_unnegated_certain
-from ..worry import extract_worry_object, is_worry_sentence
+from ..core.domain import Assertion, CaseState, Phase, RiskLevel
+from ..clinical.followups import build_follow_up_plan
+from ..reports.handoff import LABELS as FACT_LABELS
+from ..core.text_match import contains_unnegated, find_unnegated_certain
+from ..core.worry import extract_worry_object, is_worry_sentence
 # The three fact tables (BANNED_PHRASES / GAP_IMPACTS / MEASUREMENT_FACTS) and
 # their fallback live in the shared ``facts`` package so that ``subagents`` and
 # other consumers can read them without importing the whole ``conclusion``

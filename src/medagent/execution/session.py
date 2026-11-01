@@ -536,7 +536,7 @@ class ExecutionSession:
             ):
                 environment[key] = value
         environment["NO_PROXY"] = "127.0.0.1,localhost,::1"
-        from ..processes import popen
+        from ..infra.processes import popen
         self.process = popen(
             [
                 shutil.which("node"),
@@ -861,20 +861,20 @@ class ExecutionSession:
                     process.wait(timeout=6)
                 except subprocess.TimeoutExpired:
                     if os.name == "nt":
-                        from ..processes import terminate
+                        from ..infra.processes import terminate
                         terminate(process)
                     else:
                         os.killpg(process.pid, signal.SIGTERM)
                     try:
                         process.wait(timeout=3)
                     except subprocess.TimeoutExpired:
-                        from ..processes import terminate
+                        from ..infra.processes import terminate
                         terminate(process)
                         process.wait(timeout=3)
         except (OSError, ProcessLookupError):
             pass
         finally:
-            from ..processes import release
+            from ..infra.processes import release
             release(process)
             if process.stdin and not process.stdin.closed:
                 process.stdin.close()

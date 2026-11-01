@@ -10,16 +10,16 @@ import statistics
 import time
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.agent_tools import TOOL_DEFINITIONS
-from medagent.backends import CompatibleBackend, DshBackend
+from medagent.infra.agent_tools import TOOL_DEFINITIONS
+from medagent.infra.backends import CompatibleBackend, DshBackend
 from medagent.consultation import UserInput
-from medagent.domain import Assertion, Phase
-from medagent.env_config import for_backend, read_env
-from medagent.events import Event, EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.core.domain import Assertion, Phase
+from medagent.infra.env_config import for_backend, read_env
+from medagent.core.events import Event, EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 
 class EvaluationBudgetExceeded(RuntimeError):

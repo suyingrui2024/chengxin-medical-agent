@@ -16,8 +16,8 @@ agree with the pre-pick state).
 import copy
 import unittest
 
-from medagent.domain import Assertion, Fact, Source
-from medagent.planner import RulePlanner
+from medagent.core.domain import Assertion, Fact, Source
+from medagent.clinical.planner import RulePlanner
 from medagent.server.runtime import build_runtime
 from tests.question_ordering_contract import (
     expected_next_question,

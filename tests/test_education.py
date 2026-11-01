@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from threading import RLock
 
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -19,7 +19,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.education import EducationEnricher
+from medagent.reports.education import EducationEnricher
 
 
 class FakeEvents:

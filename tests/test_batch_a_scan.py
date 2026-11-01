@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import unittest
 
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.red_flags import FlagHit, RedFlagScanner
-from medagent.triage import TriageService, confirmed_trigger_labels
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.guards.red_flags import FlagHit, RedFlagScanner
+from medagent.clinical.triage import TriageService, confirmed_trigger_labels
 
 
 def flag_ids(text: str) -> set:

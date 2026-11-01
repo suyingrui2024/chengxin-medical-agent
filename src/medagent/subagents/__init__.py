@@ -28,12 +28,12 @@ from threading import BoundedSemaphore, Event as ThreadEvent, Lock, Thread
 from time import monotonic
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
-from ..backends import parse_decision
+from ..infra.backends import parse_decision
 from ..facts import BANNED_PHRASES, GAP_IMPACTS, MEASUREMENT_FACTS
-from ..decision_wait import DecisionInterrupted
-from ..domain import CaseState, utc_now
-from ..events import Event
-from ..reasoning import ReasoningWorkspace, load_pathways
+from ..core.decision_wait import DecisionInterrupted
+from ..core.domain import CaseState, utc_now
+from ..core.events import Event
+from ..clinical.reasoning import ReasoningWorkspace, load_pathways
 
 from .constants import (MODES, TENDENCY_LEVELS, KINDS, _KIND_TOOLS, MAX_BRANCHES, SPAWN_ENVELOPE_TOKENS, SPAWN_ENVELOPE_DEADLINE_S, RECENT_WINDOW_TURNS, MAX_FINDINGS, MAX_CLAIM_CHARS, MAX_CONCLUSION_CHARS, _DISPOSITION_PATTERN, _DOSAGE_PATTERN, _ENVELOPE_HINT, KIND_INSTRUCTIONS, _content_index_cache)
 from .content import (watermark, _load_content_json, _content_index, _known_fact_keys, _knowledge_search, _banned_hit)

@@ -15,7 +15,7 @@ import threading
 import time
 
 from scripts.benchmarks.benchmark_execution import Baseline, BoundedGateway, ROOT, product_run, summarize
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 from medagent.execution import ExecutionManager
 from medagent import __version__
 from scripts.benchmarks.public.public_execution_cases import (

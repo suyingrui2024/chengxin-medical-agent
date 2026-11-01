@@ -6,19 +6,19 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.background_review import (
+from medagent.review.background_review import (
     BackgroundReviewCoordinator,
     ReviewJob,
     validate_review,
 )
-from medagent.decision_wait import DecisionInterrupted
-from medagent.domain import RiskLevel
-from medagent.events import Event, EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
+from medagent.core.decision_wait import DecisionInterrupted
+from medagent.core.domain import RiskLevel
+from medagent.core.events import Event, EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
 from medagent.server import Handler, MedicalAgentServer
-from medagent.triage import TriageService
+from medagent.clinical.triage import TriageService
 
 
 class ReviewBackend:

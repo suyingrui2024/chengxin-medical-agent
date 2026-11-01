@@ -3,9 +3,9 @@ from copy import deepcopy
 import unittest
 
 from medagent.consultation import UserInput
-from medagent.domain import AgentReply, Phase
-from medagent.events import Event
-from medagent.task_interactions import task_with_interaction
+from medagent.core.domain import AgentReply, Phase
+from medagent.core.events import Event
+from medagent.dialogue.task_interactions import task_with_interaction
 from tests import test_consultation as fixture
 
 

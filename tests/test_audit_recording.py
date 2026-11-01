@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from medagent.audit_recording import (
+from medagent.review.audit_recording import (
     RecordingBackend,
     TokenCounter,
     measure_messages,

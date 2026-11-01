@@ -29,7 +29,7 @@ from scripts.benchmarks.public.benchmark_wait_policy import (
 from scripts.evaluation.execution.evaluate_delivery_checks import fingerprints
 from scripts.benchmarks.execution_task_contract import CONTRACT, regression_file
 from medagent import __version__
-from medagent.env_config import read_env, for_backend
+from medagent.infra.env_config import read_env, for_backend
 from medagent.execution import ExecutionManager
 from scripts.benchmarks.public.public_execution_cases import protected
 from scripts.benchmarks.public.public_test_sample import (

@@ -11,7 +11,7 @@ from medagent import conclusion as conclusion_module
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import compose_conclusion, spoken_close_line
 from medagent.consultation import UserInput
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -20,12 +20,12 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 
 def closed_state(chief="发烧两天", risk=RiskLevel.ROUTINE, reason="confirmed_by_user"):

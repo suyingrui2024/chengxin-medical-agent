@@ -3,14 +3,14 @@ import tempfile
 import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.backends import dsh_usage
+from medagent.infra.backends import dsh_usage
 from medagent.consultation import UserInput
-from medagent.env_config import read_env, for_backend
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.infra.env_config import read_env, for_backend
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 
 class CaptureBackend:

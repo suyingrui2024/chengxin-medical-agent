@@ -31,7 +31,7 @@ import json
 from pathlib import Path
 
 from medagent.conclusion import BANNED_PHRASES, RETURN_NOW_IF, compose_conclusion
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -40,7 +40,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.followups import build_follow_up_plan
+from medagent.clinical.followups import build_follow_up_plan
 
 ROOT = Path(__file__).resolve().parents[3]
 

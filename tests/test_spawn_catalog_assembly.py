@@ -23,13 +23,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
+from medagent.guards.self_checks import SelfCheckService
 from medagent.subagents import SubagentCoordinator
-from medagent.triage import TriageService
+from medagent.clinical.triage import TriageService
 from medagent.server.workspace import Workspace
 from tests.test_agent import ScriptBackend
 

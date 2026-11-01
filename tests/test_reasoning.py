@@ -6,8 +6,8 @@ from __future__ import annotations
 import unittest
 
 from medagent.consultation import UserInput
-from medagent.domain import CaseState
-from medagent.reasoning import (
+from medagent.core.domain import CaseState
+from medagent.clinical.reasoning import (
     DifferentialPlanner,
     EvidenceRef,
     Hypothesis,
@@ -17,8 +17,8 @@ from medagent.reasoning import (
     validate_workspace,
 )
 from medagent.server.runtime import build_runtime
-from medagent.triage import TriageService
-from medagent.triage_review import ReasoningReviewProvider
+from medagent.clinical.triage import TriageService
+from medagent.clinical.triage_review import ReasoningReviewProvider
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),
@@ -120,7 +120,7 @@ class DifferentialFlowTests(unittest.TestCase):
     def test_rule_planner_keeps_bank_order(self):
         # The engine default is the differential planner since 2026-10-23;
         # pin the rule planner explicitly for the bank-order contract.
-        from medagent.planner import RulePlanner
+        from medagent.clinical.planner import RulePlanner
 
         self.engine.planner = RulePlanner(self.engine)
         driver = _Driver(self.engine, self.state, self.reply)
@@ -212,7 +212,7 @@ class AbstentionTests(unittest.TestCase):
         try:
             state, _ = engine.create_session()
             # Fill every question fact so no candidates remain.
-            from medagent.domain import Assertion, Fact, Source
+            from medagent.core.domain import Assertion, Fact, Source
 
             for question in engine.content.questions:
                 state.record(Fact(
@@ -293,7 +293,7 @@ class NewPathwayCoverageTests(unittest.TestCase):
     empty (the abstention fixtures depend on it)."""
 
     def _workspace(self, facts):
-        from medagent.domain import Assertion, Fact, Source
+        from medagent.core.domain import Assertion, Fact, Source
 
         state = CaseState(session_id="pathway-unit")
         for key, value, evidence in facts:
@@ -377,7 +377,7 @@ class NegationMatchingTests(unittest.TestCase):
     reasoning-quality pass)."""
 
     def test_text_match_windows_and_clauses(self):
-        from medagent.text_match import contains_unnegated
+        from medagent.core.text_match import contains_unnegated
 
         self.assertFalse(contains_unnegated("没有呕吐", "呕吐"))
         self.assertFalse(contains_unnegated("无发热", "发热"))
@@ -389,7 +389,7 @@ class NegationMatchingTests(unittest.TestCase):
         self.assertTrue(contains_unnegated("右下腹绞痛", "右下腹"))
 
     def _workspace(self, facts):
-        from medagent.domain import Assertion, Fact, Source
+        from medagent.core.domain import Assertion, Fact, Source
 
         state = CaseState(session_id="negation-unit")
         for key, value in facts:
@@ -435,7 +435,7 @@ class BareMeiNegationTests(unittest.TestCase):
     verb (没睡好), not the symptom that follows it."""
 
     def test_mei_negates_only_when_adjacent(self):
-        from medagent.text_match import contains_unnegated
+        from medagent.core.text_match import contains_unnegated
 
         self.assertTrue(contains_unnegated("没睡好胸口疼", "胸口"))
         self.assertTrue(contains_unnegated("昨晚没睡好头疼", "头疼"))

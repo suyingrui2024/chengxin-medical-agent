@@ -9,13 +9,13 @@ from importlib import resources
 from typing import Any, Dict, List, Mapping, Optional
 from uuid import uuid4
 
-from ...agent_tools import (
+from ...infra.agent_tools import (
     ProposalError,
     TOOL_DEFINITIONS,
     validate_proposals,
     validate_command,
 )
-from ...backends import DecisionBackend
+from ...infra.backends import DecisionBackend
 from .. import (
     SELF_CHECK_SUSPEND_CAP,
     ConsultationEngine,
@@ -33,8 +33,8 @@ from ...shared_types import (
     SubjectBoundaryError,
     UserInput,
 )
-from ...decision_wait import DecisionWaiter, DecisionTurn, DecisionInterrupted
-from ...domain import (
+from ...core.decision_wait import DecisionWaiter, DecisionTurn, DecisionInterrupted
+from ...core.domain import (
     AgentReply,
     Assertion,
     CaseState,
@@ -44,27 +44,27 @@ from ...domain import (
     RiskLevel,
     Source,
 )
-from ...events import Event
+from ...core.events import Event
 from ...kg import runtime as kg_runtime
 from ...kg.ambiguity import should_clarify
-from ...consultation_subject import (
+from ...dialogue.consultation_subject import (
     subject_profile,
     reference as subject_reference,
     compatible,
     explicit_switch,
 )
-from ...interpreter import Interpretation
-from ...knowledge import Question, question_fact_gates_pass
-from ...reasoning import RuleBasedProposer, load_pathways
-from ...text_match import contains_unnegated
-from ...worry import extract_worry_object, is_worry_sentence
-from ...adaptive_questions import (
+from ...clinical.interpreter import Interpretation
+from ...clinical.knowledge import Question, question_fact_gates_pass
+from ...clinical.reasoning import RuleBasedProposer, load_pathways
+from ...core.text_match import contains_unnegated
+from ...core.worry import extract_worry_object, is_worry_sentence
+from ...dialogue.adaptive_questions import (
     AdaptiveQuestionError,
     RISK_TAG_CUES,
     project_selected_answer,
     validate_adaptive_question,
 )
-from ...bridging import (
+from ...reports.bridging import (
     DETAIL_FACT_KEYS,
     MODEL_BRIDGING_REPAIR_HINT,
     SELF_BRIDGED_OPENERS,

@@ -26,13 +26,13 @@ import threading
 import unittest
 from pathlib import Path
 
-from medagent.background_review import (
+from medagent.review.background_review import (
     REVIEW_DEADLINE_SECONDS,
     BackgroundReviewCoordinator,
 )
 from medagent.consultation import UserInput
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.events import Event, EventStore
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.core.events import Event, EventStore
 from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 from medagent.subagents import SubagentCoordinator

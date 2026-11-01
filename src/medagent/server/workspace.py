@@ -8,19 +8,19 @@ from threading import RLock, Thread
 from urllib.parse import urlparse
 
 from ..consultation.agent import AdaptiveConsultationEngine
-from ..domain import utc_now
-from ..events import EventStore
-from ..consultation_subject import subject_profile
-from ..backends import CompatibleBackend, DshBackend
+from ..core.domain import utc_now
+from ..core.events import EventStore
+from ..dialogue.consultation_subject import subject_profile
+from ..infra.backends import CompatibleBackend, DshBackend
 from .runtime import build_runtime
 from pathlib import Path
 from ..extensions.builtin import load_registry, templates
-from ..events import Event
-from ..medical_images import vision_configuration_status
-from ..web_tools import web_mode
+from ..core.events import Event
+from ..infra.medical_images import vision_configuration_status
+from ..infra.web_tools import web_mode
 
 try:
-    from ..env_config import subagent_kind_modes as _env_subagent_kind_modes
+    from ..infra.env_config import subagent_kind_modes as _env_subagent_kind_modes
 except ImportError:  # the per-kind env helper has not landed yet
     _env_subagent_kind_modes = None
 

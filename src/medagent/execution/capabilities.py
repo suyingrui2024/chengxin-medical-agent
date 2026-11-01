@@ -14,7 +14,7 @@ from ..extensions.input_evidence import CapabilityError, units_evidence
 from ..extensions.glucose import glucose_evidence
 from ..extensions.builtin import load_registry
 from ..extensions.contracts import validate, validate_references
-from ..presentation import calculation_presentation
+from ..core.presentation import calculation_presentation
 
 PROTOCOL = "execution-capabilities/v1"
 HASH = re.compile(r"[0-9a-f]{64}")
@@ -39,10 +39,10 @@ IMPLEMENTATION_FILES = (
     "extensions/input_evidence.py",
     "extensions/glucose.py",
     "extensions/conversion_forms.py",
-    "presentation.py",
-    "domain.py",
-    "location_answers.py",
-    "interpreter.py",
+    "core/presentation.py",
+    "core/domain.py",
+    "dialogue/location_answers.py",
+    "clinical/interpreter.py",
 )
 
 

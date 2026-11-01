@@ -46,7 +46,7 @@ from medagent.conclusion import (
     unaddressed_urgent_goal_parts,
 )
 from medagent.consultation import UserInput  # noqa: F401  (parity import)
-from medagent.domain import (
+from medagent.core.domain import (
     AgentReply,
     Assertion,
     CaseState,

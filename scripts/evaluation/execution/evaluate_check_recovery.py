@@ -15,7 +15,7 @@ import threading
 from scripts.benchmarks.benchmark_execution import BoundedGateway, product_run
 from scripts.evaluation.execution.evaluate_delivery_checks import fingerprints
 from medagent import __version__
-from medagent.env_config import read_env, for_backend
+from medagent.infra.env_config import read_env, for_backend
 from medagent.execution import ExecutionManager
 
 ROOT = Path(__file__).resolve().parents[3]

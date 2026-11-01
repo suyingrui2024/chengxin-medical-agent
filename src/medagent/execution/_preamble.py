@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections import deque
 import hashlib
 import json
-from ..platform_fs import os, fcntl
+from ..infra.platform_fs import os, fcntl
 from pathlib import Path, PurePosixPath
 import select
 import shutil
@@ -17,7 +17,7 @@ import time
 from uuid import uuid4
 from urllib.parse import urlsplit
 
-from ..env_config import for_backend
+from ..infra.env_config import for_backend
 from .capabilities import freeze_binding, validate_receipt
 from .observations import ACTIVE_JOB_STATES, validate_observation
 from .limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget

@@ -14,7 +14,7 @@ import threading
 import time
 
 from scripts.benchmarks.benchmark_execution import BoundedGateway, check_artifacts
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 from medagent.execution import ExecutionManager, safe_file
 
 FILES = {

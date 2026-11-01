@@ -647,7 +647,7 @@
   }
  ],
  "corpus": "web-advisory-cases",
- "note": "Engineering corpus for the web advisory layer (design: 联网与子智能体工具设计 §8.1). Provider responses and fetch bodies are frozen snapshots; evaluation is fully offline. Expected tiers follow the design §4.3 registry rules (unregistered domains are T4). Conflict cases use the medagent.education CONFLICT_PHRASES caliber (Chinese phrasings); English dismissal text is outside the v1 caliber and is tracked as a known gap, not a case.",
+ "note": "Engineering corpus for the web advisory layer (design: 联网与子智能体工具设计 §8.1). Provider responses and fetch bodies are frozen snapshots; evaluation is fully offline. Expected tiers follow the design §4.3 registry rules (unregistered domains are T4). Conflict cases use the medagent.reports.education CONFLICT_PHRASES caliber (Chinese phrasings); English dismissal text is outside the v1 caliber and is tracked as a known gap, not a case.",
  "review_status": "unreviewed",
  "version": "0",
  "web_sources_version": "1.0"

@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-from medagent.release_evaluation import evaluate_cases
+from medagent.review.release_evaluation import evaluate_cases
 
 
 def main() -> int:

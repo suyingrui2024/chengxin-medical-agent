@@ -10,8 +10,8 @@ import time
 import unittest
 
 from medagent.execution import ExecutionManager, safe_file
-from medagent.platform_fs import os as workspace_os
-from medagent.processes import popen, terminate, release
+from medagent.infra.platform_fs import os as workspace_os
+from medagent.infra.processes import popen, terminate, release
 from medagent.execution.checkpoints import checkpoint
 
 

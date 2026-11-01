@@ -8,7 +8,7 @@ from threading import Lock, RLock, Condition
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
-from ..domain import (
+from ..core.domain import (
     AgentReply,
     Assertion,
     CaseState,
@@ -20,45 +20,45 @@ from ..domain import (
     RiskAssessment,
     Source,
 )
-from ..events import Event, EventStore
-from ..publication import ReplyPublicationGate
-from ..state_transitions import commit_phase
-from ..interpreter import Interpretation, Interpreter, ObservationInputError
-from ..knowledge import (
+from ..core.events import Event, EventStore
+from ..reports.publication import ReplyPublicationGate
+from ..core.state_transitions import commit_phase
+from ..clinical.interpreter import Interpretation, Interpreter, ObservationInputError
+from ..clinical.knowledge import (
     ADULT_AGE_PROMPT,
     ContentRepository,
     Question,
     question_fact_gates_pass,
 )
-from ..adaptive_questions import DIRECT_EMERGENCY_TAGS
-from ..red_flags import load_definitions
-from ..self_checks import SelfCheckService
-from ..triage import TriageService
-from ..turn_context import TurnContext
-from ..planner import RulePlanner
-from ..question_ordering import (
+from ..dialogue.adaptive_questions import DIRECT_EMERGENCY_TAGS
+from ..guards.red_flags import load_definitions
+from ..guards.self_checks import SelfCheckService
+from ..clinical.triage import TriageService
+from ..core.turn_context import TurnContext
+from ..clinical.planner import RulePlanner
+from ..clinical.question_ordering import (
     earliest_phase_candidates,
     filter_candidates,
     ordering_for_ranker,
 )
-from ..session_store import SessionStore
-from ..phase_graph import planning_rank
-from ..followups import RETRIAGE_OUTCOMES, apply_outcome, build_follow_up_plan
-from ..reasoner import QuestionRanker
+from ..infra.session_store import SessionStore
+from ..core.phase_graph import planning_rank
+from ..clinical.followups import RETRIAGE_OUTCOMES, apply_outcome, build_follow_up_plan
+from ..clinical.reasoner import QuestionRanker
 from .. import __version__
 # ``closing`` used to be a top-level kernel module; the close-rendering bodies
 # live in this package now, so it is a sibling rather than a parent import.
 from . import closing
-from ..bridging import build_bridging_sentence
-from ..handoff import LABELS as HANDOFF_LABELS
-from ..worry import extract_worry_object
-from ..presentation import calculation_presentation
-from ..task_intents import task_intent
-from ..patient_calculations import request_draft, confirmed_parameters
-from ..observations import ObservationMixin
-from ..task_conversation import TaskConversationMixin
-from ..calculation_followup import CalculationFollowupMixin
-from ..consultation_subject import (
+from ..reports.bridging import build_bridging_sentence
+from ..reports.handoff import LABELS as HANDOFF_LABELS
+from ..core.worry import extract_worry_object
+from ..core.presentation import calculation_presentation
+from ..dialogue.task_intents import task_intent
+from ..reports.patient_calculations import request_draft, confirmed_parameters
+from ..dialogue.observations import ObservationMixin
+from ..dialogue.task_conversation import TaskConversationMixin
+from ..reports.calculation_followup import CalculationFollowupMixin
+from ..dialogue.consultation_subject import (
     subject_profile,
     proposed_profile,
     compatible,

@@ -21,8 +21,8 @@ from medagent.conclusion import (
     _sheet_evidence_count,
     compose_conclusion,
 )
-from medagent.direction_guards import is_affirmed_in_text
-from medagent.domain import (
+from medagent.guards.direction_guards import is_affirmed_in_text
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -31,8 +31,8 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.knowledge import ContentRepository
-from medagent.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 
 
 def closed_state(chief="发烧两天", risk=RiskLevel.ROUTINE):

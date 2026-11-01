@@ -17,8 +17,8 @@ from __future__ import annotations
 
 import unittest
 
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.knowledge import ContentRepository
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.clinical.knowledge import ContentRepository
 
 
 def _state(chief, extra=()):

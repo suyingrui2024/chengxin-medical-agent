@@ -14,19 +14,19 @@ from threading import RLock
 from typing import Any, Iterator
 from uuid import uuid4
 from ...extensions.glucose import convert_glucose
-from ...measurement_kinds import (
+from ...core.measurement_kinds import (
     KNOWN_KINDS,
     MeasurementKindError,
     kind_spec,
     normalize_measurement,
     trend_summary,
 )
-from ...medical_images import InspectedImage, validate_recognition
+from ...infra.medical_images import InspectedImage, validate_recognition
 
-from ..constants import BASELINE_FIELDS, GENERIC_MEASUREMENT_CONTEXTS, GLUCOSE_MEASUREMENT_CONTEXTS, SCHEMA_VERSION, _MEASUREMENT_CONTEXT_LABELS
+from ...patient_records.constants import BASELINE_FIELDS, GENERIC_MEASUREMENT_CONTEXTS, GLUCOSE_MEASUREMENT_CONTEXTS, SCHEMA_VERSION, _MEASUREMENT_CONTEXT_LABELS
 
 
-from ..validation import PatientRecordConflict, PatientRecordError, _clean_text, _profile_dict, _render_decimal, _time, default_patient_data_root, utc_now, validate_baseline_patch
+from ...patient_records.validation import PatientRecordConflict, PatientRecordError, _clean_text, _profile_dict, _render_decimal, _time, default_patient_data_root, utc_now, validate_baseline_patch
 
 
 

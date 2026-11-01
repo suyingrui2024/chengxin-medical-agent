@@ -4,14 +4,14 @@ import unittest
 
 from medagent.consultation import UserInput
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.domain import Assertion, Source
-from medagent.events import Event, EventStore
-from medagent.knowledge import ContentRepository
-from medagent.interpreter import Interpretation
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.core.domain import Assertion, Source
+from medagent.core.events import Event, EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.interpreter import Interpretation
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 from tests.test_agent import ScriptBackend, cmd, fact
 
 

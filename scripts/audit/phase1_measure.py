@@ -19,17 +19,17 @@ from types import SimpleNamespace
 sys.path.insert(0, "src")
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.audit_recording import TokenCounter, measure_messages
-from medagent.knowledge import ContentRepository
-from medagent.triage import TriageService
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.events import EventStore
-from medagent.medical_images import SYSTEM_PROMPT as VISION_PROMPT
+from medagent.review.audit_recording import TokenCounter, measure_messages
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.triage import TriageService
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.core.events import EventStore
+from medagent.infra.medical_images import SYSTEM_PROMPT as VISION_PROMPT
 from medagent.subagents import KIND_INSTRUCTIONS, SubagentCoordinator
-from medagent.background_review import REVIEW_INSTRUCTIONS
-from medagent.reasoning import Hypothesis, ReasoningWorkspace
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
+from medagent.review.background_review import REVIEW_INSTRUCTIONS
+from medagent.clinical.reasoning import Hypothesis, ReasoningWorkspace
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
 
 
 class _ScriptBackend:

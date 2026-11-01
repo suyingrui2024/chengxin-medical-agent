@@ -24,12 +24,12 @@ import unittest
 from importlib import resources
 
 from medagent import consultation as consultation_module
-from medagent import hypothesis_ranking as hr_module
+from medagent.clinical import hypothesis_ranking as hr_module
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.agent_tools import ProposalError
+from medagent.infra.agent_tools import ProposalError
 from medagent.conclusion import chief_matches_pathway
 from medagent.consultation import ConsultationEngine, UserInput
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -38,17 +38,17 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.events import EventStore
-from medagent.hypothesis_ranking import (
+from medagent.core.events import EventStore
+from medagent.clinical.hypothesis_ranking import (
     URGENT_MINIMUM_FACTS,
     HypothesisRanker,
 )
-from medagent.knowledge import ContentRepository, Question
-from medagent.planner import RulePlanner
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.clinical.knowledge import ContentRepository, Question
+from medagent.clinical.planner import RulePlanner
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 _CONTENT = ContentRepository()
 _BY_ID = {question.id: question for question in _CONTENT.questions}

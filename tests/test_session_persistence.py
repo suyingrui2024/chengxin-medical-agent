@@ -9,7 +9,7 @@ from pathlib import Path
 
 from medagent.consultation import UserInput
 from medagent.server.runtime import build_runtime
-from medagent.session_store import SessionStore
+from medagent.infra.session_store import SessionStore
 
 ANSWERS = {
     "consult_for": ("我自己", "self"),

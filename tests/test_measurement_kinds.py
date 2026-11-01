@@ -21,7 +21,7 @@ from decimal import Decimal
 import pytest
 
 from medagent.extensions.glucose import convert_glucose
-from medagent.measurement_kinds import (
+from medagent.core.measurement_kinds import (
     KNOWN_KINDS,
     MeasurementKindError,
     canonical_unit,

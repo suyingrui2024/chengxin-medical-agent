@@ -30,7 +30,7 @@ from medagent.conclusion import (
     compose_conclusion,
     unaddressed_goal_parts,
 )
-from medagent.domain import (
+from medagent.core.domain import (
     AgentReply,
     Assertion,
     CaseState,

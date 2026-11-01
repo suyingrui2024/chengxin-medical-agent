@@ -9,7 +9,7 @@ from medagent.extensions.builtin import load_registry
 from medagent.extensions.glucose import convert_glucose, glucose_evidence
 from medagent.extensions.input_evidence import CapabilityError
 from medagent.extensions.registry import Capability, CapabilityRegistry
-from medagent.presentation import calculation_presentation
+from medagent.core.presentation import calculation_presentation
 from tests import test_patient_calculations as patient_fixture
 from tests.test_execution_capabilities import payload
 

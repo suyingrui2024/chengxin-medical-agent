@@ -14,7 +14,7 @@ import threading
 
 from scripts.benchmarks.benchmark_execution import BoundedGateway, product_run
 from scripts.evaluation.execution.evaluate_persistence import ContextWitness
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 from medagent.execution import ExecutionManager
 
 

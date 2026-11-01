@@ -7,9 +7,9 @@ import copy
 import unittest
 
 from medagent.consultation import UserInput
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.followups import build_follow_up_plan, routine_hours_for
-from medagent.flywheel import build_candidate, merge_candidates
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.clinical.followups import build_follow_up_plan, routine_hours_for
+from medagent.review.flywheel import build_candidate, merge_candidates
 from medagent.server.runtime import build_runtime
 
 ANSWERS = {
@@ -146,7 +146,7 @@ class FollowUpFlowTests(unittest.TestCase):
         self.assertEqual(prior["outcome"], "worsened")
         self.assertEqual(prior["outcome_note"], "又烧起来了")
         self.assertTrue(prior["disposition_level"])
-        from medagent.handoff import build_handoff
+        from medagent.reports.handoff import build_handoff
 
         self.assertEqual(build_handoff(new_state)["prior_case"], prior)
 

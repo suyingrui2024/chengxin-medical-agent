@@ -11,10 +11,10 @@ import threading
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from medagent import __version__
-from medagent.backends import DshBackend
+from medagent.infra.backends import DshBackend
 from medagent.consultation import UserInput
-from medagent.domain import Assertion
-from medagent.env_config import for_backend, read_env
+from medagent.core.domain import Assertion
+from medagent.infra.env_config import for_backend, read_env
 from scripts.evaluation.medical.test_live_desktop import EvaluationGateway
 from tests.test_self_check_conversation import SelfCheckConversationTests
 

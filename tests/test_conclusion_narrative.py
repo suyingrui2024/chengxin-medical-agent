@@ -16,7 +16,7 @@ from unittest import mock
 
 from medagent import conclusion as conclusion_module
 from medagent.conclusion import compose_conclusion, spoken_close_line
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -25,7 +25,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
+from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 
 DEPT_DATA = {
     "version": "1.0",

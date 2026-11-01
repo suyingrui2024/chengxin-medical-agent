@@ -16,8 +16,8 @@ from pathlib import Path
 
 from scripts.evaluation.medical.evaluate_live import Budget, make_engine
 from medagent.consultation import UserInput
-from medagent.env_config import for_backend, read_env
-from medagent.events import EventStore
+from medagent.infra.env_config import for_backend, read_env
+from medagent.core.events import EventStore
 
 
 ROOT = Path(__file__).resolve().parents[3]

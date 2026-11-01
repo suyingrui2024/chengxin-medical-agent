@@ -48,8 +48,8 @@ walkthrough is never bypassed):
 
 import unittest
 
-from medagent.domain import Assertion, Fact, Phase, Source
-from medagent.events import Event
+from medagent.core.domain import Assertion, Fact, Phase, Source
+from medagent.core.events import Event
 from medagent.server.runtime import build_runtime
 
 SCREEN_EVIDENCE = (

@@ -19,7 +19,7 @@ from medagent.execution.capabilities import (
     freeze_binding,
 )
 from medagent.extensions.builtin import load_registry
-from medagent.presentation import calculation_presentation
+from medagent.core.presentation import calculation_presentation
 
 
 def test_implementation_files_all_exist():

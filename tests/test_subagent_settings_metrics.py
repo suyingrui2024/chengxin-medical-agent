@@ -28,9 +28,9 @@ from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.events import Event, EventStore
-from medagent.reasoning import Hypothesis, ReasoningWorkspace
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.core.events import Event, EventStore
+from medagent.clinical.reasoning import Hypothesis, ReasoningWorkspace
 from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 from medagent.subagents import SubagentCoordinator

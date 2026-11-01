@@ -47,14 +47,14 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from medagent.knowledge import question_fact_gates_pass
-from medagent.question_ordering import (
+from medagent.clinical.knowledge import question_fact_gates_pass
+from medagent.clinical.question_ordering import (
     DifferentialOrdering,
     HypothesisOrdering,
     earliest_phase_candidates,
     filter_candidates,
 )
-from medagent.reasoning import (
+from medagent.clinical.reasoning import (
     ReasoningWorkspace,
     RuleBasedProposer,
     validate_workspace,

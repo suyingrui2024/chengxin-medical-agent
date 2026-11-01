@@ -23,7 +23,7 @@ import zlib
 from unittest import mock
 from urllib.error import URLError
 
-from medagent.medical_images import (
+from medagent.infra.medical_images import (
     DeepSeekVisionRecognizer,
     MedicalImageError,
     RecognitionError,
@@ -153,7 +153,7 @@ class P2DTests(unittest.TestCase):
     # --- 3. Rejection category retained ---------------------------------
     def _recognize_body(self, body):
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse(_provider_payload(body)),
         ):
             return self.recognizer.recognize(self.image)
@@ -183,7 +183,7 @@ class P2DTests(unittest.TestCase):
 
     def test_malformed_envelope_gets_parse_category(self):
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse({"choices": []}),
         ):
             with self.assertRaises(RecognitionError) as ctx:
@@ -210,7 +210,7 @@ class P2DTests(unittest.TestCase):
                 raise URLError("connection reset")
             return FakeResponse(_provider_payload(_recognition()))
 
-        with mock.patch("medagent.medical_images.urlopen", side_effect=flaky):
+        with mock.patch("medagent.infra.medical_images.urlopen", side_effect=flaky):
             result = self.recognizer.recognize(self.image)
         self.assertEqual(calls["n"], 2)
         self.assertTrue(self.recognizer.last_retried)
@@ -218,7 +218,7 @@ class P2DTests(unittest.TestCase):
 
     def test_failed_call_on_reused_instance_clears_telemetry(self):
         with mock.patch(
-            "medagent.medical_images.urlopen",
+            "medagent.infra.medical_images.urlopen",
             return_value=FakeResponse(
                 {**_provider_payload(_recognition()), "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15}}
             ),
@@ -226,7 +226,7 @@ class P2DTests(unittest.TestCase):
             self.recognizer.recognize(self.image)
         self.assertIsNotNone(self.recognizer.last_usage)
         with mock.patch(
-            "medagent.medical_images.urlopen", side_effect=URLError("down")
+            "medagent.infra.medical_images.urlopen", side_effect=URLError("down")
         ):
             with self.assertRaises(RecognitionError):
                 self.recognizer.recognize(self.image)

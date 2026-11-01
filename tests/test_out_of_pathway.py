@@ -28,7 +28,7 @@ from importlib import resources
 
 from medagent import conclusion as conclusion_module
 from medagent.conclusion import apply_neutral_fallback, chief_matches_pathway
-from medagent.out_of_pathway import SCOPE_NOTE, warning_questions
+from medagent.clinical.out_of_pathway import SCOPE_NOTE, warning_questions
 
 EXPECTED_DOMAINS = ["意识", "呼吸", "出血", "剧痛", "持续加重", "功能骤降"]
 

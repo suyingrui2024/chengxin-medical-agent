@@ -15,7 +15,7 @@ from unittest import mock
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.conclusion import compose_conclusion
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -24,12 +24,12 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.events import EventStore
-from medagent.knowledge import ADULT_AGE_PROMPT, ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ADULT_AGE_PROMPT, ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
 from medagent.server import _consultation_patient_id
-from medagent.triage import TriageService
+from medagent.clinical.triage import TriageService
 
 
 def _state_with_consult_for(value):
@@ -140,7 +140,7 @@ class ConclusionAllergyHintTests(unittest.TestCase):
         # content release adds an allergy line, this test must be
         # updated alongside the clinical review — not silently passed
         # by editing self_care wording here.
-        from medagent.baseline_projection import build_allergy_hint
+        from medagent.guards.baseline_projection import build_allergy_hint
         from medagent.conclusion import _load_json
 
         data = _load_json("self_care.json")

@@ -22,8 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "src"))
 
-from medagent.domain import CaseState  # noqa: E402
-from medagent.triage import TriageService  # noqa: E402
+from medagent.core.domain import CaseState  # noqa: E402
+from medagent.clinical.triage import TriageService  # noqa: E402
 
 
 def main() -> int:

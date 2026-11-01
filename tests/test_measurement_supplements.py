@@ -3,10 +3,10 @@ import json
 import unittest
 
 from medagent.consultation import ConsultationEngine, UserInput
-from medagent.domain import Assertion, ObservationQuality, Phase
+from medagent.core.domain import Assertion, ObservationQuality, Phase
 from medagent.extensions.builtin import observation
-from medagent.interpreter import ObservationInputError
-from medagent.measurement_reports import temperature_report
+from medagent.clinical.interpreter import ObservationInputError
+from medagent.reports.measurement_reports import temperature_report
 from tests.test_agent import cmd, fact
 from tests.test_repeated_observations import measured_case, repeat, OPENING
 

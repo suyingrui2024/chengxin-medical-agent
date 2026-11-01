@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 
 from medagent.consultation import StaleActionError, SubjectBoundaryError, UserInput
-from medagent.consultation_subject import (
+from medagent.dialogue.consultation_subject import (
     compatible,
     explicit_switch,
     proposed_profile,
@@ -130,7 +130,7 @@ class ConsultationSubjectTests(unittest.TestCase):
         )
 
     def test_third_person_reflexive_is_not_a_second_reporter_identity(self):
-        from medagent.consultation_subject import reference
+        from medagent.dialogue.consultation_subject import reference
 
         for quote in ["接下来为我母亲咨询她本人的不适", "母亲本人", "他本人", "她本人", "患者本人"]:
             with self.subTest(quote=quote):

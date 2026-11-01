@@ -28,7 +28,7 @@ from uuid import uuid4
 
 from scripts.benchmarks.execution_benchmark_cases import CASES
 from scripts.evaluation.medical.test_live_desktop import EvaluationGateway, GatewayHandler
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 from medagent.execution import ExecutionManager, safe_file
 
 ROOT = Path(__file__).resolve().parents[2]

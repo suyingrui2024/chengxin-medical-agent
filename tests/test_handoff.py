@@ -4,8 +4,8 @@ import glob
 import json
 from pathlib import Path
 
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.handoff import (
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.reports.handoff import (
     LABELS,
     REGISTERED_FACT_KEYS,
     build_handoff,

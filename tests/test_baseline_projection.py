@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 
-from medagent.baseline_projection import (
+from medagent.guards.baseline_projection import (
     BASELINE_REFERENCE_DISABLED_EVENT,
     BASELINE_REFERENCE_ENABLED_FIELD,
     baseline_reference_enabled,

@@ -4,15 +4,15 @@ from copy import deepcopy
 import unittest
 
 from medagent.consultation import UserInput
-from medagent.events import EventStore
+from medagent.core.events import EventStore
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.extensions.builtin import load_registry
 from medagent.extensions.scale_forms import ScaleSpecError, scale_form_spec
-from medagent.knowledge import ContentRepository
-from medagent.patient_calculations import confirmed_parameters, request_draft
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.clinical.knowledge import ContentRepository
+from medagent.reports.patient_calculations import confirmed_parameters, request_draft
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 SCALE_ID = "calculate.phq8"
 REQUEST = "帮我做个 PHQ-8 抑郁自评"

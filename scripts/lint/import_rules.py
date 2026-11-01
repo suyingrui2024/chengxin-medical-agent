@@ -10,16 +10,22 @@ are different debts; this check owns the second one.
 
 The layering
 ------------
-The 2026-10 modularisation left a three-tier shape.  It is not enforced by
+The 2026-10 modularisation left a layered shape.  It is not enforced by
 directory nesting, so it is declared here explicitly:
 
-* **capability** (``extensions``, ``kg``) — formula/scale/glucose engines and the
-  knowledge graph.  Widely reused, so they must stay ignorant of every feature.
-* **feature** (``consultation``, ``conclusion``, ``agent``, ``execution``,
-  ``patient_records``, ``subagents``) — the clinical workflows.  They may use
-  capabilities and the flat kernel, never each other.
-* **app** (``server``) — HTTP surface, sits on top of everything.  Only the
-  process entry points may import it.
+* **capability** (``extensions``, ``kg``, ``facts``) — formula/scale/glucose
+  engines, the knowledge graph and the shared fact tables.  Widely reused, so
+  they must stay ignorant of every feature.
+* **feature** (``consultation`` — which contains the adaptive engine as
+  ``consultation/agent`` — ``conclusion``, ``execution``, ``patient_records``,
+  ``subagents``) — the clinical workflows.  They may use capabilities and the
+  kernel, never each other.
+* **kernel** (``core``, ``guards``, ``dialogue``, ``clinical``, ``reports``,
+  ``review``, ``infra``, ``shared_types``, plus the two entry modules) — the
+  shared vocabulary and machinery.  Everything may use it; it may use nothing
+  above itself.
+* **app** (``server``) — HTTP surface and composition roots, sits on top of
+  everything.  Only the process entry points may import it.
 
 Imports that point *up* this stack are inversions: a capability that knows about
 a feature can no longer be reused or tested in isolation, and two features that
@@ -28,16 +34,18 @@ import each other cannot be changed independently.
 Rules
 -----
 R1  capability packages must not import feature or app packages.
-R2  feature packages must not import each other (capabilities and the flat
-    kernel are fair game).
+R2  feature packages must not import each other (capabilities and the kernel
+    are fair game).
 R3  only entry points (``cli``, ``desktop_service``) may import ``server``.
 R4  no import cycles.  Cycles are detected on *module-level* edges only: a
     function-level (late-bound) import is the canonical cycle-break and cannot
     trigger a circular-import error, so it is not counted as a cycle.  Every
     cycle the graph now contains is a genuine violation and fails the check;
     there is no tolerated baseline left.
-R5  the flat top-level module count must not grow.  It is the shared kernel and
-    the natural place for new debt to accumulate.
+R5  the flat top-level module count must not grow.  Only the two process entry
+    points are left at the top level; everything else lives in a package, so
+    there is no longer a shared "kernel directory" for new code to pile into.
+
 R6  the shared kernel must not import feature packages.  The kernel is the
     vocabulary every layer depends on, so a kernel module that reaches into a
     clinical workflow stops being reusable by the other workflows — and the
@@ -61,7 +69,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PACKAGE_ROOT = ROOT / "src" / "medagent"
 
-CAPABILITY_PACKAGES = frozenset({"extensions", "kg"})
+CAPABILITY_PACKAGES = frozenset({"extensions", "kg", "facts"})
 FEATURE_PACKAGES = frozenset(
     {"consultation", "conclusion", "agent", "execution", "patient_records", "subagents"}
 )
@@ -121,7 +129,7 @@ CYCLE_BASELINE: tuple[frozenset[str], ...] = ()
 
 # Flat modules directly under src/medagent/.  Frozen: new code belongs in a
 # package, not in the shared kernel.  Lower this number as modules move out.
-TOP_LEVEL_CEILING = 61
+TOP_LEVEL_CEILING = 2
 
 
 def module_name(path: pathlib.Path, root: pathlib.Path) -> str:

@@ -79,7 +79,7 @@ from datetime import datetime, timezone
 from typing import Any, Iterator
 from uuid import uuid4
 
-from ..medical_images import recognize_in_background
+from ..infra.medical_images import recognize_in_background
 from .validation import PatientRecordConflict, PatientRecordError
 
 JOB_STATUSES = ("queued", "running", "succeeded", "failed")

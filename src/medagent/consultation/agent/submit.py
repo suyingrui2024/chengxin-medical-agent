@@ -372,7 +372,7 @@ class AdaptiveConsultationEngineSubmit:
                 state, self._confirmed_summary_reply(state, turn_id), turn_id
             )
         if state.active_task:
-            from ...task_conversation import is_observation_entry
+            from ...dialogue.task_conversation import is_observation_entry
 
             if is_observation_entry(
                 self.content.tasks[state.active_task], text, user_input.choice_value

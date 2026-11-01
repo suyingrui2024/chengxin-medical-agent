@@ -48,7 +48,7 @@ no code change here; agent.py findings go to the coordinator):
 import unittest
 
 from medagent.consultation import closing
-from medagent.bridging import GROUP_BRIDGES, lint_group_bridge
+from medagent.reports.bridging import GROUP_BRIDGES, lint_group_bridge
 from medagent.conclusion import (
     UNCERTAINTY_NOTE,
     compose_conclusion,
@@ -58,7 +58,7 @@ from medagent.conclusion import (
     unaddressed_goal_parts,
 )
 from medagent.consultation import UserInput
-from medagent.domain import (
+from medagent.core.domain import (
     AgentReply,
     Assertion,
     Fact,
@@ -67,7 +67,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.out_of_pathway import SCOPE_NOTE
+from medagent.clinical.out_of_pathway import SCOPE_NOTE
 from medagent.server.runtime import build_runtime
 
 FIXED_HANDLING = "这一点这次问诊的信息还不足以直接回答，需当面评估后决定"
@@ -845,7 +845,7 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
 
         state, reply = self._question_reply("severity", "咳嗽两天")
         with mock.patch(
-            "medagent.bridging.build_group_bridge",
+            "medagent.reports.bridging.build_group_bridge",
             return_value="初步考虑是感冒。",
         ):
             self.engine._apply_group_bridge(state, reply)

@@ -1,6 +1,6 @@
 import unittest
 
-from medagent.background_review_evaluation import score_cases
+from medagent.review.background_review_evaluation import score_cases
 
 
 def review(**items):

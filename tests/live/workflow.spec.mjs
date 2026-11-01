@@ -257,7 +257,7 @@ test("synthetic patient completes a native live consultation, emergency routing 
         ageQuestionsAfterEdit === 0;
       // model.requested events no longer persist the prompt text
       // (metadata only: message count, char sizes, content sha256 —
-      // see medagent.backends.request_event_payload), so this check
+      // see medagent.infra.backends.request_event_payload), so this check
       // verifies the deterministic inputs the model context is built
       // from instead of parsing the wire payload: the age fact holds
       // the edited value, at least one model request was recorded,

@@ -1,6 +1,6 @@
 import unittest
 
-from medagent.plugins import PluginHost, RuntimeContext
+from medagent.infra.plugins import PluginHost, RuntimeContext
 
 
 class DemoPlugin:

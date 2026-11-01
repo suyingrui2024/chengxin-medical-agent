@@ -1,6 +1,6 @@
 """Tests for the P3a deterministic report interpretation module."""
 
-from medagent.report_interpretation import (
+from medagent.reports.report_interpretation import (
     DISCLAIMER,
     build_interpretation,
     grade_observation_value,

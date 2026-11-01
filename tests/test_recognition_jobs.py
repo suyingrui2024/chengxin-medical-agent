@@ -15,7 +15,7 @@ import unittest
 import zlib
 from pathlib import Path
 
-from medagent.medical_images import (
+from medagent.infra.medical_images import (
     BackgroundRecognition,
     MedicalImageError,
     RecognitionError,

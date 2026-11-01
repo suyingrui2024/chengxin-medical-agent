@@ -30,7 +30,7 @@ from medagent.conclusion import (
     _gaps,
     compose_conclusion,
 )
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -39,8 +39,8 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.handoff import REGISTERED_FACT_KEYS
-from medagent.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
+from medagent.reports.handoff import REGISTERED_FACT_KEYS
+from medagent.clinical.reasoning import EvidenceRef, Hypothesis, ReasoningWorkspace
 
 
 def closed_state(chief="发烧两天"):

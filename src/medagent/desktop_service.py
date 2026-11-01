@@ -32,7 +32,7 @@ class DesktopHandler(Handler):
 
 def main():
     if os.name == "nt":
-        from .windows_process import own_process_tree
+        from .infra.windows_process import own_process_tree
         own_process_tree()
     message = json.loads(sys.stdin.readline(8192))
     token = message.get("token")

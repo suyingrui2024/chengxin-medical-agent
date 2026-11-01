@@ -33,10 +33,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from medagent.domain import utc_now  # noqa: E402
+from medagent.core.domain import utc_now  # noqa: E402
 from medagent.server.runtime import build_runtime  # noqa: E402
 from medagent.subagents import SubagentCoordinator  # noqa: E402
-from medagent.web_tools import WebTools  # noqa: E402
+from medagent.infra.web_tools import WebTools  # noqa: E402
 from medagent.server.workspace import Workspace  # noqa: E402
 
 

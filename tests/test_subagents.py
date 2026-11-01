@@ -8,12 +8,12 @@ import socket
 import unittest
 from unittest import mock
 
-from medagent.decision_wait import DecisionInterrupted
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.events import Event, EventStore
-from medagent.reasoning import Hypothesis, ReasoningWorkspace
+from medagent.core.decision_wait import DecisionInterrupted
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.core.events import Event, EventStore
+from medagent.clinical.reasoning import Hypothesis, ReasoningWorkspace
 from medagent.subagents import KINDS, SubagentCoordinator, _content_index, watermark
-from medagent.web_tools import WebTools
+from medagent.infra.web_tools import WebTools
 
 
 CHIEF_EVIDENCE = "我咳嗽三天了，还有点嗓子疼"

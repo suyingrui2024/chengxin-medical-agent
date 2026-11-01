@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from medagent.background_review_evaluation import score_cases
+from medagent.review.background_review_evaluation import score_cases
 
 
 def main():

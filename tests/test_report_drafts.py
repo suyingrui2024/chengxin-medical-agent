@@ -3,11 +3,11 @@ import threading
 import unittest
 from urllib.request import Request, urlopen
 
-from medagent.background_review import BackgroundReviewCoordinator, ReviewJob
-from medagent.domain import Assertion, CaseState, Fact, Source
-from medagent.events import EventStore
-from medagent.handoff import build_handoff
-from medagent.report_drafts import parse_report_draft
+from medagent.review.background_review import BackgroundReviewCoordinator, ReviewJob
+from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.core.events import EventStore
+from medagent.reports.handoff import build_handoff
+from medagent.reports.report_drafts import parse_report_draft
 from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 

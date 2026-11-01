@@ -15,14 +15,14 @@ import time
 
 from scripts.benchmarks.benchmark_execution import BoundedGateway, BenchmarkGatewayHandler
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.backends import DshBackend
+from medagent.infra.backends import DshBackend
 from medagent.consultation import UserInput
-from medagent.env_config import read_env, for_backend
-from medagent.events import EventStore
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.infra.env_config import read_env, for_backend
+from medagent.core.events import EventStore
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 from medagent import __version__
 
 ROOT = Path(__file__).resolve().parents[3]

@@ -22,14 +22,14 @@ import sys
 import types
 import unittest
 
-from medagent.bridging import (
+from medagent.reports.bridging import (
     GROUP_BRIDGES,
     build_bridging_sentence,
     build_group_bridge,
     lint_group_bridge,
     question_group,
 )
-from medagent.domain import Assertion, CaseState, Fact, Source
+from medagent.core.domain import Assertion, CaseState, Fact, Source
 
 
 def fact(key, value, assertion=Assertion.PRESENT, evidence=None):
@@ -185,13 +185,13 @@ class QuestionGroupTests(unittest.TestCase):
         )
 
     def test_p3_warning_seam_proactive_when_module_present(self):
-        stub = types.ModuleType("medagent.out_of_pathway")
+        stub = types.ModuleType("medagent.clinical.out_of_pathway")
         stub.warning_questions = lambda chief: [
             {"id": "warning_consciousness"},
             {"fact_key": "warning_breathing"},
             "warning_bleeding",
         ]
-        sys.modules["medagent.out_of_pathway"] = stub
+        sys.modules["medagent.clinical.out_of_pathway"] = stub
         try:
             for qid in (
                 "warning_consciousness",
@@ -202,13 +202,13 @@ class QuestionGroupTests(unittest.TestCase):
                     question_group(qid, state("眼睛红")), "proactive"
                 )
         finally:
-            sys.modules.pop("medagent.out_of_pathway", None)
+            sys.modules.pop("medagent.clinical.out_of_pathway", None)
 
     def test_p3_warning_seam_degrades_when_module_absent(self):
         # sys.modules[...] = None makes the import raise ImportError,
         # simulating a tree where P3 has not landed yet.
-        previous = sys.modules.get("medagent.out_of_pathway", None)
-        sys.modules["medagent.out_of_pathway"] = None
+        previous = sys.modules.get("medagent.clinical.out_of_pathway", None)
+        sys.modules["medagent.clinical.out_of_pathway"] = None
         try:
             self.assertEqual(
                 question_group("warning_consciousness", state("眼睛红")),
@@ -216,16 +216,16 @@ class QuestionGroupTests(unittest.TestCase):
             )
         finally:
             if previous is None:
-                sys.modules.pop("medagent.out_of_pathway", None)
+                sys.modules.pop("medagent.clinical.out_of_pathway", None)
             else:
-                sys.modules["medagent.out_of_pathway"] = previous
+                sys.modules["medagent.clinical.out_of_pathway"] = previous
 
     def test_p3_warning_seam_real_module_domain_ids(self):
         # Seam against the real P3 module (not a stub): off-pathway
         # chiefs yield warning_<domain> ids that classify proactive,
         # while an on-pathway chief yields none of them.
         try:
-            from medagent.out_of_pathway import warning_questions
+            from medagent.clinical.out_of_pathway import warning_questions
         except ImportError:
             self.skipTest("P3 module not present in this tree")
         off_pathway = state("肥胖")
@@ -243,20 +243,20 @@ class QuestionGroupTests(unittest.TestCase):
                 self.assertEqual(question_group(qid, on_pathway), "other")
 
     def test_p3_warning_seam_degrades_when_p3_raises(self):
-        stub = types.ModuleType("medagent.out_of_pathway")
+        stub = types.ModuleType("medagent.clinical.out_of_pathway")
 
         def boom(chief):
             raise RuntimeError("p3 not ready")
 
         stub.warning_questions = boom
-        sys.modules["medagent.out_of_pathway"] = stub
+        sys.modules["medagent.clinical.out_of_pathway"] = stub
         try:
             self.assertEqual(
                 question_group("warning_consciousness", state("眼睛红")),
                 "other",
             )
         finally:
-            sys.modules.pop("medagent.out_of_pathway", None)
+            sys.modules.pop("medagent.clinical.out_of_pathway", None)
 
 
 class LintGroupBridgeTests(unittest.TestCase):

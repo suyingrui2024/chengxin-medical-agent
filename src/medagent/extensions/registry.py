@@ -10,8 +10,8 @@ from .contracts import validate, validate_schema, validate_references
 from .conversion_forms import conversion_spec
 from .scale_forms import scale_form_spec
 from .formula_forms import formula_form_spec
-from ..presentation import calculation_presentation
-from ..location_answers import validate_answer_contract
+from ..core.presentation import calculation_presentation
+from ..dialogue.location_answers import validate_answer_contract
 
 API_VERSION = "medical-capability/v1"
 
@@ -295,8 +295,8 @@ class CapabilityRegistry:
         return payload
 
     def interpret_task(self, task_id, text, choice):
-        from ..domain import Assertion, ObservationQuality, Source
-        from ..interpreter import Interpretation
+        from ..core.domain import Assertion, ObservationQuality, Source
+        from ..clinical.interpreter import Interpretation
 
         task = self._tasks[task_id]
         entry = self._entries[task["provider"]["id"]]

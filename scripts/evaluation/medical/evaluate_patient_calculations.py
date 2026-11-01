@@ -15,7 +15,7 @@ import subprocess
 import threading
 
 from scripts.benchmarks.benchmark_execution import BoundedGateway, sanitized_environment
-from medagent.env_config import for_backend, read_env
+from medagent.infra.env_config import for_backend, read_env
 
 
 def main():

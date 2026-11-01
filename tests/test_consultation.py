@@ -1,7 +1,7 @@
 import unittest
 
 from medagent.consultation import StaleActionError, UserInput
-from medagent.domain import Assertion, ObservationQuality, Phase, RiskLevel, Source
+from medagent.core.domain import Assertion, ObservationQuality, Phase, RiskLevel, Source
 from medagent.server.runtime import build_runtime
 
 
@@ -124,7 +124,7 @@ class ConsultationTestCase(unittest.TestCase):
     def test_fact_history_preserves_superseded_values(self):
         self.answer("我自己", "self")
         first = self.state.facts["consult_for"]
-        from medagent.interpreter import Interpretation
+        from medagent.clinical.interpreter import Interpretation
 
         self.engine._record_fact(
             self.state,

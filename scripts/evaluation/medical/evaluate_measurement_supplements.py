@@ -12,10 +12,10 @@ from pathlib import Path
 import secrets
 import threading
 
-from medagent.backends import DshBackend
+from medagent.infra.backends import DshBackend
 from medagent.consultation import UserInput
-from medagent.domain import Assertion
-from medagent.env_config import for_backend, read_env
+from medagent.core.domain import Assertion
+from medagent.infra.env_config import for_backend, read_env
 from scripts.evaluation.medical.test_live_desktop import EvaluationGateway
 from tests.test_repeated_observations import measured_case, repeat
 

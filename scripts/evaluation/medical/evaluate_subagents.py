@@ -135,8 +135,8 @@ def _find_disposition(node):
 
 
 def _run_case(subagents, case):
-    from medagent.domain import Assertion, Fact, Source
-    from medagent.events import EventStore
+    from medagent.core.domain import Assertion, Fact, Source
+    from medagent.core.events import EventStore
     from scripts.evaluation.medical.evaluate_conclusion_sheet import build_state
 
     state, _summary = build_state(case)

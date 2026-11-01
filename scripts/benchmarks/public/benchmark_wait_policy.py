@@ -20,7 +20,7 @@ import time
 from scripts.benchmarks.benchmark_execution import BoundedGateway
 from scripts.benchmarks.public.benchmark_public_test_sample import task_prompt, POLICY
 from scripts.benchmarks.execution_task_contract import CONTRACT, regression_file
-from medagent.env_config import read_env, for_backend
+from medagent.infra.env_config import read_env, for_backend
 from medagent.execution import ExecutionManager
 from scripts.benchmarks.public.public_execution_cases import protected
 from scripts.benchmarks.public.public_test_sample import (

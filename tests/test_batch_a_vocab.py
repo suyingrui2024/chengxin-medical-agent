@@ -28,7 +28,7 @@ from medagent.conclusion import (
     compose_conclusion,
     emergency_explanation,
 )
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -37,8 +37,8 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.knowledge import ContentRepository
-from medagent.reasoning import RuleBasedProposer, validate_workspace
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoning import RuleBasedProposer, validate_workspace
 
 
 def closed_state(chief, facts=()):

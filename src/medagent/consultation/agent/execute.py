@@ -38,7 +38,7 @@ class AdaptiveConsultationEngineExecute:
                 turn_id,
             )
         if tool == "repeat_self_check":
-            from ...observations import repeat_intent
+            from ...dialogue.observations import repeat_intent
 
             evidence = args["evidence"]
             if (

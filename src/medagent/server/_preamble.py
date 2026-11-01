@@ -21,32 +21,32 @@ from ..shared_types import (
     StaleActionError,
     UserInput,
 )
-from ..domain import utc_now
-from ..events import Event, EventStore
+from ..core.domain import utc_now
+from ..core.events import Event, EventStore
 from ..consultation.agent import AdaptiveConsultationEngine
-from ..background_review import BackgroundReviewCoordinator
-from ..education import EducationEnricher
+from ..review.background_review import BackgroundReviewCoordinator
+from ..reports.education import EducationEnricher
 from ..subagents import SubagentCoordinator
-from ..web_tools import WebTools
-from ..handoff import build_handoff
-from ..medical_images import (
+from ..infra.web_tools import WebTools
+from ..reports.handoff import build_handoff
+from ..infra.medical_images import (
     MedicalImageError,
     RecognitionError,
     decode_image_data_url,
     inspect_image,
     recognizer_from_settings,
 )
-from .. import education as education_module
-from ..baseline_projection import build_baseline_projection
-from ..medication_reminders import build_medication_reminders
+from ..reports import education as education_module
+from ..guards.baseline_projection import build_baseline_projection
+from ..reports.medication_reminders import build_medication_reminders
 from ..patient_records.recognition_jobs import (
     RecognitionJobError,
     RecognitionJobStore,
     get_job,
     submit_job,
 )
-from ..report_interpretation import build_interpretation, interpretation_summary
-from ..measurement_kinds import (
+from ..reports.report_interpretation import build_interpretation, interpretation_summary
+from ..core.measurement_kinds import (
     MeasurementKindError,
     normalize_measurement,
     saveable_from_observation,
@@ -56,7 +56,7 @@ from ..patient_records import (
     PatientRecordError,
     PatientRecordStore,
 )
-from ..report_drafts import parse_report_draft
+from ..reports.report_drafts import parse_report_draft
 from .runtime import build_runtime
 from .workspace import Workspace, StaleCompositionError, subagent_kind_overrides
 from .. import __version__

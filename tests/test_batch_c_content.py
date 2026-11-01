@@ -23,7 +23,7 @@ from medagent.conclusion import (
     format_window_text,
     spoken_close_line,
 )
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -32,7 +32,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.knowledge import ContentRepository, question_fact_gates_pass
+from medagent.clinical.knowledge import ContentRepository, question_fact_gates_pass
 
 
 def closed_state(chief, extra=None):

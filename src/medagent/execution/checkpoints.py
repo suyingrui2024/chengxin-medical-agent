@@ -15,7 +15,7 @@ from .paths import (
     relative_path,
     watch_path_covers,
 )
-from ..platform_fs import os
+from ..infra.platform_fs import os
 
 
 def _capture_paths(directory, identity, paths):

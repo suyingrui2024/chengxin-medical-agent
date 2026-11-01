@@ -6,7 +6,7 @@ from __future__ import annotations
 import re
 import unittest
 
-from medagent.medication_reminders import build_medication_reminders
+from medagent.reports.medication_reminders import build_medication_reminders
 
 FORBIDDEN_IN_NOTES = ("剂量", "mg", "毫克", "相互作用", "配伍", "禁忌")
 

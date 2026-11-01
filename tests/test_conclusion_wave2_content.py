@@ -17,7 +17,7 @@ from medagent.conclusion import (
     emergency_explanation,
     spoken_close_line,
 )
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     CaseState,
     Fact,
@@ -26,7 +26,7 @@ from medagent.domain import (
     RiskLevel,
     Source,
 )
-from medagent.reasoning import RuleBasedProposer
+from medagent.clinical.reasoning import RuleBasedProposer
 
 # Verbatim back_details from live-eval case5: documented radicular
 # features (radiating pain, numbness, electric-shock sensation) with

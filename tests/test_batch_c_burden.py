@@ -12,22 +12,22 @@ Each test names the issue it covers. Scope notes:
 import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.agent_tools import ProposalError
-from medagent.bridging import build_bridging_sentence
+from medagent.infra.agent_tools import ProposalError
+from medagent.reports.bridging import build_bridging_sentence
 from medagent.consultation import UserInput  # noqa: F401  (parity import)
-from medagent.domain import (
+from medagent.core.domain import (
     Assertion,
     Fact,
     Phase,
     Source,
 )
-from medagent.events import EventStore
-from medagent.interpreter import Interpretation
-from medagent.knowledge import ContentRepository
-from medagent.reasoner import OrderedQuestionRanker
+from medagent.core.events import EventStore
+from medagent.clinical.interpreter import Interpretation
+from medagent.clinical.knowledge import ContentRepository
+from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.self_checks import SelfCheckService
-from medagent.triage import TriageService
+from medagent.guards.self_checks import SelfCheckService
+from medagent.clinical.triage import TriageService
 
 
 def fact(key, value, assertion=Assertion.PRESENT, evidence=None):
