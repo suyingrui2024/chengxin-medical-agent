@@ -6,15 +6,15 @@ import difflib
 import hashlib
 import json
 import math
-from .platform_fs import os
+from ..platform_fs import os
 from pathlib import Path, PurePosixPath
 import stat
 import sys
 import time
 from uuid import uuid4
 
-from .execution_store import identifier
-from .execution_identity import decode_identity
+from .store import identifier
+from .identity import decode_identity
 
 FORMAT = "workspace-baseline/v1"
 MAX_RECORD_BYTES = 4_000_000
@@ -89,7 +89,7 @@ def capture(
     paths=None,
     with_previews=True,
 ):
-    from .execution import open_workspace_directory
+    from ..execution import open_workspace_directory
 
     selected = paths or ["."]
     for path in selected:

@@ -12,7 +12,7 @@ import unittest
 from medagent.execution import ExecutionManager, safe_file
 from medagent.platform_fs import os as workspace_os
 from medagent.processes import popen, terminate, release
-from medagent.execution_checkpoints import checkpoint
+from medagent.execution.checkpoints import checkpoint
 
 
 @unittest.skipUnless(os.name == "nt", "requires the real Windows kernel")
@@ -35,7 +35,7 @@ class NativeWindowsTests(unittest.TestCase):
             os.utime(source, ns=(named.st_atime_ns, named.st_mtime_ns))
             changed = checkpoint(root, (info.st_dev, info.st_ino), ["."])
             if not changed["complete"]:
-                from medagent.execution_changes import capture, fingerprint
+                from medagent.execution.changes import capture, fingerprint
 
                 fd = workspace_os.open(
                     source, workspace_os.O_RDONLY | workspace_os.O_NOFOLLOW

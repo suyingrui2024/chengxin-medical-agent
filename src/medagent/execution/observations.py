@@ -78,8 +78,8 @@ def validate_observation(value):
         ):
             raise ValueError("Invalid delivery check identity")
     if "check_snapshot" in value and value["check_snapshot"] is not None:
-        from .execution_checkpoints import normalize_paths
-        from .execution_changes import IGNORED_DIRECTORIES
+        from .checkpoints import normalize_paths
+        from .changes import IGNORED_DIRECTORIES
 
         snapshot = value["check_snapshot"]
         if (
@@ -121,7 +121,7 @@ def validate_observation(value):
     ):
         raise ValueError("Check snapshot requires delivery identity")
     if "check_inputs" in value:
-        from .execution_checkpoints import normalize_paths
+        from .checkpoints import normalize_paths
         paths = value["check_inputs"]
         if (
             value["tool"] != "delivery_check"

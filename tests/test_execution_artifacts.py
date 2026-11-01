@@ -13,7 +13,7 @@ from urllib.error import HTTPError
 import zlib
 
 from medagent.execution import ExecutionManager, ExecutionError, safe_bytes
-from medagent.execution_artifacts import projection, IMAGE_LIMIT
+from medagent.execution.artifacts import projection, IMAGE_LIMIT
 from medagent.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 

@@ -4,7 +4,7 @@ from decimal import Decimal
 import unittest
 
 from medagent.consultation import UserInput, StaleActionError
-from medagent.execution_capabilities import dispatch, freeze_binding, validate_receipt
+from medagent.execution.capabilities import dispatch, freeze_binding, validate_receipt
 from medagent.extensions.builtin import load_registry
 from medagent.extensions.glucose import convert_glucose, glucose_evidence
 from medagent.extensions.input_evidence import CapabilityError

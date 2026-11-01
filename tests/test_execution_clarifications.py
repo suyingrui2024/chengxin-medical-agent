@@ -13,7 +13,7 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 
 from medagent.execution import ExecutionManager, ExecutionError, ExecutionBusy
-from medagent.execution_clarifications import validate_clarification
+from medagent.execution.clarifications import validate_clarification
 
 CONFIG = {
     "MEDAGENT_LLM_BASE_URL": "https://fixture.invalid/anthropic",

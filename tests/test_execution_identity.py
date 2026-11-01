@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import unittest
 
-from medagent.execution_identity import encode_identity, decode_identity
+from medagent.execution.identity import encode_identity, decode_identity
 
 
 class IdentityTransportTests(unittest.TestCase):

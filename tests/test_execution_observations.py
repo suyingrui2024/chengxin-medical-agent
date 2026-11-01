@@ -12,7 +12,7 @@ import unittest
 from uuid import uuid4
 
 from medagent.execution import ExecutionBusy, ExecutionManager
-from medagent.execution_observations import validate_observation
+from medagent.execution.observations import validate_observation
 
 
 class ObservationContractTests(unittest.TestCase):

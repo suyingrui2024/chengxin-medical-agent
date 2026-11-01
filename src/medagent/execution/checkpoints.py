@@ -7,11 +7,11 @@ import stat
 import time
 import unicodedata
 
-from .execution_changes import (
+from .changes import (
     capture, relative_path, watch_path_covers, IGNORED_DIRECTORIES,
 )
-from .execution_identity import decode_identity
-from .platform_fs import os
+from .identity import decode_identity
+from ..platform_fs import os
 
 
 def normalize_paths(paths):
@@ -30,7 +30,7 @@ def normalize_paths(paths):
 
 def _capture_paths(directory, identity, paths):
     """Resolve native spelling through pinned parents, without following links."""
-    from .execution import open_workspace_directory
+    from ..execution import open_workspace_directory
 
     root = open_workspace_directory(directory, identity)
     cache, states, resolved = {}, {}, []

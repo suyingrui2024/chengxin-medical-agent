@@ -12,7 +12,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from medagent.execution import ExecutionManager
-from medagent.execution_changes import ChangeTracker, ChangeError, capture, compare
+from medagent.execution.changes import ChangeTracker, ChangeError, capture, compare
 
 
 class ChangeObservationTests(unittest.TestCase):

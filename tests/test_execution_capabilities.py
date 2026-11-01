@@ -11,7 +11,7 @@ import unittest
 from uuid import uuid4
 
 from medagent.execution import ExecutionManager, ExecutionError
-from medagent.execution_capabilities import CapabilityError, dispatch, freeze_binding
+from medagent.execution.capabilities import CapabilityError, dispatch, freeze_binding
 from medagent.extensions.builtin import load_registry
 from medagent.presentation import calculation_presentation
 

@@ -61,7 +61,7 @@ from ..runtime import build_runtime
 from ..workspace import Workspace, StaleCompositionError, subagent_kind_overrides
 from .. import __version__
 from ..execution import ExecutionManager, ExecutionError, ExecutionBusy
-from ..execution_files import DirectoryChanged
+from ..execution.files import DirectoryChanged
 
 
 MAX_BODY_BYTES = 64 * 1024

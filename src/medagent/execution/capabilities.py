@@ -10,21 +10,24 @@ import sys
 import time
 from uuid import UUID, uuid4
 
-from .extensions.input_evidence import CapabilityError, units_evidence
-from .extensions.glucose import glucose_evidence
-from .extensions.builtin import load_registry
-from .extensions.contracts import validate, validate_references
-from .presentation import calculation_presentation
+from ..extensions.input_evidence import CapabilityError, units_evidence
+from ..extensions.glucose import glucose_evidence
+from ..extensions.builtin import load_registry
+from ..extensions.contracts import validate, validate_references
+from ..presentation import calculation_presentation
 
 PROTOCOL = "execution-capabilities/v1"
 HASH = re.compile(r"[0-9a-f]{64}")
 
 
 def implementation_sha256():
-    root = Path(__file__).parent
+    # This module lives in the ``execution`` package, so the hash root is the
+    # package's parent (``src/medagent``) and its own file is addressed through
+    # the package path.  Getting either wrong silently hashes the wrong bytes.
+    root = Path(__file__).resolve().parents[1]
     digest = hashlib.sha256()
     for name in [
-        "execution_capabilities.py",
+        "execution/capabilities.py",
         "extensions/builtin.py",
         "extensions/registry.py",
         "extensions/contracts.py",

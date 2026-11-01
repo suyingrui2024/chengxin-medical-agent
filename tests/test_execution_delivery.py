@@ -11,7 +11,7 @@ import time
 import unittest
 
 from medagent.execution import ExecutionManager
-from medagent.execution_observations import validate_observation
+from medagent.execution.observations import validate_observation
 
 
 def tool(name, **arguments):

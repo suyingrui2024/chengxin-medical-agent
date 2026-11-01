@@ -1,15 +1,15 @@
 """Host-owned workspace index, outside all model-runtime mounts. No credentials."""
 
 import json
-from .execution_observations import validate_observation
-from .execution_limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
-from .execution_clarifications import validate_clarification
+from .observations import validate_observation
+from .limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
+from .clarifications import validate_clarification
 import math
-from .platform_fs import os, fcntl
+from ..platform_fs import os, fcntl
 from pathlib import Path
 import stat
 from uuid import UUID, uuid4
-from .execution_capabilities import validate_binding, validate_receipt
+from .capabilities import validate_binding, validate_receipt
 
 
 FORMAT = "execution-workspace/v1"

@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from medagent.execution_checkpoints import checkpoint, normalize_paths
+from medagent.execution.checkpoints import checkpoint, normalize_paths
 
 
 class CheckpointTests(unittest.TestCase):

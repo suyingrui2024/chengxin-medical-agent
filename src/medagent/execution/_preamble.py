@@ -18,23 +18,23 @@ from uuid import uuid4
 from urllib.parse import urlsplit
 
 from ..env_config import for_backend
-from ..execution_capabilities import freeze_binding, validate_receipt
-from ..execution_observations import ACTIVE_JOB_STATES, validate_observation
-from ..execution_limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
-from ..execution_changes import ChangeTracker
-from ..execution_identity import encode_identity
-from ..execution_clarifications import (
+from .capabilities import freeze_binding, validate_receipt
+from .observations import ACTIVE_JOB_STATES, validate_observation
+from .limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
+from .changes import ChangeTracker
+from .identity import encode_identity
+from .clarifications import (
     validate_clarification,
     ACTIVE_CLARIFICATION_STATES,
 )
-from ..execution_projects import project_path as validate_project_path
-from ..execution_files import directory_page, DirectoryChanged
-from ..execution_artifacts import (
+from .projects import project_path as validate_project_path
+from .files import directory_page, DirectoryChanged
+from .artifacts import (
     projection as artifact_projection,
     read_limit,
     IMAGE_LIMIT,
 )
-from ..execution_store import (
+from .store import (
     WorkspaceStore,
     WorkspaceStoreError,
     WorkspaceOccupied,
