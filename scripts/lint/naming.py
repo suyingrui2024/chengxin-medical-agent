@@ -29,10 +29,17 @@ R2  No file with a date in its name -- ``extra``, ``old``, ``new``,
     named a review round, not a subject.  A second file means the first one has
     two responsibilities: split them and name both.
 
-R3  Every ``.py`` directly under ``tests/`` is a test module, so it must be
-    named ``test_*.py``.  A pytest-style test that does not start with ``test_``
-    is never collected: 84 tests sat unrun this way before the suite moved to
-    pytest.  Shared fixtures and helpers belong in ``tests/support/``.
+R3  Every ``.py`` under ``tests/`` is a test module unless it sits in
+    ``support/`` or ``fixtures/``, so it must be named ``test_*.py``.  A
+    pytest-style test that does not start with ``test_`` is never collected:
+    84 tests sat unrun this way before the suite moved to pytest.  Shared
+    fixtures and helpers belong in ``tests/support/``.
+
+R4  No ``test_*.py`` directly under ``tests/``.  The suite is grouped by the
+    package it exercises -- ``tests/conclusion/``, ``tests/execution/`` and so
+    on -- and a file at the root defeats the point of the grouping: the next
+    one lands there too, and 162 loose files is where this started.  ``tests/``
+    itself is for ``conftest.py``, ``__init__.py`` and the directories.
 
 The rules apply to ``.py``, ``.js``, ``.mjs``, ``.cjs`` and ``.css``.  They were
 Python-only for one round, and in that round the stylesheets grew
@@ -120,8 +127,28 @@ TIME_WORDS = frozenset(
 # R2: ``v2``..``v9``, and a bare trailing version number.
 VERSION_WORD = re.compile(r"^(?:v[2-9]\d*|[2-9])$")
 
-# R3: the only files allowed to sit directly in tests/ without a test_ prefix.
+# R3: the only files allowed under tests/ without a test_ prefix.
 TESTS_ALLOWED = frozenset({"conftest.py", "__init__.py"})
+
+#: Directories under ``tests/`` that hold helpers rather than collected tests.
+TESTS_HELPER_DIRS = frozenset({"support", "fixtures"})
+
+#: R4: the areas a test module may live in, mirroring ``src/medagent``.
+TEST_AREAS = (
+    "architecture",
+    "clinical",
+    "conclusion",
+    "consultation",
+    "dialogue",
+    "execution",
+    "extensions",
+    "integration",
+    "kernel",
+    "records",
+    "reports",
+    "server",
+    "subagents",
+)
 
 #: The stem is split on every separator so ``date-utils`` and ``date_utils``
 #: are caught by the same rule, and a leading digit stays attached to nothing.
@@ -176,13 +203,23 @@ def check(path: pathlib.Path, root: pathlib.Path) -> str | None:
         )
 
     parts = path.relative_to(root).parts
-    if parts[:1] == ("tests",) and len(parts) == 2 and path.name not in TESTS_ALLOWED:
-        if path.suffix == ".py" and not path.name.startswith("test_"):
-            return (
-                f"{rel}: a module directly under tests/ must be named test_*.py "
-                "or pytest will never collect it. Move shared helpers to "
-                "tests/support/."
-            )
+    if parts[:1] != ("tests",) or path.suffix != ".py":
+        return None
+
+    if path.name in TESTS_ALLOWED or parts[1] in TESTS_HELPER_DIRS:
+        return None
+
+    if not path.name.startswith("test_"):
+        return (
+            f"{rel}: a module under tests/ must be named test_*.py or pytest "
+            "will never collect it. Move shared helpers to tests/support/."
+        )
+
+    if len(parts) == 2:
+        return (
+            f"{rel}: tests/ is not a place for test modules. Put it under the "
+            "directory of the package it exercises (" + ", ".join(TEST_AREAS) + ")."
+        )
 
     return None
 

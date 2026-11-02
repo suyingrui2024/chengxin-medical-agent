@@ -20,7 +20,7 @@ def process_container_temporary_directory(prefix):
     options = {"prefix": prefix}
     if os.name == "nt":
         root = (
-            Path(__file__).resolve().parents[1]
+            Path(__file__).resolve().parents[2]
             / ".runtime"
             / "windows"
             / "process-container-test-state"

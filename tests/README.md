@@ -1,12 +1,12 @@
 # 测试套件
 
-159 个 Python 测试文件、2043 个收集节点（参数化用例计为多个节点；本机运行 1972 passed、71 skipped），86 个 Playwright spec（ui 52 / desktop 33 / live 1）。这份文件解释**怎么跑、什么会跳过、东西放哪**。
+161 个 Python 测试文件、2077 个收集节点（参数化用例计为多个节点；本机运行 2006 passed、71 skipped），86 个 Playwright spec（ui 52 / desktop 33 / live 1）。这份文件解释**怎么跑、什么会跳过、东西放哪**。
 
 ## 跑什么
 
 | 命令 | 内容 | 耗时 |
 |---|---|---|
-| `npm run test:python` | 全量 Python（2043 个收集节点） | ~86 秒 |
+| `npm run test:python` | 全量 Python（2077 个收集节点） | ~82 秒 |
 | `npm run test:coverage` | 同上 + branch 覆盖率（当前 85%） | ~2 分钟 |
 | `npm run lint:structure` | 架构门禁：单文件行数 + 依赖方向 + 大文件基线 | ~4 秒 |
 | `npm run lint:python` | ruff 最小集：未定义名、语法错、坏 `__all__` | <1 秒 |
@@ -33,45 +33,58 @@ CI 跑的是：三个门禁（行数、依赖方向、ruff）→ 全量 pytest +
 
 ## 东西放哪
 
+测试按**被测的包**分组，目录名与 `src/medagent` 同名。改哪个包，就去同名目录找：
+
 ```
 tests/
   conftest.py         共享 fixture：clean_medagent_env、demo_server、demo_server_factory
-  support/
-    builders.py       closed_state / make_fact / add_fact（构造病例状态）
-    scripted.py       ScriptBackend / cmd / fact / make_engine / Provider（脚本化模型）
-    question_ordering_contract.py  expected_question_order（题序契约，测试侧薄 helper）
-    windows_process_roots.py       ProcessContainer 会话的测试用工作根目录
-  fixtures/           语料与 UI 夹具（conclusion_cases_v0.json 等）
+  consultation/  24   一次问诊回合：agent、阶段、状态机、中断、安全闸
+  conclusion/    16   结论单：方向、书面/口头结语、自护、路径缺口
+  execution/     29   执行沙箱：变更、检查点、恢复、预算、Windows
+  reports/       14   交接、报告解读、教育、随访、发布门
+  clinical/      12   推理、假设排序、分诊、题序契约、知识图谱
+  kernel/        10   共享词汇：事件、后端、缓存、度量投影
+  extensions/    10   能力包、公式、量表、葡萄糖、目录
+  records/       10   患者记录、测量、影像识别
+  dialogue/       8   题序、位置、观察、任务、确认
+  server/         8   HTTP 层、会话持久化、桌面生命周期
+  subagents/      6   子智能体、spawn、web 工具
+  architecture/   6   门禁自身的测试（命名、依赖方向、文档路径、静态资源、公开面）
+  integration/    8   跨包端到端与公开基准
+  support/            共享夹具与构造器（不是测试，pytest 不收集）
+  fixtures/           语料与二进制夹具
   ui/ desktop/ live/  Playwright spec
+  unit/               JS 单测（node --test）
 ```
+
+**顶层不放测试文件。** `naming.py` 的 R4 会拒绝 `tests/test_*.py`：一旦允许，下一个也会放那里，而 162 个文件平铺就是这样长出来的。
 
 **加新测试前先看 `support/`**：`closed_state` 和 `fact` 这类构造器以前被复制了三十遍，改一次 `CaseState` 要改三十个文件。
 
-测试文件数量主要增加导航成本，不等于运行成本或冗余。当前全量 Python 用例约 69 秒；只有同一行为契约、相同输入条件与相同预期被重复验证时才合并。不同风险情境即使断言相似，也应保留独立测试，便于失败定位。文件持续增长时优先按领域目录分组，并保留可直接运行的 pytest 节点名；不要为减少文件数把不同契约塞进巨型模块。
+测试文件数量主要增加导航成本，不等于运行成本或冗余。当前全量 Python 用例约 80 秒；只有同一行为契约、相同输入条件与相同预期被重复验证时才合并。不同风险情境即使断言相似，也应保留独立测试，便于失败定位。**一个测试只属于一个目录**——它主要断言哪个包的行为，就放哪个目录；真的横跨多个包，放 `integration/`。
 
 `conftest.py` 的 fixture **不是 autouse**：`clean_medagent_env` 会清掉 `MEDAGENT_*`，如果全局生效，会改变那些自己设置这些变量的测试。
 
-## 按领域找测试
+## 怎么找到一个测试
 
-文件名现在描述**测什么**。少数仍带批次号的文件，对照表见下一节。
+三层就够了，不需要维护一张索引表：
 
-| 领域 | 代表文件 |
-|---|---|
-| 结论单 | `test_conclusion*.py`、`test_close_*.py`、`test_denied_clarification_memory.py`、`test_self_care_oral.py`、`test_direction_guards.py`、`test_pathway_close_gate.py` |
-| 问诊引擎 | `test_agent*.py`、`test_consultation*.py`、`test_engine_question_gating.py`、`test_controller_safety_gates.py`、`test_turn_pipeline.py`、`test_dual_engine_safety.py` |
-| 知识与推理 | `test_kg.py`、`test_reasoning.py`、`test_triage_scan_gating.py`、`test_pathway_vocabulary.py`、`test_hypothesis_ranking.py`、`test_question_ordering_contract.py` |
-| 计算与执行 | `test_formula_engine.py`、`test_scale_engine.py`、`test_capabilities.py`、`test_execution*.py` |
-| 病历与会话 | `test_patient_records*.py`、`test_records_measurements_and_reminders.py`、`test_attachment_and_baseline.py`、`test_workspace*.py`、`test_session_events_cursor.py` |
-| 联网与报告 | `test_web_tools.py`、`test_report_interpretation*.py`、`test_education.py` |
-| 内核单测 | `test_text_match.py`、`test_presentation.py`、`test_task_intents.py`、`test_location_answers.py`、`test_worry_and_goal.py` |
-| 架构门禁 | `test_import_rules.py` |
-| 平台差异 | `test_platform.py`（翻转 `_WINDOWS`/`_MACOS`，两个分支都能测） |
-| 属性测试 | `test_properties.py`（hypothesis） |
+1. **目录说层级** —— 目录名就是 `src/medagent` 的包名。改 `conclusion/`，看 `tests/conclusion/`。
+2. **文件名说行为** —— `test_conclusion_directions.py` 测方向，`test_conclusion_framing.py` 测措辞框架。用 `-k` 直接跑。
+3. **跨包的进 `integration/`** —— 一条链路要穿过三四个包才能断言，就属于那里；不要为了塞进某个目录而切断断言。
+
+三类测试不按包走，看到时不必奇怪：
+
+| 类型 | 位置 | 为什么 |
+|---|---|---|
+| 平台差异 | `server/test_platform.py` | 翻转 `_WINDOWS`/`_MACOS`，两个分支都要测 |
+| 属性测试 | `kernel/test_properties.py` | hypothesis，覆盖的是不变量而不是某个函数 |
+| 门禁自身 | `architecture/` | 测的是 `scripts/lint/*`，不是 `src/` |
 
 ## 文件名的历史包袱
 
 文件名里的批次号（`batch_a`、`round3`、`wave2`）记录的是**设计文档的验收批次**，
-不是目录结构。2026-11 把 20 个只有批次号的文件按内容重命名了：
+不是目录结构。2026-11 把 20 个只有批次号的文件按内容重命名了（它们现在在各自领域的目录下）：
 
 | 旧名 | 新名 |
 | --- | --- |
