@@ -31,6 +31,12 @@ jobs:
       # allowed to import whom.
       - name: Enforce module-size ceiling
         run: python scripts/lint/module_size.py
+      # A file can be within the 1200-line ceiling and still be unreadable,
+      # because the cost is inside the functions. This one bounds 60 lines and
+      # 20 branches per function and freezes today's 127 outliers at their
+      # current size, so the number can only go down.
+      - name: Enforce function-size ceiling
+        run: python scripts/lint/function_size.py
       - name: Enforce import direction
         run: python scripts/lint/import_rules.py
       # A file can be the right size in the right layer and still be called

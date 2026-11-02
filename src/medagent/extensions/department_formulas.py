@@ -700,10 +700,6 @@ AREA_0_6 = [
 ]
 
 
-def _enum(identity, label, options):
-    return {"id": identity, "label": label, "type": "enum", "options": options}
-
-
 def _easi_inputs():
     out = []
     for region, name in (("head", "头颈"), ("arms", "上肢"), ("trunk", "躯干"), ("legs", "下肢")):
