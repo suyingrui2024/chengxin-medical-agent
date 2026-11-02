@@ -20,13 +20,8 @@ import unittest
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import ConsultationEngine, UserInput
-from medagent.core.events import EventStore
 from medagent.reports.handoff import build_handoff, handoff_lines
-from medagent.clinical.knowledge import ContentRepository
-from medagent.clinical.reasoner import OrderedQuestionRanker
 from medagent.server.runtime import build_runtime
-from medagent.guards.self_checks import SelfCheckService
-from medagent.clinical.triage import TriageService
 from medagent.server.workspace import Workspace
 from tests.test_handoff import _sheet, _state
 from tests.test_repeated_observations import measured_case, repeat
@@ -72,7 +67,7 @@ class Point0BackendSwitchTests(unittest.TestCase):
         # Adaptive control: ordinary (non-observation, non-cancel) text
         # during a repeat suspends the task conversation.
         engine, _, state, reply = measured_case()
-        offered = repeat(engine, state, reply)
+        _ = repeat(engine, state, reply)
         self.assertTrue(state.observation_resume)
         self.assertEqual(state.active_task, "axillary_temperature")
         calls = []
@@ -86,7 +81,7 @@ class Point0BackendSwitchTests(unittest.TestCase):
         # Deterministic engine with a stray backend attribute: same
         # state, same text -- the suspend branch must NOT fire.
         engine2, _, state2, reply2 = measured_case()
-        offered2 = repeat(engine2, state2, reply2)
+        _ = repeat(engine2, state2, reply2)
         demo = _demo_engine(engine2)
         demo.backend = _StubBackend()
         calls2 = []

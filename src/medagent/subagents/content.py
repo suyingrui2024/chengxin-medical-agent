@@ -1,21 +1,12 @@
 from __future__ import annotations
 import hashlib
 import json
-import os
 import re
-from concurrent.futures import ThreadPoolExecutor
-from datetime import date
 from importlib import resources
-from threading import BoundedSemaphore, Event as ThreadEvent, Lock, Thread
-from time import monotonic
-from typing import Any, Dict, List, Optional
-from uuid import uuid4
-from ..infra.backends import parse_decision
+from typing import Any, Dict, List
 from ..facts import BANNED_PHRASES, GAP_IMPACTS, MEASUREMENT_FACTS
-from ..core.decision_wait import DecisionInterrupted
-from ..core.domain import CaseState, utc_now
-from ..core.events import Event
-from ..clinical.reasoning import ReasoningWorkspace, load_pathways
+from ..core.domain import CaseState
+from ..clinical.reasoning import load_pathways
 
 from .constants import _content_index_cache
 

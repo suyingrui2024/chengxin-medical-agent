@@ -1,5 +1,4 @@
 """Inspecting a failed worker must retain its diagnostic during pipe shutdown."""
-import os
 from pathlib import Path
 import subprocess
 import sys

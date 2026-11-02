@@ -1,23 +1,6 @@
 from __future__ import annotations
-import json
-import os
 import re
-from copy import deepcopy
-from datetime import datetime
-from importlib import resources
-from typing import Any, Dict, List, Optional
-from ..guards.baseline_projection import build_allergy_hint
-from ..guards.direction_guards import (
-    direction_kept,
-    is_affirmed_in_text,
-    severity_consistent_text,
-)
-from ..core.domain import Assertion, CaseState, Phase, RiskLevel
-from ..clinical.followups import build_follow_up_plan
-from ..reports.handoff import LABELS as FACT_LABELS
-from ..clinical.reasoning import RuleBasedProposer, validate_workspace
-from ..core.text_match import contains_unnegated, find_unnegated_certain
-from ..core.worry import extract_worry_object, is_worry_sentence
+from typing import Any, Dict, List
 
 from .constants import _CHIEF_CHUNK_STOPWORDS, _GOAL_DRUG_TREATMENT_WORDS, _GOAL_PART_FIXED_HANDLING, _GOAL_PART_PREFIXES, _GOAL_VISIT_PART_KEYWORDS
 

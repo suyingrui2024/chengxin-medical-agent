@@ -8,7 +8,6 @@ import tempfile
 import threading
 import time
 import unittest
-from unittest.mock import patch
 from uuid import uuid4
 
 from medagent.execution import ExecutionManager

@@ -10,7 +10,7 @@ from medagent.consultation import (
     SubjectBoundaryError,
     UserInput,
 )
-from medagent.core.domain import Assertion, Fact, Phase, RiskLevel, Source
+from medagent.core.domain import Assertion, Fact, RiskLevel, Source
 from medagent.core.events import EventStore
 from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker

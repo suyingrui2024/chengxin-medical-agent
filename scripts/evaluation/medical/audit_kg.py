@@ -15,7 +15,6 @@ the goal; an honest one is.
 
 from __future__ import annotations
 
-import json
 import time
 from collections import Counter, defaultdict
 from pathlib import Path

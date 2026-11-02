@@ -223,7 +223,7 @@ class RankerDeterminismTests(unittest.TestCase):
         state = _state(
             "咳嗽发烧两天", extras=[("resp_cough_details", "干咳为主")]
         )
-        candidates = _questions(
+        _ = _questions(
             [
                 "onset",
                 "trajectory",

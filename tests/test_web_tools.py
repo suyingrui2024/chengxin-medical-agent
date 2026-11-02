@@ -10,7 +10,6 @@ import json
 import socket
 from datetime import datetime
 
-import pytest
 
 from medagent.core.events import EventStore
 from medagent.infra.web_tools import (

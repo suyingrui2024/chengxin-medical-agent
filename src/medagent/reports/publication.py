@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
 
 from ..core.domain import AgentReply, CaseState, Phase, QuickReply, RiskLevel
 from ..dialogue.adaptive_questions import AdaptiveQuestionError, validate_adaptive_question

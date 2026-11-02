@@ -1,6 +1,5 @@
 """Human answers resume the original SDK call, with no invented default or budget reset."""
 
-from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os

@@ -1,26 +1,12 @@
 from __future__ import annotations
-import json
-import os
-import re
-from copy import deepcopy
-from datetime import datetime
-from importlib import resources
 from typing import Any, Dict, List, Optional
-from ..guards.baseline_projection import build_allergy_hint
 from ..guards.direction_guards import (
-    direction_kept,
-    is_affirmed_in_text,
     severity_consistent_text,
 )
-from ..core.domain import Assertion, CaseState, Phase, RiskLevel
-from ..clinical.followups import build_follow_up_plan
-from ..reports.handoff import LABELS as FACT_LABELS
-from ..clinical.reasoning import RuleBasedProposer, validate_workspace
-from ..core.text_match import contains_unnegated, find_unnegated_certain
+from ..core.domain import Assertion, CaseState
 from ..core.worry import extract_worry_object, is_worry_sentence
 
 from .constants import BANNED_PHRASES, CERTAINTY_TEMPLATES, _VISIT_GOAL_KEYWORDS, _WORRY_FALLBACK_OBJECT
-from .assets import _load_json_optional, _narrative_templates
 
 def _narrative_reasoning(
     templates: Dict[str, Any],

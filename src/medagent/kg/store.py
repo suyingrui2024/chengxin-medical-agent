@@ -24,7 +24,7 @@ import json
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Iterable
 
 #: Concept kinds. Kept closed so a typo cannot silently create a new axis.
 KINDS = (

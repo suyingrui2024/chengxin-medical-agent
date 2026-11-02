@@ -96,10 +96,10 @@ def run_case(name, settings, output):
         "prompt": case["prompt"],
         "files": case["files"],
     }
-    session = directory = state = None
+    session = directory = None
     try:
         session = manager.create(config)
-        directory, state = session.directory, session.state_directory
+        directory, _ = session.directory, session.state_directory
         for path, value in case["files"].items():
             target = directory / path
             target.parent.mkdir(parents=True, exist_ok=True)

@@ -269,7 +269,7 @@ class RepeatedObservationTests(unittest.TestCase):
                     UserInput("再测一次", "repeat_self_check:axillary_temperature", action),
                 )
         self.assertEqual(len(engine.events.for_session(state.session_id)), before)
-        offered = repeat(engine, state, prior)
+        _ = repeat(engine, state, prior)
         emergency = engine.submit(
             state.session_id, UserInput("嘴唇发紫", "skip", "old-page")
         )

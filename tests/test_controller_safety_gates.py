@@ -453,7 +453,7 @@ class SummaryConfirmationTests(unittest.TestCase):
     def test_free_text_correction_is_not_a_confirmation(self):
         self._reach_summary()
         self.backend.commands = [cmd("ask_question", question_id="age")]
-        reply = self.engine.submit(
+        _ = self.engine.submit(
             self.state.session_id, UserInput("不对，年龄写错了，应该是33岁")
         )
         self.assertNotEqual(self.state.phase, Phase.CLOSED)

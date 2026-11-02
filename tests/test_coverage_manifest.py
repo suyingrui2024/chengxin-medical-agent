@@ -11,7 +11,6 @@ card.
 
 import json
 import unittest
-from importlib import resources
 
 from medagent.extensions.builtin import load_registry
 

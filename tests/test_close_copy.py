@@ -34,7 +34,6 @@ import unittest
 
 import medagent.conclusion as conclusion_module
 from medagent.consultation import closing
-from medagent.consultation import ConsultationEngine
 from medagent.core.domain import (
     AgentReply,
     Phase,

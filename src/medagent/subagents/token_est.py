@@ -1,21 +1,6 @@
 from __future__ import annotations
-import hashlib
 import json
-import os
-import re
-from concurrent.futures import ThreadPoolExecutor
-from datetime import date
-from importlib import resources
-from threading import BoundedSemaphore, Event as ThreadEvent, Lock, Thread
-from time import monotonic
-from typing import Any, Dict, List, Optional
-from uuid import uuid4
-from ..infra.backends import parse_decision
-from ..facts import BANNED_PHRASES, GAP_IMPACTS, MEASUREMENT_FACTS
-from ..core.decision_wait import DecisionInterrupted
-from ..core.domain import CaseState, utc_now
-from ..core.events import Event
-from ..clinical.reasoning import ReasoningWorkspace, load_pathways
+from typing import Any, Dict, List
 
 def _estimate_roundtrip_tokens(messages: List[Dict[str, str]], raw_command: Any) -> int:
     """Coarse token estimate for one backend round trip (P2-B-D10 fuse).

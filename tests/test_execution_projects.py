@@ -7,7 +7,6 @@ import unittest
 from unittest.mock import patch
 
 from medagent.execution import ExecutionManager, ExecutionBusy, ExecutionError
-from medagent.execution.projects import project_path
 
 CONFIG = {
     "MEDAGENT_LLM_BASE_URL": "https://fixture.invalid/anthropic",

@@ -39,7 +39,6 @@ from scripts.benchmarks.public.public_test_sample import (
     code_for,
     parse,
     classify,
-    MARKER,
 )
 
 FIXTURES = ROOT / "benchmarks/swe-lite-transfer"

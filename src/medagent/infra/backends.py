@@ -7,7 +7,6 @@ import logging
 import os
 import re
 import subprocess
-import signal
 from http.client import HTTPException
 from threading import Lock
 from pathlib import Path

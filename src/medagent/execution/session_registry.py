@@ -141,7 +141,7 @@ class ExecutionManager:
                 if lease is not None:
                     os.close(lease)
                 raise ExecutionBusy(str(exc)) from None
-            except (WorkspaceStoreError, OSError) as exc:
+            except (WorkspaceStoreError, OSError):
                 if lease is not None:
                     os.close(lease)
                 raise ExecutionError("工作区记录或目录不可读取，未创建替代会话") from None

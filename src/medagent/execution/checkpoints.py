@@ -12,8 +12,6 @@ from .identity import decode_identity
 from .paths import (
     IGNORED_DIRECTORIES,
     normalize_paths,
-    relative_path,
-    watch_path_covers,
 )
 from ..infra.platform_fs import os
 

@@ -59,7 +59,7 @@ class FollowUpFlowTests(unittest.TestCase):
         raise AssertionError(f"did not reach summary; last kind={reply.kind}")
 
     def test_confirmed_summary_schedules_routine_follow_up(self):
-        summary = self._drive_to_summary()
+        _ = self._drive_to_summary()
         self.assertFalse(self.state.follow_up)
         reply = self._answer("确认", "confirm_summary")
         self.assertEqual(reply.kind, "closed")

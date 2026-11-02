@@ -12,16 +12,11 @@ the spoken close line and the emergency explanation exactly once.
 import json
 import unittest
 
-from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.infra.agent_tools import ProposalError
 from medagent.conclusion import spoken_close_line
 from medagent.consultation import UserInput
-from medagent.core.events import EventStore
 from medagent.clinical.knowledge import ContentRepository
-from medagent.clinical.reasoner import OrderedQuestionRanker
-from medagent.guards.self_checks import SelfCheckService
-from medagent.clinical.triage import TriageService
-from tests.support.scripted import ScriptBackend, cmd, fact
+from tests.support.scripted import cmd, fact
 from tests.support.scripted import make_engine, record
 
 

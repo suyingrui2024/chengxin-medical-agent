@@ -4,7 +4,6 @@ import re
 from uuid import uuid4
 
 from ..extensions.contracts import validate
-from ..extensions.input_evidence import units_evidence, ALIASES
 from ..extensions.conversion_forms import conversion_spec
 
 UNIT_LABELS = {"kg": "千克 kg", "g": "克 g", "mg": "毫克 mg", "L": "升 L", "mL": "毫升 mL"}

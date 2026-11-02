@@ -6,7 +6,7 @@ import json
 from importlib import resources
 from pathlib import Path
 
-from medagent.extensions.catalog import CATALOG, STATUSES, by_department, summary
+from medagent.extensions.catalog import CATALOG, by_department, summary
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "docs" / "门诊显式计算科目与项目总表.md"

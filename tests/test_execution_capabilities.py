@@ -1,5 +1,4 @@
 """Real registered computation, evidence rejection, SDK errors and cold receipts."""
-from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os

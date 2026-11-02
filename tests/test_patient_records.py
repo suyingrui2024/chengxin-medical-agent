@@ -265,7 +265,7 @@ class PatientRecordStoreTests(unittest.TestCase):
         self.assertEqual(self.store.list_patients(include_archived=False), [self.patient])
         # Archiving the default is refused (M3): it must not silently
         # promote a family member to the self profile.
-        second = self.store.add_member("第二位成员")
+        _ = self.store.add_member("第二位成员")
         with self.assertRaises(PatientRecordError):
             self.store.archive_patient(self.patient["patient_id"])
         self.assertEqual(

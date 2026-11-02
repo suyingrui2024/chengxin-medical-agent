@@ -9,10 +9,8 @@ from ..clinical.interpreter import (
     Interpretation,
     Interpreter,
     ObservationInputError,
-    UNKNOWN_PHRASES,
 )
 from .registry import Capability, CapabilityRegistry
-from ..guards.assertion_evidence import has_uncertainty
 from ..reports.measurement_reports import temperature_report
 from .glucose import convert_glucose
 from .scale_engine import run_scale, validate_scale

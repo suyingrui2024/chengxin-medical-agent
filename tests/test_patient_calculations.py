@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 
 from medagent.consultation import StaleActionError, UserInput
-from medagent.core.domain import Assertion, Fact, Phase, Source
+from medagent.core.domain import Assertion, Fact, Source
 from medagent.core.events import EventStore
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.extensions.builtin import load_registry
@@ -259,7 +259,7 @@ class PatientCalculationTests(unittest.TestCase):
             Fact("age_years", 32, Assertion.PRESENT, Source.PATIENT, "fixture")
         )
         draft = self.request()
-        reply = self.engine.correct_fact(
+        _ = self.engine.correct_fact(
             self.state.session_id,
             "age_years",
             "33岁",

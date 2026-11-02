@@ -7,7 +7,6 @@ _scripts_sys.path.insert(0, str(_ScriptsPath(__file__).resolve().parents[3]))
 
 
 import json
-from pathlib import Path
 import shutil
 
 from scripts.benchmarks.public.public_test_sample import ROOT, inventory, run_code

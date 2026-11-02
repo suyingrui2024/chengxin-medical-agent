@@ -3,7 +3,6 @@ medications, never invent a schedule, never suggest a dose, never judge
 interactions."""
 from __future__ import annotations
 
-import re
 import unittest
 
 from medagent.reports.medication_reminders import build_medication_reminders

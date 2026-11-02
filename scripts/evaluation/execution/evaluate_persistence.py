@@ -193,7 +193,7 @@ def main():
                 report["checks"]["independent_code_execution"] = report[
                     "independent_verification"
                 ]["passed"]
-            except Exception as exc:
+            except Exception:
                 report["checks"]["independent_code_execution"] = False
         gateway.shutdown()
         gateway.server_close()

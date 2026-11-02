@@ -213,7 +213,7 @@ class P3P4IntegrationTests(unittest.TestCase):
         self.assertNotIn(default_saved["entry"]["entry_id"], member_entry_ids)
         with self.assertRaises(HTTPError) as unknown_member:
             self.request(
-                f"/api/patients/no-such/measurements/temperature",
+                "/api/patients/no-such/measurements/temperature",
                 "POST",
                 {"value_text": "36.8", "unit": "°C", "measured_at": "2026-08-30T07:20:00+08:00"},
             )

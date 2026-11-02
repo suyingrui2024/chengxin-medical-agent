@@ -25,7 +25,7 @@ import re
 from dataclasses import fields
 from uuid import uuid4
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from ..core.domain import (
     Assertion,

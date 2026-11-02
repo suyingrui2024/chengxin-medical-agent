@@ -16,8 +16,6 @@ import json
 from importlib import resources
 from typing import Any, Dict
 
-from ..clinical.reasoning import chief_matches_pathway
-from ..core.text_match import contains_unnegated
 
 from .constants import _cache
 

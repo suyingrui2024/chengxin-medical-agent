@@ -192,7 +192,7 @@ class PatientRecordApiTests(unittest.TestCase):
     def test_bind_patient_rebuilds_baseline_and_gates_attach(self):
         # M4: minimal binding — snapshot key + member baseline + attach gate.
         store = self.server.patient_records
-        default = self.request("/api/patient")["patient"]
+        _ = self.request("/api/patient")["patient"]
         member = self.request("/api/patients", "POST", {"display_name": "孩子"})[
             "patient"
         ]

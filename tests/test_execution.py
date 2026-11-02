@@ -5,7 +5,6 @@ import tempfile
 import threading
 import time
 import unittest
-from unittest.mock import patch
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from medagent.execution import (

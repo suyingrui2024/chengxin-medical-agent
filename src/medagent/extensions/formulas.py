@@ -16,11 +16,9 @@ single ``FORMULAS`` table.
 
 from __future__ import annotations
 
-from decimal import Decimal
 from typing import Dict
 
 from .formulas_core import (
-    DISCLAIMER,
     FormulaSpec,
     _anion_gap,
     _bmi,

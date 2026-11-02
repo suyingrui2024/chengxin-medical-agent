@@ -5,7 +5,7 @@ from urllib.request import Request, urlopen
 
 from medagent.consultation.agent import AdaptiveConsultationEngine
 from medagent.consultation import UserInput
-from medagent.core.domain import AgentReply, CaseState, Phase, RiskLevel
+from medagent.core.domain import AgentReply, Phase, RiskLevel
 from medagent.core.events import EventStore
 from medagent.clinical.knowledge import ContentRepository
 from medagent.clinical.reasoner import OrderedQuestionRanker

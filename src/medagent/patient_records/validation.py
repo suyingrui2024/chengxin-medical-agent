@@ -1,25 +1,11 @@
 from __future__ import annotations
 import json
-import os
 import re
 import sqlite3
-from contextlib import contextmanager
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from decimal import Decimal
-from hashlib import sha256
 from pathlib import Path
-from threading import RLock
-from typing import Any, Iterator
-from uuid import uuid4
-from ..extensions.glucose import convert_glucose
-from ..core.measurement_kinds import (
-    KNOWN_KINDS,
-    MeasurementKindError,
-    kind_spec,
-    normalize_measurement,
-    trend_summary,
-)
-from ..infra.medical_images import InspectedImage, validate_recognition
+from typing import Any
 
 from .constants import BASELINE_FIELDS, BASELINE_LIST_LIMIT, BASELINE_STRING_LIMIT, _ALLERGY_KINDS
 

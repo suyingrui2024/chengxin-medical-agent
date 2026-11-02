@@ -3,6 +3,15 @@
 # star is the one place that list is assembled. These are the only star
 # imports left in the tree -- every other module imports what it uses.
 from ._preamble import *  # noqa: F401,F403
+from ._preamble import (
+    BaseHTTPRequestHandler,
+    Optional,
+    Path,
+    __version__,
+    argparse,
+    build_runtime,
+    os,
+)
 from ._preamble import __all__ as _PREAMBLE_ALL
 from .types import *  # noqa: F401,F403
 from .types import MedicalAgentServer
@@ -10,7 +19,6 @@ from .core import HandlerCore
 from .consultation import HandlerConsultation
 from .patient import HandlerPatient
 from .agent import HandlerAgent
-from ._preamble import BaseHTTPRequestHandler
 
 
 class Handler(

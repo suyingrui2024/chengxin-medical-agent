@@ -11,7 +11,6 @@ from medagent.core.domain import (
     AgentReply,
     Assertion,
     Fact,
-    Phase,
     Source,
 )
 from medagent.server.runtime import build_runtime

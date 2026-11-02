@@ -156,7 +156,7 @@ class WorkspaceDraftWiringTests(unittest.TestCase):
         self.assertEqual(len(backend.calls), calls_after_first)
 
     def test_drafts_survive_a_fresh_workspace_without_a_coordinator(self):
-        state = make_follow_up_state(self.engine)
+        _ = make_follow_up_state(self.engine)
         backend = StubBackend(drafting_handler)
         self._attach(SubagentCoordinator(self.events, backend, mode="advisory"))
         self.assertEqual(self.workspace.maybe_schedule_followup_drafts(), 1)
