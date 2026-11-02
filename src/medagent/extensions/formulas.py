@@ -4,10 +4,14 @@ Each entry declares the exact input/output signature a pack must reproduce, the
 arithmetic itself, and the audit cases used by tests.
 
 The shared vocabulary — ``FormulaSpec`` and the field helpers — lives in
-``formulas_core``.  It used to live here, with the department catalog merged in
-at the bottom of this module while that catalog imported ``FormulaSpec`` back
-from here; the cycle only worked because of import order.  Both sides now depend
-on the core instead, so either can be read on its own.
+``formulas_core``.  It used to live here, with the department table merged in at
+the bottom of this module while that table imported ``FormulaSpec`` back from
+here; the cycle only worked because of import order.  Both sides now depend on
+the core instead, so either can be read on its own.
+
+The general-purpose formulas are defined in this file and the department-owned
+ones in ``department_formulas``; the two are merged below so callers still see a
+single ``FORMULAS`` table.
 """
 
 from __future__ import annotations
@@ -29,6 +33,7 @@ from .formulas_core import (
     _output,
     _shock_index,
 )
+from .department_formulas import DEPARTMENT_FORMULAS
 
 
 FORMULAS: Dict[str, FormulaSpec] = {
@@ -213,10 +218,8 @@ FORMULAS: Dict[str, FormulaSpec] = {
 }
 
 
-# Department-catalog formulas live in a sibling module to keep this file
-# reviewable. The import sits at the end on purpose: ``formulas_extra``
-# imports ``FormulaSpec`` and the field helpers from here, so those names
-# must already exist when this line runs.
-from .formulas_extra import EXTRA_FORMULAS  # noqa: E402
-
-FORMULAS.update(EXTRA_FORMULAS)
+# Department-catalog formulas live in a sibling module to keep each file
+# reviewable. The merge happens here, at module scope, so importing this module
+# is still the one way to see every formula; nothing downstream needs to know
+# the table was assembled from two files.
+FORMULAS.update(DEPARTMENT_FORMULAS)

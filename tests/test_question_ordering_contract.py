@@ -19,7 +19,7 @@ import unittest
 from medagent.core.domain import Assertion, Fact, Source
 from medagent.clinical.planner import RulePlanner
 from medagent.server.runtime import build_runtime
-from tests.question_ordering_contract import (
+from tests.support.question_ordering_contract import (
     expected_next_question,
     expected_question_order,
 )

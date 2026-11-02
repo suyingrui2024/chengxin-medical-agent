@@ -1,4 +1,15 @@
-"""Manager that owns the collection of execution sessions."""
+"""The open-session registry: ``ExecutionManager`` and the recovery it drives.
+
+This module owns the collection, not any one session — ``session.py`` is the
+single session. Creating, reopening from disk, listing, and releasing all live
+here because they are the same operation seen from different angles: what is in
+the registry, and is it still alive.
+
+The class keeps the name ``ExecutionManager`` because it is the public entry
+point the server, the CLI, every evaluation script and 20 test files import. The
+file is named after what it holds so the module list in this package reads as
+content (session, store, paths, changes) rather than as job titles.
+"""
 from ._preamble import *  # noqa: F401,F403
 from .session import ExecutionSession
 

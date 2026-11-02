@@ -1,9 +1,15 @@
-"""Additional named formulas for the department catalog.
+"""Formulas that belong to a department rather than to the general workup.
 
-Imported by ``formulas.py`` at the end of its module body, so
-``FormulaSpec`` and the field helpers are already defined when this
-module runs. Content still cannot add formulas: every name here is
-imported by code, never by a pack.
+The general-purpose ones (BMI, anion gap, corrected calcium, ...) live in
+``formulas``.  Everything here is a score or index a specific specialty owns —
+fibrosis indices, prostate volume, burn area, EASI/PASI, CAM, eGFR — and it is
+kept in its own module only because 34 specs in one file is more than a reviewer
+can hold at once, not because the two are different in kind.  The split is by
+size, and this file is the larger half.
+
+``formulas`` imports this module at module scope and merges the table, so both
+are loaded by the same ``import medagent.extensions.formulas``.  Content still
+cannot add formulas: every name here is imported by code, never by a pack.
 """
 
 from __future__ import annotations
@@ -29,11 +35,11 @@ SEX = [
     {"value": "female", "label": "女"},
 ]
 
-EXTRA_FORMULAS = {}
+DEPARTMENT_FORMULAS = {}
 
 
 def add(spec):
-    EXTRA_FORMULAS[spec.key] = spec
+    DEPARTMENT_FORMULAS[spec.key] = spec
 
 
 add(

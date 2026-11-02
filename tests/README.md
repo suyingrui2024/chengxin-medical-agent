@@ -39,6 +39,8 @@ tests/
   support/
     builders.py       closed_state / make_fact / add_fact（构造病例状态）
     scripted.py       ScriptBackend / cmd / fact / make_engine / Provider（脚本化模型）
+    question_ordering_contract.py  expected_question_order（题序契约，测试侧薄 helper）
+    windows_process_roots.py       ProcessContainer 会话的测试用工作根目录
   fixtures/           语料与 UI 夹具（conclusion_cases_v0.json 等）
   ui/ desktop/ live/  Playwright spec
 ```
