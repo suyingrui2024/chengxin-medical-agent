@@ -1,6 +1,8 @@
 /* 06-adaptive.css — cascade slice 6 of 8; styles.css imports these in order.
    Holds: adaptive choices and answers, body map, structured task controls.
 */
+
+/* ---- adaptive choices ---- */
 .adaptive-choices {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   margin: 0 0 14px;
@@ -67,6 +69,8 @@
   font-size: 17px;
   color: var(--muted);
 }
+
+/* ---- trajectory choices ---- */
 .choices-trajectory {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -98,6 +102,8 @@
   background: var(--danger-bg);
   border-color: var(--danger-line);
 }
+
+/* ---- question disclosure ---- */
 .question-original {
   text-align: left;
   font-size: 12px;
@@ -184,6 +190,8 @@
 .screen-question .question-original {
   margin-top: 10px;
 }
+
+/* ---- severity selection ---- */
 .severity-selection {
   display: flex;
   align-items: center;
@@ -263,6 +271,8 @@
   > :not(.current-summary):not(.current-summary-message):not(.current-outcome) {
   display: none;
 }
+
+/* ---- focused summary view ---- */
 .summary-focused #messages {
   padding-top: 6px;
 }
@@ -370,6 +380,8 @@
   font-size: 14px;
   line-height: 1.8;
 }
+
+/* ---- summary grid ---- */
 .summary-grid .summary-item {
   padding: 11px 13px;
   gap: 5px;
@@ -477,6 +489,8 @@
     height: 32px;
   }
 }
+
+/* ---- structured task prompt ---- */
 .structured-task .task-prompt {
   margin: 8px 20px 15px;
   padding: 0;
@@ -521,6 +535,8 @@
   background: var(--raised);
   color: var(--primary);
 }
+
+/* ---- location answer ---- */
 .location-answer-progress {
   display: flex;
   justify-content: space-between;
@@ -617,6 +633,8 @@
   opacity: 0.45;
   text-shadow: 0 0 4px currentColor;
 }
+
+/* ---- body map ---- */
 .body-map-canvas {
   min-width: 0;
 }
@@ -656,6 +674,8 @@
 .structured-task .location-stage {
   display: block;
 }
+
+/* ---- location step guide ---- */
 .location-step-guide {
   margin-top: 10px;
   text-align: left;

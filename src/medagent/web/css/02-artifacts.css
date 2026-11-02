@@ -1,6 +1,8 @@
 /* 02-artifacts.css — cascade slice 2 of 8; styles.css imports these in order.
    Holds: artifact text and tables, task-focus bar, consultation grid.
 */
+
+/* ---- artifact text and tables ---- */
 .artifact-text {
   margin: 0;
   font: inherit;
@@ -256,6 +258,8 @@ body[data-mode="developer"] .patient-only {
 .template-surface form > div {
   flex: 1;
 }
+
+/* ---- capability list ---- */
 .capability-heading {
   margin: 0 0 15px;
 }
@@ -313,6 +317,8 @@ body[data-mode="developer"] .patient-only {
   cursor: pointer;
 }
 .manifest-details pre,
+
+/* ---- calculation card ---- */
 .calculation-card pre {
   max-height: 280px;
   overflow: auto;
@@ -414,6 +420,8 @@ body[data-mode="developer"] .patient-only {
 * {
   box-sizing: border-box;
 }
+
+/* ---- page chrome: body, selects, controls ---- */
 body {
   margin: 0;
   color: var(--ink);
@@ -581,6 +589,8 @@ svg.icon {
 .primary-button:hover {
   background: var(--primary);
 }
+
+/* ---- sidebar navigation ---- */
 .nav-label {
   margin: 30px 12px 12px;
   color: var(--muted);

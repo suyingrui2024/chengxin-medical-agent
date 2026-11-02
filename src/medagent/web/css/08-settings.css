@@ -32,6 +32,8 @@
    actions float at the surface's top-right; content keeps a
    centered reading measure; focused questions center vertically.
    ============================================================ */
+
+/* ---- view visibility rules ---- */
 main:has(#view-consultation:not([hidden])) {
   padding: 0;
   display: flex;
@@ -225,6 +227,8 @@ body.task-focused .surface-actions {
 
 /* Longitudinal loop: pending follow-ups on the history view, the outcome
    dialog, and the re-triage source banner. */
+
+/* ---- follow-up sections ---- */
 .followup-section {
   margin: 0 0 26px;
 }
@@ -416,6 +420,8 @@ body.task-focused .surface-actions {
    Neutral by design: a score band is not a traffic light. No red/green
    colouring is applied to bands — that would read as a verdict.
    ------------------------------------------------------------------ */
+
+/* ---- scale form intro and progress ---- */
 .scale-form .scale-intro {
   margin: 4px 0 0;
   color: var(--muted);
@@ -570,6 +576,8 @@ body.task-focused .surface-actions {
    inherit that, or every legend sits centred above left-aligned
    options. Spacing is tightened so more than four items fit on screen.
    ------------------------------------------------------------------ */
+
+/* ---- scale form items ---- */
 .scale-form {
   text-align: left;
 }
@@ -648,6 +656,8 @@ body.task-focused .surface-actions {
 
 /* Formula form matches the scale form: left-aligned, hints under their
    own field rather than centred under the card. */
+
+/* ---- formula form ---- */
 .formula-form {
   text-align: left;
 }

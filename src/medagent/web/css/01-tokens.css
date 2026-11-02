@@ -18,6 +18,8 @@
   --success-bg: #22352a;
   --success-line: #476b58;
 }
+
+/* ---- execution workspace ---- */
 .execution-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
@@ -463,6 +465,8 @@
   padding: 10px 15px;
   gap: 5px;
 }
+
+/* ---- execution directory picker ---- */
 .directory-toolbar {
   padding: 8px 15px 0;
   display: grid;
@@ -577,6 +581,8 @@
   font-size: 11px;
 }
 .change-count,
+
+/* ---- pending changes: state and additions ---- */
 .change-state {
   display: inline-block;
   border-radius: 5px;
@@ -637,6 +643,8 @@
   margin: 7px 0 0;
   color: var(--muted);
 }
+
+/* ---- change review dialog ---- */
 .change-dialog-counts {
   display: flex;
   gap: 8px;
@@ -773,6 +781,8 @@
     max-height: 30dvh;
   }
 }
+
+/* ---- execution file list ---- */
 .execution-files > p {
   font-size: 12px;
   color: var(--muted);
@@ -839,6 +849,8 @@
   overflow: auto;
   overflow-wrap: anywhere;
 }
+
+/* ---- artifact dialog controls ---- */
 .artifact-controls {
   display: flex;
   flex-wrap: wrap;

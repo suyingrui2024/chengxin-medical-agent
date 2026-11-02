@@ -133,6 +133,8 @@
   text-align: center;
   margin-top: 9px;
 }
+
+/* ---- structured task shell ---- */
 .structured-task .step-view {
   padding: 0;
   min-width: 0;
@@ -234,6 +236,8 @@
   font-size: 14px;
   font-weight: 650;
 }
+
+/* ---- subject change cards ---- */
 .subject-change-card {
   max-width: 620px;
   margin: 0 auto;
@@ -330,6 +334,8 @@
     margin: 8px 0 14px;
   }
 }
+
+/* ---- interaction follow-ups ---- */
 .interaction-followup {
   display: flex;
   align-items: baseline;
@@ -612,6 +618,8 @@
   margin-top: 16px;
   font-size: 12px;
 }
+
+/* ---- unknown items ---- */
 .unknown-items {
   display: flex;
   flex-wrap: wrap;

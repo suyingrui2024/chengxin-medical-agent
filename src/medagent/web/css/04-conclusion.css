@@ -1,6 +1,8 @@
 /* 04-conclusion.css — cascade slice 4 of 8; styles.css imports these in order.
    Holds: conclusion basis/handoff/care, capability rows, dialog chrome.
 */
+
+/* ---- conclusion directions and handoff ---- */
 .conclusion-direction-basis {
   margin: 4px 0 0;
   color: var(--muted);
@@ -108,6 +110,8 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
 }
+
+/* ---- library cards ---- */
 .library-card {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -166,6 +170,8 @@
   width: 15px;
   height: 15px;
 }
+
+/* ---- history ---- */
 .history-list {
   display: grid;
   gap: 12px;
@@ -324,6 +330,8 @@ select {
   font-size: 10px;
   padding: 6px;
 }
+
+/* ---- event timeline ---- */
 .event-list {
   margin-top: 15px;
   max-height: 560px;
@@ -389,6 +397,8 @@ select {
   max-height: 300px;
   overflow: auto;
 }
+
+/* ---- evidence items ---- */
 .evidence-item {
   padding: 17px 0;
   border-bottom: 1px solid var(--line);
@@ -541,6 +551,8 @@ dialog::backdrop {
   color: var(--muted);
   margin: 16px 0 22px;
 }
+
+/* ---- mode options ---- */
 .mode-options {
   border: 0;
   margin: 0 0 20px;

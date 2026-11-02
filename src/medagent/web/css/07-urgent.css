@@ -32,6 +32,8 @@
   }
 }
 /* Repeated observations keep the retained reading separate from failed attempts. */
+
+/* ---- observation card ---- */
 .observation-card {
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -87,6 +89,8 @@
 }
 .observation-details summary,
 .observation-evidence summary,
+
+/* ---- observation proposal and history ---- */
 .observation-proposal summary {
   min-height: 44px;
   display: flex;
@@ -175,6 +179,8 @@
 .active-observation .observation-card {
   margin-bottom: 0;
 }
+
+/* ---- compact observations ---- */
 .observation-compact {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -336,6 +342,8 @@
     font-size: 11px;
   }
 }
+
+/* ---- location answer with area figure ---- */
 .location-answer-field.with-area-figure {
   display: grid;
   grid-template-columns: minmax(70px, 0.5fr) minmax(0, 2fr);
@@ -392,6 +400,8 @@
 }
 
 /* Patient summaries make record status legible without repeating the full source text. */
+
+/* ---- summary review status ---- */
 .summary-review-status {
   display: flex;
   align-items: center;
@@ -716,6 +726,8 @@ html[data-font-scale="small"] .fact-value {
   max-width: 1020px;
   margin-inline: auto;
 }
+
+/* ---- settings rail ---- */
 .settings-rail {
   position: sticky;
   top: 24px;
@@ -759,6 +771,8 @@ html[data-font-scale="small"] .fact-value {
   margin: 0 0 20px;
   max-width: 640px;
 }
+
+/* ---- subagent rows ---- */
 .subagent-kind-row {
   display: flex;
   align-items: center;
