@@ -25,7 +25,7 @@
     "test:appearance": "playwright test tests/ui/appearance.spec.mjs",
     "test:python": "PYTHONPATH=src python3 -m pytest tests/ -q",
     "test:coverage": "PYTHONPATH=src python3 -m coverage run -m pytest tests -q && python3 -m coverage report",
-    "lint:structure": "python3 scripts/lint/module_size.py && python3 scripts/lint/import_rules.py && python3 scripts/lint/asset_size.py",
+    "lint:structure": "python3 scripts/lint/module_size.py && python3 scripts/lint/import_rules.py && python3 scripts/lint/naming.py && python3 scripts/lint/asset_size.py",
     "lint:assets": "python3 scripts/lint/asset_size.py",
     "lint:python": "python3 -m ruff check src tests scripts",
     "test:kg": "PYTHONPATH=src python3 -m pytest tests/test_kg.py -q",

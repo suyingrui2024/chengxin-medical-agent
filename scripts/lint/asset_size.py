@@ -48,6 +48,7 @@ THRESHOLD = 8 * 1024 * 1024
 SKIP_DIRS = {
     ".git",
     ".runtime",
+    ".venv",
     ".workbuddy",
     "__pycache__",
     "build",

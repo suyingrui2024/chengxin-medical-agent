@@ -33,6 +33,10 @@ jobs:
         run: python scripts/lint/module_size.py
       - name: Enforce import direction
         run: python scripts/lint/import_rules.py
+      # A file can be the right size in the right layer and still be called
+      # `utils`. Size and coupling do not notice a name that describes nothing.
+      - name: Enforce file naming
+        run: python scripts/lint/naming.py
       # The evidence snapshots already carry 481 MiB of wheels, tarballs and
       # fonts. That history is not being rewritten; this only refuses *new*
       # copies of the same bytes.
