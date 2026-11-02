@@ -33,6 +33,18 @@ jobs:
         run: python scripts/lint/module_size.py
       - name: Enforce import direction
         run: python scripts/lint/import_rules.py
+      # The evidence snapshots already carry 481 MiB of wheels, tarballs and
+      # fonts. That history is not being rewritten; this only refuses *new*
+      # copies of the same bytes.
+      - name: Enforce large-asset ceiling
+        run: python scripts/lint/asset_size.py
+      # Undefined names and broken annotations are cheap to catch and were the
+      # one class of defect the suite could not: a skipped test hid a
+      # `threading` that was never imported.
+      - name: Enforce Python lint baseline
+        run: |
+          python -m pip install --quiet ruff
+          python -m ruff check src tests scripts
       - name: Install locked browser test dependencies
         run: |
           npm ci --ignore-scripts
@@ -66,3 +78,15 @@ jobs:
         run: npm run test:ui:ci
       - name: Check interface formatting (same list as local format:check)
         run: npm run format:check
+      # A failing spec is worth nothing without its trace: the screenshots and
+      # trace files are the only record of what the browser actually saw, and
+      # `retain-on-failure` writes them only for the cases that failed. Kept a
+      # week — long enough to investigate, short enough not to accumulate.
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-failure
+          path: test-results/ui
+          retention-days: 7
+          if-no-files-found: ignore

@@ -310,7 +310,7 @@ def collapse_duplicate_names(store: ConceptStore) -> int:
 
     priority = {"disease": 0, "symptom": 1, "drug": 2, "lab": 3, "category": 4}
     merged = 0
-    for name, items in groups.items():
+    for items in groups.values():
         if len(items) < 2:
             continue
         items.sort(

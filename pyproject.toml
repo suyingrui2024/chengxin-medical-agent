@@ -24,6 +24,30 @@ where = ["src"]
 medagent = ["web/*", "content/*.json", "content/*.txt"]
 "medagent.extensions" = ["packs/*.json", "templates/*.json"]
 
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+# Frozen evaluation snapshots are evidence, not code under review: they keep
+# the sources they were run against, broken imports and all.
+extend-exclude = ["docs/evaluations", "docs/review-packets", ".runtime", "node_modules"]
+
+[tool.ruff.lint]
+# Deliberately only the rules that mean the code is *broken*, not merely
+# untidy: syntax errors, broken `__all__`, invalid `assert`, undefined names,
+# plus two bugbear checks whose hits are all genuine.
+#
+# The usual Python lint sets cannot be enabled as-is here. 32 modules start
+# with `from ._preamble import *`, so F401 (unused import) and F403 (star
+# import) fire on every one of them, and F821 is the only unused-name check
+# that still means something. Bugbear's B023 alone adds 79 hits from closures
+# created inside loops that are invoked immediately, and every B905 (`zip`
+# without `strict=`) site needs a per-site decision about which length is
+# allowed to be shorter — neither may be enabled blind.
+#
+# B904 (raise without `from` inside `except`) and B007 (loop variable never
+# used) are on because both were clean after fixing their few real hits.
+select = ["E9", "F63", "F7", "F82", "B904", "B007"]
+
 [tool.coverage.run]
 source = ["src/medagent"]
 branch = true

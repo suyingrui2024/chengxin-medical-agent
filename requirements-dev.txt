@@ -20,3 +20,7 @@ hypothesis>=6
 # 任何事。它的价值在反面：精确指出从没被测试碰过的代码。
 coverage>=7
 pytest>=8
+# 静态检查（`npm run lint:python`，CI 的 Python lint 步骤）。只开"代码是坏的"
+# 规则（E9/F63/F7/F82），不追究风格：32 个模块用 `from ._preamble import *`，
+# 常规规则集会把它们全部报错。规则说明见 pyproject.toml 的 [tool.ruff.lint]。
+ruff>=0.17

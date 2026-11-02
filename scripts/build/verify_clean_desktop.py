@@ -161,7 +161,10 @@ def main():
         (output / "launcher-result.json").write_text(
             json.dumps({"passed": False, "error": "timeout"}) + "\n"
         )
-        raise SystemExit("Isolated desktop timed out; evidence retained")
+        # `from None`: the timeout is the whole story, and the evidence files
+        # written above are what the operator reads. Chaining the subprocess
+        # traceback would bury them.
+        raise SystemExit("Isolated desktop timed out; evidence retained") from None
     (output / "stdout.log").write_bytes(result.stdout)
     (output / "stderr.log").write_bytes(result.stderr)
     probe_path = output / "probe.json"

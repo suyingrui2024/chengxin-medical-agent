@@ -93,7 +93,7 @@ def main() -> int:
     lines += ["\t".join(row) for row in rows]
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"wrote {OUT} candidates={len(rows)}")
-    for concept, phrase, flag, _ in rows:
+    for _concept, phrase, flag, _ in rows:
         print(f"  {flag:18s} {phrase}")
     return 0
 
