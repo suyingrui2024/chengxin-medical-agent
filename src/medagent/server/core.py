@@ -183,6 +183,22 @@ class HandlerCore:
             return False
         return True
 
+    @staticmethod
+    def _route(parts: list[str], *pattern: Optional[str]) -> bool:
+        """True when the path segments match ``pattern`` exactly.
+
+        ``parts`` is ``path.strip("/").split("/")``. ``None`` in the pattern
+        matches any one segment, which is how route ids are skipped. The
+        length is part of the match, so ``/api/sessions/x`` can never satisfy
+        a four-segment pattern by prefix accident.
+        """
+        if len(parts) != len(pattern):
+            return False
+        return all(
+            expected is None or expected == actual
+            for expected, actual in zip(pattern, parts)
+        )
+
     def _static(self, path: str) -> None:
         filename = "index.html" if path == "/" else path.removeprefix("/")
         if "/" in filename or filename.startswith("."):

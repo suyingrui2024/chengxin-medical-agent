@@ -184,10 +184,17 @@ def _save_medication_schedules(store, schedules: dict) -> None:
     path = _medication_schedules_path(store)
     tmp = path.with_suffix(".json.tmp")
     with store.lock:
-        tmp.write_text(
-            json.dumps(schedules, ensure_ascii=False), encoding="utf-8"
-        )
-        tmp.replace(path)
+        try:
+            tmp.write_text(
+                json.dumps(schedules, ensure_ascii=False), encoding="utf-8"
+            )
+            tmp.replace(path)
+        except OSError:
+            # Reads only ever look at ``path``, so a half-written temp file is
+            # harmless once the failure is reported — but nothing would ever
+            # remove it either. Clean up, then let the caller answer 500.
+            tmp.unlink(missing_ok=True)
+            raise
 
 
 def _persist_engine_state(engine, state) -> None:
