@@ -109,6 +109,15 @@ def test_an_unknown_selection_mode_is_rejected():
         validate_adaptive_question(q(selection_mode="ranked"))
 
 
+@pytest.mark.parametrize("mode", [["single"], {"mode": "single"}, None, 1])
+def test_a_non_text_selection_mode_fails_as_a_domain_error(mode):
+    """A list is unhashable, so a bare ``mode in SELECTION_MODES`` check would
+    raise TypeError — a type the callers do not catch."""
+    with pytest.raises(AdaptiveQuestionError, match="动态问题选择模式无效"):
+        validate_adaptive_question(q(selection_mode=mode))
+
+
+
 def test_allow_other_must_be_a_real_boolean():
     with pytest.raises(AdaptiveQuestionError, match="allow_other必须是布尔值"):
         validate_adaptive_question(q(allow_other="yes"))
@@ -193,6 +202,10 @@ def test_prohibited_instructions_in_an_option_are_rejected():
         (["not_a_tag"], "动态选项风险标签无效"),
         (["chest_discomfort"] * 2, "动态选项风险标签无效"),
         ([f"tag{i}" for i in range(5)], "动态选项风险标签无效"),
+        # Unhashable elements must not escape as TypeError: the caller only
+        # ever catches AdaptiveQuestionError.
+        ([["chest_discomfort"]], "动态选项风险标签无效"),
+        ([{"tag": "chest_discomfort"}], "动态选项风险标签无效"),
     ],
 )
 def test_risk_tags_are_validated(tags, match):

@@ -23,7 +23,7 @@ REFERENCE = re.compile(r"src/medagent/[\w/]+\.py")
 ROW = re.compile(r"^\|\s*`(src/medagent/[\w/]+\.py)`\s*\|\s*`([^`]+)`\s*\|$", re.M)
 
 #: Generated evaluation output, vendored trees and project metadata are not docs.
-SKIP_PARTS = ("docs/evaluations", "node_modules", ".git", ".workbuddy-ai")
+SKIP_PARTS = ("docs/evaluations", "node_modules", ".git")
 
 #: ``xxx`` is the conventional placeholder for "some module here" — the mapping
 #: table's intro and the notes pointing at it use it. It is not a claim that a

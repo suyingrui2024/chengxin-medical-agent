@@ -11,6 +11,7 @@ the tool-call payloads expect.
 from __future__ import annotations
 
 import json
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from medagent.clinical.knowledge import ContentRepository

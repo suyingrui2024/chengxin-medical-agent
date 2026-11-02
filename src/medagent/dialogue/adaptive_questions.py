@@ -100,7 +100,9 @@ def validate_adaptive_question(
     if any(phrase in question for phrase in _PROHIBITED_PATIENT_ACTIONS):
         raise AdaptiveQuestionError("动态问题包含未允许的医疗指令")
     mode = value["selection_mode"]
-    if mode not in SELECTION_MODES:
+    # Type first, membership second: a list here is unhashable, and `in` would
+    # raise TypeError instead of the domain error the caller expects.
+    if not isinstance(mode, str) or mode not in SELECTION_MODES:
         raise AdaptiveQuestionError("动态问题选择模式无效")
     if not isinstance(value["allow_other"], bool):
         raise AdaptiveQuestionError("allow_other必须是布尔值")
@@ -145,6 +147,7 @@ def validate_adaptive_question(
         if (
             not isinstance(tags, list)
             or len(tags) > 4
+            or any(not isinstance(tag, str) for tag in tags)
             or len(set(tags)) != len(tags)
             or any(tag not in RISK_TAG_CUES for tag in tags)
         ):

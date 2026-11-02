@@ -146,3 +146,34 @@ def test_an_empty_time_list_clears_the_schedule(demo_server_factory):
     assert status == 200
     assert body["scheduled_times"] == []
     assert body["status"] == "pending_setup"
+
+
+# --- temp file hygiene -----------------------------------------------------
+
+
+def test_a_failed_schedule_write_leaves_no_temp_file(tmp_path, monkeypatch):
+    """The write goes through ``.json.tmp`` and a rename.
+
+    When the rename fails the temp file used to stay behind forever: no read
+    path touches it, so nothing ever cleans it up. One was sitting in a real
+    data directory when this was found.
+    """
+    from pathlib import Path
+
+    from medagent.patient_records.store import PatientRecordStore
+    from medagent.server._preamble import _save_medication_schedules
+
+    store = PatientRecordStore(tmp_path / "patient-data")
+    target = tmp_path / "patient-data" / "medication_schedules.json"
+    target.write_text("{}", encoding="utf-8")
+
+    def disk_full(self, other):
+        raise OSError("no space left on device")
+
+    monkeypatch.setattr(Path, "replace", disk_full)
+    with pytest.raises(OSError):
+        _save_medication_schedules(store, {"降压药": {"name": "降压药", "times": ["08:00"]}})
+
+    assert target.with_suffix(".json.tmp").exists() is False
+    assert target.read_text(encoding="utf-8") == "{}"
+

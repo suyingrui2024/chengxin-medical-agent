@@ -303,14 +303,17 @@ flowchart TD
 ## 验证
 
 ```bash
-# Python 行为测试（1910 个），真实 DSH 与隔离沙箱测试默认跳过
+# Python 行为测试（2006 个收集节点，本机 1935 通过 / 71 跳过），真实 DSH 与隔离沙箱测试默认跳过
 npm run test:python          # 等价于 PYTHONPATH=src python3 -m pytest tests -q
 
 # 同上 + branch 覆盖率（当前 85%）
 npm run test:coverage
 
-# 架构门禁：单文件行数 + 依赖方向（CI 第一步，失败即停）
+# 架构门禁：单文件行数 + 依赖方向 + 大文件（CI 第一步，失败即停）
 npm run lint:structure
+
+# 静态检查最小集：未定义名、语法错、坏 __all__（规则与限制见 pyproject.toml）
+npm run lint:python
 
 # 发布门禁：红旗召回率 / 结论单 / 联网语料阈值
 PYTHONPATH=src python3 scripts/evaluation/medical/evaluate_release_gate.py

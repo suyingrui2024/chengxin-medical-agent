@@ -43,7 +43,13 @@ def demo_server(clean_medagent_env):
     The demo backend keeps the suite offline and deterministic. Teardown order
     matters: shut the socket down before stopping the runtime, or a request
     thread can still be inside the engine when it is torn out.
+
+    The patient store is given an explicit root inside the temp directory:
+    ``MedicalAgentServer`` builds a default store lazily, and that default is
+    the real per-user data directory. Without this, a test POST writes into
+    the developer's own records and later runs read them back.
     """
+    from medagent.patient_records.store import PatientRecordStore
     from medagent.server import Handler, MedicalAgentServer
     from medagent.server.runtime import build_runtime
 
@@ -61,6 +67,7 @@ def demo_server(clean_medagent_env):
             context.services.require("consultation"),
             context.services.require("events"),
             "demo",
+            patient_store=PatientRecordStore(root / "patient-data"),
         )
         worker = threading.Thread(target=httpd.serve_forever, daemon=True)
         worker.start()
@@ -82,6 +89,7 @@ def demo_server_factory():
     the per-test ``demo_server`` instead — they would otherwise see each
     other's writes.
     """
+    from medagent.patient_records.store import PatientRecordStore
     from medagent.server import Handler, MedicalAgentServer
     from medagent.server.runtime import build_runtime
 
@@ -102,6 +110,8 @@ def demo_server_factory():
         context.services.require("consultation"),
         context.services.require("events"),
         "demo",
+        # Same reason as ``demo_server``: never touch the real data root.
+        patient_store=PatientRecordStore(root / "patient-data"),
     )
     worker = threading.Thread(target=httpd.serve_forever, daemon=True)
     worker.start()

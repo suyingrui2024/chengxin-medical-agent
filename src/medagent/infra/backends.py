@@ -352,7 +352,10 @@ class CompatibleBackend:
                     )
                 )
                 if cancelled is not None and cancelled.is_set():
-                    raise DecisionInterrupted()
+                    # Keep the transport error as the cause: an interruption
+                    # that lands here is usually the consequence of a bad
+                    # response, and the traceback should say which.
+                    raise DecisionInterrupted() from exc
                 if self.retry_backoff_seconds > 0:
                     sleep(self.retry_backoff_seconds)
                 continue

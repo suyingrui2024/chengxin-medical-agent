@@ -371,7 +371,7 @@ class ClarificationSdkTests(unittest.TestCase):
                     session.start_turn("ROOT_CLARIFICATION_FIXTURE 明确需求后再执行。", 16, 60)
                     process = None
                     turn = session.turn_id
-                    for index, answer in enumerate(["保留现有行为", "1.25 kg", "纯文本"]):
+                    for answer in ["保留现有行为", "1.25 kg", "纯文本"]:
                         value = self.wait(
                             lambda: next(
                                 (

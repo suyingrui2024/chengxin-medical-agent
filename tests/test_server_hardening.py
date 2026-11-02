@@ -147,6 +147,25 @@ class ServerHardeningTests(unittest.TestCase):
             status, _ = self.request(f"/api/sessions/{session_id}/{sub}")
             self.assertEqual(status, 200, sub)
 
+    def test_a_route_pattern_matches_by_length_and_literal(self):
+        """The dispatch check is length-exact; a short pattern is a silent 404.
+
+        Writing `("api", "patients", None, "measurements")` as three segments
+        costs a whole endpoint with no error anywhere — it just never matches.
+        These are the cases that made that bug possible.
+        """
+        route = Handler._route
+        parts = ["api", "sessions", "abc", "messages"]
+        self.assertTrue(route(parts, "api", "sessions", None, "messages"))
+        # The wildcard is per segment: it skips one id, never several.
+        self.assertFalse(route(parts, "api", "sessions", None, None, "messages"))
+        self.assertFalse(route(parts, "api", "sessions", None))
+        # A prefix is not a match, and neither is a longer pattern.
+        self.assertFalse(route(parts, "api", "sessions"))
+        self.assertFalse(route(parts, "api", "sessions", None, "messages", "extra"))
+        # Literals still have to agree.
+        self.assertFalse(route(parts, "api", "sessions", None, "snapshot"))
+
     # -- idempotent create -------------------------------------------------
 
     def test_create_session_is_idempotent_per_request_id(self):

@@ -1,20 +1,21 @@
 # 测试套件
 
-154 个 Python 测试文件、1910 个用例，88 个 Playwright spec（ui 52 / desktop 33 / live 3）。这份文件解释**怎么跑、什么会跳过、东西放哪**。
+158 个 Python 测试文件、2006 个收集节点（参数化用例计为多个节点；本机运行 1935 passed、71 skipped），88 个 Playwright spec（ui 52 / desktop 33 / live 3）。这份文件解释**怎么跑、什么会跳过、东西放哪**。
 
 ## 跑什么
 
 | 命令 | 内容 | 耗时 |
 |---|---|---|
-| `npm run test:python` | 全量 Python（1910 个） | ~65 秒 |
+| `npm run test:python` | 全量 Python（2006 个收集节点） | ~79 秒 |
 | `npm run test:coverage` | 同上 + branch 覆盖率（当前 85%） | ~2 分钟 |
-| `npm run lint:structure` | 架构门禁：单文件行数 + 依赖方向 | <1 秒 |
+| `npm run lint:structure` | 架构门禁：单文件行数 + 依赖方向 + 大文件基线 | ~4 秒 |
+| `npm run lint:python` | ruff 最小集：未定义名、语法错、坏 `__all__` | <1 秒 |
 | `npm run test:ui` | 52 个前端 spec（每文件独立起服务） | ~20 分钟 |
 | `npm run test:desktop` | 33 个 Electron spec | — |
 | `npm run test:execution` | 执行沙箱，需 `RUN_DSH_EXECUTION=1` | — |
 | `npm run test:kg` | 只跑知识图谱 | — |
 
-CI 跑的是：两个门禁 → 全量 pytest + release gate → 全量浏览器 → format:check。
+CI 跑的是：三个门禁（行数、依赖方向、ruff）→ 全量 pytest + release gate → 全量浏览器 → format:check。
 
 ## 本地绿 ≠ 全绿
 
@@ -44,6 +45,8 @@ tests/
 
 **加新测试前先看 `support/`**：`closed_state` 和 `fact` 这类构造器以前被复制了三十遍，改一次 `CaseState` 要改三十个文件。
 
+测试文件数量主要增加导航成本，不等于运行成本或冗余。当前全量 Python 用例约 69 秒；只有同一行为契约、相同输入条件与相同预期被重复验证时才合并。不同风险情境即使断言相似，也应保留独立测试，便于失败定位。文件持续增长时优先按领域目录分组，并保留可直接运行的 pytest 节点名；不要为减少文件数把不同契约塞进巨型模块。
+
 `conftest.py` 的 fixture **不是 autouse**：`clean_medagent_env` 会清掉 `MEDAGENT_*`，如果全局生效，会改变那些自己设置这些变量的测试。
 
 ## 按领域找测试
@@ -52,11 +55,11 @@ tests/
 
 | 领域 | 代表文件 |
 |---|---|
-| 结论单 | `test_conclusion*.py`、`test_close_*.py`、`test_denied_clarification_memory.py`、`test_self_care_oral.py` |
+| 结论单 | `test_conclusion*.py`、`test_close_*.py`、`test_denied_clarification_memory.py`、`test_self_care_oral.py`、`test_direction_guards.py`、`test_pathway_close_gate.py` |
 | 问诊引擎 | `test_agent*.py`、`test_consultation*.py`、`test_engine_question_gating.py`、`test_controller_safety_gates.py`、`test_turn_pipeline.py`、`test_dual_engine_safety.py` |
 | 知识与推理 | `test_kg.py`、`test_reasoning.py`、`test_triage_scan_gating.py`、`test_pathway_vocabulary.py`、`test_hypothesis_ranking.py`、`test_question_ordering_contract.py` |
 | 计算与执行 | `test_formula_engine.py`、`test_scale_engine.py`、`test_capabilities.py`、`test_execution*.py` |
-| 病历与会话 | `test_patient_records*.py`、`test_records_measurements_and_reminders.py`、`test_attachment_and_baseline.py`、`test_workspace*.py` |
+| 病历与会话 | `test_patient_records*.py`、`test_records_measurements_and_reminders.py`、`test_attachment_and_baseline.py`、`test_workspace*.py`、`test_session_events_cursor.py` |
 | 联网与报告 | `test_web_tools.py`、`test_report_interpretation*.py`、`test_education.py` |
 | 内核单测 | `test_text_match.py`、`test_presentation.py`、`test_task_intents.py`、`test_location_answers.py`、`test_worry_and_goal.py` |
 | 架构门禁 | `test_import_rules.py` |
