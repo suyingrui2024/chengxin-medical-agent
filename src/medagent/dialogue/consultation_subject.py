@@ -48,9 +48,18 @@ PATTERN = re.compile(
 
 
 def compatible(first, second):
+    """Two references can be merged only if their attribute vectors align.
+
+    ``zip`` stops at the shorter one, so a three-slot reference and a two-slot
+    reference used to compare as compatible whenever the two shared a prefix --
+    the missing slot silently read as "no conflict". Length is part of the
+    shape, not an accident of how the vectors were built.
+    """
+    if len(first["attributes"]) != len(second["attributes"]):
+        return False
     return all(
         a == b or a == "*" or b == "*"
-        for a, b in zip(first["attributes"], second["attributes"])
+        for a, b in zip(first["attributes"], second["attributes"], strict=True)
     )
 
 
@@ -60,7 +69,8 @@ def merge_reference(first, second):
         max([first, second], key=lambda v: sum(a != "*" for a in v["attributes"]))
     )
     result["attributes"] = [
-        b if a == "*" else a for a, b in zip(first["attributes"], second["attributes"])
+        b if a == "*" else a
+        for a, b in zip(first["attributes"], second["attributes"], strict=True)
     ]
     return result
 

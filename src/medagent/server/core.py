@@ -238,7 +238,7 @@ class HandlerCore:
             return False
         return all(
             expected is None or expected == actual
-            for expected, actual in zip(pattern, parts)
+            for expected, actual in zip(pattern, parts, strict=True)
         )
 
     def _static(self, path: str) -> None:

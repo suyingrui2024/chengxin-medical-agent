@@ -84,7 +84,7 @@ def _validate_inputs(inputs: Any, expected: List[Dict[str, Any]]) -> None:
         raise FormulaSpecError("公式输入必须是有界列表")
     if len(inputs) != len(expected):
         raise FormulaSpecError("公式输入项数量与已注册签名不一致")
-    for index, (item, signature) in enumerate(zip(inputs, expected)):
+    for index, (item, signature) in enumerate(zip(inputs, expected, strict=True)):
         where = f"输入[{index}]"
         if not isinstance(item, dict) or set(item) != set(signature):
             raise FormulaSpecError(f"{where} 字段必须与已注册签名完全一致")

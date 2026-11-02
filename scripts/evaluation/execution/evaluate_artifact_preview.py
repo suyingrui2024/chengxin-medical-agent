@@ -45,6 +45,7 @@ def verify_rows(text):
                         ("B", Decimal("2.00")),
                         ("C", Decimal("0.75")),
                     ],
+                    strict=True,
                 )
             )
         )

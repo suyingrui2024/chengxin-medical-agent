@@ -37,11 +37,12 @@ extend-exclude = ["docs/evaluations", "docs/review-packets", ".runtime", "node_m
 # names, unused imports and variables, plus two bugbear checks whose hits are
 # all genuine.
 #
-# F401/F403/F405 only became possible once the star imports went. 32 modules
+# F401/F403/F405 only became possible once the star imports went. 46 modules
 # began with `from ._preamble import *`, which makes "unused import" and
-# "possibly undefined" meaningless: every name might come from anywhere. Those
-# modules now import what they use, and the eight facades that keep a star
-# declare their surface in `__all__` and carry `# noqa: F401,F403`.
+# "possibly undefined" meaningless: every name might come from anywhere. There
+# are none left: 38 import what they use, and the 8 package facades import an
+# explicit list and declare it in `__all__`, so no `# noqa` is needed for a
+# star import anywhere in the tree.
 #
 # Turning F401 on then found 467 unused imports: 252 in the packages that had
 # been split out of one module (each submodule kept the original file's whole
@@ -52,24 +53,37 @@ extend-exclude = ["docs/evaluations", "docs/review-packets", ".runtime", "node_m
 # `conclusion/constants.py` are re-exported on purpose -- the comment above
 # them says why -- so that module declares a 35-name `__all__` instead.
 #
-# Bugbear's B023 alone adds 79 hits from closures created inside loops that are
-# invoked immediately, and every B905 (`zip` without `strict=`) site needs a
-# per-site decision about which length is allowed to be shorter — neither may
-# be enabled blind.
+# Bugbear is on as a whole set: `--select B` is clean everywhere except B023,
+# which is handled per-file below. B905 (`zip` without `strict=`) was 7 sites
+# and each turned out to be a place where the two sides are equal by
+# construction -- an explicit length check, or a list built from the other --
+# so all seven now say `strict=True` and a future mismatch raises instead of
+# silently dropping the tail. One of them was not merely stylistic:
+# `consultation_subject.compatible` compared a 3-slot reference against a
+# 2-slot one by their shared prefix, so a truncated profile read as compatible.
 select = [
+    "B",     # bugbear: the whole set, minus the B023 exception below
     "E9",    # syntax errors
     "F401",  # unused import
     "F403",  # star import
     "F405",  # name that may be undefined because of a star import
     "F541",  # f-string without placeholders
-    "F63",   # invalid `__all__`, assert misuse, ... 
+    "F63",   # invalid `__all__`, assert misuse, ...
     "F7",    # real statements that do nothing
     "F811",  # redefinition
     "F82",   # undefined name
     "F841",  # unused local variable
-    "B904",  # raise without `from` inside `except`
-    "B007",  # loop variable never used
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# B023 flags a `def` or `class` created inside a loop that reads a loop
+# variable. It cannot tell whether the closure escapes the iteration, and in
+# these two trees it never does: the fixtures build one fake backend per case
+# and hand it to the engine before the loop advances (73 hits in tests, 6 in
+# scripted evaluation). Production code has none of these, so the rule stays on
+# exactly where a late-bound closure would be a real defect.
+"tests/**" = ["B023"]
+"scripts/evaluation/**" = ["B023"]
 
 [tool.coverage.run]
 source = ["src/medagent"]

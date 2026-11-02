@@ -184,7 +184,7 @@ def render(records, version):
             if len(assets) != len(steps):
                 raise ValueError("Each illustrated step must have a matching asset")
             panels = []
-            for i, (step, asset) in enumerate(zip(steps, assets), 1):
+            for i, (step, asset) in enumerate(zip(steps, assets, strict=True), 1):
                 if asset.split("#")[0] not in [
                     "/assets/illustrations/neutral-temperature.svg",
                     "/assets/illustrations/body-location.svg",

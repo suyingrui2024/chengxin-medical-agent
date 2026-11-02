@@ -186,7 +186,7 @@ class CoordinatorBranch:
         # case moved while branches ran, findings are withheld.
         stale = watermark(state) != mark
         branches_out = []
-        for branch, result in zip(prepared, results):
+        for branch, result in zip(prepared, results, strict=True):
             if result is None:
                 result = self._branch_shell(branch, "failed")
             if stale and result.get("status") not in {
