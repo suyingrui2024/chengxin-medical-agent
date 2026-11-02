@@ -454,11 +454,22 @@ export function refreshConclusionCard(conclusion) {
 export async function loadEvents() {
   const id = state.sessionId;
   if (!id) return;
-  const data = await api(`/api/sessions/${id}/events`);
+  // Poll with a cursor: a long turn produces megabytes of event payload, and
+  // the page re-reads this route about once a second while it runs. "delta"
+  // appends what is new; anything else (first load, session reset, a server
+  // that does not know the cursor) is a full list that replaces ours.
+  const held = state.events.length;
+  const data = await api(`/api/sessions/${id}/events?since=${held}`);
   if (state.sessionId !== id) return;
-  if (data.events.length < state.events.length) return;
-  const added = data.events.slice(state.events.length);
-  state.events = data.events;
+  let added;
+  if (data.mode === "delta" && held > 0) {
+    added = data.events;
+    if (added.length) state.events = state.events.concat(added);
+  } else {
+    if (data.events.length < held) return;
+    added = data.events.slice(held);
+    state.events = data.events;
+  }
   const educationUpdated = added.some(
     (event) =>
       event.event_type === "web.citation_attached" ||

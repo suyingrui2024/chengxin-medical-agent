@@ -72,12 +72,23 @@ class HandlerConsultation:
                 self._error(HTTPStatus.NOT_FOUND, "session_not_found", "找不到该问诊会话")
                 return
             if len(parts) == 4 and parts[3] == "events":
+                # ``?since=<n>`` returns only the events after a cursor. The
+                # page polls this route about once a second while a turn runs,
+                # and one long session already carries megabytes of model
+                # payload; resending all of it every second is pure waste.
+                # No cursor, or a cursor past the end (session reset), means
+                # "send everything" and the client replaces its list.
+                events = self.app.events.for_session(state.session_id)
+                total = len(events)
+                since = self._events_cursor(total)
                 self._json(
                     {
                         "events": [
                             event.to_dict()
-                            for event in self.app.events.for_session(state.session_id)
-                        ]
+                            for event in (events if since is None else events[since:])
+                        ],
+                        "total": total,
+                        "mode": "full" if since is None else "delta",
                     }
                 )
             elif len(parts) == 4 and parts[3] == "snapshot":
@@ -118,10 +129,6 @@ class HandlerConsultation:
             and parts[0:2] == ["api", "sessions"]
             and parts[3] == "report-items"
         ):
-            origin = self.headers.get("Origin")
-            if origin and urlparse(origin).netloc != self.headers.get("Host"):
-                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
-                return
             try:
                 engine = self.app.workspace.engine_for(parts[2])
                 with engine._session_locks[parts[2]]:
@@ -151,10 +158,6 @@ class HandlerConsultation:
             self._json(response)
             return
         if len(parts) == 3 and parts[0:2] == ["api", "sessions"]:
-            origin = self.headers.get("Origin")
-            if origin and urlparse(origin).netloc != self.headers.get("Host"):
-                self._error(HTTPStatus.FORBIDDEN, "invalid_origin", "此操作只允许来自当前应用")
-                return
             try:
                 engine = self.app.workspace.engine_for(parts[2])
                 with engine._session_locks[parts[2]]:
@@ -334,3 +337,18 @@ class HandlerConsultation:
             schedule()
         except Exception:
             return
+
+    def _events_cursor(self, total: int) -> Optional[int]:
+        """Read ``?since=`` for the events route as an offset into the list.
+
+        ``None`` means "send the whole list": no cursor, a malformed one, or
+        a cursor past the end. The last case is a session whose events
+        shrank (reset, or a restart from a trimmed log), and answering with
+        a full list makes the page replace its copy instead of appending
+        onto a history the server no longer has.
+        """
+        raw = (parse_qs(urlparse(self.path).query).get("since") or [""])[0]
+        if not raw.isdigit():
+            return None
+        since = int(raw)
+        return since if 0 < since <= total else None

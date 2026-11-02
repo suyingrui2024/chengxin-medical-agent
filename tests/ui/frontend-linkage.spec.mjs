@@ -302,7 +302,9 @@ test("education completion refreshes the conclusion card in place", async ({
 }) => {
   test.setTimeout(90000);
   let enrich = false;
-  await page.route("**/api/sessions/*/events", async (route) => {
+  // The trailing `*` matters: the page polls this route with `?since=<n>`, so
+  // an exact-path pattern never matches and the injected event never lands.
+  await page.route("**/api/sessions/*/events*", async (route) => {
     const response = await route.fetch();
     const json = await response.json();
     if (enrich)
