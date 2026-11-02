@@ -1,22 +1,5 @@
 from __future__ import annotations
-import json
-import os
-import re
-from copy import deepcopy
-from datetime import datetime
-from importlib import resources
-from typing import Any, Dict, List, Optional
-from ..guards.baseline_projection import build_allergy_hint
-from ..guards.direction_guards import (
-    direction_kept,
-    is_affirmed_in_text,
-    severity_consistent_text,
-)
-from ..core.domain import Assertion, CaseState, Phase, RiskLevel
-from ..clinical.followups import build_follow_up_plan
-from ..reports.handoff import LABELS as FACT_LABELS
-from ..core.text_match import contains_unnegated, find_unnegated_certain
-from ..core.worry import extract_worry_object, is_worry_sentence
+from typing import Any, Dict
 # The three fact tables (BANNED_PHRASES / GAP_IMPACTS / MEASUREMENT_FACTS) and
 # their fallback live in the shared ``facts`` package so that ``subagents`` and
 # other consumers can read them without importing the whole ``conclusion``
@@ -29,6 +12,47 @@ from ..facts import (
     MEASUREMENT_FACTS,
     PRIOR_RANK,
 )
+
+# The module's surface: the 30 values below, plus the five fact tables
+# re-exported from ``..facts``. Declared rather than implied, so an import
+# that nothing here reads cannot pass for public API.
+__all__ = [
+    "ABSTAIN_TEXT",
+    "BANNED_PHRASES",
+    "CERTAINTY_TEMPLATES",
+    "DEFAULT_GAP_IMPACT",
+    "DETAIL_FACT_GROUPS",
+    "GAP_IMPACTS",
+    "MEASUREMENT_FACTS",
+    "ORAL_CHIEF_TERMS",
+    "PATHWAY_GROUPS",
+    "PRIOR_RANK",
+    "RETURN_NOW_IF",
+    "UNCERTAINTY_NOTE",
+    "VISIT_NOTES_CHIEF_MAX_CHARS",
+    "VISIT_NOTES_EVIDENCE_MAX",
+    "VISIT_NOTES_MAX",
+    "_AGAINST_LABEL_OVERRIDES",
+    "_CHIEF_CHUNK_STOPWORDS",
+    "_CHRONIC_OUTLOOK",
+    "_ENCODING_QUOTES",
+    "_G12_WORSENING_MAP",
+    "_GENERIC_WORD_FRAGMENTS",
+    "_GOAL_DRUG_TREATMENT_WORDS",
+    "_GOAL_PART_FIXED_HANDLING",
+    "_GOAL_PART_PREFIXES",
+    "_GOAL_VISIT_PART_KEYWORDS",
+    "_INFANT_OBSERVABLE_DO",
+    "_INFANT_OBSERVABLE_MEASURE",
+    "_INFANT_WORSENING",
+    "_OUTLOOK_QUALIFIER_TOKENS",
+    "_QUALIFIED_MARKERS",
+    "_REFUSAL_EVIDENCE_MARKERS",
+    "_SHORT_TERM_OUTLOOK_MARKERS",
+    "_VISIT_GOAL_KEYWORDS",
+    "_WORRY_FALLBACK_OBJECT",
+    "_cache",
+]
 
 RETURN_NOW_IF = [
     "意识异常或抽搐",

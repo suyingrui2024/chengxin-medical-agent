@@ -1,23 +1,16 @@
 from __future__ import annotations
 import json
-import os
-import re
 from copy import deepcopy
 from datetime import datetime
-from importlib import resources
 from typing import Any, Dict, List, Optional
 from ..guards.baseline_projection import build_allergy_hint
-from ..guards.direction_guards import (
-    direction_kept,
-    is_affirmed_in_text,
-    severity_consistent_text,
-)
 from ..core.domain import Assertion, CaseState, Phase, RiskLevel
 from ..clinical.followups import build_follow_up_plan
-from ..reports.handoff import LABELS as FACT_LABELS
-from ..clinical.reasoning import RuleBasedProposer, validate_workspace
-from ..core.text_match import contains_unnegated, find_unnegated_certain
-from ..core.worry import extract_worry_object, is_worry_sentence
+from ..clinical.reasoning import (
+    RuleBasedProposer,
+    chief_matches_pathway,
+    validate_workspace,
+)
 
 from .constants import ABSTAIN_TEXT, BANNED_PHRASES, ORAL_CHIEF_TERMS, PATHWAY_GROUPS, RETURN_NOW_IF, UNCERTAINTY_NOTE, VISIT_NOTES_CHIEF_MAX_CHARS, VISIT_NOTES_EVIDENCE_MAX, VISIT_NOTES_MAX, _CHRONIC_OUTLOOK, _G12_WORSENING_MAP, _INFANT_OBSERVABLE_DO, _INFANT_OBSERVABLE_MEASURE, _INFANT_WORSENING, _SHORT_TERM_OUTLOOK_MARKERS
 
@@ -564,6 +557,6 @@ def compose_conclusion(
 
 from .disposition import _disposition, _gaps, format_window_text
 from .narrative import _build_goal_response, _build_narrative, _build_worry
-from .assets import _narrative_templates
-from .sheet import _explored_pathway_group, _load_json, _load_json_optional, _pathway_return_now_if, _self_care_group, apply_neutral_fallback, chief_matches_pathway, department_visible, directions_mode, directions_restricted_visible, directions_visible
+from .assets import _load_json_optional, _narrative_templates
+from .sheet import _explored_pathway_group, _load_json, _pathway_return_now_if, _self_care_group, apply_neutral_fallback, department_visible, directions_mode, directions_visible
 from .support import _adjust_assertion_wording, _is_infant_case, _is_undetermined_unknown_screen, _onset_is_chronic_gradual, _select_directions, _sheet_evidence_count
