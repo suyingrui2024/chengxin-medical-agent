@@ -1,6 +1,18 @@
 """Mixin: consultation routes for Handler."""
-from ._preamble import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from http import HTTPStatus
+from typing import Optional
+from urllib.parse import parse_qs, urlparse
+from ._preamble import (
+    ConsultationBusyError,
+    Event,
+    PatientRecordError,
+    StaleActionError,
+    __version__,
+    _persist_engine_state,
+    build_handoff,
+    education_module,
+    utc_now,
+)
 
 
 class HandlerConsultation:

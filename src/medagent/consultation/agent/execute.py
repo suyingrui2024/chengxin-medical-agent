@@ -1,5 +1,33 @@
 """Mixin: execute for AdaptiveConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
+from typing import Any, Dict
+from ._preamble import (
+    AgentReply,
+    Assertion,
+    CaseState,
+    DETAIL_FACT_KEYS,
+    Event,
+    FLUCTUATION_PHRASES,
+    Fact,
+    MODEL_BRIDGING_REPAIR_HINT,
+    MODEL_SPAWN_TASK_KINDS,
+    Phase,
+    ProposalError,
+    QuickReply,
+    SELF_CHECK_SUSPEND_CAP,
+    Source,
+    _strip_denied_items,
+    compatible,
+    explicit_switch,
+    has_anchorable_fact,
+    is_steady_not_improving_evidence,
+    merge_preserving_denials,
+    model_question_bridging_status,
+    subject_profile,
+    subject_reference,
+    validate_adaptive_question,
+    validate_command,
+    validate_proposals,
+)
 
 
 class AdaptiveConsultationEngineExecute:

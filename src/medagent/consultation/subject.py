@@ -1,6 +1,24 @@
 """Mixin: subject for ConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from copy import deepcopy
+from typing import Any, Dict, List, Optional
+from uuid import uuid4
+from ._preamble import (
+    AgentReply,
+    CaseState,
+    Event,
+    Fact,
+    Interpretation,
+    Phase,
+    RiskAssessment,
+    RiskLevel,
+    Source,
+    _preserved_segments,
+    conflicting_reference,
+    explicit_switch,
+    merge_preserving_denials,
+    subject_profile,
+)
+from .types import StaleActionError
 
 
 class ConsultationEngineSubject:

@@ -1,6 +1,28 @@
 """Mixin: closing flow for ConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from copy import deepcopy
+from typing import Any, Dict, List, Optional
+from uuid import uuid4
+from ._preamble import (
+    AgentReply,
+    Assertion,
+    CaseState,
+    Event,
+    FACT_LABELS,
+    HANDOFF_LABELS,
+    Phase,
+    QuickReply,
+    RETRIAGE_OUTCOMES,
+    RiskAssessment,
+    RiskLevel,
+    VALUE_LABELS,
+    apply_outcome,
+    build_bridging_sentence,
+    build_follow_up_plan,
+    closing,
+    commit_phase,
+    is_refusal_text,
+    subject_profile,
+)
 
 
 class ConsultationEngineClosing:

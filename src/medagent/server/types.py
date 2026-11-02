@@ -1,5 +1,21 @@
 """Small server types (the threaded HTTP server)."""
-from ._preamble import *  # noqa: F401,F403
+from http.server import ThreadingHTTPServer
+import os
+from typing import Optional
+from ._preamble import (
+    AdaptiveConsultationEngine,
+    BackgroundReviewCoordinator,
+    ConsultationEngine,
+    EducationEnricher,
+    EventStore,
+    ExecutionManager,
+    PatientRecordStore,
+    RecognitionJobStore,
+    SubagentCoordinator,
+    WebTools,
+    Workspace,
+    subagent_kind_overrides,
+)
 
 
 class MedicalAgentServer(ThreadingHTTPServer):

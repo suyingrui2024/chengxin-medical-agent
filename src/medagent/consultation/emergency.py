@@ -1,6 +1,22 @@
 """Mixin: emergency for ConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from copy import deepcopy
+from typing import Any, Dict, List, Optional
+from ._preamble import (
+    AgentReply,
+    Assertion,
+    CaseState,
+    DIRECT_EMERGENCY_TAGS,
+    Event,
+    FACT_LABELS,
+    Fact,
+    Phase,
+    QuickReply,
+    RiskAssessment,
+    RiskLevel,
+    Source,
+    VALUE_LABELS,
+    load_definitions,
+)
 
 
 class ConsultationEngineEmergency:

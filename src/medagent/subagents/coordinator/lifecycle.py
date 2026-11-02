@@ -1,5 +1,10 @@
 """Mixin: lifecycle for SubagentCoordinator."""
-from ._preamble import *  # noqa: F401,F403
+from datetime import date
+import os
+from threading import BoundedSemaphore, Lock
+from time import monotonic
+from typing import Any, Dict, List, Optional
+from ._preamble import CaseState, Event, KINDS, MODES
 
 
 class CoordinatorLifecycle:

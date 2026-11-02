@@ -1,6 +1,29 @@
 """Mixin: core for ConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from copy import deepcopy
+import os
+from threading import Condition, Lock, RLock
+from typing import Dict, Optional
+from uuid import uuid4
+from ._preamble import (
+    AgentReply,
+    CaseState,
+    ContentRepository,
+    Event,
+    EventStore,
+    Interpreter,
+    Phase,
+    QuestionRanker,
+    ReplyPublicationGate,
+    RiskLevel,
+    RulePlanner,
+    SelfCheckService,
+    SessionStore,
+    TriageService,
+    __version__,
+    calculation_presentation,
+    request_draft,
+)
+from .types import UserInput
 
 
 class ConsultationEngineCore:

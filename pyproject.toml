@@ -36,17 +36,22 @@ extend-exclude = ["docs/evaluations", "docs/review-packets", ".runtime", "node_m
 # untidy: syntax errors, broken `__all__`, invalid `assert`, undefined names,
 # plus two bugbear checks whose hits are all genuine.
 #
-# The usual Python lint sets cannot be enabled as-is here. 32 modules start
-# with `from ._preamble import *`, so F401 (unused import) and F403 (star
-# import) fire on every one of them, and F821 is the only unused-name check
-# that still means something. Bugbear's B023 alone adds 79 hits from closures
-# created inside loops that are invoked immediately, and every B905 (`zip`
-# without `strict=`) site needs a per-site decision about which length is
-# allowed to be shorter — neither may be enabled blind.
+# The star imports are no longer what blocks a wider rule set. 32 modules used
+# to start with `from ._preamble import *`; they now import the names they use,
+# and the eight that remain are package facades whose surface is an explicit
+# `__all__`. What still blocks F401 is a separate, older backlog: the
+# `conclusion`, `subagents` and `patient_records` packages re-export through
+# their `__init__.py` without declaring `__all__`, so 467 names read as unused.
+# Declaring those surfaces would let F401 in; guessing at them would not.
 #
-# B904 (raise without `from` inside `except`) and B007 (loop variable never
-# used) are on because both were clean after fixing their few real hits.
-select = ["E9", "F63", "F7", "F82", "B904", "B007"]
+# Bugbear's B023 alone adds 79 hits from closures created inside loops that are
+# invoked immediately, and every B905 (`zip` without `strict=`) site needs a
+# per-site decision about which length is allowed to be shorter — neither may
+# be enabled blind.
+#
+# B904 (raise without `from` inside `except`), B007 (loop variable never used)
+# and F811 (redefinition) are on because all three were clean.
+select = ["E9", "F63", "F7", "F811", "F82", "B904", "B007"]
 
 [tool.coverage.run]
 source = ["src/medagent"]

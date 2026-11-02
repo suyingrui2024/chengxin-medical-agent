@@ -1,5 +1,40 @@
 """Mixin: core for AdaptiveConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
+import hashlib
+from importlib import resources
+import json
+import re
+from typing import Any, Dict, List, Optional
+from uuid import uuid4
+from ._preamble import (
+    AdaptiveQuestionError,
+    AgentReply,
+    CaseState,
+    ConsultationBusyError,
+    DETAIL_FACT_KEYS,
+    DecisionBackend,
+    DecisionTurn,
+    DecisionWaiter,
+    Event,
+    MODEL_SPAWN_TASK_KINDS,
+    Phase,
+    Question,
+    QuickReply,
+    RISK_TAG_CUES,
+    RuleBasedProposer,
+    SCREENING_FIELDS,
+    SELF_CHECK_SUSPEND_CAP,
+    StaleActionError,
+    TOOL_DEFINITIONS,
+    _capability_advertisement,
+    _strip_denied_items,
+    is_refusal_text,
+    kg_runtime,
+    load_pathways,
+    project_selected_answer,
+    question_fact_gates_pass,
+    should_clarify,
+    subject_profile,
+)
 
 
 class AdaptiveConsultationEngineCore:

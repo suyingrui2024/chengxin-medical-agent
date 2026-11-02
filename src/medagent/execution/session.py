@@ -1,5 +1,47 @@
 """Owned full-DSH workspace session."""
-from ._preamble import *  # noqa: F401,F403
+from collections import deque
+import hashlib
+import json
+import shutil
+import stat
+import subprocess
+import sys
+import threading
+import time
+from urllib.parse import urlsplit
+from uuid import uuid4
+from ._preamble import (
+    ACTIVE_CLARIFICATION_STATES,
+    ACTIVE_JOB_STATES,
+    ChangeTracker,
+    DEFAULT_TIME_BUDGET_SECONDS,
+    DSH_VERSION,
+    DirectoryChanged,
+    ExecutionBusy,
+    ExecutionError,
+    FORMAT,
+    IMAGE_LIMIT,
+    WorkspaceOccupied,
+    WorkspaceStoreError,
+    artifact_projection,
+    directory_page,
+    encode_identity,
+    fcntl,
+    file_revision,
+    for_backend,
+    open_workspace_directory,
+    os,
+    read_limit,
+    route_identity,
+    safe_bytes,
+    safe_file,
+    scrub,
+    time_budget,
+    validate_clarification,
+    validate_observation,
+    validate_project_path,
+    validate_receipt,
+)
 from ..infra.platform import isolation_kind, startup_timeout_seconds, supports_sandbox
 
 

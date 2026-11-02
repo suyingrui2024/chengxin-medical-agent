@@ -1,5 +1,31 @@
 """Mixin: branch for SubagentCoordinator."""
-from ._preamble import *  # noqa: F401,F403
+from concurrent.futures import ThreadPoolExecutor
+import hashlib
+import json
+from threading import Event as ThreadEvent, Thread
+from time import monotonic
+from typing import Any, Dict, List, Optional
+from uuid import uuid4
+from ._preamble import (
+    CaseState,
+    DecisionInterrupted,
+    Event,
+    KINDS,
+    KIND_INSTRUCTIONS,
+    MAX_BRANCHES,
+    RECENT_WINDOW_TURNS,
+    ReasoningWorkspace,
+    SPAWN_ENVELOPE_DEADLINE_S,
+    SPAWN_ENVELOPE_TOKENS,
+    TENDENCY_LEVELS,
+    _KIND_TOOLS,
+    _content_index,
+    _estimate_roundtrip_tokens,
+    _knowledge_search,
+    _known_fact_keys,
+    parse_decision,
+    watermark,
+)
 
 
 class CoordinatorBranch:

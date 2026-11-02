@@ -1,5 +1,6 @@
 """Mixin: context for AdaptiveConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
+from typing import Any, Dict
+from ._preamble import CaseState, subject_profile
 
 
 class AdaptiveConsultationEngineContext:

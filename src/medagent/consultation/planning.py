@@ -1,6 +1,32 @@
 """Mixin: planning for ConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from copy import deepcopy
+from typing import Any, List, Optional
+from ._preamble import (
+    ADULT_AGE_PROMPT,
+    AgentReply,
+    Assertion,
+    CaseState,
+    Event,
+    ObservationInputError,
+    ObservationQuality,
+    Phase,
+    Question,
+    QuickReply,
+    RiskAssessment,
+    RiskLevel,
+    SELF_CHECK_SUSPEND_CAP,
+    SUSPEND_CAP_NOTICE,
+    Source,
+    URGENT_MINIMUM_FACTS,
+    URGENT_SINGLE_CLUE_TRIGGERS,
+    earliest_phase_candidates,
+    filter_candidates,
+    is_self_check_skip_text,
+    ordering_for_ranker,
+    planning_rank,
+    question_fact_gates_pass,
+    task_intent,
+)
 
 
 class ConsultationEnginePlanning:

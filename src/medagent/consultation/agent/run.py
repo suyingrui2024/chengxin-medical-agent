@@ -1,5 +1,20 @@
 """Mixin: run for AdaptiveConsultationEngine."""
-from ._preamble import *  # noqa: F401,F403
+from copy import deepcopy
+from ._preamble import (
+    AgentReply,
+    Assertion,
+    CaseState,
+    DecisionInterrupted,
+    Event,
+    Fact,
+    Phase,
+    ProposalError,
+    RiskLevel,
+    SubjectBoundaryError,
+    _decision_envelope_guidance,
+    extract_worry_object,
+    is_worry_sentence,
+)
 
 
 class AdaptiveConsultationEngineRun:
