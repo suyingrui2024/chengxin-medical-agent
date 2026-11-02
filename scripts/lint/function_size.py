@@ -51,11 +51,11 @@ BRANCH_CEILING = 20
 #: is split, and removed once both numbers are under the ceilings.  Longest
 #: first, because that is the order in which they are worth opening.
 BASELINE: dict[str, tuple[int, int]] = {
-    "medagent.consultation.agent.run::AdaptiveConsultationEngineRun._run": (313, 40),
+    "medagent.consultation.agent.run::AdaptiveConsultationEngineRun._run": (291, 37),
     "medagent.conclusion.adjustments::compose_conclusion": (297, 50),
     "medagent.execution.changes::capture": (295, 7),
     "medagent.subagents.coordinator.branch::CoordinatorBranch._run_spawn": (243, 29),
-    "medagent.subagents.coordinator.validate::CoordinatorValidate._validate_report": (218, 50),
+    "medagent.subagents.coordinator.validate::CoordinatorValidate._validate_report": (88, 17),
     "medagent.execution.session::ExecutionSession._read": (212, 70),
     "medagent.subagents.coordinator.branch::CoordinatorBranch._run_branch": (207, 20),
     "medagent.infra.agent_tools::_validate_item": (190, 55),
