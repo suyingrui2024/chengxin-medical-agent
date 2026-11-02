@@ -143,9 +143,12 @@ class ArtifactTests(unittest.TestCase):
             path.write_text("after")
             return result
 
-        with patch(
-            "medagent.execution.os.read", side_effect=concurrent_change
-        ), self.assertRaisesRegex(ExecutionError, "读取期间"):
+        # ``os.read`` is the module attribute execution reads through; the
+        # patch used to name it as ``medagent.execution.os.read``, which only
+        # resolved because the package re-exported the ``os`` import.
+        with patch("os.read", side_effect=concurrent_change), self.assertRaisesRegex(
+            ExecutionError, "读取期间"
+        ):
             safe_bytes(root, "changing.txt")
         root.rename(root.with_name("moved"))
         root.mkdir()

@@ -1,19 +1,31 @@
 """Package entry point: composes the mixins back into the public class."""
-# Facade re-export: the package surface is the explicit `__all__` below, so the
-# star is the one place that list is assembled. These are the only star
-# imports left in the tree -- every other module imports what it uses.
-from ._preamble import *  # noqa: F401,F403
-from ._preamble import __all__ as _PREAMBLE_ALL
-from .types import *  # noqa: F401,F403
-from .types import UserInput, StaleActionError, SubjectBoundaryError, ConsultationBusyError
-from .core import ConsultationEngineCore
+
+from ._preamble import (
+    SELF_CHECK_SUSPEND_CAP,
+    URGENT_MINIMUM_FACTS,
+    VALUE_LABELS,
+    CalculationFollowupMixin,
+    ObservationMixin,
+    TaskConversationMixin,
+    is_refusal_text,
+    is_steady_not_improving_evidence,
+    is_summary_confirmation_text,
+    merge_preserving_denials,
+)
+from . import closing
 from .calculation import ConsultationEngineCalculation
-from .subject import ConsultationEngineSubject
+from .closing_flow import ConsultationEngineClosing
+from .core import ConsultationEngineCore
+from .emergency import ConsultationEngineEmergency
 from .handlers import ConsultationEngineHandlers
 from .planning import ConsultationEnginePlanning
-from .emergency import ConsultationEngineEmergency
-from .closing_flow import ConsultationEngineClosing
-from ._preamble import TaskConversationMixin, ObservationMixin, CalculationFollowupMixin
+from .subject import ConsultationEngineSubject
+from .types import (
+    ConsultationBusyError,
+    StaleActionError,
+    SubjectBoundaryError,
+    UserInput,
+)
 
 
 class ConsultationEngine(
@@ -33,10 +45,18 @@ class ConsultationEngine(
     _CLOSE_SOOTHING = "我听到你说的这些了，先别慌，按下面的步骤来就可以。"
 
 
-__all__ = list(_PREAMBLE_ALL) + [
-    "UserInput",
+__all__ = [
+    "ConsultationBusyError",
+    "ConsultationEngine",
+    "SELF_CHECK_SUSPEND_CAP",
     "StaleActionError",
     "SubjectBoundaryError",
-    "ConsultationBusyError",
-    "ConsultationEngine"
+    "URGENT_MINIMUM_FACTS",
+    "UserInput",
+    "VALUE_LABELS",
+    "closing",
+    "is_refusal_text",
+    "is_steady_not_improving_evidence",
+    "is_summary_confirmation_text",
+    "merge_preserving_denials",
 ]

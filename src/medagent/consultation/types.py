@@ -2,8 +2,8 @@
 
 The definitions moved to ``medagent.shared_types`` so that the kernel, the
 feature packages and the app layer can all name them without depending on each
-other.  This module stays because eight modules in this package reach the
-types through ``from .types import *``.
+other.  This module stays because the rest of this package imports the four
+names from here, which keeps a single place to change if they move again.
 """
 from ..shared_types import (
     ConsultationBusyError,

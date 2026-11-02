@@ -26,10 +26,16 @@ SRC = (ROOT / "src").resolve()
 #: to be the original monolithic module, plus the constants module that
 #: re-exports the shared fact tables on purpose.
 SURFACES = [
+    "medagent.consultation",
+    "medagent.consultation.agent",
     "medagent.conclusion",
     "medagent.conclusion.constants",
-    "medagent.subagents",
+    "medagent.execution",
     "medagent.patient_records",
+    "medagent.patient_records.store",
+    "medagent.server",
+    "medagent.subagents",
+    "medagent.subagents.coordinator",
 ]
 
 
@@ -107,10 +113,34 @@ def test_surface_is_sorted_and_unique(module):
     assert len(exported) == len(set(exported)), f"{module}.__all__ 有重复"
 
 
+def defined_in_package(module: str) -> set[str]:
+    """Names the package defines somewhere under its own directory."""
+    root = SRC / module.replace(".", "/")
+    if not root.is_dir():
+        root = root.parent
+    found: set[str] = set()
+    for path in root.rglob("*.py"):
+        for node in ast.parse(path.read_text(encoding="utf-8")).body:
+            if isinstance(node, ast.Assign):
+                found |= {t.id for t in node.targets if isinstance(t, ast.Name)}
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                found.add(node.name)
+    return found
+
+
 @pytest.mark.parametrize("module", SURFACES)
-def test_every_export_has_a_consumer(module):
-    """An export nobody imports is a name kept alive by habit."""
+def test_every_export_is_used_or_owned(module):
+    """An export must be either wanted somewhere, or the package's own work.
+
+    Both halves matter. `conclusion` used to re-export `CaseState`, which is
+    neither: a reader would take it for the conclusion package's type. But
+    `execution` exports `ExecutionSession` with no caller today, and that is
+    fine -- the class lives here, so this is where it belongs. The rule is
+    about accidental re-exports, not about forbidding a package from naming its
+    own headline class.
+    """
     exported = set(importlib.import_module(module).__all__)
     used = consumers().get(module, set())
-    unused = sorted(exported - used)
-    assert unused == [], f"{module} 导出了没人使用的名字：{unused}"
+    owned = defined_in_package(module)
+    unjustified = sorted(exported - used - owned)
+    assert unjustified == [], f"{module} 导出了既没人用、也不属于本包的名字：{unjustified}"
