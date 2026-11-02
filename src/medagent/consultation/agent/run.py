@@ -159,32 +159,9 @@ class AdaptiveConsultationEngineRun:
             try:
                 correction_only = False
                 if command["tool"] == "record_facts":
-                    # Peek at the proposed keys before executing: a
-                    # correction-only retry bypasses the cap below.
-                    # Malformed shapes fall through as non-correction
-                    # and are rejected by _execute's own validation.
-                    facts_arg = (
-                        command["arguments"].get("facts")
-                        if isinstance(command.get("arguments"), dict)
-                        else None
+                    correction_only = self._enforce_write_budget(
+                        command, writes, rejected_keys
                     )
-                    proposed_keys = None
-                    if isinstance(facts_arg, list) and facts_arg:
-                        proposed_keys = []
-                        for item in facts_arg:
-                            if not isinstance(item, dict) or not isinstance(
-                                item.get("key"), str
-                            ):
-                                proposed_keys = None
-                                break
-                            proposed_keys.append(item["key"])
-                    correction_only = (
-                        proposed_keys is not None
-                        and bool(proposed_keys)
-                        and set(proposed_keys) <= rejected_keys
-                    )
-                    if writes >= 2 and not correction_only:
-                        raise ProposalError("本轮写入次数已达上限，请提问或核对摘要")
                 answering_goal = state.active_question == "patient_goal"
                 goal_fact_id_before = (
                     state.facts["patient_goal"].fact_id
@@ -193,85 +170,21 @@ class AdaptiveConsultationEngineRun:
                 )
                 result = self._execute(state, command, text, turn_id)
                 if command["tool"] == "record_facts":
-                    if not correction_only:
-                        writes += 1
-                    if isinstance(result, dict):
-                        for item in result.get("rejected") or []:
-                            if isinstance(item, dict) and isinstance(
-                                item.get("key"), str
-                            ):
-                                rejected_keys.add(item["key"])
-                    # A rejected key that has since landed (via a later
-                    # batch's accepted side) is no longer awaiting
-                    # correction; re-proposing it is a fresh overwrite
-                    # and must be capped normally.
-                    rejected_keys = {
-                        key for key in rejected_keys if key not in state.facts
-                    }
-                    # Judge by what actually landed: under partial recording
-                    # the patient_goal item itself may have been rejected.
-                    goal_answered = answering_goal and "patient_goal" in state.facts
+                    writes, goal_answered = self._book_write_result(
+                        state,
+                        result,
+                        writes,
+                        correction_only,
+                        rejected_keys,
+                        answering_goal,
+                    )
                     # P5 (round-2 ④-3): a worry sentence filed as
-                    # patient_goal is diverted, never booked as the goal.
-                    # The single worry contract is worry.py's
-                    # is_worry_sentence / extract_worry_object — no local
-                    # pattern is invented here. The diverted goal fact is
-                    # removed from facts (history keeps the audit trail),
-                    # the worry lands in patient_worry only, goal_answered
-                    # stays False, and the goal question stays active so
-                    # the patient's real goal is still asked afterwards.
-                    # This applies to any newly landed goal value, not
-                    # only the answering-goal round: a worry must never
-                    # occupy the goal slot.
-                    if command["tool"] == "record_facts":
-                        goal_fact = state.facts.get("patient_goal")
-                        if (
-                            goal_fact is not None
-                            and goal_fact.fact_id != goal_fact_id_before
-                        ):
-                            goal_text = (
-                                goal_fact.value
-                                if isinstance(goal_fact.value, str)
-                                else ""
-                            )
-                            if not goal_text and isinstance(
-                                goal_fact.evidence, str
-                            ):
-                                goal_text = goal_fact.evidence
-                            worry_obj = (
-                                extract_worry_object(goal_text)
-                                if goal_text
-                                else None
-                            )
-                            if worry_obj is not None and is_worry_sentence(
-                                goal_text
-                            ):
-                                del state.facts["patient_goal"]
-                                if "patient_worry" not in state.facts:
-                                    state.record(
-                                        Fact(
-                                            key="patient_worry",
-                                            value=worry_obj,
-                                            assertion=Assertion.PRESENT,
-                                            source=goal_fact.source,
-                                            turn_id=turn_id,
-                                            evidence=goal_text,
-                                        )
-                                    )
-                                if answering_goal:
-                                    state.active_question = "patient_goal"
-                                    state.active_question_is_clarification = (
-                                        False
-                                    )
-                                goal_answered = False
-                                self.events.append(
-                                    Event(
-                                        state.session_id,
-                                        "goal.worry_diverted",
-                                        {"object": worry_obj},
-                                        turn_id=turn_id,
-                                    )
-                                )
+                    # patient_goal is diverted, never booked as the goal;
+                    # _divert_worry_from_goal holds the full contract.
+                    if self._divert_worry_from_goal(
+                        state, turn_id, goal_fact_id_before, answering_goal
+                    ):
+                        goal_answered = False
             except SubjectBoundaryError as exc:
                 self.events.append(
                     Event(
@@ -418,3 +331,125 @@ class AdaptiveConsultationEngineRun:
             ),
             turn_id,
         )
+
+    def _enforce_write_budget(
+        self, command, writes: int, rejected_keys: set[str]
+    ) -> bool:
+        """Count this record_facts call against the two-write cap.
+
+        A correction-only retry -- every key it proposes was already rejected
+        this round -- bypasses the cap, because it is the model fixing its own
+        rejected items, not a fresh write.  Malformed shapes fall through as
+        non-correction and are rejected by ``_execute``'s own validation.
+
+        Returns whether this call is correction-only.
+        """
+        facts_arg = (
+            command["arguments"].get("facts")
+            if isinstance(command.get("arguments"), dict)
+            else None
+        )
+        proposed_keys = None
+        if isinstance(facts_arg, list) and facts_arg:
+            proposed_keys = []
+            for item in facts_arg:
+                if not isinstance(item, dict) or not isinstance(
+                    item.get("key"), str
+                ):
+                    proposed_keys = None
+                    break
+                proposed_keys.append(item["key"])
+        correction_only = (
+            proposed_keys is not None
+            and bool(proposed_keys)
+            and set(proposed_keys) <= rejected_keys
+        )
+        if writes >= 2 and not correction_only:
+            raise ProposalError("本轮写入次数已达上限，请提问或核对摘要")
+        return correction_only
+
+    def _book_write_result(
+        self,
+        state: CaseState,
+        result,
+        writes: int,
+        correction_only: bool,
+        rejected_keys: set[str],
+        answering_goal: bool,
+    ) -> tuple[int, bool]:
+        """Charge the write, remember the rejections, judge the goal.
+
+        A rejected key that has since landed (via a later batch's accepted
+        side) is no longer awaiting correction: re-proposing it is a fresh
+        overwrite and must be capped normally.
+
+        Returns ``(writes, goal_answered)``.  ``rejected_keys`` is updated in
+        place -- the loop reads the same set on its next step.
+        """
+        if not correction_only:
+            writes += 1
+        if isinstance(result, dict):
+            for item in result.get("rejected") or []:
+                if isinstance(item, dict) and isinstance(item.get("key"), str):
+                    rejected_keys.add(item["key"])
+        rejected_keys -= {key for key in rejected_keys if key in state.facts}
+        # Judge by what actually landed: under partial recording the
+        # patient_goal item itself may have been rejected.
+        return writes, answering_goal and "patient_goal" in state.facts
+
+    def _divert_worry_from_goal(
+        self,
+        state: CaseState,
+        turn_id: str,
+        goal_fact_id_before,
+        answering_goal: bool,
+    ) -> bool:
+        """Move a worry sentence out of the patient_goal slot.
+
+        P5 (round-2 ④-3): a worry sentence filed as patient_goal is diverted,
+        never booked as the goal.  The single worry contract is worry.py's
+        ``is_worry_sentence`` / ``extract_worry_object`` -- no local pattern is
+        invented here.  The diverted goal fact is removed from facts (history
+        keeps the audit trail), the worry lands in patient_worry only, and the
+        goal question stays active so the patient's real goal is still asked
+        afterwards.
+
+        This applies to any newly landed goal value, not only the
+        answering-goal round: a worry must never occupy the goal slot.
+
+        Returns True when a diversion happened, so the caller keeps
+        ``goal_answered`` False.
+        """
+        goal_fact = state.facts.get("patient_goal")
+        if goal_fact is None or goal_fact.fact_id == goal_fact_id_before:
+            return False
+        goal_text = goal_fact.value if isinstance(goal_fact.value, str) else ""
+        if not goal_text and isinstance(goal_fact.evidence, str):
+            goal_text = goal_fact.evidence
+        worry_obj = extract_worry_object(goal_text) if goal_text else None
+        if not (worry_obj is not None and is_worry_sentence(goal_text)):
+            return False
+        del state.facts["patient_goal"]
+        if "patient_worry" not in state.facts:
+            state.record(
+                Fact(
+                    key="patient_worry",
+                    value=worry_obj,
+                    assertion=Assertion.PRESENT,
+                    source=goal_fact.source,
+                    turn_id=turn_id,
+                    evidence=goal_text,
+                )
+            )
+        if answering_goal:
+            state.active_question = "patient_goal"
+            state.active_question_is_clarification = False
+        self.events.append(
+            Event(
+                state.session_id,
+                "goal.worry_diverted",
+                {"object": worry_obj},
+                turn_id=turn_id,
+            )
+        )
+        return True
