@@ -730,33 +730,16 @@ class AdaptiveConsultationEngineSubmit:
             state.active_question = None
             state.phase = Phase.HISTORY
             if state.risk.level == RiskLevel.EMERGENCY:
-                action = self._emergency_clarification_action(state, new_text, ())
-                if (
-                    action == "clarify"
-                    and self._emergency_clarification_denied_before(state, new_text)
-                ):
-                    # C-10: same group already denied; suppress the
-                    # repeat clarification and continue the normal
-                    # correction flow (risk stood down as in the
-                    # clarification reply).
-                    state.risk = self._deferred_risk(state)
-                elif action == "clarify":
-                    return self._deliver(
-                        state,
-                        self._emergency_clarification_reply(state, new_text, turn_id),
-                        turn_id,
-                    )
-                elif action == "confirmed":
-                    return self._deliver(
-                        state,
-                        self._emergency_reply(
-                            state, state.risk.triggers, include_clarification=True
-                        ),
-                        turn_id,
-                    )
-                else:
-                    reply = self._emergency_reply(state, state.risk.triggers)
-                    return self._deliver(state, reply, turn_id)
+                # The same dispatch the submit path uses.  A correction that
+                # re-triages into an emergency has to ask, confirm and answer
+                # exactly like any other emergency turn -- three copies of that
+                # decision was three chances for the correction path to drift
+                # away from the one patients actually walk.
+                reply = self._dispatch_emergency_clarification(
+                    state, new_text, (), state.risk.triggers, turn_id
+                )
+                if reply is not None:
+                    return reply
             if state.risk.level == RiskLevel.URGENT:
                 gated = self._urgent_or_defer(state, turn_id)
                 if gated is not None:

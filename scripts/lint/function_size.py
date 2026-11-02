@@ -68,7 +68,7 @@ BASELINE: dict[str, tuple[int, int]] = {
     "medagent.execution.session::ExecutionSession.__init__": (156, 30),
     "medagent.execution.files::directory_page": (150, 32),
     "medagent.server.patient::HandlerPatient._patient_get": (150, 32),
-    "medagent.consultation.agent.submit::AdaptiveConsultationEngineSubmit.correct_fact": (150, 28),
+    "medagent.consultation.agent.submit::AdaptiveConsultationEngineSubmit.correct_fact": (133, 25),
     "medagent.execution.changes::capture.walk": (147, 36),
     "medagent.core.presentation::reply_presentation": (143, 25),
     "medagent.extensions.registry::CapabilityRegistry.__init__": (142, 44),
