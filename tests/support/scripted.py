@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import threading
+from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from medagent.clinical.knowledge import ContentRepository
@@ -43,10 +44,15 @@ class ScriptBackend:
         self.calls = []
 
     def decide(self, session_id, messages):
-        self.calls.append(messages.copy())
+        self.calls.append(deepcopy(messages))
         if not self.commands:
             raise RuntimeError("No scripted command")
-        return self.commands.pop(0)
+        command = self.commands.pop(0)
+        # A scripted exception is how a test rehearses a failing tool call;
+        # the engine sees a raise, not a result.
+        if isinstance(command, BaseException):
+            raise command
+        return command
 
 
 def make_engine():
@@ -65,6 +71,26 @@ def make_engine():
 
 def record(engine, state, text, facts, turn="t-record"):
     return engine._execute(state, cmd("record_facts", facts=facts), text, turn)
+
+
+def medication(correction=False, taken_by="昨晚用过药物甲"):
+    return cmd(
+        "record_facts",
+        facts=[fact("medications_taken", taken_by, taken_by, correction=correction)],
+    )
+
+
+def ask(identity="age"):
+    return cmd("ask_question", question_id=identity)
+
+
+def calculation(text, identity="calculate.units"):
+    return cmd(
+        "run_capability",
+        id=identity,
+        input={"value": "1.25", "from_unit": "kg", "to_unit": "g"},
+        evidence=text,
+    )
 
 
 def tool(name, **arguments):

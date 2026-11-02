@@ -19,6 +19,7 @@ from medagent.server.runtime import build_runtime
 from medagent.guards.self_checks import SelfCheckService
 from medagent.clinical.triage import TriageService
 from tests.support.builders import closed_state as _build_closed_state
+from tests.support.conclusion_case import ANSWERS
 
 
 def closed_state(chief='发烧两天', risk=RiskLevel.ROUTINE, reason='confirmed_by_user'):
@@ -121,20 +122,6 @@ class ComposerUnitTests(unittest.TestCase):
             host.stop()
 
 
-ANSWERS = {
-    "consult_for": ("我自己", "self"),
-    "age": ("32岁", None),
-    "chief_complaint": ("咳嗽、发烧两天，嗓子疼", None),
-    "emergency_screen": ("都没有", "no"),
-    "onset": ("两天前开始的", None),
-    "trajectory": ("变化不大", "stable"),
-    "severity": ("4分", None),
-    "associated_symptoms": ("没有", None),
-    "medications_taken": ("没有", None),
-    "allergies": ("不知道", None),
-    "relevant_history": ("没有", None),
-    "patient_goal": ("想整理信息去就医", None),
-}
 
 
 class DeterministicConclusionTests(unittest.TestCase):

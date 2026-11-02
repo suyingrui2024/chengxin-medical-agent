@@ -3,18 +3,21 @@ from copy import deepcopy
 import unittest
 
 from medagent.consultation import StaleActionError, UserInput
-from tests.consultation import test_self_check_conversation as fixture
+from tests.support.location_flow import LocationFlow
 from tests.support.scripted import cmd
 
 
 class LocationAnswerTests(unittest.TestCase):
     def setUp(self):
-        self.helper = fixture.SelfCheckConversationTests()
-        self.helper.setUp()
+        self.flow = LocationFlow()
+        # ``helper`` is the self-check layer: tests call ``self.helper.offer()``
+        # for the plain offered task and ``self.offer()`` for the interrupted
+        # one, exactly as when the helper was the self-check test class.
+        self.helper = self.flow.helper
         self.engine, self.state, self.backend = (
-            self.helper.engine,
-            self.helper.state,
-            self.helper.backend,
+            self.flow.engine,
+            self.flow.state,
+            self.flow.backend,
         )
 
     def offer(self, fields=None):

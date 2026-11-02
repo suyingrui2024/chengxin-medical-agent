@@ -3,14 +3,13 @@ import json
 import unittest
 
 from medagent.consultation import UserInput
-from tests.consultation import test_self_check_conversation as conversation
+from tests.support.self_check_flow import SelfCheckFlow
 from tests.support.scripted import cmd, fact
 
 
 class ObservationCompletionTests(unittest.TestCase):
     def setUp(self):
-        helper = conversation.SelfCheckConversationTests()
-        helper.setUp()
+        helper = SelfCheckFlow()
         self.helper = helper
         self.engine, self.state, self.backend = (
             helper.engine,
@@ -159,7 +158,7 @@ class ObservationCompletionTests(unittest.TestCase):
         self.assertNotIn("symptom_location", context["facts"])
 
     def test_preserved_previous_reading_is_not_reported_as_newly_recorded(self):
-        from tests.dialogue.test_repeated_observations import measured_case, repeat
+        from tests.support.repeat_observations import measured_case, repeat
 
         engine, backend, state, prior = measured_case(summary=True)
         old = state.facts["temperature_c"].fact_id

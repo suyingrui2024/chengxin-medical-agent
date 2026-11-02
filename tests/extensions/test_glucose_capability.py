@@ -10,8 +10,8 @@ from medagent.extensions.glucose import convert_glucose, glucose_evidence
 from medagent.extensions.input_evidence import CapabilityError
 from medagent.extensions.registry import Capability, CapabilityRegistry
 from medagent.core.presentation import calculation_presentation
-from tests.records import test_patient_calculations as patient_fixture
-from tests.execution.test_execution_capabilities import payload
+from tests.support.calculation_case import calculation_runtime
+from tests.support.execution_case import payload
 
 
 class GlucoseCalculationTests(unittest.TestCase):
@@ -184,14 +184,7 @@ class GlucoseCalculationTests(unittest.TestCase):
 
 class PatientGlucoseTests(unittest.TestCase):
     def setUp(self):
-        # Reuse setup only; importing the test module must not duplicate its cases.
-        fixture = patient_fixture.PatientCalculationTests()
-        fixture.setUp()
-        self.engine, self.backend, self.state = (
-            fixture.engine,
-            fixture.backend,
-            fixture.state,
-        )
+        self.engine, self.backend, self.state, _opening = calculation_runtime()
 
     def request(self, text="请把血糖180mg/dL换成mmol/L", arguments=None):
         self.backend.commands = [

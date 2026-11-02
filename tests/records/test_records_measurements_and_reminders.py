@@ -22,7 +22,7 @@ from urllib.request import Request, urlopen
 from medagent.patient_records import PatientRecordStore
 from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
-from tests.records.test_patient_records import recognition
+from tests.support.records_case import recognition
 
 
 def png(width=64, height=64):

@@ -1,59 +1,13 @@
 """Calculation-first replies must not silently strand the rest of a patient turn."""
-from copy import deepcopy
 import json
 import unittest
 
 from medagent.reports.calculation_followup import simple_conversion_request
 from medagent.consultation import StaleActionError, UserInput
 from medagent.core.domain import Assertion, Fact, Source
-from tests.records import test_patient_calculations as fixture
-from tests.dialogue import test_repeated_observations as observation_fixture
-
-
-class Backend:
-    name = "fixture"
-
-    def __init__(self):
-        self.commands, self.calls = [], []
-
-    def decide(self, identity, messages):
-        self.calls.append(deepcopy(messages))
-        command = self.commands.pop(0)
-        if isinstance(command, BaseException):
-            raise command
-        return command
-
-
-def medication(correction=False):
-    return {
-        "tool": "record_facts",
-        "arguments": {
-            "facts": [
-                {
-                    "key": "medications_taken",
-                    "value": "昨晚用过药物甲",
-                    "assertion": "present",
-                    "evidence": "昨晚用过药物甲",
-                    "correction": correction,
-                }
-            ]
-        },
-    }
-
-
-def ask(identity="age"):
-    return {"tool": "ask_question", "arguments": {"question_id": identity}}
-
-
-def calculation(text):
-    return {
-        "tool": "run_capability",
-        "arguments": {
-            "id": "calculate.units",
-            "input": {"value": "1.25", "from_unit": "kg", "to_unit": "g"},
-            "evidence": text,
-        },
-    }
+from tests.support.calculation_case import calculation_runtime
+from tests.support.repeat_observations import measured_case, repeat
+from tests.support.scripted import ask, calculation, medication
 
 
 class CalculationSupplementTests(unittest.TestCase):
@@ -133,11 +87,7 @@ class CalculationSupplementTests(unittest.TestCase):
         self.assertTrue(edited.calculation_followup["can_process"])
 
     def setUp(self):
-        helper = fixture.PatientCalculationTests()
-        helper.setUp()
-        self.engine, self.state = helper.engine, helper.state
-        self.backend = Backend()
-        self.engine.backend = self.backend
+        self.engine, self.backend, self.state, _opening = calculation_runtime()
         self.text = "请把1.25kg换算成g；昨晚用过药物甲。"
 
     def offer(self, text=None, quote=None):
@@ -381,12 +331,12 @@ class CalculationSupplementTests(unittest.TestCase):
     def test_repeat_measurement_can_suspend_a_mixed_request_without_losing_its_supplement(
         self,
     ):
-        self.engine, _, self.state, summary = observation_fixture.measured_case(
+        self.engine, _, self.state, summary = measured_case(
             summary=True
         )
         self.engine.backend = self.backend
         draft = self.offer("请把1.25kg换算成g；更正：昨晚用过药物甲。")
-        task = observation_fixture.repeat(self.engine, self.state, draft)
+        task = repeat(self.engine, self.state, draft)
         again = self.engine.submit(
             self.state.session_id,
             UserInput("腋温37.6℃", expected_action_id=task.action_id),

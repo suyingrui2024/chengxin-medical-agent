@@ -40,8 +40,8 @@ from medagent.subagents import SubagentCoordinator
 from medagent.clinical.triage import TriageService
 from tests.support.scripted import ScriptBackend
 from tests.support.scripted import make_engine as make_adaptive_engine
-from tests.conclusion.test_conclusion import ANSWERS
-from tests.reports.test_education import (
+from tests.support.conclusion_case import ANSWERS
+from tests.support.reports_case import (
     FakeEngine,
     FakeEvents,
     FakeWebTools,
@@ -274,7 +274,7 @@ class NeedsEnrichmentTests(unittest.TestCase):
     def test_each_condition_flips_it_off(self):
         self.assertFalse(needs_enrichment(make_state(phase=Phase.HISTORY)))
         self.assertFalse(needs_enrichment(make_state({})))
-        from tests.reports.test_education import make_sheet
+        from tests.support.reports_case import make_sheet
 
         hidden = make_state(make_sheet(directions_visible=False))
         self.assertFalse(needs_enrichment(hidden))

@@ -42,6 +42,7 @@ from medagent.core.domain import (
 from medagent.core.events import Event
 from medagent.server.runtime import build_runtime
 from tests.support.scripted import cmd, fact
+from tests.support.location_flow import LocationFlow
 from tests.support.scripted import make_engine, record
 
 
@@ -822,12 +823,8 @@ class SuspendCapSemanticsTests(unittest.TestCase):
         # five consecutive location-draft submissions on the same
         # clarified task. Each draft suspends and resumes the task, so
         # the consecutive run never reaches the cap.
-        from tests.dialogue.test_location_answers import LocationAnswerTests
 
-        case = LocationAnswerTests(
-            "test_uncertain_or_unsupported_words_cannot_become_positive_drafts"
-        )
-        case.setUp()
+        case = LocationFlow()
         case.offer()
         for text, proposed in [
             ("可能右太阳穴附近", {"side": "right"}),

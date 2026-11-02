@@ -2,22 +2,23 @@ import unittest
 
 from medagent.consultation import StaleActionError, UserInput
 from medagent.core.domain import Assertion, ObservationQuality, Phase, RiskLevel, Source
-from medagent.server.runtime import build_runtime
+from tests.support.consultation_flow import ConsultationFlow
 
 
 class ConsultationTestCase(unittest.TestCase):
     def setUp(self):
-        self.host = build_runtime()
-        self.context = self.host.start()
-        self.engine = self.context.services.require("consultation")
-        self.events = self.context.services.require("events")
-        self.state, self.reply = self.engine.create_session()
+        self.flow = ConsultationFlow()
+        self.host = self.flow.host
+        self.context = self.flow.context
+        self.engine = self.flow.engine
+        self.events = self.flow.events
+        self.state, self.reply = self.flow.state, self.flow.reply
 
     def tearDown(self):
         self.host.stop()
 
     def answer(self, text, choice=None):
-        self.reply = self.engine.submit(self.state.session_id, UserInput(text, choice))
+        self.reply = self.flow.answer(text, choice)
         return self.reply
 
     def establish_adult_complaint(self, complaint="咳嗽发烧两天"):

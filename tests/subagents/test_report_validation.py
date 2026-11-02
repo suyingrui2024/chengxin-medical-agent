@@ -9,7 +9,7 @@ import unittest
 
 from medagent.core.events import EventStore
 
-from tests.subagents.test_subagents import (
+from tests.support.subagents_case import (
     StubBackend,
     coordinator,
     make_state,

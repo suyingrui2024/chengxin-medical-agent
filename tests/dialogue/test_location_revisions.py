@@ -4,14 +4,13 @@ import unittest
 
 from medagent.consultation import StaleActionError, UserInput
 from medagent.core.domain import Phase
-from tests.dialogue import test_location_answers as fixture
+from tests.support.location_flow import LocationFlow
 from tests.support.scripted import cmd
 
 
 class LocationRevisionTests(unittest.TestCase):
     def setUp(self):
-        self.flow = fixture.LocationAnswerTests()
-        self.flow.setUp()
+        self.flow = LocationFlow()
         self.engine, self.state, self.backend = (
             self.flow.engine,
             self.flow.state,
@@ -382,10 +381,9 @@ class LocationRevisionTests(unittest.TestCase):
         self.assertEqual(self.state.get("onset"), "昨天开始")
 
     def test_offline_caregiver_can_revise_a_legacy_coarse_location(self):
-        from tests.consultation import test_consultation as offline
+        from tests.support.consultation_flow import ConsultationFlow
 
-        base = offline.ConsultationTestCase()
-        base.setUp()
+        base = ConsultationFlow()
         try:
             # Answer order follows the differential planner's history
             # phase for a headache chief (associated + targeted detail
@@ -432,7 +430,7 @@ class LocationRevisionTests(unittest.TestCase):
             self.assertEqual(latest.supersedes, old.fact_id)
             self.assertEqual(resumed.question_id, old_reply.question_id)
         finally:
-            base.tearDown()
+            base.stop()
 
 
 if __name__ == "__main__":

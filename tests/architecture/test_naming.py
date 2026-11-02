@@ -28,10 +28,10 @@ def _load():
 rules = _load()
 
 
-def failure_for(root: pathlib.Path, rel: str) -> str | None:
+def failure_for(root: pathlib.Path, rel: str, body: str = "") -> str | None:
     path = root / rel
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("", encoding="utf-8")
+    path.write_text(body, encoding="utf-8")
     return rules.check(path, root)
 
 
@@ -95,6 +95,38 @@ def test_helper_module_under_tests_needs_no_prefix_outside_support(tmp_path):
     message = failure_for(tmp_path, "tests/consultation/builders.py")
     assert message and "test_*.py" in message, message
     assert failure_for(tmp_path, "tests/support/builders.py") is None
+
+
+def test_importing_another_test_module_is_rejected(tmp_path):
+    """R5: a fixture imported from a test file has no home of its own."""
+    message = failure_for(
+        tmp_path,
+        "tests/records/test_things.py",
+        body="from tests.consultation.test_agent import make_state\n",
+    )
+    assert message and "imports another test module" in message, message
+
+
+def test_importing_the_support_tree_stays_allowed(tmp_path):
+    assert (
+        failure_for(
+            tmp_path,
+            "tests/records/test_things.py",
+            body="from tests.support.builders import closed_state\n",
+        )
+        is None
+    )
+
+
+def test_import_shapes_other_than_from_x_import_y_are_caught_too(tmp_path):
+    """Submodule paths and plain imports both count -- the first pass of the
+    regex missed five of them."""
+    for body in (
+        "import tests.consultation.test_agent\n",
+        "from tests.consultation import test_agent as offline\n",
+    ):
+        message = failure_for(tmp_path, "tests/records/test_things.py", body=body)
+        assert message and "imports another test module" in message, (body, message)
 
 
 def test_support_helpers_keep_their_own_names(tmp_path):

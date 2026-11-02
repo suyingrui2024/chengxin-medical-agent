@@ -1,43 +1,15 @@
 """Explicit patient confirmation, zero-model arithmetic and continuation boundaries."""
-from copy import deepcopy
 import unittest
 
 from medagent.consultation import StaleActionError, UserInput
 from medagent.core.domain import Assertion, Fact, Source
-from medagent.core.events import EventStore
-from medagent.consultation.agent import AdaptiveConsultationEngine
-from medagent.extensions.builtin import load_registry
-from medagent.clinical.knowledge import ContentRepository
-from medagent.clinical.reasoner import OrderedQuestionRanker
-from medagent.guards.self_checks import SelfCheckService
-from medagent.clinical.triage import TriageService
-
-
-class Backend:
-    name = "fixture"
-
-    def __init__(self):
-        self.commands, self.calls = [], []
-
-    def decide(self, identity, messages):
-        self.calls.append(deepcopy(messages))
-        return self.commands.pop(0)
+from tests.support.calculation_case import calculation_runtime
 
 
 class PatientCalculationTests(unittest.TestCase):
     def setUp(self):
-        self.backend = Backend()
-        registry = load_registry()
-        self.events = EventStore()
-        self.engine = AdaptiveConsultationEngine(
-            content=ContentRepository(registry),
-            triage=TriageService(),
-            self_checks=SelfCheckService(registry),
-            events=self.events,
-            ranker=OrderedQuestionRanker(),
-            backend=self.backend,
-        )
-        self.state, self.opening = self.engine.create_session()
+        self.engine, self.backend, self.state, self.opening = calculation_runtime()
+        self.events = self.engine.events
 
     def request(self, values=None, text="请把1.25kg换算成g", quote=None):
         self.backend.commands.append(

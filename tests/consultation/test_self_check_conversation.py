@@ -2,46 +2,30 @@
 from copy import deepcopy
 import unittest
 
-from medagent.consultation import StaleActionError, UserInput
+from medagent.consultation import StaleActionError
 from medagent.extensions.builtin import observation
 from medagent.clinical.interpreter import ObservationInputError
 from tests.support.scripted import cmd, fact
-from tests.kernel.test_calculation_supplements import Backend
-from tests.records import test_patient_calculations as calculation_fixture
+from tests.support.self_check_flow import SelfCheckFlow
 
 
 class SelfCheckConversationTests(unittest.TestCase):
     def setUp(self):
-        fixture = calculation_fixture.PatientCalculationTests()
-        fixture.setUp()
-        self.engine, self.state = fixture.engine, fixture.state
-        self.backend = self.engine.backend = Backend()
+        self.flow = SelfCheckFlow()
+        self.engine, self.state, self.backend = (
+            self.flow.engine,
+            self.flow.state,
+            self.flow.backend,
+        )
 
     def submit(self, text, choice=None, action=None):
-        return self.engine.submit(
-            self.state.session_id, UserInput(text, choice, action)
-        )
+        return self.flow.submit(text, choice, action)
 
     def offer(self, task="body_location"):
-        chief = "头疼" if task == "body_location" else "发热"
-        self.backend.commands = [
-            cmd(
-                "record_facts",
-                facts=[
-                    fact("consult_for", "self", "我自己"),
-                    fact("age_years", 32, "32岁"),
-                    fact("chief_complaint", chief, chief),
-                    fact("emergency_screen", None, "上述危险信号都没有", "absent"),
-                ],
-            ),
-            cmd("show_self_check", task_id=task),
-        ]
-        return self.submit(f"我自己32岁，{chief}；上述危险信号都没有。")
+        return self.flow.offer(task)
 
     def medicine(self):
-        return cmd(
-            "record_facts", facts=[fact("medications_taken", "昨晚用过药物甲", "昨晚用过药物甲")]
-        )
+        return self.flow.medicine()
 
     def test_medication_supplement_is_not_a_location_and_original_task_can_resume(self):
         offered = self.offer()

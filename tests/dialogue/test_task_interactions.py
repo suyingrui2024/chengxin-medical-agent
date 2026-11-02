@@ -6,14 +6,13 @@ from medagent.consultation import UserInput
 from medagent.core.domain import AgentReply, Phase
 from medagent.core.events import Event
 from medagent.dialogue.task_interactions import task_with_interaction
-from tests.consultation import test_consultation as fixture
+from tests.support.consultation_flow import ConsultationFlow
 
 
 class TaskInteractionTests(unittest.TestCase):
     def setUp(self):
-        self.helper = fixture.ConsultationTestCase()
-        self.helper.setUp()
-        self.addCleanup(self.helper.tearDown)
+        self.helper = ConsultationFlow()
+        self.addCleanup(self.helper.stop)
         self.engine, self.state = self.helper.engine, self.helper.state
 
     def task(self, complaint="头疼"):

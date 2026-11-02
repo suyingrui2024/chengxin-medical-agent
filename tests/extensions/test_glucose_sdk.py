@@ -9,7 +9,7 @@ import time
 import unittest
 
 from medagent.execution import ExecutionManager
-from tests.execution.test_execution_capabilities import model_reply
+from tests.support.execution_case import model_reply
 
 
 @unittest.skipUnless(

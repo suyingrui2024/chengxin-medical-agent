@@ -8,7 +8,7 @@ from medagent.extensions.builtin import observation
 from medagent.clinical.interpreter import ObservationInputError
 from medagent.reports.measurement_reports import temperature_report
 from tests.support.scripted import cmd, fact
-from tests.dialogue.test_repeated_observations import measured_case, repeat, OPENING
+from tests.support.repeat_observations import OPENING, measured_case, repeat
 
 
 REPORT = "腋温37.6℃；更正：昨晚用过药物甲，用量不清楚。"

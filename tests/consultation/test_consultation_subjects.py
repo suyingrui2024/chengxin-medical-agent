@@ -10,9 +10,9 @@ from medagent.dialogue.consultation_subject import (
     reference,
     subject_profile,
 )
-from tests.records import test_patient_calculations as fixture
-from tests.kernel import test_calculation_supplements as calculation_fixture
-from tests.dialogue import test_repeated_observations as observation_fixture
+from tests.support.calculation_case import calculation_runtime
+from tests.support.repeat_observations import measured_case, repeat
+from tests.support.scripted import ask, calculation
 
 
 def record(
@@ -50,16 +50,12 @@ def record(
 
 class ConsultationSubjectTests(unittest.TestCase):
     def setUp(self):
-        helper = fixture.PatientCalculationTests()
-        helper.setUp()
-        self.engine, self.state = helper.engine, helper.state
-        self.backend = calculation_fixture.Backend()
-        self.engine.backend = self.backend
+        self.engine, self.backend, self.state, _opening = calculation_runtime()
 
     def establish(self, person="我父亲", age=68, complaint="头疼", category="other_adult"):
         self.backend.commands = [
             record(person, age, complaint, category),
-            calculation_fixture.ask("emergency_screen"),
+            ask("emergency_screen"),
         ]
         return self.engine.submit(
             self.state.session_id, UserInput(f"{person}{age}岁，{complaint}。")
@@ -171,7 +167,7 @@ class ConsultationSubjectTests(unittest.TestCase):
                     ]
                 },
             },
-            calculation_fixture.ask("emergency_screen"),
+            ask("emergency_screen"),
         ]
         reply = self.engine.submit(self.state.session_id, UserInput(text))
         self.assertNotEqual(reply.kind, "subject_change")
@@ -201,7 +197,7 @@ class ConsultationSubjectTests(unittest.TestCase):
                     ]
                 },
             },
-            calculation_fixture.ask("emergency_screen"),
+            ask("emergency_screen"),
         ]
         self.engine.submit(self.state.session_id, UserInput("这次是其他家人。"))
         self.assertEqual(subject_profile(self.state)["label"], "父亲")
@@ -226,7 +222,7 @@ class ConsultationSubjectTests(unittest.TestCase):
                     ]
                 },
             },
-            calculation_fixture.ask("emergency_screen"),
+            ask("emergency_screen"),
         ]
         self.engine.submit(self.state.session_id, UserInput("大宝是我儿子。"))
         self.assertEqual(
@@ -272,7 +268,7 @@ class ConsultationSubjectTests(unittest.TestCase):
     def test_semantic_boundary_restores_a_cancelled_but_unexecuted_input_card(self):
         self.establish()
         text = "请把1.25kg换算成g"
-        self.backend.commands = [calculation_fixture.calculation(text)]
+        self.backend.commands = [calculation(text)]
         draft = self.engine.submit(self.state.session_id, UserInput(text))
         proposal = draft.calculation_input["proposal_id"]
         self.backend.commands = [
@@ -305,7 +301,7 @@ class ConsultationSubjectTests(unittest.TestCase):
     ):
         self.establish()
         text = "请把1.25kg换算成g"
-        self.backend.commands = [calculation_fixture.calculation(text)]
+        self.backend.commands = [calculation(text)]
         self.engine.submit(self.state.session_id, UserInput(text))
         self.backend.commands = [
             {
@@ -342,7 +338,7 @@ class ConsultationSubjectTests(unittest.TestCase):
     def _verify_failed_calculation_return(self, semantic):
         self.establish()
         text = "请把1.25kg换算成g；父亲昨晚用过药物甲。"
-        self.backend.commands = [calculation_fixture.calculation(text)]
+        self.backend.commands = [calculation(text)]
         draft = self.engine.submit(self.state.session_id, UserInput(text))
         result = self.engine.submit(
             self.state.session_id,
@@ -393,7 +389,7 @@ class ConsultationSubjectTests(unittest.TestCase):
                     ]
                 },
             },
-            calculation_fixture.ask("sex"),
+            ask("sex"),
         ]
         recovered = self.engine.submit(
             self.state.session_id, UserInput("重试", "retry_turn", restored.action_id)
@@ -402,11 +398,11 @@ class ConsultationSubjectTests(unittest.TestCase):
         self.assertEqual(len(self.state.calculations), 1)
 
     def test_observation_failure_and_emergency_priority_survive_subject_dialog(self):
-        self.engine, _, self.state, summary = observation_fixture.measured_case(
+        self.engine, _, self.state, summary = measured_case(
             summary=True
         )
         self.engine.backend = self.backend
-        task = observation_fixture.repeat(self.engine, self.state, summary)
+        task = repeat(self.engine, self.state, summary)
         self.backend.commands = [RuntimeError("fixture failure")]
         failed = self.engine.submit(
             self.state.session_id,

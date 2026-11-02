@@ -7,7 +7,8 @@ import tempfile
 import threading
 import time
 import unittest
-from uuid import uuid4
+
+from tests.support.execution_case import model_reply, payload
 
 import medagent
 from medagent.execution import ExecutionManager, ExecutionError
@@ -35,22 +36,6 @@ def test_implementation_files_all_exist():
     assert not missing, f"implementation hash list points at missing files: {missing}"
 
 
-def payload(
-    text="请把1.25 kg换算成g", quote="1.25 kg", value="1.25", before="kg", after="g"
-):
-    turn = str(uuid4())
-    return {
-        "binding": freeze_binding(),
-        "operation": "execute",
-        "workspace_id": str(uuid4()),
-        "turn_id": turn,
-        "sources": [{"id": turn, "text": text}],
-        "request": {
-            "capability_id": "calculate.units",
-            "input": {"value": value, "from_unit": before, "to_unit": after},
-            "evidence": quote,
-        },
-    }
 
 
 class RegisteredCalculationTests(unittest.TestCase):
@@ -240,58 +225,6 @@ class RegisteredCalculationTests(unittest.TestCase):
         self.assertEqual(error.exception.code, "capability_binding_missing")
 
 
-def model_reply(handler, index, tool=None):
-    events = [
-        {
-            "type": "message_start",
-            "message": {
-                "id": f"cap-{index}",
-                "type": "message",
-                "role": "assistant",
-                "model": "deepseek-flash",
-                "content": [],
-                "usage": {"input_tokens": 20, "output_tokens": 1},
-            },
-        },
-        {
-            "type": "content_block_start",
-            "index": 0,
-            "content_block": {
-                "type": "tool_use",
-                "id": f"call-{index}",
-                "name": tool["name"],
-                "input": {},
-            }
-            if tool
-            else {"type": "text", "text": ""},
-        },
-        {
-            "type": "content_block_delta",
-            "index": 0,
-            "delta": {
-                "type": "input_json_delta",
-                "partial_json": json.dumps(tool["input"]),
-            }
-            if tool
-            else {"type": "text_delta", "text": "计算完成，输入仍待核对。"},
-        },
-        {"type": "content_block_stop", "index": 0},
-        {
-            "type": "message_delta",
-            "delta": {"stop_reason": "tool_use" if tool else "end_turn"},
-            "usage": {"output_tokens": 20},
-        },
-        {"type": "message_stop"},
-    ]
-    data = "".join(
-        "event: " + event["type"] + "\ndata: " + json.dumps(event) + "\n\n"
-        for event in events
-    ).encode()
-    handler.send_response(200)
-    handler.send_header("Content-Type", "text/event-stream")
-    handler.send_header("Content-Length", str(len(data)))
-    handler.end_headers()
-    handler.wfile.write(data)
 
 
 @unittest.skipUnless(

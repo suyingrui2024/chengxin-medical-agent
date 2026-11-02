@@ -23,8 +23,8 @@ from medagent.consultation import ConsultationEngine, UserInput
 from medagent.reports.handoff import build_handoff, handoff_lines
 from medagent.server.runtime import build_runtime
 from medagent.server.workspace import Workspace
-from tests.reports.test_handoff import _sheet, _state
-from tests.dialogue.test_repeated_observations import measured_case, repeat
+from tests.support.reports_case import _sheet, _state
+from tests.support.repeat_observations import measured_case, repeat
 
 
 class _StubBackend:

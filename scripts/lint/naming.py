@@ -41,6 +41,12 @@ R4  No ``test_*.py`` directly under ``tests/``.  The suite is grouped by the
     one lands there too, and 162 loose files is where this started.  ``tests/``
     itself is for ``conftest.py``, ``__init__.py`` and the directories.
 
+R5  No module under ``tests/`` imports another ``tests.<area>.test_*`` module.
+    Sharing a fixture by importing a test file means the fixture has no home:
+    editing one suite silently breaks others, and instantiating someone's
+    ``TestCase`` to borrow its ``setUp`` runs that suite's real construction
+    code with none of its intent.  Shared builders live in ``tests/support/``.
+
 The rules apply to ``.py``, ``.js``, ``.mjs``, ``.cjs`` and ``.css``.  They were
 Python-only for one round, and in that round the stylesheets grew
 ``styles-01-tokens-base-execution.css`` and
@@ -81,6 +87,7 @@ that to prove each rule actually fires.
 from __future__ import annotations
 
 import argparse
+import ast
 import pathlib
 import re
 import sys
@@ -220,6 +227,46 @@ def check(path: pathlib.Path, root: pathlib.Path) -> str | None:
             f"{rel}: tests/ is not a place for test modules. Put it under the "
             "directory of the package it exercises (" + ", ".join(TEST_AREAS) + ")."
         )
+
+    # R5 needs the imports, so this is an AST walk rather than a name check.
+    # Matching every import shape matters: a first pass with a regex found 12
+    # edges and missed 5 more -- submodule paths and non-test names both
+    # slipped past it.
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+    except SyntaxError:
+        return None
+    for node in ast.walk(tree):
+        mods = []
+        if isinstance(node, ast.ImportFrom) and node.module:
+            mods = [node.module]
+        elif isinstance(node, ast.Import):
+            mods = [alias.name for alias in node.names]
+        for module in mods:
+            parts_mod = module.split(".")
+            if (
+                len(parts_mod) >= 3
+                and parts_mod[0] == "tests"
+                and any(part.startswith("test_") for part in parts_mod[1:])
+            ):
+                return (
+                    f"{rel}: imports another test module ({module}). Shared "
+                    "builders belong in tests/support/, not in someone's "
+                    "test class."
+                )
+        # ``from tests.<area> import test_x``: the module path is only two
+        # segments, but the imported name is a test module.
+        if isinstance(node, ast.ImportFrom) and node.module:
+            base = node.module.split(".")
+            if base[0] == "tests" and any(
+                alias.name.startswith("test_") for alias in node.names
+            ):
+                return (
+                    f"{rel}: imports another test module "
+                    f"({node.module}."
+                    f"{node.names[0].name}). Shared builders belong in "
+                    "tests/support/, not in someone's test class."
+                )
 
     return None
 

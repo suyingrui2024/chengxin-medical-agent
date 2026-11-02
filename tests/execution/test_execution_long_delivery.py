@@ -5,7 +5,8 @@ import os
 import time
 import unittest
 
-import tests.execution.test_execution_delivery as fixtures
+from tests.support.delivery_runtime import DeliveryRuntime
+from tests.support.scripted import final, tool
 
 
 @unittest.skipUnless(
@@ -18,18 +19,18 @@ class LongDeliveryTests(unittest.TestCase):
         "requires explicit 605-second multi-wait delivery runtime check",
     )
     def test_check_continues_same_job_across_the_600_second_wait_boundary(self):
-        fixture = fixtures.DeliveryRuntimeTests()
+        fixture = DeliveryRuntime()
         fixture.setUp()
         try:
             session = fixture.session(
                 [
-                    fixtures.tool(
+                    tool(
                         "delivery_check",
                         label="跨600秒检查",
                         command="python3 -u -c \"import time;from pathlib import Path;print('started',flush=True);time.sleep(605);Path('chunked-check.txt').write_text('finished');print('finished')\"",
                         timeout_ms=720000,
                     ),
-                    fixtures.final("跨等待边界的同一作业完成。"),
+                    final("跨等待边界的同一作业完成。"),
                 ]
             )
             started = time.monotonic()
@@ -91,18 +92,18 @@ class LongDeliveryTests(unittest.TestCase):
             fixture.tearDown()
 
     def test_check_runs_beyond_the_old_tool_cap_and_collects_the_same_job(self):
-        fixture = fixtures.DeliveryRuntimeTests()
+        fixture = DeliveryRuntime()
         fixture.setUp()
         try:
             session = fixture.session(
                 [
-                    fixtures.tool(
+                    tool(
                         "delivery_check",
                         label="真实长检查",
                         command="python3 -u -c \"import time;from pathlib import Path;print('started',flush=True);time.sleep(142);Path('long-check.txt').write_text('finished');print('finished')\"",
                         timeout_ms=180000,
                     ),
-                    fixtures.final("同一检查作业已运行完成。"),
+                    final("同一检查作业已运行完成。"),
                 ]
             )
             started = time.monotonic()

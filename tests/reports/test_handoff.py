@@ -1,10 +1,12 @@
 """Handoff v2 tests (design doc 6.1, P4-A)."""
 
+from tests.support.reports_case import _fact, _sheet, _state
+
 import glob
 import json
 from pathlib import Path
 
-from medagent.core.domain import Assertion, CaseState, Fact, Source
+from medagent.core.domain import CaseState
 from medagent.reports.handoff import (
     LABELS,
     REGISTERED_FACT_KEYS,
@@ -18,86 +20,10 @@ CONTENT = REPO / "src" / "medagent" / "content"
 PACKS = REPO / "src" / "medagent" / "extensions" / "packs"
 
 
-def _fact(key, value, assertion=Assertion.PRESENT):
-    return Fact(
-        key=key,
-        value=value,
-        assertion=assertion,
-        source=Source.PATIENT,
-        turn_id="t1",
-        evidence="原话",
-    )
 
 
-def _sheet(
-    *,
-    directions_visible=True,
-    department_visible=True,
-    directions_mode=None,
-    visit_notes=None,
-):
-    sheet = {
-        "disposition": {
-            "level": "routine_visit",
-            "text": "可以在家先观察；请在 72 小时内到线下医疗机构就诊评估。",
-            "window_hours": 72,
-            "department_hint": "呼吸内科",
-        },
-        "directions": [
-            {
-                "hypothesis_id": "uri",
-                "patient_label": "普通感冒",
-                "group": "likely",
-                "certainty": "可能",
-                "support_quotes": ["患者原话引用"],
-                "against_note": "你否认了发热，这一点不支持它",
-            }
-        ],
-        "directions_visible": directions_visible,
-        "department_visible": department_visible,
-        "self_care": {
-            "do": ["多休息"],
-            "avoid": ["避免劳累"],
-            "measure": ["留意体温变化"],
-            "allergy_hint": "你档案里记有青霉素过敏，涉及用药请先核对",
-        },
-        "return_now_if": ["呼吸困难加重"],
-    }
-    # v1.3 additive fields: only present when the caller passes them,
-    # so legacy sheets (no mode) keep the phase-A shape untouched.
-    if directions_mode is not None:
-        sheet["directions_mode"] = directions_mode
-    if visit_notes is not None:
-        sheet["visit_notes"] = visit_notes
-    return sheet
 
 
-def _state(*, sheet=None, baseline=None, follow_up=None):
-    state = CaseState(session_id="s1")
-    state.record(_fact("chief_complaint", "咳嗽三天"))
-    state.record(_fact("sex", "女"))
-    state.record(_fact("pregnancy_status", "否"))
-    state.record(_fact("onset", None, Assertion.UNKNOWN))
-    state.report_items = [
-        {
-            "name": "血糖",
-            "reported_value": "6.1",
-            "unit": "mmol/L",
-            "reference_range": "",
-            "status": "confirmed_by_patient",
-            "record_title": "血糖自测",
-            "measured_at": "2026-10-24",
-            "source": "patient_record",
-            "secret_extra": "must-not-leak",
-        }
-    ]
-    if sheet is not None:
-        state.conclusion = sheet
-    if baseline is not None:
-        state.profile_baseline = baseline
-    if follow_up is not None:
-        state.follow_up = follow_up
-    return state
 
 
 def _baseline():
