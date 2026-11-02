@@ -1,12 +1,12 @@
 # 测试套件
 
-158 个 Python 测试文件、2006 个收集节点（参数化用例计为多个节点；本机运行 1935 passed、71 skipped），88 个 Playwright spec（ui 52 / desktop 33 / live 3）。这份文件解释**怎么跑、什么会跳过、东西放哪**。
+159 个 Python 测试文件、2043 个收集节点（参数化用例计为多个节点；本机运行 1972 passed、71 skipped），86 个 Playwright spec（ui 52 / desktop 33 / live 1）。这份文件解释**怎么跑、什么会跳过、东西放哪**。
 
 ## 跑什么
 
 | 命令 | 内容 | 耗时 |
 |---|---|---|
-| `npm run test:python` | 全量 Python（2006 个收集节点） | ~79 秒 |
+| `npm run test:python` | 全量 Python（2043 个收集节点） | ~86 秒 |
 | `npm run test:coverage` | 同上 + branch 覆盖率（当前 85%） | ~2 分钟 |
 | `npm run lint:structure` | 架构门禁：单文件行数 + 依赖方向 + 大文件基线 | ~4 秒 |
 | `npm run lint:python` | ruff 最小集：未定义名、语法错、坏 `__all__` | <1 秒 |

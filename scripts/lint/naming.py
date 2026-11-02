@@ -16,22 +16,31 @@ already cost this repo real time.
 
 Rules
 -----
-R1  No files named after a category of leftovers: ``utils``, ``helpers``,
-    ``common``, ``shared``, ``misc``, ``stuff``, ``tmp``, ``temp``, ``scratch``.
-    Name the file after the thing it does.
+R1  No file whose last name word is a category of leftovers: ``utils``,
+    ``helpers``, ``common``, ``shared``, ``misc``, ``stuff``, ``tmp``, ``temp``,
+    ``scratch``.  Name the file after the thing it does.
 
-R2  No batch or version suffix on a source file: ``_extra``, ``_old``, ``_new``,
-    ``_copy``, ``_backup``, ``_bak``, ``_orig``, ``_final``, ``_tmp``, ``_temp``,
-    ``_v2`` and up, or a bare ``_2``/``_3``.  ``formulas_extra`` held 34 of the
-    42 formulas -- it was the main table named as if it were the appendix -- and
-    "extra" told no reader that.  A second file means the first one has two
-    responsibilities; split them and name both.
+R2  No file with a date in its name -- ``extra``, ``old``, ``new``,
+    ``backup``, ``bak``, ``orig``, ``final``, ``late``, ``legacy``, ``tmp``,
+    ``temp`` anywhere in the name, or a version word (``v2`` and up, a bare
+    ``2``/``3``) at the end.
+    ``formulas_extra`` held 34 of the 42 formulas -- it was the main table named
+    as if it were the appendix.  ``styles-08-settings-and-late-refinements.css``
+    named a review round, not a subject.  A second file means the first one has
+    two responsibilities: split them and name both.
 
 R3  Every ``.py`` directly under ``tests/`` is a test module, so it must be
     named ``test_*.py``.  A pytest-style test that does not start with ``test_``
     is never collected: 84 tests sat unrun this way before the suite moved to
-    pytest.  Shared fixtures and helpers belong in ``tests/support/``, where
-    this rule does not apply.
+    pytest.  Shared fixtures and helpers belong in ``tests/support/``.
+
+The rules apply to ``.py``, ``.js``, ``.mjs``, ``.cjs`` and ``.css``.  They were
+Python-only for one round, and in that round the stylesheets grew
+``styles-01-tokens-base-execution.css`` and
+``styles-08-settings-and-late-refinements.css`` unopposed: eight numbered
+slices, four of them welding three subjects together with ``-and-``, one named
+after when it was written.  A guard that covers one language guards one
+language.
 
 What is *not* checked
 ---------------------
@@ -42,6 +51,18 @@ several mixin modules, sitting beside ``agent.py``/``patient.py``/``closing.py``
 by design.  Renaming those would desynchronise them from the class names they
 define (``HandlerCore``, ``ConsultationEngineCore``) without making any of them
 easier to find.
+
+``_and_`` in the middle of a name is not checked either.  ``test_worry_and_goal.py``
+tests worry and goal; the ``-and-`` problem was specific to stylesheets, where it
+welded three unrelated subjects into one file *name* while the file itself was
+only a size slice.  The fix there was to name the slice after its leading topic,
+not to ban the word.
+
+``copy`` is left out of R2 on purpose.  The first run of this check flagged
+``test_close_copy.py``, which tests the *close copy* -- the wording the
+consultation says when it closes -- not a copy of something.  ``copy`` is a
+domain word here, so a rule against it would be wrong more often than right;
+``old``/``backup``/``bak`` cover the copy-of-a-file case.
 
 Run locally::
 
@@ -59,7 +80,8 @@ import sys
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
-SCAN_ROOTS = ("src", "tests", "scripts")
+SCAN_ROOTS = ("src", "tests", "scripts", "desktop", "integrations")
+EXTENSIONS = {".py", ".js", ".mjs", ".cjs", ".css"}
 SKIP_DIRS = {
     "__pycache__",
     "node_modules",
@@ -73,7 +95,7 @@ SKIP_DIRS = {
 }
 
 # R1: names that describe a category of leftovers rather than a thing.
-LEFTOVER_STEMS = frozenset(
+LEFTOVER_WORDS = frozenset(
     {
         "utils",
         "util",
@@ -90,28 +112,36 @@ LEFTOVER_STEMS = frozenset(
     }
 )
 
-# R2: suffixes that date a file instead of describing it.
-#
-# ``_copy`` is deliberately absent. The first run of this check flagged
-# ``test_close_copy.py``, which tests the *close copy* -- the wording the
-# consultation says when it closes -- not a copy of something. In this codebase
-# "copy" is a domain word, so a rule against it would be wrong more often than
-# right; ``_old``/``_backup``/``_bak`` cover the copy-of-a-file case.
-BATCH_SUFFIX = re.compile(
-    r"_(extra|old|new|backup|bak|orig|final|tmp|temp|v[2-9]\d*|[2-9])$"
+# R2: words that date a file instead of describing it.
+TIME_WORDS = frozenset(
+    {"extra", "old", "new", "backup", "bak", "orig", "final", "late", "legacy", "tmp", "temp"}
 )
+
+# R2: ``v2``..``v9``, and a bare trailing version number.
+VERSION_WORD = re.compile(r"^(?:v[2-9]\d*|[2-9])$")
 
 # R3: the only files allowed to sit directly in tests/ without a test_ prefix.
 TESTS_ALLOWED = frozenset({"conftest.py", "__init__.py"})
 
+#: The stem is split on every separator so ``date-utils`` and ``date_utils``
+#: are caught by the same rule, and a leading digit stays attached to nothing.
+WORD_SPLIT = re.compile(r"[-_.]+")
 
-def iter_module_files(root: pathlib.Path) -> list[pathlib.Path]:
+
+def name_words(path: pathlib.Path) -> list[str]:
+    """Lower-case words of a file name, in order, separators removed."""
+    return [word.lower() for word in WORD_SPLIT.split(path.stem) if word]
+
+
+def iter_source_files(root: pathlib.Path) -> list[pathlib.Path]:
     files: list[pathlib.Path] = []
     for root_name in SCAN_ROOTS:
         base = root / root_name
         if not base.is_dir():
             continue
-        for path in base.rglob("*.py"):
+        for path in base.rglob("*"):
+            if not path.is_file() or path.suffix not in EXTENSIONS:
+                continue
             if any(part in SKIP_DIRS for part in path.relative_to(root).parts):
                 continue
             files.append(path)
@@ -120,25 +150,34 @@ def iter_module_files(root: pathlib.Path) -> list[pathlib.Path]:
 
 def check(path: pathlib.Path, root: pathlib.Path) -> str | None:
     rel = path.relative_to(root).as_posix()
-    stem = path.stem
+    words = name_words(path)
+    last = words[-1] if words else ""
 
-    if stem in LEFTOVER_STEMS:
+    if last in LEFTOVER_WORDS:
         return (
-            f"{rel}: '{stem}' names a category of leftovers, not a thing. "
+            f"{rel}: '{last}' names a category of leftovers, not a thing. "
             "Name the file after what it does."
         )
 
-    match = BATCH_SUFFIX.search(stem)
-    if match:
+    # Any word, not just the last one. The name this rule was written for was
+    # ``styles-08-settings-and-late-refinements.css``; a suffix-only check would
+    # have watched it go by, because the date sat in the middle.
+    dated = [word for word in words if word in TIME_WORDS]
+    if dated:
         return (
-            f"{rel}: '{match.group(0).lstrip('_')}' suffix records when the file "
-            "was written, not what it holds. Name both halves of the split, or "
-            "merge them."
+            f"{rel}: '{dated[0]}' records when the file was written, not what "
+            "it holds. Name both halves of the split, or merge them."
+        )
+
+    if VERSION_WORD.match(last):
+        return (
+            f"{rel}: '{last}' records when the file was written, not what it "
+            "holds. Name both halves of the split, or merge them."
         )
 
     parts = path.relative_to(root).parts
     if parts[:1] == ("tests",) and len(parts) == 2 and path.name not in TESTS_ALLOWED:
-        if not path.name.startswith("test_"):
+        if path.suffix == ".py" and not path.name.startswith("test_"):
             return (
                 f"{rel}: a module directly under tests/ must be named test_*.py "
                 "or pytest will never collect it. Move shared helpers to "
@@ -159,7 +198,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     root = args.root.resolve()
 
-    files = iter_module_files(root)
+    files = iter_source_files(root)
     failures = [msg for path in sorted(files) if (msg := check(path, root))]
 
     if failures:
@@ -173,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
 
-    print(f"naming check passed: {len(files)} module(s) scanned.")
+    print(f"naming check passed: {len(files)} file(s) scanned.")
     return 0
 
 
