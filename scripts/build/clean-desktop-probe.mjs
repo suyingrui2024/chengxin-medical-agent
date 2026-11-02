@@ -163,7 +163,7 @@ print(json.dumps({'executable': sys.executable, 'version': sys.version.split()[0
   await page.getByRole("button", { name: "下一步", exact: true }).click();
   await expect(page.locator("#active-task .task-image")).toHaveAttribute(
     "src",
-    "/neutral-temperature.svg#step-2",
+    "/assets/illustrations/neutral-temperature.svg#step-2",
   );
   expect(
     (
@@ -178,21 +178,21 @@ print(json.dumps({'executable': sys.executable, 'version': sys.version.split()[0
     await page.getByRole("button", { name: "上一步", exact: true }).click();
     await expect(page.locator("#active-task .task-image")).toHaveAttribute(
       "src",
-      "/neutral-temperature.svg#step-1",
+      "/assets/illustrations/neutral-temperature.svg#step-1",
     );
     await page.screenshot({ path: "/out/temperature-step-1.png" });
     await page.getByRole("button", { name: "下一步", exact: true }).click();
     await page.getByRole("button", { name: "下一步", exact: true }).click();
     await expect(page.locator("#active-task .task-image")).toHaveAttribute(
       "src",
-      "/neutral-temperature.svg#step-3",
+      "/assets/illustrations/neutral-temperature.svg#step-3",
     );
     await page.screenshot({ path: "/out/temperature-step-3.png" });
     await page.getByRole("button", { name: "上一步", exact: true }).click();
     await page.evaluate(() => {
       const image = document.createElement("img");
       image.id = "illustration-environment-preview";
-      image.src = "/body-location.svg";
+      image.src = "/assets/illustrations/body-location.svg";
       image.style.cssText =
         "position:fixed;left:0;top:0;width:720px;height:420px;z-index:9999";
       document.body.append(image);
@@ -211,11 +211,16 @@ print(json.dumps({'executable': sys.executable, 'version': sys.version.split()[0
       );
     }
     report.illustrations = await page.evaluate(async () => {
-      const manifest = await (await fetch("/illustration-labels.json")).json();
+      const manifestUrl = "/assets/illustrations/illustration-labels.json";
+      const manifest = await (await fetch(manifestUrl)).json();
       return Promise.all(
         manifest.files.map(async (entry) => {
           const svg = new DOMParser().parseFromString(
-            await (await fetch(`/${entry.file}`)).text(),
+            await (
+              await fetch(
+                new URL(entry.file, new URL(manifestUrl, location.href)),
+              )
+            ).text(),
             "image/svg+xml",
           );
           return {

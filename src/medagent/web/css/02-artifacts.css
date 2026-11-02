@@ -1,4 +1,6 @@
-/* 02-artifacts-and-task-bar.css — Artifact text/tables, task-focus bar and consultation grid. */
+/* 02-artifacts.css — cascade slice 2 of 8; styles.css imports these in order.
+   Holds: artifact text and tables, task-focus bar, consultation grid.
+*/
 .artifact-text {
   margin: 0;
   font: inherit;

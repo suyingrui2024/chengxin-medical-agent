@@ -46,7 +46,7 @@ export function installTask(register, taskProgress) {
       );
       const avatar = el("span", "message-avatar");
       const image = el("img");
-      image.src = "brand.png";
+      image.src = "/assets/brand.png";
       image.alt = "";
       avatar.append(image);
       row.append(avatar, el("div", "bubble", data.text));
@@ -198,7 +198,8 @@ export function installTask(register, taskProgress) {
         ) &&
         data.step_assets?.every(
           (value, index) =>
-            value === `/neutral-temperature.svg#step-${index + 1}`,
+            value ===
+            `/assets/illustrations/neutral-temperature.svg#step-${index + 1}`,
         ) &&
         data.step_assets.length === temperatureGuide.length;
       if (compactGuide) card.classList.add("illustrated-task");

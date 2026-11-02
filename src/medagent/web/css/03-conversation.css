@@ -1,4 +1,6 @@
-/* 03-conversation-and-conclusion.css — Conversation panel, welcome state, report rows and conclusion routing. */
+/* 03-conversation.css — cascade slice 3 of 8; styles.css imports these in order.
+   Holds: conversation panel, welcome state, report rows, conclusion routing.
+*/
 .conversation-panel {
   display: flex;
   flex-direction: column;

@@ -1,4 +1,6 @@
-/* 01-tokens-base-execution.css — Design tokens, base elements, execution layout and artifact previews. */
+/* 01-tokens.css — cascade slice 1 of 8; styles.css imports these in order.
+   Holds: design tokens, base elements, execution layout, artifact previews.
+*/
 :root {
   --serif: "Chengxin Serif SC", "Noto Serif CJK SC", "Songti SC", STSong, serif;
   --sans:

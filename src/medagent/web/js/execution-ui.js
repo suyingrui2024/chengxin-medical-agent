@@ -1,15 +1,15 @@
 // Only host receipt events become structured cards. Model HTML/JSON is text.
 import { createRenderer, calculationEnvelope } from "./structured-ui.js";
-import { createChangeReview } from "./execution-changes-ui.js";
-import { createClarificationUI } from "./execution-clarification-ui.js";
-import { createArtifactPreview } from "./execution-artifact-ui.js";
-import { createDirectoryUI } from "./execution-directory-ui.js";
-import { createExecutionFocus } from "./execution-focus-ui.js";
+import { createChangeReview } from "./execution-ui-changes.js";
+import { createClarificationUI } from "./execution-ui-clarification.js";
+import { createArtifactPreview } from "./execution-ui-artifact.js";
+import { createDirectoryUI } from "./execution-ui-directory.js";
+import { createExecutionFocus } from "./execution-ui-focus.js";
 import {
   observationPresentation,
   inputProofMissing,
   toolObservationKey,
-} from "./execution-observation-ui.js";
+} from "./execution-ui-observation.js";
 export function createExecutionUI(api) {
   const $ = (id) => document.getElementById(id);
   let current = null,

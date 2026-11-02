@@ -1,4 +1,6 @@
-/* 08-settings-and-late-refinements.css — Settings view, late visual refinements and formula/scale forms. */
+/* 08-settings.css — cascade slice 8 of 8; styles.css imports these in order.
+   Holds: settings view, full-bleed surface, visual refinements, scales, capability lab.
+*/
 .connection-alert .status-dot {
   background: var(--red);
 }

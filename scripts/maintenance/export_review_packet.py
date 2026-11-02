@@ -30,12 +30,12 @@ SOURCES = [
     "src/medagent/extensions/packs/units.json",
     "src/medagent/extensions/packs/glucose.json",
     "src/medagent/extensions/templates/general.json",
-    "src/medagent/web/NotoSansCJKsc-Regular.otf",
-    "src/medagent/web/fonts-OFL.txt",
-    "src/medagent/web/font-sources.json",
-    "src/medagent/web/neutral-temperature.svg",
-    "src/medagent/web/body-location.svg",
-    "src/medagent/web/illustration-labels.json",
+    "src/medagent/web/assets/fonts/NotoSansCJKsc-Regular.otf",
+    "src/medagent/web/assets/fonts/fonts-OFL.txt",
+    "src/medagent/web/assets/fonts/font-sources.json",
+    "src/medagent/web/assets/illustrations/neutral-temperature.svg",
+    "src/medagent/web/assets/illustrations/body-location.svg",
+    "src/medagent/web/assets/illustrations/illustration-labels.json",
     "assets/illustrations/body-location.svg",
 ]
 LABELS = {
@@ -186,8 +186,8 @@ def render(records, version):
             panels = []
             for i, (step, asset) in enumerate(zip(steps, assets), 1):
                 if asset.split("#")[0] not in [
-                    "/neutral-temperature.svg",
-                    "/body-location.svg",
+                    "/assets/illustrations/neutral-temperature.svg",
+                    "/assets/illustrations/body-location.svg",
                 ]:
                     raise ValueError("Unapproved illustration path")
                 panels.append(
@@ -362,7 +362,7 @@ def export(root, output):
         "风险短语需结合完整triage.py审核，不能把单条短语当作完整分流逻辑。\n"
         "sources包含固定白名单源码和原始字节的图示／字体；不包含患者数据或.env。\n"
         "本包只呈现静态内容及相关实现，不是全量运行时行为、安全或临床有效性审计。\n"
-        "字体版权、OFL与来源见sources/src/medagent/web/，本包仅使用其中Sans字体。\n"
+        "字体版权、OFL与来源见sources/src/medagent/web/assets/fonts/，本包仅使用其中Sans字体。\n"
         "核对命令：python3 -B scripts/maintenance/export_review_packet.py --verify 此目录\n",
         encoding="utf-8",
     )

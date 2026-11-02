@@ -19,7 +19,7 @@ class AssetBurstTests(unittest.TestCase):
         )
         clients = []
         worker = None
-        assets = ["app.js", "execution-focus-ui.js", "execution-focus.css"]
+        assets = ["js/app.js", "js/execution-ui-focus.js", "css/execution-focus.css"]
         try:
             # Deliberately queue a full burst before accepting any connection.
             # The old five-connection backlog resets or times out on this burst.
@@ -41,7 +41,7 @@ class AssetBurstTests(unittest.TestCase):
                 self.assertGreater(len(response.read()), 100)
             connection = http.client.HTTPConnection(*server.server_address, timeout=5)
             try:
-                connection.request("GET", "/execution-focus-ui.js")
+                connection.request("GET", "/js/execution-ui-focus.js")
                 self.assertEqual(connection.getresponse().status, 401)
             finally:
                 connection.close()

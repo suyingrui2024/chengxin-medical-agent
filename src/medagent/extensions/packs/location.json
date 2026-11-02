@@ -21,7 +21,7 @@
       "chief_complaint_contains_any": ["痛", "疼", "皮疹", "痒", "肿"]
     },
     "equipment": [],
-    "asset": "/body-location.svg",
+    "asset": "/assets/illustrations/body-location.svg",
     "steps": [
       "看图找到最明显的位置。",
       "选择部位；需要时补充左侧、右侧、范围和是否移动。"

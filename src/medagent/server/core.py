@@ -1,6 +1,48 @@
 """Mixin: core routes for Handler."""
-from ._preamble import *  # noqa: F401,F403
-from .types import *  # noqa: F401,F403
+from http import HTTPStatus
+from importlib import resources
+import json
+import mimetypes
+from pathlib import Path
+import re
+import secrets
+from typing import Any, Dict, Optional
+from urllib.parse import urlparse
+from uuid import uuid4
+from ._preamble import MAX_BODY_BYTES
+from .types import MedicalAgentServer
+
+#: Explicit types for the extensions the page actually ships.
+#:
+#: ``mimetypes`` reads a platform database, and that database disagrees
+#: across systems: Windows consults the registry and reports ``text/plain``
+#: for ``.js`` on a machine where the key is missing or has been edited. A
+#: wrong type is not a cosmetic problem here, because every response carries
+#: ``X-Content-Type-Options: nosniff`` — the browser then refuses the
+#: stylesheet outright. The files are known up front, so the answer should
+#: not depend on the host's registry.
+_STATIC_TYPES = {
+    ".html": "text/html; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".mjs": "text/javascript; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".txt": "text/plain; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".otf": "font/otf",
+    ".woff2": "font/woff2",
+}
+
+#: Segments a static request may not contain. ``..`` and ``.`` would walk out
+#: of the package, and a leading dot reaches ``__pycache__`` and any dotfile
+#: that ends up beside the assets.
+_FORBIDDEN_SEGMENTS = {"", ".", ".."}
+
+#: Suffixes the handler refuses even when the file is really there. The web
+#: package is a Python package, so it carries its own ``__init__.py``; serving
+#: it would work, which is exactly why it needs an explicit answer.
+_FORBIDDEN_SUFFIXES = {".py", ".pyc", ".pyo"}
 
 
 class HandlerCore:
@@ -200,23 +242,39 @@ class HandlerCore:
         )
 
     def _static(self, path: str) -> None:
-        filename = "index.html" if path == "/" else path.removeprefix("/")
-        if "/" in filename or filename.startswith("."):
+        """Serve one file from the ``medagent.web`` package.
+
+        Nested paths are allowed: the page keeps its scripts, stylesheets and
+        media in separate directories, and a flat handler forced all of them
+        into one folder of 55 siblings. Traversal is refused segment by
+        segment rather than by string prefix, so ``/css/../core.py`` and
+        ``/%2e%2e/core.py`` both fail — the second one stays percent-encoded,
+        matches no directory, and 404s like any other missing name.
+        """
+        relative = "index.html" if path == "/" else path.removeprefix("/")
+        segments = relative.split("/")
+        if any(
+            segment in _FORBIDDEN_SEGMENTS
+            or segment.startswith(".")
+            or "\\" in segment
+            or "\x00" in segment
+            for segment in segments
+        ) or Path(segments[-1]).suffix.lower() in _FORBIDDEN_SUFFIXES:
             self._error(HTTPStatus.NOT_FOUND, "not_found", "文件不存在")
             return
-        resource = resources.files("medagent.web").joinpath(filename)
-        if not resource.is_file():
+        node = resources.files("medagent.web")
+        for segment in segments:
+            node = node.joinpath(segment)
+        if not node.is_file():
             self._error(HTTPStatus.NOT_FOUND, "not_found", "文件不存在")
             return
-        body = resource.read_bytes()
-        mime = mimetypes.guess_type(filename)[0] or "application/octet-stream"
-        self.send_response(HTTPStatus.OK)
-        self.send_header(
-            "Content-Type",
-            f"{mime}; charset=utf-8"
-            if mime.startswith("text/") or mime == "application/javascript"
-            else mime,
+        suffix = Path(segments[-1]).suffix.lower()
+        mime = _STATIC_TYPES.get(suffix) or mimetypes.guess_type(relative)[0] or (
+            "application/octet-stream"
         )
+        body = node.read_bytes()
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", mime)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-cache")
         self.send_header("X-Content-Type-Options", "nosniff")

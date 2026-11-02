@@ -5,30 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5f6f2" />
     <title>知微 · 健康记录与问诊助手</title>
-    <link rel="icon" href="brand.png" type="image/png" />
+    <link rel="icon" href="assets/brand.png" type="image/png" />
     <link
       rel="preload"
-      href="NotoSansCJKsc-Regular.otf"
+      href="assets/fonts/NotoSansCJKsc-Regular.otf"
       as="font"
       type="font/otf"
       crossorigin="anonymous"
     />
     <link
       rel="preload"
-      href="NotoSerifCJKsc-Regular.otf"
+      href="assets/fonts/NotoSerifCJKsc-Regular.otf"
       as="font"
       type="font/otf"
       crossorigin="anonymous"
     />
-    <script src="themes.js"></script>
-    <link rel="stylesheet" href="themes.css" />
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="appearance.css" />
-    <link rel="stylesheet" href="self-check.css" />
-    <link rel="stylesheet" href="patient-reflow.css" />
-    <link rel="stylesheet" href="patient-records.css" />
-    <link rel="stylesheet" href="execution-focus.css" />
-    <link rel="stylesheet" href="artifact-chart.css" />
+    <script src="js/themes.js"></script>
+    <link rel="stylesheet" href="css/themes.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/appearance.css" />
+    <link rel="stylesheet" href="css/self-check.css" />
+    <link rel="stylesheet" href="css/patient-reflow.css" />
+    <link rel="stylesheet" href="css/patient-records.css" />
+    <link rel="stylesheet" href="css/execution-focus.css" />
+    <link rel="stylesheet" href="css/artifact-chart.css" />
   </head>
   <body data-mode="patient">
     <svg
@@ -98,7 +98,7 @@
     <div class="app-shell">
       <aside class="sidebar" id="sidebar" aria-label="主导航">
         <a class="brand" href="#consultation"
-          ><img src="brand.png" alt="" width="37" height="37" /><span
+          ><img src="assets/brand.png" alt="" width="37" height="37" /><span
             ><strong>知微</strong><small>ZHIWEI HEALTH</small></span
           ></a
         >
@@ -481,7 +481,7 @@
               <section class="surface execution-main" aria-label="执行任务">
                 <div class="execution-head">
                   <span class="agent-avatar"
-                    ><img src="brand.png" width="25" height="25" alt=""
+                    ><img src="assets/brand.png" width="25" height="25" alt=""
                   /></span>
                   <div>
                     <strong>知微执行助手</strong
@@ -1920,6 +1920,6 @@
     </dialog>
 
     <div id="toast" class="toast" role="status" hidden></div>
-    <script src="app.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
   </body>
 </html>

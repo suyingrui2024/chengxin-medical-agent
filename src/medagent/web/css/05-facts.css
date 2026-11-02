@@ -1,4 +1,6 @@
-/* 05-facts-library-calculations.css — Facts panel, library cards, patient calculations and visual choices. */
+/* 05-facts.css — cascade slice 5 of 8; styles.css imports these in order.
+   Holds: facts panel, library cards, patient calculations, visual choices.
+*/
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;

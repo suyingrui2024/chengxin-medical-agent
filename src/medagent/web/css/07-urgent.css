@@ -1,4 +1,6 @@
-/* 07-urgent-summary-connection.css — Urgent help, summary states, follow-up cards and connection alerts. */
+/* 07-urgent.css — cascade slice 7 of 8; styles.css imports these in order.
+   Holds: urgent help, summary states, follow-up cards, connection alerts.
+*/
 .urgent-help {
   display: inline-flex;
   align-items: center;

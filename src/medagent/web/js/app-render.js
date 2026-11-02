@@ -348,7 +348,7 @@ export function appendMessage(text, role, kind = "") {
   if (role === "user") avatar.textContent = "你";
   else {
     const image = el("img");
-    image.src = "brand.png";
+    image.src = "/assets/brand.png";
     image.alt = "";
     avatar.append(image);
   }

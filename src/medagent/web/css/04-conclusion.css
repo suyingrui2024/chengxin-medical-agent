@@ -1,4 +1,6 @@
-/* 04-conclusion-dialogs-capabilities.css — Conclusion basis/handoff/care, capability rows and dialog chrome. */
+/* 04-conclusion.css — cascade slice 4 of 8; styles.css imports these in order.
+   Holds: conclusion basis/handoff/care, capability rows, dialog chrome.
+*/
 .conclusion-direction-basis {
   margin: 4px 0 0;
   color: var(--muted);

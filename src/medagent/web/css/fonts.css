@@ -1,7 +1,7 @@
 /* Original Noto CJK fonts; provenance and OFL are bundled beside these files. */
 @font-face {
   font-family: "Chengxin Sans SC";
-  src: url("NotoSansCJKsc-Regular.otf") format("opentype");
+  src: url("../assets/fonts/NotoSansCJKsc-Regular.otf") format("opentype");
   font-style: normal;
   font-weight: 400;
   font-display: block;
@@ -12,7 +12,7 @@
 
 @font-face {
   font-family: "Chengxin Serif SC";
-  src: url("NotoSerifCJKsc-Regular.otf") format("opentype");
+  src: url("../assets/fonts/NotoSerifCJKsc-Regular.otf") format("opentype");
   font-style: normal;
   font-weight: 400;
   font-display: block;

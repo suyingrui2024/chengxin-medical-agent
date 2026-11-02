@@ -6,9 +6,9 @@ export {
   createInterpretationSection,
   createBaselineBanner,
   RECOGNITION_POLL,
-} from "./patient-records-primitives.js";
-import { installRecordsCore } from "./patient-records-core.js";
-import { installRecordsDetail } from "./patient-records-detail.js";
+} from "./patient-records-ui-primitives.js";
+import { installRecordsCore } from "./patient-records-ui-core.js";
+import { installRecordsDetail } from "./patient-records-ui-detail.js";
 
 export function createPatientRecordsUI(api, toast, options = {}) {
   const deps = {};

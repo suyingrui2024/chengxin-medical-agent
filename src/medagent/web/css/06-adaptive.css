@@ -1,4 +1,6 @@
-/* 06-adaptive-and-structured-task.css — Adaptive choices/answers, body map and structured task controls. */
+/* 06-adaptive.css — cascade slice 6 of 8; styles.css imports these in order.
+   Holds: adaptive choices and answers, body map, structured task controls.
+*/
 .adaptive-choices {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   margin: 0 0 14px;

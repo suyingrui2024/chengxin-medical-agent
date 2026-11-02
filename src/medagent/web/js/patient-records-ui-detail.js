@@ -22,7 +22,7 @@ import {
   ALLERGY_KINDS,
   createBaselineBanner,
   splitList,
-} from "./patient-records-primitives.js";
+} from "./patient-records-ui-primitives.js";
 
 export function installRecordsDetail({
   api,

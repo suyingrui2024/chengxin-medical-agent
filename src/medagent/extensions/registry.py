@@ -15,6 +15,13 @@ from ..dialogue.location_answers import validate_answer_contract
 
 API_VERSION = "medical-capability/v1"
 
+#: A packaged illustration: lowercase path segments from the web root, ending in
+#: ``.svg``. The path is narrow on purpose — it ends up in an ``img src``, so the
+#: only shape accepted is one that cannot leave the package: no dots, no case
+#: tricks, no escaping through ``..``. Directories are allowed because the media
+#: live in ``web/assets/illustrations/`` rather than beside 29 scripts.
+ILLUSTRATION_PATH = r"(?:/[a-z0-9-]+)+\.svg"
+
 
 @dataclass(frozen=True)
 class Capability:
@@ -106,7 +113,7 @@ class CapabilityRegistry:
                     raise ValueError("图示内容包缺少任务字段或解释器")
                 validate_answer_contract(task)
                 if item.get("ui") != "step_task" or not re.fullmatch(
-                    r"/[a-z0-9-]+\.svg", task["asset"]
+                    ILLUSTRATION_PATH, task["asset"]
                 ):
                     raise ValueError("任务只能使用已打包的图示组件")
                 if (
@@ -150,7 +157,7 @@ class CapabilityRegistry:
                         raise ValueError("分步图示必须与步骤一一对应")
                     for asset in assets:
                         if not isinstance(asset, str) or not re.fullmatch(
-                            r"/[a-z0-9-]+\.svg(?:#step-[1-9][0-9]?)?", asset
+                            ILLUSTRATION_PATH + r"(?:#step-[1-9][0-9]?)?", asset
                         ):
                             raise ValueError("分步图示只能使用已打包的本地 SVG")
                         if (
