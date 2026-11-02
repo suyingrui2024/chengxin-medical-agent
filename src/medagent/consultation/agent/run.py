@@ -256,38 +256,16 @@ class AdaptiveConsultationEngineRun:
                 {"role": "user", "content": self._json({"tool_result": result})}
             )
             if state.risk.level == RiskLevel.EMERGENCY:
-                action = self._emergency_clarification_action(state, text, ())
-                if (
-                    action == "clarify"
-                    and self._emergency_clarification_denied_before(state, text)
-                ):
-                    # C-10: same group already denied; suppress the
-                    # repeat clarification. Record_facts re-assesses
-                    # risk from this same text, so this post-record
-                    # site is where a suppressed pre-model turn would
-                    # otherwise re-trigger; stand risk down and fall
-                    # through to the normal next question.
-                    state.risk = self._deferred_risk(state)
-                elif action == "clarify":
-                    return self._deliver(
-                        state,
-                        self._emergency_clarification_reply(state, text, turn_id),
-                        turn_id,
-                    )
-                elif action == "confirmed":
-                    return self._deliver(
-                        state,
-                        self._emergency_reply(
-                            state, state.risk.triggers, include_clarification=True
-                        ),
-                        turn_id,
-                    )
-                else:
-                    return self._deliver(
-                        state,
-                        self._emergency_reply(state, state.risk.triggers),
-                        turn_id,
-                    )
+                # Same dispatch the submit path uses.  Record_facts re-assesses
+                # risk from this text, so this post-record site is where a
+                # suppressed pre-model turn would otherwise re-trigger; a
+                # denial already on record stands the risk down and returns
+                # None, falling through to the normal next question.
+                reply = self._dispatch_emergency_clarification(
+                    state, text, (), state.risk.triggers, turn_id
+                )
+                if reply is not None:
+                    return reply
             if state.risk.level == RiskLevel.URGENT:
                 gated = self._urgent_or_defer(state, turn_id)
                 if gated is not None:
