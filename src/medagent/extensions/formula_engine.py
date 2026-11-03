@@ -102,6 +102,13 @@ def _validate_output(output: Any, expected: Dict[str, Any]) -> None:
 
 
 def _validate_bands(bands: Any) -> List[Dict[str, Any]]:
+    """Check a formula's interpretation bands: bounded, ordered, non-overlapping.
+
+    Each band carries a key and a label, and the bounds must ascend without
+    gaps or overlaps -- an interpretation read off overlapping bands would be
+    whichever the implementation happened to test first.  An empty band list
+    is legitimate: a formula may report a value without interpreting it.
+    """
     if bands is None or bands == []:
         return []
     if not isinstance(bands, list) or not 1 <= len(bands) <= MAX_BANDS:
@@ -209,6 +216,13 @@ def expected_properties(spec: Mapping[str, Any]) -> Dict[str, Dict[str, Any]]:
 
 
 def _parse_values(spec: Mapping[str, Any], values: Mapping[str, Any]):
+    """Parse the patient's inputs against the formula's declared inputs.
+
+    Every declared input must be present, enums must be one of their options,
+    and dates must be real dates -- the message names the missing or wrong
+    field by its patient-facing label, because the person correcting it is
+    the one who typed it.
+    """
     parsed: Dict[str, Any] = {}
     for item in spec["inputs"]:
         key = item["id"]

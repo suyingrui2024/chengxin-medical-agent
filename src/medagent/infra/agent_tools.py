@@ -206,6 +206,13 @@ ARGUMENTS = {
 
 
 def validate_command(command: Dict[str, Any]) -> None:
+    """Check one tool proposal against the registered tool catalog.
+
+    The shape is exact (tool + arguments only), the tool must be registered,
+    and each tool's argument set is its own -- an unregistered tool name is
+    refused with the catalog in the message, because the model corrects by
+    enumeration, not by guessing what tools exist.
+    """
     if set(command) != {"tool", "arguments"} or not isinstance(
         command["arguments"], dict
     ):
@@ -496,6 +503,13 @@ def _validate_item(
 def validate_proposals(
     content: ContentRepository, state: CaseState, raw_text: str, proposals: Any
 ) -> List[Dict[str, Any]]:
+    """Validate a batch of fact proposals and attach per-item verdicts.
+
+    The batch is capped at twenty and de-duplicated, every proposed key must
+    be a registered question's fact key, and each item comes back with a
+    verdict instead of the batch failing -- one bad proposal should not cost
+    the model the nineteen good ones.
+    """
     if not isinstance(proposals, list) or not 1 <= len(proposals) <= 20:
         raise ProposalError("facts 必须是 1 到 20 项的数组")
     fields = {q.fact_key: q for q in content.questions}

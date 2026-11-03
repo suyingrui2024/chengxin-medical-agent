@@ -464,6 +464,13 @@ class WebTools:
     def _run_search(
         self, query: str, min_tier: str, max_results: int
     ) -> Tuple[str, List[Dict[str, Any]], int]:
+        """Run one web search through the model's server-side tool.
+
+        The search runs on the provider side with a single-use budget, so the
+        patient's question cannot turn into an unbounded crawl.  The result
+        carries the tier of every source, because the education flow only cites
+        trusted tiers.
+        """
         model = os.environ.get("MEDAGENT_LLM_MODEL", "")
         payload = {
             "model": model,

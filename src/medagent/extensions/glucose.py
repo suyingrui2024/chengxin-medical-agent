@@ -41,6 +41,13 @@ def glucose_subject(quote):
 
 
 def glucose_evidence(arguments, quote, sources):
+    """Check that the quoted text really supports the glucose being converted.
+
+    The quote must be a bounded run of the patient's own words naming the
+    glucose and its original unit, and it is located inside a recorded
+    source -- a conversion whose evidence cannot be found in what the patient
+    actually said is refused before any arithmetic happens.
+    """
     if not isinstance(quote, str) or not 1 <= len(quote) <= 1024:
         raise CapabilityError("input_evidence_invalid", "请引用包含血糖、数值及原单位的连续原文。")
     glucose_subject(quote)
@@ -116,6 +123,12 @@ def glucose_evidence(arguments, quote, sources):
 
 
 def convert_glucose(arguments):
+    """Convert a glucose value between mg/dL and mmol/L, exactly.
+
+    Only those two units are accepted and the factor is the defined one (/18),
+    computed in Decimal at precision 48 -- a glucose value is a clinical
+    number, and a floating-point rounding has no place in it.
+    """
     raw = arguments["value"]
     if not re.fullmatch(r"\d{1,12}(?:\.\d{1,12})?", raw):
         raise ValueError("血糖数值请使用非负十进制，整数和小数各最多12位")

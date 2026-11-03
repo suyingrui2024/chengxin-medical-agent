@@ -25,6 +25,13 @@ POLICIES = {
 
 
 def conversion_spec(manifest):
+    """Build the patient-facing input spec for one conversion capability.
+
+    The form version selects the evidence policy, and a blood-glucose policy
+    must declare its sources -- a conversion the patient can see has to say
+    where the numbers came from.  The fields are checked against the
+    declared schema so the form and the contract cannot drift apart.
+    """
     form = manifest.get("patient_form")
     if form == "unit_conversion/v1":
         policy_id = "mass_or_volume"

@@ -86,6 +86,13 @@ def _require_int(value: Any, where: str, low: int, high: int) -> int:
 
 
 def _validate_items(items: Any) -> List[Dict[str, Any]]:
+    """Check a scale's items: bounded, uniquely identified, mutually consistent.
+
+    Weights, options and reverse-links are validated per item, and a
+    reverse_of must name another item -- a scale that double-counts or
+    reverses a question that does not exist would score a patient
+    confidently and wrongly.
+    """
     if not isinstance(items, list) or not 1 <= len(items) <= _MAX_ITEMS:
         raise ScaleSpecError("量表条目必须是有界列表")
     seen: set = set()
@@ -189,6 +196,14 @@ def _validate_bands(bands: Any, minimum: int, maximum: int) -> List[Dict[str, An
     # Bands are optional: a scale that reports a score without an
     # interpretation is legitimate (and preferred where thresholds are
     # population-dependent).
+    """Check a scale's interpretation bands against the score's real range.
+
+    Bands are optional -- a scale that reports a score without an
+    interpretation is legitimate where thresholds are population-dependent
+    -- but when present they must tile the declared minimum..maximum
+    without gaps or overlaps, so every possible score lands in exactly one
+    interpretation.
+    """
     if bands is None or bands == []:
         return []
     if not isinstance(bands, list) or not 1 <= len(bands) <= _MAX_BANDS:

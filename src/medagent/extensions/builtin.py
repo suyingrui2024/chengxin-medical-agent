@@ -18,6 +18,14 @@ from .formula_engine import run_formula, validate_formula
 
 
 def observation(text, choice, parser):
+    """Read one self-check answer into an interpretation, per task kind.
+
+    A skip, "unable" or "not_available" becomes UNKNOWN/NOT_DONE with the
+    reason attached -- a decision the patient made, recorded as such.  The
+    location parser refuses free text that bypasses the illustrated choice,
+    because a position picked from prose is not the position the patient
+    confirmed on the map.
+    """
     if choice in {"not_available", "unable", "skip"}:
         return Interpretation(
             {"reason": choice},
@@ -66,6 +74,13 @@ def observation(text, choice, parser):
 
 
 def convert_units(arguments):
+    """Convert between mass and volume units, exactly.
+
+    The value grammar is fixed (non-negative decimal, 12 digits per side)
+    and the arithmetic runs in Decimal at precision 48, so a conversion is
+    never a floating-point surprise.  Cross-dimension conversion is refused:
+    without a density, mass and volume do not interchange.
+    """
     raw = arguments["value"]
     if not re.fullmatch(r"\d{1,12}(?:\.\d{1,12})?", raw):
         raise ValueError("数值请使用非负十进制，整数和小数各最多 12 位")
@@ -167,6 +182,14 @@ _REGISTRY_CACHE: dict = {}
 
 
 def load_registry(template_id="general", enabled=None):
+    """Load the capability registry for a template, cached for the process.
+
+    Parsing and validating ~80 packs on every server start dominated the test
+    suite once the catalog grew (50s to 76s, with connection resets under
+    concurrent servers).  Registries are immutable -- with_enabled returns a
+    new object -- so the built instance is shared for the process lifetime
+    and keyed by template and enabled set.
+    """
     template = next((item for item in templates() if item["id"] == template_id), None)
     if template is None:
         raise ValueError("问诊模板未注册")

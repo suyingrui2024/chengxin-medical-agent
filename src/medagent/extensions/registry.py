@@ -45,6 +45,14 @@ class CapabilityRegistry:
     """An immutable composition. Reconfiguration builds a new registry/engine."""
 
     def __init__(self, capabilities, template, enabled=None):
+        """Build the registry from manifests, checking every one before use.
+
+        The required manifest keys, the version compatibility and the review
+        status are all checked here, so a capability that should not run is
+        never registered rather than registered-and-refused later.  The
+        template and enabled sets are deep-copied: the registry is immutable
+        and shared for the process lifetime.
+        """
         self._entries = {}
         self._template = deepcopy(template)
         for capability in capabilities:
@@ -277,6 +285,15 @@ class CapabilityRegistry:
         ]
 
     def execute(self, identity, arguments, origin):
+        """Run one capability and validate its output against its contract.
+
+        The capability must be enabled, must be a computing one -- an
+        illustrated task is executed by the patient, not called -- and the
+        arguments are checked against the input schema.  Implementations get a
+        copy with no case object or service registry: a capability computes,
+        it does not reach into the session.  The result is validated too, so
+        a broken capability fails here instead of poisoning the record.
+        """
         if identity not in self._enabled:
             raise ValueError("能力未启用或未注册")
         entry = self._entries[identity]
@@ -313,6 +330,14 @@ class CapabilityRegistry:
         return payload
 
     def interpret_task(self, task_id, text, choice):
+        """Interpret one illustrated-task answer through the task's provider.
+
+        A skip is UNKNOWN/NOT_DONE with the reason carried, decided here once
+        for every task kind; everything else goes to the provider's own
+        interpreter.  The task must be registered and its provider must exist
+        -- an interpretation is only as trustworthy as the content that
+        declared it.
+        """
         from ..core.domain import Assertion, ObservationQuality, Source
         from ..clinical.interpreter import Interpretation
 

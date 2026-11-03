@@ -26,6 +26,13 @@ def validate_references(references):
 
 
 def validate(value, schema, path="input"):
+    """Validate a value against a capability contract, naming the path.
+
+    The type check runs first and every failure names its path ("input.x"),
+    so a model that sent the wrong shape learns exactly which field was
+    wrong.  Numbers must be finite: JSON has no NaN, and an infinity would
+    poison every calculation downstream.
+    """
     kind = schema.get("type")
     valid = {
         "object": lambda: isinstance(value, dict),
@@ -68,6 +75,13 @@ def validate(value, schema, path="input"):
 
 
 def validate_schema(schema):
+    """Check that a capability declares a contract this engine can enforce.
+
+    The supported keyword set is closed -- an unsupported keyword would be
+    silently unenforced, which is worse than refusing the capability.  Every
+    property inside is validated recursively, so a bad nested schema fails
+    at load rather than at execution.
+    """
     if not isinstance(schema, dict) or schema.get("type") not in {
         "object",
         "array",

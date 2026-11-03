@@ -129,6 +129,12 @@ else:
             # file/device IDs to zero. Query fresh IDs so comparisons with a
             # subsequently opened handle detect replacement without rejecting
             # every ordinary file as changed.
+            """Re-stat this directory entry freshly, on Windows.
+
+            DirEntry caches enumeration metadata and zeroes file and device ids,
+            which would make every ordinary file look replaced.  The ids are
+            queried fresh so the identity comparison sees the real values.
+            """
             info = os.stat(self.path, follow_symlinks=follow_symlinks)
             if not follow_symlinks and info.st_file_attributes & 0x400:
                 values = {
@@ -179,6 +185,14 @@ else:
             return getattr(_os, name)
 
         def open(self, path, flags, mode=0o777, *, dir_fd=None):
+            """Open a file relative to a directory descriptor, Windows-style.
+
+            The POSIX semantics the POSIX-side code relies on are reproduced with
+            the Windows API: a directory gets pinning share flags so its identity
+            is stable, regular files allow replacement, and the no-follow flag is
+            honoured through FILE_FLAG_OPEN_REPARSE_POINT.  The access mask is
+            built from the POSIX flags rather than asked for in full.
+            """
             directory = bool(flags & self.O_DIRECTORY)
             nofollow = bool(flags & self.O_NOFOLLOW)
             access = 0x100000 | 0x80  # SYNCHRONIZE | FILE_READ_ATTRIBUTES
@@ -279,6 +293,13 @@ else:
             )
 
         def stat(self, path, *, dir_fd=None, follow_symlinks=True):
+            """Stat a path relative to a directory descriptor, through the kernel API.
+
+            CPython's path-stat on Windows reports birth time as ctime while fstat
+            reports metadata change time -- the two sides of the
+            replacement/content comparisons must agree, so both are queried the
+            same way, through the opened object.
+            """
             if isinstance(path, int):
                 return _os.fstat(path)
             name = child_path(path, dir_fd) if dir_fd is not None else path

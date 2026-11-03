@@ -95,6 +95,13 @@ def _png_is_complete(data: bytes) -> bool:
 
 
 def _jpeg_dimensions(data: bytes) -> tuple[int, int] | None:
+    """Read a JPEG's pixel dimensions out of its start-of-frame marker.
+
+    The walk follows the marker chain properly -- padding bytes skipped,
+    segments length-tracked -- so a hand-crafted file cannot make the reader
+    report dimensions from arbitrary bytes.  None means "not a JPEG", which
+    the caller treats as one candidate among three.
+    """
     if len(data) < 4 or not data.startswith(b"\xff\xd8\xff"):
         return None
     offset = 2
@@ -157,6 +164,13 @@ def _webp_dimensions(data: bytes) -> tuple[int, int] | None:
 
 
 def inspect_image(data: bytes) -> InspectedImage:
+    """Inspect an uploaded image: type, size and dimensions, before anything else.
+
+    The ceiling is checked before the format, empty input is refused with its
+    own message, and the format is detected from the bytes rather than the
+    filename -- an extension is a claim, the magic number is the fact.  Only
+    JPEG, PNG and WebP are accepted, and the refusal says so.
+    """
     if not isinstance(data, bytes) or not data:
         raise MedicalImageError("图片内容为空")
     if len(data) > MAX_IMAGE_BYTES:
@@ -212,6 +226,14 @@ def _short_text(value: Any, maximum: int, *, allow_empty: bool = False) -> str:
 
 
 def validate_recognition(value: Any) -> dict[str, Any]:
+    """Validate a recognition result against its versioned contract.
+
+    The shape is exact, the version pinned, and every field is bounded --
+    document type to short text, numbers to a capped list -- because this
+    comes from a model and is about to be attached to a patient's archive.
+    A field the renderer does not know is data loss; a number the parser
+    cannot re-read is a wrong value in a record.
+    """
     if not isinstance(value, dict) or set(value) != {
         "schema",
         "document_type",
@@ -336,6 +358,14 @@ class DeepSeekVisionRecognizer:
         model: str = "deepseek-flash",
         retry_backoff_seconds: float = 0.5,
     ):
+        """Configure the vision transport, refusing endpoints that leak.
+
+        The URL may not carry credentials, a query or a fragment -- those end
+        up in logs -- and the retry backoff is bounded so a misconfigured
+        deployment cannot turn one failed recognition into a minute of
+        retries.  A provider-specific suffix is stripped so the same base URL
+        works across providers.
+        """
         parsed = urlparse(base_url)
         if parsed.scheme not in {"http", "https"} or not parsed.hostname:
             raise ValueError("视觉模型地址无效")
@@ -367,6 +397,12 @@ class DeepSeekVisionRecognizer:
         self.last_validation_rule: str | None = None
 
     def recognize(self, image: InspectedImage) -> dict[str, Any]:
+        """Send one image to the vision model and return its fixed-shape answer.
+
+        The image is base64-inlined with its detected mime type, temperature is
+        zero and the response format is forced to JSON -- recognition feeds the
+        archive, and a creative answer is worse than a failed one.
+        """
         encoded = base64.b64encode(image.data).decode("ascii")
         payload = {
             "model": self.model,

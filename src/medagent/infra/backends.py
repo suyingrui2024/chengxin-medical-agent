@@ -225,6 +225,13 @@ class CompatibleBackend:
     name = "compatible"
 
     def __init__(self, events: EventStore, config: Dict[str, str] = None) -> None:
+        """Configure the OpenAI-compatible transport, endpoint first.
+
+        The base URL must be HTTPS or loopback -- a plaintext remote endpoint
+        would carry the API key and the patient's words in the clear -- and it
+        is stored without credentials so it can appear in event payloads.  The
+        token ceiling is bounded because it bounds what one decision can cost.
+        """
         self.events = events
         settings = config if config is not None else os.environ
         self.base_url = settings["MEDAGENT_LLM_BASE_URL"].rstrip("/")
@@ -288,6 +295,14 @@ class CompatibleBackend:
         return self._decide(session_id, messages, cancelled)
 
     def _decide(self, session_id, messages, cancelled=None):
+        """Ask the model for one decision, or raise the two interrupts.
+
+        A cancelled turn raises DecisionInterrupted before the request is sent.
+        The request forces a JSON object response, and the transport details
+        that vary by host (a thinking budget on DeepSeek) are keyed off the
+        host rather than configured separately, because they are properties of
+        the endpoint, not of this deployment.
+        """
         if cancelled is not None and cancelled.is_set():
             raise DecisionInterrupted()
         payload = {
@@ -474,6 +489,13 @@ class DshBackend:
     def __init__(
         self, events: EventStore, project_root: Path, config: Dict[str, str] = None
     ) -> None:
+        """Configure the DSH bridge: the project root is the trust boundary.
+
+        The bridge runs the SDK from this root, so the root is resolved and
+        kept -- everything the bridge may touch is inside it.  The endpoint
+        rules are the same as the compatible backend's, and the bridge
+        inherits them rather than re-deciding.
+        """
         self.events = events
         self.root = project_root.resolve()
         settings = config if config is not None else os.environ
@@ -528,6 +550,13 @@ class DshBackend:
         return self._decide(session_id, messages, cancelled)
 
     def _decide(self, session_id, messages, cancelled=None):
+        """Run one decision through the bridge process, recording the request.
+
+        The request event is appended before the bridge runs, so a decision
+        that is interrupted -- the parent owns the disposable root even when
+        the bridge is killed -- still has the request in the log to be read
+        against whatever the bridge managed to do.
+        """
         if cancelled is not None and cancelled.is_set():
             raise DecisionInterrupted()
         self.events.append(
@@ -549,6 +578,14 @@ class DshBackend:
 
     def _bridge_decision(self, session_id, messages, cancelled, started, scratch):
         # JSON is passed via stdin, never interpolated into a command or argv.
+        """Drive the bridge process for one decision and read its answer.
+
+        JSON goes in on stdin, never interpolated into a command or argv -- the
+        patient's words are data, not code.  The call is serialised under a
+        lock because the bridge is one process, and cancellation is checked
+        again after the lock, so an interrupted turn does not queue behind
+        itself.
+        """
         with self._process_lock:
             if self._closed:
                 raise RuntimeError("DSH backend is closed")

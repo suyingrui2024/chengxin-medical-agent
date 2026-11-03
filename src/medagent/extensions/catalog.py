@@ -210,6 +210,13 @@ class Entry:
 
 
 def _parse() -> List[Entry]:
+    """Parse the embedded department catalog, refusing anything unregistered.
+
+    Every row must have exactly eight fields, and its kind, audience and
+    status must be already-registered values -- a typo in the embedded data
+    is an import-time error, not a capability that quietly never appears.
+    Duplicate codes and ids are refused too.
+    """
     entries: List[Entry] = []
     seen_codes: set = set()
     seen_ids: set = set()

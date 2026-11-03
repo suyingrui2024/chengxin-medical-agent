@@ -65,6 +65,13 @@ def subagent_kind_modes(source) -> dict:
 
 
 def read_env(path):
+    """Read a .env file with shell quoting rules and export-prefix tolerance.
+
+    Values go through shlex, so quoted secrets keep their spaces and comments
+    are stripped the way the shell would -- an operator writing
+    KEY="value # not a comment" gets the value they meant.  A syntax error
+    names the line, because the file is hand-edited.
+    """
     settings = {}
     for index, line in enumerate(
         Path(path).read_text(encoding="utf-8-sig").splitlines(), 1

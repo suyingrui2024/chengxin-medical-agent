@@ -96,6 +96,13 @@ def serialize_state(state: CaseState) -> Dict[str, Any]:
 
 
 def restore_state(payload: Dict[str, Any]) -> CaseState:
+    """Rebuild a CaseState from a persisted record, refusing other schemas.
+
+    The schema check comes first -- a record written by a different version
+    must not be half-interpreted.  Fields are restored by name from the
+    dataclass, with the structured ones (facts, history) rebuilt through
+    their own constructors so an old shape fails at the boundary.
+    """
     if payload.get("schema") != SCHEMA:
         raise ValueError(f"unsupported session schema: {payload.get('schema')!r}")
     raw = payload["state"]
