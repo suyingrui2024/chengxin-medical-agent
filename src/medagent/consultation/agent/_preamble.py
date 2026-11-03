@@ -163,6 +163,17 @@ def _strip_denied_items(text: str, facts: Mapping[str, Any]) -> str:
 
 
 def _filter_question_clauses(text: str, recorded: List[str]) -> str:
+    """Drop the options the patient has already denied from a question.
+
+    "有没有发烧、咳嗽" becomes "有没有咳嗽" once the patient has denied a
+    fever.  Only clauses that actually ask "is there ..." are touched, and
+    clauses carrying a purpose marker are left alone -- rewriting those would
+    change what the question is for, not what it asks.
+
+    If every option in a clause is denied, the clause is dropped; if that
+    would empty the whole text, the original is returned instead, because an
+    empty question is worse than a repeated one.
+    """
     clauses = re.split(r"(？|\?|；|;)", text)
     out: List[str] = []
     index = 0

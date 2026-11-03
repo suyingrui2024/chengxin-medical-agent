@@ -42,6 +42,25 @@ class AdaptiveConsultationEngineCore:
     def __init__(
         self, *args, backend: DecisionBackend, subagent_coordinator=None, **kwargs
     ):
+        """Assemble the engine's immutable catalogue and its static prompt prefix.
+
+        Everything built here is per-engine and case-independent: the tool
+        definitions, the fact schema, the question and self-check catalogues, the
+        capability list, and the prompt prefix.  It exists so a provider can
+        reuse one KV prefix across every case -- it caches no patient answer and
+        no decision.
+
+        Which tools are *advertised* to the model is deliberately not decided
+        here.  The subagent coordinator is injected after construction (server
+        startup, or when settings attach it), so a tool list frozen now would
+        advertise ``spawn_subagent`` exactly never, and would keep advertising
+        it after the coordinator was detached.  The advertisement is resolved at
+        message-build time instead.
+
+        ``subagent_coordinator`` may be None: the spawn tool is then simply
+        unavailable, which is the state every construction path outside the
+        server should be in.
+        """
         super().__init__(*args, **kwargs)
         self.backend = backend
         # Optional medagent.subagents.SubagentCoordinator; None keeps the
@@ -271,6 +290,17 @@ class AdaptiveConsultationEngineCore:
         return {"present": present, "absent_or_unknown_value": None}
 
     def create_session(self, request_id=None):
+        """Open a case and ask the opening question.
+
+        The first question is always the chief complaint, and the reply's
+        message is replaced with an open invitation: the engine has no chief
+        complaint yet, and a generated prompt would assert one.
+
+        The ``agent.started`` event carries the policy version and the prompt
+        hash, so an audit record can be matched to the code and the prompt that
+        produced it.  The trace is cleared in a ``finally``: a failed opening
+        must not leave the session bound to a trace nobody will close.
+        """
         trace_id = str(uuid4())
         state = self._create_state(trace_id, request_id)
         try:
@@ -401,6 +431,17 @@ class AdaptiveConsultationEngineCore:
             )
 
     def submit(self, session_id, user_input):
+        """Take one patient turn.
+
+        This is the engine's public entry: it serialises the turn against the
+        session lock, rejects an input aimed at a stale page, registers the
+        turn so an in-flight decision can be interrupted, and binds the trace
+        the reply will be recorded under.
+
+        The trace is unbound and the turn deregistered in a ``finally``, so a
+        turn that raises leaves no live turn behind for the next one to trip
+        over.
+        """
         state = self.state(session_id)
         with self._session_locks[session_id]:
             self._interrupt_or_reject(
@@ -608,6 +649,19 @@ class AdaptiveConsultationEngineCore:
         ]
 
     def _deliver(self, state: CaseState, reply: AgentReply, turn_id: str) -> AgentReply:
+        """Publish one reply and remember it as this session's latest.
+
+        Three adjustments happen here and nowhere else: the "continue the
+        self-check" affordance is offered while the suspend cap allows it, a
+        service error is turned into a retry button, and the pending input is
+        cleared -- except after a subject change, where the earlier turn is
+        still owed to the model.
+
+        The self-check affordance stops at the suspend cap on purpose.  Without
+        the button the stale-action check also rejects a fabricated resume
+        choice for the capped frame, so offering it would only let the patient
+        retry an action the engine will refuse.
+        """
         # The resume affordance is not offered past the suspend cap:
         # without the button, the stale-action check also rejects a
         # fabricated resume choice for the capped frame.

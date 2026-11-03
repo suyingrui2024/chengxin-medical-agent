@@ -5,6 +5,20 @@ from ._preamble import CaseState, subject_profile
 
 class AdaptiveConsultationEngineContext:
     def _context(self, state: CaseState, text: str) -> Dict[str, Any]:
+        """Build the state view the model reasons over.
+
+        This is the engine's answer to "what does the model know right now":
+        the recorded facts with their provenance, the questions still worth
+        asking, the blocking fields that are still missing, the self-check
+        tasks that apply, and any pathway exploration in flight.
+
+        Two things here are deliberate.  ``patient_goal`` is a blocking field
+        like any other -- excluding it let an abstained summary close with the
+        patient's goal never recorded (healthcheck P1-A-D1).  And
+        ``earlier_source_turns`` only carries turns whose text is not already
+        in the recent transcript, so the model is not handed the same sentence
+        twice under two names.
+        """
         chief = str(state.get("chief_complaint", ""))
         candidates = self._candidate_questions(state, chief)
         active_question = next(

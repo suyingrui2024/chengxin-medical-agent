@@ -655,6 +655,23 @@ class AdaptiveConsultationEngineSubmit:
         new_text: str,
         expected_fact_id: Optional[str] = None,
     ) -> AgentReply:
+        """Correct one recorded fact from the interface.
+
+        The correction is written as a new record with ``correction=True``, so
+        the original stays in the history and the audit trail shows what was
+        said before.  The patient's own words are the source: the model is not
+        asked to interpret them, and an ungrounded model value is never
+        accepted here.
+
+        A closed case is read-only -- except one routed to emergency, where the
+        route was decided by the text that caused it and an edit cannot
+        retract it.  Without that exemption this override would silently
+        rewind CLOSED to HISTORY, forking the case away from its conclusion
+        sheet and orphaning its follow-up plan.
+
+        The case is re-triaged afterwards, and an emergency found by the
+        correction goes through the same dispatch as any other emergency turn.
+        """
         # Explicit UI correction remains available; it does not use ungrounded model values.
         state = self.state(session_id)
         with self._session_locks[session_id]:

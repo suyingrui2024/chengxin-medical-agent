@@ -19,6 +19,27 @@ from ._preamble import (
 
 class AdaptiveConsultationEngineRun:
     def _run(self, state: CaseState, text: str, turn_id: str) -> AgentReply:
+        """Run the model loop until the turn has an answer to deliver.
+
+        At most six steps: each one is a tool call, and a step that fails in a
+        repairable way -- a malformed decision envelope -- is fed back to the
+        model as a tool result inside the same round rather than ending the
+        turn.  A cancellation returns the session's latest reply unchanged.
+
+        Two gates shape what may be recorded.  Writes are capped at two per
+        round, except a correction-only retry, which is the model fixing items
+        it already proposed and was rejected for.  And the emergency assessment
+        happens *after* the facts land, never before: a gate that closed on
+        "asked" minimum facts would close the case while the answer that
+        settles it was still in flight.
+
+        The summary is projected rather than requested once every blocking
+        field -- the patient's goal included -- is recorded; the same gate and
+        the same confirmation still apply.  One exception stays outside that
+        projection: a pathway whose detail facts were never probed is asked
+        first, because the pathway's term list is wider than the question
+        catalog's and ``missing_required`` cannot see that gap.
+        """
         if state.calculation_feedback:
             state.calculation_feedback["processing"] = (
                 text == state.calculation_feedback["text"]

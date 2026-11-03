@@ -59,6 +59,11 @@ jobs:
       # when a document is missing from it.
       - name: Enforce the docs index
         run: python scripts/lint/docs_index.py --check
+      # A function of 25 lines or more has to say what it guarantees, what
+      # it touches and when not to call it. The baseline freezes today's
+      # gaps: only the ones fixed can leave it.
+      - name: Enforce function docstrings
+        run: python scripts/lint/docstrings.py
       # Undefined names and broken annotations are cheap to catch and were the
       # one class of defect the suite could not: a skipped test hid a
       # `threading` that was never imported.

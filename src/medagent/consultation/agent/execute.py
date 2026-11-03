@@ -70,6 +70,17 @@ class AdaptiveConsultationEngineExecute:
     def _tool_change_subject(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Start a consultation for somebody else.
+
+        The evidence has to be a verbatim quote from this turn, and the switch
+        has to be explicit: a mention of a relative is not a change of
+        subject.  ``compatible`` decides that -- a way of naming the current
+        patient more precisely is a clarification, not a second case, and
+        ordinary family history must never be read as one.
+
+        With no subject established yet there is nothing to switch away from,
+        so the proposal is refused rather than accepted as a first subject.
+        """
         evidence = args["evidence"]
         if (
             not isinstance(evidence, str)
@@ -136,6 +147,17 @@ class AdaptiveConsultationEngineExecute:
     def _tool_request_self_check(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Queue a self-check task the patient still has to do.
+
+        The task must be a registered one that applies to this complaint and
+        whose result is not already recorded, and the evidence must quote this
+        turn.  A task already pending is not queued twice -- the patient
+        should not be asked for the same measurement twice because the model
+        mentioned it again.
+
+        The request is recorded as an event, so the pending list is auditable
+        rather than only in memory.
+        """
         task_id, evidence = args["task_id"], args["evidence"]
         task = next(
             (
@@ -181,6 +203,21 @@ class AdaptiveConsultationEngineExecute:
     def _tool_spawn_subagent(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Derive a subagent for evidence lookup or a second opinion.
+
+        The model may only propose the two kinds it owns.  Controller-only
+        kinds -- ``case_digest`` and the rest -- are refused with an
+        explanation rather than silently accepted, because a model that
+        proposes them is asking for something it cannot have.
+
+        At most one subagent per round.  With no coordinator attached the tool
+        reports itself unavailable, which is a normal state, not an error.
+
+        In shadow mode the run happens and is recorded as events, but nothing
+        it produced enters the context.  In advisory mode a blinded second
+        opinion whose tendency disagrees with the case's current risk group is
+        surfaced to the main model as a flag -- never to the patient.
+        """
         task_kind = args.get("task_kind")
         if not isinstance(task_kind, str) or task_kind not in MODEL_SPAWN_TASK_KINDS:
             return {
@@ -643,6 +680,22 @@ class AdaptiveConsultationEngineExecute:
     def _tool_ask_question(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Ask one of the registered questions.
+
+        The question must apply to the current complaint and must not already
+        be answered -- a field that needs checking is a clarification, not a
+        repeat of the question that recorded it.
+
+        The model may phrase the question but not choose it: what to ask next
+        is the ranker's call (P0), and a proposal outside the ranker's
+        validated candidates is refused so the self-correction loop can
+        re-propose.  Clarification rounds, follow-ups of the active question
+        and pending emergency clarifications are exempt.
+
+        A pending self-check the patient already asked for comes first: it
+        satisfies a condition the patient set, and it is answered before a
+        new question is asked.
+        """
         if (
             state.pending_self_checks
             and not state.self_check_conversation
@@ -688,6 +741,23 @@ class AdaptiveConsultationEngineExecute:
     def _tool_ask_patient(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Ask a question the model wrote.
+
+        A model-written question has to carry its own bridging sentence and a
+        "why am I asking" half-sentence, so the patient hears a reason rather
+        than a form.  That is enforced only when there is a fact to anchor it
+        to: an opening round has nothing to anchor on, and forcing it there
+        would loop the self-correction instead of helping.  The host-side
+        bridge is the fallback, and it never stacks on a question that already
+        bridges itself.
+
+        The topic must be a registered field.  Legality comes from the
+        registered field set rather than the dynamic candidate list: a
+        colloquial complaint may never have made the most important field a
+        candidate, and a field that is already recorded may still need a
+        targeted follow-up -- that answer lands as a correction, which the
+        context flags.
+        """
         if state.self_check_conversation:
             raise ProposalError("图示交互进行中；先用固定问题澄清或接续当前图示")
         if (
@@ -810,6 +880,22 @@ class AdaptiveConsultationEngineExecute:
     def _tool_clarify(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Ask the patient a short clarifying question.
+
+        A clarification is bounded on purpose.  The topic must be registered,
+        the message is 2 to 160 characters, and the same topic may be
+        clarified at most twice -- after that the answer stays unknown, and
+        asking a third time is how a consultation stalls.
+
+        The message may not carry a prescription, an exclusionary conclusion
+        or a self-check instruction.  A completed emergency screen may not be
+        asked again verbatim either: a follow-up has to say it is a follow-up
+        and ask only the uncovered items.
+
+        The body-location task is exempt from the bridging-sentence rule --
+        its messages are short task prompts, and a bridge would break the
+        format.
+        """
         topic, message = args.get("topic"), args.get("message")
         fields = {q.fact_key for q in self.content.questions}
         frame = state.self_check_conversation
@@ -878,6 +964,18 @@ class AdaptiveConsultationEngineExecute:
     def _tool_show_self_check(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Show a self-check task, or resume the one already in progress.
+
+        Asking for the task that is already on screen resumes it rather than
+        restarting it.  When the same task has been suspended as often as the
+        cap allows, the task is cleared, the pending request is dropped and a
+        ``self_check.suspend_cap_reached`` event is recorded -- the patient
+        stops being asked, and the reason is auditable.
+
+        A different task cannot be opened while one is in progress; it can be
+        registered as pending instead.  A task that does not apply to this
+        complaint, or whose result is already recorded, is refused.
+        """
         if state.self_check_conversation and state.self_check_conversation["task"][
             "id"
         ] == args.get("task_id"):
@@ -932,6 +1030,18 @@ class AdaptiveConsultationEngineExecute:
     def _tool_review_summary(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
+        """Summarise the case and move it into the conclusion flow.
+
+        A pathway the chief complaint triggered but never probed blocks the
+        close, unless the model states why the pathway does not apply
+        (``abstain_reason``, 1 to 200 characters).  The gate covers the first
+        close only: re-summarising a case that already reached the summary or
+        closed stage -- a fact correction replayed -- is not a silent close.
+
+        Abstaining excuses that pathway's own detail fields and nothing else.
+        Every other unattempted field still blocks, because the stated reason
+        is precisely "this pathway's details will not be probed".
+        """
         if state.self_check_conversation:
             raise ProposalError("原图示任务尚未处理。可show_self_check接续，由患者完成或跳过；也可先澄清病史。")
         abstain_reason = args.get("abstain_reason")
