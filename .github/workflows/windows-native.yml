@@ -1,5 +1,21 @@
 name: Native Windows desktop
 on:
+  # The full Windows acceptance takes most of an hour, so it does not run on
+  # every pull request.  It runs nightly, and on a pull request that touches
+  # the code the acceptance actually exercises: the engine, the desktop shell
+  # and the packaging scripts.  Everything else is covered by the Linux gate.
+  schedule:
+    - cron: "30 21 * * *" # 05:30 Beijing time, before the working day
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/medagent/**"
+      - "desktop/**"
+      - "integrations/dsh/**"
+      - "scripts/platform/windows/**"
+      - "scripts/app/**"
+      - "package.json"
+      - ".github/workflows/windows-native.yml"
   workflow_dispatch:
     inputs:
       deadline_diagnostic:
@@ -14,7 +30,7 @@ permissions:
   contents: read
 jobs:
   deadline-diagnostic:
-    if: ${{ inputs.deadline_diagnostic }}
+    if: ${{ github.event_name != 'pull_request' && inputs.deadline_diagnostic }}
     name: Windows 11 command deadline investigation (source only)
     runs-on: windows-11-arm
     timeout-minutes: 15

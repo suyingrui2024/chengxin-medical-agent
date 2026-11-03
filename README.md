@@ -20,7 +20,7 @@ Python 3.10+；DSH 模式另需 Node 22.19+。以下命令从项目根目录运�
 | --- | --- | --- | --- |
 | Windows 10 19044+／Windows 11 x64 | 已验证的原生桌面版；Windows 11 Arm 可运行 x64 应用 | 在 PowerShell 执行 `scripts/platform/windows/windows.ps1 -Mode Setup`。脚本下载项目专用 Python、Node、Electron 与原生执行器，并创建桌面快捷方式；`scripts/config/windows/03-configure-full.ps1` 生成两层本地配置。 | 双击桌面“知微”，或执行 `scripts/platform/windows/windows.ps1 -Mode Start`。 |
 | Ubuntu／其他 Linux x64 | 已验证 Linux x64 的源码版与桌面打包版 | 准备系统 Python 3.10+；DSH 模式另需系统 Node 22.19+。从源码运行时执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`；`./scripts/config/ubuntu/03-configure-full.sh` 生成两层本地配置。 | 双击“知微.desktop”，或执行 `./scripts/app/start-desktop.sh`。打包目录也必须完整保留。 |
-| macOS（Apple Silicon／Intel） | 可从源码启动开发版；尚无安装器、打包产物或 CI 验收 | 准备 Python 3.10+ 和 Node 22.19+（Homebrew 可执行 `brew install node@22`），再执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`。可运行 `./scripts/config/macos/03-configure-full.sh` 生成两层本地配置。 | 执行 `./scripts/app/start-desktop.sh`；读取项目 `.env` 时执行 `./scripts/app/start-desktop.sh --live`。启动器会优先使用 Homebrew 的 `node@22`。 |
+| macOS（Apple Silicon／Intel） | 可从源码启动开发版；CI 跑 Python 全量 + 结构门禁 + 前端单测 + 单文件浏览器冒烟（无安装器/打包产物） | 准备 Python 3.10+ 和 Node 22.19+（Homebrew 可执行 `brew install node@22`），再执行 `npm ci --ignore-scripts` 和 `npm run desktop:setup`。可运行 `./scripts/config/macos/03-configure-full.sh` 生成两层本地配置。 | 执行 `./scripts/app/start-desktop.sh`；读取项目 `.env` 时执行 `./scripts/app/start-desktop.sh --live`。启动器会优先使用 Homebrew 的 `node@22`。 |
 
 上述桌面快捷方式和启动器只提供“点击启动”，不设置登录后或开机自动启动。Windows 的安装与完整验收范围见 [Windows 原生环境与验收](docs/Windows原生环境与验收.md)，Linux 的打包与验证细节见 [桌面版使用、打包和验证](docs/桌面应用使用与打包.md)。
 
@@ -308,6 +308,19 @@ npm run test:python          # 等价于 PYTHONPATH=src python3 -m pytest tests 
 
 # 同上 + branch 覆盖率（当前 85%）
 npm run test:coverage
+
+## CI 拓扑
+
+三条 workflow，各管一层：
+
+| Workflow | 平台 | 触发 | 管什么 |
+|---|---|---|---|
+| `main-quality` | ubuntu-24.04 | push / PR（main） | Python 全量、结构门禁（R1–R7 + 尺寸 + docstrings + 版本 + 文档索引）、前端单测、浏览器全量（4 shard） |
+| `main-quality` › `macos-smoke` | macos-15 | 同上 | 开发平台的冒烟：Python 全量 + 门禁 + 单文件浏览器（防"只在 Linux 上成立"的假设） |
+| `windows-native` | Windows 11 Arm | 每日 05:30 北京时间 / 触及 `src/medagent`、`desktop/`、打包脚本的 PR / 手动 | 桌面、安装器、原生隔离的完整验收 |
+
+结构性规则的完整清单见 `scripts/lint/`（naming R1–R5、import_rules R1–R7、
+module_size、function_size、docstrings、version、asset_size、docs_index）。
 
 # 架构门禁：单文件行数 + 依赖方向 + 大文件（CI 第一步，失败即停）
 npm run lint:structure

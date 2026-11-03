@@ -154,3 +154,50 @@ jobs:
           path: test-results/ui-${{ matrix.shard }}
           retention-days: 7
           if-no-files-found: ignore
+
+  # macOS is the development machine and has no packaging story, so it gets
+  # a smoke rather than the full pipeline: the Python suite, the frontend
+  # unit tests, every structural guard, and one browser spec file.  The
+  # browser suite's logic is platform-independent; what the macOS job is for
+  # is catching "works on the dev machine only" assumptions in the Python
+  # and Node layers.
+  macos-smoke:
+    name: macOS smoke (dev platform)
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.23.3
+          cache: npm
+      - name: Install dependencies
+        run: |
+          python -m pip install --quiet pytest ruff
+          npm ci --ignore-scripts
+          npx playwright install chromium
+      - name: Structural guards
+        run: |
+          python scripts/lint/module_size.py
+          python scripts/lint/function_size.py
+          python scripts/lint/import_rules.py
+          python scripts/lint/naming.py
+          python scripts/lint/asset_size.py
+          python scripts/lint/version.py
+          python scripts/lint/docs_index.py --check
+          python scripts/lint/docstrings.py
+          python -m ruff check src tests scripts
+      - name: Python suite
+        env:
+          PYTHONPATH: src
+        run: python -m pytest tests -q
+      - name: Frontend unit tests
+        run: npm run test:unit
+      - name: Browser smoke (one spec file, fresh server)
+        env:
+          UI_PORT: 18766
+          UI_OUTPUT_DIR: test-results/ui-smoke
+        run: npx playwright test --config playwright.ci.config.mjs --reporter=line workspace
