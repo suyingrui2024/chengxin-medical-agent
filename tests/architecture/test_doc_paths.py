@@ -22,8 +22,11 @@ REFERENCE = re.compile(r"src/medagent/[\w/]+\.py")
 #: A row of the mapping table: | `old` | `new` |
 ROW = re.compile(r"^\|\s*`(src/medagent/[\w/]+\.py)`\s*\|\s*`([^`]+)`\s*\|$", re.M)
 
-#: Generated evaluation output, vendored trees and project metadata are not docs.
-SKIP_PARTS = ("docs/evaluations", "node_modules", ".git")
+#: Generated evaluation output, vendored trees and project metadata are not
+#: docs.  The agent's own working notes are not docs either: they exist to
+#: record what happened, including paths that were deleted on the way -- which
+#: is exactly what this rule would flag.
+SKIP_PARTS = ("docs/evaluations", "node_modules", ".git", ".workbuddy")
 
 #: ``xxx`` is the conventional placeholder for "some module here" — the mapping
 #: table's intro and the notes pointing at it use it. It is not a claim that a
