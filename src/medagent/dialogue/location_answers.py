@@ -11,6 +11,15 @@ LABELS = {"region": "部位", "area": "具体位置", "side": "左右", "extent"
 
 
 def validate_answer_contract(task):
+    """Check that a task's location-answer contract matches this renderer.
+
+    The contract is versioned, the field order is the renderer's, and every
+    option list is bounded with machine-readable codes -- the component is
+    generated from this data, so a field the component does not know would
+    render as nothing at all.  The refusal message tells the patient the
+    component is incompatible, because that is a version problem, not
+    something they answered wrong.
+    """
     contract = task.get("answer_contract")
     if contract is None:
         return
@@ -154,6 +163,16 @@ def validate_draft_evidence(spec, raw, evidence, quotes, source_scope, region):
 
 
 def normalize_answers(spec, raw, complete=True):
+    """Turn the component's raw answer into one fact-shaped value per field.
+
+    No field outside the contract is accepted, and a complete answer must
+    cover every field -- with "说不清" as an explicit choice, so an unknown
+    is a decision the patient made, never a blank.  Free-text areas are
+    length-bounded; presets must name a value the contract listed.
+
+    The result is assertion-shaped ("unknown" stays unknown), ready to be
+    recorded without a second interpretation pass.
+    """
     if not isinstance(raw, dict) or set(raw) - set(spec["fields"]):
         raise ValueError("定位答案包含未提问的字段。")
     if complete and set(raw) != set(spec["fields"]):
@@ -203,6 +222,17 @@ def normalize_answers(spec, raw, complete=True):
 
 
 def project_answer(spec, answers, note):
+    """Project a confirmed answer into the text and structure the record stores.
+
+    The text is the patient's answer in field labels, plus their note --
+    the wording the sheet shows is the wording they confirmed, not a
+    paraphrase.  A prefill (the model's proposal) is carried through with
+    its full provenance, so a location the model proposed and the patient
+    accepted stays traceable to the proposal.
+
+    input_method records that the controls were confirmed -- the difference
+    between an answer given by tapping and one parsed out of prose.
+    """
     if not isinstance(note, str) or len(note) > 200:
         raise ValueError("定位补充最多200字。")
     normalized = normalize_answers(spec, answers)

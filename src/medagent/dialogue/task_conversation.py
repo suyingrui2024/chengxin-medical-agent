@@ -95,6 +95,14 @@ class TaskConversationMixin(LocationRevisionMixin):
             state.self_check_conversation = None
 
     def _suspend_task_conversation(self, state, turn_id):
+        """Suspend the open task and keep everything needed to resume it.
+
+        The frame carries a deep copy of the task as it was offered -- rebuilt
+        from the event log when the latest reply does not have it, so the
+        interaction id the patient answers against survives the suspension.
+        The previous fact is kept too: resuming verifies the task still
+        applies to the same answer.
+        """
         identity = state.active_task
         frame = state.self_check_conversation
         if not frame:
@@ -138,6 +146,13 @@ class TaskConversationMixin(LocationRevisionMixin):
         )
 
     def _task_conversation_context(self, state):
+        """The context block the reply carries about an open or suspended task.
+
+        Everything the UI needs to render the task -- its id, the interaction
+        it answers, whether a model proposal is waiting -- plus the two
+        special states: a revision in progress names the fact it revises, and
+        a pending answer request names the fields it still needs.
+        """
         frame = state.self_check_conversation
         if not frame:
             return None
@@ -166,6 +181,14 @@ class TaskConversationMixin(LocationRevisionMixin):
         }
 
     def _resume_task_conversation(self, state):
+        """Resume a suspended task, refusing when the case has moved on.
+
+        Three things must still hold: the task applies to the current
+        complaint, the previous fact is the one the suspension recorded, and
+        a repeat task still has its attempt open.  Anything else clears the
+        frame with a reason and tells the patient to choose again -- resuming
+        against a changed case would answer a question that no longer exists.
+        """
         frame = state.self_check_conversation
         if not frame:
             raise ValueError("没有可接续的原图示任务。")
@@ -231,6 +254,14 @@ class TaskConversationMixin(LocationRevisionMixin):
         )
 
     def _clarify_location_task(self, state, message, fields=None):
+        """Re-ask part of the location form without discarding what was given.
+
+        The requested fields are re-asked and everything else is kept as the
+        prefill, with a fresh prefill id so the proposal is traceable.  A
+        revision re-asks the whole location family when only the region was
+        queried, because a new region invalidates the area, side and extent
+        recorded for the old one.
+        """
         spec = answer_spec(self.content.tasks["body_location"], fields)
         reply = self._resume_task_conversation(state)
         frame = state.self_check_conversation
@@ -270,6 +301,17 @@ class TaskConversationMixin(LocationRevisionMixin):
         return reply
 
     def _propose_task_result(self, state, args, text, turn_id):
+        """Accept a model-proposed location, or refuse it and ask the patient.
+
+        The proposal must name an option the task actually offers, quote the
+        patient's own words from this turn verbatim, and stay within the
+        length bound -- an unquoted or over-long evidence is a proposal the
+        patient cannot check.  Only body_location can be proposed: a model
+        never proposes a temperature or a new examination.
+
+        The proposal is recorded as a candidate; the patient confirming it is
+        what turns it into a fact.
+        """
         frame = state.self_check_conversation
         if (
             not frame
@@ -407,6 +449,13 @@ class TaskConversationMixin(LocationRevisionMixin):
         return reply
 
     def _check_task_conversation_action(self, state, user_input):
+        """Check that a resume or confirm action is still the one on screen.
+
+        Both actions must match the frame's id and the session's revision,
+        and a resume must be one of the quick replies actually offered -- so
+        a stale page cannot resume a task that was suspended again, and a
+        confirm cannot land on a candidate the patient has not seen.
+        """
         choice = user_input.choice_value or ""
         if not choice.startswith(("resume_self_check:", "confirm_self_check:")):
             return
@@ -434,6 +483,13 @@ class TaskConversationMixin(LocationRevisionMixin):
             raise StaleActionError("图示核对入口已更新，请使用当前页面；未重复记录。")
 
     def _handle_task_conversation_action(self, state, user_input, turn_id):
+        """Route a resume or a confirm to its handler.
+
+        The confirm path records the proposal as confirmed in the event log
+        before accepting it -- the event carries the proposal id and its
+        source turn, so the record shows the patient confirming a specific
+        proposal, not just a fact appearing.
+        """
         choice = user_input.choice_value or ""
         if choice.startswith("resume_self_check:"):
             return self._resume_task_conversation(state)
@@ -467,6 +523,15 @@ class TaskConversationMixin(LocationRevisionMixin):
         return None
 
     def _prepare_location_answer(self, state, user_input):
+        """Validate a location submission against the open answer request.
+
+        The submission must arrive through the confirmation entry with the
+        current revision, and it may not ride along a calculation -- a
+        location answer and a computation are two different confirmations.
+        A region chosen while more dimensions are still needed is refused with
+        "use the current input card", because recording a broad region alone
+        would lose the follow-up questions.
+        """
         frame = state.self_check_conversation
         spec = frame.get("answer_request") if frame else None
         choice = user_input.choice_value
@@ -517,6 +582,13 @@ class TaskConversationMixin(LocationRevisionMixin):
         return text
 
     def _record_location_answer(self, state, prepared, turn_id):
+        """Record a confirmed location answer as a present fact.
+
+        The quality is NOT_ASSESSED -- the patient told us where it hurts, and
+        no examination happened -- and the structured input travels with the
+        fact so the revision flow can prefill from it later.  The supplement
+        flag reflects whether the patient added a note beyond the fields.
+        """
         from ..guards.self_checks import TaskResult
         from ..clinical.interpreter import Interpretation
         from ..core.domain import Assertion, Source, ObservationQuality

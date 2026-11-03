@@ -3,6 +3,16 @@ from copy import deepcopy
 
 
 def task_with_interaction(task, session_id, action_id, events):
+    """Bind a task to the interaction id the patient will answer against.
+
+    The binding is proven from the event log, not assumed: an offer must
+    appear as an event in this session, and a repeat attempt must have a
+    matching repeat-started event -- otherwise the id falls back to the
+    action id, so a stale or replayed task can never be answered against an
+    interaction that was never offered.
+
+    The task is deep-copied: the caller's task stays as it was.
+    """
     result = deepcopy(task)
     offered = {
         f"offer:{event.event_id}"

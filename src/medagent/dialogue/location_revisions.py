@@ -13,6 +13,14 @@ from .task_intents import task_intent
 
 class LocationRevisionMixin:
     def _location_revision_target(self, state, fact_id, current_input=None):
+        """Check that this fact may still be revised, and return the task and fact.
+
+        Four refusals, each a reason the revision would be wrong rather than
+        merely late: the fact is not the one named, the task no longer applies
+        to this complaint, the case has escalated to urgent or emergency, or
+        an emergency screening fact is already recorded.  A revision never
+        runs against a case that has moved on.
+        """
         fact = state.facts.get("symptom_location")
         task = self.content.tasks.get("body_location")
         if (
@@ -55,6 +63,16 @@ class LocationRevisionMixin:
         return {"fact_id": fact.fact_id, "choice": f"revise_location:{fact.fact_id}"}
 
     def _check_location_revision_action(self, state, user_input):
+        """Intercept the turn for a revision start, cancel or out-of-order action.
+
+        While a revision is open, confirming the summary is a stale action and
+        is refused -- the revision has to be finished or cancelled first, or
+        the summary would confirm a location the patient is mid-way through
+        changing.
+
+        A "skip" during an open revision is a cancellation, not a skip: the
+        patient saying "leave it" must not read as "no answer".
+        """
         choice = user_input.choice_value or ""
         frame = state.self_check_conversation or {}
         editing = frame.get("revision_resume")
@@ -87,6 +105,14 @@ class LocationRevisionMixin:
 
     @staticmethod
     def _location_record_answers(task, fact):
+        """Re-shape a recorded location fact into the revision form's answers.
+
+        The recorded fact and the form speak different shapes -- the fact has
+        an assertion and possibly a reported text, the form wants kind/value
+        pairs the component can prefill.  The mapping is lossless where the
+        fact allows it and falls back to "unknown" where it does not, so a
+        revision never starts with an answer the patient did not give.
+        """
         structured = fact.structured_input or {}
         answers = {}
         regions = {x["value"] for x in task["options"] if x["value"] != "skip"}
@@ -126,6 +152,14 @@ class LocationRevisionMixin:
         return answers
 
     def _start_location_revision(self, state, fact_id, turn_id, current_input=None):
+        """Open a revision with the recorded answer prefilled and provenance kept.
+
+        The prefill carries the original fact id, evidence, turn and note, so
+        the revision is visibly "this answer, being changed" -- and the new
+        fact can record revision_of afterwards.  The previous interaction
+        state is deep-copied into the frame, because the host conversation
+        must come back exactly as it was.
+        """
         task, fact = self._location_revision_target(state, fact_id, current_input)
         spec = answer_spec(task, ["region", "area", "side", "extent"])
         spec["prefill"] = {
@@ -192,6 +226,17 @@ class LocationRevisionMixin:
         return self._start_location_revision(state, fact.fact_id, turn_id, text)
 
     def _restore_location_revision_host(self, state, resume, changed):
+        """Put the conversation back the way the revision found it.
+
+        A finished case stays finished when nothing changed; a case that was
+        at summary re-renders the summary through _finish, so the sheet the
+        patient saw is re-derived rather than replayed stale; anything else
+        resumes the exact question that was pending, with its reply.
+
+        "changed" decides between restore and re-render, because a revision
+        that altered the answer must not restore a sheet built from the old
+        one.
+        """
         old = deepcopy(resume["reply"])
         state.active_task = None
         if resume["phase"] == Phase.CLOSED and not changed:
@@ -248,6 +293,14 @@ class LocationRevisionMixin:
         return None
 
     def _complete_location_revision(self, state, prepared, turn_id):
+        """Record the revised answer and close the revision frame.
+
+        The new fact points at the old one through revision_of, so the record
+        keeps both the original answer and what replaced it -- an audit trail,
+        not an overwrite.  The supplement flag is recomputed against the
+        previous note, so "the patient added something" reflects this
+        revision, not a leftover from an earlier one.
+        """
         frame = state.self_check_conversation or {}
         if not frame.get("revision_resume"):
             return None

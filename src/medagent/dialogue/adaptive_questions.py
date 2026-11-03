@@ -86,6 +86,18 @@ def _has_positive_cue(text: str, cues: tuple[str, ...]) -> bool:
 def validate_adaptive_question(
     value: Any, *, allowed_topics: Iterable[str] | None = None
 ) -> dict[str, Any]:
+    """Check a model-proposed adaptive question against the fixed contract.
+
+    The topic must be registered, the wording bounded, and the question may
+    not contain a medical instruction -- the model phrases a question, it
+    never directs the patient to take or stop a treatment.  Selection modes
+    are checked by type before membership so a non-string mode fails with
+    the shape error, not a confusing membership miss.
+
+    Everything the renderer will bind to -- options, the free-text affordance
+    and its label -- is validated here, because the renderer trusts the
+    envelope by construction.
+    """
     if not isinstance(value, dict):
         raise AdaptiveQuestionError("动态问题必须是对象")
     required = {"topic", "question", "selection_mode", "options", "allow_other"}

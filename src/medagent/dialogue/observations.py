@@ -82,6 +82,17 @@ class ObservationMixin:
                 raise StaleActionError("这次读数已处理或没有待核对的读数")
 
     def _request_repeat(self, state, identity, text, turn_id):
+        """Open a repeat attempt for a measurement the patient is asked to redo.
+
+        The attempt carries the fact it will replace, its own id, and who is
+        measuring -- a caregiver measuring a child answers a different
+        question than the patient does.  Quality starts at "not_done": the
+        previous attempt was not good enough, and this one has not happened
+        yet.
+
+        The resume frame keeps what was on screen, so the interrupted
+        conversation can be restored when the attempt ends.
+        """
         task = self._repeat_task(state, identity)
         previous = state.facts[task["result_key"]]
         old = self._latest_replies.get(state.session_id)
@@ -165,6 +176,14 @@ class ObservationMixin:
         )
 
     def _clear_observation(self, state, reason, turn_id=None):
+        """Cancel an open repeat attempt and restore what it interrupted.
+
+        The attempt is marked cancelled with its reason and recorded as an
+        event -- a cancelled measurement is part of the record, not an
+        absence.  A calculation the patient opened mid-attempt is released
+        with the attempt, since the draft belonged to a measurement that is
+        no longer being taken.
+        """
         resume = state.observation_resume
         if not resume:
             return
@@ -200,6 +219,14 @@ class ObservationMixin:
             self._clear_task_conversation(state, "repeat_" + reason, turn_id)
 
     def _handle_observation_action(self, state, user_input, text, turn_id):
+        """Route one turn that arrives while an observation is on screen.
+
+        The routing order is the contract.  A model-backed session first gets
+        the chance to treat the turn as conversation about the task -- prose
+        that clarifies rather than answers -- because a patient typing "我没量"
+        is answering, not ignoring.  Explicit confirmations and cancels are
+        read before anything else, so they cannot be mistaken for free text.
+        """
         choice = user_input.choice_value or ""
         if state.observation_resume and state.active_task:
             resume = state.observation_resume
@@ -366,6 +393,15 @@ class ObservationMixin:
         return None
 
     def _project_observation_feedback(self, state, reply):
+        """Carry the observation's outcome into the next reply, or drop it.
+
+        A handled location or a pure reading is decision context, not a
+        pending supplement -- clearing it when the reply succeeded is what
+        stops a completed task from asking again.  For a temperature, the
+        supplement stays pending until it is actually handled, and a service
+        error never clears anything: a reply the patient could not see must
+        not consume their answer.
+        """
         feedback = state.observation_feedback
         if not feedback:
             return
@@ -413,6 +449,14 @@ class ObservationMixin:
         return result
 
     def _observation_series(self, state, task):
+        """Build the measurement series from the fact chain, newest first.
+
+        The chain is walked through supersedes -- the link every re-measurement
+        writes -- so the series is exactly the history of attempts for this
+        measurement, with cycles broken by the seen-set rather than looping.
+        Each entry's status is the assertion itself: recorded, or unconfirmed
+        where the patient never verified the value.
+        """
         current = state.facts.get(task["result_key"])
         if current is None:
             return None

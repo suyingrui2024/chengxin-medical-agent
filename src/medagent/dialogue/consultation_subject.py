@@ -115,6 +115,15 @@ def proposed_profile(category, evidence):
 
 
 def subject_profile(state):
+    """Work out who the consultation is about, from the facts as recorded.
+
+    Every present consult_for fact whose value still matches the current one
+    is a candidate; the most recent one that carries a reference wins, and
+    compatible references are merged so a subject stated twice is one person,
+    not two.  A consultation with no present consult_for fact is about
+    nobody in particular and returns None -- the callers decide what that
+    means for them.
+    """
     current = state.facts.get("consult_for")
     if current is None or current.assertion != ASSERTION_PRESENT:
         return None
