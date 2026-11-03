@@ -81,8 +81,19 @@ test("location revision returns an unsent severity selection to the original que
       step += 1
     ) {
       await input.fill("两天前逐渐出现，变化不大");
+      // The turn has to be over before the state is read again. The busy
+      // indicator is hidden before the request is even sent, so waiting
+      // for it can let the loop ask one question too many -- and the
+      // scripted model, whose queue is finite, answers that extra turn
+      // with an error. Waiting for the response is what a finished turn
+      // looks like.
+      const answered = page.waitForResponse(
+        (r) =>
+          r.request().method() === "POST" &&
+          r.url().endsWith(`/sessions/${sessionId}/messages`),
+      );
       await page.getByRole("button", { name: "发送回答" }).click();
-      await expect(page.locator("#busy-indicator")).toBeHidden();
+      await answered;
     }
     expect(await pending()).toBe("severity");
     await expect(five).toBeVisible();

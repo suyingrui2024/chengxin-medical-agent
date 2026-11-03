@@ -37,7 +37,11 @@ ASSET_LITERAL = re.compile(
     r'["\'`]([\w./-]+\.(?:svg|png|otf|json|woff2))(?:#[^"\'`]*)?["\'`]'
 )
 #: A URL literal in a browser spec, naming a file the server would serve.
-SPEC_URL = re.compile(r'"(/[^"\s]+\.(?:js|css|svg|png|json|woff2?))"')
+#: The fragment is part of the literal -- "/x.svg#step-2" is one URL -- so it
+#: is matched here and stripped before the path is resolved.
+SPEC_URL = re.compile(
+    r'"(/[^"\s]+\.(?:js|css|svg|png|json|woff2?)(?:#[^"\s]*)?)"'
+)
 #: ``page.route("**/name", ...)`` -- the spec answers this request itself, so
 #: the URL needs no file behind it.
 ROUTE_GLOB = re.compile(r'page\.route\(\s*["\']([^"\']+)["\']')

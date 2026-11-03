@@ -66,7 +66,7 @@ test("patient conversation, self-check, history, evidence and export use actual 
   await expect(page.getByText("2 / 3")).toBeVisible();
   await expect(page.locator("#active-task .task-image")).toHaveAttribute(
     "src",
-    "/neutral-temperature.svg#step-2",
+    "/assets/illustrations/neutral-temperature.svg#step-2",
   );
   await page.getByRole("button", { name: "展开对话记录" }).click();
   await expect(page.locator("#active-task")).toBeHidden();
@@ -372,7 +372,7 @@ test("mobile layout has no horizontal overflow and exposes records and navigatio
   await page.getByRole("button", { name: "下一步", exact: true }).click();
   await expect(page.locator("#task-preview .task-image")).toHaveAttribute(
     "src",
-    "/neutral-temperature.svg#step-2",
+    "/assets/illustrations/neutral-temperature.svg#step-2",
   );
   expect(
     await page.evaluate(
