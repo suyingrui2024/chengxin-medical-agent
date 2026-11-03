@@ -188,6 +188,17 @@ class ConsultationEngineClosing:
         *,
         risk_override: Optional[RiskAssessment] = None,
     ) -> AgentReply:
+        """Close out the consultation.
+
+        An ordinary case stops at SUMMARY and waits for the patient to check
+        the sheet: the consultation is not closed until they confirm it.  An
+        urgent case skips that and closes straight away as ``urgent_route``,
+        because waiting for a confirmation is not an option there.
+
+        The two paths differ in the review status the sheet carries and in
+        what the reply says -- one asks for a check, the other says the record
+        was not confirmed.
+        """
         state.phase = Phase.SUMMARY
         state.risk = risk_override or self.triage.assess(state)
         needs_confirmation = state.risk.level not in {
@@ -393,6 +404,21 @@ class ConsultationEngineClosing:
     def _record_reply(
         self, state: CaseState, reply: AgentReply, turn_id: str, reason: str
     ) -> None:
+        """Publish one reply: gate it, record it, and close the case if it closes.
+
+        The publication gate decides whether the patient may see this reply.
+        When it refuses, an emergency closes the session on the spot
+        (``emergency_route``); otherwise the gate's fallback replaces the reply
+        wholesale.  Either way the decision is recorded as an event with the
+        rule ids that produced it, so "why did the patient see this" is
+        answerable after the fact.
+
+        The conclusion sheet is composed only on the turn that actually closes
+        the session.  Guard replies on an already-closed case also carry phase
+        CLOSED, and re-composing for them bumped the sheet revision on every
+        message and silently overwrote post-close enrichment.  For the same
+        reason the closing line is spoken once, by the turn that closes.
+        """
         self._apply_bridging(state, reply)
         self._apply_group_bridge(state, reply)
         decision = self.publication_gate.validate(state, reply)

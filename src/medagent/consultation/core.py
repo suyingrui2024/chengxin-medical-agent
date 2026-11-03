@@ -36,6 +36,14 @@ class ConsultationEngineCore:
         ranker: QuestionRanker,
         session_store: Optional[SessionStore] = None,
     ) -> None:
+        """Assemble the deterministic engine.
+
+        The planner defaults to the differential one: the A/B evaluation
+        (2026-10-23) found no outcome regressions and earlier capture of the
+        discriminating question on every covered pathway.
+        ``MEDAGENT_PLANNER=rule`` is the rollback, kept as an environment
+        switch because the evaluation is the evidence for the default.
+        """
         self.content = content
         self.triage = triage
         self.self_checks = self_checks
@@ -118,6 +126,16 @@ class ConsultationEngineCore:
     def _create_state(
         self, trace_id: Optional[str] = None, request_id: Optional[str] = None
     ) -> CaseState:
+        """Create a session and register it.
+
+        The runtime snapshot records the engine version, the content registry
+        and the content versions, so a case can be read back against the
+        content it was collected with.
+
+        The session, its lock and its condition are registered together under
+        one lock, so a session is never visible without the machinery that
+        serialises it.
+        """
         session_id = str(uuid4())
         state = CaseState(session_id=session_id)
         state.runtime_snapshot = {
@@ -193,6 +211,16 @@ class ConsultationEngineCore:
     def run_capability(
         self, state, identity, arguments, origin, turn_id, confirmation=None
     ):
+        """Execute a capability and record the attempt.
+
+        Two refusals come first.  A closed case, or one that needs urgent or
+        emergency help, does not get to compute anything.  And a model-proposed
+        call is refused outright: the patient has to see the input card and
+        confirm it before the calculation runs.
+
+        Both the request and a failure are recorded, so a capability that did
+        not run is as visible as one that did.
+        """
         if state.phase == Phase.CLOSED or state.risk.level in {
             RiskLevel.EMERGENCY,
             RiskLevel.URGENT,
@@ -234,6 +262,16 @@ class ConsultationEngineCore:
         return result
 
     def request_calculation(self, state, identity, arguments, evidence, text, turn_id):
+        """Draft a calculation for the patient to confirm.
+
+        A pending supplement blocks a new request: the patient already has
+        something to finish, and asking again would lose it.  So does a closed
+        or escalated case, a self-check on screen, or a task in progress.
+
+        The state needed to resume the interrupted question afterwards is
+        saved with the draft, including the reply that was on screen when the
+        calculation was proposed.
+        """
         if state.calculation_feedback:
             raise ValueError("之前的计算请求仍有同轮补充待处理。先处理补充信息，不要重复已完成或已跳过的换算。")
         if (

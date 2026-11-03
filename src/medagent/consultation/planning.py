@@ -33,6 +33,16 @@ class ConsultationEnginePlanning:
     def _try_task_result(self, state, text, choice_value, turn_id):
         # D-03: free-text "跳过" (with or without punctuation) counts as
         # one skip attempt, exactly like tapping the skip option.
+        """Try to read the patient's answer to the self-check on screen.
+
+        Free text that says "skip" counts as one skip attempt, exactly like
+        tapping the skip option -- the patient should not have to know which
+        of the two the interface offers.
+
+        A failure is recorded as an event and answered with a message that
+        asks for a redo or a skip.  Nothing is written to the record: an
+        unreadable answer is not a measurement.
+        """
         if choice_value is None and is_self_check_skip_text(text):
             choice_value = "skip"
         try:
@@ -75,6 +85,23 @@ class ConsultationEnginePlanning:
         decoded=None,
         structured_input=None,
     ) -> None:
+        """Record the outcome of one self-check task.
+
+        A repeat measurement does not overwrite a positive earlier reading with
+        a negative one: the earlier fact is preserved and the attempt is
+        recorded as skipped or unconfirmed instead.  A temperature task also
+        produces a report, and the report's supplement is preferred as the
+        evidence when it has one.
+
+        The attempt's status is derived from the interpretation -- recorded,
+        skipped or unconfirmed -- and its source follows the consultation
+        subject: a measurement taken for a child or another adult is the
+        caregiver's evidence, not the patient's.
+
+        The completion is kept as host-owned context even when the report adds
+        no narrative, because a failed decision retry needs it.  It is not a
+        new fact.
+        """
         task_result = decoded or self.self_checks.interpret(task_id, text, choice_value)
         result = task_result.interpretation
         from ..reports.measurement_reports import temperature_report
@@ -172,6 +199,14 @@ class ConsultationEnginePlanning:
         )
 
     def _plan_next(self, state: CaseState) -> AgentReply:
+        """Choose what to ask next.
+
+        Filtering and phase selection run through the shared ordering
+        scaffold, and the pick within a phase runs through the strategy the
+        injected ranker maps to.  Non-blocking fields -- sex, a reported
+        temperature -- stay askable but never gate the summary, which is the
+        same rule the adaptive engine follows.
+        """
         chief = str(state.get("chief_complaint", ""))
         # Package A (modular refactor): filtering + phase selection run
         # through the shared question_ordering scaffold; the same-phase
@@ -387,6 +422,20 @@ class ConsultationEnginePlanning:
     def _offer_task(
         self, state: CaseState, chief: str, task_id: Optional[str] = None
     ) -> Optional[AgentReply]:
+        """Offer a self-check task, or resume the one already in progress.
+
+        A task the patient asked for is taken off the pending list when it is
+        offered: the request has been satisfied, and leaving it there would ask
+        for it again.
+
+        A suspended task may not hang across turns forever.  At the cap it is
+        cleared, the pending request is dropped and planning resumes -- the
+        caller moves on to the next question or to the finish -- rather than
+        re-offering the same suspended step verbatim.
+
+        Returns ``None`` when there is nothing to offer, which is also the
+        case while another task is on screen or when a block reason applies.
+        """
         if state.self_check_conversation:
             frame_id = state.self_check_conversation["task"]["id"]
             # D-04: a suspended task must not hang across turns forever.
@@ -566,6 +615,15 @@ class ConsultationEnginePlanning:
                 )
 
     def _ask(self, state: CaseState, question: Question, reason: str) -> AgentReply:
+        """Put a question to the patient.
+
+        The age prompt is adapted to the subject: the catalog's infant-months
+        wording is only shown when the consultation is about a child, because
+        "how old in months" to an adult's guardian reads as a mistake.
+
+        The question is recorded as asked, and the suspend-cap notice is
+        attached when the patient has suspended this task too often.
+        """
         state.phase = question.phase
         state.active_question = question.id
         state.active_question_is_clarification = False

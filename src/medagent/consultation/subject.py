@@ -56,6 +56,16 @@ class ConsultationEngineSubject:
         }
 
     def _restore_subject_interaction(self, state, checkpoint, turn_id):
+        """Put the interaction back the way it was before a subject change.
+
+        Only if the case still looks the same: the checkpoint carries a
+        completion fingerprint, and a mismatch means the case moved on, so
+        restoring would undo work the patient has since done.
+
+        Before restoring, the pending work that did not survive the boundary
+        is recorded as cancelled -- a self-check the patient asked for and a
+        calculation input are both tied to the person they were asked of.
+        """
         if checkpoint["completion"] != self._subject_completion_fingerprint(state):
             return False
         old = checkpoint["interaction"]
@@ -86,6 +96,12 @@ class ConsultationEngineSubject:
         return True
 
     def _subject_change_reply(self, state, requested, text, turn_id):
+        """Tell the patient that the other person needs a consultation of their own.
+
+        The current case is kept, not merged: the boundary event carries both
+        subjects and the patient's own words, and the reply asks for a separate
+        consultation rather than switching this one over mid-flight.
+        """
         if state.subject_resume is None:
             state.subject_resume = state.subject_candidate or self._subject_checkpoint(
                 state
@@ -115,6 +131,16 @@ class ConsultationEngineSubject:
         )
 
     def _subject_control(self, state, user_input, text, turn_id):
+        """Handle "that was for somebody else" and "go back to me".
+
+        Resuming the current subject replays the reply the patient was given
+        before the boundary, so returning is not a dead end -- the interrupted
+        question is answered again rather than planned from scratch.
+
+        A switch is only detected from an explicit statement, or from a
+        reference that conflicts with the established subject.  A mention of a
+        relative is not a switch.
+        """
         self._check_subject_action(state, user_input)
         if user_input.choice_value == "resume_current_subject":
             checkpoint = state.subject_resume
@@ -153,6 +179,17 @@ class ConsultationEngineSubject:
             raise StaleActionError("就诊对象入口已更新，请使用当前页面。")
 
     def _apply_fact_update_dependencies(self, state, updates, turn_id):
+        """Work out what a changed fact invalidates, and cancel it.
+
+        A field a task depends on invalidates that task's result; a changed
+        chief complaint invalidates the whole set of findings that hang off it.
+        Fields the batch explicitly replaces are excluded -- that evidence
+        belongs to the new state and must not be cancelled by the update that
+        carried it.
+
+        Indirect removals are validated before any task is cancelled or fact
+        is touched, so a rejected update leaves the case as it was.
+        """
         changed = {
             item["key"]
             for item in updates
@@ -244,6 +281,23 @@ class ConsultationEngineSubject:
         new_text: str,
         expected_fact_id: Optional[str] = None,
     ) -> AgentReply:
+        """Correct one recorded fact, in a case that is still open.
+
+        A closed case is read-only history, and for a restored session doubly
+        so: reopening one here would fork it from its conclusion sheet and,
+        once persisted as not-closed, make its follow-up plan vanish on the
+        next restart.  A case routed to emergency is exempt -- a correction
+        there re-runs triage and lands back on the emergency reply, because
+        the route itself cannot be retracted by an edit.
+
+        The correction *replaces* the fact rather than merging into it.  Merging
+        would resurrect the very denial the patient just corrected away, and
+        the patient's corrected words are the only source here -- the model is
+        not asked to reinterpret them.
+
+        ``emergency_screen`` cannot be corrected directly: it is a screening
+        result with its own rules, and rewriting it would bypass them.
+        """
         state = self.state(session_id)
         with self._lock_for(session_id):
             urgent_reply = self._correction_emergency(state, new_text)
@@ -462,6 +516,12 @@ class ConsultationEngineSubject:
             return reply
 
     def _correction_emergency(self, state, text):
+        """Handle a correction whose own text hits the emergency gate.
+
+        The corrected text is the patient's words, so it is triaged like any
+        other turn -- before the field and version checks.  An emergency found
+        this way outranks them: the case is already unsafe.
+        """
         triggers = self.triage.scan_text(text)
         if not triggers:
             return None
@@ -533,6 +593,15 @@ class ConsultationEngineSubject:
         structured_input: Optional[Dict[str, Any]] = None,
         merge: bool = True,
     ) -> None:
+        """Record one fact, and keep the record honest about where it came from.
+
+        Two rules apply.  When the consultation is about somebody else, the
+        patient's own words are the caregiver's evidence, not the patient's.
+        And when merging into an earlier value, the earlier denial is
+        preserved: a patient who first denied a symptom and later described it
+        has not retracted the denial, and merging it away would lose the
+        uncertainty they expressed.
+        """
         source = result.source
         if source == Source.PATIENT and state.get("consult_for") in {
             "child",

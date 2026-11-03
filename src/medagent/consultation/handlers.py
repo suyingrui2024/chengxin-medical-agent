@@ -20,6 +20,14 @@ from .types import StaleActionError, UserInput
 
 class ConsultationEngineHandlers:
     def _submit(self, state: CaseState, user_input: UserInput) -> AgentReply:
+        """Take a patient turn on the deterministic engine.
+
+        The order here is the contract.  A request for priority help comes
+        first, then the stale-action check, then the turn context is built --
+        and only then is a pending emergency clarification answered.  So a
+        confirmation or a denial is read against the state the turn actually
+        produced, not against the state before the patient's words.
+        """
         if user_input.choice_value == "request_emergency_help":
             return self._requested_emergency_help(state, user_input.text)
         self._guard_stale_action(state, user_input)
@@ -84,6 +92,17 @@ class ConsultationEngineHandlers:
             raise StaleActionError("页面上的问题已经变化，请按当前问题重新回答")
 
     def _begin_turn(self, state: CaseState, user_input: UserInput) -> TurnContext:
+        """Open a turn: settle the text, prepare the location answer, record it.
+
+        The text is settled before anything else uses it.  A location input
+        wins over the typed text, and a prepared location answer wins over
+        both -- otherwise the location the patient selected would be parsed as
+        prose.
+
+        The three control checks run only when the text is not itself a danger
+        signal, and they run before the turn is recorded, so a control the
+        patient triggered is part of the same turn.
+        """
         turn_id = str(uuid4())
         text = user_input.text.strip()
         urgent_text = self._location_input_text(user_input)
@@ -269,6 +288,16 @@ class ConsultationEngineHandlers:
         return reply
 
     def _h_intake(self, state, user_input, ctx):
+        """Read the patient's answer to the question or task in front of them.
+
+        A failed task result keeps the task on screen: the patient is told what
+        to redo, and nothing is written.
+
+        A refusal is recorded as a declined fact -- present=false, no value --
+        rather than looping the question or booking the refusal wording as the
+        field's value.  "I would rather not say" is an answer, and it satisfies
+        the gate without inventing a clinical fact.
+        """
         text, turn_id = ctx.text, ctx.turn_id
         if state.active_task:
             failure = self._try_task_result(
@@ -331,6 +360,16 @@ class ConsultationEngineHandlers:
         return None
 
     def _h_risk_escalation(self, state, user_input, ctx):
+        """Re-triage the turn and escalate if the risk demands it.
+
+        The assessment is recorded as an event before it is acted on, so the
+        risk level behind a reply can be read back later.
+
+        An emergency signal that is only a bare co-occurrence is clarified
+        first; a confirmed one goes straight to the emergency reply with its
+        clarification attached.  Urgent risk defers to the gate, which decides
+        between helping now and asking again.
+        """
         text, turn_id = ctx.text, ctx.turn_id
         state.risk = self.triage.assess(state, text)
         self.events.append(

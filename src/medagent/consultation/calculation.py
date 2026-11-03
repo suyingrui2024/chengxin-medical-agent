@@ -34,6 +34,17 @@ class ConsultationEngineCalculation:
         )
 
     def _check_calculation_action(self, state, user_input):
+        """Check that a calculation action still matches the screen.
+
+        The supplement entry point names the feedback it belongs to, and it is
+        only accepted when that feedback is the current one, nothing else is
+        pending, and the page revision matches -- otherwise the original words
+        would be processed twice.
+
+        A summary confirmation is refused while a supplement is still
+        waiting: the supplement is part of the same turn, and confirming the
+        summary first would drop it.
+        """
         choice = user_input.choice_value
         if choice and choice.startswith("process_calculation_supplement:"):
             if (
@@ -101,6 +112,13 @@ class ConsultationEngineCalculation:
         state.calculation_resume = None
 
     def _resume_calculation(self, state):
+        """Go back to the question the calculation interrupted.
+
+        The original reply is restored -- its wording, its quick replies and
+        its adaptive question -- so the patient sees the same question they
+        were asked, not a paraphrase of it.  The same restore rule applies as
+        in the observation path.
+        """
         resume = state.calculation_resume or {}
         state.pending_calculation = None
         state.calculation_resume = None
@@ -142,6 +160,22 @@ class ConsultationEngineCalculation:
         return None
 
     def _handle_calculation_action(self, state, user_input, text, turn_id):
+        """Confirm a calculation draft, or repair the values in it.
+
+        A confirmed draft goes through ``confirmed_parameters`` first, so a
+        value the capability will not accept never reaches it.  When the
+        confirmation is malformed, the draft is kept and only the parts that
+        can be trusted are merged in, per form kind:
+
+        * a scale keeps integer answers for its own items and drops the rest;
+        * a formula keeps decimal strings for its own inputs, and a bad value
+          is *preserved* rather than dropped -- the patient should correct one
+          field, not retype the whole form.
+
+        The rule is narrow on purpose.  A calculation the patient confirmed
+        with their own words is clinical evidence, so it is never silently
+        rewritten to something that computes.
+        """
         choice = user_input.choice_value
         if choice == "confirm_calculation":
             draft = state.pending_calculation

@@ -68,6 +68,17 @@ class ConsultationEngineEmergency:
     def _emergency_clarification_reply(
         self, state: CaseState, text: str, turn_id: Optional[str] = None
     ) -> AgentReply:
+        """Ask the patient to confirm a bare danger signal before escalating.
+
+        Risk is stood down first, for the same reason the urgent gate does it:
+        a clarification question cannot be published while risk is EMERGENCY.
+        The facts and the pending clarification record are left untouched, so
+        the answer can still be read back.
+
+        The question names the signals and offers both answers -- confirm and
+        deny -- because a patient who does not have the symptom has to be
+        able to say so without arguing with the wording.
+        """
         try:
             hits = self.triage.scan_detailed(text)
         except Exception:
@@ -305,6 +316,20 @@ class ConsultationEngineEmergency:
     def _emergency_reply(
         self, state: CaseState, triggers: List[str], requested_help=False, *, include_clarification=False
     ) -> AgentReply:
+        """Close the case on an emergency and tell the patient what to do now.
+
+        Everything pending is cleared first: a calculation, an observation and
+        a self-check all belong to a consultation that is now over, and the
+        session is closed as ``emergency_route``.
+
+        The reply states the signals, the confirmed facts and where to go.
+        ``requested_help`` is the variant for a patient who asked for priority
+        help: it says the consultation stopped and asks them to call 120 now
+        rather than drive themselves.
+
+        Callers pass the triggers they found.  The reply quotes those, not
+        whatever ``state.risk`` holds afterwards.
+        """
         state.subject_resume = state.subject_candidate = None
         self._clear_calculation(state, "emergency")
         self._clear_observation(state, "emergency")
@@ -373,6 +398,16 @@ class ConsultationEngineEmergency:
         )
 
     def _urgent(self, state: CaseState) -> AgentReply:
+        """Close the case on an urgent finding and say where to go today.
+
+        The conclusion sheet is composed first and only then relabelled
+        ``urgent``, so the sheet and the spoken reply cannot disagree.
+
+        The collected facts are listed inline.  The closing copy promises
+        "the information collected below" -- a promise that must not stand
+        without the information itself -- and when nothing was collected the
+        clause is dropped rather than left dangling.
+        """
         state.subject_resume = state.subject_candidate = None
         self._clear_calculation(state, "urgent")
         self._clear_observation(state, "urgent")
