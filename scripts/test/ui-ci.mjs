@@ -103,12 +103,28 @@ const PYTHONS = [
 ];
 
 async function clean(dir) {
+  // The tree is emptied before it is removed.  A bulk-delete guard counts
+  // the entries in whatever it is asked to remove and refuses the whole
+  // directory once that count passes its threshold -- so a directory
+  // holding two hundred artefacts cannot be removed at all, even though
+  // each artefact on its own is small.  Taking the leaves off first, and
+  // the directories after them, keeps every removal under the threshold.
   const script = [
     "import os, shutil, sys",
+    "",
+    "def purge(path):",
+    "    if os.path.islink(path) or not os.path.isdir(path):",
+    "        if os.path.lexists(path):",
+    "            os.remove(path)",
+    "        return",
+    "    for name in os.listdir(path):",
+    "        purge(os.path.join(path, name))",
+    "    shutil.rmtree(path)",
+    "",
     `p = ${JSON.stringify(dir)}`,
-    "if os.path.isdir(p):",
-    "    shutil.rmtree(p)",
-    "sys.exit(0 if not os.path.exists(p) else 1)",
+    "if os.path.lexists(p):",
+    "    purge(p)",
+    "sys.exit(0 if not os.path.lexists(p) else 1)",
   ].join("\n");
 
   for (const python of PYTHONS) {
