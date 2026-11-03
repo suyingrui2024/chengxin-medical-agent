@@ -44,6 +44,15 @@ class TemperatureReport:
 
 
 def temperature_report(text):
+    """Read one temperature out of what the patient said.
+
+    Several explicit temperatures in one answer are not a licence to pick
+    one: the reading is only taken when there is exactly one labelled value,
+    or exactly one bare number with no label at all.  Anything else is treated
+    as no reading, because a temperature that belongs to another clause --
+    "the child was 38 degrees, the adult 37" -- must not be attributed to the
+    patient by position.
+    """
     clauses = list(_CLAUSE.finditer(text))
     labeled = list(_LABELED.finditer(text))
     strict_value = Interpreter().temperature(text)

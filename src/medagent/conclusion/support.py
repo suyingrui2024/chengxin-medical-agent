@@ -1,3 +1,13 @@
+"""Choosing the directions to show, and remembering what was denied.
+
+The directions on the sheet are the consultation's results, so their
+selection is conservative: a ruled-out condition is shown, a serious
+condition that came out unlikely is not, and a symptom the patient denied
+cannot reappear as something they reported.
+
+Start at ``_select_directions``.
+"""
+
 from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
@@ -103,6 +113,20 @@ def _against_note(hypothesis, state: CaseState) -> Optional[str]:
 
 
 def _select_directions(accepted, state: CaseState) -> tuple[List[Dict[str, Any]], bool]:
+    """Choose the directions to show the patient on the sheet.
+
+    A ruled-out condition is worth showing -- it is what the consultation
+    established.  A common condition that came out "unlikely" on the chief
+    complaint alone is still a fair "possible" direction when the patient
+    described something verbatim for it, but a serious condition that came out
+    unlikely stays out: that reads as worked-up-and-excluded, not as a lead.
+
+    Supported rule-outs outrank merely active ones and red-flag linkage breaks
+    the tie, so a strongly evidenced serious hypothesis is never crowded out by
+    weakly evidenced ones.
+
+    Returns the directions and whether the sheet abstained.
+    """
     labels = _patient_labels()
     active = accepted.active()
     rule_outs = [
@@ -233,6 +257,18 @@ def _denial_remainders(text: str) -> List[str]:
 
 
 def _denied_texts(state: CaseState) -> List[str]:
+    """Collect everything the patient has denied.
+
+    A denial rarely lives in its own ABSENT fact.  The grouped emergency-screen
+    fact is ABSENT but carries no value or evidence -- the denial survives only
+    inside some PRESENT fact's evidence ("没有肢体无力、说话不清").  And
+    sometimes it survives in neither: the recording layer books only the
+    affirmative part of an answer, so the denial is only in the raw patient
+    text in the transcript.
+
+    All three shapes are read, because a symptom the patient denied must not
+    reappear in the sheet as if they had reported it.
+    """
     texts: List[str] = []
     for fact in state.facts.values():
         if fact.assertion != Assertion.ABSENT:

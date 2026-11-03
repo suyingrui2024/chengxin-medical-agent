@@ -1,3 +1,13 @@
+"""The question catalog and the capability registry.
+
+This module is the kernel's view of what may be asked and what may be
+computed.  The question catalog is data (questions.json); the registry is
+loaded late so the kernel does not depend on the capability package.
+
+Start at ``ContentRepository`` for the questions, and at the registry for the
+capabilities.
+"""
+
 from __future__ import annotations
 
 import json
@@ -178,6 +188,14 @@ class ContentRepository:
         # (knowledge <-> builtin <-> interpreter <-> knowledge, plus
         # measurement_reports / extensions.registry).  Sinking the import
         # here breaks the cycle while keeping the convenience default.
+        """Load the question catalog and the capability registry.
+
+        The registry import is late-bound on purpose.  ``load_registry`` lives in
+        the extensions package, and importing it at module level would wire the
+        kernel to a capability package and close a five-module import cycle.
+        Sinking the import here breaks the cycle and keeps the convenience
+        default; a caller may inject its own registry instead.
+        """
         from ..extensions.builtin import load_registry
 
         package = resources.files("medagent.content")

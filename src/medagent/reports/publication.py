@@ -20,6 +20,15 @@ class ReplyPublicationGate:
     _EMERGENCY_TEXT = "请现在拨打 120，或让身边的人协助呼叫急救；不要自己驾车。不要继续等待本次对话。"
 
     def validate(self, state: CaseState, reply: AgentReply) -> PublicationDecision:
+        """Decide whether this reply may be shown to the patient.
+
+        The rules are mechanical: the phase has to match the case, the message has
+        to be bounded text without control characters, the quick replies have to
+        be bounded and unique, and an adaptive question has to be well formed.
+
+        Every rule that fails is reported by id, so the reason a reply was blocked
+        is legible after the fact rather than only at the moment it happened.
+        """
         failures: list[str] = []
         if reply.phase != state.phase:
             failures.append("reply_phase_matches_case")

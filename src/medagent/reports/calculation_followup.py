@@ -158,6 +158,16 @@ class CalculationFollowupMixin:
                 raise ValueError("这是较早的补充原话，不能覆盖随后更新的记录。保留当前值，只处理仍未处理的内容。")
 
     def _project_calculation_followup(self, state, reply):
+        """Say what is still owed from this turn's calculation.
+
+        A calculation whose supplement has not been handled leaves the case
+        unfinished, and the reply says so: a summary confirmation is refused with
+        a message pointing at the pending supplement, because confirming a
+        summary while part of the same turn is unprocessed would drop it.
+
+        ``can_process`` is only true when nothing else is in the way -- no
+        calculation on screen, no resume, no task, no observation feedback.
+        """
         feedback = state.calculation_feedback
         if feedback is None:
             return

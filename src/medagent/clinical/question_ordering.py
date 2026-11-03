@@ -290,6 +290,13 @@ class HypothesisOrdering:
     name = "hypothesis"
 
     def __init__(self, season_override: Optional[str] = None) -> None:
+        """Assemble the ranking: prior weights, catalog order and the pathways.
+
+        The weights come from the recorded priors rather than from taste, and the
+        catalog order is the order the questions were authored in.  The pathways
+        supply what each hypothesis can be refuted by and which questions tell it
+        apart from the others -- both are read once here rather than per question.
+        """
         self._season_override = season_override
         self._weights = _load_prior_weights()
         self._catalog_order = {
@@ -371,6 +378,13 @@ class HypothesisOrdering:
         return [(hid, score) for score, _, _, hid in scored]
 
     def _question_scorers(self, state: CaseState):
+        """Score the candidate questions against the ranked hypotheses.
+
+        A question is falsifiable when it could refute one of the three leading
+        hypotheses, or when it would tell apart two hypotheses that are not in the
+        lead.  Those are the questions worth asking next: everything else either
+        confirms what is already ranked or describes a field nothing hinges on.
+        """
         ranked = [hid for hid, _ in self.ranked_hypotheses(state)]
         top3 = ranked[:3]
         top5 = ranked[:5]
@@ -572,6 +586,12 @@ class DifferentialOrdering:
         # (differentials.json via load_pathways); the caller may inject
         # pathways for tests. This is only used by
         # potential_discrimination; scoring itself needs no pathways.
+        """Hold the pathways the differential ordering needs.
+
+        The pathways come from the same content source as the planner's proposer;
+        a caller may inject them for tests.  They are needed for the potential
+        discrimination counts only -- the scoring itself needs no pathways.
+        """
         self._pathways = pathways if pathways is not None else load_pathways()
 
     def potential_discrimination(self, state: CaseState) -> Dict[str, int]:
@@ -609,6 +629,13 @@ class DifferentialOrdering:
         changed_ids: set,
         potential_counts: Optional[Dict[str, int]] = None,
     ) -> float:
+        """Rank one question for the differential ordering.
+
+        The same shape as the planner's own scoring: red flags, then questions
+        that discriminate, then required fields, then freshness.  The potential
+        counts let a question that would discriminate enter the ranking before its
+        pathway's details have been asked.
+        """
         active = workspace.active()
         red_flag = any(
             question.id in h.red_flag_questions and h.red_flags for h in active

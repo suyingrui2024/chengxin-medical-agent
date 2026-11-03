@@ -304,6 +304,16 @@ class EducationEnricher:
             self._release(job)
 
     def _enrich(self, job: _EnrichJob) -> None:
+        """Gather the patient-education material for a sheet.
+
+        Three limits bound the work: the number of citations, the number of
+        searches, and a deadline.  A search that fails is recorded and skipped
+        rather than retried -- the material is an addition to the sheet, and a
+        missing source is not worth holding the sheet up for.
+
+        Only material from a trusted tier is used, and every citation is kept
+        with the source it came from.
+        """
         tools = self._tools()
         started = job.created_at
         citations: List[Dict[str, Any]] = []
@@ -466,6 +476,17 @@ class EducationEnricher:
     def _write_back(
         self, job: _EnrichJob, citations: List[Dict[str, Any]], started: float
     ) -> None:
+        """Attach the gathered material to the sheet.
+
+        The write is refused when the sheet has moved on since the job started:
+        the citations were gathered for a revision that no longer exists, and
+        attaching them would put material next to conclusions it does not
+        support.  The stale attempt is recorded so it is visible that the work
+        happened.
+
+        The case may also have been discarded entirely, in which case there is
+        nothing to attach to and nothing to report.
+        """
         try:
             state = job.engine.state(job.session_id)
         except KeyError:
@@ -524,6 +545,13 @@ class EducationEnricher:
     # -- review channel (telemetry only, never writes back) --
 
     def _run_review(self, job: _EnrichJob) -> None:
+        """Check the guidelines for the sheet's directions.
+
+        Queries are scrubbed against the fragments that must never leave the
+        system, and a query that does not survive the scrub is recorded as
+        blocked rather than retried with different words.  A blocked query is a
+        fact about the case, not a transient error.
+        """
         try:
             tools = self._tools()
             now = datetime.now(timezone.utc)

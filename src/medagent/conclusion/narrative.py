@@ -1,3 +1,11 @@
+"""The narrative section of the conclusion sheet.
+
+The narrative explains the sheet in the patient's language, and it is the part
+most likely to overstate: the wording is checked against the directions that
+were actually selected, so it cannot describe a hypothesis the patient will
+not see.
+"""
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional
 from ..guards.direction_guards import (

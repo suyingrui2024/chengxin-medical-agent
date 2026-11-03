@@ -141,6 +141,12 @@ class HypothesisRanker:
     """Deterministic hypothesis-driven ranker (``QuestionRanker`` protocol)."""
 
     def __init__(self, season_override: Optional[str] = None) -> None:
+        """Assemble the ranker: prior weights, catalog order and the pathways.
+
+        The pathways supply what each hypothesis can be refuted by and which
+        questions tell it apart from the others, read once here rather than per
+        question.
+        """
         self._season_override = season_override
         self._weights = _load_prior_weights()
         self._catalog_order = {
@@ -222,6 +228,12 @@ class HypothesisRanker:
         return [(hid, score) for score, _, _, hid in scored]
 
     def _question_scorers(self, state: CaseState):
+        """Score the candidate questions against the ranked hypotheses.
+
+        A question is falsifiable when it could refute one of the three leading
+        hypotheses, or when it would tell apart two hypotheses that are not in the
+        lead.
+        """
         ranked = [hid for hid, _ in self.ranked_hypotheses(state)]
         top3 = ranked[:3]
         top5 = ranked[:5]

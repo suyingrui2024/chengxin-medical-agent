@@ -250,6 +250,17 @@ def _genuine_wording_quote(fact) -> Optional[str]:
 
 
 def _condition_quote(state: CaseState, condition: Dict[str, Any]) -> Optional[str]:
+    """Find the patient's own words that satisfy one hypothesis condition.
+
+    The quote is always the patient's wording -- for a denial, the denial
+    itself -- never ``str(value)``: an ABSENT fact has no value, and the
+    literal string "None" would enter the evidence chain as a quotation the
+    patient never said.
+
+    A negated mention never counts as evidence of a term.  "没有呕吐" is the
+    patient reporting the absence of vomiting, so it cannot support a
+    condition that requires vomiting to be present.
+    """
     fact = state.facts.get(condition["fact_key"])
     if fact is None or fact.assertion == Assertion.UNKNOWN:
         return None
@@ -301,6 +312,15 @@ class RuleBasedProposer:
         self._question_fact_keys = question_fact_keys or {}
 
     def propose(self, state: CaseState) -> ReasoningWorkspace:
+        """Propose hypotheses from the pathways the chief complaint matches.
+
+        The rule-based planner: a pathway is matched on the chief complaint
+        alone, and each of its hypotheses is read against the recorded facts.
+        Every piece of evidence it cites is a verbatim quote from the patient,
+        so a hypothesis cannot be supported by something they never said.
+
+        This is the fallback planner -- ``MEDAGENT_PLANNER=rule`` selects it.
+        """
         chief = str(state.get("chief_complaint", ""))
         workspace = ReasoningWorkspace()
         chief_fact = state.facts.get("chief_complaint")
@@ -386,6 +406,17 @@ class RuleBasedProposer:
 def validate_workspace(
     state: CaseState, workspace: ReasoningWorkspace
 ) -> Tuple[ReasoningWorkspace, List[Tuple[str, str]]]:
+    """Check that every proposed evidence reference still holds.
+
+    Three things must be true for a reference to survive: the fact is still
+    recorded, the fact has not been superseded since the reference was made,
+    and the quote appears verbatim in the fact's evidence, its value or the
+    transcript.  A reference that fails any of these rejects its whole
+    hypothesis -- a hypothesis built on a quote that cannot be found is not a
+    hypothesis with a weak citation.
+
+    Returns the accepted workspace and the reasons the rest were rejected.
+    """
     transcript_pool = "\n".join(
         item.get("content", "")
         for item in state.transcript
@@ -449,6 +480,16 @@ class DifferentialPlanner:
     W_FRESHNESS = 0.5
 
     def _refresh_workspace(self, state: CaseState) -> Tuple[ReasoningWorkspace, set]:
+        """Re-propose, validate, and note what changed since last time.
+
+        A proposal the validation rejects is recorded as an event, because a
+        hypothesis that was proposed and refused is a fact about the planner's
+        behaviour, not a silent no-op.
+
+        The ids whose status changed are returned: a question that just
+        separated two hypotheses is worth more than one that separated them
+        three turns ago.
+        """
         engine = self._engine
         proposed = self._proposer.propose(state)
         accepted, rejected = validate_workspace(state, proposed)
@@ -536,6 +577,14 @@ class DifferentialPlanner:
         changed_ids: set,
         potential_counts: Optional[Dict[str, int]] = None,
     ) -> float:
+        """Rank one question against the current hypotheses.
+
+        Red flags come first, then questions that discriminate between active
+        hypotheses, then the required fields, then freshness.  The
+        discrimination count also consults the potential counts, which is how
+        a question that *would* discriminate enters the ranking before its
+        pathway's details have been asked.
+        """
         active = workspace.active()
         red_flag = any(
             question.id in h.red_flag_questions and h.red_flags for h in active
@@ -569,6 +618,16 @@ class DifferentialPlanner:
         return f"{question.fact_key} 是当前阶段尚未获得的关键字段"
 
     def plan(self, state: CaseState) -> AgentReply:
+        """Choose the next question, differential planner.
+
+        The workspace is refreshed first, so the ranking works on hypotheses
+        that have just been checked against the facts.  Candidates are the
+        fields that are not recorded, that apply to this complaint and whose
+        gates pass.
+
+        Non-blocking fields stay askable but never gate the finish on their
+        own -- the same rule the deterministic engine follows.
+        """
         engine = self._engine
         workspace, changed_ids = self._refresh_workspace(state)
         chief = str(state.get("chief_complaint", ""))

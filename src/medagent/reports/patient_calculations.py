@@ -13,6 +13,17 @@ UNITS = re.compile(r"(?<![A-Za-z])(?:kg|mg|mL|g|L|千克|公斤|毫克|毫升|�
 
 
 def request_draft(registry, identity, arguments, quote, text, turn_id):
+    """Build the input card the patient has to confirm before a calculation runs.
+
+    The card's shape comes from the capability: a scale has its own items, a
+    formula its own inputs, and a plain conversion a single value.  What the
+    patient typed is the only evidence a draft may carry -- the quote has to
+    appear in this turn's text, and a request that does not name an intent
+    ("换算", "计算") is refused rather than guessed at.
+
+    Nothing here computes anything.  The draft exists so the patient can see
+    the inputs and confirm them.
+    """
     manifest = next(
         (item for item in registry.descriptions() if item["id"] == identity), None
     )

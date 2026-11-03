@@ -1,3 +1,13 @@
+"""Assembling the conclusion sheet.
+
+The sheet is a dictionary, and this module is where its fields come from and
+what each one promises.  The visibility contract is the important part: a
+field that is missing means invisible, and a missing flag fails closed.
+
+Start at ``compose_conclusion`` in ``adjustments.py``, which builds the sheet
+and then adjusts its wording.
+"""
+
 from __future__ import annotations
 import os
 from copy import deepcopy

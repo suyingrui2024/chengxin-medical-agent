@@ -1,3 +1,14 @@
+"""The wording adjustments applied to a finished conclusion sheet.
+
+These run after the sheet is assembled.  They change how a conclusion reads,
+never what it concludes: the chronic-outlook consistency, the infant
+observable wording, the eye-domain generic worsening and the assertion-state
+wording all keep the level, the window and the direction visibility intact.
+
+Start at ``compose_conclusion``, which is where the sheet is built and then
+adjusted.
+"""
+
 from __future__ import annotations
 import json
 from copy import deepcopy

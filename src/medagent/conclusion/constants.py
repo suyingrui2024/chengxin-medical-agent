@@ -1,3 +1,10 @@
+"""The fixed texts and vocabularies the conclusion sheet uses.
+
+Everything here is wording that must not drift: the disclaimers, the phrases
+the lint rejects, and the labels the patient sees.  They live in one file so
+that a change to one is a visible change to all of them.
+"""
+
 from __future__ import annotations
 from typing import Any, Dict
 # The three fact tables (BANNED_PHRASES / GAP_IMPACTS / MEASUREMENT_FACTS) and

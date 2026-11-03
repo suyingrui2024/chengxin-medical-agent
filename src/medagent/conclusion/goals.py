@@ -1,3 +1,10 @@
+"""The patient's own goal, and the goals the sheet did not reach.
+
+A goal the patient never stated is a gap, not a sentence.  This module keeps
+the difference visible: what was said in their words, what was only
+inferred, and what was left unaddressed are recorded separately.
+"""
+
 from __future__ import annotations
 import re
 from typing import Any, Dict, List

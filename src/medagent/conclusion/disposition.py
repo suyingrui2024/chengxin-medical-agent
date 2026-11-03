@@ -1,3 +1,13 @@
+"""Where the patient should go, and what is still unknown.
+
+The disposition is the one line of the sheet that carries an instruction, so
+it is derived rather than composed: the tier and the directions decide the
+level, and the level decides the words.  The gaps are ranked so the sheet can
+say what it still does not know, and rank a gap the patient declined lower.
+
+Start at ``_disposition`` and ``_gaps``.
+"""
+
 from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional
@@ -23,6 +33,14 @@ def _gap_label(detail: Dict[str, Any], key: str) -> str:
 
 
 def _gaps(state: CaseState, summary, accepted) -> List[Dict[str, Any]]:
+    """Rank the gaps -- what is still unknown and worth knowing.
+
+    A measurement is worth asking for, and so is a field that would tell two
+    hypotheses apart; both score higher than an ordinary unknown.
+
+    A gap the patient declined is ranked down.  "I would rather not say" is a
+    decision, and repeating the question would be ignoring it.
+    """
     details = (summary or {}).get("unknown_details") or []
     declined_keys = {
         detail.get("key")
@@ -145,6 +163,15 @@ def format_window_text(disposition, window_hours=None) -> str:
 
 
 def _disposition(state, tier, directions, due_hours, show_directions):
+    """Decide where the patient should go next, and say it in one line.
+
+    Urgent means today.  A ruled-out condition means a routine visit, because
+    the sheet has something to show for the consultation.  Otherwise the case
+    can be managed at home.
+
+    The ruled-out condition is named only when the directions are visible to
+    the patient -- a label they cannot see is not for them.
+    """
     if tier == "urgent":
         return {
             "level": "urgent_today",

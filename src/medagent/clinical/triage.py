@@ -1,3 +1,16 @@
+"""Deciding how urgent a turn is.
+
+The triage is the one place that says "this patient needs help now", so its
+rules are conservative and its reasons are recorded: the triggers that fired
+travel with the assessment into the audit trail.
+
+Two rules are not obvious.  An issued emergency route cannot be retracted by
+editing an unrelated field, and an oral, dental or jaw complaint combined with
+exertion is urgent even though neither half is.
+
+Start at ``TriageService.assess``.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -201,6 +214,17 @@ class TriageService:
         latest_text: str = "",
         risk_tags: Iterable[str] = (),
     ) -> RiskAssessment:
+        """Assess the risk level of this turn.
+
+        An issued emergency route cannot be retracted by editing an unrelated
+        field: once the case was routed, its triggers stay.  A confirmed emergency
+        screening item is an emergency on its own, and a direct risk tag counts
+        like a text hit.
+
+        Below emergency, the urgent combinations are read off the complaint and
+        the tags together -- an oral, dental or jaw complaint together with
+        exertion is urgent even though neither half is.
+        """
         triggers = self.scan_text(latest_text)
         selected_tags = set(risk_tags)
         triggers.extend(

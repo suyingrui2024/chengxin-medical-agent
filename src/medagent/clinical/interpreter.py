@@ -1,3 +1,13 @@
+"""Reading a patient's answer as a structured interpretation.
+
+Every answer to a question becomes an ``Interpretation``: a value, an
+assertion, a source and a quality.  The rules that matter are the ones about
+what must NOT be inferred -- an uncertain phrasing yields UNKNOWN rather than
+a guess, and an explicit "I do not know" is an answer, not a missing one.
+
+Start at ``Interpreter.interpret``.
+"""
+
 from __future__ import annotations
 
 import re
@@ -33,6 +43,16 @@ class Interpreter:
     def interpret(
         self, question: Question, text: str, choice_value: Optional[str] = None
     ) -> Interpretation:
+        """Read the patient's answer as a structured interpretation.
+
+        "I do not know" is an answer, not a missing one: it comes back as
+        UNKNOWN with no value, and a field answered that way is a gap the sheet
+        can show rather than a blank.
+
+        A chosen option is read first, then its label, then the free text.  When
+        the question takes free text, uncertainty in the wording also yields
+        UNKNOWN rather than a guess.
+        """
         raw = text.strip()
         selected = choice_value.strip() if choice_value else None
         if selected == "unknown" or any(phrase in raw for phrase in UNKNOWN_PHRASES):
