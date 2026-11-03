@@ -52,6 +52,21 @@ R6  the shared kernel must not import feature packages.  The kernel is the
     kernel is precisely where new coupling accumulates.  Entry points are
     exempt: they are the app surface and drive the workflows on purpose.
 
+R7  a module must define something, or say what it is forwarding.
+
+    A module that imports names from elsewhere and defines none of its own is
+    a relay: the reader has to open it to learn where a name lives, and the
+    answer turns out to be "somewhere else".  Six such modules existed under
+    names that said nothing (``_preamble.py``), carrying 1417 lines and 286
+    names of which 230 were pure pass-through -- 169 of them read by exactly
+    one module.
+
+    The fix is not a ban on re-exporting: a package facade exists precisely to
+    re-export.  It is that a relay has to be explicit.  A module that defines
+    no name must either declare ``__all__`` -- saying which names it forwards
+    and therefore promising to keep them -- or be an entry point, which
+    forwards one call on purpose.
+
 Run locally::
 
     python scripts/lint/import_rules.py
@@ -403,6 +418,92 @@ def check_cycles(graph: dict[str, set[str]]) -> tuple[list[str], list[str]]:
     return failures, notes
 
 
+def check_relays(root: pathlib.Path) -> list[str]:
+    """Modules that forward names without defining any or declaring __all__.
+
+    A facade is fine: it says what it publishes.  A module that quietly
+    re-exports four names from three different packages is not a facade --
+    it is a place where the reader has to look twice, and the module's own
+    name says nothing about what it forwards.
+
+    An empty module is not a relay: it forwards nothing.
+
+    Two things are exempt.  A package's ``__init__.py`` is its facade --
+    forwarding is its job.  An entry point forwards one call on purpose.
+    """
+    failures: list[str] = []
+    for path in sorted(root.rglob("*.py")):
+        if "__pycache__" in path.parts:
+            continue
+        rel = path.relative_to(root).as_posix()
+        # A package's ``__init__.py`` is its facade: forwarding is its job,
+        # and an empty one says the package publishes nothing.
+        if path.name == "__init__.py":
+            continue
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except SyntaxError:
+            continue
+
+        defines = False
+        declares_all = False
+        is_entry_point = False
+        forwards = False
+        for node in tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                defines = True
+            elif isinstance(node, ast.Import):
+                forwards = True
+            elif isinstance(node, ast.ImportFrom):
+                forwards = True
+            elif isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        if target.id == "__all__":
+                            declares_all = True
+                        else:
+                            defines = True
+            elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+                # ``__all__: list[str] = []`` is a declaration too: it says
+                # what the module forwards, which is exactly what R7 asks for.
+                if node.target.id == "__all__":
+                    declares_all = True
+                else:
+                    defines = True
+            elif isinstance(node, ast.If):
+                # A branch may define the module's own name: platform_fs.py
+                # binds ``os`` on POSIX and a whole implementation on Windows.
+                for branch in node.body:
+                    if isinstance(branch, ast.Assign):
+                        for target in branch.targets:
+                            if isinstance(target, ast.Name) and target.id != "__all__":
+                                defines = True
+                    elif isinstance(
+                        branch, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+                    ):
+                        defines = True
+                # ``if __name__ == "__main__":`` marks an entry point.
+                test = node.test
+                if (
+                    isinstance(test, ast.Compare)
+                    and isinstance(test.left, ast.Name)
+                    and test.left.id == "__name__"
+                ):
+                    is_entry_point = True
+
+        # An empty module forwards nothing, so it is not a relay.  A relay
+        # forwards names without saying what it is for.
+        if not forwards or defines or declares_all or is_entry_point:
+            continue
+        failures.append(
+            f"R7 {rel}: forwards names but defines none and declares no "
+            "__all__ -- a reader cannot tell what it is for. Import from the "
+            "module that defines the name, or declare __all__ if it is a "
+            "facade on purpose."
+        )
+    return failures
+
+
 def count_top_level(files: list[pathlib.Path], root: pathlib.Path) -> int:
     return sum(
         1 for path in files if path.parent == root and path.name != "__init__.py"
@@ -429,6 +530,7 @@ def run(
     cycle_failures, notes = check_cycles(module_level_graph)
     failures.extend(cycle_failures)
     notes.extend(layering_warnings)
+    failures.extend(check_relays(root))
 
     top_level = count_top_level(files, root)
     if top_level > ceiling:

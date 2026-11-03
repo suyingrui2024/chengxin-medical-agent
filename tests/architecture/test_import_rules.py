@@ -67,9 +67,9 @@ def test_feature_may_import_a_capability(tmp_path):
         tmp_path,
         {
             "consultation/__init__.py": "",
-            "consultation/core.py": "from ..extensions import formulas\n",
+            "consultation/core.py": "from ..extensions import formulas\n\n\nVALUE = 1\n",
             "extensions/__init__.py": "",
-            "extensions/formulas.py": "",
+            "extensions/formulas.py": "VALUE = 1\n",
         },
     )
     failures, _, _ = rules.run(tmp_path, ceiling=99)
@@ -93,9 +93,9 @@ def test_entry_point_may_import_the_app_layer(tmp_path):
     build(
         tmp_path,
         {
-            "cli.py": "from .server import core\n",
+            "cli.py": "from .server import core\n\n\nif __name__ == \"__main__\":\n    pass\n",
             "server/__init__.py": "",
-            "server/core.py": "",
+            "server/core.py": "VALUE = 1\n",
         },
     )
     failures, _, _ = rules.run(tmp_path, ceiling=99)
@@ -108,7 +108,7 @@ def test_intra_package_wiring_is_not_an_app_layer_violation(tmp_path):
         {
             "server/__init__.py": "",
             "server/types.py": "",
-            "server/agent.py": "from .types import Payload\n",
+            "server/agent.py": "from .types import Payload\n\n\nVALUE = 1\n",
         },
     )
     failures, _, _ = rules.run(tmp_path, ceiling=99)
@@ -144,23 +144,24 @@ def test_a_baselined_edge_is_frozen_not_banned(tmp_path, monkeypatch):
         tmp_path,
         {
             "agent/__init__.py": "",
-            "agent/_preamble.py": "from ..consultation import core\n",
-            "agent/run.py": "from ..consultation import core\n",
+            "agent/_preamble.py": "from ..consultation import core\n\n\nVALUE = 1\n",
+            "agent/run.py": "from ..consultation import core\n\n\nVALUE = 1\n",
             "consultation/__init__.py": "",
-            "consultation/core.py": "",
+            "consultation/core.py": "VALUE = 1\n",
         },
     )
     failures, _, _ = rules.run(tmp_path, ceiling=99)
-    assert len(failures) == 1, failures
-    assert "agent.run" in failures[0], failures
+    cross_package = [f for f in failures if f.startswith("R2")]
+    assert len(cross_package) == 1, cross_package
+    assert "agent.run" in cross_package[0], cross_package
 
 
 def test_a_new_cycle_is_rejected(tmp_path):
     build(
         tmp_path,
         {
-            "alpha.py": "from . import beta\n",
-            "beta.py": "from . import alpha\n",
+            "alpha.py": "from . import beta\n\n\nVALUE = 1\n",
+            "beta.py": "from . import alpha\n\n\nVALUE = 1\n",
         },
     )
     failures, _, _ = rules.run(tmp_path, ceiling=99)
@@ -173,8 +174,8 @@ def test_a_baselined_cycle_is_tolerated(tmp_path, monkeypatch):
     build(
         tmp_path,
         {
-            "alpha.py": "from . import beta\n",
-            "beta.py": "from . import alpha\n",
+            "alpha.py": "from . import beta\n\n\nVALUE = 1\n",
+            "beta.py": "from . import alpha\n\n\nVALUE = 1\n",
         },
     )
     failures, notes, _ = rules.run(tmp_path, ceiling=99)
@@ -188,8 +189,8 @@ def test_a_shrunken_baselined_cycle_is_reported_for_tightening(tmp_path, monkeyp
     build(
         tmp_path,
         {
-            "alpha.py": "from . import beta\n",
-            "beta.py": "",
+            "alpha.py": "from . import beta\n\n\nVALUE = 1\n",
+            "beta.py": "VALUE = 1\n",
         },
     )
     failures, notes, _ = rules.run(tmp_path, ceiling=99)
@@ -217,8 +218,8 @@ def test_relative_imports_from_nested_modules_resolve_to_the_package(tmp_path):
         {
             "kg/__init__.py": "",
             "kg/deep/__init__.py": "",
-            "kg/deep/engine.py": "from .. import store\n",
-            "kg/store.py": "",
+            "kg/deep/engine.py": "from .. import store\n\n\nVALUE = 1\n",
+            "kg/store.py": "VALUE = 1\n",
         },
     )
     failures, _, _ = rules.run(tmp_path, ceiling=99)
@@ -249,9 +250,9 @@ def test_kernel_may_not_import_a_feature(tmp_path):
     build(
         tmp_path,
         {
-            "planner.py": "from .consultation import core\n",
+            "planner.py": "from .consultation import core\n\n\nVALUE = 1\n",
             "consultation/__init__.py": "",
-            "consultation/core.py": "",
+            "consultation/core.py": "VALUE = 1\n",
         },
     )
     failures, _, _ = rules.run(tmp_path, ceiling=99)
@@ -266,7 +267,7 @@ def test_a_baselined_kernel_edge_is_tolerated(tmp_path, monkeypatch):
     build(
         tmp_path,
         {
-            "planner.py": "from .consultation import core\n",
+            "planner.py": "from .consultation import core\n\n\nVALUE = 1\n",
             "consultation/__init__.py": "",
             "consultation/core.py": "",
         },
@@ -335,3 +336,102 @@ def test_the_real_tree_passes():
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))
+
+
+def test_a_relay_with_no_declaration_is_rejected(tmp_path):
+    """R7: a module that forwards names and says nothing is not a module.
+
+    This is the shape the six ``_preamble.py`` files had.  The reader sees
+    ``from ._preamble import CaseState`` and has to open the file to learn
+    where CaseState lives -- and the file's own name never said.
+    """
+    build(
+        tmp_path,
+        {
+            "consultation/__init__.py": "",
+            "consultation/_preamble.py": "from ..core.domain import CaseState\n",
+            "consultation/core.py": "from ._preamble import CaseState\n",
+            "core/__init__.py": "",
+            "core/domain.py": "class CaseState:\n    pass\n",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert any(f.startswith("R7") for f in failures), failures
+
+
+def test_a_facade_that_declares_its_surface_is_allowed(tmp_path):
+    """Re-exporting is not the problem; hiding what you re-export is."""
+    build(
+        tmp_path,
+        {
+            "consultation/__init__.py": "",
+            "consultation/types.py": (
+                "from ..core.domain import CaseState\n\n\n"
+                '__all__ = ["CaseState"]\n'
+            ),
+            "core/__init__.py": "",
+            "core/domain.py": "class CaseState:\n    pass\n",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert not any(f.startswith("R7") for f in failures), failures
+
+
+def test_an_empty_but_declared_surface_is_allowed(tmp_path):
+    """``__all__: list[str] = []`` says "this package forwards nothing"."""
+    build(
+        tmp_path,
+        {
+            "clinical/__init__.py": "__all__: list[str] = []\n",
+            "core/__init__.py": "",
+            "core/domain.py": "class CaseState:\n    pass\n",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert not any(f.startswith("R7") for f in failures), failures
+
+
+def test_a_module_that_defines_something_is_allowed(tmp_path):
+    build(
+        tmp_path,
+        {
+            "consultation/__init__.py": "",
+            "consultation/labels.py": (
+                "from ..core.domain import CaseState\n\n\n"
+                "LABELS = {}\n"
+            ),
+            "core/__init__.py": "",
+            "core/domain.py": "class CaseState:\n    pass\n",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert not any(f.startswith("R7") for f in failures), failures
+
+
+def test_an_entry_point_is_allowed(tmp_path):
+    """Forwarding one call is what an entry point is for."""
+    build(
+        tmp_path,
+        {
+            "cli.py": "from .server import main\n\n\nif __name__ == \"__main__\":\n    main()\n",
+            "server/__init__.py": "def main():\n    pass\n",
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert not any(f.startswith("R7") for f in failures), failures
+
+
+def test_a_platform_shim_defining_its_name_in_a_branch_is_allowed(tmp_path):
+    """platform_fs.py binds ``os`` on POSIX and a whole implementation on
+    Windows; a branch is still a definition."""
+    build(
+        tmp_path,
+        {
+            "infra/__init__.py": "",
+            "infra/platform_fs.py": (
+                "import os as _os\n\nif _os.name != 'nt':\n    os = _os\n"
+            ),
+        },
+    )
+    failures, _, _ = rules.run(tmp_path, ceiling=99)
+    assert not any(f.startswith("R7") for f in failures), failures
