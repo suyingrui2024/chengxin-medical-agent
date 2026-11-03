@@ -6,26 +6,28 @@ from threading import Event as ThreadEvent, Thread
 from time import monotonic
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
-from ._preamble import (
-    CaseState,
-    DecisionInterrupted,
-    Event,
-    KINDS,
+from ...clinical.reasoning import ReasoningWorkspace
+from ...core.decision_wait import DecisionInterrupted
+from ...core.domain import CaseState
+from ...core.events import Event
+from ...infra.backends import parse_decision
+from ..constants import (
     KIND_INSTRUCTIONS,
+    KINDS,
     MAX_BRANCHES,
     RECENT_WINDOW_TURNS,
-    ReasoningWorkspace,
     SPAWN_ENVELOPE_DEADLINE_S,
     SPAWN_ENVELOPE_TOKENS,
     TENDENCY_LEVELS,
     _KIND_TOOLS,
+)
+from ..content import (
     _content_index,
-    _estimate_roundtrip_tokens,
     _knowledge_search,
     _known_fact_keys,
-    parse_decision,
     watermark,
 )
+from ..token_est import _estimate_roundtrip_tokens
 
 
 class CoordinatorBranch:

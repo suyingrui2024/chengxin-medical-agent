@@ -8,21 +8,24 @@ import re
 import sqlite3
 from typing import Any
 from uuid import uuid4
-from ._preamble import (
-    GENERIC_MEASUREMENT_CONTEXTS,
-    GLUCOSE_MEASUREMENT_CONTEXTS,
-    InspectedImage,
+from ...core.measurement_kinds import (
     KNOWN_KINDS,
     MeasurementKindError,
-    PatientRecordConflict,
-    PatientRecordError,
-    _MEASUREMENT_CONTEXT_LABELS,
-    _clean_text,
-    _time,
     kind_spec,
     normalize_measurement,
-    utc_now,
-    validate_recognition,
+)
+from ...core.domain import utc_now
+from ...infra.medical_images import InspectedImage, validate_recognition
+from ..constants import (
+    GENERIC_MEASUREMENT_CONTEXTS,
+    GLUCOSE_MEASUREMENT_CONTEXTS,
+    _MEASUREMENT_CONTEXT_LABELS,
+)
+from ..validation import (
+    PatientRecordConflict,
+    PatientRecordError,
+    _clean_text,
+    _time,
 )
 
 

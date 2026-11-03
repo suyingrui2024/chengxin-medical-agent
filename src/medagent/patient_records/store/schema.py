@@ -6,13 +6,12 @@ import sqlite3
 from threading import RLock
 from typing import Any, Iterator
 from uuid import uuid4
-from ._preamble import (
-    BASELINE_FIELDS,
+from ...core.domain import utc_now
+from ..constants import BASELINE_FIELDS, SCHEMA_VERSION
+from ..validation import (
     PatientRecordError,
-    SCHEMA_VERSION,
     _profile_dict,
     default_patient_data_root,
-    utc_now,
     validate_baseline_patch,
 )
 

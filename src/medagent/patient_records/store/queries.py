@@ -4,16 +4,18 @@ from decimal import Decimal
 import json
 from pathlib import Path
 from typing import Any
-from ._preamble import (
+from ...core.domain import utc_now
+from ...core.measurement_kinds import (
     MeasurementKindError,
-    PatientRecordConflict,
-    PatientRecordError,
-    _render_decimal,
-    convert_glucose,
     kind_spec,
     normalize_measurement,
     trend_summary,
-    utc_now,
+)
+from ...extensions.glucose import convert_glucose
+from ..validation import (
+    PatientRecordConflict,
+    PatientRecordError,
+    _render_decimal,
 )
 
 

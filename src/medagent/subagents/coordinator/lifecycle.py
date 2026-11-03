@@ -4,7 +4,9 @@ import os
 from threading import BoundedSemaphore, Lock
 from time import monotonic
 from typing import Any, Dict, List, Optional
-from ._preamble import CaseState, Event, KINDS, MODES
+from ...core.domain import CaseState
+from ...core.events import Event
+from ..constants import KINDS, MODES
 
 
 class CoordinatorLifecycle:
