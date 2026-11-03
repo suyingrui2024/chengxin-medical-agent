@@ -48,6 +48,17 @@ jobs:
       # copies of the same bytes.
       - name: Enforce large-asset ceiling
         run: python scripts/lint/asset_size.py
+      # The version is declared once, in src/medagent/_version.py. Two manifest
+      # files and the policy version stamped into every audit record have to
+      # agree with it: a stale policy_version says the clinical policy in force
+      # was a different one from the code that ran.
+      - name: Enforce one version
+        run: python scripts/lint/version.py
+      # A design document nobody can find is a design nobody reads. The index
+      # lists every document with its status and last change, and this fails
+      # when a document is missing from it.
+      - name: Enforce the docs index
+        run: python scripts/lint/docs_index.py --check
       # Undefined names and broken annotations are cheap to catch and were the
       # one class of defect the suite could not: a skipped test hid a
       # `threading` that was never imported.
@@ -74,29 +85,61 @@ jobs:
       #
       # Running a hand-picked list is how sixteen appearance tests stayed
       # red for five days: they were never in the workflow. The browser
-      # suite now runs whole, the same way the Python step runs the whole
-      # suite.
+      # suite runs whole, the same way the Python step runs the whole suite.
       #
-      # It is a hard gate now. Two things had to change first: the scripted
-      # models obey the engine's machine-readable feedback (so a rejected
-      # proposal no longer desyncs the whole script), and `test:ui:ci` runs
-      # one spec file per server — sharing a single server meant each file
-      # inherited the previous one's patient record and the red set moved
-      # with file order. With those, all 52 spec files pass on a clean
-      # checkout, so a failure here is a real failure.
-      - name: Run the whole browser suite
-        run: npm run test:ui:ci
+      # It used to run in this job too, but it is the long pole of the
+      # pipeline -- one server per spec file -- so it moved to its own job
+      # below, split into four shards, and this job no longer has to fit it
+      # in the same timeout. It is still a hard gate: two things had to change
+      # first, the scripted models obeying the engine's machine-readable
+      # feedback (so a rejected proposal no longer desyncs the whole script)
+      # and `test:ui:ci` running one spec file per server. With those, all 52
+      # spec files pass on a clean checkout, so a failure there is a real
+      # failure.
       - name: Check interface formatting (same list as local format:check)
         run: npm run format:check
-      # A failing spec is worth nothing without its trace: the screenshots and
-      # trace files are the only record of what the browser actually saw, and
-      # `retain-on-failure` writes them only for the cases that failed. Kept a
-      # week — long enough to investigate, short enough not to accumulate.
+
+  # The browser suite starts a fresh server per spec file, which makes it the
+  # long pole of the whole pipeline: on one runner it is most of the job, and
+  # the patient-safety job above has to fit it in the same timeout. Four
+  # shards on four runners finish in the time one shard took before.
+  #
+  # Sharding is by file index, round robin, so the shards carry comparable
+  # cost. Each shard gets its own port and its own output directory: the
+  # suite wipes its output directory between files, so two shards sharing one
+  # would spend their time deleting each other's artefacts.
+  browser-suite:
+    name: Browser suite (shard ${{ matrix.shard }}/4)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.23.3
+          cache: npm
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install locked browser test dependencies
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps chromium
+      - name: Run the browser suite
+        env:
+          UI_SHARD: ${{ matrix.shard }}/4
+          UI_PORT: 18766
+          UI_OUTPUT_DIR: test-results/ui-${{ matrix.shard }}
+        run: npm run test:ui:ci
       - name: Upload browser failure evidence
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: playwright-failure
-          path: test-results/ui
+          name: playwright-failure-${{ matrix.shard }}
+          path: test-results/ui-${{ matrix.shard }}
           retention-days: 7
           if-no-files-found: ignore

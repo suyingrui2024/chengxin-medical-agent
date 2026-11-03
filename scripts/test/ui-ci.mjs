@@ -33,9 +33,47 @@ import process from "node:process";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const UI_DIR = path.join(ROOT, "tests/ui");
-const OUTPUT_DIR = path.join(ROOT, "test-results/ui");
+// The same directory the Playwright config writes to, so the cleanup and
+// the run always agree about where the artefacts are.
+const OUTPUT_DIR = path.join(
+  ROOT,
+  process.env.UI_OUTPUT_DIR || "test-results/ui",
+);
 const SHOTS_DIR = path.join(ROOT, "test-results/shots");
-const PORT = 18766;
+/**
+ * The port the demo server binds. Each shard needs its own: the suite is
+ * sequential on purpose, but two shards running side by side would fight
+ * over the port, and the wait-for-free logic would then spend its time
+ * failing rather than testing.
+ */
+const PORT = Number(process.env.UI_PORT || 18766);
+
+/**
+ * `UI_SHARD=2/4` runs the second quarter of the spec files. The browser
+ * suite is the long pole in CI -- it starts a fresh server per file -- so
+ * sharding it is what keeps the job inside its timeout. Files are assigned
+ * round-robin by index, which keeps the shards comparable in cost rather
+ * than front-loading the slow ones into one of them.
+ */
+function shardOf(index, total) {
+  return index % total;
+}
+
+function parseShard() {
+  const raw = process.env.UI_SHARD;
+  if (!raw) return null;
+  const match = /^(\d+)\/(\d+)$/.exec(raw.trim());
+  if (!match) {
+    console.error(`UI_SHARD must look like 2/4, got ${raw}`);
+    process.exit(1);
+  }
+  const [, index, total] = match.map(Number);
+  if (index < 1 || index > total) {
+    console.error(`UI_SHARD ${raw} is out of range`);
+    process.exit(1);
+  }
+  return { index: index - 1, total };
+}
 /**
  * `--shots` writes the acceptance screenshots into `docs/assets/ui`
  * (the committed set) instead of the throwaway output directory. Set as an
@@ -94,13 +132,14 @@ async function waitForPortFree(timeoutMs = 20000) {
   return false;
 }
 
+/**
+ * Every spec file, in a stable order. The name filter is applied later, after
+ * sharding: filtering first would renumber the files and hand most of the
+ * shards nothing to run.
+ */
 function specFiles() {
-  // Optional argument filters by file name, so a single spec can be run
-  // through the same isolated path while iterating on it.
-  const filter = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
   return readdirSync(UI_DIR)
     .filter((name) => name.endsWith(".spec.mjs"))
-    .filter((name) => !filter || name.includes(filter))
     .sort()
     .map((name) => path.join("tests/ui", name));
 }
@@ -131,9 +170,29 @@ function run(file) {
   });
 }
 
-const files = specFiles();
-if (files.length === 0) {
+const allFiles = specFiles();
+if (allFiles.length === 0) {
   console.error("no spec files under tests/ui");
+  process.exit(1);
+}
+const shard = parseShard();
+const sharded = shard
+  ? allFiles.filter((_, index) => shardOf(index, shard.total) === shard.index)
+  : allFiles;
+// Optional argument filters by file name, so a single spec can be run
+// through the same isolated path while iterating on it. It narrows the
+// shard, it does not replace it.
+const filter = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
+const files = filter
+  ? sharded.filter((file) => file.includes(filter))
+  : sharded;
+if (shard) {
+  console.log(
+    `shard ${shard.index + 1}/${shard.total}: ${files.length} of ${sharded.length} spec files`,
+  );
+}
+if (files.length === 0) {
+  console.error("no spec files matched");
   process.exit(1);
 }
 
