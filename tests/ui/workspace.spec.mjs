@@ -153,7 +153,7 @@ test("structured components isolate errors and keep patient text inert", async (
   await page.goto("/");
   await expect(page.getByText("本机服务已连接")).toBeVisible();
   await page.evaluate(async () => {
-    const { createRenderer } = await import("/structured-ui.js");
+    const { createRenderer } = await import("/js/structured-ui.js");
     const renderer = createRenderer();
     renderer.register(
       "broken-test",

@@ -74,7 +74,7 @@ test("baseline banner hides on dismiss and fires its callback", async ({
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    const module = await import("/patient-records-ui.js");
+    const module = await import("/js/patient-records-ui.js");
     let called = false;
     const banner = module.createBaselineBanner({
       onDismiss: () => {

@@ -10,6 +10,7 @@ requires it to close.
 """
 from __future__ import annotations
 
+import fnmatch
 import io
 import pathlib
 import posixpath
@@ -35,6 +36,11 @@ JS_IMPORT = re.compile(
 ASSET_LITERAL = re.compile(
     r'["\'`]([\w./-]+\.(?:svg|png|otf|json|woff2))(?:#[^"\'`]*)?["\'`]'
 )
+#: A URL literal in a browser spec, naming a file the server would serve.
+SPEC_URL = re.compile(r'"(/[^"\s]+\.(?:js|css|svg|png|json|woff2?))"')
+#: ``page.route("**/name", ...)`` -- the spec answers this request itself, so
+#: the URL needs no file behind it.
+ROUTE_GLOB = re.compile(r'page\.route\(\s*["\']([^"\']+)["\']')
 #: In a manifest only these keys name a served file; ``upstream_path`` and
 #: ``editable_source`` describe somewhere else entirely.
 MANIFEST_ENTRY = re.compile(r'"(?:file|license_file)"\s*:\s*"([^"]+)"')
@@ -267,6 +273,37 @@ class DesktopShellTests(unittest.TestCase):
             if not (ROOT / "desktop" / reference).is_file()
         ]
         self.assertEqual(missing, [], f"启动页引用了不存在的文件：{missing}")
+
+
+class BrowserSuiteReferenceTests(unittest.TestCase):
+    """A browser spec that asks for a file the server does not serve fails at
+    the moment it runs, not when it is written.
+
+    The page's own reference graph is checked above.  The specs' is a second
+    graph: they import modules by URL (``await import("/structured-ui.js")``)
+    and the browser resolves that against the server.  When the web tree moved
+    into ``css/``, ``js/`` and ``assets/``, the page was updated and the specs
+    were not, so twenty-nine tests failed on a module that was simply no
+    longer at the old address.
+    """
+
+    def test_spec_urls_resolve_to_served_files(self):
+        served = {
+            path.relative_to(WEB_ROOT).as_posix()
+            for path in WEB_ROOT.rglob("*")
+            if path.is_file() and "__pycache__" not in path.parts
+        }
+        missing = []
+        for spec in sorted((ROOT / "tests" / "ui").glob("*.mjs")):
+            text = spec.read_text(encoding="utf-8")
+            mocked = ROUTE_GLOB.findall(text)
+            for url in SPEC_URL.findall(text):
+                if any(fnmatch.fnmatch(url, glob) for glob in mocked):
+                    continue  # the spec answers this one itself
+                key = resolve("", url.split("#")[0])
+                if key not in served:
+                    missing.append(f"{spec.name}: {url}")
+        self.assertEqual(missing, [], f"浏览器测试引用了不存在的文件：{missing}")
 
 
 if __name__ == "__main__":

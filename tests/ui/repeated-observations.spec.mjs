@@ -46,7 +46,7 @@ test("observation rendering rejects malformed histories and treats evidence as i
 }) => {
   await page.goto("/");
   await page.evaluate(async () => {
-    const { createRenderer } = await import("/structured-ui.js");
+    const { createRenderer } = await import("/js/structured-ui.js");
     const renderer = createRenderer();
     const series = {
       task_id: "axillary_temperature",

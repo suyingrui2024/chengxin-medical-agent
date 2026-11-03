@@ -386,10 +386,25 @@ export function sourceTurnContext(context, evidence) {
   );
   return details;
 }
+/**
+ * An illustration path, as the capability packs declare it.
+ *
+ * The rule is the server's: `ILLUSTRATION_PATH` in
+ * `medagent/extensions/registry.py` is `(?:/[a-z0-9-]+)+\.svg`, one or more
+ * lowercase segments. The two must stay the same, because the packs point at
+ * `web/assets/illustrations/` and a stricter rule here rejects a path the
+ * server considers valid -- the task card then renders as "this part cannot
+ * be displayed" instead of the task.
+ *
+ * The narrowness is the point: the path ends up in an `img src`, so it may
+ * not reach outside the served tree. A dot is not in the segment alphabet,
+ * so no segment can be `..`, and the leading slash makes the path absolute
+ * within the server's own routes rather than a URL.
+ */
 export function asset(value) {
   if (
     typeof value !== "string" ||
-    !/^\/[a-z0-9-]+\.svg(?:#step-[1-9][0-9]?)?$/.test(value)
+    !/^(?:\/[a-z0-9-]+)+\.svg(?:#step-[1-9][0-9]?)?$/.test(value)
   )
     throw new Error("Invalid local asset");
   return value;

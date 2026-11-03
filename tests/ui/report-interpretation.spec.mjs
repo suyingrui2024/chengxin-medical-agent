@@ -9,7 +9,7 @@ test("interpretation section renders grades, explanations and disclaimer", async
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    const module = await import("/patient-records-ui.js");
+    const module = await import("/js/patient-records-ui.js");
     const section = module.createInterpretationSection({
       // 后端 report-interpretation/v1 的 summary 是对象（text 在内）。
       summary: { text: "整体来看有两项需要注意，其余在参考区间内。" },
@@ -77,7 +77,7 @@ test("unknown interpretation grade falls back to grey unjudged", async ({
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    const module = await import("/patient-records-ui.js");
+    const module = await import("/js/patient-records-ui.js");
     const section = module.createInterpretationSection({
       items: [
         {

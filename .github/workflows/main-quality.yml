@@ -76,6 +76,12 @@ jobs:
           npm ci --ignore-scripts
           npx playwright install --with-deps chromium
           node -e "console.log('CHROME_BIN=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      # The frontend unit tests exist but nothing ran them: three files under
+      # tests/unit/ were checked by nobody, and a contract mismatch between
+      # the server's illustration rule and the browser's went unnoticed until
+      # a task card failed to render in fourteen browser tests.
+      - name: Run the frontend unit tests
+        run: npm run test:unit
       - name: Run the full Python suite and the release gate
         env:
           PYTHONPATH: src

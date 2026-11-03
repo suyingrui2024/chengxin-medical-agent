@@ -53,7 +53,7 @@ test("read-only and busy degree cards reject forced programmatic actions", async
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {
-    const { createRenderer } = await import("/structured-ui.js");
+    const { createRenderer } = await import("/js/structured-ui.js");
     const renderer = createRenderer();
     const calls = [];
     for (const context of [{ readOnly: true }, { isBusy: () => true }, {}]) {

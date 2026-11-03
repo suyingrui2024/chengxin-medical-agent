@@ -44,7 +44,7 @@ test("supplement evidence stays inert and invalid processing status falls back",
 }) => {
   await page.goto("/");
   await page.evaluate(async () => {
-    const { createRenderer } = await import("/structured-ui.js");
+    const { createRenderer } = await import("/js/structured-ui.js");
     const renderer = createRenderer();
     const evidence = '<img src=x onerror="window.SUPPLEMENT_EXECUTED=1">';
     const base = {

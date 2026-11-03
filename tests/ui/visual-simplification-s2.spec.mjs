@@ -54,7 +54,7 @@ function makeSheet(level) {
 
 async function renderSheet(page, level) {
   return page.evaluate(async (sheet) => {
-    const module = await import("/structured-ui.js");
+    const module = await import("/js/structured-ui.js");
     const renderer = module.createRenderer();
     const fragment = renderer.renderEnvelope(
       module.replyEnvelope({ action_id: "s2", message: "", conclusion: sheet }),
@@ -145,7 +145,7 @@ test("S2 urgent disposition keeps the safety net expanded", async ({
 test("S2 expanding all toggles reveals every section", async ({ page }) => {
   await page.goto("/");
   const expanded = await page.evaluate(async (sheet) => {
-    const module = await import("/structured-ui.js");
+    const module = await import("/js/structured-ui.js");
     const renderer = module.createRenderer();
     const fragment = renderer.renderEnvelope(
       module.replyEnvelope({ action_id: "s2", message: "", conclusion: sheet }),

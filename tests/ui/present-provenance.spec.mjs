@@ -45,7 +45,7 @@ test("recorded evidence is inert, malformed sources fall back and old summaries 
 }) => {
   await page.goto("/");
   await page.evaluate(async () => {
-    const { createRenderer } = await import("/structured-ui.js");
+    const { createRenderer } = await import("/js/structured-ui.js");
     const renderer = createRenderer();
     const evidence = '<img src=x onerror="window.KNOWN_EXECUTED=1">已报告';
     const item = {

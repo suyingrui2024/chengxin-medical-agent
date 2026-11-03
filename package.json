@@ -23,6 +23,7 @@
     "test:dsh": "node --test integrations/dsh/tests/*.test.mjs",
     "test:dsh:integration": "node integrations/dsh/tests/runtime-smoke.mjs",
     "test:appearance": "playwright test tests/ui/appearance.spec.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs",
     "test:python": "PYTHONPATH=src python3 -m pytest tests/ -q",
     "test:coverage": "PYTHONPATH=src python3 -m coverage run -m pytest tests -q && python3 -m coverage report",
     "lint:structure": "python3 scripts/lint/module_size.py && python3 scripts/lint/function_size.py && python3 scripts/lint/import_rules.py && python3 scripts/lint/naming.py && python3 scripts/lint/asset_size.py && python3 scripts/lint/version.py && python3 scripts/lint/docs_index.py --check && python3 scripts/lint/docstrings.py",
