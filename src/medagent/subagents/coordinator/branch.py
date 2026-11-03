@@ -39,6 +39,14 @@ class CoordinatorBranch:
         cancelled,
         view_extras: Optional[Dict[str, Any]],
     ) -> Dict[str, Any]:
+        """Spawn one subagent task in its configured mode, or refuse honestly.
+
+        The mode decides before the backend is even checked -- "off" returns
+        disabled, an unavailable backend returns unavailable -- so a shadow
+        run that cannot start is a fact in the record, never a silently
+        skipped capability.  Everything the spawn does is recorded under its
+        own session id, so its cost is attributable.
+        """
         kind = proposal.get("task_kind") if isinstance(proposal, dict) else None
         effective_mode = self.mode_for(kind)
         if effective_mode == "off":
@@ -399,6 +407,13 @@ class CoordinatorBranch:
         want_prior: bool,
         view_extras: Optional[Dict[str, Any]],
     ) -> Dict[str, Any]:
+        """Build the view one branch is allowed to see.
+
+        The view is the security boundary: only the kept fact keys, the kept
+        hypotheses and the requested transcript tier go in -- a branch works
+        from what its kind needs, not from the whole case.  Prior context is
+        included only when the kind asked for it.
+        """
         facts = {}
         for key in kept_keys:
             fact = state.facts[key]
@@ -494,6 +509,13 @@ class CoordinatorBranch:
     def _branch_shell(
         self, branch: Dict[str, Any], status: str, error_type: str = None
     ) -> Dict[str, Any]:
+        """Build the failure-shaped result every branch starts from.
+
+        A branch that dies anywhere returns this shell with its status and
+        error type -- the caller always reads the same shape, so a failed
+        branch is data rather than an exception crossing the coordinator.
+        Uncertainty starts high and only evidence lowers it.
+        """
         result = {
             "subagent_id": branch["subagent_id"],
             "branch_id": branch["branch_id"],
@@ -534,6 +556,14 @@ class CoordinatorBranch:
         spawn_id: str,
         parent_cancelled,
     ) -> Dict[str, Any]:
+        """Run one branch with its own budget, deadline and cancellation.
+
+        The branch gets a sub-session id, a token budget from the shared pool
+        and a watcher thread that fires the deadline -- the three limits a
+        spawned model call must not be able to exceed.  Cancellation is a
+        thread event, so the parent stopping does not depend on the child
+        noticing anything.
+        """
         kind = branch["view"]["task_kind"]
         budget = branch["budget"]
         sub_session = f"sub:{branch['subagent_id']}#{branch['branch_id']}"
@@ -781,6 +811,12 @@ class CoordinatorBranch:
         web_pool: Dict[str, str],
         knowledge_pool: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
+        """Serve one tool call from inside a branch, out of the branch's own pools.
+
+        case_view is the view, not the case.  Knowledge and web calls come
+        from the branch's pooled connections, so a branch cannot spend the
+        parent's budget or open its own endpoints.
+        """
         kind = branch["view"]["task_kind"]
         if tool == "case_view":
             return {"ok": True, "tool": tool, "view": branch["view"]}
@@ -840,6 +876,12 @@ class CoordinatorBranch:
         return {"ok": False, "tool": tool, "error": "未知工具"}
 
     def _usage_for(self, sub_session: str, started: float) -> Dict[str, int]:
+        """Tally one sub-session's token and call usage from its event log.
+
+        The usage is read from the events rather than tracked in memory, so a
+        branch that died mid-flight still reports what it spent before it
+        died -- and a coordinator restart does not lose the accounting.
+        """
         usage = {
             "model_calls": 0,
             "input_tokens": 0,

@@ -42,67 +42,12 @@ LINE_THRESHOLD = 25
 
 #: ``module::Qualified.name`` -> the line count when it was grandfathered.
 #: Existing debt only: remove an entry once the function has a docstring.
-BASELINE: dict[str, int] = {
-    "subagents/coordinator/branch.py::CoordinatorBranch._run_spawn": 243,
-    "subagents/coordinator/branch.py::CoordinatorBranch._run_branch": 207,
-    "patient_records/store/schema.py::StoreSchema._initialize": 183,
-    "core/presentation.py::reply_presentation": 143,
-    "patient_records/store/assets.py::StoreAssets.finish_recognition": 107,
-    "review/background_review.py::BackgroundReviewCoordinator._finish_success": 94,
-    "subagents/coordinator/validate.py::CoordinatorValidate._validate_digest": 94,
-    "subagents/coordinator/branch.py::CoordinatorBranch._build_view": 88,
-    "subagents/coordinator/validate.py::CoordinatorValidate._validate_report": 88,
-    "patient_records/store/assets.py::StoreAssets.revise_observation": 87,
-    "patient_records/store/assets.py::StoreAssets.add_measurement": 78,
-    "desktop_service.py::main": 75,
-    "patient_records/store/queries.py::StoreQueries.glucose_trend": 75,
-    "subagents/coordinator/branch.py::CoordinatorBranch._execute_tool": 67,
-    "core/domain.py::CaseState.to_dict": 65,
-    "patient_records/store/assets.py::StoreAssets.create_image_entry": 65,
-    "patient_records/store/queries.py::StoreQueries.timeline": 57,
-    "review/background_review.py::BackgroundReviewCoordinator._run": 57,
-    "patient_records/store/queries.py::StoreQueries.entry": 53,
-    "core/decision_wait.py::DecisionWaiter.invoke": 52,
-    "review/background_review.py::BackgroundReviewCoordinator._snapshot": 51,
-    "guards/red_flags.py::RedFlagScanner._combo_hit": 50,
-    "patient_records/store/assets.py::StoreAssets._insert_observation": 49,
-    "subagents/coordinator/lifecycle.py::CoordinatorLifecycle.__init__": 49,
-    "kg/store.py::ConceptStore.add": 48,
-    "review/background_review.py::BackgroundReviewCoordinator._finish_failure": 42,
-    "desktop_service.py::main.watch_parent": 41,
-    "guards/red_flags.py::RedFlagScanner.scan": 38,
-    "patient_records/store/queries.py::StoreQueries.delete_entry": 38,
-    "core/presentation.py::calculation_presentation": 37,
-    "review/release_evaluation.py::validate_case": 36,
-    "core/text_match.py::_occurrence_negated": 34,
-    "subagents/coordinator/branch.py::CoordinatorBranch._branch_shell": 34,
-    "guards/red_flags.py::load_definitions": 32,
-    "kg/normalize.py::Normalizer.find": 32,
-    "subagents/coordinator/branch.py::CoordinatorBranch._usage_for": 31,
-    "core/domain.py::AgentReply.to_dict": 29,
-    "patient_records/recognition_jobs.py::_run_job_in_thread": 29,
-    "review/release_evaluation.py::evaluate_cases": 29,
-    "infra/web_tools.py::WebTools.__init__": 28,
-    "core/events.py::EventStore.append": 27,
-    "guards/red_flags.py::RedFlagScanner._combo_is_discriminated": 27,
-    "review/audit_recording.py::RecordingBackend._record": 27,
-    "patient_records/store/assets.py::StoreAssets.answer_clarification": 26,
-    "subagents/coordinator/validate.py::CoordinatorValidate._validate_followup": 26,
-    "guards/red_flags.py::RedFlagScanner._pattern_hit": 25,
-
-}
+BASELINE: dict[str, int] = {}
 
 #: Modules without a module docstring, grandfathered.  Remove an entry once
 #: the module says what it is for.
-MODULE_BASELINE: set[str] = {
-    "cli.py",
-    "guards/self_checks.py",
-    "patient_records/constants.py",
-    "patient_records/validation.py",
-    "subagents/constants.py",
-    "subagents/content.py",
-    "subagents/token_est.py",
-}
+MODULE_BASELINE: set[str] = set()
+
 
 
 def qualified_name(node: ast.AST, prefix: str = "") -> str:

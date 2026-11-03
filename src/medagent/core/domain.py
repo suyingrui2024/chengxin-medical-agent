@@ -182,6 +182,13 @@ class CaseState:
         return fact.assertion if fact else Assertion.UNKNOWN
 
     def to_dict(self) -> Dict[str, Any]:
+        """Serialise the case for the API: subject, facts, phase, risk, tasks.
+
+        The consultation subject is derived here so every consumer of the
+        state sees the same answer to "who is this about"; the facts are
+        serialised through their own to_dict so assertion and provenance
+        travel as values, not enum objects.
+        """
         from ..dialogue.consultation_subject import subject_profile
 
         return {
@@ -280,6 +287,12 @@ class AgentReply:
     adaptive_question: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
+        """Serialise the reply, attaching the UI envelope and the subject.
+
+        The presentation is built here rather than cached: the envelope is
+        derived from the reply's current state, so a rebuilt reply always
+        matches what the structured fields say.
+        """
         from .presentation import reply_presentation
 
         payload = {

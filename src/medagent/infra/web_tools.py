@@ -360,6 +360,12 @@ class WebTools:
         daily_cap: int = 500,
         now: Optional[Callable[[], datetime]] = None,
     ) -> None:
+        """Hold the search credentials and the tier list the education flow may cite.
+
+        The key is kept off the instance's repr path and the tiers come from
+        the deployment, because which sources are trusted is an operator
+        decision, not a code decision.
+        """
         self.events = events
         self.api_key = (
             api_key if api_key is not None else os.environ.get("MEDAGENT_LLM_API_KEY", "")

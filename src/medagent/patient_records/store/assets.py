@@ -48,6 +48,13 @@ class StoreAssets:
         original_filename: Any,
         image: InspectedImage,
     ) -> dict[str, Any]:
+        """Archive one image entry: the asset, the entry and its first observation.
+
+        The asset id and the entry id are separate because the picture and the
+        record about it have different lives -- recognition runs against the
+        asset, the timeline shows the entry.  Titles and filenames are
+        cleaned and defaulted so an unnamed photo still has a readable row.
+        """
         entry_id = str(uuid4())
         asset_id = str(uuid4())
         now = utc_now()
@@ -173,6 +180,13 @@ class StoreAssets:
         source_id: str,
         now: str,
     ) -> str:
+        """Write one observation and its first revision inside the caller's transaction.
+
+        Every value lands with a revision id from birth: a measurement that
+        can never be revised is a measurement that cannot be corrected, and
+        the archive's whole versioning rests on revisions existing from the
+        start.
+        """
         observation_id = str(uuid4())
         revision_id = str(uuid4())
         connection.execute(
@@ -211,6 +225,13 @@ class StoreAssets:
     def finish_recognition(
         self, recognition_id: str, result: Any
     ) -> dict[str, Any]:
+        """Complete a recognition run with a validated result.
+
+        The result is validated before the transaction opens, the run must
+        still be pending, and the recognized numbers become observations of
+        the entry the image belongs to -- a completed recognition that writes
+        nothing would leave the patient with a picture and no record.
+        """
         normalized = validate_recognition(result)
         now = utc_now()
         with self._transaction() as connection:
@@ -348,6 +369,12 @@ class StoreAssets:
         measured_at: Any,
         measurement_context: Any,
     ) -> dict[str, Any]:
+        """Record one measurement the patient entered by hand.
+
+        The kind must be a registered measurement kind, the value is
+        normalised against that kind's rules and unit -- the archive cannot
+        hold "120" without knowing whether it is mmHg or mmol/L.
+        """
         measurement_kind = _clean_text(kind, "测量项目", 60)
         try:
             spec = kind_spec(measurement_kind)
@@ -437,6 +464,14 @@ class StoreAssets:
         expected_revision_id: Any,
         reason: str = "correction",
     ) -> dict[str, Any]:
+        """Revise one observation, expected-revision style, keeping the old value.
+
+        The revision only lands when the caller's expected revision id is the
+        current one -- two screens editing the same observation resolve to one
+        winner instead of a silent last-write.  The reason is recorded, and
+        the previous revision stays in the table: a corrected blood pressure
+        keeps the wrong one that was corrected.
+        """
         value = _clean_text(value_text, "修改内容", 300)
         normalized_unit = _clean_text(unit or "", "单位", 40, required=False)
         expected = _clean_text(expected_revision_id, "数据版本", 80)
@@ -524,6 +559,13 @@ class StoreAssets:
         unit: Any,
         expected_revision_id: Any,
     ) -> dict[str, Any]:
+        """Answer a clarification the archive raised about one observation.
+
+        The answer is written as a revision of the observation it clarifies,
+        guarded by the expected revision id -- and the clarification row must
+        still belong to a live observation, because answering a question
+        about a deleted measurement would create an orphan fact.
+        """
         with self._read() as connection:
             row = connection.execute(
                 """SELECT c.*, o.current_revision_id FROM clarification_requests c

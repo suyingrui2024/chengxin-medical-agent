@@ -1,3 +1,13 @@
+"""Every write into the health archive passes through here.
+
+The validators are the archive's immune system: field shapes, version
+guards and cross-references are checked before a transaction opens, so
+an invalid write leaves stored data untouched rather than half-applied.
+
+Start at the ``validate_*`` functions; the store calls them, routes do
+not.
+"""
+
 from __future__ import annotations
 import json
 import re

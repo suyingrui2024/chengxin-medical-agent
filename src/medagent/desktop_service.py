@@ -31,6 +31,14 @@ class DesktopHandler(Handler):
 
 
 def main():
+    """The desktop sidecar's entry point: one handshake, then serve.
+
+    The Electron parent owns this process's stdin, and the first line is a
+    64-character token that every later request must carry -- an HTTP
+    endpoint cannot join the conversation.  The backend comes from the
+    environment only when live mode was asked for; otherwise the sidecar is
+    demo, which cannot call a model.
+    """
     from .infra.processes import own_process_tree
 
     own_process_tree()
@@ -59,6 +67,12 @@ def main():
     def watch_parent():
         # Only the Electron parent owns this pipe. No renderer/HTTP endpoint can
         # nominate a directory. EOF also arrives when the parent crashes.
+        """Serve the command pipe from the Electron parent until it dies.
+
+        Only the parent can nominate a directory -- there is no renderer or
+        HTTP path to this pipe -- and EOF means the parent crashed, so the
+        sidecar exits rather than outliving its UI.
+        """
         while True:
             line = sys.stdin.readline(8192)
             if not line:

@@ -78,6 +78,13 @@ class EventStore:
                 self.skipped_corrupt += 1
 
     def append(self, event: Event) -> None:
+        """Append one event, stamping the session's trace identity onto it.
+
+        The first event of a turn establishes the trace, request and decision
+        ids; every later event inherits them, so an audit trail can be read
+        as one thread even though events are appended from several places.
+        The append itself is locked and ordered.
+        """
         with self._lock:
             trace = self._traces.get(event.session_id, {})
             if trace:

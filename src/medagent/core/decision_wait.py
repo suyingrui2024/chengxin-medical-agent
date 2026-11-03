@@ -28,6 +28,14 @@ class DecisionWaiter:
     def invoke(
         self, backend, session_id, messages, turn, condition: Condition, discarded
     ):
+        """Run one model decision on a worker slot, or refuse when busy.
+
+        The slot is acquired without blocking: a capacity error tells the
+        engine to stop the turn rather than queue it, because a queued
+        decision would finish after the patient stopped waiting.  A discarded
+        result is logged exactly once, so the audit shows the model worked
+        and the answer was thrown away.
+        """
         if turn.cancelled.is_set():
             raise DecisionInterrupted()
         if not self.slots.acquire(blocking=False):

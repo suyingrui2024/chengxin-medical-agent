@@ -283,6 +283,12 @@ class BackgroundReviewCoordinator:
         return turn_id, material
 
     def _snapshot(self, state, job: ReviewJob) -> Dict[str, Any]:
+        """Freeze the case state a review runs against.
+
+        The snapshot keeps only the fields the review reads, taken under the
+        engine lock -- the review runs in the background, and a fact edited
+        while it runs must not change what was already reviewed.
+        """
         facts = {
             key: {
                 name: value
@@ -335,6 +341,13 @@ class BackgroundReviewCoordinator:
         }
 
     def _run(self, job: ReviewJob) -> None:
+        """Run one review job on a slot, with its deadline armed.
+
+        The slot is non-blocking: a full coordinator fails the job as "capacity"
+        rather than queueing it, because a review that runs after the patient
+        left is worthless.  The state is snapshotted under the session lock
+        and the model call happens outside it.
+        """
         if not self._slots.acquire(blocking=False):
             self._finish_failure(job, "capacity")
             return
@@ -407,6 +420,13 @@ class BackgroundReviewCoordinator:
         # when its poll sees the cancellation, so without this the
         # deadline label (and any per-error_type metric) is systematically
         # under-counted even though the failure semantics were right.
+        """Settle a failed review, labelling the deadline correctly.
+
+        A timeout is a timeout whatever the backend raised while being cancelled
+        -- the real backend raises DecisionInterrupted when its poll sees the
+        cancellation, and without this mapping the deadline label is
+        systematically under-counted even though the semantics were right.
+        """
         if job.timed_out.is_set():
             error_type = "deadline"
         try:
@@ -450,6 +470,13 @@ class BackgroundReviewCoordinator:
         review: Dict[str, list[str]],
         dropped_counts: Optional[Dict[str, int]] = None,
     ) -> None:
+        """Apply a finished review, re-checking every gate under the session lock.
+
+        The schedule gate is re-checked at completion -- a review started when a
+        review was allowed must not land after the case was closed or
+        escalated.  The session may also be gone entirely, in which case
+        there is nothing to attach the review to and that is not an error.
+        """
         try:
             try:
                 state = job.engine.state(job.session_id)

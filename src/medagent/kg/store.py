@@ -126,6 +126,12 @@ class ConceptStore:
         self.connection.close()
 
     def add(self, concepts: Iterable[Concept], relations: Iterable[Relation] = ()) -> None:
+        """Insert or replace concepts and their relations in one transaction.
+
+        The transaction is the boundary: either the batch lands completely or
+        the store stays as it was, so a partially loaded concept set cannot be
+        queried as if it were whole.
+        """
         with self.connection:
             for concept in concepts:
                 self.connection.execute(

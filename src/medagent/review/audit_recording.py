@@ -133,6 +133,12 @@ class RecordingBackend:
         self.wrapped_name = getattr(inner, "name", None)
 
     def _record(self, session_id: str, messages, started: float, result, error):
+        """Record one model call for the audit: full messages, timing, outcome.
+
+        The messages are deep-copied because the caller mutates them after the
+        call, and an audit that shows the prompt as it is *now* is not an
+        audit of the call that happened.
+        """
         self._seq += 1
         record = {
             "call_site": self.call_site,

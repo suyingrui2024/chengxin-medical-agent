@@ -62,6 +62,14 @@ class StoreSchema:
                 connection.close()
 
     def _initialize(self) -> None:
+        """Create the schema, versioned, under a lock, in WAL mode.
+
+        WAL is what lets the archive be read while a recognition writes, and the
+        migrations are idempotent so an archive opened by an older build is
+        brought forward rather than refused.  The whole thing runs under the
+        schema lock, because two connections creating tables concurrently is
+        how a database ends up with both versions of a table.
+        """
         with self.lock:
             connection = self._connect()
             try:

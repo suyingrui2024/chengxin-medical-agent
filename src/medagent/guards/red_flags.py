@@ -320,6 +320,13 @@ class FlagHit:
 
 
 def load_definitions() -> Tuple[RedFlagDefinition, ...]:
+    """Load the red-flag definitions from the embedded content package.
+
+    The JSON is read once per call rather than cached at import, so a test
+    that rewrites the definitions sees them; every flag's phrases, patterns
+    and combination rule are built here, and a malformed definition fails at
+    load.
+    """
     raw = (
         resources.files("medagent.content")
         .joinpath("red_flags.json")
@@ -391,6 +398,13 @@ class RedFlagScanner:
     def _pattern_hit(
         self, definition: RedFlagDefinition, patterns: List[re.Pattern], text: str
     ) -> Optional[FlagHit]:
+        """Match one regex definition, honouring its per-pattern negation exemptions.
+
+        Negation inside the matched span is the symptom itself ("没有胸痛" as
+        part of a longer description) and is exempt; only a negation
+        earlier in the sentence kills the hit.  The distinction is per
+        pattern, because the data decides where negation applies.
+        """
         exempt = set(definition.negation_exempt_patterns)
         for pattern in patterns:
             for match in pattern.finditer(text):
@@ -415,6 +429,13 @@ class RedFlagScanner:
         return None
 
     def _combo_hit(self, definition: RedFlagDefinition, text: str) -> Optional[FlagHit]:
+        """Match a combination rule: two cues from the required groups, no exclusion.
+
+        Each required group must be affirmed somewhere in the text, tokens the
+        rule excludes carve out their spans first, and the combination must
+        be affirmed in one sentence -- "出汗" in one sentence and "胸痛" in
+        another is not a crying-sweat combination.
+        """
         combo = definition.combo
         if combo is None:
             return None
@@ -537,6 +558,13 @@ class RedFlagScanner:
     def _combo_is_discriminated(
         self, text: str, span: Tuple[int, int], combo: ComboRule
     ) -> bool:
+        """Check that a combination hit carries discriminating quality, not a bare mention.
+
+        A sentence naming two cues is only a red flag when at least one is
+        affirmed with quality -- sweat that is real, pain of a described
+        character, a severity that is stated.  Two bare mentions in one
+        sentence are how a patient lists what they do not have.
+        """
         sent_start, sent_end = self._sentence_span(text, span[0])
         for token in (
             self._COMBO_SWEAT_MARKERS
@@ -564,6 +592,12 @@ class RedFlagScanner:
 
     # -- public ---------------------------------------------------------
     def scan(self, text: str) -> List[FlagHit]:
+        """Scan free text for red flags: phrase, then pattern, then combination.
+
+        The three matchers run in order for every definition, and the first hit
+        wins -- a combination rule is only consulted when neither a phrase nor a
+        pattern matched, so the more specific evidence is preferred.
+        """
         hits: List[FlagHit] = []
         for definition, patterns in self._compiled:
             hit = self._phrase_hit(definition, text)

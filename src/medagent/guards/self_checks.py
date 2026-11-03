@@ -1,3 +1,13 @@
+"""The self-check tasks a patient is offered, and what counts as done.
+
+A task is offered only when it applies and is not already answered, and
+its result is accepted only through the versioned contract the task
+declares -- "done" is a claim the record can verify, not a tick in the
+interface.
+
+Start at ``SelfCheckService``.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

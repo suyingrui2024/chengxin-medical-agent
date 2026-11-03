@@ -21,6 +21,12 @@ from ..validation import (
 
 class StoreQueries:
     def timeline(self, patient_id: str) -> dict[str, Any]:
+        """Serve one patient's timeline: entries with their observation counts.
+
+        The counts are subqueries rather than a join, so an entry with no
+        observations still appears exactly once instead of being duplicated
+        per observation or dropped entirely.
+        """
         patient = self.patient(patient_id)
         with self._read() as connection:
             rows = connection.execute(
@@ -120,6 +126,11 @@ class StoreQueries:
         return {"entry": detail["entry"], "observations": verified}
 
     def glucose_trend(self, patient_id: str) -> dict[str, Any]:
+        """Serve the glucose series for the trend chart, in recorded order.
+
+        Only current revisions are read -- a superseded value stays in the
+        archive for audit but must not draw a second point on the chart.
+        """
         self.patient(patient_id)
         with self._read() as connection:
             rows = connection.execute(
@@ -413,6 +424,12 @@ class StoreQueries:
         return results
 
     def entry(self, entry_id: str) -> dict[str, Any]:
+        """Serve one entry in full: its assets, observations and clarifications.
+
+        Deleted assets stay out of the detail view, and a missing entry raises
+        through _require_entry so the caller answers 404 rather than
+        fabricating an empty record.
+        """
         with self._read() as connection:
             entry = self._require_entry(connection, entry_id)
             assets = connection.execute(
@@ -467,6 +484,13 @@ class StoreQueries:
         }
 
     def delete_entry(self, entry_id: str, expected_version: Any) -> None:
+        """Soft-delete one entry under optimistic concurrency, and collect its files.
+
+        The expected version makes a delete from a stale screen fail instead of
+        removing an entry edited since it was loaded.  The asset paths are
+        collected inside the transaction and unlinked after it commits -- the
+        record is the source of truth, the files follow it.
+        """
         if not isinstance(expected_version, int) or expected_version < 1:
             raise PatientRecordError("记录版本无效")
         now = utc_now()

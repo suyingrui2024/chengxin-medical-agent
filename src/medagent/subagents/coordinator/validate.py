@@ -23,6 +23,12 @@ class CoordinatorValidate:
         spawn_id: str,
         knowledge_pool: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
+        """Validate a branch report into the shell shape, field by field.
+
+        The report starts as a failed shell and earns its fields: every note
+        records why something was dropped or defaulted, so a degraded report
+        is visible as degraded rather than reading as complete.
+        """
         kind = branch["view"]["task_kind"]
         result = self._branch_shell(branch, "failed")
         validation = result["validation"]
@@ -310,6 +316,12 @@ class CoordinatorValidate:
         digest: Any,
         scope_keys: Optional[set] = None,
     ) -> Optional[Dict[str, Any]]:
+        """Validate a branch's case digest against what the view actually contained.
+
+        Findings are cleaned and bounded, and a digest claim that references
+        something outside the branch's kept keys is dropped -- a subagent
+        cannot cite a fact it was never shown.
+        """
         if not isinstance(digest, dict):
             return None
 
@@ -403,6 +415,12 @@ class CoordinatorValidate:
     def _validate_followup(
         report: Dict[str, Any], validation: Dict[str, Any]
     ) -> Optional[Dict[str, Any]]:
+        """Validate the follow-up block, defaulting safely and recording what defaulted.
+
+        An unknown priority becomes "routine" -- the cautious direction -- and a
+        missing draft becomes a note on the validation rather than a silent
+        empty message the patient would receive.
+        """
         priority = report.get("priority")
         if priority not in {"high", "routine"}:
             priority = "routine"

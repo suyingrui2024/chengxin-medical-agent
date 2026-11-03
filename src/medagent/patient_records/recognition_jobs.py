@@ -298,6 +298,13 @@ def _run_job_in_thread(
     image: Any,
     on_complete: Any = None,
 ) -> None:
+    """Run one recognition job off-thread and settle its state either way.
+
+    A RecognitionJobError was already recorded by run_job, so the thread only
+    re-reads the job; any other exception is recorded here, because a
+    background job that dies silently would leave the patient waiting for a
+    result that will never come.
+    """
     try:
         final = run_job(job_store, records, recognizer, job, image)
     except RecognitionJobError:

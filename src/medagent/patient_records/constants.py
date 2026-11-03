@@ -1,3 +1,11 @@
+"""The fixed vocabularies of the health archive.
+
+Measurement contexts, status names and the field lists the store
+validates against all live here: they are the words the archive uses,
+and a value that is not in one of these lists is refused rather than
+stored and guessed at later.
+"""
+
 from __future__ import annotations
 
 SCHEMA_VERSION = 2

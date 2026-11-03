@@ -41,6 +41,14 @@ UNCERTAINTY_MARKERS = ("不清楚", "不知道", "没注意", "没留意", "不�
 
 
 def _occurrence_negated(text: str, index: int) -> bool:
+    """Check whether one occurrence of a term sits inside a negation.
+
+    Negation scopes within its own clause: "感冒没好，又发热了" has a real
+    fever, because the 没 belongs to the previous clause -- the window is cut
+    at the last clause break before the match.  A bare 没 counts only in its
+    immediate construction, which is the difference between "没发烧" and
+    "没量体温".
+    """
     window = text[max(0, index - WINDOW) : index]
     # A negation only scopes within its own clause: "感冒没好，又发热了"
     # has a real fever — the 没 belongs to the previous clause.

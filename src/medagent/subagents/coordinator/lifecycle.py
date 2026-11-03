@@ -22,6 +22,13 @@ class CoordinatorLifecycle:
         max_concurrent: int = 8,
         daily_token_cap: Optional[int] = None,
     ):
+        """Configure the coordinator: mode, per-kind overrides and the budget.
+
+        The mode is one of off/shadow/advisory and per-kind overrides may not
+        invent kinds or exceed the global budget -- a subagent that could
+        spend without limit would be the one part of the system with no
+        ceiling.
+        """
         if mode not in MODES:
             raise ValueError("subagent mode must be off, shadow or advisory")
         if max_concurrent < 1:

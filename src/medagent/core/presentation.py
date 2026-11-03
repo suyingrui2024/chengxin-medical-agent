@@ -25,6 +25,14 @@ def block(kind, identity, data):
 
 
 def reply_presentation(reply):
+    """Turn a reply into the versioned block envelope the frontend renders.
+
+    The identity comes from the action or question id, falling back to a hash
+    of the reply so a block id always exists and is stable.  The block family
+    mirrors what the reply carries -- message, question, task, summary,
+    follow-up, calculation -- and the renderer refuses anything it did not
+    register, so a new field must be rendered deliberately.
+    """
     identity = (
         reply.get("action_id")
         or reply.get("question_id")
@@ -170,6 +178,13 @@ def reply_presentation(reply):
 
 
 def calculation_presentation(result, input_labels=None):
+    """Build the calculation card: the inputs as entered, with labels.
+
+    The labels are the patient-facing names of the input keys, and the data
+    is a deep copy so a later mutation of the result cannot change what the
+    card already showed.  The identity prefers the execution id, falling back
+    to a hash of the inputs.
+    """
     identity = (
         result.get("execution_id")
         or hashlib.sha256(

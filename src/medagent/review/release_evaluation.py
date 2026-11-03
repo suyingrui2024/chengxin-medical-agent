@@ -30,6 +30,12 @@ def _strings(value: Any, field: str) -> list[str]:
 
 
 def validate_case(case: Any) -> dict[str, Any]:
+    """Check one evaluation case: exact fields, a real id, comparable halves.
+
+    The clinical review, the expected labels and the observed labels are
+    validated separately so a malformed case fails with the reason
+    instead of silently scoring as zero.
+    """
     if not isinstance(case, dict):
         raise ValueError("case must be an object")
     required = {"case_id", "clinical_review", "expected", "observed"}
@@ -68,6 +74,11 @@ def validate_case(case: Any) -> dict[str, Any]:
 
 
 def evaluate_cases(payload: Any) -> dict[str, Any]:
+    """Score an evaluation payload: every case, or a clear refusal.
+
+    The schema is pinned and at least one case is required -- an empty
+    evaluation that reported 100% would be worse than an error.
+    """
     if not isinstance(payload, dict) or set(payload) != {"schema", "cases"}:
         raise ValueError("evaluation payload is invalid")
     if payload["schema"] != SCHEMA:

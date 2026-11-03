@@ -39,6 +39,12 @@ class Normalizer:
         return "".join(ch.lower() if ch.isascii() else ch for ch in text)
 
     def find(self, text: str) -> list[Match]:
+        """Find clinical concepts in free text, longest alias first, without overlap.
+
+        Matching runs on folded text (case and width normalised) and marks
+        consumed spans so a longer alias cannot be double-counted inside a
+        shorter one -- "急性冠脉综合征" wins over "冠脉" inside it.
+        """
         if not text:
             return []
         haystack = self._fold(text)

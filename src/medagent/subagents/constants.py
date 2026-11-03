@@ -1,3 +1,10 @@
+"""The subagent task kinds and the constants their behaviour hangs on.
+
+The kinds are the closed set of tasks a subagent may be spawned for,
+each with the tools it may use and the limits it runs under.  A kind
+that is not listed here cannot be spawned, whatever a model proposes.
+"""
+
 from __future__ import annotations
 import re
 from typing import Any, Dict, Optional

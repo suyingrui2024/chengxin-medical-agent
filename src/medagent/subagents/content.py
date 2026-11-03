@@ -1,3 +1,10 @@
+"""What a subagent is told, and the tools it may call.
+
+The content index, the knowledge search and the known-fact keys are the
+three inputs a branch's view is built from; they are read once per
+branch so a view is a consistent snapshot rather than a moving target.
+"""
+
 from __future__ import annotations
 import hashlib
 import json

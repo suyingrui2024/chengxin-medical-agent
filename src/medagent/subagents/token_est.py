@@ -1,3 +1,10 @@
+"""Estimating what a subagent turn will cost before it is spent.
+
+The estimates are deliberately conservative: the budget check runs on
+the estimate, so an optimistic estimate would be a budget overrun, not
+a saving.
+"""
+
 from __future__ import annotations
 import json
 from typing import Any, Dict, List
