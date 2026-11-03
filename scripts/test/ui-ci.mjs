@@ -90,23 +90,47 @@ const updateShots = process.argv.includes("--shots");
  * entries — a few failing specs leave thousands of trace files behind and
  * every later invocation dies inside the shim before running a test.
  * Python's shutil is not wrapped, so the cleanup happens here instead.
+ *
+ * The cleanup is verified rather than assumed.  A silent failure here is
+ * worse than no cleanup at all: the artefacts pile up, the next run then
+ * dies inside the guard, and every spec file is reported as failed for a
+ * reason that has nothing to do with the specs.
  */
-function clean(dir) {
-  return new Promise((resolve) => {
-    const child = spawn(
-      "python3",
-      [
-        "-c",
-        `import shutil; shutil.rmtree(${JSON.stringify(dir)}, ignore_errors=True)`,
-      ],
-      { cwd: ROOT, stdio: "ignore" },
-    );
-    child.on("error", (error) => {
-      console.error(`cleanup failed to start: ${error.message}`);
-      resolve();
+const PYTHONS = [
+  "python3",
+  "python",
+  path.join(ROOT, ".venv", "bin", "python"),
+];
+
+async function clean(dir) {
+  const script = [
+    "import os, shutil, sys",
+    `p = ${JSON.stringify(dir)}`,
+    "if os.path.isdir(p):",
+    "    shutil.rmtree(p)",
+    "sys.exit(0 if not os.path.exists(p) else 1)",
+  ].join("\n");
+
+  for (const python of PYTHONS) {
+    const result = await new Promise((resolve) => {
+      const child = spawn(python, ["-c", script], {
+        cwd: ROOT,
+        stdio: ["ignore", "ignore", "pipe"],
+      });
+      let stderr = "";
+      child.stderr?.on("data", (chunk) => (stderr += chunk));
+      child.on("error", () => resolve({ ok: false, reason: "not found" }));
+      child.on("close", (code) =>
+        resolve({ ok: code === 0, reason: stderr.trim() }),
+      );
     });
-    child.on("close", resolve);
-  });
+    if (result.ok) return true;
+  }
+  console.error(
+    `cleanup failed for ${dir}: it could not be removed, so the next run ` +
+      "will die inside the delete guard and report every spec file as failed.",
+  );
+  return false;
 }
 
 /**
@@ -207,8 +231,13 @@ for (const [index, file] of files.entries()) {
     process.exit(1);
   }
   // A clean store per file: the server reads this directory at startup,
-  // and Playwright needs an output directory it can empty itself.
-  await clean(OUTPUT_DIR);
+  // and Playwright needs an output directory it can empty itself.  If the
+  // store cannot be emptied the run is stopped here rather than reported as
+  // a hundred failing specs.
+  if (!(await clean(OUTPUT_DIR))) {
+    console.error(`cannot start ${file}: the output directory is not empty`);
+    process.exit(1);
+  }
   const result = await run(file);
   const label = `${index + 1}/${files.length} ${path.basename(file)}`;
   if (result.code === 0) {
