@@ -5,6 +5,7 @@ import json
 import re
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
+from ... import __version__
 from ._preamble import (
     AdaptiveQuestionError,
     AgentReply,
@@ -287,7 +288,7 @@ class AdaptiveConsultationEngineCore:
                     {
                         "backend": self.backend.name,
                         "reply": reply.to_dict(),
-                        "policy_version": "medical-tools-v0.11.17",
+                        "policy_version": f"medical-tools-v{__version__}",
                         "prompt_sha256": self._current_prefix()[1],
                         "prompt_layout": "static-catalog-prefix/v1",
                     },
