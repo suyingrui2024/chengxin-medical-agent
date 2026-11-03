@@ -13,20 +13,19 @@ content (session, store, paths, changes) rather than as job titles.
 from pathlib import Path
 import threading
 from uuid import uuid4
-from ._preamble import (
-    ACTIVE_JOB_STATES,
-    ExecutionBusy,
-    ExecutionError,
+from ..infra.env_config import for_backend
+from ..infra.platform_fs import os
+from .capabilities import freeze_binding
+from .endpoint import route_identity
+from .errors import ExecutionBusy, ExecutionError
+from .observations import ACTIVE_JOB_STATES
+from .projects import project_path as validate_project_path
+from .store import (
     WorkspaceOccupied,
     WorkspaceStore,
     WorkspaceStoreError,
-    for_backend,
-    freeze_binding,
-    open_workspace_directory,
-    os,
-    route_identity,
-    validate_project_path,
 )
+from .workspace_files import open_workspace_directory
 from .session import ExecutionSession
 
 

@@ -1,27 +1,35 @@
 """Mixin: patient routes for Handler."""
 from http import HTTPStatus
 from typing import Any, Dict, Optional
-from ._preamble import (
-    Event,
+from ..core.domain import utc_now
+from ..core.events import Event
+from ..core.measurement_kinds import (
+    MeasurementKindError,
+    normalize_measurement,
+    saveable_from_observation,
+)
+from ..infra.medical_images import (
+    MedicalImageError,
+    RecognitionError,
+    decode_image_data_url,
+    inspect_image,
+)
+from ..patient_records import (
+    PatientRecordConflict,
+    PatientRecordError,
+)
+from ..patient_records.recognition_jobs import (
+    RecognitionJobError,
+    get_job,
+    submit_job,
+)
+from ..reports.report_interpretation import build_interpretation
+from .limits import (
     MAX_BODY_BYTES,
     MAX_IMAGE_BODY_BYTES,
     MEASUREMENT_SLUGS,
-    MeasurementKindError,
-    MedicalImageError,
-    PatientRecordConflict,
-    PatientRecordError,
-    RecognitionError,
-    RecognitionJobError,
-    _persist_engine_state,
-    build_interpretation,
-    decode_image_data_url,
-    get_job,
-    inspect_image,
-    normalize_measurement,
-    saveable_from_observation,
-    submit_job,
-    utc_now,
 )
+from .persistence import _persist_engine_state
 
 
 class HandlerPatient:

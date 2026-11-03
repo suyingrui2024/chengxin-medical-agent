@@ -1,8 +1,7 @@
 """Package entry point: re-exports the execution public surface."""
 
-from ._preamble import (
-    ExecutionBusy,
-    ExecutionError,
+from .errors import ExecutionBusy, ExecutionError
+from .workspace_files import (
     open_workspace_directory,
     safe_bytes,
     safe_file,

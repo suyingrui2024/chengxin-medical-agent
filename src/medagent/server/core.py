@@ -9,7 +9,7 @@ import secrets
 from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
-from ._preamble import MAX_BODY_BYTES
+from .limits import MAX_BODY_BYTES
 from .types import MedicalAgentServer
 
 #: Explicit types for the extensions the page actually ships.

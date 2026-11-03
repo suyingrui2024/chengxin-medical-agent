@@ -1,14 +1,13 @@
 """Package entry point: composes the Handler mixins and exposes the CLI."""
-from ._preamble import (
-    BaseHTTPRequestHandler,
-    Optional,
-    Path,
-    __version__,
-    _consultation_patient_id,
-    argparse,
-    build_runtime,
-    os,
-)
+from http.server import BaseHTTPRequestHandler
+import argparse
+import os
+from pathlib import Path
+from typing import Optional
+
+from .. import __version__
+from .baseline import _consultation_patient_id
+from .runtime import build_runtime
 from .types import MedicalAgentServer
 from .core import HandlerCore
 from .consultation import HandlerConsultation

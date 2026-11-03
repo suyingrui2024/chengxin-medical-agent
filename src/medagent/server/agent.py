@@ -2,28 +2,31 @@
 from http import HTTPStatus
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
-from ._preamble import (
+from ..execution.errors import ExecutionBusy, ExecutionError
+from ..core.domain import utc_now
+from ..core.events import Event
+from ..execution.files import DirectoryChanged
+from ..infra.medical_images import recognizer_from_settings
+from ..patient_records import PatientRecordError
+from ..reports.medication_reminders import build_medication_reminders
+from ..reports.report_drafts import parse_report_draft
+from ..reports.report_interpretation import interpretation_summary
+from ..shared_types import (
     ConsultationBusyError,
-    DirectoryChanged,
-    Event,
-    ExecutionBusy,
-    ExecutionError,
-    PatientRecordError,
     StaleActionError,
-    StaleCompositionError,
     UserInput,
-    _TIME_RE,
+)
+from .baseline import (
     _consultation_patient_id,
+    _session_baseline_projection,
+)
+from .persistence import (
+    _TIME_RE,
     _load_medication_schedules,
     _persist_engine_state,
     _save_medication_schedules,
-    _session_baseline_projection,
-    build_medication_reminders,
-    interpretation_summary,
-    parse_report_draft,
-    recognizer_from_settings,
-    utc_now,
 )
+from .workspace import StaleCompositionError
 
 
 class HandlerAgent:

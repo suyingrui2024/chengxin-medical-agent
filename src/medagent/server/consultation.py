@@ -2,17 +2,17 @@
 from http import HTTPStatus
 from typing import Optional
 from urllib.parse import parse_qs, urlparse
-from ._preamble import (
+from .. import __version__
+from ..core.domain import utc_now
+from ..core.events import Event
+from ..patient_records import PatientRecordError
+from ..reports import education as education_module
+from ..reports.handoff import build_handoff
+from ..shared_types import (
     ConsultationBusyError,
-    Event,
-    PatientRecordError,
     StaleActionError,
-    __version__,
-    _persist_engine_state,
-    build_handoff,
-    education_module,
-    utc_now,
 )
+from .persistence import _persist_engine_state
 
 
 class HandlerConsultation:

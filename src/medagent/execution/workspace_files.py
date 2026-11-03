@@ -1,83 +1,19 @@
-"""Shared imports, exception types and module-level helpers."""
+"""Reading files inside the workspace without following anything out of it.
+
+Every read goes through an owned directory descriptor and resolves each
+component of the path relative to it, so a symlink, a replaced directory or a
+path that climbs out of the workspace cannot widen what the caller can reach.
+The size limit and the revision check are the two other guards: the first
+bounds how much a single file can cost, the second notices a file changing
+while it is being read.
+"""
 from __future__ import annotations
 
-from collections import deque
-import hashlib
-import json
-from ..infra.platform_fs import os, fcntl
-from pathlib import Path, PurePosixPath
-import select
-import shutil
-import signal
 import stat
-import subprocess
-import sys
-import threading
-import time
-from uuid import uuid4
-from urllib.parse import urlsplit
+from pathlib import Path, PurePosixPath
 
-from ..infra.env_config import for_backend
-from .capabilities import freeze_binding, validate_receipt
-from .observations import ACTIVE_JOB_STATES, validate_observation
-from .limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
-from .changes import ChangeTracker
-from .identity import encode_identity
-from .clarifications import (
-    validate_clarification,
-    ACTIVE_CLARIFICATION_STATES,
-)
-from .projects import project_path as validate_project_path
-from .files import directory_page, DirectoryChanged
-from .artifacts import (
-    projection as artifact_projection,
-    read_limit,
-    IMAGE_LIMIT,
-)
-from .store import (
-    WorkspaceStore,
-    WorkspaceStoreError,
-    WorkspaceOccupied,
-    FORMAT,
-    DSH_VERSION,
-)
-
-
-class ExecutionError(ValueError):
-    pass
-
-
-class ExecutionBusy(ExecutionError):
-    pass
-
-
-def route_identity(settings):
-    endpoint = settings["MEDAGENT_LLM_BASE_URL"].rstrip("/")
-    try:
-        parsed = urlsplit(endpoint)
-        if (
-            parsed.scheme not in {"https", "http"}
-            or not parsed.hostname
-            or parsed.username
-            or parsed.password
-            or parsed.query
-            or parsed.fragment
-        ):
-            raise ValueError()
-    except ValueError:
-        raise ExecutionError("模型服务地址无效") from None
-    return (
-        hashlib.sha256(
-            json.dumps(
-                [endpoint, settings["MEDAGENT_LLM_MODEL"]], ensure_ascii=False
-            ).encode()
-        ).hexdigest(),
-        parsed.hostname,
-    )
-
-
-def scrub(text, secret):
-    return text.replace(secret, "[REDACTED]") if secret else text
+from ..infra.platform_fs import os
+from .errors import ExecutionError
 
 
 def open_workspace_directory(root, identity=None):
@@ -94,10 +30,8 @@ def open_workspace_directory(root, identity=None):
             os.close(directory)
         raise ExecutionError("工作目录不存在、已被替换或不可读取；请恢复原目录或新建工作区") from None
 
-
 def file_revision(info):
     return f"{info.st_size}:{info.st_mtime_ns}:{info.st_ctime_ns}"
-
 
 def safe_bytes(root: Path, relative: str, limit=128_000, root_identity=None):
     """Open every component relative to an owned directory fd, never a symlink."""
@@ -161,7 +95,6 @@ def safe_bytes(root: Path, relative: str, limit=128_000, root_identity=None):
         raise ExecutionError("文件过大，请在本机工作目录查看")
     return data, file_revision(info)
 
-
 def safe_file(root: Path, relative: str, limit=128_000, root_identity=None):
     data, _ = safe_bytes(root, relative, limit, root_identity)
     try:
@@ -172,51 +105,8 @@ def safe_file(root: Path, relative: str, limit=128_000, root_identity=None):
 
 
 __all__ = [
-    "deque",
-    "hashlib",
-    "json",
-    "os",
-    "fcntl",
-    "Path",
-    "PurePosixPath",
-    "select",
-    "shutil",
-    "signal",
-    "stat",
-    "subprocess",
-    "sys",
-    "threading",
-    "time",
-    "uuid4",
-    "urlsplit",
-    "for_backend",
-    "freeze_binding",
-    "validate_receipt",
-    "ACTIVE_JOB_STATES",
-    "validate_observation",
-    "DEFAULT_TIME_BUDGET_SECONDS",
-    "time_budget",
-    "ChangeTracker",
-    "encode_identity",
-    "validate_clarification",
-    "ACTIVE_CLARIFICATION_STATES",
-    "validate_project_path",
-    "directory_page",
-    "DirectoryChanged",
-    "artifact_projection",
-    "read_limit",
-    "IMAGE_LIMIT",
-    "WorkspaceStore",
-    "WorkspaceStoreError",
-    "WorkspaceOccupied",
-    "FORMAT",
-    "DSH_VERSION",
-    "route_identity",
-    "scrub",
-    "open_workspace_directory",
     "file_revision",
+    "open_workspace_directory",
     "safe_bytes",
     "safe_file",
-    "ExecutionError",
-    "ExecutionBusy",
 ]

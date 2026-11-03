@@ -161,7 +161,7 @@ def test_a_failed_schedule_write_leaves_no_temp_file(tmp_path, monkeypatch):
     from pathlib import Path
 
     from medagent.patient_records.store import PatientRecordStore
-    from medagent.server._preamble import _save_medication_schedules
+    from medagent.server.persistence import _save_medication_schedules
 
     store = PatientRecordStore(tmp_path / "patient-data")
     target = tmp_path / "patient-data" / "medication_schedules.json"

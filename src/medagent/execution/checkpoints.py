@@ -18,7 +18,7 @@ from ..infra.platform_fs import os
 
 def _capture_paths(directory, identity, paths):
     """Resolve native spelling through pinned parents, without following links."""
-    from ..execution import open_workspace_directory
+    from .workspace_files import open_workspace_directory
 
     root = open_workspace_directory(directory, identity)
     cache, states, resolved = {}, {}, []

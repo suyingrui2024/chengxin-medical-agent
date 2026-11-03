@@ -27,7 +27,7 @@ from medagent.dialogue.adaptive_questions import (
     validate_adaptive_question,
 )
 from medagent.execution import ExecutionError
-from medagent.execution._preamble import safe_bytes
+from medagent.execution.workspace_files import safe_bytes
 
 SETTINGS = settings(
     max_examples=300,

@@ -2,20 +2,17 @@
 from http.server import ThreadingHTTPServer
 import os
 from typing import Optional
-from ._preamble import (
-    AdaptiveConsultationEngine,
-    BackgroundReviewCoordinator,
-    ConsultationEngine,
-    EducationEnricher,
-    EventStore,
-    ExecutionManager,
-    PatientRecordStore,
-    RecognitionJobStore,
-    SubagentCoordinator,
-    WebTools,
-    Workspace,
-    subagent_kind_overrides,
-)
+from ..consultation import ConsultationEngine
+from ..consultation.agent import AdaptiveConsultationEngine
+from ..core.events import EventStore
+from ..execution import ExecutionManager
+from ..infra.web_tools import WebTools
+from ..patient_records import PatientRecordStore
+from ..patient_records.recognition_jobs import RecognitionJobStore
+from ..reports.education import EducationEnricher
+from ..review.background_review import BackgroundReviewCoordinator
+from ..subagents import SubagentCoordinator
+from .workspace import Workspace, subagent_kind_overrides
 
 
 class MedicalAgentServer(ThreadingHTTPServer):

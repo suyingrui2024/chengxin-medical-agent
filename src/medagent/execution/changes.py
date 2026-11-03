@@ -66,7 +66,7 @@ def capture(
     paths=None,
     with_previews=True,
 ):
-    from ..execution import open_workspace_directory
+    from .workspace_files import open_workspace_directory
 
     selected = paths or ["."]
     for path in selected:
