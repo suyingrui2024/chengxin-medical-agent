@@ -122,6 +122,22 @@ def functions(path: pathlib.Path) -> list[tuple[str, int, int, int]]:
     except SyntaxError as exc:  # pragma: no cover - would fail ruff and pytest
         raise SystemExit(f"{path}: cannot parse: {exc}") from exc
 
+    # Every docstring's lines, collected once.  A nested function's docstring
+    # sits inside its parent's span; without this it would be charged to the
+    # parent, and documenting an inner helper would look like the outer
+    # function growing.
+    doc_lines: set[int] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            body = node.body
+            if (
+                body
+                and isinstance(body[0], ast.Expr)
+                and isinstance(body[0].value, ast.Constant)
+                and isinstance(body[0].value.value, str)
+            ):
+                doc_lines.update(range(body[0].lineno, body[0].end_lineno + 1))
+
     found: list[tuple[str, int, int, int]] = []
 
     def walk(node: ast.AST, prefix: str) -> None:
@@ -130,16 +146,10 @@ def functions(path: pathlib.Path) -> list[tuple[str, int, int, int]]:
                 walk(child, f"{prefix}{child.name}.")
             elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 span = (child.end_lineno or child.lineno) - child.lineno + 1
+                span -= sum(1 for n in range(child.lineno, child.end_lineno + 1) if n in doc_lines)
                 # A docstring is prose about the function, not the function.
                 # Counting it would make writing the explanation an act of
                 # code growth, and the two guards would fight each other.
-                if (
-                    child.body
-                    and isinstance(child.body[0], ast.Expr)
-                    and isinstance(child.body[0].value, ast.Constant)
-                    and isinstance(child.body[0].value.value, str)
-                ):
-                    span -= child.body[0].end_lineno - child.body[0].lineno + 1
                 exits = sum(isinstance(n, ast.Return) for n in ast.walk(child))
                 found.append((f"{prefix}{child.name}", span, branch_count(child), exits))
                 # Nested functions are measured on their own as well: a long
