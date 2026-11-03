@@ -2,22 +2,23 @@
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
-from ._preamble import (
+from ..clinical.interpreter import Interpretation
+from ..core.domain import (
     AgentReply,
     CaseState,
-    Event,
     Fact,
-    Interpretation,
     Phase,
     RiskAssessment,
     RiskLevel,
     Source,
-    _preserved_segments,
+)
+from ..core.events import Event
+from ..dialogue.consultation_subject import (
     conflicting_reference,
     explicit_switch,
-    merge_preserving_denials,
     subject_profile,
 )
+from .vocabulary import _preserved_segments, merge_preserving_denials
 from .types import StaleActionError
 
 

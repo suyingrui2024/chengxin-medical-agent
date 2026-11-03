@@ -2,20 +2,19 @@
 from typing import NamedTuple, Optional
 from uuid import uuid4
 from ...core.domain import RiskAssessment
-from ._preamble import (
+from ...core.domain import (
     AgentReply,
     Assertion,
     CaseState,
-    Event,
     Fact,
     Phase,
     RiskLevel,
     Source,
-    StaleActionError,
-    UserInput,
-    is_summary_confirmation_text,
-    validate_proposals,
 )
+from ...core.events import Event
+from ...infra.agent_tools import validate_proposals
+from ...shared_types import StaleActionError, UserInput
+from ..vocabulary import is_summary_confirmation_text
 
 
 class _PreparedTurn(NamedTuple):

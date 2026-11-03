@@ -1,6 +1,7 @@
 """Package entry point: composes the mixins back into the public class."""
 
-from ._preamble import ConsultationEngine, _capability_advertisement
+from .. import ConsultationEngine
+from .catalog import _capability_advertisement
 from .context import AdaptiveConsultationEngineContext
 from .core import AdaptiveConsultationEngineCore
 from .execute import AdaptiveConsultationEngineExecute

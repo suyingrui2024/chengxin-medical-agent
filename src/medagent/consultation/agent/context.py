@@ -1,6 +1,7 @@
 """Mixin: context for AdaptiveConsultationEngine."""
 from typing import Any, Dict
-from ._preamble import CaseState, subject_profile
+from ...core.domain import CaseState
+from ...dialogue.consultation_subject import subject_profile
 
 
 class AdaptiveConsultationEngineContext:

@@ -1,5 +1,8 @@
 """Mixin: pathway for AdaptiveConsultationEngine."""
-from ._preamble import CaseState, Event, ProposalError, contains_unnegated
+from ...core.domain import CaseState
+from ...core.events import Event
+from ...core.text_match import contains_unnegated
+from ...infra.agent_tools import ProposalError
 
 
 class AdaptiveConsultationEnginePathway:

@@ -1,20 +1,19 @@
 """Mixin: handlers for ConsultationEngine."""
 from uuid import uuid4
-from ._preamble import (
+from ..clinical.interpreter import Interpretation
+from ..core.domain import (
     AgentReply,
     Assertion,
     CaseState,
-    Event,
     Fact,
-    Interpretation,
     Phase,
     RiskLevel,
     Source,
-    TurnContext,
-    extract_worry_object,
-    is_refusal_text,
-    is_summary_confirmation_text,
 )
+from ..core.events import Event
+from ..core.turn_context import TurnContext
+from ..core.worry import extract_worry_object
+from .vocabulary import is_refusal_text, is_summary_confirmation_text
 from .types import StaleActionError, UserInput
 
 

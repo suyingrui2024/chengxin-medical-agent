@@ -1,16 +1,13 @@
 """Mixin: calculation for ConsultationEngine."""
 from copy import deepcopy
-from ._preamble import (
-    AgentReply,
-    Assertion,
-    Event,
-    Phase,
-    QuickReply,
+from ..core.domain import AgentReply, Assertion, Phase, QuickReply
+from ..core.events import Event
+from ..dialogue.consultation_subject import (
     compatible,
-    confirmed_parameters,
     proposed_profile,
     subject_profile,
 )
+from ..reports.patient_calculations import confirmed_parameters
 from .types import StaleActionError, SubjectBoundaryError
 
 

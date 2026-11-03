@@ -6,36 +6,31 @@ import re
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 from ... import __version__
-from ._preamble import (
+from ...core.decision_wait import DecisionTurn, DecisionWaiter
+from ...core.domain import AgentReply, CaseState, Phase, QuickReply
+from ...core.events import Event
+from ...clinical.knowledge import Question, question_fact_gates_pass
+from ...clinical.reasoning import RuleBasedProposer, load_pathways
+from ...dialogue.adaptive_questions import (
     AdaptiveQuestionError,
-    AgentReply,
-    CaseState,
-    ConsultationBusyError,
-    DETAIL_FACT_KEYS,
-    DecisionBackend,
-    DecisionTurn,
-    DecisionWaiter,
-    Event,
-    MODEL_SPAWN_TASK_KINDS,
-    Phase,
-    Question,
-    QuickReply,
     RISK_TAG_CUES,
-    RuleBasedProposer,
-    SCREENING_FIELDS,
-    SELF_CHECK_SUSPEND_CAP,
-    StaleActionError,
-    TOOL_DEFINITIONS,
-    _capability_advertisement,
-    _strip_denied_items,
-    is_refusal_text,
-    kg_runtime,
-    load_pathways,
     project_selected_answer,
-    question_fact_gates_pass,
-    should_clarify,
-    subject_profile,
 )
+from ...dialogue.consultation_subject import subject_profile
+from ...infra.agent_tools import TOOL_DEFINITIONS
+from ...infra.backends import DecisionBackend
+from ...kg import runtime as kg_runtime
+from ...kg.ambiguity import should_clarify
+from ...reports.bridging import DETAIL_FACT_KEYS
+from ...shared_types import ConsultationBusyError, StaleActionError
+from ..thresholds import SELF_CHECK_SUSPEND_CAP
+from ..vocabulary import is_refusal_text
+from .catalog import (
+    MODEL_SPAWN_TASK_KINDS,
+    SCREENING_FIELDS,
+    _capability_advertisement,
+)
+from .questions import _strip_denied_items
 
 
 class AdaptiveConsultationEngineCore:

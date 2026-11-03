@@ -1,20 +1,19 @@
 """Mixin: run for AdaptiveConsultationEngine."""
 from copy import deepcopy
-from ._preamble import (
+from ...core.decision_wait import DecisionInterrupted
+from ...core.domain import (
     AgentReply,
     Assertion,
     CaseState,
-    DecisionInterrupted,
-    Event,
     Fact,
     Phase,
-    ProposalError,
     RiskLevel,
-    SubjectBoundaryError,
-    _decision_envelope_guidance,
-    extract_worry_object,
-    is_worry_sentence,
 )
+from ...core.events import Event
+from ...core.worry import extract_worry_object, is_worry_sentence
+from ...infra.agent_tools import ProposalError
+from ...shared_types import SubjectBoundaryError
+from .decision import _decision_envelope_guidance
 
 
 class AdaptiveConsultationEngineRun:

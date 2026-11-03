@@ -1,12 +1,11 @@
 """Package entry point: composes the mixins back into the public class."""
 
-from ._preamble import (
-    SELF_CHECK_SUSPEND_CAP,
-    URGENT_MINIMUM_FACTS,
+from ..dialogue.observations import ObservationMixin
+from ..dialogue.task_conversation import TaskConversationMixin
+from ..reports.calculation_followup import CalculationFollowupMixin
+from .thresholds import SELF_CHECK_SUSPEND_CAP, URGENT_MINIMUM_FACTS
+from .vocabulary import (
     VALUE_LABELS,
-    CalculationFollowupMixin,
-    ObservationMixin,
-    TaskConversationMixin,
     is_refusal_text,
     is_steady_not_improving_evidence,
     is_summary_confirmation_text,

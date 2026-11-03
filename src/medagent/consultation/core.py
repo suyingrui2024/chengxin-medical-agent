@@ -4,25 +4,19 @@ import os
 from threading import Condition, Lock, RLock
 from typing import Dict, Optional
 from uuid import uuid4
-from ._preamble import (
-    AgentReply,
-    CaseState,
-    ContentRepository,
-    Event,
-    EventStore,
-    Interpreter,
-    Phase,
-    QuestionRanker,
-    ReplyPublicationGate,
-    RiskLevel,
-    RulePlanner,
-    SelfCheckService,
-    SessionStore,
-    TriageService,
-    __version__,
-    calculation_presentation,
-    request_draft,
-)
+from .. import __version__
+from ..core.domain import AgentReply, CaseState, Phase, RiskLevel
+from ..core.events import Event, EventStore
+from ..core.presentation import calculation_presentation
+from ..clinical.interpreter import Interpreter
+from ..clinical.knowledge import ContentRepository
+from ..clinical.planner import RulePlanner
+from ..clinical.reasoner import QuestionRanker
+from ..clinical.triage import TriageService
+from ..guards.self_checks import SelfCheckService
+from ..infra.session_store import SessionStore
+from ..reports.publication import ReplyPublicationGate
+from ..reports.patient_calculations import request_draft
 from .types import UserInput
 
 

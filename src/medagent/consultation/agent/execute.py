@@ -1,33 +1,40 @@
 """Mixin: execute for AdaptiveConsultationEngine."""
 from typing import Any, Dict
-from ._preamble import (
+from ...core.domain import (
     AgentReply,
     Assertion,
     CaseState,
-    DETAIL_FACT_KEYS,
-    Event,
-    FLUCTUATION_PHRASES,
     Fact,
-    MODEL_BRIDGING_REPAIR_HINT,
-    MODEL_SPAWN_TASK_KINDS,
     Phase,
-    ProposalError,
     QuickReply,
-    SELF_CHECK_SUSPEND_CAP,
     Source,
-    _strip_denied_items,
+)
+from ...core.events import Event
+from ...dialogue.adaptive_questions import validate_adaptive_question
+from ...dialogue.consultation_subject import (
     compatible,
     explicit_switch,
-    has_anchorable_fact,
-    is_steady_not_improving_evidence,
-    merge_preserving_denials,
-    model_question_bridging_status,
     subject_profile,
-    subject_reference,
-    validate_adaptive_question,
+)
+from ...dialogue.consultation_subject import reference as subject_reference
+from ...infra.agent_tools import (
+    ProposalError,
     validate_command,
     validate_proposals,
 )
+from ...reports.bridging import (
+    DETAIL_FACT_KEYS,
+    MODEL_BRIDGING_REPAIR_HINT,
+    has_anchorable_fact,
+    model_question_bridging_status,
+)
+from ..thresholds import SELF_CHECK_SUSPEND_CAP
+from ..vocabulary import (
+    is_steady_not_improving_evidence,
+    merge_preserving_denials,
+)
+from .catalog import FLUCTUATION_PHRASES, MODEL_SPAWN_TASK_KINDS
+from .questions import _strip_denied_items
 
 
 class AdaptiveConsultationEngineExecute:

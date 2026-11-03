@@ -1,22 +1,21 @@
 """Mixin: emergency for ConsultationEngine."""
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
-from ._preamble import (
+from ..core.domain import (
     AgentReply,
     Assertion,
     CaseState,
-    DIRECT_EMERGENCY_TAGS,
-    Event,
-    FACT_LABELS,
     Fact,
     Phase,
     QuickReply,
     RiskAssessment,
     RiskLevel,
     Source,
-    VALUE_LABELS,
-    load_definitions,
 )
+from ..core.events import Event
+from ..dialogue.adaptive_questions import DIRECT_EMERGENCY_TAGS
+from ..guards.red_flags import load_definitions
+from .vocabulary import FACT_LABELS, VALUE_LABELS
 
 
 class ConsultationEngineEmergency:
