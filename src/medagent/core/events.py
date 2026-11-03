@@ -1,3 +1,14 @@
+"""The append-only event log every layer writes and only readers read.
+
+An event is recorded before it is acted on -- risk assessments, task
+failures, refusals -- so the reason behind a reply can be read back later
+from the same file the reply came from.  The store is append-only by design:
+nothing here rewrites or reorders, and a corrupt line is skipped and counted
+rather than allowed to stop the log.
+
+Start at ``EventStore``.
+"""
+
 from __future__ import annotations
 
 import json

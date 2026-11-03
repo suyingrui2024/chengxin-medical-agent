@@ -57,6 +57,17 @@ class ExecutionSession:
         capability_binding=None,
         project_path=None,
     ):
+        """Build the session: resolve the workspace, open the state directory.
+
+        Two identities are pinned at construction and verified on every later
+        open -- the project directory's and the state directory's (dev, inode)
+        pair -- so a directory that is renamed, replaced or swapped for a
+        symlink between turns is refused rather than silently followed.
+
+        A new session creates both directories private (0700); a reopened one
+        takes its shape from the persisted record instead, and never creates
+        anything.
+        """
         self.id = identifier
         self.storage_root = root
         self.project_path = (record or {}).get("project_path", project_path)
@@ -221,6 +232,17 @@ class ExecutionSession:
         self.configuration_error = None
 
     def persist(self, strict=False):
+        """Write the session record, with the model secret scrubbed from it.
+
+        The history is trimmed from the front at thirty-two turns and each
+        kept turn's free text is scrubbed of the API key and length-capped, so
+        a long session cannot quietly grow the record past what the store
+        accepts -- or worse, persist the credential that the scrub exists to
+        keep out.
+
+        A session without a store or a lease is in-memory only and skips the
+        write; that is the demo shape, not an error.
+        """
         if self.store is None or self.lease is None:
             return
         secret = self.settings.get("MEDAGENT_LLM_API_KEY", "")
@@ -329,6 +351,16 @@ class ExecutionSession:
     def start_turn(
         self, text, max_calls=24, time_budget_seconds=DEFAULT_TIME_BUDGET_SECONDS
     ):
+        """Validate and open one turn: the only entry point for new work.
+
+        The text and the call ceiling are checked first, then the state -- a
+        closed workspace, an unconfigured model, or a turn already running all
+        refuse before anything is created, because half-starting a turn would
+        leave the worker owning work nobody asked for.
+
+        The workspace identity is re-verified here too, so a directory swapped
+        between turns is caught at turn start rather than at first file read.
+        """
         try:
             time_budget_seconds = time_budget(time_budget_seconds)
         except ValueError as exc:
@@ -441,6 +473,16 @@ class ExecutionSession:
         return status not in {"cancelling", "failed", "cancelled", "interrupted"}
 
     def answer_clarification(self, request_id, turn_id, answer):
+        """Answer a pending clarification, idempotently.
+
+        The answer is length-capped, control-character-free and scrubbed of the
+        model secret before anything else happens.  Re-submitting the same
+        answer to an already-answered question returns the snapshot unchanged
+        -- a retry after a flaky network is not a second answer.
+
+        The question must belong to this workspace and to a still-live turn; a
+        clarification whose turn has ended can no longer be answered.
+        """
         if (
             not isinstance(answer, str)
             or not answer.strip()
@@ -501,6 +543,16 @@ class ExecutionSession:
             return self.snapshot()
 
     def _accept_clarification(self, kind, record):
+        """Take a clarification event from the worker, or refuse it.
+
+        The record is validated, tied to a turn this session owns, and checked
+        against what is already held: a request for an unknown or already-open
+        question, past its deadline, or addressed to a finished turn is
+        dropped -- the worker will re-ask if it still matters.
+
+        Answers and closures only ever update a question this session has seen,
+        so a forged event cannot create state out of nothing.
+        """
         try:
             value = validate_clarification(record.get("clarification"))
             if value["turn_id"] != record.get("turn_id") or not any(
@@ -556,6 +608,15 @@ class ExecutionSession:
                 value.update(status="closed", reason=reason)
 
     def _start(self):
+        """Spawn the execution worker, with the environment it is allowed to have.
+
+        The worker needs Linux bubblewrap and Node -- checked here, where the
+        failure can still become a turn error rather than a half-open process.
+        The environment is an allowlist: PATH and locale, plus proxy variables
+        only when they carry no credentials, and loopback addresses are pinned
+        into NO_PROXY so the worker's traffic to the local server cannot be
+        redirected through a proxy.
+        """
         if self.process and self.process.poll() is None:
             return
         if not supports_sandbox():
@@ -632,6 +693,17 @@ class ExecutionSession:
             raise ExecutionError(self.error or "隔离执行环境启动失败")
 
     def _read(self, process):
+        """Consume the worker's event stream for the lifetime of one process.
+
+        Every line is size-capped and parsed before the lock is taken; a line
+        that is not JSON is skipped, because a stray print from a build tool is
+        noise, not a protocol error.  Events either update session state and
+        persist, or are folded into the running turn's transcript.
+
+        The loop breaks when the process it is reading is no longer the
+        session's process -- a replaced worker's output must not be applied to
+        the state that replaced it.
+        """
         try:
             for line in process.stdout:
                 if len(line) > 4_000_000:
@@ -845,6 +917,14 @@ class ExecutionSession:
                 self.ready.set()
 
     def _run(self, turn):
+        """Send one turn to the worker, or record why the turn never started.
+
+        The worker is started first; a session that was closed or cancelled
+        while that happened becomes "cancelled" with a cancelled turn, not an
+        orphaned run.  Anything raised on the way -- a failed start, a closed
+        pipe -- becomes a failed turn with a message the patient can act on,
+        and never propagates out of the worker thread.
+        """
         try:
             self._start()
             with self.lock:
@@ -892,6 +972,14 @@ class ExecutionSession:
         return self.snapshot()
 
     def _terminate(self):
+        """Stop the worker, gracefully first, and release what it held.
+
+        Closing stdin asks the worker to exit; six seconds later it is
+        terminated, and three after that killed -- a worker stuck in a build
+        gets every chance to flush before the last resort.  The process and
+        the reader thread are released even when the termination path raised,
+        because a leaked worker holds the workspace lease.
+        """
         process = self.process
         if not process:
             return
@@ -939,11 +1027,29 @@ class ExecutionSession:
                     self.lease = None
 
     def artifact_overview(self):
+        """Walk the workspace for the artifact list, bounded and explained.
+
+        The walk has a depth limit, an entry budget and an output cap, and
+        every bound it hits is recorded as a reason -- "the list stops here"
+        is a fact the UI shows, not a silent truncation.  Hidden entries,
+        dependency directories and names that are not valid UTF-8 are skipped
+        with their reasons kept.
+
+        Nothing here reads file contents: sizes and kinds only.
+        """
         output = []
         visited = [0]
         reasons = set()
 
         def walk(directory, prefix="", depth=0):
+            """Walk one level of the workspace, bounded and self-explaining.
+
+            Depth, entries visited and output size are three independent
+            ceilings, and hitting any of them is recorded as a reason on the
+            result rather than ending the walk silently -- the UI can then say
+            "the list is partial" instead of showing a complete-looking list
+            that stopped early.
+            """
             if depth > 8:
                 reasons.add("depth_limit")
                 return
@@ -1090,6 +1196,14 @@ class ExecutionSession:
         )
 
     def changes(self, path=None, *, limit=200, offset=0):
+        """Report what the last turn changed in the workspace.
+
+        Three honest states: "not_started" when no turn exists,
+        "baseline_unavailable" when the turn's baseline is gone, and the full
+        observation otherwise.  A transient read failure becomes an
+        ExecutionError -- the caller can retry -- rather than an empty answer
+        that would read as "nothing changed".
+        """
         with self.lock:
             turn_id = self.turns[-1]["id"] if self.turns else None
             tracker = self._change_tracker()
@@ -1120,6 +1234,17 @@ class ExecutionSession:
             raise ExecutionError("本轮文件变更暂不可用，请检查基线和工作目录。") from None
 
     def snapshot(self, after=0, include_artifacts=True):
+        """Build the reply the poll endpoint returns, and nudge the worker.
+
+        While a turn is running, an inspect request is sent at most once a
+        second so the artifact list stays current without a request per poll.
+        Without artifacts the workspace identity is re-verified instead -- the
+        cheap check that catches a replaced directory even when nothing else
+        was asked.
+
+        Everything is read under the session lock, so a snapshot never mixes
+        the state of one turn with the transcript of another.
+        """
         with self.lock:
             if (
                 self.process

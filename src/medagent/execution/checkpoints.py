@@ -114,6 +114,17 @@ def _capture_paths(directory, identity, paths):
 
 
 def checkpoint(directory, identity, paths, **limits):
+    """Capture the watched paths of a workspace as a single verifiable checkpoint.
+
+    The scope is captured before and after the tree walk, and the checkpoint
+    is only "complete" when the two scope readings agree, every scoped file
+    appears in the tree, and no symlink sits on a watched path -- any other
+    outcome is reported as incomplete rather than dressed up as a snapshot.
+
+    An unreadable workspace degrades to an empty, explicitly incomplete
+    checkpoint: the caller learns that nothing could be verified, which is
+    the one claim that is still true.
+    """
     if (
         not isinstance(identity, (tuple, list))
         or len(identity) != 2

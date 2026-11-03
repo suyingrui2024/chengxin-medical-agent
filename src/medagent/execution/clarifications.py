@@ -7,6 +7,18 @@ ACTIVE_CLARIFICATION_STATES = {"pending", "submitted"}
 
 
 def validate_clarification(value):
+    """Check a persisted clarification record field by field.
+
+    The shape is exact -- no extra key, no missing one -- because the record
+    is replayed on reopen and an unknown key would be silently dropped.  Text
+    fields carry length limits and a control-character ban, and every string
+    is forced through UTF-8 encoding so a record that cannot round-trip fails
+    here rather than when it is rendered days later.
+
+    Options are capped at three and must be clean: a clarification the patient
+    answers by tapping is UI, and UI text with leading spaces or control
+    characters is a bug, not data.
+    """
     if not isinstance(value, dict) or set(value) != {
         "schema",
         "id",

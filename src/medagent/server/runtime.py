@@ -1,3 +1,14 @@
+"""Composing the server's services, and choosing which model backend runs.
+
+One factory owns the whole graph -- events, content, triage, self-checks and
+the consultation engine -- so no route can assemble a half-wired set.  The
+backend is chosen here too: ``demo`` is explicitly offline, and anything else
+must bring its address, key and model name, with a plaintext non-loopback
+endpoint refused at build time rather than at first call.
+
+Start at ``build_runtime``.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path

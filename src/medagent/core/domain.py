@@ -1,3 +1,14 @@
+"""The vocabulary every layer speaks: facts, cases, replies, risk.
+
+These are the types the consultation is made of -- a recorded Fact with its
+assertion and provenance, the CaseState that carries them, the AgentReply a
+turn produces and the risk level that decides what may still be asked.  They
+carry no behaviour beyond their own invariants, which is why every other
+package can depend on this one and none of them can be depended on.
+
+Read ``Fact`` and ``CaseState`` first; everything else names itself.
+"""
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field

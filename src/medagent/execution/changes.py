@@ -66,6 +66,17 @@ def capture(
     paths=None,
     with_previews=True,
 ):
+    """Snapshot the workspace: every tracked file's hash, mode and preview.
+
+    The walk is bounded -- a file ceiling, a byte budget and a per-file cap --
+    and when a bound is hit the capture records that it is incomplete instead
+    of quietly pretending to have seen everything.  Ignored directories,
+    symlinks that were not followed and depth limits are recorded as issues
+    with reasons, so the caller can tell "unchanged" from "unwatched".
+
+    The directory is opened through open_workspace_directory, so nothing the
+    walk does can escape the workspace.
+    """
     from .workspace_files import open_workspace_directory
 
     selected = paths or ["."]
@@ -95,6 +106,17 @@ def capture(
             result["issues"].append({"path": path, "reason": reason})
 
     def walk(fd, prefix="", depth=0):
+        """Walk one directory level, depth-first, recording what is found.
+
+        The depth limit and the stop flag are the two escape hatches: a
+        pathological tree cannot recurse forever, and a budget overrun stops
+        the walk mid-level with the reason recorded rather than abandoned.
+
+        Every condition that changes how an entry is treated -- ignored
+        directories, unreadable entries, non-regular files -- is written to
+        the issues list with a reason, because an unexplained gap in the
+        snapshot reads as a deletion.
+        """
         if depth > 32:
             issue(prefix, "depth_limit", listing=True)
             return
@@ -243,6 +265,14 @@ def capture(
             issue(prefix, "unreadable_directory", listing=True)
 
     def preview_priority(name):
+        """Order the files that get inline previews.
+
+        Source code under src/ first, then other code, then everything else,
+        with documentation directories demoted -- the preview budget is small
+        and the patient's session cares about what the turn changed in code,
+        not about a test fixture.  Depth and name break ties so the order is
+        stable across runs.
+        """
         parts = PurePosixPath(name).parts
         docs = any(
             part in {"doc", "docs", "examples", "tests", "test"} for part in parts[:-1]
@@ -270,6 +300,17 @@ def capture(
         )
 
     def previews():
+        """Fill the preview budget with the most useful readable files.
+
+        Only files whose content was hashed, that fit the remaining budget and
+        that pass the text check are read, and each is read through its own
+        chain of directory descriptors -- the same no-escape rule the walk
+        uses, so a file that was renamed mid-capture cannot pull the preview
+        outside the workspace.
+
+        When the budget runs out the rest stay preview-less: a change entry
+        without a preview is still a change entry.
+        """
         for name in sorted(result["entries"], key=preview_priority):
             entry = result["entries"][name]
             if (
@@ -353,6 +394,17 @@ def capture(
 
 
 def compare(before, after, limit=200, offset=0):
+    """Diff two captures into paged change entries.
+
+    The four states are decided by evidence, not absence: "added" and
+    "deleted" only when the respective capture was complete, "unverified"
+    when a side could not hash the file, and "modified" on a hash, kind or
+    mode difference.  An incomplete capture therefore reports less than the
+    truth rather than inventing deletions.
+
+    The result is paged and sorted by path, so a large turn reads back
+    deterministically.
+    """
     entries, counts = [], {
         name: 0 for name in ["added", "modified", "deleted", "unverified"]
     }
@@ -435,6 +487,16 @@ class ChangeTracker:
             raise
 
     def begin(self, turn_id):
+        """Record the before-snapshot that a turn is measured against.
+
+        The snapshot is captured and written atomically -- a temporary file
+        created O_EXCL inside the index directory, then renamed -- so a crash
+        mid-write leaves either the old baseline or the new one, never a
+        torn file that the next turn would compare against.
+
+        The identity of the watched directories is baked into the record, so
+        a baseline cannot be replayed against a different workspace.
+        """
         turn_id = identifier(turn_id)
         observed = capture(self.directory, self.identity, self.secret)
         value = {
@@ -475,6 +537,16 @@ class ChangeTracker:
         }
 
     def load(self, turn_id):
+        """Read back the baseline recorded for this turn.
+
+        The read is defensive on every axis: opened O_NOFOLLOW so a swapped
+        symlink cannot redirect it, checked to be a regular file, and read
+        under the record ceiling so a baseline that grew past its limit fails
+        loudly instead of being silently truncated.
+
+        The identity recorded at begin is verified here -- a baseline that
+        belongs to another workspace is an error, not a diff.
+        """
         turn_id = identifier(turn_id)
         directory = self._index()
         try:
@@ -611,6 +683,17 @@ class ChangeTracker:
             os.close(directory)
 
     def observe(self, turn_id, path=None, *, limit=200, offset=0):
+        """Diff the workspace now against this turn's baseline.
+
+        The comparison is the whole point: what this turn added, modified or
+        deleted, paged so that a turn which touched a thousand files can be
+        read back in slices.  A single path can be asked for specifically,
+        including a unified diff when both sides are readable text.
+
+        Entries only one side managed to capture come back as "unverified"
+        rather than guessed -- an incomplete capture never pretends to be a
+        deletion.
+        """
         if (
             type(limit) is not int
             or not 1 <= limit <= 200
@@ -666,6 +749,13 @@ class ChangeTracker:
 
 
 def main():
+    """The per-turn change observer's process entry point.
+
+    The observer runs out-of-process so a hostile workspace cannot take the
+    session down with it: stdin carries the request, stdout carries exactly
+    one JSON line, and every expected failure mode comes back as a structured
+    "unavailable" rather than a traceback the caller cannot parse.
+    """
     try:
         data = json.loads(sys.stdin.buffer.read(32001))
         tracker = ChangeTracker(

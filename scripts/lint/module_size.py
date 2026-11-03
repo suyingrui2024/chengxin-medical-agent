@@ -63,6 +63,39 @@ def iter_files() -> list[pathlib.Path]:
     return files
 
 
+def logic_lines(path: pathlib.Path) -> int | None:
+    """Line count without the docstrings, for Python files.
+
+    A module's size is its logic, not the prose about it -- the same rule the
+    function-size guard applies.  Counting docstrings would make writing the
+    explanation an act of growth, and the two guards would fight each other:
+    this guard and the docstring guard demand the same files.
+    """
+    if path.suffix != ".py":
+        return None
+    import ast
+
+    source = path.read_text(encoding="utf-8", errors="ignore")
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return None
+    lines = set()
+    for node in ast.walk(tree):
+        if isinstance(
+            node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+        ):
+            body = node.body
+            if (
+                body
+                and isinstance(body[0], ast.Expr)
+                and isinstance(body[0].value, ast.Constant)
+                and isinstance(body[0].value.value, str)
+            ):
+                lines.update(range(body[0].lineno, body[0].end_lineno + 1))
+    return len(source.splitlines()) - len(lines)
+
+
 def main() -> int:
     failures: list[str] = []
     warnings: list[str] = []
@@ -71,7 +104,12 @@ def main() -> int:
     for path in sorted(files):
         rel = path.relative_to(ROOT).as_posix()
         try:
-            count = len(path.read_text(encoding="utf-8", errors="ignore").splitlines())
+            counted = logic_lines(path)
+            if counted is None:
+                counted = len(
+                    path.read_text(encoding="utf-8", errors="ignore").splitlines()
+                )
+            count = counted
         except OSError as exc:  # pragma: no cover - unreadable file
             warnings.append(f"{rel}: could not read ({exc})")
             continue

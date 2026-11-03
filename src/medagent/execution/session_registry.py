@@ -44,6 +44,17 @@ class ExecutionManager:
         self.store = WorkspaceStore(self.root)
 
     def create(self, settings, registry=None, *, project_path=None):
+        """Create a session, leasing its workspace and freezing its capabilities.
+
+        The model settings are checked before anything is built: a session that
+        would call a model cannot exist half-configured, and the message names the
+        offline demo explicitly because that is the likely cause.  The registry
+        keeps at most twenty sessions -- enough for real use, few enough that a
+        leaked session is visible rather than silently accumulated.
+
+        On any failure the lease is released and the half-built session is closed,
+        so a failed create never leaves an occupied workspace behind.
+        """
         if not all(
             isinstance(settings.get(key), str) and settings[key]
             for key in (
@@ -110,6 +121,17 @@ class ExecutionManager:
             return self.create(settings, registry, project_path=str(directory))
 
     def open(self, identity, settings):
+        """Reopen a recorded session, or hand back the one already in memory.
+
+        An existing session is re-bound to the caller's settings rather than
+        rebuilt, so reopening keeps the lease and the in-memory state that a
+        rebuild would lose.  A workspace occupied by another process becomes
+        ExecutionBusy -- a condition that may clear -- while an unreadable record
+        becomes ExecutionError, one that will not; the distinction decides whether
+        the caller retries.
+
+        As in create, any failure releases the lease before propagating.
+        """
         with self.lock:
             if self.closed:
                 raise ExecutionError("执行工作台正在关闭")

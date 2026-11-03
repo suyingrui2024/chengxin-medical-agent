@@ -40,6 +40,19 @@ STATES = {
 
 
 def validate_observation(value):
+    """Check one execution observation before it is recorded.
+
+    The shape is versioned and the tool set is closed: bash, job output and
+    delivery check are the only tools that produce observations, and anything
+    else is unsupported rather than tolerated.  A delivery check may carry the
+    check fields -- and when it does, the check key must be the 64-hex digest
+    of the check itself and the turn must match, so a check recorded against
+    another turn can never be replayed as evidence.
+
+    Extra fields are rejected, not ignored: an observation is read back on
+    reopen, and a field the reader does not know is data loss waiting to
+    happen.
+    """
     if (
         not isinstance(value, dict)
         or set(value)

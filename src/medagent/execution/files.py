@@ -52,6 +52,18 @@ def directory_page(
     max_entries=10000,
     max_seconds=1.0,
 ):
+    """Serve one page of a workspace directory listing, resumably.
+
+    The walk is bounded three ways -- an entry ceiling, a wall-clock budget
+    and the caller's page size -- so a directory with ten thousand files
+    cannot hold the session hostage.  The cursor is a signed payload carrying
+    the revision and the sort position of the last entry: a stale or
+    hand-made cursor is refused with a message that tells the caller to start
+    over, rather than silently returning a shifted page.
+
+    Every entry carries the reason it can or cannot be previewed, so the UI
+    explains itself instead of greying things out.
+    """
     parts = path_parts(path)
     path = "/".join(parts)
     if (

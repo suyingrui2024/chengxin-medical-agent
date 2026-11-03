@@ -69,6 +69,18 @@ def freeze_binding(registry=None):
 
 
 def validate_binding(binding):
+    """Check a workspace's capability binding, if it has one.
+
+    A binding is all-or-nothing: every key must be present and no other key
+    may be, because a workspace recorded under one protocol must not quietly
+    gain permissions recorded under another.  Older workspaces without a
+    binding pass untouched -- they keep the permissions they were created
+    with.
+
+    The enabled list is capped and de-duplicated so a hostile payload cannot
+    force an unbounded rebuild; the cap was raised from 64 when the department
+    catalog grew past it.
+    """
     if binding is None:  # Older workspaces do not silently gain new permissions.
         return
     if (
@@ -134,6 +146,18 @@ EVIDENCE_POLICIES = {
 
 
 def dispatch(payload):
+    """Serve one capability request: list the catalog or run one capability.
+
+    The catalog is the registry filtered to capabilities that have an evidence
+    policy -- a capability without a way to check the patient's own words is
+    not offered at all.  Execution takes exactly three fields, validates the
+    input against the capability's own schema, and runs the evidence policy
+    before the capability, so a calculation whose quoted text does not support
+    its inputs never reaches the arithmetic.
+
+    Every refusal is a CapabilityError with a machine-readable kind, because
+    the caller corrects itself by kind, not by message.
+    """
     registry = bound_registry(payload.get("binding"))
     available = [
         item for item in registry.descriptions() if item["id"] in EVIDENCE_POLICIES

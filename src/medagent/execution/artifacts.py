@@ -103,6 +103,19 @@ def dimensions(data, suffix):
 
 
 def projection(path, data, revision):
+    """Turn one artifact's bytes into the shape the frontend previews.
+
+    Three limits are the contract: the size ceiling is checked before anything
+    else and names the local directory instead, because a file too big to
+    preview is not an error the patient caused; only UTF-8 text, PNG and JPEG
+    are rendered, and anything else is refused with the same message rather
+    than guessed at; and CSV/TSV are parsed strictly, so a broken table falls
+    back to the raw text with a notice instead of silently showing a
+    half-parsed grid.
+
+    The sha256 and the workspace revision travel with every projection, so a
+    preview can be matched to the state it was taken from.
+    """
     if len(data) > read_limit(path):
         raise ValueError("文件过大，请在本机工作目录查看")
     result = {

@@ -9,6 +9,19 @@ from ..infra.platform import protected_roots
 
 
 def project_path(value, storage_root, source_root):
+    """Resolve and vet the project folder a workspace is allowed to see.
+
+    The path must be absolute, existing and a directory, and it must not be
+    -- or live inside, or contain -- anything trusted: the app's own source,
+    its storage root, the Python environment, SSH or cloud credentials, the
+    Node installation, or the plain anchors like the home directory and
+    /tmp.  The check is bidirectional on purpose, because mounting a parent
+    of the storage root exposes the records just as surely as mounting the
+    records themselves.
+
+    Read, write and execute are all required: a read-only folder would let a
+    session start and then fail on its first write.
+    """
     if not isinstance(value, (str, Path)):
         raise ValueError("请选择一个已有的项目文件夹")
     raw = str(value)

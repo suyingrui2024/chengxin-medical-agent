@@ -88,6 +88,17 @@ class WorkspaceStore:
             os.close(directory)
 
     def save(self, identity, record):
+        """Write one workspace record atomically and durably.
+
+        The record is size-capped, written to a temporary file created O_EXCL and
+        O_NOFOLLOW inside the store, fsynced, then renamed over the previous
+        record with the directory fsynced too -- so a crash leaves either the old
+        record or the new one, never a half-written file that reopen would trip
+        over.
+
+        The temporary file is unlinked even on success, because os.replace leaves
+        nothing behind but the code should not depend on that.
+        """
         identity = identifier(identity)
         data = json.dumps(record, ensure_ascii=False, allow_nan=False).encode()
         if len(data) > 2_000_000:
@@ -122,6 +133,16 @@ class WorkspaceStore:
             os.close(directory)
 
     def read(self, identity):
+        """Read one workspace record back, refusing anything that is not intact.
+
+        The read is O_NOFOLLOW and O_NONBLOCK, requires a regular file, and stops
+        at the same size ceiling save uses -- a record that grew past its limit is
+        an error, not silently truncated data.
+
+        Every record that comes back is validated before it leaves this function:
+        a record that is corrupt or from an incompatible version becomes
+        "unavailable", and no substitute session is invented for it.
+        """
         identity = identifier(identity)
         directory = self._directory()
         try:
@@ -154,6 +175,17 @@ class WorkspaceStore:
 
     @staticmethod
     def validate(record, identity):
+        """Check one workspace record's shape and its cross-references.
+
+        The project path, if present, must be absolute, normalised and free of
+        control characters.  Clarifications and observations are each validated by
+        their own rules and each must reference a turn the record actually
+        contains -- an observation pinned to a turn that does not exist is
+        rejected, because reopen replays these against the turns they name.
+
+        Lists are capped so a corrupt file cannot expand into unbounded memory
+        on reopen.
+        """
         if not isinstance(record, dict):
             raise ValueError()
         if "project_path" in record:
@@ -283,6 +315,14 @@ class WorkspaceStore:
                 raise ValueError()
 
     def catalog(self):
+        """List the saved workspaces, newest first, unreadable ones included.
+
+        A record that fails validation is not skipped: it appears with an
+        "unavailable" status, because a workspace the patient can see but cannot
+        open is a fact worth showing, not an error to hide.  Only the fields the
+        list view needs are read out, and the catalog is capped at two hundred
+        entries.
+        """
         try:
             directory = self._directory()
         except FileNotFoundError:
