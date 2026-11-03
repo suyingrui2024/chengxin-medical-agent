@@ -6,3 +6,5 @@
 #: agent.started event is derived from it at runtime, so an audit record
 #: can never claim a policy the code did not run.
 __version__ = "0.11.17"
+
+__all__ = ["__version__"]

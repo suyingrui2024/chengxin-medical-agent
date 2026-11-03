@@ -74,9 +74,9 @@ class ModelBackedEngine:
 
 
 __all__ = [
-    "UserInput",
-    "StaleActionError",
-    "SubjectBoundaryError",
     "ConsultationBusyError",
     "ModelBackedEngine",
+    "StaleActionError",
+    "SubjectBoundaryError",
+    "UserInput",
 ]

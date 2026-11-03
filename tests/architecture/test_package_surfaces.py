@@ -26,17 +26,64 @@ SRC = (ROOT / "src").resolve()
 #: to be the original monolithic module, plus the constants module that
 #: re-exports the shared fact tables on purpose.
 SURFACES = [
+    "medagent",
     "medagent.consultation",
     "medagent.consultation.agent",
     "medagent.conclusion",
     "medagent.conclusion.constants",
     "medagent.execution",
+    "medagent.kg",
+    "medagent.shared_types",
     "medagent.patient_records",
     "medagent.patient_records.store",
     "medagent.server",
     "medagent.subagents",
     "medagent.subagents.coordinator",
 ]
+
+
+def every_package() -> list[str]:
+    """Every package in the tree, by dotted name."""
+    names = []
+    for path in sorted(SRC.rglob("__init__.py")):
+        parts = list(path.relative_to(SRC).with_suffix("").parts)
+        if parts and parts[-1] == "__init__":
+            parts.pop()
+        if parts:
+            names.append(".".join(parts))
+    return names
+
+
+def test_every_package_declares_its_surface():
+    """A package must say what it exports -- including when that is nothing.
+
+    Seven packages are organised by submodule and promise no names of their
+    own.  They used to leave ``__init__.py`` empty, which read the same as
+    "nobody got round to it".  Declaring the empty surface makes the two
+    states different, and this test is what keeps them different.
+    """
+    for package in every_package():
+        module = importlib.import_module(package)
+        assert hasattr(module, "__all__"), (
+            f"{package} declares no surface -- either publish one and add it "
+            "to SURFACES, or declare an empty one on purpose"
+        )
+
+
+def test_a_package_outside_surfaces_publishes_nothing():
+    """A package not listed in SURFACES must not quietly grow a surface.
+
+    Publishing a name is a promise, and a promise made in a package nobody
+    checks is how the 467 stray re-exports came back.
+    """
+    for package in every_package():
+        if package in SURFACES:
+            continue
+        module = importlib.import_module(package)
+        assert list(module.__all__) == [], (
+            f"{package} publishes {module.__all__} but is not in SURFACES -- "
+            "add it there to have the exports checked"
+        )
 
 
 def module_path(module: str) -> pathlib.Path:
