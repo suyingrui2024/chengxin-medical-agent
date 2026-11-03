@@ -39,6 +39,13 @@ def serve(
     # sidecar injects one). Binding a non-loopback interface would
     # expose full consultation records to the network — refuse unless
     # the operator explicitly accepts that with MEDAGENT_ALLOW_REMOTE=1.
+    """Run the standalone HTTP server.
+
+    The standalone server has no access token -- only the desktop sidecar
+    injects one -- so binding a non-loopback interface would expose full
+    consultation records to the network.  That is refused unless the operator
+    explicitly accepts it with MEDAGENT_ALLOW_REMOTE=1.
+    """
     if host not in {"127.0.0.1", "::1", "localhost"} and os.environ.get(
         "MEDAGENT_ALLOW_REMOTE"
     ) != "1":

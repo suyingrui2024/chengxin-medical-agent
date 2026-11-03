@@ -17,6 +17,13 @@ from .persistence import _persist_engine_state
 
 class HandlerConsultation:
     def _do_GET(self) -> None:
+        """Serve the consultation's read routes, health first.
+
+        /api/health is deliberately first and self-contained: it is what the
+        desktop shell and the CI webServer poll, and it reports the persistence
+        counters so a silent write failure is visible in a health check rather
+        than only in a broken session.
+        """
         path = urlparse(self.path).path
         if path == "/api/health":
             self._json(
@@ -129,6 +136,12 @@ class HandlerConsultation:
         self._static(path)
 
     def _do_DELETE(self) -> None:
+        """Serve deletions: archive entries and report items.
+
+        Same-origin first, as for every mutating verb.  A report item is
+        deleted under the session lock, so a delete racing a draft edit
+        resolves to one ordering rather than interleaving.
+        """
         if not self._same_origin():
             return
         path = urlparse(self.path).path
@@ -184,6 +197,12 @@ class HandlerConsultation:
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
     def _do_PATCH(self) -> None:
+        """Serve partial updates: archive member baselines and session facts.
+
+        The archive patch is validated whole by the store before it is
+        written, so an invalid PATCH leaves stored data untouched -- the
+        comment in the branch is the contract, not a wish.
+        """
         if not self._same_origin():
             return
         path = urlparse(self.path).path

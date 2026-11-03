@@ -34,6 +34,12 @@ class HandlerAgent:
         # Every POST route is same-origin by construction: the check happens
         # once, here. Per-route copies of it used to sit inside a dozen
         # branches below, where they could never fail — do not add more.
+        """Route one POST after checking same-origin exactly once.
+
+        Every POST route is same-origin by construction, and the check sits
+        here rather than inside a dozen branches -- a per-route copy could
+        never fail, which is how a new route would ship without it.
+        """
         if not self._same_origin():
             return
         path = urlparse(self.path).path
@@ -80,6 +86,13 @@ class HandlerAgent:
         self._error(HTTPStatus.NOT_FOUND, "not_found", "接口不存在")
 
     def _post_capabilities(self, path: str) -> None:
+        """Configure or preview the execution capability binding.
+
+        The preview path takes exactly id, input and expected revision: the
+        revision is what makes a stale page refuse to run, and a preview that
+        lost the race answers 409 with "stale_composition" instead of silently
+        computing against a composition the patient has not seen.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -113,6 +126,13 @@ class HandlerAgent:
         self._json(result)
 
     def _post_settings(self, path: str) -> None:
+        """Apply new model settings, or probe them without applying.
+
+        "test" probes the connection and changes nothing; apply switches the
+        backend.  A failed connection is a 502 with the cause named -- address,
+        protocol, model id or key -- because "settings rejected" sends the
+        patient hunting through four fields for the one that is wrong.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -166,6 +186,13 @@ class HandlerAgent:
         self._json({"enabled": enabled})
 
     def _post_medication_schedule(self) -> None:
+        """Save one patient-set medication reminder schedule.
+
+        Only a name and HH:MM clock times are accepted -- no dose, no
+        frequency advice, no interaction data -- because this is a reminder
+        the patient asked for, not clinical guidance the server is giving.
+        Unknown fields are rejected rather than ignored.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -208,6 +235,14 @@ class HandlerAgent:
         )
 
     def _post_new_session(self) -> None:
+        """Create a consultation session, idempotently.
+
+        A retried request carrying the same X-Request-ID returns the session it
+        already created instead of minting a duplicate consultation -- the
+        double-tap that used to leave two live cases.  The subject's baseline
+        is snapshotted once here, fail-open: an archive failure leaves an
+        empty projection, never a failed session.
+        """
         with self.app.workspace.lock:
             # Idempotent create: a retried request (same X-Request-ID)
             # returns the session it already created instead of
@@ -239,6 +274,13 @@ class HandlerAgent:
         self._json(replay, HTTPStatus.CREATED)
 
     def _post_session_baseline_reference(self, parts: list[str]) -> None:
+        """Turn the archive-reference banner on or off for one session.
+
+        Enabling rebuilds the projection from the session's own subject rather
+        than from a stored snapshot, so the reference reflects the archive as
+        it is now -- the patient turning the banner back on expects today's
+        facts, not the ones from when the session started.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -287,6 +329,12 @@ class HandlerAgent:
         self._json(response)
 
     def _post_session_bind_patient(self, parts: list[str]) -> None:
+        """Bind a consultation session to one member of the health archive.
+
+        Binding decides whose baseline the session reads and whose record an
+        entry may be attached to, so an unknown patient id is a 404 and an
+        unresolvable one is refused before the session changes at all.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -341,6 +389,12 @@ class HandlerAgent:
         self._json(response)
 
     def _post_session_followup_outcome(self, parts: list[str]) -> None:
+        """Record what came of a follow-up plan.
+
+        The outcome and the patient's note are stored against the plan; a
+        session that no longer exists is 404 rather than a silently created
+        record nobody can read back.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -370,6 +424,14 @@ class HandlerAgent:
         self._json({**result, "follow_up": dict(state.follow_up)})
 
     def _post_session_attach_records(self, parts: list[str]) -> None:
+        """Bring health-archive entries into the consultation as candidates.
+
+        The gate is entry owner == consultation subject, resolved through the
+        archive: an unbound session keeps the old semantics exactly --
+        "self" reads the default profile, a proxy subject is refused.  The
+        request takes no body, because what to attach is decided by the gate,
+        not by the caller.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -498,6 +560,13 @@ class HandlerAgent:
         self._json(response)
 
     def _post_session_confirm_draft(self, parts: list[str]) -> None:
+        """Confirm one item of a report draft into the case record.
+
+        The draft is looked up by id and the item inside it by the caller's
+        source item id -- both must still exist, because a confirmed item that
+        no longer matches the draft on screen would attach something the
+        patient did not review.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -555,6 +624,13 @@ class HandlerAgent:
         self._json(response)
 
     def _post_session_create_draft(self, parts: list[str]) -> None:
+        """Parse pasted text into a report draft attached to the session.
+
+        The text and an optional format hint are all the request carries; the
+        parse -- not the caller -- decides what the draft contains, so a
+        malformed paste becomes an empty draft the patient can see, never a
+        half-interpreted record.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -594,6 +670,14 @@ class HandlerAgent:
         self._json({"draft": draft}, HTTPStatus.CREATED)
 
     def _post_session_message(self, parts: list[str]) -> None:
+        """Take one patient turn: the route the whole consultation flows through.
+
+        The payload names every structured input the engine accepts -- choice,
+        expected action, calculation confirmation, observation -- and each is
+        type-checked here so the engine never sees a shape it did not agree
+        to.  The submission runs under the session lock, so two tabs cannot
+        interleave turns.
+        """
         payload = self._read_json()
         if payload is None:
             return
@@ -709,6 +793,13 @@ class HandlerAgent:
         return self._same_origin()
 
     def _execution_get(self, path):
+        """Serve the execution workspace's read routes.
+
+        Gated first: the execution workspace only exists for callers that may
+        use it at all.  File reads go through the session's own path
+        validation, directory reads take pagination and a hidden-entries
+        switch whose only two values are enforced here.
+        """
         if not self._execution_allowed():
             return
         try:
@@ -778,6 +869,14 @@ class HandlerAgent:
             self._error(HTTPStatus.BAD_REQUEST, "execution_error", str(exc))
 
     def _execution_post(self, path):
+        """Serve the execution workspace's action routes.
+
+        Creating a session snapshots the model settings and the capability
+        registry under the workspace lock, so a session cannot start with a
+        binding the engine has already moved past.  Everything else routes by
+        path shape, and a shape that matches nothing is an error the caller
+        can read.
+        """
         if not self._execution_allowed():
             return
         payload = self._read_json()

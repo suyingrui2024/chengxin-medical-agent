@@ -56,6 +56,12 @@ class HandlerPatient:
         }
 
     def _patient_get(self, path: str) -> None:
+        """Serve the health archive's read routes.
+
+        The default patient is created on demand here: an archive read for a
+        patient who has never been saved still returns a usable profile, so
+        the UI renders an empty archive rather than an error screen.
+        """
         try:
             parts = path.strip("/").split("/")
             if path == "/api/patients":
@@ -357,6 +363,12 @@ class HandlerPatient:
         self._json({"patient": member})
 
     def _post_patient_entry_image(self, payload: dict) -> None:
+        """Archive one image entry from a data URL.
+
+        The field set is closed and the image is decoded here, so a bad data
+        URL is a rejected request rather than a stored entry that cannot be
+        rendered later.
+        """
         if set(payload) - {
             "title",
             "measured_at",
@@ -390,6 +402,13 @@ class HandlerPatient:
         self._json(detail, HTTPStatus.CREATED)
 
     def _post_patient_interpretation(self, parts: list[str], payload: dict) -> None:
+        """Run the report interpreter over one archived entry.
+
+        The entry's owner is checked against the patient the request names --
+        both addressing shapes are accepted, and a mismatch is refused, so an
+        interpretation can never be produced for an entry the patient named
+        does not own.
+        """
         if payload:
             raise PatientRecordError("解读请求不接受额外参数")
         if len(parts) == 6:
@@ -437,6 +456,13 @@ class HandlerPatient:
         )
 
     def _post_patient_measurement_from_observation(self, payload: dict) -> None:
+        """Save a consultation observation into the archive as a measurement.
+
+        Only entry id, observation id and an optional unit are accepted; the
+        value itself comes from the recorded observation, never from the
+        request -- the archive cannot be written to with a number the
+        consultation did not measure.
+        """
         if (
             not {"entry_id", "observation_id"}.issubset(payload)
             or set(payload) - {"entry_id", "observation_id", "unit"}
@@ -594,6 +620,13 @@ class HandlerPatient:
         )
 
     def _post_patient_recognition(self, parts: list[str], payload: dict) -> None:
+        """Run image recognition over an archived image, asynchronously.
+
+        Without a vision model this is a 409 with the image already archived --
+        the patient's picture is safe either way, and recognition can be run
+        later.  The completion callback writes back into the archive rather
+        than the HTTP response, because recognition outlives the request.
+        """
         if payload:
             raise PatientRecordError("识别请求不接受额外参数")
         recognizer = self._configured_recognizer()
@@ -679,6 +712,13 @@ class HandlerPatient:
         self._json(detail)
 
     def _patient_delete(self, path: str) -> None:
+        """Delete one archive entry, optimistic-concurrency style.
+
+        The request must carry the expected version: a delete issued from a
+        stale screen is refused instead of silently removing an entry the
+        patient has since edited.  Sessions that referenced the entry are
+        detached as part of the same operation.
+        """
         if not self._same_origin():
             return
         parts = path.strip("/").split("/")

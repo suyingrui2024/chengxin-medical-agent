@@ -117,6 +117,14 @@ def _validate_subagent_modes(mapping):
 
 class Workspace:
     def __init__(self, engine, events, backend):
+        """Hold the running composition and the coordinates it must be rebuilt with.
+
+        The desktop sidecar builds its first runtime with an explicit session
+        directory and event path; a recomposition that forgets them produces an
+        engine whose session store is None, so every session created after a
+        settings apply silently stops reaching disk.  They are recorded here,
+        at the moment they are known, for exactly that reason.
+        """
         self.engine = engine
         self.events = events
         self.backend = backend
@@ -241,6 +249,13 @@ class Workspace:
             self._subagent_modes_coordinator = coordinator
 
     def resolve(self, payload):
+        """Turn a settings payload into a backend mode and a config dict.
+
+        The field set is closed -- an unknown key is refused, because a
+        silently ignored setting reads as applied.  The caller's names are
+        mapped to the engine's environment names here, so the frontend never
+        needs to know the environment variable spelling.
+        """
         if set(payload) - {
             "backend",
             "base_url",
@@ -301,6 +316,13 @@ class Workspace:
         return mode, config
 
     def apply(self, payload):
+        """Apply new settings, switching the subagent modes first.
+
+        subagent_modes is handled at this layer and never mixed into the
+        resolved LLM config: it switches the shared coordinator in place and
+        must not recompose engines.  It is validated before anything changes,
+        so an invalid switch leaves every piece of state untouched.
+        """
         with self.lock:
             if self.closing:
                 raise RuntimeError("工作台正在关闭")
@@ -346,6 +368,16 @@ class Workspace:
                 self._subagent_modes_coordinator = coordinator
 
     def _compose(self, mode, config, registry):
+        """Build and start a new runtime, and retire the previous one.
+
+        The new host is started and its engine wired before the old host is
+        closed, so a settings apply never leaves the server without an engine --
+        the patient's next turn either works against the new composition or
+        fails loudly, not against nothing.
+
+        The session directory and event path travel with the composition; see
+        __init__ for why they must never be dropped.
+        """
         host = build_runtime(
             backend=mode,
             config=config,
@@ -410,6 +442,13 @@ class Workspace:
             return {**self.engine.content.registry.catalog(), "templates": templates()}
 
     def reconfigure(self, payload):
+        """Switch the capability binding of the running engine.
+
+        The expected revision makes the stale-page race explicit: a configure
+        issued against a composition that has since changed is a 409, not a
+        silent overwrite.  Template and per-capability switches are mutually
+        exclusive in one request, because mixing them has no defined meaning.
+        """
         with self.lock:
             if self.closing:
                 raise ValueError("工作台正在关闭")
@@ -449,6 +488,13 @@ class Workspace:
         return result
 
     def probe(self, payload):
+        """Test a settings payload without applying it.
+
+        The demo mode needs no connection and says so plainly, including that
+        vision stays offline -- the patient should learn that images are not
+        sent anywhere before they send one.  Everything else attempts a real
+        connection and reports what failed.
+        """
         with self.lock:
             if self.closing:
                 raise RuntimeError("工作台正在关闭")
@@ -512,6 +558,12 @@ class Workspace:
         raise KeyError(session_id)
 
     def sessions(self):
+        """List every session across every composition this process has run.
+
+        Engines from earlier compositions are kept precisely so this list can
+        still read their sessions; each state is snapshotted under its own
+        engine's lock, so the list is consistent even while a turn runs.
+        """
         output = []
         with self.lock:
             for engine in self.engines:

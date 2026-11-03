@@ -32,6 +32,13 @@ class MedicalAgentServer(ThreadingHTTPServer):
         patient_store: Optional[PatientRecordStore] = None,
         image_recognizer=None,
     ):
+        """Assemble the HTTP server around one runtime composition.
+
+        The engine, events and backend mode come from the caller's runtime;
+        the workspace, execution manager and patient store are created here,
+        each owning exactly one concern of the running process.  The access
+        token is optional because the standalone server does not use one.
+        """
         super().__init__(address, handler)
         self.engine = engine
         self.events = events

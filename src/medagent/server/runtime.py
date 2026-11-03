@@ -61,6 +61,15 @@ def build_runtime(event_path: Optional[Path] = None, backend: Optional[str] = No
         )
 
     def create_engine(ctx):
+        """Build the consultation engine for one runtime composition.
+
+        The planner is the differential one by default; the rule planner stays
+        available as MEDAGENT_PLANNER=rule, the rollback the A/B evaluation is
+        the evidence for.  Session persistence is layered the same way: an
+        explicit directory wins, then the environment override, then a sibling
+        of the event log -- and without any of them, sessions stay in process
+        memory, which is a documented shape, not an accident.
+        """
         kwargs = dict(content=ctx.services.require("content"), triage=ctx.services.require("triage"),
                       self_checks=ctx.services.require("self_checks"), events=ctx.services.require("events"),
                       ranker=HypothesisRanker())

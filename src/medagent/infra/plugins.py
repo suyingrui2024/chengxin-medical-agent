@@ -1,3 +1,13 @@
+"""The service graph the runtime is assembled from.
+
+Plugins provide services by name into a context, and the context resolves
+them on demand -- so a route asks for "consultation" without knowing whether
+the engine behind it is the deterministic one or a model-backed one.  The
+graph is built once per composition and torn down with it.
+
+Start at ``PluginHost`` and ``RuntimeContext``.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

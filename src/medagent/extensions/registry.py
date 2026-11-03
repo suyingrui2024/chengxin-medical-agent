@@ -1,3 +1,14 @@
+"""Loading and vetting the capability packs the model may call.
+
+A pack declares capabilities, their input schemas and the illustrations the
+patient sees; this module loads them, checks every path against a narrow
+alphabet that cannot leave the served tree, and refuses a pack whose
+illustration is missing -- a capability the patient cannot see is not
+offered quietly.
+
+Start at ``load_registry``.
+"""
+
 from copy import deepcopy
 from dataclasses import dataclass
 import hashlib
