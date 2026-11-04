@@ -344,9 +344,10 @@ if __name__ == "__main__":
 
 
 class MessageLengthLimitTests(ServerHardeningTests):
-    """使用体验评测 F2（2026-11-04）：UI 计数 2000，API 曾静默接受超长文本。
+    """使用体验评测 F2（2026-11-04）：UI 计数与 API 上限必须一致。
 
-    上限在服务端说清楚：拒绝并返回与 UI 一致的数字，而不是吞掉。
+    方案 A 复议后上限从 2000 放宽到 8000（MESSAGE_TEXT_LIMIT）——复杂
+    病史可以整段说完，但仍有界。拒绝时返回与 UI 计数相同的数字。
     """
 
     def test_an_over_long_message_is_refused_with_the_ui_limit(self):
@@ -355,13 +356,24 @@ class MessageLengthLimitTests(ServerHardeningTests):
         status, body = self.request(
             f"/api/sessions/{session_id}/messages",
             "POST",
-            {"text": "头痛" * 2501},
+            {"text": "头痛" * 4001},
         )
         self.assertEqual(status, 400)
         self.assertEqual(body["error"]["code"], "invalid_message")
-        self.assertIn("2000", body["error"]["message"])
+        self.assertIn("8000", body["error"]["message"])
 
     def test_a_message_at_the_limit_is_accepted(self):
+        payload = self.create_session()
+        session_id = payload["session_id"]
+        status, _body = self.request(
+            f"/api/sessions/{session_id}/messages",
+            "POST",
+            {"text": "头" * 8000},
+        )
+        self.assertEqual(status, 200)
+
+    def test_the_old_limit_still_passes(self):
+        """2000 字的内容在上限放宽后必须仍然可用。"""
         payload = self.create_session()
         session_id = payload["session_id"]
         status, _body = self.request(

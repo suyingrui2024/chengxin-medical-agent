@@ -597,7 +597,8 @@ export async function sendMessage(
     ) {
       $("#message-input").value = "";
       $("#message-input").style.height = "auto";
-      $("#input-count").textContent = "0 / 2000";
+      $("#input-count").textContent = "0 / 8000";
+      $("#composer-length-hint").hidden = true;
       composerDrafts.delete(sessionId);
     }
     if (!choiceValue) subjectDrafts.delete(sessionId);

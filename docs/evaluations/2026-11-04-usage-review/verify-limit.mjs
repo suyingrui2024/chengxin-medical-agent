@@ -1,0 +1,16 @@
+import { chromium } from "@playwright/test";
+const browser = await chromium.launch({ channel: "chrome" });
+const page = await browser.newPage();
+await page.goto("http://127.0.0.1:19011/");
+await page.getByRole("button", { name: "开始问诊", exact: true }).click();
+const input = page.getByRole("textbox", { name: "输入你的描述" });
+await input.fill("短文本");
+const shortCount = await page.locator("#input-count").textContent();
+const shortHint = await page.locator("#composer-length-hint").isVisible();
+await input.fill("长".repeat(2500));
+const longCount = await page.locator("#input-count").textContent();
+const longHint = await page.locator("#composer-length-hint").isVisible();
+console.log("短文本:", shortCount.trim(), "| 提示可见:", shortHint);
+console.log("2500字:", longCount.trim(), "| 提示可见:", longHint);
+await page.screenshot({ path: "screenshots/119-composer-length-hint.png", fullPage: false });
+await browser.close();
