@@ -1,0 +1,23 @@
+{"seq":1,"round":2,"action":"选择「我自己」"}
+{"seq":2,"round":2,"action":"选择「男」"}
+{"seq":3,"round":2,"action":"选择「都没有」"}
+{"seq":4,"round":2,"action":"选择「变化不大」"}
+{"seq":5,"round":2,"action":"摘要已确认"}
+{"seq":7,"round":2,"action":"截图 r2-06-conclusion.png"}
+{"seq":9,"round":2,"action":"截图 r2-08-handoff.png"}
+{"seq":10,"round":2,"action":"交接摘要对话框","print_buttons":1}
+{"seq":12,"round":2,"action":"截图 r2-11-report-dialog.png"}
+{"seq":14,"round":2,"action":"截图 r2-13-report-draft-result.png"}
+{"seq":15,"round":2,"action":"报告提取完成","feedback":"尚未写入任何问诊记录。"}
+{"seq":16,"round":2,"action":"核对区按钮","choices":[]}
+{"seq":18,"round":2,"action":"截图 r2-17-report-confirmed.png"}
+{"seq":19,"round":2,"action":"切到视图 records"}
+{"seq":21,"round":2,"action":"截图 r2-20-records-after-report.png"}
+{"seq":22,"round":2,"action":"健康档案计数","count":"0"}
+{"seq":23,"round":2,"action":"切到视图 history"}
+{"seq":25,"round":2,"action":"截图 r2-24-history-view.png"}
+{"seq":26,"round":2,"action":"随访到期计数","count":"0"}
+{"seq":27,"round":2,"action":"切到视图 settings"}
+{"seq":29,"round":2,"action":"截图 r2-28-settings-model.png"}
+{"seq":30,"round":2,"action":"外观主题按钮未见"}
+{"seq":32,"round":2,"action":"截图 r2-31-settings-data.png"}
