@@ -144,6 +144,7 @@ GROUPS: list[tuple[str, str, list[str]]] = [
             "待临床评审清单.md",
             "证据与来源.md",
             "测试覆盖矩阵.md",
+            "使用体验评测报告.md",
         ],
     ),
 ]

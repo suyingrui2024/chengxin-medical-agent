@@ -1,0 +1,85 @@
+{"seq":1,"persona":"蓝-自护","action":"开始问诊","session_id":"e463632d-071f-4458-b038-d9b4b013b9ac","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":3,"persona":"蓝-自护","action":"截图 02-蓝-自护-opening.png","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]},"phase":"明确问题"}
+{"seq":4,"persona":"蓝-自护","action":"开场选项","choices":["我自己↗","孩子↗","其他家人↗"]}
+{"seq":5,"persona":"蓝-自护","action":"选择「我自己」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":6,"persona":"蓝-自护","action":"选择「男」","question":{"title":"请问是男是女？","choices":["男↗","女↗"]}}
+{"seq":7,"persona":"蓝-自护","action":"回答「32岁」","question":{"title":"你多大？可直接写年龄，例如 32 岁。","choices":[]}}
+{"seq":8,"persona":"蓝-自护","action":"回答「后脑勺胀痛两天，一阵一阵的」","question":{"title":"最困扰你的是什么？","choices":[]}}
+{"seq":10,"persona":"蓝-自护","action":"截图 09-蓝-自护-safety-screen.png","question":{"title":"现在，有以下任一情况吗？","choices":["有任一项↗","都没有↗","不确定↗"]},"phase":"紧急信号"}
+{"seq":12,"persona":"蓝-自护","action":"截图 11-蓝-自护-q-emergency_screen.png","question":{"title":"现在，有以下任一情况吗？","choices":["有任一项↗","都没有↗","不确定↗"]},"phase":"紧急信号"}
+{"seq":13,"persona":"蓝-自护","action":"选择「都没有」","question":{"title":"现在，有以下任一情况吗？","choices":["有任一项↗","都没有↗","不确定↗"]}}
+{"seq":15,"persona":"蓝-自护","action":"截图 14-蓝-自护-q-onset.png","question":{"title":"从什么时候开始？","choices":[]},"phase":"了解经过"}
+{"seq":16,"persona":"蓝-自护","action":"回答「两天前逐渐出现」","question":{"title":"从什么时候开始？","choices":[]}}
+{"seq":18,"persona":"蓝-自护","action":"截图 17-蓝-自护-q-trajectory.png","question":{"title":"和刚开始比，怎么样了？","choices":["在加重↗","在减轻↗","变化不大↗","一阵一阵的↗","说不清↗"]},"phase":"了解经过"}
+{"seq":19,"persona":"蓝-自护","action":"选择「变化不大」","question":{"title":"和刚开始比，怎么样了？","choices":["在加重↗","在减轻↗","变化不大↗","一阵一阵的↗","说不清↗"]}}
+{"seq":21,"persona":"蓝-自护","action":"截图 20-蓝-自护-q-severity.png","question":{"title":"现在，大约有多难受？","choices":["先选择分数","0","1","2","3","4","5","6"]},"phase":"了解经过"}
+{"seq":22,"persona":"蓝-自护","action":"回答「3分」","question":{"title":"现在，大约有多难受？","choices":["先选择分数","0","1","2","3","4","5","6"]}}
+{"seq":24,"persona":"蓝-自护","action":"截图 23-蓝-自护-q-associated_symptoms.png","question":{"title":"还有其他不舒服吗？","choices":[]},"phase":"了解经过"}
+{"seq":25,"persona":"蓝-自护","action":"回答「没有其他不适」","question":{"title":"还有其他不舒服吗？","choices":[]}}
+{"seq":26,"persona":"蓝-自护","action":"选择「没有」","question":{"title":null,"choices":[]}}
+{"seq":28,"persona":"蓝-自护","action":"截图 27-蓝-自护-step-6.png","question":{"title":null,"choices":[]},"phase":"了解经过"}
+{"seq":29,"persona":"蓝-自护","action":"选择「没有」","question":{"title":null,"choices":[]}}
+{"seq":30,"persona":"蓝-自护","action":"选择「没有」","question":{"title":null,"choices":[]}}
+{"seq":31,"persona":"蓝-自护","action":"【图示定位任务出现】"}
+{"seq":33,"persona":"蓝-自护","action":"截图 32-蓝-自护-location-part.png","question":{"title":null,"choices":[]},"phase":"定向观察"}
+{"seq":34,"persona":"蓝-自护","action":"定位选择「头/面部」"}
+{"seq":36,"persona":"蓝-自护","action":"截图 35-蓝-自护-location-recorded.png","question":{"title":"用过药，或做过什么处理？","choices":[]},"phase":"补充背景"}
+{"seq":37,"persona":"蓝-自护","action":"定位提交「记录：头/面部」","question":{"title":"用过药，或做过什么处理？","choices":[]}}
+{"seq":39,"persona":"蓝-自护","action":"截图 38-蓝-自护-q-medications_taken.png","question":{"title":"用过药，或做过什么处理？","choices":[]},"phase":"补充背景"}
+{"seq":40,"persona":"蓝-自护","action":"回答「没有吃过药」","question":{"title":"用过药，或做过什么处理？","choices":[]}}
+{"seq":42,"persona":"蓝-自护","action":"截图 41-蓝-自护-q-allergies.png","question":{"title":"有已知的药物或食物过敏吗？","choices":[]},"phase":"补充背景"}
+{"seq":43,"persona":"蓝-自护","action":"回答「没有」","question":{"title":"有已知的药物或食物过敏吗？","choices":[]}}
+{"seq":45,"persona":"蓝-自护","action":"截图 44-蓝-自护-q-relevant_history.png","question":{"title":"有哪些需要了解的病史？","choices":[]},"phase":"补充背景"}
+{"seq":46,"persona":"蓝-自护","action":"回答「没有」","question":{"title":"有哪些需要了解的病史？","choices":[]}}
+{"seq":48,"persona":"蓝-自护","action":"截图 47-蓝-自护-q-patient_goal.png","question":{"title":"你最希望得到什么帮助？","choices":[]},"phase":"补充背景"}
+{"seq":49,"persona":"蓝-自护","action":"回答「看看要不要去医院」","question":{"title":"你最希望得到什么帮助？","choices":[]}}
+{"seq":51,"persona":"蓝-自护","action":"截图 50-蓝-自护-summary-sheet.png","question":{"title":null,"choices":[]},"phase":"待核对"}
+{"seq":52,"persona":"蓝-自护","action":"摘要页可用按钮","choices":[]}
+{"seq":54,"persona":"蓝-自护","action":"截图 53-蓝-自护-after-confirm.png","question":{"title":null,"choices":[]},"phase":"已结束"}
+{"seq":55,"persona":"红-急症","action":"开始问诊","session_id":"afaa356a-d694-4938-9c7e-bcc34086dd03","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":56,"persona":"红-急症","action":"选择「我自己」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":57,"persona":"红-急症","action":"选择「男」","question":{"title":"请问是男是女？","choices":["男↗","女↗"]}}
+{"seq":58,"persona":"红-急症","action":"回答「58岁」","question":{"title":"你多大？可直接写年龄，例如 32 岁。","choices":[]}}
+{"seq":59,"persona":"红-急症","action":"回答「胸口像压了块大石头，喘不上气，一直出冷汗」","question":{"title":"最困扰你的是什么？","choices":[]}}
+{"seq":61,"persona":"红-急症","action":"截图 60-红-急症-after-chief.png","question":{"title":null,"choices":[]},"phase":"立即求助"}
+{"seq":63,"persona":"红-急症","action":"截图 62-红-急症-escalation.png","question":{"title":null,"choices":[]},"phase":"立即求助"}
+{"seq":64,"persona":"红-急症","action":"急症路径结束状态","phase":"立即求助"}
+{"seq":65,"persona":"黄-家长","action":"开始问诊","session_id":"1502d2cc-0ce7-4063-aad1-4d1a00cb8809","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":67,"persona":"黄-家长","action":"截图 66-黄-家长-opening.png","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]},"phase":"明确问题"}
+{"seq":68,"persona":"黄-家长","action":"开场选项","choices":["我自己↗","孩子↗","其他家人↗"]}
+{"seq":69,"persona":"黄-家长","action":"选择「孩子」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":70,"persona":"黄-家长","action":"代答入口之后","question":{"title":"请问是男是女？","choices":["男↗","女↗"]}}
+{"seq":72,"persona":"黄-家长","action":"截图 71-黄-家长-subject.png","question":{"title":"请问是男是女？","choices":["男↗","女↗"]},"phase":"明确问题"}
+{"seq":73,"persona":"黄-家长","action":"选择「男」","question":{"title":"请问是男是女？","choices":["男↗","女↗"]}}
+{"seq":74,"persona":"黄-家长","action":"回答「3岁」","question":{"title":"患者多大了？","choices":[]}}
+{"seq":75,"persona":"黄-家长","action":"回答「孩子发烧38度5，精神不太好」","question":{"title":"最困扰你的是什么？","choices":[]}}
+{"seq":77,"persona":"黄-家长","action":"截图 76-黄-家长-after-chief.png","question":{"title":"现在，有以下任一情况吗？","choices":["有任一项↗","都没有↗","不确定↗"]},"phase":"紧急信号"}
+{"seq":79,"persona":"黄-家长","action":"截图 78-黄-家长-q-emergency_screen.png","question":{"title":"现在，有以下任一情况吗？","choices":["有任一项↗","都没有↗","不确定↗"]},"phase":"紧急信号"}
+{"seq":80,"persona":"黄-家长","action":"选择「都没有」","question":{"title":"现在，有以下任一情况吗？","choices":["有任一项↗","都没有↗","不确定↗"]}}
+{"seq":82,"persona":"黄-家长","action":"截图 81-黄-家长-q-resp_breathing.png","question":{"title":"现在呼吸怎么样？","choices":[]},"phase":"了解经过"}
+{"seq":83,"persona":"黄-家长","action":"回答「呼吸正常」","question":{"title":"现在呼吸怎么样？","choices":[]}}
+{"seq":85,"persona":"黄-家长","action":"截图 84-黄-家长-q-trajectory.png","question":{"title":"和刚开始比，怎么样了？","choices":["在加重↗","在减轻↗","变化不大↗","一阵一阵的↗","说不清↗"]},"phase":"了解经过"}
+{"seq":86,"persona":"黄-家长","action":"选择「变化不大」","question":{"title":"和刚开始比，怎么样了？","choices":["在加重↗","在减轻↗","变化不大↗","一阵一阵的↗","说不清↗"]}}
+{"seq":88,"persona":"黄-家长","action":"截图 87-黄-家长-q-severity.png","question":{"title":"现在，大约有多难受？","choices":["先选择分数","0","1","2","3","4","5","6"]},"phase":"了解经过"}
+{"seq":89,"persona":"黄-家长","action":"回答「3分」","question":{"title":"现在，大约有多难受？","choices":["先选择分数","0","1","2","3","4","5","6"]}}
+{"seq":91,"persona":"黄-家长","action":"截图 90-黄-家长-q-associated_symptoms.png","question":{"title":"还有其他不舒服吗？","choices":[]},"phase":"了解经过"}
+{"seq":92,"persona":"黄-家长","action":"回答「没有其他不适」","question":{"title":"还有其他不舒服吗？","choices":[]}}
+{"seq":94,"persona":"黄-家长","action":"截图 93-黄-家长-q-onset.png","question":{"title":"从什么时候开始？","choices":[]},"phase":"了解经过"}
+{"seq":95,"persona":"黄-家长","action":"回答「两天前逐渐出现」","question":{"title":"从什么时候开始？","choices":[]}}
+{"seq":97,"persona":"黄-家长","action":"截图 96-黄-家长-q-resp_cough_details.png","question":{"title":"咳嗽是什么样的？","choices":[]},"phase":"了解经过"}
+{"seq":98,"persona":"黄-家长","action":"回答「没有咳嗽」","question":{"title":"咳嗽是什么样的？","choices":[]}}
+{"seq":100,"persona":"黄-家长","action":"截图 99-黄-家长-q-resp_intake.png","question":{"title":"喝水、吃饭和排尿正常吗？","choices":[]},"phase":"了解经过"}
+{"seq":101,"persona":"黄-家长","action":"回答「能正常喝水吃饭」","question":{"title":"喝水、吃饭和排尿正常吗？","choices":[]}}
+{"seq":103,"persona":"黄-家长","action":"截图 102-黄-家长-q-reported_temperature.png","question":{"title":"你说孩子发烧38度5，精神不太好，再问一句：自己量过体温吗？如果量过，是多少度、什么时候量的？没量过请直接说没量过。","choices":[]},"phase":"了解经过"}
+{"seq":104,"persona":"黄-家长","action":"回答「38.5℃」","question":{"title":"你说孩子发烧38度5，精神不太好，再问一句：自己量过体温吗？如果量过，是多少度、什么时候量的？没量过请直接说没量过。","choices":[]}}
+{"seq":106,"persona":"黄-家长","action":"截图 105-黄-家长-end-state.png","question":{"title":null,"choices":[]},"phase":"定向观察"}
+{"seq":107,"persona":"坏路径","action":"开始问诊","session_id":"eebf5091-26d1-45e7-9a1e-1571b7ddd054","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":108,"persona":"坏路径","action":"选择「我自己」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":109,"persona":"坏路径","action":"空消息","status":400,"body":"{\"error\": {\"code\": \"invalid_message\", \"message\": \"消息不能为空\"}}"}
+{"seq":110,"persona":"坏路径","action":"5000字消息","status":200,"body":"{\"reply\": {\"message\": \"你多大？可直接写年龄，例如 32 岁。\", \"phase\": \"opening\", \"kind\": \"question\", \"question_id\": \"age\", \"quick_replies\": [], \"task\": null, \"summary\": null, \"developer_trace\": {\"reason\": \"age_years "}
+{"seq":111,"persona":"坏路径","action":"不存在的会话","status":404,"body":"{\"error\": {\"code\": \"session_not_found\", \"message\": \"找不到该问诊会话\"}}"}
+{"seq":112,"persona":"坏路径","action":"回答「32岁」","question":{"title":"请问是男是女？","choices":["男↗","女↗"]}}
+{"seq":113,"persona":"坏路径","action":"双击发送","user_messages":3}
+{"seq":115,"persona":"坏路径","action":"截图 114-坏路径-double-click.png","question":{"title":"我没能确认年龄。请写成“8个月”或“32岁”这样的格式。","choices":[]},"phase":"明确问题"}
+{"seq":117,"persona":"坏路径","action":"截图 116-坏路径-after-reload.png","question":{"title":null,"choices":[]},"phase":"尚未开始"}
+{"seq":118,"persona":"坏路径","action":"刷新恢复","phase":"尚未开始","question":{"title":null,"choices":[]}}
