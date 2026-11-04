@@ -1,0 +1,10 @@
+{
+  "groups": ["A", "D", "K"],
+  "seconds": 1931,
+  "steps": 1467,
+  "shots": 155,
+  "duplicates": 171,
+  "findings": 63,
+  "failing": 14,
+  "serverTail": "[05/Nov/2026 01:04:24] \"GET /assets/illustrations/body-location.svg HTTP/1.1\" 200 -\n[05/Nov/2026 01:04:24] \"GET /api/patient/timeline HTTP/1.1\" 200 -\n[05/Nov/2026 01:04:25] \"GET /assets/brand.png HTTP/1.1\" 200 -\n[05/Nov/2026 01:04:25] \"POST /api/sessions HTTP/1.1\" 201 -\n[05/Nov/2026 01:04:25] \"GET /api/sessions HTTP/1.1\" 200 -\n[05/Nov/2026 01:04:25] \"GET /api/sessions/6bd542b0-f540-43bc-be38-2b4a57994741/events?since=0 HTTP/1.1\" 200 -"
+}
