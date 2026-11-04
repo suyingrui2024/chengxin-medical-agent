@@ -22,6 +22,21 @@ _TEXT_ROW = re.compile(
     r"(?P<unit>[A-Za-zμµ/%][A-Za-z0-9μµ/%^·*/.-]{0,20})?\s*"
     r"(?P<reference>(?:[<>≤≥]\s*\d+(?:\.\d+)?)|(?:\d+(?:\.\d+)?\s*(?:-|–|—|~|至)\s*\d+(?:\.\d+)?))\s*$"
 )
+# 使用体验评测 R2-1（2026-11-04）：真实检验单最常见的两种行格式。
+# 括注参考："空腹血糖 5.6 mmol/L（参考 3.9-6.1）"——归一化时把括注里的
+# 参考区间搬出来，变成 _TEXT_ROW 认的行尾形态。
+_ANNOTATED_REFERENCE = re.compile(
+    r"[（(]\s*(?:参考|参考范围|正常范围)\s*[:：]?\s*"
+    r"(?P<reference>(?:[<>≤≥]\s*\d+(?:\.\d+)?)|(?:\d+(?:\.\d+)?\s*(?:-|–|—|~|至)\s*\d+(?:\.\d+)?))"
+    r"[)）]\s*$"
+)
+# 血压比值："血压 128/84 mmHg"——收缩/舒张是一对数，不是两个独立项；
+# 此类行通常不带参考区间，reference 留空交由用户核对。
+_PAIR_ROW = re.compile(
+    r"^\s*(?P<name>[A-Za-z\u4e00-\u9fff][A-Za-z0-9\u4e00-\u9fff()（）/%+\- ]{0,80}?)\s+"
+    r"(?P<value>\d{2,3}\s*/\s*\d{2,3})\s*"
+    r"(?P<unit>[A-Za-zμµ/%][A-Za-z0-9μµ/%^·*/.-]{0,20})?\s*$"
+)
 
 
 def _clean(value: Any, maximum: int = 180) -> str:
@@ -72,12 +87,43 @@ def _parse_csv(text: str) -> list[dict[str, str]]:
 
 
 def _parse_text(text: str) -> list[dict[str, str]]:
+    """Parse one free-text lab report line by line into review items.
+
+    Three accepted line shapes, tried in order: the canonical
+    "项目 数值 单位 参考范围", the annotated "…（参考 X-Y）" (normalized
+    to the canonical shape for matching, original line kept as the
+    excerpt), and the blood-pressure pair "血压 128/84 mmHg" with no
+    reference.  A line matching nothing is skipped, never guessed.
+    """
     items = []
     for index, line in enumerate(text.splitlines(), 1):
         if len(items) == MAX_REPORT_ITEMS:
             break
         match = _TEXT_ROW.match(line)
         if not match:
+            # 括注参考先归一化成行尾参考区间再匹配；excerpt 仍保留
+            # 患者粘贴的原文（核对时要对得上原始行）。
+            annotated = _ANNOTATED_REFERENCE.search(line)
+            if annotated:
+                normalized = (
+                    _ANNOTATED_REFERENCE.sub("", line).rstrip()
+                    + " "
+                    + annotated.group("reference")
+                )
+                match = _TEXT_ROW.match(normalized)
+        if not match:
+            pair = _PAIR_ROW.match(line)
+            if pair:
+                items.append(
+                    _item(
+                        line,
+                        pair.group("name"),
+                        pair.group("value"),
+                        pair.group("unit"),
+                        "",
+                        index,
+                    )
+                )
             continue
         items.append(
             _item(

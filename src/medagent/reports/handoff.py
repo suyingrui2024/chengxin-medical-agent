@@ -142,11 +142,57 @@ _BASELINE_KEYS = (
 )
 
 
+# 使用体验评测 R2-2（2026-11-04）：交接摘要面向患者，枚举值说患者的
+# 语言——标签与 questions.json 的选项文案一致；内部值（self/male/stable）
+# 与 None 绝不直接渲染。对话框、打印页与 .md/.txt 导出共用这一份。
+_ENUM_VALUE_LABELS = {
+    "consult_for": {"self": "本人", "child": "孩子", "other_adult": "其他家人"},
+    "sex": {"male": "男", "female": "女"},
+    "trajectory": {
+        "worsening": "在加重",
+        "improving": "在减轻",
+        "stable": "变化不大",
+        "intermittent": "一阵一阵的",
+        "unknown": "说不清",
+    },
+    "emergency_screen": {"yes": "有任一项", "no": "都没有", "unknown": "不确定"},
+    "pregnancy_status": {
+        "not_pregnant": "没有怀孕",
+        "pregnant": "已经怀孕",
+        "uncertain": "不确定",
+    },
+}
+
+
+def _patient_value(key: str, fact: Any) -> Any:
+    value = fact.value
+    labels = _ENUM_VALUE_LABELS.get(key)
+    if labels is not None and isinstance(value, str):
+        label = labels.get(value)
+        if label is not None:
+            return label
+    if value is None:
+        # 患者的语言里没有"null"：按断言说明为什么没有值。
+        assertion = getattr(fact.assertion, "value", fact.assertion)
+        if assertion == "absent":
+            return "已明确没有"
+        if assertion == "unknown":
+            return "未说明"
+        if assertion == "unconfirmed":
+            return "未确认"
+        return "未记录"
+    if value is True:
+        return "有"
+    if value is False:
+        return "没有"
+    return value
+
+
 def _fact_row(key: str, fact: Any) -> dict[str, Any]:
     return {
         "label": LABELS.get(key, key),
         "assertion": fact.assertion.value,
-        "value": fact.value,
+        "value": _patient_value(key, fact),
         "evidence": fact.evidence,
         "source": fact.source.value,
         "quality": fact.quality.value,

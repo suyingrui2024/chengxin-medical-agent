@@ -8,8 +8,8 @@
 {"seq":10,"round":2,"action":"交接摘要对话框","print_buttons":1}
 {"seq":12,"round":2,"action":"截图 r2-11-report-dialog.png"}
 {"seq":14,"round":2,"action":"截图 r2-13-report-draft-result.png"}
-{"seq":15,"round":2,"action":"报告提取完成","feedback":"尚未写入任何问诊记录。"}
-{"seq":16,"round":2,"action":"核对区按钮","choices":[]}
+{"seq":15,"round":2,"action":"报告提取完成","feedback":"请核对每一项后再加入本次记录。"}
+{"seq":16,"round":2,"action":"核对区按钮","choices":["确认加入","确认加入","确认加入"]}
 {"seq":18,"round":2,"action":"截图 r2-17-report-confirmed.png"}
 {"seq":19,"round":2,"action":"切到视图 records"}
 {"seq":21,"round":2,"action":"截图 r2-20-records-after-report.png"}

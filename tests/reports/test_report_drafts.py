@@ -8,6 +8,7 @@ from medagent.core.domain import Assertion, CaseState, Fact, Source
 from medagent.core.events import EventStore
 from medagent.reports.handoff import build_handoff
 from medagent.reports.report_drafts import parse_report_draft
+from tests.support.reports_case import _fact
 from medagent.server.runtime import build_runtime
 from medagent.server import Handler, MedicalAgentServer
 
@@ -154,3 +155,80 @@ class ReportDraftTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RealWorldReportFormatTests(unittest.TestCase):
+    """使用体验评测 R2-1（2026-11-04）：真实检验单最常见行格式。
+
+    修复前两种格式都提取为零——括注参考被 （参考 …） 挡住，血压比值
+    不是独立数值。excerpt 必须保留患者粘贴的原文。
+    """
+
+    def test_annotated_reference_line_parses(self):
+        draft = parse_report_draft("空腹血糖 5.6 mmol/L（参考 3.9-6.1）")
+        item = draft["items"][0]
+        self.assertEqual(item["name"], "空腹血糖")
+        self.assertEqual(item["reported_value"], "5.6")
+        self.assertEqual(item["unit"], "mmol/L")
+        self.assertEqual(item["reference_range"], "3.9-6.1")
+        self.assertIn("（参考 3.9-6.1）", item["source_excerpt"])
+
+    def test_annotated_single_bound_and_half_width_parens_parse(self):
+        draft = parse_report_draft("总胆固醇 6.2 mmol/L (参考 <5.2)")
+        item = draft["items"][0]
+        self.assertEqual(item["name"], "总胆固醇")
+        self.assertEqual(item["reference_range"], "<5.2")
+
+    def test_blood_pressure_pair_parses_without_reference(self):
+        draft = parse_report_draft("血压 128/84 mmHg")
+        item = draft["items"][0]
+        self.assertEqual(item["name"], "血压")
+        self.assertEqual(item["reported_value"], "128/84")
+        self.assertEqual(item["unit"], "mmHg")
+        self.assertEqual(item["reference_range"], "")
+
+    def test_the_reviewers_original_report_extracts_three_items(self):
+        draft = parse_report_draft(
+            "检验报告日期 2026-11-01\n"
+            "空腹血糖 5.6 mmol/L（参考 3.9-6.1）\n"
+            "总胆固醇 6.2 mmol/L（参考 <5.2）\n"
+            "血压 128/84 mmHg"
+        )
+        self.assertEqual(len(draft["items"]), 3)
+        self.assertEqual(draft["missing_context"], [])
+
+
+class HandoffPatientLanguageTests(unittest.TestCase):
+    """使用体验评测 R2-2（2026-11-04）：交接摘要不说内部语言。
+
+    枚举值渲染为 questions.json 的患者文案，None 按断言说明原因——
+    'self'/'male'/stable/null 这样的内部值绝不直接出现在患者眼前。
+    """
+
+    def _state_with_enums(self):
+        state = CaseState("handoff-language-test")
+        state.record(_fact("consult_for", "self", Assertion.PRESENT))
+        state.record(_fact("sex", "male", Assertion.PRESENT))
+        state.record(_fact("trajectory", "stable", Assertion.PRESENT))
+        state.record(_fact("medications_taken", None, Assertion.UNKNOWN))
+        state.record(_fact("emergency_screen", None, Assertion.ABSENT))
+        return state
+
+    def test_enum_values_render_patient_labels(self):
+        handoff = build_handoff(self._state_with_enums())
+        values = {row["label"]: row["value"] for row in handoff["facts"]}
+        self.assertEqual(values["咨询对象"], "本人")
+        self.assertEqual(values["性别"], "男")
+        self.assertEqual(values["变化趋势"], "变化不大")
+
+    def test_unknown_facts_go_to_needs_confirmation_not_null_rows(self):
+        # 未知项本就路由到"仍待补充"——那是正确的患者语言；
+        # 这里钉住它不再退回 null 行。
+        handoff = build_handoff(self._state_with_enums())
+        values = {row["label"]: row["value"] for row in handoff["facts"]}
+        self.assertEqual(values["急症筛查"], "已明确没有")
+        self.assertIn("已报告用药与处理", [x["label"] for x in handoff["needs_confirmation"]])
+        encoded = json.dumps(handoff, ensure_ascii=False)
+        self.assertNotIn('"value": null', encoded)
+        self.assertNotIn('"value": "self"', encoded)
+        self.assertNotIn('"value": "male"', encoded)
