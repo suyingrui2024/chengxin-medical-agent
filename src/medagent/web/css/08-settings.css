@@ -396,6 +396,20 @@ body.task-focused .surface-actions {
   color: var(--ink);
   padding: 10px 0;
 }
+/* 使用体验评测 F4（2026-11-04）：折叠区默认收起，仅凭文字与静态标题
+   难以区分——加一个随 aria-expanded 旋转的箭头，纯 CSS，不改 DOM 与
+   文案，避免影响按文本断言的测试。 */
+.conclusion-collapse-toggle::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--ink-soft, var(--ink));
+  opacity: 0.55;
+  transition: transform 0.15s ease;
+}
+.conclusion-collapse-toggle[aria-expanded="true"]::before {
+  transform: rotate(90deg);
+}
 .conclusion-collapse-body {
   padding-bottom: 4px;
 }

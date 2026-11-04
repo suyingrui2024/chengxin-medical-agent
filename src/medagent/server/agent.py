@@ -29,6 +29,32 @@ from .persistence import (
 from .workspace import StaleCompositionError
 
 
+def _message_payload_error(payload: dict):
+    """Validate one patient-turn payload; return _error arguments or None.
+
+    The length ceiling matches the composer's counter (2000): a rejection
+    must name the same number the patient sees, 使用体验评测 F2.
+    """
+    observation = payload.get("observation")
+    if observation is not None and not isinstance(observation, dict):
+        return (HTTPStatus.BAD_REQUEST, "invalid_observation", "定位答案格式错误")
+    calculation = payload.get("calculation")
+    if calculation is not None and not isinstance(calculation, dict):
+        return (HTTPStatus.BAD_REQUEST, "invalid_calculation", "计算参数格式错误")
+    text = payload.get("text")
+    if not isinstance(text, str) or not text.strip():
+        return (HTTPStatus.BAD_REQUEST, "invalid_message", "消息不能为空")
+    if len(text) > 2000:
+        return (HTTPStatus.BAD_REQUEST, "invalid_message", "消息不能超过 2000 字")
+    choice_value = payload.get("choice_value")
+    if choice_value is not None and not isinstance(choice_value, str):
+        return (HTTPStatus.BAD_REQUEST, "invalid_choice", "选项值格式错误")
+    expected_action_id = payload.get("expected_action_id")
+    if expected_action_id is not None and not isinstance(expected_action_id, str):
+        return (HTTPStatus.BAD_REQUEST, "invalid_action_id", "问题标识格式错误")
+    return None
+
+
 class HandlerAgent:
     def _do_POST(self) -> None:
         # Every POST route is same-origin by construction: the check happens
@@ -681,28 +707,15 @@ class HandlerAgent:
         payload = self._read_json()
         if payload is None:
             return
+        error = _message_payload_error(payload)
+        if error is not None:
+            self._error(*error)
+            return
         text = payload.get("text")
         choice_value = payload.get("choice_value")
         expected_action_id = payload.get("expected_action_id")
         calculation = payload.get("calculation")
         observation = payload.get("observation")
-        if observation is not None and not isinstance(observation, dict):
-            self._error(HTTPStatus.BAD_REQUEST, "invalid_observation", "定位答案格式错误")
-            return
-        if calculation is not None and not isinstance(calculation, dict):
-            self._error(HTTPStatus.BAD_REQUEST, "invalid_calculation", "计算参数格式错误")
-            return
-        if not isinstance(text, str) or not text.strip():
-            self._error(HTTPStatus.BAD_REQUEST, "invalid_message", "消息不能为空")
-            return
-        if choice_value is not None and not isinstance(choice_value, str):
-            self._error(HTTPStatus.BAD_REQUEST, "invalid_choice", "选项值格式错误")
-            return
-        if expected_action_id is not None and not isinstance(
-            expected_action_id, str
-        ):
-            self._error(HTTPStatus.BAD_REQUEST, "invalid_action_id", "问题标识格式错误")
-            return
         try:
             engine = self.app.workspace.engine_for(parts[2])
             with engine._session_locks[parts[2]]:

@@ -332,3 +332,60 @@ class SelfCheckConversationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TemperatureOfferBridgingTests(unittest.TestCase):
+    """使用体验评测 F1（2026-11-04）：任务发放话术必须承认已记录的自述读数。
+
+    自述（quality=not_assessed）不等于核实过的测量——任务仍会提供，这是
+    设计；但发放话术若不提患者/家属刚说过的数值，他们会觉得没被听见。
+    """
+
+    def setUp(self):
+        self.flow = SelfCheckFlow()
+        self.engine, self.state = self.flow.engine, self.flow.state
+
+    def test_offer_acknowledges_the_reported_reading(self):
+        self._flow_with_reported_reading()
+        reply = self.engine._offer_task(self.state, "发烧")
+        self.assertIsNotNone(reply)
+        self.assertEqual(reply.kind, "self_check")
+        self.assertIn("38.5℃", reply.message)
+        self.assertIn("自述", reply.message)
+
+    def _flow_with_reported_reading(self):
+        """evidence 必须是患者原话的逐字子串，所以提交文本要含全部引文。"""
+        self.flow.backend.commands = [
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("age_years", 3, "3岁"),
+                    fact("chief_complaint", "发烧", "发烧"),
+                    fact("emergency_screen", None, "上述危险信号都没有", "absent"),
+                    fact("reported_temperature", "38.5℃", "38.5℃"),
+                ],
+            ),
+            cmd("ask_question", question_id="sex"),
+        ]
+        self.flow.submit("我自己，孩子3岁，发烧，量了38.5℃，上述危险信号都没有。")
+
+    def test_offer_without_a_reported_reading_keeps_the_neutral_message(self):
+        self.flow.backend.commands = [
+            cmd(
+                "record_facts",
+                facts=[
+                    fact("consult_for", "self", "我自己"),
+                    fact("age_years", 3, "3岁"),
+                    fact("chief_complaint", "发烧", "发烧"),
+                    fact("emergency_screen", None, "上述危险信号都没有", "absent"),
+                ],
+            ),
+            cmd("ask_question", question_id="sex"),
+        ]
+        self.flow.submit("我自己，孩子3岁，发烧，上述危险信号都没有。")
+        reply = self.engine._offer_task(self.state, "发烧")
+        self.assertIsNotNone(reply)
+        self.assertEqual(reply.kind, "self_check")
+        self.assertIn("为了把当前情况记录得更清楚", reply.message)
+        self.assertNotIn("自述", reply.message)

@@ -312,8 +312,14 @@ async function personaYellow(browser) {
 async function badPaths(browser) {
   const P = "坏路径";
   const page = await newPage(browser);
-  const id = await startSession(page, P);
-  await clickChoice(page, P, "我自己");
+  // F3 生效后，goto 会自动回到上一个画像未结束的会话——直接复用它。
+  await page.goto(BASE + "/");
+  await page.waitForTimeout(2000);
+  const list = await page.evaluate(async () =>
+    (await fetch("/api/sessions")).json(),
+  );
+  const id = list.sessions[0]?.session_id;
+  record(P, "复用活动会话", { session_id: id });
 
   // 1. 空消息
   const empty = await page.evaluate(async (id) => {
@@ -344,18 +350,22 @@ async function badPaths(browser) {
   });
   record(P, "不存在的会话", missing);
 
-  // 4. 发送按钮双击（连点两次）
-  await answer(page, P, "32岁");
-  await page.getByRole("textbox", { name: "输入你的描述" }).fill("后脑勺胀痛");
-  await page.getByRole("button", { name: "发送回答" }).click();
-  await page
-    .getByRole("button", { name: "发送回答" })
-    .click({ force: true, timeout: 1500 })
-    .catch(() => {});
-  await page.waitForTimeout(800);
-  const dup = await page.locator(".message.user").count();
-  record(P, "双击发送", { user_messages: dup });
-  await shot(page, P, "double-click");
+  // 4. 发送按钮双击（连点两次）——仅当自由输入框在屏时执行
+  const input = page.getByRole("textbox", { name: "输入你的描述" });
+  if (await input.isVisible().catch(() => false)) {
+    await input.fill("后脑勺胀痛");
+    await page.getByRole("button", { name: "发送回答" }).click();
+    await page
+      .getByRole("button", { name: "发送回答" })
+      .click({ force: true, timeout: 1500 })
+      .catch(() => {});
+    await page.waitForTimeout(800);
+    const dup = await page.locator(".message.user").count();
+    record(P, "双击发送", { user_messages: dup });
+    await shot(page, P, "double-click");
+  } else {
+    record(P, "双击发送：会话停在任务卡，输入框不在屏，跳过");
+  }
 
   // 5. 中途刷新，看恢复
   await page.reload();

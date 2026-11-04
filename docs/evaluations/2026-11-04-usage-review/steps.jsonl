@@ -1,4 +1,4 @@
-{"seq":1,"persona":"蓝-自护","action":"开始问诊","session_id":"e463632d-071f-4458-b038-d9b4b013b9ac","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":1,"persona":"蓝-自护","action":"开始问诊","session_id":"bbb37e0f-3c78-4d8b-bf8e-477c5a180247","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
 {"seq":3,"persona":"蓝-自护","action":"截图 02-蓝-自护-opening.png","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]},"phase":"明确问题"}
 {"seq":4,"persona":"蓝-自护","action":"开场选项","choices":["我自己↗","孩子↗","其他家人↗"]}
 {"seq":5,"persona":"蓝-自护","action":"选择「我自己」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
@@ -36,7 +36,7 @@
 {"seq":51,"persona":"蓝-自护","action":"截图 50-蓝-自护-summary-sheet.png","question":{"title":null,"choices":[]},"phase":"待核对"}
 {"seq":52,"persona":"蓝-自护","action":"摘要页可用按钮","choices":[]}
 {"seq":54,"persona":"蓝-自护","action":"截图 53-蓝-自护-after-confirm.png","question":{"title":null,"choices":[]},"phase":"已结束"}
-{"seq":55,"persona":"红-急症","action":"开始问诊","session_id":"afaa356a-d694-4938-9c7e-bcc34086dd03","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":55,"persona":"红-急症","action":"开始问诊","session_id":"fcad826e-ac5a-4d49-8de7-0805e6c6bf95","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
 {"seq":56,"persona":"红-急症","action":"选择「我自己」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
 {"seq":57,"persona":"红-急症","action":"选择「男」","question":{"title":"请问是男是女？","choices":["男↗","女↗"]}}
 {"seq":58,"persona":"红-急症","action":"回答「58岁」","question":{"title":"你多大？可直接写年龄，例如 32 岁。","choices":[]}}
@@ -44,7 +44,7 @@
 {"seq":61,"persona":"红-急症","action":"截图 60-红-急症-after-chief.png","question":{"title":null,"choices":[]},"phase":"立即求助"}
 {"seq":63,"persona":"红-急症","action":"截图 62-红-急症-escalation.png","question":{"title":null,"choices":[]},"phase":"立即求助"}
 {"seq":64,"persona":"红-急症","action":"急症路径结束状态","phase":"立即求助"}
-{"seq":65,"persona":"黄-家长","action":"开始问诊","session_id":"1502d2cc-0ce7-4063-aad1-4d1a00cb8809","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
+{"seq":65,"persona":"黄-家长","action":"开始问诊","session_id":"04dc099a-9eb2-47a1-a740-61b9222a9d22","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
 {"seq":67,"persona":"黄-家长","action":"截图 66-黄-家长-opening.png","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]},"phase":"明确问题"}
 {"seq":68,"persona":"黄-家长","action":"开场选项","choices":["我自己↗","孩子↗","其他家人↗"]}
 {"seq":69,"persona":"黄-家长","action":"选择「孩子」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
@@ -73,13 +73,10 @@
 {"seq":103,"persona":"黄-家长","action":"截图 102-黄-家长-q-reported_temperature.png","question":{"title":"你说孩子发烧38度5，精神不太好，再问一句：自己量过体温吗？如果量过，是多少度、什么时候量的？没量过请直接说没量过。","choices":[]},"phase":"了解经过"}
 {"seq":104,"persona":"黄-家长","action":"回答「38.5℃」","question":{"title":"你说孩子发烧38度5，精神不太好，再问一句：自己量过体温吗？如果量过，是多少度、什么时候量的？没量过请直接说没量过。","choices":[]}}
 {"seq":106,"persona":"黄-家长","action":"截图 105-黄-家长-end-state.png","question":{"title":null,"choices":[]},"phase":"定向观察"}
-{"seq":107,"persona":"坏路径","action":"开始问诊","session_id":"eebf5091-26d1-45e7-9a1e-1571b7ddd054","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
-{"seq":108,"persona":"坏路径","action":"选择「我自己」","question":{"title":"这次，为谁咨询？","choices":["我自己↗","孩子↗","其他家人↗"]}}
-{"seq":109,"persona":"坏路径","action":"空消息","status":400,"body":"{\"error\": {\"code\": \"invalid_message\", \"message\": \"消息不能为空\"}}"}
-{"seq":110,"persona":"坏路径","action":"5000字消息","status":200,"body":"{\"reply\": {\"message\": \"你多大？可直接写年龄，例如 32 岁。\", \"phase\": \"opening\", \"kind\": \"question\", \"question_id\": \"age\", \"quick_replies\": [], \"task\": null, \"summary\": null, \"developer_trace\": {\"reason\": \"age_years "}
-{"seq":111,"persona":"坏路径","action":"不存在的会话","status":404,"body":"{\"error\": {\"code\": \"session_not_found\", \"message\": \"找不到该问诊会话\"}}"}
-{"seq":112,"persona":"坏路径","action":"回答「32岁」","question":{"title":"请问是男是女？","choices":["男↗","女↗"]}}
-{"seq":113,"persona":"坏路径","action":"双击发送","user_messages":3}
-{"seq":115,"persona":"坏路径","action":"截图 114-坏路径-double-click.png","question":{"title":"我没能确认年龄。请写成“8个月”或“32岁”这样的格式。","choices":[]},"phase":"明确问题"}
-{"seq":117,"persona":"坏路径","action":"截图 116-坏路径-after-reload.png","question":{"title":null,"choices":[]},"phase":"尚未开始"}
-{"seq":118,"persona":"坏路径","action":"刷新恢复","phase":"尚未开始","question":{"title":null,"choices":[]}}
+{"seq":107,"persona":"坏路径","action":"复用活动会话","session_id":"04dc099a-9eb2-47a1-a740-61b9222a9d22"}
+{"seq":108,"persona":"坏路径","action":"空消息","status":400,"body":"{\"error\": {\"code\": \"invalid_message\", \"message\": \"消息不能为空\"}}"}
+{"seq":109,"persona":"坏路径","action":"5000字消息","status":400,"body":"{\"error\": {\"code\": \"invalid_message\", \"message\": \"消息不能超过 2000 字\"}}"}
+{"seq":110,"persona":"坏路径","action":"不存在的会话","status":404,"body":"{\"error\": {\"code\": \"session_not_found\", \"message\": \"找不到该问诊会话\"}}"}
+{"seq":111,"persona":"坏路径","action":"双击发送：会话停在任务卡，输入框不在屏，跳过"}
+{"seq":113,"persona":"坏路径","action":"截图 112-坏路径-after-reload.png","question":{"title":null,"choices":[]},"phase":"定向观察"}
+{"seq":114,"persona":"坏路径","action":"刷新恢复","phase":"定向观察","question":{"title":null,"choices":[]}}

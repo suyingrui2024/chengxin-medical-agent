@@ -41,6 +41,7 @@ import {
   requestEmergencyHelp,
   resumeSession,
   refreshSessions,
+  lastSessionId,
 } from "./app-flow.js";
 import {
   refreshRecordsCount,
@@ -792,6 +793,18 @@ export async function init() {
     $("#connection-alert").hidden = true;
     enforceBannerPriority();
     await refreshSessions();
+    // 使用体验评测 F3（2026-11-04）：中途刷新曾落在开始页，患者得自己
+    // 想起来去侧栏找回会话。恢复范围只限**本浏览器**记住的、仍未结束的
+    // 那一次问诊——服务器上其他活动会话（别的标签页、测试残留）不参与。
+    const stored = lastSessionId();
+    const active = stored
+      ? state.sessions.find(
+          (item) => item.session_id === stored && item.phase !== "closed",
+        )
+      : undefined;
+    if (active && !state.sessionId) {
+      await resumeSession(active.session_id, true).catch(() => {});
+    }
     // Best-effort: a failed count fetch leaves the badge at its
     // placeholder and must not block startup.
     refreshRecordsCount().catch(() => {});

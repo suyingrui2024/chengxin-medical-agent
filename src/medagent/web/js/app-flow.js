@@ -502,6 +502,26 @@ export function restoreComposerDraft(id) {
   $("#message-input").dispatchEvent(new Event("input"));
 }
 
+// 使用体验评测 F3（2026-11-04）：中途刷新曾落在开始页。只记住**本浏览器**
+// 最后进行到的会话——刷新后回到它；测试与别的标签页不受影响。
+const LAST_SESSION_KEY = "medagent:last-session-id";
+
+function rememberLastSession(id) {
+  try {
+    localStorage.setItem(LAST_SESSION_KEY, id);
+  } catch {
+    /* 隐私模式等无 localStorage 的场景：刷新恢复不可用，其余不受影响 */
+  }
+}
+
+export function lastSessionId() {
+  try {
+    return localStorage.getItem(LAST_SESSION_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export async function startSession() {
   if (state.busy) return;
   state.starting = true;
@@ -511,6 +531,7 @@ export async function startSession() {
     const firstDraft = !state.sessionId ? $("#message-input").value : "";
     rememberComposerDraft();
     state.sessionId = data.session_id;
+    rememberLastSession(state.sessionId);
     if (firstDraft) composerDrafts.set(state.sessionId, firstDraft);
     state.reply = null;
     state.taskHistory = false;
@@ -693,6 +714,7 @@ export async function resumeSession(id, force = false) {
       state.handoffText = "";
     }
     state.sessionId = id;
+    rememberLastSession(id);
     state.events = trace.events;
     state.taskHistory = false;
     state.shownCalculations.clear();

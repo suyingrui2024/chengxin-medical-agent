@@ -507,7 +507,7 @@ class ConsultationEnginePlanning:
                 )
             )
             return AgentReply(
-                "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。",
+                self._task_offer_message(state, task),
                 state.phase,
                 kind="self_check",
                 task=task,
@@ -515,6 +515,27 @@ class ConsultationEnginePlanning:
                 developer_trace={"reason": "主诉符合固定任务的适用条件；任务结果保留自述来源"},
             )
         return None
+
+    def _task_offer_message(self, state: CaseState, task: dict) -> str:
+        """The line above a self-check task card.
+
+        When a reported temperature is already on record the offer must
+        acknowledge it first -- 自述（quality=not_assessed）不等于核实过的
+        测量，任务仍会提供，但话术若不提患者/家属刚说出的数值，他们会觉得
+        自己的话没被听见。任务卡上的用途说明承担解释为什么还要测的另一半。
+        """
+        reported = state.facts.get("reported_temperature")
+        if (
+            task["result_key"] == "temperature_c"
+            and reported is not None
+            and getattr(reported.assertion, "value", reported.assertion) == "present"
+        ):
+            return (
+                f"你刚才说的体温（{reported.value}）已经记下了，标记为自述。"
+                "自述和实测是两回事：想把这一条变成核实过的测量，可以完成"
+                "下面这一步。做不到或不想做都可以跳过。"
+            )
+        return "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。"
 
     def _offer_pending_self_check(self, state):
         if self._self_check_block_reason(state):
