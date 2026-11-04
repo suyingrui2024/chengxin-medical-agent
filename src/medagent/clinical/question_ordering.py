@@ -1,6 +1,6 @@
 """Shared question-ordering scaffold + strategies (modular-refactor package A).
 
-Design doc: ``docs/模块化重整设计文档.md`` §2 (call-site map) and §6.1
+Design doc: ``docs/archive/模块化重整设计文档.md`` §2 (call-site map) and §6.1
 (interface). This module is a *move*, not a redesign:
 
 * The shared scaffold (candidate filtering, earliest-phase selection,

@@ -1,4 +1,4 @@
-"""P1 conclusion upgrades (docs/阿福对标改造设计文档.md §3.1/§3.4/§3.5):
+"""P1 conclusion upgrades (docs/archive/阿福对标改造设计文档.md §3.1/§3.4/§3.5):
 the narrative triple, the department hint chain, the generalized
 against_note, and the spoken framing opener.
 
