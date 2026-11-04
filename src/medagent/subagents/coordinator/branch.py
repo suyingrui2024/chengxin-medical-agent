@@ -11,6 +11,7 @@ from ...core.decision_wait import DecisionInterrupted
 from ...core.domain import CaseState
 from ...core.events import Event
 from ...infra.backends import parse_decision
+from ...infra.web_tools import patient_query_fragments
 from ..constants import (
     KIND_INSTRUCTIONS,
     KINDS,
@@ -375,6 +376,45 @@ class CoordinatorBranch:
             bool(scope.get("prior_case")),
             view_extras,
         )
+        return self._branch_record(
+            state,
+            branch_id,
+            raw_branch,
+            proposal,
+            view,
+            clamped,
+            tools_clamped,
+            effective_tools,
+            budget,
+            kept_keys,
+            kept_hypotheses,
+            transcript_tier,
+            scope,
+        )
+
+    def _branch_record(
+        self,
+        state: CaseState,
+        branch_id: str,
+        raw_branch: Dict[str, Any],
+        proposal: Dict[str, Any],
+        view: Dict[str, Any],
+        clamped: List[str],
+        tools_clamped: List[str],
+        effective_tools: set,
+        budget: Dict[str, Any],
+        kept_keys: List[str],
+        kept_hypotheses: List[str],
+        transcript_tier: str,
+        scope: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Assemble the branch dict the runner and the tool executor read.
+
+        forbidden_fragments is the §4.4 outbound gate's table: the view can
+        carry evidence verbatim, and a search query echoing it would hand
+        the patient's words to the search provider.  Computed once here,
+        handed to WebTools.search at tool execution.
+        """
         return {
             "branch_id": branch_id,
             "subagent_id": str(uuid4()),
@@ -386,6 +426,7 @@ class CoordinatorBranch:
             "tools_clamped": tools_clamped,
             "effective_tools": effective_tools,
             "budget": budget,
+            "forbidden_fragments": patient_query_fragments(state),
             "scope_summary": {
                 "fact_keys": kept_keys,
                 "hypotheses": kept_hypotheses,
@@ -817,7 +858,6 @@ class CoordinatorBranch:
         from the branch's pooled connections, so a branch cannot spend the
         parent's budget or open its own endpoints.
         """
-        kind = branch["view"]["task_kind"]
         if tool == "case_view":
             return {"ok": True, "tool": tool, "view": branch["view"]}
         if tool == "knowledge_search":
@@ -829,51 +869,88 @@ class CoordinatorBranch:
                     knowledge_pool[item["ref"]] = item["excerpt"]
             return {"ok": True, "tool": tool, "results": results}
         if tool in {"web_search", "web_fetch"}:
-            allowed = (
-                KINDS[kind]["allow_web"] and self.web_enabled and self.web_tools is not None
+            return self._execute_web_tool(
+                tool, arguments, branch, session_id, spawn_id, web_pool
             )
-            if not allowed:
-                self.events.append(
-                    Event(
-                        session_id,
-                        "subagent.denied",
-                        {
-                            "spawn_id": spawn_id,
-                            "branch_id": branch["branch_id"],
-                            "tool": tool,
-                            "reason": "web_unavailable",
-                        },
-                    )
-                )
-                return {"ok": False, "tool": tool, "error": "联网工具在本次部署中不可用"}
-            try:
-                if tool == "web_search":
-                    value = self.web_tools.search(
-                        str(arguments.get("query", "")),
-                        purpose=str(arguments.get("purpose", "guideline_check")),
-                        caller="subagent",
-                    )
-                    return {"ok": True, "tool": tool, "result": value}
-                url = str(arguments.get("url", ""))
-                value = self.web_tools.fetch(url, caller="subagent")
-                text = (
-                    value.get("content", "")
-                    if isinstance(value, dict)
-                    else str(value)
-                )
-                fetch_id = hashlib.sha256(url.encode()).hexdigest()[:12]
-                web_pool[fetch_id] = text
-                web_pool[url] = text
-                return {
-                    "ok": True,
-                    "tool": tool,
-                    "fetch_id": fetch_id,
-                    "url": url,
-                    "content": text[:8000],
-                }
-            except Exception as exc:
-                return {"ok": False, "tool": tool, "error": type(exc).__name__}
         return {"ok": False, "tool": tool, "error": "未知工具"}
+
+    def _execute_web_tool(
+        self,
+        tool: str,
+        arguments: Dict[str, Any],
+        branch: Dict[str, Any],
+        session_id: str,
+        spawn_id: str,
+        web_pool: Dict[str, str],
+    ) -> Dict[str, Any]:
+        """Serve one web tool call, behind the §4.4 outbound gate.
+
+        The search query goes to WebTools.search with the branch's
+        patient-fragment table: the view can carry evidence verbatim, and a
+        query echoing it would hand the patient's words to the search
+        provider.  A blocked query comes back as a tool error the branch
+        can act on, not as a search that quietly returned nothing.
+        """
+        kind = branch["view"]["task_kind"]
+        allowed = (
+            KINDS[kind]["allow_web"] and self.web_enabled and self.web_tools is not None
+        )
+        if not allowed:
+            self.events.append(
+                Event(
+                    session_id,
+                    "subagent.denied",
+                    {
+                        "spawn_id": spawn_id,
+                        "branch_id": branch["branch_id"],
+                        "tool": tool,
+                        "reason": "web_unavailable",
+                    },
+                )
+            )
+            return {"ok": False, "tool": tool, "error": "联网工具在本次部署中不可用"}
+        try:
+            if tool == "web_search":
+                value = self.web_tools.search(
+                    str(arguments.get("query", "")),
+                    purpose=str(arguments.get("purpose", "guideline_check")),
+                    caller="subagent",
+                    forbidden_fragments=tuple(
+                        branch.get("forbidden_fragments") or ()
+                    ),
+                )
+                if value.get("status") == "query_blocked":
+                    return {
+                        "ok": False,
+                        "tool": tool,
+                        "error": "搜索词与病例原文冲突，已被隐私闸门拒绝；"
+                        "请只用疾病名、检查名等受控词汇重新构造查询",
+                    }
+                return {"ok": True, "tool": tool, "result": value}
+            return self._execute_web_fetch(tool, arguments, web_pool)
+        except Exception as exc:
+            return {"ok": False, "tool": tool, "error": type(exc).__name__}
+
+    def _execute_web_fetch(
+        self,
+        tool: str,
+        arguments: Dict[str, Any],
+        web_pool: Dict[str, str],
+    ) -> Dict[str, Any]:
+        """Fetch one URL and index its text under both id and address."""
+        url = str(arguments.get("url", ""))
+        value = self.web_tools.fetch(url, caller="subagent")
+        text = value.get("content", "") if isinstance(value, dict) else str(value)
+        fetch_id = hashlib.sha256(url.encode()).hexdigest()[:12]
+        web_pool[fetch_id] = text
+        web_pool[url] = text
+        return {
+            "ok": True,
+            "tool": tool,
+            "fetch_id": fetch_id,
+            "url": url,
+            "content": text[:8000],
+        }
 
     def _usage_for(self, sub_session: str, started: float) -> Dict[str, int]:
         """Tally one sub-session's token and call usage from its event log.

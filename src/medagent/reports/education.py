@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from ..core.domain import Phase
 from ..core.events import Event
+from ..infra.web_tools import patient_query_fragments
 
 
 MAX_CONCURRENT_ENRICHMENTS = 2
@@ -255,13 +256,8 @@ class EducationEnricher:
             for text in (self_care.get(group) or [])
             if isinstance(text, str)
         ]
-        fragments: List[str] = []
-        chief = state.facts.get("chief_complaint")
-        if chief is not None and chief.value:
-            fragments.append(str(chief.value))
-        for fact in state.facts.values():
-            if fact.evidence:
-                fragments.append(fact.evidence)
+        # 片段表来自 web_tools 的唯一定义（设计 §4.4）：education 与
+        # subagent 两条搜索路径必须禁止同一批原文片段。
         job = _EnrichJob(
             session_id=state.session_id,
             engine=engine,
@@ -269,7 +265,7 @@ class EducationEnricher:
             directions=directions,
             care_topics=care_topics,
             return_now_if=list(conclusion.get("return_now_if") or []),
-            forbidden_fragments=fragments,
+            forbidden_fragments=list(patient_query_fragments(state)),
         )
         if mode in ("education", "all"):
             self._start(job, self._run_education, "medical-education")

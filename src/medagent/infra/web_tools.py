@@ -171,6 +171,24 @@ def _contains_forbidden_fragment(text: str, fragments: Tuple[str, ...]) -> bool:
     return False
 
 
+def patient_query_fragments(state: Any) -> Tuple[str, ...]:
+    """病例里禁止重新出现在出站查询中的原文片段（设计 §4.4）。
+
+    主诉取值与每条 fact 的 evidence 是患者亲口说的话——它们可以发给
+    问诊模型（产品本身），但绝不能作为搜索词发给检索供应商。education
+    与 subagent 两条搜索路径共用这一份片段表，保证"哪些话不许外发"
+    只有一处定义。
+    """
+    fragments: List[str] = []
+    chief = state.facts.get("chief_complaint")
+    if chief is not None and chief.value:
+        fragments.append(str(chief.value))
+    for fact in state.facts.values():
+        if fact.evidence:
+            fragments.append(fact.evidence)
+    return tuple(fragments)
+
+
 def scrub_free_query(
     text: str, *, forbidden_fragments: Tuple[str, ...] = ()
 ) -> Optional[str]:
@@ -417,11 +435,19 @@ class WebTools:
         min_tier: str = "T3",
         max_results: int = 5,
         caller: str = "education",
+        forbidden_fragments: Tuple[str, ...] = (),
     ) -> Dict[str, Any]:
         """官方 Search 检索：结果带分级与出处，低级别只计数不返回。
 
-        status ∈ ok | insufficient_authoritative_results |
+        status ∈ ok | insufficient_authoritative_results | query_blocked |
         provider_error | timeout | daily_budget_exceeded。
+
+        出站闸门（设计 §4.4）在方法内执行，而不是交给调用方：query 先过
+        scrub_free_query——可识别信息（邮箱/证件/手机号/绝对日期/精确年龄）
+        一律删除；调用方传入的 forbidden_fragments（病例原文片段）若仍命中
+        则整条拒绝。拒绝不产生任何外发请求，也不把原始 query 写进事件。
+        把闸门放在这里的原因：search 是唯一的出站点，调用方会不断增加，
+        靠每个调用点自觉脱敏迟早会漏（subagent 路径就漏过）。
         """
         search_id = "ws_" + uuid4().hex[:12]
         base: Dict[str, Any] = {
@@ -432,6 +458,9 @@ class WebTools:
             "filtered_below_tier": 0,
             "status": "provider_error",
         }
+        query = self._gated_query(query, forbidden_fragments, base, caller, purpose)
+        if query is None:
+            return base
         if not self._claim_daily("search"):
             base["status"] = "daily_budget_exceeded"
             return base
@@ -466,6 +495,32 @@ class WebTools:
             },
         )
         return base
+
+    def _gated_query(
+        self,
+        query: str,
+        forbidden_fragments: Tuple[str, ...],
+        base: Dict[str, Any],
+        caller: str,
+        purpose: str,
+    ) -> Optional[str]:
+        """§4.4 出站闸门：返回可发送的 query，被拒时返回 None。
+
+        可识别信息（邮箱/证件/手机号/绝对日期/精确年龄）一律删除；
+        病例原文片段仍命中则整条拒绝。拒绝路径不产生任何外发请求，
+        web.blocked 事件也**有意不带 query 原文**——被拒的查询最可能
+        就是泄漏患者原话的那条，事件日志不能变成它的副本。
+        """
+        cleaned = scrub_free_query(query, forbidden_fragments=forbidden_fragments)
+        if cleaned is None:
+            base["status"] = "query_blocked"
+            self._emit(
+                "web.blocked",
+                {"caller": caller, "purpose": purpose, "reason": "query_blocked"},
+            )
+            return None
+        base["query_as_sent"] = cleaned
+        return cleaned
 
     def _run_search(
         self, query: str, min_tier: str, max_results: int

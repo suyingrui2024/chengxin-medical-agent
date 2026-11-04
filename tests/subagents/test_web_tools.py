@@ -458,3 +458,59 @@ def test_fixed_now_drives_fetched_at_and_daily_window():
     fixed = datetime(2026, 10, 23, 9, 0, 0)
     tools = WebTools(api_key="k", now=lambda: fixed)
     assert tools.fetch("http://example.com/x")["fetched_at"].startswith("2026-10-23T09:00:00")
+
+
+# ---------------------------------------------------------------------------
+# 出站闸门（设计 §4.4）：search 内置脱敏，患者原文片段 fail-closed
+# ---------------------------------------------------------------------------
+
+
+def test_search_blocks_query_echoing_patient_evidence():
+    events = EventStore()
+
+    def transport(*args):
+        raise AssertionError("被拒的查询不得产生任何外发请求")
+
+    tools = _tools_with_transport(transport, events)
+    evidence = "左侧太阳穴一阵一阵地跳痛已经两天了"
+    out = tools.search(
+        f"{evidence[:20]} 诊疗指南",
+        purpose="guideline_check",
+        caller="subagent",
+        forbidden_fragments=(evidence,),
+    )
+    assert out["status"] == "query_blocked"
+    assert out["results"] == []
+    recorded = events.for_session("web-tools")
+    assert [e.event_type for e in recorded] == ["web.blocked"]
+    # web.blocked 有意不带被拒的 query 原文：那条查询最可能就是
+    # 泄漏患者原话的载体，事件日志不能变成它的副本。
+    assert evidence[:8] not in json.dumps(
+        recorded[0].payload, ensure_ascii=False
+    )
+
+
+def test_search_scrubs_identifiers_from_query_before_sending():
+    captured = {}
+
+    def transport(method, url, headers, body, timeout):
+        captured["body"] = body
+        return _anthropic_response([])
+
+    tools = _tools_with_transport(transport, EventStore())
+    out = tools.search(
+        "偏头痛 诊疗指南 手机13812345678",
+        purpose="guideline_check",
+        caller="subagent",
+    )
+    assert out["status"] in ("ok", "insufficient_authoritative_results")
+    sent = json.loads(captured["body"].decode())["messages"][0]["content"]
+    assert "13812345678" not in sent
+    assert "13812345678" not in out["query_as_sent"]
+
+
+def test_search_clean_query_passes_through_unchanged():
+    tools = _tools_with_transport(lambda *a: _anthropic_response([]), EventStore())
+    out = tools.search("偏头痛 诊疗指南", purpose="guideline_check", caller="subagent")
+    assert out["status"] in ("ok", "insufficient_authoritative_results")
+    assert out["query_as_sent"] == "偏头痛 诊疗指南"
