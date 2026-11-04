@@ -29,17 +29,13 @@ from .persistence import (
 from .workspace import StaleCompositionError
 
 
-#: 与前端输入框计数一致的上限（方案 A，使用体验评测 F2 复议）：比原
-#: 2000 宽裕到能整段说完复杂病史，仍有界——单条消息会整体进入最近
-#: 16 轮的模型上下文，无上限意味着无上限的单轮成本。
-MESSAGE_TEXT_LIMIT = 8000
-
-
 def _message_payload_error(payload: dict):
     """Validate one patient-turn payload; return _error arguments or None.
 
-    The length ceiling matches the composer's counter (8000): a rejection
-    must name the same number the patient sees, 使用体验评测 F2.
+    研究测试阶段不设消息字数上限（2026-11-04 产品决定，撤销 F2 的
+    8000 上限）：长文本的代价由模型端点的上下文窗口兜底，超窗时
+    供应商会显式报错而不是静默丢失。超过 2000 字时前端仍提示更合适
+    的入口——那是引导，不是闸门。空消息依旧拒绝。
     """
     observation = payload.get("observation")
     if observation is not None and not isinstance(observation, dict):
@@ -50,12 +46,6 @@ def _message_payload_error(payload: dict):
     text = payload.get("text")
     if not isinstance(text, str) or not text.strip():
         return (HTTPStatus.BAD_REQUEST, "invalid_message", "消息不能为空")
-    if len(text) > MESSAGE_TEXT_LIMIT:
-        return (
-            HTTPStatus.BAD_REQUEST,
-            "invalid_message",
-            f"消息不能超过 {MESSAGE_TEXT_LIMIT} 字",
-        )
     choice_value = payload.get("choice_value")
     if choice_value is not None and not isinstance(choice_value, str):
         return (HTTPStatus.BAD_REQUEST, "invalid_choice", "选项值格式错误")

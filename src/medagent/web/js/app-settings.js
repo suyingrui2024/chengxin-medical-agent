@@ -570,9 +570,9 @@ $("#message-input").addEventListener("input", () => {
   if (state.sessionId) composerDrafts.set(state.sessionId, input.value);
   input.style.height = "auto";
   input.style.height = `${Math.min(input.scrollHeight, 130)}px`;
-  $("#input-count").textContent = `${input.value.length} / 8000`;
-  // 使用体验评测 F2（2026-11-04）：上限放宽到 8000，超过 2000 时提示
-  // 更合适的入口——长病史可以整段说完，但报告类文本有专门的粘贴路径。
+  $("#input-count").textContent = `${input.value.length} 字`;
+  // 使用体验评测 F2 复议（2026-11-04）：测试阶段不设上限；超过 2000
+  // 字时提示仍是引导（拆分发送或报告粘贴），不是闸门。
   $("#composer-length-hint").hidden = input.value.length <= 2000;
 });
 $("#toggle-facts").addEventListener("click", () => {

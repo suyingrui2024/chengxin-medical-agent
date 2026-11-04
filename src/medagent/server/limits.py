@@ -9,7 +9,10 @@ be changed in one of them.
 from __future__ import annotations
 
 
-MAX_BODY_BYTES = 64 * 1024
+# 研究测试阶段放宽（2026-11-04，F2 复议"不设字数上限"）：消息体不设
+# 字数上限，传输层保留 1MB 兜底防荒谬请求——约 33 万汉字，对一次问诊
+# 发言等效于无上限，同时图片等其余路由的语义不变。
+MAX_BODY_BYTES = 1024 * 1024
 
 MAX_IMAGE_BODY_BYTES = 6 * 1024 * 1024
 

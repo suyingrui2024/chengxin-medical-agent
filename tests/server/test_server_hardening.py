@@ -343,42 +343,31 @@ if __name__ == "__main__":
     unittest.main()
 
 
-class MessageLengthLimitTests(ServerHardeningTests):
-    """使用体验评测 F2（2026-11-04）：UI 计数与 API 上限必须一致。
+class MessageLengthTests(ServerHardeningTests):
+    """使用体验评测 F2 复议（2026-11-04）：研究测试阶段不设字数上限。
 
-    方案 A 复议后上限从 2000 放宽到 8000（MESSAGE_TEXT_LIMIT）——复杂
-    病史可以整段说完，但仍有界。拒绝时返回与 UI 计数相同的数字。
+    撤销 8000 上限——长文本由模型端点的上下文窗口兜底，超窗时供应商
+    显式报错。仍然守住的边界只有"消息必须非空"。
     """
 
-    def test_an_over_long_message_is_refused_with_the_ui_limit(self):
+    def test_a_very_long_message_is_accepted(self):
+        payload = self.create_session()
+        session_id = payload["session_id"]
+        status, _body = self.request(
+            f"/api/sessions/{session_id}/messages",
+            "POST",
+            {"text": "头" * 20000},
+        )
+        self.assertEqual(status, 200)
+
+    def test_an_empty_message_is_still_refused(self):
         payload = self.create_session()
         session_id = payload["session_id"]
         status, body = self.request(
             f"/api/sessions/{session_id}/messages",
             "POST",
-            {"text": "头痛" * 4001},
+            {"text": "   "},
         )
         self.assertEqual(status, 400)
         self.assertEqual(body["error"]["code"], "invalid_message")
-        self.assertIn("8000", body["error"]["message"])
-
-    def test_a_message_at_the_limit_is_accepted(self):
-        payload = self.create_session()
-        session_id = payload["session_id"]
-        status, _body = self.request(
-            f"/api/sessions/{session_id}/messages",
-            "POST",
-            {"text": "头" * 8000},
-        )
-        self.assertEqual(status, 200)
-
-    def test_the_old_limit_still_passes(self):
-        """2000 字的内容在上限放宽后必须仍然可用。"""
-        payload = self.create_session()
-        session_id = payload["session_id"]
-        status, _body = self.request(
-            f"/api/sessions/{session_id}/messages",
-            "POST",
-            {"text": "头" * 2000},
-        )
-        self.assertEqual(status, 200)
+        self.assertEqual(body["error"]["message"], "消息不能为空")
