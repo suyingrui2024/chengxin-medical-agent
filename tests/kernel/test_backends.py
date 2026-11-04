@@ -106,7 +106,8 @@ class BackendTests(unittest.TestCase):
         )
         backend.decide("s", [{"role": "user", "content": "synthetic"}])
         payload = json.loads(urlopen.call_args.args[0].data)
-        self.assertEqual(payload["thinking"], {"type": "disabled"})
+        # 默认思考模式开启（2026-11-04）：deepseek host 上默认发送 enabled。
+        self.assertEqual(payload["thinking"], {"type": "enabled"})
         self.assertEqual(
             events.for_session("s")[-1].payload["usage"]["prompt_cache_hit_tokens"], 900
         )

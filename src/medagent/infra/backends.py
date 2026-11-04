@@ -241,7 +241,10 @@ class CompatibleBackend:
         self.max_tokens = int(settings.get("MEDAGENT_LLM_MAX_TOKENS", "2048"))
         if not 128 <= self.max_tokens <= 8192:
             raise ValueError("max output tokens must be between 128 and 8192")
-        self.thinking = settings.get("MEDAGENT_LLM_THINKING", "disabled")
+        # 思考模式默认开启（2026-11-04 产品决定）：只在 api.deepseek.com
+        # 生效（见 _decide 的 host 门），其他 host 依旧丢弃并告警。
+        # 关闭方式：显式设 MEDAGENT_LLM_THINKING=disabled。
+        self.thinking = settings.get("MEDAGENT_LLM_THINKING", "enabled")
         if self.thinking not in {"enabled", "disabled"}:
             raise ValueError("thinking must be enabled or disabled")
         # V4-generation models grade thinking as low/high/max
@@ -520,7 +523,8 @@ class DshBackend:
         self.max_tokens = int(settings.get("MEDAGENT_LLM_MAX_TOKENS", "2048"))
         if not 128 <= self.max_tokens <= 8192:
             raise ValueError("max output tokens must be between 128 and 8192")
-        self.thinking = settings.get("MEDAGENT_LLM_THINKING", "disabled")
+        # 与 CompatibleBackend 相同的默认：思考模式开启（2026-11-04）。
+        self.thinking = settings.get("MEDAGENT_LLM_THINKING", "enabled")
         if self.thinking not in {"enabled", "disabled"}:
             raise ValueError("thinking must be enabled or disabled")
         self.reasoning_effort = settings.get("MEDAGENT_LLM_REASONING_EFFORT") or None
