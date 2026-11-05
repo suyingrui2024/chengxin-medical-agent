@@ -39,6 +39,9 @@ FACT_LABELS = {
 
 VALUE_LABELS = {
     "self": "本人",
+    "male": "男",
+    "female": "女",
+    "other": "其他",
     "child": "孩子",
     "other_adult": "其他家人",
     "worsening": "加重",

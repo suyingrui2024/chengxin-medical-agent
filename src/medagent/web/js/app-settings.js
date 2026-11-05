@@ -818,6 +818,15 @@ export async function init() {
     $("#connection-status").textContent = "服务未连接";
     $("#connection-alert").hidden = false;
     enforceBannerPriority();
-    toast(`无法连接本机服务：${error.message}`);
+    // 使用体验评测 R3-13：fetch 的网络错误是英文（Failed to fetch），
+    // 而且只说了"连不上"。换成患者能懂的说明 + 下一步。
+    const reason = /Failed to fetch|NetworkError|Load failed/i.test(
+      error.message ?? "",
+    )
+      ? "本机服务没有响应"
+      : error.message || "未知错误";
+    toast(
+      `无法连接本机服务：${reason}。请确认桌面应用仍在运行（或服务已在 8765 端口启动），然后点「重新连接」。`,
+    );
   }
 }

@@ -28,11 +28,11 @@
    "value": 32,
    "assertion": "present",
    "source": "patient",
-   "turn_id": "563343cc-9469-4592-ac6d-ba19fb9a7ed3",
-   "recorded_at": "2026-11-05T00:27:43.561134+00:00",
+   "turn_id": "e8e63e53-77c3-48e5-8750-4533eb5ffbbe",
+   "recorded_at": "2026-11-05T00:47:24.552990+00:00",
    "quality": "not_assessed",
    "supersedes": null,
-   "fact_id": "05f2d76d-0fd4-4949-baf3-008c110b71fc",
+   "fact_id": "c294f37d-16d0-41f8-b473-e4dd97dc88bf",
    "evidence": "32岁"
   },
   "pass": true,
@@ -137,11 +137,8 @@
   "id": "R3-A9-tokens",
   "severity": "P1",
   "expected": "结论单不出现内部枚举（self/stable/null…）",
-  "actual": {
-   "token": "male",
-   "sample": "话与来源\n影响程度\n6 / 10\n系统整理\n已确认\n原话与来源\n当前不适\n性别\nmale\n系统整理\n已确认\n原话与来源\n主要问题\n最近三天太阳穴胀痛，越来越重\n"
-  },
-  "pass": false,
+  "actual": "clean",
+  "pass": true,
   "group": "A",
   "persona": "蓝-自护",
   "evidence": []
@@ -220,11 +217,11 @@
     },
     "assertion": "unknown",
     "source": "patient",
-    "turn_id": "98afb57b-abe8-4cd5-bf57-cd7fd2109405",
-    "recorded_at": "2026-11-04T16:41:49.205715+00:00",
+    "turn_id": "4096c989-7f82-439d-b20d-e7d42742bdea",
+    "recorded_at": "2026-11-05T00:42:33.705580+00:00",
     "quality": "not_done",
     "supersedes": null,
-    "fact_id": "90072560-393a-4379-9fad-430d3fa0afed",
+    "fact_id": "fad20196-557b-4952-a0be-6e07eebe6d56",
     "evidence": "说不清/跳过"
    },
    "task": null
@@ -252,9 +249,9 @@
   "severity": "P2",
   "expected": "口头「取消定位」应结束任务并回到原问题",
   "actual": {
-   "activeTask": "body_location"
+   "activeTask": null
   },
-  "pass": false,
+  "pass": true,
   "group": "C",
   "persona": "蓝-定位-C3",
   "evidence": []
@@ -455,23 +452,13 @@
   "severity": "P2",
   "expected": "明确要替另一位家人问时，给出换人卡片（两个动作），不打断当前记录",
   "actual": {
-   "kind": "question",
+   "kind": "subject_change",
    "labels": [
-    "先选择分数",
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10"
+    "为儿子新建问诊",
+    "继续孩子问诊"
    ]
   },
-  "pass": false,
+  "pass": true,
   "group": "F",
   "persona": "王-代答",
   "evidence": []
@@ -487,11 +474,11 @@
     "value": null,
     "assertion": "unknown",
     "source": "caregiver",
-    "turn_id": "ab76c7da-0828-4b3b-a3fa-d61f3c6c4e76",
-    "recorded_at": "2026-11-05T00:29:16.442690+00:00",
+    "turn_id": "724a6831-7ad6-49f8-a139-d920ecafa68b",
+    "recorded_at": "2026-11-05T00:43:31.127571+00:00",
     "quality": "not_assessed",
     "supersedes": null,
-    "fact_id": "d9016e65-4ea2-4031-b683-40b68ca67f33",
+    "fact_id": "076f8c6d-fc0b-4210-ae7c-8d80d974cea8",
     "evidence": "对了，帮我儿子也看一下，他也咳嗽"
    },
    "trigger": "interpreter 用 raw.startswith(「有」「是」「对」) 判定 yes——「对了…」命中了「对」"
@@ -506,11 +493,11 @@
   "severity": "P2",
   "expected": "「这次先给我先生问一下」是很自然的换人说法，应被识别（或在答完当前题后追问）",
   "actual": {
-   "kind": "question",
-   "questionId": "trajectory",
+   "kind": "subject_change",
+   "questionId": null,
    "note": "关系词表有丈夫/老公，没有「先生」"
   },
-  "pass": false,
+  "pass": true,
   "group": "F",
   "persona": "王-代答",
   "evidence": []
@@ -525,11 +512,11 @@
     "value": "child",
     "assertion": "present",
     "source": "patient",
-    "turn_id": "737ffba9-732c-4815-bb46-6f71499f2142",
-    "recorded_at": "2026-11-05T00:29:18.360088+00:00",
+    "turn_id": "6a7434a6-da0c-4c13-bd84-bff802370332",
+    "recorded_at": "2026-11-05T00:43:32.876898+00:00",
     "quality": "not_assessed",
     "supersedes": null,
-    "fact_id": "741d59bf-0713-406a-b738-b536deb81a0f",
+    "fact_id": "2fea2600-3303-4e29-8892-ee4582b83483",
     "evidence": "孩子"
    },
    "phase": "history"
@@ -884,9 +871,9 @@
   "severity": "P2",
   "expected": "重连失败时给出可执行的下一步（检查桌面应用/端口），而不只是一句「无法连接」",
   "actual": {
-   "toast": "无法连接本机服务：Failed to fetch"
+   "toast": "无法连接本机服务：本机服务没有响应。请确认桌面应用仍在运行（或服务已在 8765 端口启动），然后点「重新连接」。"
   },
-  "pass": false,
+  "pass": true,
   "group": "M",
   "persona": "孙-界面",
   "evidence": []
@@ -948,14 +935,14 @@
   "expected": "同一主诉的多次问诊在「最近问诊」里可区分（时间/序号），否则患者分不清点哪一条",
   "actual": {
    "count": 3,
-   "unique": 2,
+   "unique": 3,
    "sample": [
-    "本人 · 新的问诊",
-    "本人 · 新的问诊",
-    "本人 · 嗓子疼三天"
+    "本人 · 新的问诊 · 08:46:12",
+    "本人 · 新的问诊 · 08:46:06",
+    "本人 · 最近三天太阳穴胀痛，越来越重 · 08:44:43"
    ]
   },
-  "pass": false,
+  "pass": true,
   "group": "M",
   "persona": "孙-界面",
   "evidence": []

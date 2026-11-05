@@ -797,8 +797,10 @@ export function renderRecent() {
     const title = label
       ? `${label}${item.subject_label ? "" : "（待发送）"} · ${item.title}`
       : item.title;
+    // 同主诉的几次问诊否则长得一模一样：每条都带上开始时间（R3-10）。
+    const shown = `${title} · ${formatTime(item.created_at)}`;
     const node = button(
-      title,
+      shown,
       `recent-item ${item.session_id === state.sessionId ? "active" : ""}`,
       () =>
         resumeSession(item.session_id).catch((error) => toast(error.message)),

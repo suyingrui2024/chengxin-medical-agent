@@ -1,12 +1,12 @@
 {
  "groups": [
-  "D"
+  "A"
  ],
- "seconds": 35,
- "steps": 1891,
- "shots": 232,
- "duplicates": 343,
+ "seconds": 85,
+ "steps": 2245,
+ "shots": 240,
+ "duplicates": 413,
  "findings": 63,
- "failing": 9,
+ "failing": 3,
  "serverTail": ""
 }

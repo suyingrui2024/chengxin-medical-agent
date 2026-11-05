@@ -52,6 +52,11 @@ class ConsultationEnginePlanning:
         """
         if choice_value is None and is_self_check_skip_text(text):
             choice_value = "skip"
+        elif choice_value is None and self._is_task_cancel_text(state, text):
+            # 使用体验评测 R3-08：任务卡在屏时，患者说"取消定位"曾被当成
+            # "用文字描述部位"而拒绝。取消和跳过是同一件事——不记录结果、
+            # 回到原来的问题——所以按跳过处理，而不是报错让他再点一次。
+            choice_value = "skip"
         try:
             decoded = self.self_checks.interpret(state.active_task, text, choice_value)
         except Exception as exc:
@@ -81,6 +86,14 @@ class ConsultationEnginePlanning:
             state, state.active_task, text, choice_value, turn_id, decoded
         )
         return None
+
+    def _is_task_cancel_text(self, state, text: str) -> bool:
+        """当前任务上，患者这句话是不是"我不做这一步了"。"""
+        task = self.content.tasks.get(state.active_task) if state.active_task else None
+        if not task:
+            return False
+        intent, _evidence = task_intent(text, [], task.get("cancel_phrases", []))
+        return intent == "cancel"
 
     def _accept_task_result(
         self,

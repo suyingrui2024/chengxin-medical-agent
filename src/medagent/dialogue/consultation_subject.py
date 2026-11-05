@@ -18,8 +18,8 @@ GROUPS = [
     (("paternal_grandmother", "*", "*"), "奶奶", ("奶奶", "祖母")),
     (("maternal_grandfather", "*", "*"), "外公", ("外公", "姥爷", "外祖父")),
     (("maternal_grandmother", "*", "*"), "外婆", ("外婆", "姥姥", "外祖母")),
-    (("husband", "*", "*"), "丈夫", ("丈夫", "老公")),
-    (("wife", "*", "*"), "妻子", ("妻子", "老婆")),
+    (("husband", "*", "*"), "丈夫", ("丈夫", "老公", "我先生", "我丈夫")),
+    (("wife", "*", "*"), "妻子", ("妻子", "老婆", "我太太", "我妻子")),
     (("father_in_law", "*", "*"), "公公", ("公公",)),
     (("mother_in_law", "*", "*"), "婆婆", ("婆婆",)),
     (("wife_father", "*", "*"), "岳父", ("岳父", "岳丈")),
@@ -165,8 +165,16 @@ def subject_profile(state):
 
 
 def explicit_switch(text, current):
-    """Only explicit present switch phrases; ordinary family history is not a switch."""
-    for clause in re.split(r"[，。；！？,;!?\n]", text):
+    """Only explicit present switch phrases; ordinary family history is not a switch.
+
+    The switch phrase and the relative often sit in different clauses --
+    "换个人问一下，我儿子也在咳嗽" -- so when the clause holding the phrase has
+    no relative in it, the search continues from the phrase to the end of the
+    sentence.  The relative still has to come after the switch, which keeps
+    "我儿子昨天发烧" from reading as a switch.
+    """
+    for clause_match in re.finditer(r"[^，。；！？,;!?\n]+", text):
+        clause = clause_match.group()
         switch = re.search(r"改问|换成问|换个人|换一个人|(?:另一个|另一位)(?:孩子|儿子|女儿|家人)", clause)
         if switch is None:
             continue
@@ -174,10 +182,16 @@ def explicit_switch(text, current):
             r"如果|假如|假设|下次|以后|不是|并非|不想|不要|别|能不能|可不可以|没有说", clause[: switch.start()]
         ):
             continue
+        absolute = clause_match.start() + switch.start()
         try:
             item = reference(clause[switch.start() :])
         except ValueError:
-            continue
+            item = None
+        if item is None:
+            try:
+                item = reference(text[absolute:])
+            except ValueError:
+                item = None
         if item is None:
             continue
         forced = switch.group().startswith(("换个人", "换一个人", "另一个", "另一位"))
