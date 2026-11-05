@@ -448,24 +448,14 @@ async function groupH(ctx) {
       { persona: REPORT, group: "H" },
       "H1-zero-context",
     );
-    await check(page, rec, {
-      id: "R3-H1-report-entry",
-      severity: "P3",
+    // R3-14 复核后撤销（2026-11-05）：先粘化验单、再谈症状是合理的就诊顺序，
+    // 把入口藏到"有记录之后"等于删掉这条路径。留下的要求只是：空上下文时
+    // 对话框要把"会发生什么"说清楚——下面这段在提取后取一次文案来钉住它。
+    rec.record({
       group: "H",
       persona: REPORT,
-      expected:
-        "刚开场、还没有任何记录时，「添加报告内容 / 就诊交接摘要」不该是可点的空上下文",
-      run: async () => {
-        const report = await page
-          .locator("#open-report-draft")
-          .isVisible()
-          .catch(() => false);
-        const handoff = await page
-          .locator("#open-handoff")
-          .isVisible()
-          .catch(() => false);
-        return { pass: !report && !handoff, actual: { report, handoff } };
-      },
+      action: "开场入口复核",
+      detail: "报告/交接入口在会话已开时可见；空上下文由对话框自述，不作为缺陷",
     });
 
     await page.locator("#open-report-draft").click();

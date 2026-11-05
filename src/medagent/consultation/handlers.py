@@ -1,4 +1,5 @@
 """Mixin: handlers for ConsultationEngine."""
+import re
 from uuid import uuid4
 from ..clinical.interpreter import Interpretation
 from ..core.domain import (
@@ -15,6 +16,47 @@ from ..core.turn_context import TurnContext
 from ..core.worry import extract_worry_object
 from .vocabulary import is_refusal_text, is_summary_confirmation_text
 from .types import StaleActionError, UserInput
+
+
+#: 明确在"要一个算出来的数"的说法。规则引擎没有计算能力（计算挂在自适应
+#: 引擎的工具上，见 extensions 的公式包），所以这类请求既算不出来，也不该
+#: 被当成当前题的答案悄悄记下——患者会以为系统算过了。
+_CALCULATION_OBJECTS = (
+    "bmi",
+    "体重指数",
+    "身高",
+    "体重",
+    "血压",
+    "平均动脉压",
+    "心率",
+    "血糖",
+    "肌酐",
+    "egfr",
+    "剂量",
+    "孕周",
+    "预产期",
+    "体表面积",
+)
+_CALCULATION_ASK = re.compile(
+    # 要么是"帮我算…"这种请求，要么是"算一下/换算"这种动作；
+    # 单说"我算过了"不算请求，避免把"体重我算过了，70公斤"当计算请求。
+    r"(?:帮我|帮忙|给我|替我)(?:算|计算|换算)|算一算|算一下|算算|计算一下|计算|换算"
+)
+_DIGIT = re.compile(r"\d")
+
+
+def _asks_for_a_calculation(text: str) -> bool:
+    """True when the patient is asking for a number we would have to compute.
+
+    Narrow on purpose: the ask has to name a computed quantity and carry a
+    number.  "我算了一下大概38度" is a hedged temperature, not a request.
+    """
+    lowered = text.lower()
+    if not _DIGIT.search(text):
+        return False
+    if not _CALCULATION_ASK.search(text):
+        return False
+    return any(name in lowered for name in _CALCULATION_OBJECTS)
 
 
 class ConsultationEngineHandlers:
@@ -286,6 +328,92 @@ class ConsultationEngineHandlers:
         ctx.reply_reason = "用户核对摘要"
         return reply
 
+    def _calculation_unavailable_reply(self, state, question, text, turn_id):
+        """Say plainly that this build cannot compute, then stay on the question.
+
+        The text is kept as an event rather than a fact: what the patient said
+        still has to be readable later, but it is not an answer to the pending
+        question and must not satisfy its gate.
+        """
+        self.events.append(
+            Event(
+                state.session_id,
+                "calculation.unavailable",
+                {"question_id": question.id, "evidence": text},
+                turn_id=turn_id,
+            )
+        )
+        return AgentReply(
+            "这个版本还不能替你算这道数（BMI、换算这类公式要接计算能力才行）。"
+            "你可以把数值直接写出来，我按你给的数值判断。"
+            f"回到刚才的问题：{question.prompt}",
+            question.phase,
+            kind="clarification",
+            question_id=question.id,
+            quick_replies=question.options,
+            developer_trace={
+                "reason": "确定性疾病引擎不含计算插件，计算请求不作为当前问题的答案",
+                "content_version": self.content.versions["questions"],
+            },
+        )
+
+    def _answer_active_question(self, state, question, user_input, ctx, turn_id):
+        """Take the patient's words as an answer to the question on screen.
+
+        Three ways it can go, in order: a request to compute something (the
+        engine cannot, and saying so beats booking it as an answer), a refusal
+        (recorded as a declined fact, so the gate is satisfied without inventing
+        a value), and an ordinary answer, which is interpreted and recorded.
+        """
+        text = ctx.text
+        if _asks_for_a_calculation(text):
+            # 使用体验评测 R3-06（2026-11-05）：患者说"帮我算一下 BMI，
+            # 身高175，体重70"时，规则引擎既算不出来，也不该把这句当成
+            # 主诉/答案记下——那样患者等一个数值，等到的却是下一个问题。
+            ctx.reply_reason = "计算请求：本引擎无计算能力，先说明再回到原问题"
+            return self._calculation_unavailable_reply(state, question, text, turn_id)
+        if is_refusal_text(text):
+            # J-01 (deterministic engine): a refusal lands as a declined
+            # fact — recorded, gate-satisfying, value-free — instead of
+            # looping the question (age) or booking the refusal wording as the
+            # field's value (choice).
+            self._record_fact(
+                state,
+                question.fact_key,
+                Interpretation(None, Assertion.UNKNOWN, Source.PATIENT),
+                turn_id,
+                text,
+            )
+            self.events.append(
+                Event(
+                    state.session_id,
+                    "fact.declined",
+                    {"fact_key": question.fact_key, "evidence": text},
+                    turn_id=turn_id,
+                )
+            )
+            state.active_question = None
+            state.active_question_is_clarification = False
+            return None
+        result = self.interpreter.interpret(question, text, user_input.choice_value)
+        if question.input == "age" and (
+            not isinstance(result.value, (int, float)) or not 0 <= result.value <= 120
+        ):
+            ctx.reply_reason = "年龄输入未通过校验"
+            return AgentReply(
+                "我没能确认年龄。请写成“8个月”或“32岁”这样的格式。",
+                question.phase,
+                kind="clarification",
+                question_id=question.id,
+                developer_trace={
+                    "reason": "年龄格式或范围未通过确定性校验，原输入未写入年龄字段"
+                },
+            )
+        self._record_fact(state, question.fact_key, result, turn_id, text)
+        state.active_question = None
+        state.active_question_is_clarification = False
+        return None
+
     def _h_intake(self, state, user_input, ctx):
         """Read the patient's answer to the question or task in front of them.
 
@@ -307,47 +435,7 @@ class ConsultationEngineHandlers:
                 return failure
         elif state.active_question:
             question = self.content.question(state.active_question)
-            if is_refusal_text(text):
-                # J-01 (deterministic engine): a refusal lands as a
-                # declined fact — recorded, gate-satisfying, value-free —
-                # instead of looping the question (age) or booking the
-                # refusal wording as the field's value (choice).
-                self._record_fact(
-                    state,
-                    question.fact_key,
-                    Interpretation(None, Assertion.UNKNOWN, Source.PATIENT),
-                    turn_id,
-                    text,
-                )
-                self.events.append(
-                    Event(
-                        state.session_id,
-                        "fact.declined",
-                        {"fact_key": question.fact_key, "evidence": text},
-                        turn_id=turn_id,
-                    )
-                )
-                state.active_question = None
-                state.active_question_is_clarification = False
-            else:
-                result = self.interpreter.interpret(
-                    question, text, user_input.choice_value
-                )
-                if question.input == "age" and (
-                    not isinstance(result.value, (int, float))
-                    or not 0 <= result.value <= 120
-                ):
-                    ctx.reply_reason = "年龄输入未通过校验"
-                    return AgentReply(
-                        "我没能确认年龄。请写成“8个月”或“32岁”这样的格式。",
-                        question.phase,
-                        kind="clarification",
-                        question_id=question.id,
-                        developer_trace={"reason": "年龄格式或范围未通过确定性校验，原输入未写入年龄字段"},
-                    )
-                self._record_fact(state, question.fact_key, result, turn_id, text)
-                state.active_question = None
-                state.active_question_is_clarification = False
+            return self._answer_active_question(state, question, user_input, ctx, turn_id)
         else:
             self._record_fact(
                 state,

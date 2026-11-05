@@ -1,7 +1,7 @@
 # 对话全文 · 蓝-定位-C4
 
-> 会话 `9d1c7ac7-0c20-48ce-8e41-5f6f99a94d38` · 16 轮 · 生成于 2026-11-05T00:43:27.143Z
-> 来源：`GET /api/sessions/9d1c7ac7-0c20-48ce-8e41-5f6f99a94d38/snapshot` 的事件流（患者原话与助手回复逐字，未经 UI 截断）
+> 会话 `ff28d6b7-a7c8-4c35-8bce-e5ea34d992b0` · 16 轮 · 生成于 2026-11-05T01:49:08.974Z
+> 来源：`GET /api/sessions/ff28d6b7-a7c8-4c35-8bce-e5ea34d992b0/snapshot` 的事件流（患者原话与助手回复逐字，未经 UI 截断）
 
 ## 轮 1 · phase=opening · consult_for
 **患者**：（无输入，系统主动发起）
@@ -12,82 +12,82 @@
 **患者**：我自己
 **助手**：请问是男是女？
 - 可选项：男 / 女
-- 事件：fact.recorded(key=consult_for value=self assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:42:59.136979+00:00)
+- 事件：fact.recorded(key=consult_for value=self assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:48:40.029417+00:00)
 
 ## 轮 3 · phase=opening · age
 **患者**：男
 **助手**：你多大？可直接写年龄，例如 32 岁。
-- 事件：fact.recorded(key=sex value=male assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:42:59.821153+00:00)
+- 事件：fact.recorded(key=sex value=male assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:48:40.694939+00:00)
 
 ## 轮 4 · phase=opening · chief_complaint
 **患者**：32岁
 **助手**：这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。
-- 事件：fact.recorded(key=age_years value=32 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:43:00.421692+00:00)
+- 事件：fact.recorded(key=age_years value=32 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:48:41.296228+00:00)
 
 ## 轮 5 · phase=emergency_screen · emergency_screen
 **患者**：后脑勺胀痛两天了，一阵一阵的
 **助手**：你说后脑勺胀痛两天了，一阵一阵的，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？
 - 可选项：有任一项 / 都没有 / 不确定
-- 事件：fact.recorded(key=chief_complaint value=后脑勺胀痛两天了，一阵一阵的 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:43:01.055113+00:00)
+- 事件：fact.recorded(key=chief_complaint value=后脑勺胀痛两天了，一阵一阵的 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:48:41.945919+00:00)
 
 ## 轮 6 · phase=history · onset
 **患者**：都没有
 **助手**：先把你这个症状本身问清楚，部位、性质、时间这些细节会决定接下来问什么。你说后脑勺胀痛两天了，一阵一阵的，再问一句：这个问题从什么时候开始？是突然出现，还是逐渐出现？
-- 事件：fact.recorded(key=emergency_screen value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:01.904185+00:00)
+- 事件：fact.recorded(key=emergency_screen value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:42.828103+00:00)
 
 ## 轮 7 · phase=history · trajectory
 **患者**：两天前开始的
 **助手**：你说后脑勺胀痛两天了，一阵一阵的，再问一句：从开始到现在，总体是在加重、减轻、变化不大，还是一阵一阵的？
 - 可选项：在加重 / 在减轻 / 变化不大 / 一阵一阵的 / 说不清
-- 事件：fact.recorded(key=onset value=两天前开始的 assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:02.754745+00:00)
+- 事件：fact.recorded(key=onset value=两天前开始的 assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:43.662599+00:00)
 
 ## 轮 8 · phase=history · severity
 **患者**：一阵一阵的
 **助手**：从两天前开始到现在，再问一句：如果 0 分是完全不影响，10 分是难以忍受，现在大约几分？也可以直接描述对吃饭、睡觉、活动的影响。
-- 事件：fact.recorded(key=trajectory value=intermittent assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:03.654002+00:00)
+- 事件：fact.recorded(key=trajectory value=intermittent assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:44.561206+00:00)
 
 ## 轮 9 · phase=history · associated_symptoms
 **患者**：5分
 **助手**：除了你说的这些，我再问几个你可能没留意的表现，有没有都请直接说。你说现在大约5分，再问一句：除了最主要的问题，还有哪些同时出现的不舒服？没有也请直接说没有。
-- 事件：fact.recorded(key=severity value=5 assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:04.836977+00:00)
+- 事件：fact.recorded(key=severity value=5 assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:45.744649+00:00)
 
 ## 轮 10 · phase=history · warning_剧痛
 **患者**：没有其他不舒服
 **助手**：从两天前开始到现在，再问一句：有没有出现突然出现的剧烈疼痛，或疼痛一下子加重到难以忍受的情况？
 - 可选项：有 / 没有 / 不确定
-- 事件：fact.recorded(key=associated_symptoms value=没有其他不舒服 assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:05.687898+00:00)
+- 事件：fact.recorded(key=associated_symptoms value=没有其他不舒服 assertion=present source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:46.596163+00:00)
 
 ## 轮 11 · phase=history · warning_持续加重
 **患者**：没有
 **助手**：你说现在大约5分，再问一句：最近症状是不是持续加重，一直没有好转？
 - 可选项：有 / 没有 / 不确定
-- 事件：fact.recorded(key=warning_剧痛 value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:06.587886+00:00)
+- 事件：fact.recorded(key=warning_剧痛 value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:47.512242+00:00)
 
 ## 轮 12 · phase=history · warning_功能骤降
 **患者**：没有
 **助手**：除了后脑勺胀痛两天了，一阵一阵的，你还提到没有其他不舒服，再问一句：有没有出现突然不能正常活动、不能进食饮水，或日常活动能力明显下降的情况？
 - 可选项：有 / 没有 / 不确定
-- 事件：fact.recorded(key=warning_持续加重 value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:07.521530+00:00)
+- 事件：fact.recorded(key=warning_持续加重 value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:48.428371+00:00)
 
 ## 轮 13 · phase=observation · self_check
 **患者**：没有
 **助手**：为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。
 - 可选项：头/面部 / 胸部 / 腹部 / 背/腰部 / 四肢 / 其他部位 / 说不清/跳过
-- 事件：fact.recorded(key=warning_功能骤降 value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:08.438217+00:00)；self_check.offered(task_id=body_location content_version=12d40cac27da9eb54627f2bb6a1d308907ca03c4 requested_by_user=false requests:{})
+- 事件：fact.recorded(key=warning_功能骤降 value=false assertion=absent source=patient)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:49.362166+00:00)；self_check.offered(task_id=body_location content_version=12d40cac27da9eb54627f2bb6a1d308907ca03c4 requested_by_user=false requests:{})
 
 ## 轮 14 · phase=background · medications_taken
 **患者**：头/面部
 **助手**：最后补几个背景情况，问完我就把结论整理给你。从两天前开始到现在，再问一句：这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。
-- 事件：fact.recorded(key=symptom_location value=头/面部 assertion=present source=patient)；self_check.completed(task_id=body_location quality=not_assessed assertion=present previous_reading_preserved=false)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T00:43:09.387579+00:00)
+- 事件：fact.recorded(key=symptom_location value=头/面部 assertion=present source=patient)；self_check.completed(task_id=body_location quality=not_assessed assertion=present previous_reading_preserved=false)；triage.assessed(level=routine triggers:{} assessed_at=2026-11-05T01:48:50.312448+00:00)
 
 ## 轮 15 · phase=observation · self_check
 **患者**：修改定位
 **助手**：继续这一步；可以补充其他信息，也可以跳过。
 - 可选项：取消修改，保留原记录
-- 事件：self_check.location_revision_started(fact_id=f8cd66b4-b888-4fef-9245-aea1cde41dfb form_id=4111a3e6-e8ee-4ef6-a428-1113f49ae711)；self_check.conversation_resumed(task_id=body_location interaction_id=offer:8a5cc8ba-d96b-4f96-9b6e-418309ff84)
+- 事件：self_check.location_revision_started(fact_id=db7bb3a7-ae6c-4806-ad04-ed119bb8d7f6 form_id=a67d7521-2eea-4a11-a18f-891016dacf78)；self_check.conversation_resumed(task_id=body_location interaction_id=offer:5c96fb89-d229-4386-abf0-bb00cfdc8f)
 
 ## 轮 16 · phase=background · medications_taken
 **患者**：部位：头/面部；具体位置：头顶附近；左右：两侧；范围：一片范围
 **助手**：最后补几个背景情况，问完我就把结论整理给你。从两天前开始到现在，再问一句：这次不舒服后，用过什么药或做过什么处理？请尽量写药名、剂量和时间；没有请说没有。
-- 事件：fact.recorded(key=symptom_location value=部位：头/面部；具体位置：头顶附近；左右：两侧；范围：一片范围 assertion=present source=patient)；self_check.conversation_cleared(task_id=body_location interaction_id=offer:8a5cc8ba-d96b-4f96-9b6e-418309ff84 reason=result_recorded)；self_check.completed(task_id=body_location quality=not_assessed assertion=present previous_reading_preserved=false)；self_check.answer_confirmed(fact_id=11d4404c-d50c-44cc-97d8-44b062b04b2f form_id=4111a3e6-e8ee-4ef6-a428-1113f49ae711 answers:{region,area,side,extent})；self_check.location_revision_completed(previous_fact_id=f8cd66b4-b888-4fef-9245-aea1cde41dfb fact_id=11d4404c-d50c-44cc-97d8-44b062b04b2f)
+- 事件：fact.recorded(key=symptom_location value=部位：头/面部；具体位置：头顶附近；左右：两侧；范围：一片范围 assertion=present source=patient)；self_check.conversation_cleared(task_id=body_location interaction_id=offer:5c96fb89-d229-4386-abf0-bb00cfdc8f reason=result_recorded)；self_check.completed(task_id=body_location quality=not_assessed assertion=present previous_reading_preserved=false)；self_check.answer_confirmed(fact_id=890d0e4c-3217-47ec-a543-4a4568401187 form_id=a67d7521-2eea-4a11-a18f-891016dacf78 answers:{region,area,side,extent})；self_check.location_revision_completed(previous_fact_id=db7bb3a7-ae6c-4806-ad04-ed119bb8d7f6 fact_id=890d0e4c-3217-47ec-a543-4a4568401187)
 

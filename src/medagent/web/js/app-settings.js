@@ -771,6 +771,19 @@ document.addEventListener("click", (event) => {
     $("#sidebar").classList.remove("open");
 });
 $("#connection-retry")?.addEventListener("click", () => init());
+// 刚结束的问诊，重开应用还留在原处；超过这个窗口就从首页开始。
+// 患者关掉应用半小时后回来，多半是想再看一遍结论；隔了一天再来，
+// 那是新的一次就医，回到首页更顺（使用体验评测 R3-09，2026-11-05）。
+const REOPEN_CLOSED_WITHIN_MS = 24 * 60 * 60 * 1000;
+
+function worthReopening(item, now = Date.now()) {
+  // 进行中的问诊不限窗口——它本来就还没结束。
+  if (item.phase !== "closed") return true;
+  const stamp = Date.parse(item.updated_at ?? "");
+  if (Number.isNaN(stamp)) return false;
+  return now - stamp <= REOPEN_CLOSED_WITHIN_MS;
+}
+
 export async function init() {
   // Static HTML is visible before module hydration; enable only after handlers exist.
   $("#workspace-mode").disabled = false;
@@ -796,13 +809,14 @@ export async function init() {
     $("#connection-alert").hidden = true;
     enforceBannerPriority();
     await refreshSessions();
-    // 使用体验评测 F3（2026-11-04）：中途刷新曾落在开始页，患者得自己
-    // 想起来去侧栏找回会话。恢复范围只限**本浏览器**记住的、仍未结束的
-    // 那一次问诊——服务器上其他活动会话（别的标签页、测试残留）不参与。
+    // 使用体验评测 F3（2026-11-04）/ R3-09（2026-11-05）：刷新或重开应用
+    // 曾落在开始页，患者得自己去侧栏找回会话。恢复范围只限**本浏览器**
+    // 记住的那一次——进行中不限，已结束的限一天之内；服务器上其他会话
+    // （别的标签页、自动化残留）不参与。
     const stored = lastSessionId();
     const active = stored
       ? state.sessions.find(
-          (item) => item.session_id === stored && item.phase !== "closed",
+          (item) => item.session_id === stored && worthReopening(item),
         )
       : undefined;
     if (active && !state.sessionId) {

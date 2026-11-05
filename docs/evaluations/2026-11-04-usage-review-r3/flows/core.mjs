@@ -231,7 +231,6 @@ async function groupA(ctx) {
   try {
     const sessionId = await startSession(page, rec, BLUE, "A", base);
     ctx.track(BLUE, sessionId);
-
     // A1 开场
     await shotHere(
       page,

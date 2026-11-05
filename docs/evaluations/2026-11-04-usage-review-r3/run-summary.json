@@ -1,12 +1,24 @@
 {
  "groups": [
-  "A"
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M"
  ],
- "seconds": 85,
- "steps": 2245,
- "shots": 240,
- "duplicates": 413,
- "findings": 63,
- "failing": 3,
- "serverTail": ""
+ "seconds": 379,
+ "steps": 488,
+ "shots": 102,
+ "duplicates": 0,
+ "findings": 62,
+ "failing": 0,
+ "serverTail": "[05/Nov/2026 09:51:37] \"GET /js/themes.js HTTP/1.1\" 200 -\n[05/Nov/2026 09:51:37] \"GET /css/appearance.css HTTP/1.1\" 200 -\n[05/Nov/2026 09:51:37] \"GET /css/styles.css HTTP/1.1\" 200 -\n[05/Nov/2026 09:51:37] \"GET /assets/fonts/NotoSansCJKsc-Regular.otf HTTP/1.1\" 200 -\n[05/Nov/2026 09:51:37] \"GET /css/patient-reflow.css HTTP/1.1\" 200 -\n[05/Nov/2026 09:51:37] \"GET /css/self-check.css HTTP/1.1\" 200 -"
 }

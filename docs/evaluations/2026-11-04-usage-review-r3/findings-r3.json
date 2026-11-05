@@ -28,11 +28,11 @@
    "value": 32,
    "assertion": "present",
    "source": "patient",
-   "turn_id": "e8e63e53-77c3-48e5-8750-4533eb5ffbbe",
-   "recorded_at": "2026-11-05T00:47:24.552990+00:00",
+   "turn_id": "867871cb-01c2-400c-868d-d4ead544e5b7",
+   "recorded_at": "2026-11-05T01:45:48.983755+00:00",
    "quality": "not_assessed",
    "supersedes": null,
-   "fact_id": "c294f37d-16d0-41f8-b473-e4dd97dc88bf",
+   "fact_id": "0d61a07a-8575-4b29-9875-b7dc5522d157",
    "evidence": "32岁"
   },
   "pass": true,
@@ -217,11 +217,11 @@
     },
     "assertion": "unknown",
     "source": "patient",
-    "turn_id": "4096c989-7f82-439d-b20d-e7d42742bdea",
-    "recorded_at": "2026-11-05T00:42:33.705580+00:00",
+    "turn_id": "0d316b68-29e7-40ec-8c19-0598eba12cac",
+    "recorded_at": "2026-11-05T01:48:11.346919+00:00",
     "quality": "not_done",
     "supersedes": null,
-    "fact_id": "fad20196-557b-4952-a0be-6e07eebe6d56",
+    "fact_id": "a7424b7d-3808-4ce3-a07e-e1cdce2fc536",
     "evidence": "说不清/跳过"
    },
    "task": null
@@ -294,11 +294,11 @@
     "value": 38.2,
     "assertion": "present",
     "source": "caregiver",
-    "turn_id": "ef4128d8-53f1-4d8b-8370-dc1e3a5a9a50",
-    "recorded_at": "2026-11-05T00:32:47.224424+00:00",
+    "turn_id": "20192df8-fce5-45c4-8cc9-13764e72f513",
+    "recorded_at": "2026-11-05T01:49:25.096718+00:00",
     "quality": "not_assessed",
     "supersedes": null,
-    "fact_id": "25d9f69b-33c1-4c4d-afde-e67e1692b657",
+    "fact_id": "dc688cc8-ffe9-466a-b1ed-8bdb9015d89f",
     "evidence": "38.2"
    },
    "readings": [
@@ -354,11 +354,11 @@
     "value": 38.6,
     "assertion": "present",
     "source": "caregiver",
-    "turn_id": "28f6a797-8ba8-4224-8782-c033a1a6ba55",
-    "recorded_at": "2026-11-05T00:32:52.539955+00:00",
+    "turn_id": "4539f403-21f6-4ff3-9e4d-208b60e2261f",
+    "recorded_at": "2026-11-05T01:49:30.463490+00:00",
     "quality": "not_assessed",
-    "supersedes": "25d9f69b-33c1-4c4d-afde-e67e1692b657",
-    "fact_id": "5ced5a9e-9cb3-46dd-9547-3015437249d1",
+    "supersedes": "dc688cc8-ffe9-466a-b1ed-8bdb9015d89f",
+    "fact_id": "95a72ded-a767-4a1a-9f7d-5f1605509326",
     "evidence": "38.6"
    },
    "flagged": true,
@@ -380,11 +380,11 @@
     "value": 38.6,
     "assertion": "present",
     "source": "caregiver",
-    "turn_id": "28f6a797-8ba8-4224-8782-c033a1a6ba55",
-    "recorded_at": "2026-11-05T00:32:52.539955+00:00",
+    "turn_id": "4539f403-21f6-4ff3-9e4d-208b60e2261f",
+    "recorded_at": "2026-11-05T01:49:30.463490+00:00",
     "quality": "not_assessed",
-    "supersedes": "25d9f69b-33c1-4c4d-afde-e67e1692b657",
-    "fact_id": "5ced5a9e-9cb3-46dd-9547-3015437249d1",
+    "supersedes": "dc688cc8-ffe9-466a-b1ed-8bdb9015d89f",
+    "fact_id": "95a72ded-a767-4a1a-9f7d-5f1605509326",
     "evidence": "38.6"
    }
   },
@@ -398,7 +398,7 @@
   "severity": "P2",
   "expected": "记录血糖表单可用，保存后时间线出现条目",
   "actual": {
-   "cards": 1,
+   "cards": 5,
    "empty": false
   },
   "pass": true,
@@ -412,7 +412,7 @@
   "expected": "血压这类双值测量能一次录入，两个数都留下",
   "actual": {
    "hasBoth": true,
-   "sample": "05日\n2026年11月\n血压自测\n血压 128/84 mmHg\n已归档\n05日\n2026年11月\n血糖自测\n血糖 5.6 mmol/L\n已归档"
+   "sample": "05日\n2026年11月\n血压自测\n血压 128/84 mmHg\n已归档\n05日\n2026年11月\n血糖自测\n血糖 5.6 mmol/L\n已归档\n05日\n2026年11月\n血压自测\n血压 128/84 mmHg\n已归档\n05日\n2026年11月\n血糖自测\n血糖 5.6 mmol/L\n已归档\n05日\n2026年11月\n血压自测\n血压 128/84 mmHg\n已归档\n05日\n2026年11月\n血糖自测"
   },
   "pass": true,
   "group": "E",
@@ -424,11 +424,11 @@
   "severity": "P2",
   "expected": "患者明确要求「算 BMI」时，要么给出计算卡，要么说明这一步在当前模式里做不到",
   "actual": {
-   "kind": "question",
-   "questionId": "emergency_screen",
-   "tail": "先确认一下：这次是为谁咨询？你我自己请问是男是女？你男你多大？可直接写年龄，例如 32 岁。你32岁这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。你帮我算一下 BMI，身高175厘米，体重70公斤你说帮我算一下 BMI，身高175厘米，体重70公斤，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？"
+   "kind": "clarification",
+   "questionId": "chief_complaint",
+   "tail": "先确认一下：这次是为谁咨询？你我自己请问是男是女？你男你多大？可直接写年龄，例如 32 岁。你32岁这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。你帮我算一下 BMI，身高175厘米，体重70公斤这个版本还不能替你算这道数（BMI、换算这类公式要接计算能力才行）。你可以把数值直接写出来，我按你给的数值判断。回到刚才的问题：这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。"
   },
-  "pass": false,
+  "pass": true,
   "group": "E",
   "persona": "蓝-计算",
   "evidence": []
@@ -474,11 +474,11 @@
     "value": null,
     "assertion": "unknown",
     "source": "caregiver",
-    "turn_id": "724a6831-7ad6-49f8-a139-d920ecafa68b",
-    "recorded_at": "2026-11-05T00:43:31.127571+00:00",
+    "turn_id": "492d6c11-3270-4024-9572-cd1d2ccca6f7",
+    "recorded_at": "2026-11-05T01:49:54.817016+00:00",
     "quality": "not_assessed",
     "supersedes": null,
-    "fact_id": "076f8c6d-fc0b-4210-ae7c-8d80d974cea8",
+    "fact_id": "6d273134-2e93-4a98-bb12-a0d92b012bb8",
     "evidence": "对了，帮我儿子也看一下，他也咳嗽"
    },
    "trigger": "interpreter 用 raw.startswith(「有」「是」「对」) 判定 yes——「对了…」命中了「对」"
@@ -512,11 +512,11 @@
     "value": "child",
     "assertion": "present",
     "source": "patient",
-    "turn_id": "6a7434a6-da0c-4c13-bd84-bff802370332",
-    "recorded_at": "2026-11-05T00:43:32.876898+00:00",
+    "turn_id": "623899eb-8a17-4341-b39a-0002cba74c10",
+    "recorded_at": "2026-11-05T01:49:57.366243+00:00",
     "quality": "not_assessed",
     "supersedes": null,
-    "fact_id": "2fea2600-3303-4e29-8892-ee4582b83483",
+    "fact_id": "ffd79db8-ce39-46c5-90f2-ca5c27d0362f",
     "evidence": "孩子"
    },
    "phase": "history"
@@ -530,7 +530,7 @@
   "id": "R3-G1-followup",
   "severity": "P2",
   "expected": "会话结束后「待随访」区出现，并说清什么时候回访",
-  "actual": "待随访\n\n上次问诊约定的回访时间到了，请记录现在的近况；如果加重， 系统会为你开启一次新的问诊。\n\n桌面通知仅在应用打开时送达：关闭应用后不会推送，到期项仍会在这里和顶部徽标中汇总。\n\n咳嗽三天，有痰\n例行回访 · 摘要已确认，例行回访确认恢复情况\n约定回访时间 11月8日 00:29\n待随访\n记录近况",
+  "actual": "待随访\n\n上次问诊约定的回访时间到了，请记录现在的近况；如果加重， 系统会为你开启一次新的问诊。\n\n桌面通知仅在应用打开时送达：关闭应用后不会推送，到期项仍会在这里和顶部徽标中汇总。\n\n孩子发烧一天，最高40度2\n紧急确认 · 风险升级关闭，建议 24 小时内确认是否已获线下评估：症状持续加重、测得体温达到 40℃\n约定回访时间 11月6日 09:47\n待随访\n记录近况\n最近三天太阳穴胀痛，越来越",
   "pass": true,
   "group": "G",
   "persona": "李-随访",
@@ -554,7 +554,7 @@
   "expected": "记录近况后对话框关闭，待随访区不再把这条算作待办",
   "actual": {
    "dialogOpen": false,
-   "list": ""
+   "list": "最近三天太阳穴胀痛，越来越重\n例行回访 · 摘要已确认，例行回访确认恢复情况\n约定回访时间 11月8日 09:47\n待随访\n记录近况\n咳嗽三天，有痰\n例行回访 · 摘要已确认，例行回访确认恢复情况\n约定回访时间 11月8日 09:50\n待随"
   },
   "pass": true,
   "group": "G",
@@ -567,24 +567,11 @@
   "expected": "反馈「加重了」时，系统要主动重分诊，并说明为什么、下一步是什么",
   "actual": {
    "retriage": true,
-   "tail": "FOLLOW-UP\n\n记录随访近况\n\n肚子不舒服两天 · 例行回访（约定 11月7日 00:30）\n\n现在感觉怎么样\n已痊愈\n好转中\n没有变化\n加重了\n已经就医\n已经住院\n备注（可选）\n\n已记录近况：情况有变，需要重新分诊。\n\n已记录。你反馈的情况需要重新分诊， 系统已经为你开启了一次新的问诊。\n\n进入新的问诊\n取消\n保存记录"
+   "tail": "FOLLOW-UP\n\n记录随访近况\n\n肚子不舒服两天 · 例行回访（约定 11月7日 09:50）\n\n现在感觉怎么样\n已痊愈\n好转中\n没有变化\n加重了\n已经就医\n已经住院\n备注（可选）\n\n已记录近况：情况有变，需要重新分诊。\n\n已记录。你反馈的情况需要重新分诊， 系统已经为你开启了一次新的问诊。\n\n进入新的问诊\n取消\n保存记录"
   },
   "pass": true,
   "group": "G",
   "persona": "李-随访",
-  "evidence": []
- },
- {
-  "id": "R3-H1-report-entry",
-  "severity": "P3",
-  "expected": "刚开场、还没有任何记录时，「添加报告内容 / 就诊交接摘要」不该是可点的空上下文",
-  "actual": {
-   "report": true,
-   "handoff": true
-  },
-  "pass": false,
-  "group": "H",
-  "persona": "赵-报告",
   "evidence": []
  },
  {
@@ -636,11 +623,11 @@
   "severity": "P2",
   "expected": "已结束的会话刷新后仍能回到刚才的结论（与「进行中自动恢复」一致）",
   "actual": {
-   "welcome": true,
-   "conclusion": false,
+   "welcome": false,
+   "conclusion": true,
    "hash": "#consultation"
   },
-  "pass": false,
+  "pass": true,
   "group": "A",
   "persona": "蓝-自护",
   "evidence": []
@@ -703,7 +690,7 @@
   "expected": "添加成员后列表出现，并说明「现在看的是谁」",
   "actual": {
    "hasMember": true,
-   "sample": "我的健康档案\n本人\n当前查看\n设为本次问诊对象\n改名\n小明\n成员\n切换查看\n设为本次问诊对象\n改名\n归档"
+   "sample": "我的健康档案\n本人\n当前查看\n设为本次问诊对象\n改名\n小明\n成员\n切换查看\n设为本次问诊对象\n改名\n归档\n小明\n成员\n切换查看\n设为本次问诊对象\n改名\n归档\n小明\n成员\n切换查看\n设为本次问诊对象\n改名\n归档"
   },
   "pass": true,
   "group": "I",
@@ -934,12 +921,14 @@
   "severity": "P2",
   "expected": "同一主诉的多次问诊在「最近问诊」里可区分（时间/序号），否则患者分不清点哪一条",
   "actual": {
-   "count": 3,
-   "unique": 3,
+   "count": 8,
+   "unique": 8,
    "sample": [
-    "本人 · 新的问诊 · 08:46:12",
-    "本人 · 新的问诊 · 08:46:06",
-    "本人 · 最近三天太阳穴胀痛，越来越重 · 08:44:43"
+    "本人 · 新的问诊 · 09:51:40",
+    "本人 · 新的问诊 · 09:51:33",
+    "本人 · 嗓子疼三天 · 09:51:29",
+    "本人 · 咳嗽三天，有痰 · 09:51:08",
+    "新的问诊 · 09:50:44"
    ]
   },
   "pass": true,

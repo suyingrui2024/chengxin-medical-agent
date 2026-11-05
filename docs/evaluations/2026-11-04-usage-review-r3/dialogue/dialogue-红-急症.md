@@ -1,7 +1,7 @@
 # 对话全文 · 红-急症
 
-> 会话 `4cb92b36-124c-4f2f-99b2-fe6c89c69975` · 6 轮 · 生成于 2026-11-05T00:25:32.481Z
-> 来源：`GET /api/sessions/4cb92b36-124c-4f2f-99b2-fe6c89c69975/snapshot` 的事件流（患者原话与助手回复逐字，未经 UI 截断）
+> 会话 `b163d3d5-f1e8-4406-b4ea-1425f041dc30` · 6 轮 · 生成于 2026-11-05T01:48:00.372Z
+> 来源：`GET /api/sessions/b163d3d5-f1e8-4406-b4ea-1425f041dc30/snapshot` 的事件流（患者原话与助手回复逐字，未经 UI 截断）
 
 ## 轮 1 · phase=opening · consult_for
 **患者**：（无输入，系统主动发起）
@@ -12,17 +12,17 @@
 **患者**：我自己
 **助手**：请问是男是女？
 - 可选项：男 / 女
-- 事件：fact.recorded(key=consult_for value=self assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:24:44.405516+00:00)
+- 事件：fact.recorded(key=consult_for value=self assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:47:11.285366+00:00)
 
 ## 轮 3 · phase=opening · age
 **患者**：男
 **助手**：你多大？可直接写年龄，例如 32 岁。
-- 事件：fact.recorded(key=sex value=male assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:24:45.054828+00:00)
+- 事件：fact.recorded(key=sex value=male assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:47:11.951942+00:00)
 
 ## 轮 4 · phase=opening · chief_complaint
 **患者**：58岁
 **助手**：这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。
-- 事件：fact.recorded(key=age_years value=58 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:24:45.671464+00:00)
+- 事件：fact.recorded(key=age_years value=58 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:47:12.569389+00:00)
 
 ## 轮 5 · phase=opening · clarification
 **患者**：胸口有点疼
@@ -34,5 +34,5 @@
 **患者**：没有，我没有这种情况
 **助手**：你说没有，我没有这种情况，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？
 - 可选项：有任一项 / 都没有 / 不确定
-- 事件：emergency.clarification_denied()；fact.recorded(key=chief_complaint value=没有，我没有这种情况 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:24:47.555437+00:00)
+- 事件：emergency.clarification_denied()；fact.recorded(key=chief_complaint value=没有，我没有这种情况 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:47:14.385068+00:00)
 

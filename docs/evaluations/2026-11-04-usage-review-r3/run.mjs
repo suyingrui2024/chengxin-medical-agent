@@ -55,9 +55,15 @@ function makeContext({ browser, base, rec }) {
     },
     async page(viewport = { width: 1280, height: 900 }) {
       const context = await browser.newContext({ viewport, locale: "zh-CN" });
+      // 每个组从"干净的浏览器"开始：清掉上一组留下的会话 id，避免 F3 的
+      // 刷新恢复把整组劫持到别人的会话上。只清**本标签页的第一个文档**——
+      // 否则"刷新后回到原处"这类检查永远看不到 id（2026-11-05 修正：
+      // 原本每次导航都清，A10 因此一直是假失败）。
       await context.addInitScript(() => {
         try {
+          if (sessionStorage.getItem("__r3-first-doc-cleared")) return;
           localStorage.removeItem("medagent:last-session-id");
+          sessionStorage.setItem("__r3-first-doc-cleared", "1");
         } catch {
           /* 隐私模式 */
         }

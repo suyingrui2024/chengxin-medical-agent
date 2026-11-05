@@ -209,6 +209,23 @@ export async function say(page, rec, sessionId, persona, group, text, turn) {
 /** 打开一次新会话，返回 session_id。 */
 export async function startSession(page, rec, persona, group, base) {
   await page.goto(`${base}/`);
+  // 同一组里可能已经开过一段问诊：F3 的刷新恢复会把首页直接接到那一段上，
+  // 于是"开始问诊"按钮根本不在屏幕上。要"新开一段"就得先让浏览器忘掉它，
+  // 再载入一次——这样脚本看到的才是真正的欢迎页。
+  const resumed = await page.evaluate(
+    () => document.querySelector("#welcome")?.hidden ?? false,
+  );
+  if (resumed) {
+    await page.evaluate(() => {
+      try {
+        localStorage.removeItem("medagent:last-session-id");
+      } catch {
+        /* 隐私模式 */
+      }
+    });
+    await page.reload();
+    await waitStable(page, 600);
+  }
   const created = page.waitForResponse(
     (r) => r.request().method() === "POST" && r.url().endsWith("/api/sessions"),
     { timeout: 20000 },

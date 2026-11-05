@@ -1,7 +1,7 @@
 # 对话全文 · 红-急症
 
-> 会话 `1ce64c6b-1819-4c15-b086-bdd729e16d5e` · 5 轮 · 生成于 2026-11-05T00:25:32.529Z
-> 来源：`GET /api/sessions/1ce64c6b-1819-4c15-b086-bdd729e16d5e/snapshot` 的事件流（患者原话与助手回复逐字，未经 UI 截断）
+> 会话 `9c637e98-2c84-40c8-a730-73ae1bf501b8` · 5 轮 · 生成于 2026-11-05T01:48:00.422Z
+> 来源：`GET /api/sessions/9c637e98-2c84-40c8-a730-73ae1bf501b8/snapshot` 的事件流（患者原话与助手回复逐字，未经 UI 截断）
 
 ## 轮 1 · phase=opening · consult_for
 **患者**：（无输入，系统主动发起）
@@ -12,17 +12,17 @@
 **患者**：我自己
 **助手**：请问是男是女？
 - 可选项：男 / 女
-- 事件：fact.recorded(key=consult_for value=self assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:24:53.921147+00:00)
+- 事件：fact.recorded(key=consult_for value=self assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:47:21.934429+00:00)
 
 ## 轮 3 · phase=opening · age
 **患者**：男
 **助手**：你多大？可直接写年龄，例如 32 岁。
-- 事件：fact.recorded(key=sex value=male assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:24:54.603862+00:00)
+- 事件：fact.recorded(key=sex value=male assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:47:22.617549+00:00)
 
 ## 轮 4 · phase=opening · chief_complaint
 **患者**：58岁
 **助手**：这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。
-- 事件：fact.recorded(key=age_years value=58 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T00:24:55.237750+00:00)
+- 事件：fact.recorded(key=age_years value=58 assertion=present source=patient)；triage.assessed(level=undetermined triggers:{} assessed_at=2026-11-05T01:47:23.234281+00:00)
 
 ## 轮 5 · phase=closed · emergency
 **患者**：胸口像压了块大石头，喘不上气，一直出冷汗
