@@ -13,6 +13,7 @@ export const subjectDrafts = new Map();
 export const structuredUI = createRenderer({ taskProgress });
 export const names = {
   consult_for: "咨询对象",
+  sex: "性别",
   age_years: "年龄",
   chief_complaint: "主要问题",
   emergency_screen: "紧急信号筛查",
@@ -30,9 +31,17 @@ export const names = {
   temperature_c: "报告的腋温",
   symptom_location: "主观症状部位",
   unsolicited_note: "补充说明",
+  warning_意识: "意识与抽搐",
+  warning_呼吸: "呼吸情况",
+  warning_出血: "出血情况",
+  warning_剧痛: "剧烈疼痛",
+  warning_持续加重: "是否持续加重",
+  warning_功能骤降: "活动能力",
 };
 export const values = {
   self: "本人",
+  male: "男",
+  female: "女",
   child: "孩子",
   other_adult: "其他家人",
   worsening: "加重",

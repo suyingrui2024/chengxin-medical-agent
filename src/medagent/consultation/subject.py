@@ -1,5 +1,6 @@
 """Mixin: subject for ConsultationEngine."""
 from copy import deepcopy
+from dataclasses import replace
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 from ..clinical.interpreter import Interpretation
@@ -179,6 +180,42 @@ class ConsultationEngineSubject:
         ):
             raise StaleActionError("就诊对象入口已更新，请使用当前页面。")
 
+    #: 更正主诉时会被撤回的字段，用患者看得懂的名字列出。
+    WITHDRAWN_LABELS = {
+        "emergency_screen": "紧急信号筛查",
+        "onset": "开始时间",
+        "trajectory": "变化趋势",
+        "severity": "影响程度",
+        "associated_symptoms": "伴随不适",
+        "resp_breathing": "呼吸情况",
+        "resp_cough_details": "咳嗽情况",
+        "resp_intake": "饮水与进食",
+        "medications_taken": "用药与处理",
+        "patient_goal": "期望与担心",
+        "symptom_location": "症状部位",
+    }
+
+    def _correction_notice(self, withdrawn) -> str:
+        """改主诉后，把"哪几项需要重答"说成一句患者能懂的话。
+
+        使用体验评测 R3-03：撤回原本是静默的，界面只剩一句 4.5 秒的
+        "摘要已重新整理"，患者不知道自己刚答过的内容去哪了。提示必须
+        出现在对话里（跟着这一轮回复留下），不能只挂 toast。
+        """
+        labels = [
+            self.WITHDRAWN_LABELS.get(key, key)
+            for key in sorted(withdrawn)
+            if key in self.WITHDRAWN_LABELS
+        ]
+        if not labels:
+            return ""
+        # 放在问题之后，用括注，避免和回复开头的承接句（"你说…，再问一句："）
+        # 抢同一个位置；患者先看到要回答的问题，再看到"为什么重问"。
+        return (
+            f"（主要问题改了：之前按旧问题回答的「{'、'.join(labels)}」"
+            "不再算作已确认，你的原话都还留着，我会重新问这几项。）"
+        )
+
     def _apply_fact_update_dependencies(self, state, updates, turn_id):
         """Work out what a changed fact invalidates, and cancel it.
 
@@ -322,6 +359,7 @@ class ConsultationEngineSubject:
             if question is None or fact_key == "emergency_screen":
                 raise ValueError("该字段不支持直接更正")
             turn_id = str(uuid4())
+            facts_before = set(state.facts)
             result = self.interpreter.interpret(question, new_text)
             if question.input == "age" and (
                 not isinstance(result.value, (int, float))
@@ -389,8 +427,20 @@ class ConsultationEngineSubject:
                     else None
                 )
                 reply = resumed or self._plan_next(state)
-            self._record_reply(state, reply, turn_id, f"用户更正字段 {fact_key} 后重新规划")
-            return reply
+            return self._publish_correction(state, reply, fact_key, facts_before, turn_id)
+
+    def _publish_correction(self, state, reply, fact_key, facts_before, turn_id):
+        """把"撤回了什么"补进回复，再照常发布。
+
+        单独成步是为了让 correct_fact 停在可读的长度：撤回提示只针对改主诉，
+        其它字段的更正保持原样。
+        """
+        withdrawn = (facts_before - set(state.facts)) - {fact_key}
+        notice = self._correction_notice(withdrawn) if fact_key == "chief_complaint" else ""
+        if notice:
+            reply = replace(reply, message=f"{reply.message}{notice}")
+        self._record_reply(state, reply, turn_id, f"用户更正字段 {fact_key} 后重新规划")
+        return reply
 
     def restore_fact(
         self,

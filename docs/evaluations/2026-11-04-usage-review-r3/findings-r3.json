@@ -1,926 +1,963 @@
 [
-  {
-    "id": "R3-A1-composer",
-    "severity": "P3",
-    "expected": "点选题下输入框仍可用于自由描述（不是缺陷，但要确认它有引导）",
-    "actual": "可以按自己的话回答，也可以随时补充或更正。",
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+ {
+  "id": "R3-A1-composer",
+  "severity": "P3",
+  "expected": "点选题下输入框仍可用于自由描述（不是缺陷，但要确认它有引导）",
+  "actual": "可以按自己的话回答，也可以随时补充或更正。",
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A1-objects",
+  "severity": "P2",
+  "expected": "开场给出三个咨询对象选项",
+  "actual": 3,
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A2-age",
+  "severity": "P2",
+  "expected": "年龄被记为已提供",
+  "actual": {
+   "key": "age_years",
+   "value": 32,
+   "assertion": "present",
+   "source": "patient",
+   "turn_id": "563343cc-9469-4592-ac6d-ba19fb9a7ed3",
+   "recorded_at": "2026-11-05T00:27:43.561134+00:00",
+   "quality": "not_assessed",
+   "supersedes": null,
+   "fact_id": "05f2d76d-0fd4-4949-baf3-008c110b71fc",
+   "evidence": "32岁"
   },
-  {
-    "id": "R3-A1-objects",
-    "severity": "P2",
-    "expected": "开场给出三个咨询对象选项",
-    "actual": 3,
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A3-signals",
+  "severity": "P1",
+  "expected": "急症筛查六个信号与三个选项同时在屏、不需滚动即可读全",
+  "actual": {
+   "signals": [
+    "叫不醒",
+    "抽搐",
+    "嘴唇发紫",
+    "呼吸困难",
+    "胸痛",
+    "出血"
+   ],
+   "viewport": {
+    "width": 1280,
+    "height": 900
+   }
   },
-  {
-    "id": "R3-A2-age",
-    "severity": "P2",
-    "expected": "年龄被记为已提供",
-    "actual": {
-      "key": "age_years",
-      "value": 32,
-      "assertion": "present",
-      "source": "patient",
-      "turn_id": "1516bbef-f8a8-45f4-8449-1cfcc1149496",
-      "recorded_at": "2026-11-04T16:47:50.773812+00:00",
-      "quality": "not_assessed",
-      "supersedes": null,
-      "fact_id": "6955d694-0e02-4d60-b70a-ec4fe9a1bf58",
-      "evidence": "32岁"
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A6-drawer-language",
+  "severity": "P2",
+  "expected": "「已记录信息」抽屉用患者语言显示，不出现 sex/male/warning_* 这类内部字段名",
+  "actual": {
+   "hits": [],
+   "sample": "咨询对象\n更正\n\n本人\n\n性别\n更正\n\n男\n\n年龄\n更正\n\n32 岁\n\n主要问题\n更正\n\n后脑勺胀痛两天了，一阵一阵的\n\n紧急信号筛查\n\n用户否认上述紧急信号\n\n开始时间\n更正\n\n两天前开始的，一开始只是有点胀\n\n变化趋势\n更正\n\n阵发性\n"
+  },
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A6-summary-edit",
+  "severity": "P3",
+  "expected": "摘要卡提供逐项更正（这是好的），但同一动作在抽屉里叫「更正」、未知项叫「补充 / 更正」",
+  "actual": {
+   "edits": 15,
+   "labels": [
+    "更正"
+   ]
+  },
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A8-naming",
+  "severity": "P3",
+  "expected": "同一个动作在不同位置的叫法一致（抽屉「更正」/ 摘要「更正」/「补充 / 更正」）",
+  "actual": {
+   "unique": [
+    "更正"
+   ],
+   "all": [
+    "更正",
+    "修改定位"
+   ]
+  },
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A9-conclusion",
+  "severity": "P1",
+  "expected": "确认后出现结论单与随访安排",
+  "actual": {
+   "conclusion": true,
+   "followUp": true,
+   "phase": "closed"
+  },
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A9-overflow",
+  "severity": "P2",
+  "expected": "结论单在 1280 宽下没有横向溢出",
+  "actual": [],
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-A9-tokens",
+  "severity": "P1",
+  "expected": "结论单不出现内部枚举（self/stable/null…）",
+  "actual": {
+   "token": "male",
+   "sample": "话与来源\n影响程度\n6 / 10\n系统整理\n已确认\n原话与来源\n当前不适\n性别\nmale\n系统整理\n已确认\n原话与来源\n主要问题\n最近三天太阳穴胀痛，越来越重\n"
+  },
+  "pass": false,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-B1-clarify",
+  "severity": "P1",
+  "expected": "只有部位+信号、没有严重描述时，先出澄清卡（两个明确选项），不直接判急症",
+  "actual": {
+   "labels": [
+    "是的，确实有这种情况",
+    "没有，我没有这种情况"
+   ]
+  },
+  "pass": true,
+  "group": "B",
+  "persona": "红-急症",
+  "evidence": []
+ },
+ {
+  "id": "R3-B2-deny",
+  "severity": "P1",
+  "expected": "否认后继续常规问诊，不留下急症结论",
+  "actual": {
+   "risk": "undetermined",
+   "html": false
+  },
+  "pass": true,
+  "group": "B",
+  "persona": "红-急症",
+  "evidence": []
+ },
+ {
+  "id": "R3-B3-confirm",
+  "severity": "P1",
+  "expected": "确认后立即给急救指引（含 120）",
+  "actual": "先确认一下：这次是为谁咨询？\n你\n我自己\n请问是男是女？\n你\n男\n你多大？可直接写年龄，例如 32 岁。\n你\n58岁\n这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。\n你\n胸口有点疼\n想再确认一下你提到的情况，才能判断是否需要立即急救：这种不适具体是怎样的感觉（刺痛、压榨样闷痛还是其他感觉）？有没有放射到手臂、背部或下颌？有没有出汗、呼吸困难？是持续不缓解，还是间断出现、每次持续多久？",
+  "pass": true,
+  "group": "B",
+  "persona": "红-急症",
+  "evidence": []
+ },
+ {
+  "id": "R3-B4-direct",
+  "severity": "P0",
+  "expected": "明确的急症描述一轮直达急救，不先进澄清",
+  "actual": "先确认一下：这次是为谁咨询？\n你\n我自己\n请问是男是女？\n你\n男\n你多大？可直接写年龄，例如 32 岁。\n你\n58岁\n这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。\n你\n胸口像压了块大石头，喘不上气，一直出冷汗\n\n立即行动\n\n立即急救\n现在拨打 120\n\n我听到你说的这些了，先别慌，按下面的步骤来就可以。你描述的情况包含需要立即处理的危险信号（严重呼吸困难、高风险胸痛描述）。请现在拨打 120，等待时保持安静休息，不要自行",
+  "pass": true,
+  "group": "B",
+  "persona": "红-急症",
+  "evidence": []
+ },
+ {
+  "id": "R3-B6-fever",
+  "severity": "P0",
+  "expected": "3 岁孩子 40.2℃ 应尽快升级，不停在自护",
+  "actual": {
+   "kind": "urgent",
+   "risk": "urgent",
+   "hasToday": true
+  },
+  "pass": true,
+  "group": "B",
+  "persona": "黄-家长",
+  "evidence": []
+ },
+ {
+  "id": "R3-C1-skip",
+  "severity": "P1",
+  "expected": "跳过定位应记为「未做」，不能变成「没有」；然后回到原问题",
+  "actual": {
+   "location": {
+    "key": "symptom_location",
+    "value": {
+     "reason": "skip"
     },
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+    "assertion": "unknown",
+    "source": "patient",
+    "turn_id": "98afb57b-abe8-4cd5-bf57-cd7fd2109405",
+    "recorded_at": "2026-11-04T16:41:49.205715+00:00",
+    "quality": "not_done",
+    "supersedes": null,
+    "fact_id": "90072560-393a-4379-9fad-430d3fa0afed",
+    "evidence": "说不清/跳过"
+   },
+   "task": null
   },
-  {
-    "id": "R3-A3-signals",
-    "severity": "P1",
-    "expected": "急症筛查六个信号与三个选项同时在屏、不需滚动即可读全",
-    "actual": {
-      "signals": ["叫不醒", "抽搐", "嘴唇发紫", "呼吸困难", "胸痛", "出血"],
-      "viewport": {
-        "width": 1280,
-        "height": 900
-      }
+  "pass": true,
+  "group": "C",
+  "persona": "蓝-定位-C1",
+  "evidence": []
+ },
+ {
+  "id": "R3-C2-typed",
+  "severity": "P2",
+  "expected": "在定位任务里直接打字说部位时，要么接受、要么明确指引「点上面的图示」，且不静默丢弃",
+  "actual": {
+   "taskStillThere": true,
+   "tail": "活动、不能进食饮水，或日常活动能力明显下降的情况？你没有为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。已提供图示任务：指出最明显的不适部位你头/面部请先选择图示部位；文字补充应由问诊理解，不能直接当成位置记录。如说不清具体部位，可点“说不清”或跳过这一步。已提供图示任务：指出最明显的不适部位"
+  },
+  "pass": true,
+  "group": "C",
+  "persona": "蓝-定位-C2",
+  "evidence": []
+ },
+ {
+  "id": "R3-C3-cancel",
+  "severity": "P2",
+  "expected": "口头「取消定位」应结束任务并回到原问题",
+  "actual": {
+   "activeTask": "body_location"
+  },
+  "pass": false,
+  "group": "C",
+  "persona": "蓝-定位-C3",
+  "evidence": []
+ },
+ {
+  "id": "R3-C4-revise",
+  "severity": "P2",
+  "expected": "已记录的定位可以改，改完患者能看出「这条被改过」",
+  "actual": {
+   "revisionEntry": true,
+   "revised": true,
+   "value": "部位：头/面部；具体位置：头顶附近；左右：两侧；范围：一片范围"
+  },
+  "pass": true,
+  "group": "C",
+  "persona": "蓝-定位-C4",
+  "evidence": []
+ },
+ {
+  "id": "R3-C6-toggle",
+  "severity": "P2",
+  "expected": "任务卡占满屏时，回看对话记录的入口好找、回来也明确",
+  "actual": {
+   "forward": "展开对话记录",
+   "back": "返回当前任务",
+   "taskBack": true
+  },
+  "pass": true,
+  "group": "C",
+  "persona": "蓝-定位-C6",
+  "evidence": []
+ },
+ {
+  "id": "R3-D2-first",
+  "severity": "P1",
+  "expected": "第一次测量写成一条带测量方式的记录，而不是只当「说过一句」",
+  "actual": {
+   "fact": {
+    "key": "temperature_c",
+    "value": 38.2,
+    "assertion": "present",
+    "source": "caregiver",
+    "turn_id": "ef4128d8-53f1-4d8b-8370-dc1e3a5a9a50",
+    "recorded_at": "2026-11-05T00:32:47.224424+00:00",
+    "quality": "not_assessed",
+    "supersedes": null,
+    "fact_id": "25d9f69b-33c1-4c4d-afde-e67e1692b657",
+    "evidence": "38.2"
+   },
+   "readings": [
+    "not_assessed"
+   ]
+  },
+  "pass": true,
+  "group": "D",
+  "persona": "黄-测温",
+  "evidence": []
+ },
+ {
+  "id": "R3-D3-repeat",
+  "severity": "P2",
+  "expected": "再测一次时两次读数都保留，且患者能分清哪次是哪次",
+  "actual": {
+   "count": 2,
+   "beforeRepeat": 1,
+   "previousReadingShown": false,
+   "readings": [
+    {
+     "task_id": "axillary_temperature",
+     "quality": "not_assessed",
+     "assertion": "present",
+     "previous_reading_preserved": false
     },
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+    {
+     "task_id": "axillary_temperature",
+     "quality": "not_assessed",
+     "assertion": "present",
+     "previous_reading_preserved": false
+    }
+   ]
   },
-  {
-    "id": "R3-A6-drawer-language",
-    "severity": "P2",
-    "expected": "「已记录信息」抽屉用患者语言显示，不出现 sex/male/warning_* 这类内部字段名",
-    "actual": {
-      "hits": ["sex", "male"],
-      "sample": "咨询对象\n更正\n\n本人\n\nsex\n\nmale\n\n年龄\n更正\n\n32 岁\n\n主要问题\n更正\n\n后脑勺胀痛两天了，一阵一阵的\n\n紧急信号筛查\n\n用户否认上述紧急信号\n\n开始时间\n更正\n\n两天前开始的，一开始只是有点胀\n\n变化趋势\n更正\n\n阵发性"
-    },
-    "pass": false,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "D",
+  "persona": "黄-测温",
+  "evidence": []
+ },
+ {
+  "id": "R3-D4-quality",
+  "severity": "P0",
+  "expected": "「大概38度」不能当成确定的 38.0℃；应标为质量不足或请患者重填",
+  "actual": {
+   "last": {
+    "task_id": "axillary_temperature",
+    "quality": "inadequate",
+    "assertion": "unknown",
+    "previous_reading_preserved": true
+   },
+   "fact": {
+    "key": "temperature_c",
+    "value": 38.6,
+    "assertion": "present",
+    "source": "caregiver",
+    "turn_id": "28f6a797-8ba8-4224-8782-c033a1a6ba55",
+    "recorded_at": "2026-11-05T00:32:52.539955+00:00",
+    "quality": "not_assessed",
+    "supersedes": "25d9f69b-33c1-4c4d-afde-e67e1692b657",
+    "fact_id": "5ced5a9e-9cb3-46dd-9547-3015437249d1",
+    "evidence": "38.6"
+   },
+   "flagged": true,
+   "certain": false
   },
-  {
-    "id": "R3-A6-summary-edit",
-    "severity": "P3",
-    "expected": "摘要卡提供逐项更正（这是好的），但同一动作在抽屉里叫「更正」、未知项叫「补充 / 更正」",
-    "actual": {
-      "edits": 11,
-      "labels": ["更正"]
-    },
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "D",
+  "persona": "黄-测温",
+  "evidence": []
+ },
+ {
+  "id": "R3-D5-skip",
+  "severity": "P2",
+  "expected": "跳过测量后回到原问题，并说明数据不会被当成「没有测」",
+  "actual": {
+   "activeTask": null,
+   "temperature": {
+    "key": "temperature_c",
+    "value": 38.6,
+    "assertion": "present",
+    "source": "caregiver",
+    "turn_id": "28f6a797-8ba8-4224-8782-c033a1a6ba55",
+    "recorded_at": "2026-11-05T00:32:52.539955+00:00",
+    "quality": "not_assessed",
+    "supersedes": "25d9f69b-33c1-4c4d-afde-e67e1692b657",
+    "fact_id": "5ced5a9e-9cb3-46dd-9547-3015437249d1",
+    "evidence": "38.6"
+   }
   },
-  {
-    "id": "R3-A8-naming",
-    "severity": "P3",
-    "expected": "同一个动作在不同位置的叫法一致（抽屉「更正」/ 摘要「更正」/「补充 / 更正」）",
-    "actual": {
-      "unique": ["更正"],
-      "all": ["更正", "修改定位"]
-    },
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "D",
+  "persona": "黄-测温",
+  "evidence": []
+ },
+ {
+  "id": "R3-E1-glucose",
+  "severity": "P2",
+  "expected": "记录血糖表单可用，保存后时间线出现条目",
+  "actual": {
+   "cards": 1,
+   "empty": false
   },
-  {
-    "id": "R3-A9-conclusion",
-    "severity": "P1",
-    "expected": "确认后出现结论单与随访安排",
-    "actual": {
-      "conclusion": true,
-      "followUp": true,
-      "phase": "closed"
-    },
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "E",
+  "persona": "蓝-档案",
+  "evidence": []
+ },
+ {
+  "id": "R3-E2-bp",
+  "severity": "P2",
+  "expected": "血压这类双值测量能一次录入，两个数都留下",
+  "actual": {
+   "hasBoth": true,
+   "sample": "05日\n2026年11月\n血压自测\n血压 128/84 mmHg\n已归档\n05日\n2026年11月\n血糖自测\n血糖 5.6 mmol/L\n已归档"
   },
-  {
-    "id": "R3-A9-overflow",
-    "severity": "P2",
-    "expected": "结论单在 1280 宽下没有横向溢出",
-    "actual": [],
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "E",
+  "persona": "蓝-档案",
+  "evidence": []
+ },
+ {
+  "id": "R3-E3-calculation",
+  "severity": "P2",
+  "expected": "患者明确要求「算 BMI」时，要么给出计算卡，要么说明这一步在当前模式里做不到",
+  "actual": {
+   "kind": "question",
+   "questionId": "emergency_screen",
+   "tail": "先确认一下：这次是为谁咨询？你我自己请问是男是女？你男你多大？可直接写年龄，例如 32 岁。你32岁这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。你帮我算一下 BMI，身高175厘米，体重70公斤你说帮我算一下 BMI，身高175厘米，体重70公斤，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？"
   },
-  {
-    "id": "R3-A9-tokens",
-    "severity": "P1",
-    "expected": "结论单不出现内部枚举（self/stable/null…）",
-    "actual": {
-      "token": "male",
-      "sample": "话与来源\n影响程度\n6 / 10\n系统整理\n已确认\n原话与来源\n当前不适\n性别\nmale\n系统整理\n已确认\n原话与来源\n主要问题\n最近三天太阳穴胀痛，越来越重\n"
-    },
-    "pass": false,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": false,
+  "group": "E",
+  "persona": "蓝-计算",
+  "evidence": []
+ },
+ {
+  "id": "R3-E4-registry",
+  "severity": "P2",
+  "expected": "能力目录里确实有量表/公式，但患者在 demo 的对话里没有任何入口",
+  "actual": {
+   "total": 132,
+   "scales": 36,
+   "formulas": 21
   },
-  {
-    "id": "R3-B1-clarify",
-    "severity": "P1",
-    "expected": "只有部位+信号、没有严重描述时，先出澄清卡（两个明确选项），不直接判急症",
-    "actual": {
-      "labels": ["是的，确实有这种情况", "没有，我没有这种情况"]
-    },
-    "pass": true,
-    "group": "B",
-    "persona": "红-急症",
-    "evidence": []
+  "pass": true,
+  "group": "E",
+  "persona": "蓝-计算",
+  "evidence": []
+ },
+ {
+  "id": "R3-F2-subject",
+  "severity": "P2",
+  "expected": "明确要替另一位家人问时，给出换人卡片（两个动作），不打断当前记录",
+  "actual": {
+   "kind": "question",
+   "labels": [
+    "先选择分数",
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10"
+   ]
   },
-  {
-    "id": "R3-B2-deny",
-    "severity": "P1",
-    "expected": "否认后继续常规问诊，不留下急症结论",
-    "actual": {
-      "risk": "undetermined",
-      "html": false
-    },
-    "pass": true,
-    "group": "B",
-    "persona": "红-急症",
-    "evidence": []
+  "pass": false,
+  "group": "F",
+  "persona": "王-代答",
+  "evidence": []
+ },
+ {
+  "id": "R3-F2-yesword",
+  "severity": "P0",
+  "expected": "在「急症筛查」这一题上说与本题无关的话（这里是一句换人请求）不能被判成「有危险信号」",
+  "actual": {
+   "kind": "question",
+   "screenFact": {
+    "key": "emergency_screen",
+    "value": null,
+    "assertion": "unknown",
+    "source": "caregiver",
+    "turn_id": "ab76c7da-0828-4b3b-a3fa-d61f3c6c4e76",
+    "recorded_at": "2026-11-05T00:29:16.442690+00:00",
+    "quality": "not_assessed",
+    "supersedes": null,
+    "fact_id": "d9016e65-4ea2-4031-b683-40b68ca67f33",
+    "evidence": "对了，帮我儿子也看一下，他也咳嗽"
+   },
+   "trigger": "interpreter 用 raw.startswith(「有」「是」「对」) 判定 yes——「对了…」命中了「对」"
   },
-  {
-    "id": "R3-B3-confirm",
-    "severity": "P1",
-    "expected": "确认后立即给急救指引（含 120）",
-    "actual": "先确认一下：这次是为谁咨询？\n你\n我自己\n请问是男是女？\n你\n男\n你多大？可直接写年龄，例如 32 岁。\n你\n58岁\n这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。\n你\n胸口有点疼\n想再确认一下你提到的情况，才能判断是否需要立即急救：这种不适具体是怎样的感觉（刺痛、压榨样闷痛还是其他感觉）？有没有放射到手臂、背部或下颌？有没有出汗、呼吸困难？是持续不缓解，还是间断出现、每次持续多久？",
-    "pass": true,
-    "group": "B",
-    "persona": "红-急症",
-    "evidence": []
+  "pass": true,
+  "group": "F",
+  "persona": "王-代答",
+  "evidence": []
+ },
+ {
+  "id": "R3-F3-natural",
+  "severity": "P2",
+  "expected": "「这次先给我先生问一下」是很自然的换人说法，应被识别（或在答完当前题后追问）",
+  "actual": {
+   "kind": "question",
+   "questionId": "trajectory",
+   "note": "关系词表有丈夫/老公，没有「先生」"
   },
-  {
-    "id": "R3-B4-direct",
-    "severity": "P0",
-    "expected": "明确的急症描述一轮直达急救，不先进澄清",
-    "actual": "先确认一下：这次是为谁咨询？\n你\n我自己\n请问是男是女？\n你\n男\n你多大？可直接写年龄，例如 32 岁。\n你\n58岁\n这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。\n你\n胸口像压了块大石头，喘不上气，一直出冷汗\n\n立即行动\n\n立即急救\n现在拨打 120\n\n我听到你说的这些了，先别慌，按下面的步骤来就可以。你描述的情况包含需要立即处理的危险信号（严重呼吸困难、高风险胸痛描述）。请现在拨打 120，等待时保持安静休息，不要自行",
-    "pass": true,
-    "group": "B",
-    "persona": "红-急症",
-    "evidence": []
+  "pass": false,
+  "group": "F",
+  "persona": "王-代答",
+  "evidence": []
+ },
+ {
+  "id": "R3-F4-continue",
+  "severity": "P2",
+  "expected": "选「继续当前问诊」后回到原来的问题，不丢进度",
+  "actual": {
+   "consultFor": {
+    "key": "consult_for",
+    "value": "child",
+    "assertion": "present",
+    "source": "patient",
+    "turn_id": "737ffba9-732c-4815-bb46-6f71499f2142",
+    "recorded_at": "2026-11-05T00:29:18.360088+00:00",
+    "quality": "not_assessed",
+    "supersedes": null,
+    "fact_id": "741d59bf-0713-406a-b738-b536deb81a0f",
+    "evidence": "孩子"
+   },
+   "phase": "history"
   },
-  {
-    "id": "R3-B6-fever",
-    "severity": "P0",
-    "expected": "3 岁孩子 40.2℃ 应尽快升级，不停在自护",
-    "actual": {
-      "kind": "urgent",
-      "risk": "urgent",
-      "hasToday": true
-    },
-    "pass": true,
-    "group": "B",
-    "persona": "黄-家长",
-    "evidence": []
+  "pass": true,
+  "group": "F",
+  "persona": "王-代答",
+  "evidence": []
+ },
+ {
+  "id": "R3-G1-followup",
+  "severity": "P2",
+  "expected": "会话结束后「待随访」区出现，并说清什么时候回访",
+  "actual": "待随访\n\n上次问诊约定的回访时间到了，请记录现在的近况；如果加重， 系统会为你开启一次新的问诊。\n\n桌面通知仅在应用打开时送达：关闭应用后不会推送，到期项仍会在这里和顶部徽标中汇总。\n\n咳嗽三天，有痰\n例行回访 · 摘要已确认，例行回访确认恢复情况\n约定回访时间 11月8日 00:29\n待随访\n记录近况",
+  "pass": true,
+  "group": "G",
+  "persona": "李-随访",
+  "evidence": []
+ },
+ {
+  "id": "R3-G2-outcomes",
+  "severity": "P3",
+  "expected": "随访结局覆盖「好了/好转/没变/加重/已就医/已住院」",
+  "actual": {
+   "outcomes": 6
   },
-  {
-    "id": "R3-C1-skip",
-    "severity": "P1",
-    "expected": "跳过定位应记为「未做」，不能变成「没有」；然后回到原问题",
-    "actual": {
-      "location": {
-        "key": "symptom_location",
-        "value": {
-          "reason": "skip"
-        },
-        "assertion": "unknown",
-        "source": "patient",
-        "turn_id": "98afb57b-abe8-4cd5-bf57-cd7fd2109405",
-        "recorded_at": "2026-11-04T16:41:49.205715+00:00",
-        "quality": "not_done",
-        "supersedes": null,
-        "fact_id": "90072560-393a-4379-9fad-430d3fa0afed",
-        "evidence": "说不清/跳过"
-      },
-      "task": null
-    },
-    "pass": true,
-    "group": "C",
-    "persona": "蓝-定位-C1",
-    "evidence": []
+  "pass": true,
+  "group": "G",
+  "persona": "李-随访",
+  "evidence": []
+ },
+ {
+  "id": "R3-G3-saved",
+  "severity": "P2",
+  "expected": "记录近况后对话框关闭，待随访区不再把这条算作待办",
+  "actual": {
+   "dialogOpen": false,
+   "list": ""
   },
-  {
-    "id": "R3-C2-typed",
-    "severity": "P2",
-    "expected": "在定位任务里直接打字说部位时，要么接受、要么明确指引「点上面的图示」，且不静默丢弃",
-    "actual": {
-      "taskStillThere": true,
-      "tail": "活动、不能进食饮水，或日常活动能力明显下降的情况？你没有为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。已提供图示任务：指出最明显的不适部位你头/面部请先选择图示部位；文字补充应由问诊理解，不能直接当成位置记录。如说不清具体部位，可点“说不清”或跳过这一步。已提供图示任务：指出最明显的不适部位"
-    },
-    "pass": true,
-    "group": "C",
-    "persona": "蓝-定位-C2",
-    "evidence": []
+  "pass": true,
+  "group": "G",
+  "persona": "李-随访",
+  "evidence": []
+ },
+ {
+  "id": "R3-G4-retriage",
+  "severity": "P1",
+  "expected": "反馈「加重了」时，系统要主动重分诊，并说明为什么、下一步是什么",
+  "actual": {
+   "retriage": true,
+   "tail": "FOLLOW-UP\n\n记录随访近况\n\n肚子不舒服两天 · 例行回访（约定 11月7日 00:30）\n\n现在感觉怎么样\n已痊愈\n好转中\n没有变化\n加重了\n已经就医\n已经住院\n备注（可选）\n\n已记录近况：情况有变，需要重新分诊。\n\n已记录。你反馈的情况需要重新分诊， 系统已经为你开启了一次新的问诊。\n\n进入新的问诊\n取消\n保存记录"
   },
-  {
-    "id": "R3-C3-cancel",
-    "severity": "P2",
-    "expected": "口头「取消定位」应结束任务并回到原问题",
-    "actual": {
-      "activeTask": "body_location"
-    },
-    "pass": false,
-    "group": "C",
-    "persona": "蓝-定位-C3",
-    "evidence": []
+  "pass": true,
+  "group": "G",
+  "persona": "李-随访",
+  "evidence": []
+ },
+ {
+  "id": "R3-H1-report-entry",
+  "severity": "P3",
+  "expected": "刚开场、还没有任何记录时，「添加报告内容 / 就诊交接摘要」不该是可点的空上下文",
+  "actual": {
+   "report": true,
+   "handoff": true
   },
-  {
-    "id": "R3-C4-revise",
-    "severity": "P2",
-    "expected": "已记录的定位可以改，改完患者能看出「这条被改过」",
-    "actual": {
-      "revisionEntry": true,
-      "revised": true,
-      "value": "部位：头/面部；具体位置：头顶附近；左右：两侧；范围：一片范围"
-    },
-    "pass": true,
-    "group": "C",
-    "persona": "蓝-定位-C4",
-    "evidence": []
+  "pass": false,
+  "group": "H",
+  "persona": "赵-报告",
+  "evidence": []
+ },
+ {
+  "id": "R3-H1-silent-withdraw",
+  "severity": "P1",
+  "expected": "改主诉后旧答案被撤回、急症筛查被重问，界面要说明「哪些回答需要重来、为什么」",
+  "actual": {
+   "withdrawn": [
+    "onset",
+    "trajectory",
+    "severity"
+   ],
+   "explained": true,
+   "toast": "已更新“主要问题”，摘要已重新整理。",
+   "note": "唯一反馈是 toast，且说的是「摘要已重新整理」"
   },
-  {
-    "id": "R3-C6-toggle",
-    "severity": "P2",
-    "expected": "任务卡占满屏时，回看对话记录的入口好找、回来也明确",
-    "actual": {
-      "forward": "展开对话记录",
-      "back": "返回当前任务",
-      "taskBack": true
-    },
-    "pass": true,
-    "group": "C",
-    "persona": "蓝-定位-C6",
-    "evidence": []
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-H2-edit-entry",
+  "severity": "P2",
+  "expected": "进行中想改一句刚说的话时，问题卡/对话上没有入口，只能想到去开「已记录信息」抽屉",
+  "actual": {
+   "inDrawer": 4,
+   "onMain": 0
   },
-  {
-    "id": "R3-D2-first",
-    "severity": "P1",
-    "expected": "第一次测量写成一条带测量方式的记录，而不是只当「说过一句」",
-    "actual": {
-      "fact": {
-        "key": "temperature_c",
-        "value": 38.2,
-        "assertion": "present",
-        "source": "caregiver",
-        "turn_id": "aa324428-f74a-46df-b7f6-363afc463f20",
-        "recorded_at": "2026-11-04T16:59:10.705316+00:00",
-        "quality": "not_assessed",
-        "supersedes": null,
-        "fact_id": "76fa7888-5a4d-43d6-9f98-76b869192144",
-        "evidence": "38.2"
-      },
-      "readings": ["not_assessed"]
-    },
-    "pass": true,
-    "group": "D",
-    "persona": "黄-测温",
-    "evidence": []
+  "pass": true,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-H2-parse",
+  "severity": "P1",
+  "expected": "真实检验单的两种行格式（括注参考、血压比值）都能被提取，共 3 项待核对",
+  "actual": {
+   "confirms": 3
   },
-  {
-    "id": "R3-D3-repeat",
-    "severity": "P2",
-    "expected": "再测一次时两次读数都保留，且患者能分清哪次是哪次",
-    "actual": {
-      "count": 2,
-      "beforeRepeat": 1,
-      "previousReadingShown": false,
-      "readings": [
-        {
-          "task_id": "axillary_temperature",
-          "quality": "not_assessed",
-          "assertion": "present",
-          "previous_reading_preserved": false
-        },
-        {
-          "task_id": "axillary_temperature",
-          "quality": "not_assessed",
-          "assertion": "present",
-          "previous_reading_preserved": false
-        }
-      ]
-    },
-    "pass": true,
-    "group": "D",
-    "persona": "黄-测温",
-    "evidence": []
+  "pass": true,
+  "group": "H",
+  "persona": "赵-报告",
+  "evidence": []
+ },
+ {
+  "id": "R3-H4-closed-reload",
+  "severity": "P2",
+  "expected": "已结束的会话刷新后仍能回到刚才的结论（与「进行中自动恢复」一致）",
+  "actual": {
+   "welcome": true,
+   "conclusion": false,
+   "hash": "#consultation"
   },
-  {
-    "id": "R3-D4-quality",
-    "severity": "P0",
-    "expected": "「大概38度」不能当成确定的 38.0℃；应标为质量不足或请患者重填",
-    "actual": {
-      "last": {
-        "task_id": "axillary_temperature",
-        "quality": "not_assessed",
-        "assertion": "present",
-        "previous_reading_preserved": false
-      },
-      "fact": {
-        "key": "temperature_c",
-        "value": 38,
-        "assertion": "present",
-        "source": "caregiver",
-        "turn_id": "22d6a6ad-fd11-4055-a1fa-ed3cbf80a79d",
-        "recorded_at": "2026-11-04T16:59:21.020099+00:00",
-        "quality": "not_assessed",
-        "supersedes": "8cc99439-c0de-4420-aae6-ac19992b00d3",
-        "fact_id": "e0f26402-f05e-488b-b6fc-c1b3633e6c5f",
-        "evidence": "大概38度"
-      },
-      "flagged": false,
-      "certain": false
-    },
-    "pass": false,
-    "group": "D",
-    "persona": "黄-测温",
-    "evidence": []
+  "pass": false,
+  "group": "A",
+  "persona": "蓝-自护",
+  "evidence": []
+ },
+ {
+  "id": "R3-H4-remove",
+  "severity": "P3",
+  "expected": "移除已确认的报告项可用，且与全站自绘对话框风格一致（这里用的是浏览器原生 confirm）",
+  "actual": {
+   "left": "本次问诊使用的数据\n2 项\n总胆固醇\n6.2 mmol/L\n移除\n血压\n128/84 mmHg\n移除"
   },
-  {
-    "id": "R3-D5-skip",
-    "severity": "P2",
-    "expected": "跳过测量后回到原问题，并说明数据不会被当成「没有测」",
-    "actual": {
-      "activeTask": null,
-      "temperature": {
-        "key": "temperature_c",
-        "value": 38,
-        "assertion": "present",
-        "source": "caregiver",
-        "turn_id": "22d6a6ad-fd11-4055-a1fa-ed3cbf80a79d",
-        "recorded_at": "2026-11-04T16:59:21.020099+00:00",
-        "quality": "not_assessed",
-        "supersedes": "8cc99439-c0de-4420-aae6-ac19992b00d3",
-        "fact_id": "e0f26402-f05e-488b-b6fc-c1b3633e6c5f",
-        "evidence": "大概38度"
-      }
-    },
-    "pass": true,
-    "group": "D",
-    "persona": "黄-测温",
-    "evidence": []
+  "pass": true,
+  "group": "H",
+  "persona": "赵-报告",
+  "evidence": []
+ },
+ {
+  "id": "R3-H5-defer-gate",
+  "severity": "P1",
+  "expected": "疼到 8 分仍在追问时，界面要说明「为什么还要问、以及现在就可以去」",
+  "actual": {
+   "kind": "question",
+   "questionId": "associated_symptoms",
+   "explains": true
   },
-  {
-    "id": "R3-E1-glucose",
-    "severity": "P2",
-    "expected": "记录血糖表单可用，保存后时间线出现条目",
-    "actual": {
-      "cards": 1,
-      "empty": false
-    },
-    "pass": true,
-    "group": "E",
-    "persona": "蓝-档案",
-    "evidence": []
+  "pass": true,
+  "group": "B",
+  "persona": "红-急症",
+  "evidence": []
+ },
+ {
+  "id": "R3-I1-entrances",
+  "severity": "P2",
+  "expected": "档案首页的三个入口清晰，且不与右上角按钮重复",
+  "actual": [
+   "记录血糖",
+   "上传医疗图片",
+   "记录测量"
+  ],
+  "pass": true,
+  "group": "I",
+  "persona": "钱-档案",
+  "evidence": []
+ },
+ {
+  "id": "R3-I2-baseline",
+  "severity": "P2",
+  "expected": "基线信息保存后刷新仍在（身高体重是计算类能力的前置）",
+  "actual": {
+   "year": "1992"
   },
-  {
-    "id": "R3-E2-bp",
-    "severity": "P2",
-    "expected": "血压这类双值测量能一次录入，两个数都留下",
-    "actual": {
-      "hasBoth": true,
-      "sample": "05日\n2026年11月\n血压自测\n血压 128/84 mmHg\n已归档\n05日\n2026年11月\n血糖自测\n血糖 5.6 mmol/L\n已归档"
-    },
-    "pass": true,
-    "group": "E",
-    "persona": "蓝-档案",
-    "evidence": []
+  "pass": true,
+  "group": "I",
+  "persona": "钱-档案",
+  "evidence": []
+ },
+ {
+  "id": "R3-I3-member",
+  "severity": "P2",
+  "expected": "添加成员后列表出现，并说明「现在看的是谁」",
+  "actual": {
+   "hasMember": true,
+   "sample": "我的健康档案\n本人\n当前查看\n设为本次问诊对象\n改名\n小明\n成员\n切换查看\n设为本次问诊对象\n改名\n归档"
   },
-  {
-    "id": "R3-E3-calculation",
-    "severity": "P2",
-    "expected": "患者明确要求「算 BMI」时，要么给出计算卡，要么说明这一步在当前模式里做不到",
-    "actual": {
-      "kind": "question",
-      "questionId": "emergency_screen",
-      "tail": "先确认一下：这次是为谁咨询？你我自己请问是男是女？你男你多大？可直接写年龄，例如 32 岁。你32岁这次最想解决的一个问题是什么？请按自己的话说，我会逐步追问。你帮我算一下 BMI，身高175厘米，体重70公斤你说帮我算一下 BMI，身高175厘米，体重70公斤，再问一句：此刻有没有以下任一情况：叫不醒或意识明显异常、抽搐、嘴唇发紫、严重呼吸困难、持续压榨样胸痛，或大出血？"
-    },
-    "pass": false,
-    "group": "E",
-    "persona": "蓝-计算",
-    "evidence": []
+  "pass": true,
+  "group": "I",
+  "persona": "钱-档案",
+  "evidence": []
+ },
+ {
+  "id": "R3-I4-vision",
+  "severity": "P2",
+  "expected": "离线下上传图片时，要说清「图已归档，但没有视觉模型所以没识别」，而不是只报错",
+  "actual": {
+   "feedback": "图片尺寸不在支持范围内",
+   "notice": "\n              \n              原图、识别结果和修改记录分别保留；待核对内容不会自动进入问诊。\n            "
   },
-  {
-    "id": "R3-E4-registry",
-    "severity": "P2",
-    "expected": "能力目录里确实有量表/公式，但患者在 demo 的对话里没有任何入口",
-    "actual": {
-      "total": 132,
-      "scales": 36,
-      "formulas": 21
-    },
-    "pass": true,
-    "group": "E",
-    "persona": "蓝-计算",
-    "evidence": []
+  "pass": true,
+  "group": "I",
+  "persona": "钱-档案",
+  "evidence": []
+ },
+ {
+  "id": "R3-J1-theme",
+  "severity": "P2",
+  "expected": "外观切换即时生效（夜航为深色）",
+  "actual": {
+   "theme": "night"
   },
-  {
-    "id": "R3-F2-subject",
-    "severity": "P2",
-    "expected": "明确要替另一位家人问时，给出换人卡片（两个动作），不打断当前记录",
-    "actual": {
-      "kind": "question",
-      "labels": [
-        "先选择分数",
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10"
-      ]
-    },
-    "pass": false,
-    "group": "F",
-    "persona": "王-代答",
-    "evidence": []
+  "pass": true,
+  "group": "J",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-J3-persist",
+  "severity": "P2",
+  "expected": "「下次打开会保留」要真的保留（主题与字号刷新后仍生效）",
+  "actual": {
+   "theme": "night",
+   "font": "large",
+   "fontScaleAtSwitch": "large"
   },
-  {
-    "id": "R3-F2-yesword",
-    "severity": "P0",
-    "expected": "在「急症筛查」这一题上说与本题无关的话（这里是一句换人请求）不能被判成「有危险信号」",
-    "actual": {
-      "kind": "emergency",
-      "screenFact": {
-        "key": "emergency_screen",
-        "value": true,
-        "assertion": "present",
-        "source": "caregiver",
-        "turn_id": "9a20fbe6-d94a-4cbf-b20a-4dc520817cfb",
-        "recorded_at": "2026-11-04T16:32:23.861108+00:00",
-        "quality": "not_assessed",
-        "supersedes": null,
-        "fact_id": "71b3ef35-eac1-42c8-8de1-70fd71da1bb2",
-        "evidence": "对了，帮我儿子也看一下，他也咳嗽"
-      },
-      "trigger": "interpreter 用 raw.startswith(「有」「是」「对」) 判定 yes——「对了…」命中了「对」"
-    },
-    "pass": false,
-    "group": "F",
-    "persona": "王-代答",
-    "evidence": []
+  "pass": true,
+  "group": "J",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-J4-mode",
+  "severity": "P2",
+  "expected": "患者能自己切到「完整研发界面」，也要能明确切回来",
+  "actual": {
+   "devNav": true,
+   "stillVisibleAfterSwitchBack": false
   },
-  {
-    "id": "R3-F3-natural",
-    "severity": "P2",
-    "expected": "「这次先给我先生问一下」是很自然的换人说法，应被识别（或在答完当前题后追问）",
-    "actual": {
-      "kind": "question",
-      "questionId": "trajectory",
-      "note": "关系词表有丈夫/老公，没有「先生」"
-    },
-    "pass": false,
-    "group": "F",
-    "persona": "王-代答",
-    "evidence": []
+  "pass": true,
+  "group": "J",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-K1-channels",
+  "severity": "P2",
+  "expected": "交接摘要给出去就诊的四个通道（复制/打印/.md/.txt）与免责声明齐全",
+  "actual": {
+   "buttons": [
+    "",
+    "复制摘要",
+    "打印摘要",
+    "导出 .md",
+    "导出 .txt"
+   ],
+   "disclaimer": true
   },
-  {
-    "id": "R3-F4-continue",
-    "severity": "P2",
-    "expected": "选「继续当前问诊」后回到原来的问题，不丢进度",
-    "actual": {
-      "consultFor": {
-        "key": "consult_for",
-        "value": "child",
-        "assertion": "present",
-        "source": "patient",
-        "turn_id": "0055b3fd-ee12-4331-9383-21694c7a3196",
-        "recorded_at": "2026-11-04T16:32:25.626661+00:00",
-        "quality": "not_assessed",
-        "supersedes": null,
-        "fact_id": "6d749baf-c107-4b52-9f85-8f70555b6095",
-        "evidence": "孩子"
-      },
-      "phase": "history"
-    },
-    "pass": true,
-    "group": "F",
-    "persona": "王-代答",
-    "evidence": []
+  "pass": true,
+  "group": "K",
+  "persona": "周-导出",
+  "evidence": []
+ },
+ {
+  "id": "R3-K2-copy",
+  "severity": "P1",
+  "expected": "复制出来的摘要不出现内部枚举（self/male/stable/null）",
+  "actual": {
+   "hit": null,
+   "chars": 247,
+   "sample": "就诊摘要（预问诊版）\n咨询对象：本人\n性别：男\n年龄：30\n主要问题：咳嗽三天，有痰\n急症筛查：没有\n呼吸情况：呼吸正常，不喘\n变化趋势：变化不大\n影响程度：4\n伴随不适：没有别的不舒服\n开始时间：三天前开始的\n咳嗽细节：干咳，没有痰\n进食饮水与排尿：能正常喝水吃饭\n已报告用药与处理：没吃药\n过敏信息：已明确没有\n相关"
   },
-  {
-    "id": "R3-G1-followup",
-    "severity": "P2",
-    "expected": "会话结束后「待随访」区出现，并说清什么时候回访",
-    "actual": "待随访\n\n上次问诊约定的回访时间到了，请记录现在的近况；如果加重， 系统会为你开启一次新的问诊。\n\n桌面通知仅在应用打开时送达：关闭应用后不会推送，到期项仍会在这里和顶部徽标中汇总。\n\n咳嗽三天，有痰\n例行回访 · 摘要已确认，例行回访确认恢复情况\n约定回访时间 11月8日 00:29\n待随访\n记录近况",
-    "pass": true,
-    "group": "G",
-    "persona": "李-随访",
-    "evidence": []
+  "pass": true,
+  "group": "K",
+  "persona": "周-导出",
+  "evidence": []
+ },
+ {
+  "id": "R3-K3-print",
+  "severity": "P2",
+  "expected": "打印页能打开、内容完整、带免责声明；被浏览器拦截时要有替代路径",
+  "actual": {
+   "opened": true
   },
-  {
-    "id": "R3-G2-outcomes",
-    "severity": "P3",
-    "expected": "随访结局覆盖「好了/好转/没变/加重/已就医/已住院」",
-    "actual": {
-      "outcomes": 6
-    },
-    "pass": true,
-    "group": "G",
-    "persona": "李-随访",
-    "evidence": []
+  "pass": true,
+  "group": "K",
+  "persona": "周-导出",
+  "evidence": []
+ },
+ {
+  "id": "R3-K4-export",
+  "severity": "P1",
+  "expected": "导出的 .md / .txt 都是完整摘要，且不含内部枚举；.txt 不应残留 Markdown 记号",
+  "actual": {
+   "md": {
+    "name": "就诊交接摘要.md",
+    "chars": 806,
+    "head": "# 就诊摘要（预问诊版）\n\n## 结论\n\n- 处置：可以先在家观察；如果提前加重或出现下方任何警示信号，请及时就医。\n- 建议窗口：72 小时内\n- 建议科室："
+   },
+   "txt": {
+    "name": "就诊交接摘要.txt",
+    "chars": 702,
+    "hasMarkdown": false
+   },
+   "internal": false
   },
-  {
-    "id": "R3-G3-saved",
-    "severity": "P2",
-    "expected": "记录近况后对话框关闭，待随访区不再把这条算作待办",
-    "actual": {
-      "dialogOpen": false,
-      "list": ""
-    },
-    "pass": true,
-    "group": "G",
-    "persona": "李-随访",
-    "evidence": []
+  "pass": true,
+  "group": "K",
+  "persona": "周-导出",
+  "evidence": []
+ },
+ {
+  "id": "R3-L1-mobile",
+  "severity": "P1",
+  "expected": "390px 宽下问诊可读可点，没有横向溢出",
+  "actual": {
+   "overflow": [],
+   "smallTargets": []
   },
-  {
-    "id": "R3-G4-retriage",
-    "severity": "P1",
-    "expected": "反馈「加重了」时，系统要主动重分诊，并说明为什么、下一步是什么",
-    "actual": {
-      "retriage": true,
-      "tail": "FOLLOW-UP\n\n记录随访近况\n\n肚子不舒服两天 · 例行回访（约定 11月7日 00:30）\n\n现在感觉怎么样\n已痊愈\n好转中\n没有变化\n加重了\n已经就医\n已经住院\n备注（可选）\n\n已记录近况：情况有变，需要重新分诊。\n\n已记录。你反馈的情况需要重新分诊， 系统已经为你开启了一次新的问诊。\n\n进入新的问诊\n取消\n保存记录"
-    },
-    "pass": true,
-    "group": "G",
-    "persona": "李-随访",
-    "evidence": []
+  "pass": true,
+  "group": "L",
+  "persona": "吴-窄屏",
+  "evidence": []
+ },
+ {
+  "id": "R3-L3-mobile-handoff",
+  "severity": "P2",
+  "expected": "390px 下交接摘要的四个通道不溢出、可点",
+  "actual": [],
+  "pass": true,
+  "group": "L",
+  "persona": "吴-窄屏",
+  "evidence": []
+ },
+ {
+  "id": "R3-M1-offline",
+  "severity": "P1",
+  "expected": "服务不可用时，错误条要说清「发生了什么、下一步怎么办」，而不是只留一个按钮",
+  "actual": {
+   "status": "服务未连接",
+   "alertText": "重新连接",
+   "retryVisible": true
   },
-  {
-    "id": "R3-H1-report-entry",
-    "severity": "P3",
-    "expected": "刚开场、还没有任何记录时，「添加报告内容 / 就诊交接摘要」不该是可点的空上下文",
-    "actual": {
-      "report": true,
-      "handoff": true
-    },
-    "pass": false,
-    "group": "H",
-    "persona": "赵-报告",
-    "evidence": []
+  "pass": true,
+  "group": "M",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-M2-retry",
+  "severity": "P2",
+  "expected": "重连失败时给出可执行的下一步（检查桌面应用/端口），而不只是一句「无法连接」",
+  "actual": {
+   "toast": "无法连接本机服务：Failed to fetch"
   },
-  {
-    "id": "R3-H1-silent-withdraw",
-    "severity": "P1",
-    "expected": "改主诉后旧答案被撤回、急症筛查被重问，界面要说明「哪些回答需要重来、为什么」",
-    "actual": {
-      "withdrawn": ["onset", "trajectory", "severity"],
-      "explained": false,
-      "toast": "已更新“主要问题”，摘要已重新整理。",
-      "note": "唯一反馈是 toast，且说的是「摘要已重新整理」"
-    },
-    "pass": false,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": false,
+  "group": "M",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-M3-recover",
+  "severity": "P2",
+  "expected": "服务恢复后刷新能回到可用状态",
+  "actual": {
+   "status": "本机服务已连接"
   },
-  {
-    "id": "R3-H2-edit-entry",
-    "severity": "P2",
-    "expected": "进行中想改一句刚说的话时，问题卡/对话上没有入口，只能想到去开「已记录信息」抽屉",
-    "actual": {
-      "inDrawer": 3,
-      "onMain": 0
-    },
-    "pass": true,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "M",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-M4-404",
+  "severity": "P3",
+  "expected": "打开不存在的会话时返回可理解的中文错误",
+  "actual": {
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"session_not_found\", \"message\": \"找不到该问诊会话\"}}"
   },
-  {
-    "id": "R3-H2-parse",
-    "severity": "P1",
-    "expected": "真实检验单的两种行格式（括注参考、血压比值）都能被提取，共 3 项待核对",
-    "actual": {
-      "confirms": 3
-    },
-    "pass": true,
-    "group": "H",
-    "persona": "赵-报告",
-    "evidence": []
+  "pass": true,
+  "group": "M",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-M5-double",
+  "severity": "P2",
+  "expected": "快速双击发送只产生一条用户消息（不会重复提交）",
+  "actual": {
+   "occurrences": 1,
+   "phase": "opening"
   },
-  {
-    "id": "R3-H4-closed-reload",
-    "severity": "P2",
-    "expected": "已结束的会话刷新后仍能回到刚才的结论（与「进行中自动恢复」一致）",
-    "actual": {
-      "welcome": true,
-      "conclusion": false,
-      "hash": "#consultation"
-    },
-    "pass": false,
-    "group": "A",
-    "persona": "蓝-自护",
-    "evidence": []
+  "pass": true,
+  "group": "M",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-M6-closed",
+  "severity": "P2",
+  "expected": "问诊结束后输入区收起，患者不会以為还能继续这段对话",
+  "actual": {
+   "composerVisible": false,
+   "note": "服务端的「已结束」守护话术在 UI 上不可达；改了主诉想继续时，只能自己找到「新的问诊」"
   },
-  {
-    "id": "R3-H4-remove",
-    "severity": "P3",
-    "expected": "移除已确认的报告项可用，且与全站自绘对话框风格一致（这里用的是浏览器原生 confirm）",
-    "actual": {
-      "left": "本次问诊使用的数据\n2 项\n总胆固醇\n6.2 mmol/L\n移除\n血压\n128/84 mmHg\n移除"
-    },
-    "pass": true,
-    "group": "H",
-    "persona": "赵-报告",
-    "evidence": []
+  "pass": true,
+  "group": "M",
+  "persona": "孙-界面",
+  "evidence": []
+ },
+ {
+  "id": "R3-M7-recent",
+  "severity": "P2",
+  "expected": "同一主诉的多次问诊在「最近问诊」里可区分（时间/序号），否则患者分不清点哪一条",
+  "actual": {
+   "count": 3,
+   "unique": 2,
+   "sample": [
+    "本人 · 新的问诊",
+    "本人 · 新的问诊",
+    "本人 · 嗓子疼三天"
+   ]
   },
-  {
-    "id": "R3-H5-defer-gate",
-    "severity": "P1",
-    "expected": "疼到 8 分仍在追问时，界面要说明「为什么还要问、以及现在就可以去」",
-    "actual": {
-      "kind": "question",
-      "questionId": "associated_symptoms",
-      "explains": false
-    },
-    "pass": false,
-    "group": "B",
-    "persona": "红-急症",
-    "evidence": []
-  },
-  {
-    "id": "R3-I1-entrances",
-    "severity": "P2",
-    "expected": "档案首页的三个入口清晰，且不与右上角按钮重复",
-    "actual": ["记录血糖", "上传医疗图片", "记录测量"],
-    "pass": true,
-    "group": "I",
-    "persona": "钱-档案",
-    "evidence": []
-  },
-  {
-    "id": "R3-I2-baseline",
-    "severity": "P2",
-    "expected": "基线信息保存后刷新仍在（身高体重是计算类能力的前置）",
-    "actual": {
-      "year": "1992"
-    },
-    "pass": true,
-    "group": "I",
-    "persona": "钱-档案",
-    "evidence": []
-  },
-  {
-    "id": "R3-I3-member",
-    "severity": "P2",
-    "expected": "添加成员后列表出现，并说明「现在看的是谁」",
-    "actual": {
-      "hasMember": true,
-      "sample": "我的健康档案\n本人\n当前查看\n设为本次问诊对象\n改名\n小明\n成员\n切换查看\n设为本次问诊对象\n改名\n归档"
-    },
-    "pass": true,
-    "group": "I",
-    "persona": "钱-档案",
-    "evidence": []
-  },
-  {
-    "id": "R3-I4-vision",
-    "severity": "P2",
-    "expected": "离线下上传图片时，要说清「图已归档，但没有视觉模型所以没识别」，而不是只报错",
-    "actual": {
-      "feedback": "图片尺寸不在支持范围内",
-      "notice": "\n              \n              原图、识别结果和修改记录分别保留；待核对内容不会自动进入问诊。\n            "
-    },
-    "pass": true,
-    "group": "I",
-    "persona": "钱-档案",
-    "evidence": []
-  },
-  {
-    "id": "R3-J1-theme",
-    "severity": "P2",
-    "expected": "外观切换即时生效（夜航为深色）",
-    "actual": {
-      "theme": "night"
-    },
-    "pass": true,
-    "group": "J",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-J3-persist",
-    "severity": "P2",
-    "expected": "「下次打开会保留」要真的保留（主题与字号刷新后仍生效）",
-    "actual": {
-      "theme": "night",
-      "font": "large",
-      "fontScaleAtSwitch": "large"
-    },
-    "pass": true,
-    "group": "J",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-J4-mode",
-    "severity": "P2",
-    "expected": "患者能自己切到「完整研发界面」，也要能明确切回来",
-    "actual": {
-      "devNav": true,
-      "stillVisibleAfterSwitchBack": false
-    },
-    "pass": true,
-    "group": "J",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-K1-channels",
-    "severity": "P2",
-    "expected": "交接摘要给出去就诊的四个通道（复制/打印/.md/.txt）与免责声明齐全",
-    "actual": {
-      "buttons": ["", "复制摘要", "打印摘要", "导出 .md", "导出 .txt"],
-      "disclaimer": true
-    },
-    "pass": true,
-    "group": "K",
-    "persona": "周-导出",
-    "evidence": []
-  },
-  {
-    "id": "R3-K2-copy",
-    "severity": "P1",
-    "expected": "复制出来的摘要不出现内部枚举（self/male/stable/null）",
-    "actual": {
-      "hit": null,
-      "chars": 247,
-      "sample": "就诊摘要（预问诊版）\n咨询对象：本人\n性别：男\n年龄：30\n主要问题：咳嗽三天，有痰\n急症筛查：没有\n呼吸情况：呼吸正常，不喘\n变化趋势：变化不大\n影响程度：4\n伴随不适：没有别的不舒服\n开始时间：三天前开始的\n咳嗽细节：干咳，没有痰\n进食饮水与排尿：能正常喝水吃饭\n已报告用药与处理：没吃药\n过敏信息：已明确没有\n相关"
-    },
-    "pass": true,
-    "group": "K",
-    "persona": "周-导出",
-    "evidence": []
-  },
-  {
-    "id": "R3-K3-print",
-    "severity": "P2",
-    "expected": "打印页能打开、内容完整、带免责声明；被浏览器拦截时要有替代路径",
-    "actual": {
-      "opened": true
-    },
-    "pass": true,
-    "group": "K",
-    "persona": "周-导出",
-    "evidence": []
-  },
-  {
-    "id": "R3-K4-export",
-    "severity": "P1",
-    "expected": "导出的 .md / .txt 都是完整摘要，且不含内部枚举；.txt 不应残留 Markdown 记号",
-    "actual": {
-      "md": {
-        "name": "就诊交接摘要.md",
-        "chars": 806,
-        "head": "# 就诊摘要（预问诊版）\n\n## 结论\n\n- 处置：可以先在家观察；如果提前加重或出现下方任何警示信号，请及时就医。\n- 建议窗口：72 小时内\n- 建议科室："
-      },
-      "txt": {
-        "name": "就诊交接摘要.txt",
-        "chars": 702,
-        "hasMarkdown": false
-      },
-      "internal": false
-    },
-    "pass": true,
-    "group": "K",
-    "persona": "周-导出",
-    "evidence": []
-  },
-  {
-    "id": "R3-L1-mobile",
-    "severity": "P1",
-    "expected": "390px 宽下问诊可读可点，没有横向溢出",
-    "actual": {
-      "overflow": [],
-      "smallTargets": []
-    },
-    "pass": true,
-    "group": "L",
-    "persona": "吴-窄屏",
-    "evidence": []
-  },
-  {
-    "id": "R3-L3-mobile-handoff",
-    "severity": "P2",
-    "expected": "390px 下交接摘要的四个通道不溢出、可点",
-    "actual": [],
-    "pass": true,
-    "group": "L",
-    "persona": "吴-窄屏",
-    "evidence": []
-  },
-  {
-    "id": "R3-M1-offline",
-    "severity": "P1",
-    "expected": "服务不可用时，错误条要说清「发生了什么、下一步怎么办」，而不是只留一个按钮",
-    "actual": {
-      "status": "服务未连接",
-      "alertText": "重新连接",
-      "retryVisible": true
-    },
-    "pass": true,
-    "group": "M",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-M2-retry",
-    "severity": "P2",
-    "expected": "重连失败时给出可执行的下一步（检查桌面应用/端口），而不只是一句「无法连接」",
-    "actual": {
-      "toast": "无法连接本机服务：Failed to fetch"
-    },
-    "pass": false,
-    "group": "M",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-M3-recover",
-    "severity": "P2",
-    "expected": "服务恢复后刷新能回到可用状态",
-    "actual": {
-      "status": "本机服务已连接"
-    },
-    "pass": true,
-    "group": "M",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-M4-404",
-    "severity": "P3",
-    "expected": "打开不存在的会话时返回可理解的中文错误",
-    "actual": {
-      "status": 404,
-      "body": "{\"error\": {\"code\": \"session_not_found\", \"message\": \"找不到该问诊会话\"}}"
-    },
-    "pass": true,
-    "group": "M",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-M5-double",
-    "severity": "P2",
-    "expected": "快速双击发送只产生一条用户消息（不会重复提交）",
-    "actual": {
-      "occurrences": 1,
-      "phase": "opening"
-    },
-    "pass": true,
-    "group": "M",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-M6-closed",
-    "severity": "P2",
-    "expected": "问诊结束后输入区收起，患者不会以為还能继续这段对话",
-    "actual": {
-      "composerVisible": false,
-      "note": "服务端的「已结束」守护话术在 UI 上不可达；改了主诉想继续时，只能自己找到「新的问诊」"
-    },
-    "pass": true,
-    "group": "M",
-    "persona": "孙-界面",
-    "evidence": []
-  },
-  {
-    "id": "R3-M7-recent",
-    "severity": "P2",
-    "expected": "同一主诉的多次问诊在「最近问诊」里可区分（时间/序号），否则患者分不清点哪一条",
-    "actual": {
-      "count": 3,
-      "unique": 2,
-      "sample": ["本人 · 新的问诊", "本人 · 新的问诊", "本人 · 嗓子疼三天"]
-    },
-    "pass": false,
-    "group": "M",
-    "persona": "孙-界面",
-    "evidence": []
-  }
+  "pass": false,
+  "group": "M",
+  "persona": "孙-界面",
+  "evidence": []
+ }
 ]

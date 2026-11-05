@@ -1,5 +1,6 @@
 """Mixin: planning for ConsultationEngine."""
 from copy import deepcopy
+from dataclasses import replace
 from typing import Any, List, Optional
 from ..clinical.interpreter import ObservationInputError
 from ..clinical.knowledge import (
@@ -641,6 +642,22 @@ class ConsultationEnginePlanning:
                     )
                 )
 
+    def _attach_deferred_notice(self, state: CaseState, reply: AgentReply) -> AgentReply:
+        """延迟门之后的第一道题，说明"为什么还问、什么时候该去"。
+
+        患者刚说疼到 8 分，界面却继续问细节，读起来像没听见。这句话只出现
+        一次（标记随即清除），放在问题之后，不挡住要回答的内容。
+        """
+        if not state.runtime_snapshot.pop("urgent_deferred_notice", None):
+            return reply
+        return replace(
+            reply,
+            message=(
+                f"{reply.message}（另外：你说的这些已经够让我建议今天就去线下看，"
+                "接下来几问只是把建议说得更具体，不必等问完。）"
+            ),
+        )
+
     def _ask(self, state: CaseState, question: Question, reason: str) -> AgentReply:
         """Put a question to the patient.
 
@@ -662,18 +679,21 @@ class ConsultationEnginePlanning:
             # Same adaptation as the adaptive engine: the catalog's
             # infant-months wording is only presented for child subjects.
             prompt = ADULT_AGE_PROMPT
-        return self._attach_suspend_cap_notice(
+        return self._attach_deferred_notice(
             state,
-            AgentReply(
-                prompt,
-                question.phase,
-                kind="question",
-                question_id=question.id,
-                quick_replies=question.options,
-                developer_trace={
-                    "reason": reason,
-                    "content_version": self.content.versions["questions"],
-                },
+            self._attach_suspend_cap_notice(
+                state,
+                AgentReply(
+                    prompt,
+                    question.phase,
+                    kind="question",
+                    question_id=question.id,
+                    quick_replies=question.options,
+                    developer_trace={
+                        "reason": reason,
+                        "content_version": self.content.versions["questions"],
+                    },
+                ),
             ),
         )
 
@@ -753,5 +773,8 @@ class ConsultationEnginePlanning:
                 turn_id=turn_id,
             )
         )
+        # 使用体验评测 R3-04：延迟门会让患者在"疼到 8 分"之后继续被追问，
+        # 却不说为什么。标记一次，由下一道题把话说清楚。
+        state.runtime_snapshot["urgent_deferred_notice"] = True
         state.risk = self._deferred_risk(state)
         return None

@@ -455,11 +455,13 @@ async function groupA(ctx) {
       expected:
         "改主诉后旧答案被撤回、急症筛查被重问，界面要说明「哪些回答需要重来、为什么」",
       run: async () => {
-        const pageText = await page
-          .locator("#messages, #active-question")
-          .innerText()
-          .catch(() => "");
-        const explained = /撤回|需要重新|重新回答|受影响的内容/.test(pageText);
+        // 两个容器要分别取：多选择器命中多个元素时 innerText 会因严格模式
+        // 抛错，被 catch 吞成空串，explained 就永远是 false（本轮踩过）。
+        const pageText = [
+          await page.locator("#messages").innerText().catch(() => ""),
+          await page.locator("#active-question").innerText().catch(() => ""),
+        ].join("\n");
+        const explained = /撤回|需要重新|重新回答|不再算作已确认/.test(pageText);
         return {
           pass: withdrawn.length === 0 || explained,
           actual: {

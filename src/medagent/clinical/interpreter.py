@@ -22,7 +22,32 @@ if TYPE_CHECKING:
 
 
 ABSENT_PHRASES = ("没有", "无", "否认", "都没有", "未用", "没用")
-YES_PHRASES = ("有", "是", "对", "出现了", "有一项")
+
+# 肯定回答只认「整句就是在说 yes」，不认单字前缀。
+# 旧实现用 startswith(("有","是","对"))，"对了，帮我儿子也看一下" 会因为开头
+# 的"对"被读成"有危险信号"，直接触发 120。这类口头语（对了/对不起/对于）
+# 在中文里极常见，而判断题问的是"有没有"，一句话开头撞上某个字并不等于肯定。
+YES_PATTERNS = (
+    # 有 / 是 / 对 / 是的 / 对的 / 是啊 —— 整句只有这些
+    re.compile(r"^(?:有|是|对)(?:的|啊|呀)?$"),
+    # 同上但后面接标点，例如"有，昨天开始的"
+    re.compile(r"^(?:有|是|对)(?:的|啊|呀)?[\s，,。；;！!、]"),
+    # 有这项 / 有一项 / 有这种情况 / 出现了
+    re.compile(r"^(?:有|是|对)(?:这|那|上述|该)?(?:一)?(?:项|个|种|些)"),
+    re.compile(r"^出现了"),
+    re.compile(r"^(?:确实|的确)(?:有|是)"),
+    # 有点疼 / 有些难受 / 有一点 —— 症状描述里的肯定
+    re.compile(r"^(?:有|是)(?:点|些|一点)"),
+)
+
+
+def _is_affirmative(raw: str) -> bool:
+    """True only when the answer itself is a yes.
+
+    Kept deliberately narrow: a false "有" on the red-flag screen escalates a
+    patient to an emergency call, while a false "unknown" only asks again.
+    """
+    return any(pattern.match(raw) for pattern in YES_PATTERNS)
 
 
 class ObservationInputError(ValueError):
@@ -83,7 +108,7 @@ class Interpreter:
                 return Interpretation(False, Assertion.ABSENT)
             if any(raw.startswith(phrase) for phrase in ABSENT_PHRASES):
                 return Interpretation(False, Assertion.ABSENT)
-            if any(raw.startswith(phrase) for phrase in YES_PHRASES):
+            if _is_affirmative(raw):
                 return Interpretation(True, Assertion.PRESENT)
             return Interpretation(None, Assertion.UNKNOWN)
 

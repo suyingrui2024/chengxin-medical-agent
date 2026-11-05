@@ -10,11 +10,16 @@ from ..guards.assertion_evidence import has_uncertainty
 from ..clinical.interpreter import Interpreter
 
 
+
 _CLAUSE = re.compile(r"[^，。；,;\n]+")
 _NUMBER = r"-?\d+(?:\.\d+)?\s*(?:℃|°\s*[Cc]|摄氏度?)?"
 _LABELED = re.compile(r"(?:腋温|腋下体温|体温)\s*(?:是|为|测得|读数为)?\s*(" + _NUMBER + r")")
 _VALUE = re.compile(_NUMBER)
-_QUALITY = re.compile(r"不准|不准确|不可靠|没看清|看不清|没看准|没测好|测不准")
+_QUALITY = re.compile(
+    r"不准|不准确|不可靠|没看清|看不清|没看准|没测好|测不准|"
+    r"大概|大约|差不多|将近|估计|约莫|似乎|好像|上下|左右|approxi",
+    re.IGNORECASE,
+)
 _ANCHOR = re.compile(r"读数|数值|体温|温度|腋温|测量|体温计|探头|设备")
 _HYPOTHETICAL = re.compile(r"如果|假如|假设|例如|比如")
 
@@ -31,7 +36,7 @@ def _qualifier(clause):
         rest = rest.replace(term, "")
     rest = re.sub(r"但是|不过|只是|这个|这次|这点|具体|其实|现在|我|也|还|有点|不太|但", "", rest)
     rest = _QUALITY.sub("", rest)
-    return not rest.strip(" 的了啊呀呢，。；;！!？?\t\r\n")
+    return not rest.strip(" 的了啊呀呢度℃，。；;！!？?\t\r\n")
 
 
 @dataclass(frozen=True)
