@@ -25,7 +25,7 @@ export async function actualInputCheck({ strict = true, mutate = false } = {}) {
       (
         await run(python, [
           "-c",
-          "import json,sys;from pathlib import Path;sys.path.insert(0,sys.argv[1]);from medagent.execution_checkpoints import checkpoint;p=Path(sys.argv[2]);s=p.stat();print(json.dumps(checkpoint(p,(s.st_dev,s.st_ino),json.loads(sys.argv[3]))))",
+          "import json,sys;from pathlib import Path;sys.path.insert(0,sys.argv[1]);from medagent.execution.checkpoints import checkpoint;p=Path(sys.argv[2]);s=p.stat();print(json.dumps(checkpoint(p,(s.st_dev,s.st_ino),json.loads(sys.argv[3]))))",
           path.join(root, "src"),
           directory,
           JSON.stringify(paths),

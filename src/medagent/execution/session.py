@@ -1,9 +1,7 @@
 """Owned full-DSH workspace session."""
 from collections import deque
-import hashlib
 import json
 import shutil
-import stat
 import subprocess
 import sys
 import threading
@@ -12,10 +10,7 @@ from urllib.parse import urlsplit
 from uuid import uuid4
 from ..infra.env_config import for_backend
 from ..infra.platform_fs import fcntl, os
-from .artifacts import IMAGE_LIMIT
-from .artifacts import projection as artifact_projection
-from .artifacts import read_limit
-from .capabilities import validate_receipt
+from .artifact_access import WorkspaceArtifactAccess
 from .changes import ChangeTracker
 from .clarifications import (
     ACTIVE_CLARIFICATION_STATES,
@@ -23,10 +18,10 @@ from .clarifications import (
 )
 from .endpoint import route_identity, scrub
 from .errors import ExecutionBusy, ExecutionError
-from .files import DirectoryChanged, directory_page
 from .identity import encode_identity
 from .limits import DEFAULT_TIME_BUDGET_SECONDS, time_budget
 from .observations import ACTIVE_JOB_STATES, validate_observation
+from .worker_protocol import calculation_receipt, decode_record, observation_batch
 from .projects import project_path as validate_project_path
 from .store import (
     DSH_VERSION,
@@ -34,12 +29,7 @@ from .store import (
     WorkspaceOccupied,
     WorkspaceStoreError,
 )
-from .workspace_files import (
-    file_revision,
-    open_workspace_directory,
-    safe_bytes,
-    safe_file,
-)
+from .workspace_files import open_workspace_directory
 from ..infra.platform import isolation_kind, startup_timeout_seconds, supports_sandbox
 
 
@@ -693,228 +683,211 @@ class ExecutionSession:
             raise ExecutionError(self.error or "隔离执行环境启动失败")
 
     def _read(self, process):
-        """Consume the worker's event stream for the lifetime of one process.
+        """Read one worker's stream, applying each valid record under the lock.
 
-        Every line is size-capped and parsed before the lock is taken; a line
-        that is not JSON is skipped, because a stray print from a build tool is
-        noise, not a protocol error.  Events either update session state and
-        persist, or are folded into the running turn's transcript.
-
-        The loop breaks when the process it is reading is no longer the
-        session's process -- a replaced worker's output must not be applied to
-        the state that replaced it.
+        A replaced worker cannot write into its successor's state. Parsing
+        has no state effects; acceptance and persistence stay with this
+        session, and stream closure always releases startup waiters.
         """
         try:
             for line in process.stdout:
-                if len(line) > 4_000_000:
-                    raise ExecutionError("执行事件过大")
-                try:
-                    record = json.loads(line)
-                except ValueError:
+                record = decode_record(line)
+                if record is None:
                     continue
                 with self.lock:
                     if process is not self.process:
                         break
-                    kind = record.get("type", "runtime.unknown")
-                    persist = False
-                    if kind in {
-                        "clarification.requested",
-                        "clarification.answered",
-                        "clarification.closed",
-                    }:
-                        if self._accept_clarification(kind, record):
-                            self.persist()
-                        continue
-                    if kind == "clarification.answer_rejected":
-                        for question in self.clarifications:
-                            if (
-                                question["id"] == record.get("request_id")
-                                and question["turn_id"] == record.get("turn_id")
-                                and question["status"] in ACTIVE_CLARIFICATION_STATES
-                            ):
-                                question.update(
-                                    status="closed", reason="answer_rejected"
-                                )
-                                persist = True
-                    if kind == "tool.observations":
-                        try:
-                            values = record["observations"]
-                            if not isinstance(values, list) or len(values) > 64:
-                                raise ValueError()
-                            values = [validate_observation(value) for value in values]
-                            if any(
-                                not any(
-                                    turn["id"] == value["turn_id"]
-                                    for turn in self.turns
-                                )
-                                for value in values
-                            ):
-                                raise ValueError()
-                        except (ValueError, TypeError, KeyError):
-                            self.event(
-                                "tool.observation_unavailable",
-                                reason="invalid_runtime_observation",
-                            )
-                            continue
-                        known = {value["observation_id"] for value in self.observations}
-                        for value in values:
-                            if value["observation_id"] in known:
-                                continue
-                            known.add(value["observation_id"])
-                            self.observations.append(value)
-                            self.event(
-                                "tool.observed",
-                                turn_id=value["turn_id"],
-                                observation=value,
-                            )
-                        if len(self.observations) > 128:
-                            self.history_trimmed = True
-                            self.observations = self.observations[-128:]
-                        self.persist()
-                        continue
-                    if kind == "capability.completed":
-                        try:
-                            result = validate_receipt(record.get("result"))
-                            if (
-                                result["workspace_id"] != self.id
-                                or result["turn_id"] != record.get("turn_id")
-                                or not any(
-                                    turn["id"] == result["turn_id"]
-                                    for turn in self.turns
-                                )
-                            ):
-                                raise ValueError()
-                            if not self.capability_binding or any(
-                                result[key] != self.capability_binding[key]
-                                for key in ["registry_sha256", "implementation_sha256"]
-                            ):
-                                raise ValueError()
-                        except (ValueError, TypeError, KeyError):
-                            self.event(
-                                "capability.failed",
-                                error={
-                                    "code": "invalid_host_receipt",
-                                    "message": "未接收有效计算回执。",
-                                },
-                            )
-                            continue
-                        self.calculations.append(result)
-                        self.calculations = self.calculations[-32:]
-                        persist = True
-                    self.event(
-                        kind,
-                        **{
-                            k: v
-                            for k, v in record.items()
-                            if k not in {"sequence", "type"}
-                        },
-                    )
-                    if kind == "ready":
-                        self.ready.set()
-                    elif kind in {"model.request", "model.request_started"}:
-                        persist = True
-                        for turn in self.turns:
-                            if turn["id"] == record.get("turn_id"):
-                                turn["model_calls"] = max(
-                                    turn.get("model_calls", 0), record.get("index", 0)
-                                )
-                    elif kind == "jobs.snapshot":
-                        self.jobs = record.get("jobs", [])
-                        self.agents = record.get("agents", [])
-                    elif kind in {"jobs.cancelled", "turn.work_stopped"}:
-                        if kind == "jobs.cancelled":
-                            self.jobs = []
-                            self.agents = []
-                            self._close_clarifications(record.get("reason") or "user_cancelled")
-                        for turn in self.turns:
-                            if turn["id"] == record.get("turn_id", self.turn_id) and turn["status"] == "cancelling":
-                                turn["status"] = "cancelled"
-                                persist = True
-                        if (
-                            self.status == "cancelling"
-                            and record.get("turn_id", self.turn_id) == self.turn_id
-                        ):
-                            self.status = "cancelled"
-                            if self.turns:
-                                self.turns[-1]["status"] = "cancelled"
-                            if record.get("reason") == "time_budget_exhausted":
-                                self.error = "time_budget_exhausted"
-                            persist = True
-                    elif kind == "worker.error":
-                        self.error = record.get("diagnostic", "执行环境未成功")
-                        self.ready.set()
-                    elif kind == "turn.deadline":
-                        for turn in self.turns:
-                            if turn["id"] == record.get("turn_id"):
-                                turn["status"] = "cancelling"
-                                persist = True
-                        if record.get("turn_id") == self.turn_id:
-                            self.status = "cancelling"
-                            self.error = "time_budget_exhausted"
-                            persist = True
-                    elif record.get("turn_id") == self.turn_id:
-                        if kind == "turn.started":
-                            self.status = "running"
-                        elif kind in {
-                            "turn.completed",
-                            "turn.failed",
-                            "turn.cancelled",
-                            "rejected",
-                        }:
-                            self.status = {
-                                "turn.completed": "completed",
-                                "turn.cancelled": "cancelled",
-                            }.get(kind, "failed")
-                            if kind != "turn.completed":
-                                self._close_clarifications(
-                                    record.get("error_type") or "turn_stopped",
-                                    record.get("turn_id"),
-                                )
-                            self.final_response = record.get("final_response", "")
-                            self.error = record.get("error_type") or record.get(
-                                "reason"
-                            )
-                            if self.turns:
-                                self.turns[-1].update(
-                                    status=self.status,
-                                    final_response=self.final_response,
-                                    model_calls=record.get("model_calls", 0),
-                                )
-                            persist = True
-                    notification = record.get("notification", {})
-                    if (
-                        not self.require_resume
-                        and notification.get("method") == "session.event"
-                        and notification.get("params", {}).get("sessionId") == self.id
-                        and notification.get("params", {}).get("event", {}).get("type")
-                        == "turn/start"
-                    ):
-                        self.require_resume = True
-                        persist = True
-                    if persist:
-                        self.persist()
+                    self._accept_worker_record(record)
         finally:
             process.stdout.close()
             with self.lock:
-                if process is self.process and (
-                    self.status
-                    in {
-                        "starting",
-                        "running",
-                        "cancelling",
-                    }
-                    or self.has_pending_clarification()
-                    or (bool(self.agents) and not self.closed)
+                self._worker_exited(process)
+
+    def _accept_worker_record(self, record):
+        """Apply one record while holding the session lock; validators cannot mutate state."""
+        kind = record.get("type", "runtime.unknown")
+        if kind in {
+            "clarification.requested",
+            "clarification.answered",
+            "clarification.closed",
+        }:
+            if self._accept_clarification(kind, record):
+                self.persist()
+            return
+        if kind == "tool.observations":
+            self._accept_observation_batch(record)
+            return
+        if kind == "capability.completed" and not self._accept_calculation(record):
+            return
+        persist = kind == "capability.completed"
+        if kind == "clarification.answer_rejected":
+            for question in self.clarifications:
+                if (
+                    question["id"] == record.get("request_id")
+                    and question["turn_id"] == record.get("turn_id")
+                    and question["status"] in ACTIVE_CLARIFICATION_STATES
                 ):
-                    self._close_clarifications("worker_exited")
-                    self.status, self.error = "failed", "执行进程意外结束"
-                    self.event("worker.exited", exit_code=process.poll())
-                    if self.turns:
-                        self.turns[-1]["status"] = "interrupted"
-                    self.persist()
-                if process is self.process:
-                    self.agents = []
-                self.ready.set()
+                    question.update(status="closed", reason="answer_rejected")
+                    persist = True
+        self.event(
+            kind, **{k: v for k, v in record.items() if k not in {"sequence", "type"}}
+        )
+        persist = self._update_runtime_status(kind, record) or persist
+        if (
+            not self.require_resume
+            and record.get("notification", {}).get("method") == "session.event"
+            and record["notification"].get("params", {}).get("sessionId") == self.id
+            and record["notification"]["params"].get("event", {}).get("type")
+            == "turn/start"
+        ):
+            self.require_resume = True
+            persist = True
+        if persist:
+            self.persist()
+
+    def _accept_observation_batch(self, record):
+        """Validate the entire batch before accepting any observation, then deduplicate it."""
+        try:
+            values = observation_batch(record, turn_ids={turn["id"] for turn in self.turns})
+        except (ValueError, TypeError, KeyError):
+            self.event("tool.observation_unavailable", reason="invalid_runtime_observation")
+            return
+        known = {value["observation_id"] for value in self.observations}
+        for value in values:
+            if value["observation_id"] in known:
+                continue
+            known.add(value["observation_id"])
+            self.observations.append(value)
+            self.event("tool.observed", turn_id=value["turn_id"], observation=value)
+        if len(self.observations) > 128:
+            self.history_trimmed = True
+            self.observations = self.observations[-128:]
+        self.persist()
+
+    def _accept_calculation(self, record):
+        try:
+            result = calculation_receipt(
+                record,
+                workspace_id=self.id,
+                turn_ids={turn["id"] for turn in self.turns},
+                capability_binding=self.capability_binding,
+            )
+        except (ValueError, TypeError, KeyError):
+            self.event(
+                "capability.failed",
+                error={
+                    "code": "invalid_host_receipt",
+                    "message": "未接收有效计算回执。",
+                },
+            )
+            return False
+        self.calculations.append(result)
+        self.calculations = self.calculations[-32:]
+        return True
+
+    def _update_runtime_status(self, kind, record):
+        """Dispatch lifecycle events and report whether the owner must persist."""
+        if kind == "ready":
+            self.ready.set()
+        elif kind in {"model.request", "model.request_started"}:
+            for turn in self.turns:
+                if turn["id"] == record.get("turn_id"):
+                    turn["model_calls"] = max(
+                        turn.get("model_calls", 0), record.get("index", 0)
+                    )
+            return True
+        elif kind == "jobs.snapshot":
+            self.jobs = record.get("jobs", [])
+            self.agents = record.get("agents", [])
+        elif kind in {"jobs.cancelled", "turn.work_stopped"}:
+            return self._accept_work_stopped(kind, record)
+        elif kind == "worker.error":
+            self.error = record.get("diagnostic", "执行环境未成功")
+            self.ready.set()
+        elif kind == "turn.deadline":
+            return self._accept_deadline(record)
+        elif record.get("turn_id") == self.turn_id:
+            return self._accept_turn_status(kind, record)
+        return False
+
+    def _accept_work_stopped(self, kind, record):
+        """Stop facts close pending questions without treating an earlier turn as current."""
+        persist = False
+        if kind == "jobs.cancelled":
+            self.jobs = []
+            self.agents = []
+            self._close_clarifications(record.get("reason") or "user_cancelled")
+        for turn in self.turns:
+            if (
+                turn["id"] == record.get("turn_id", self.turn_id)
+                and turn["status"] == "cancelling"
+            ):
+                turn["status"] = "cancelled"
+                persist = True
+        if (
+            self.status == "cancelling"
+            and record.get("turn_id", self.turn_id) == self.turn_id
+        ):
+            self.status = "cancelled"
+            if self.turns:
+                self.turns[-1]["status"] = "cancelled"
+            if record.get("reason") == "time_budget_exhausted":
+                self.error = "time_budget_exhausted"
+            persist = True
+        return persist
+
+    def _accept_deadline(self, record):
+        persist = False
+        for turn in self.turns:
+            if turn["id"] == record.get("turn_id"):
+                turn["status"] = "cancelling"
+                persist = True
+        if record.get("turn_id") == self.turn_id:
+            self.status = "cancelling"
+            self.error = "time_budget_exhausted"
+            persist = True
+        return persist
+
+    def _accept_turn_status(self, kind, record):
+        """Update only the current turn; starting does not establish durable SDK history."""
+        if kind == "turn.started":
+            self.status = "running"
+        elif kind in {"turn.completed", "turn.failed", "turn.cancelled", "rejected"}:
+            self.status = {
+                "turn.completed": "completed",
+                "turn.cancelled": "cancelled",
+            }.get(kind, "failed")
+            if kind != "turn.completed":
+                self._close_clarifications(
+                    record.get("error_type") or "turn_stopped", record.get("turn_id")
+                )
+            self.final_response = record.get("final_response", "")
+            self.error = record.get("error_type") or record.get("reason")
+            if self.turns:
+                self.turns[-1].update(
+                    status=self.status,
+                    final_response=self.final_response,
+                    model_calls=record.get("model_calls", 0),
+                )
+            return True
+        return False
+
+    def _worker_exited(self, process):
+        """Only the currently owned worker may interrupt live work on stream closure."""
+        if process is self.process and (
+            self.status in {"starting", "running", "cancelling"}
+            or self.has_pending_clarification()
+            or (bool(self.agents) and not self.closed)
+        ):
+            self._close_clarifications("worker_exited")
+            self.status, self.error = "failed", "执行进程意外结束"
+            self.event("worker.exited", exit_code=process.poll())
+            if self.turns:
+                self.turns[-1]["status"] = "interrupted"
+            self.persist()
+        if process is self.process:
+            self.agents = []
+        self.ready.set()
 
     def _run(self, turn):
         """Send one turn to the worker, or record why the turn never started.
@@ -1027,82 +1000,10 @@ class ExecutionSession:
                     self.lease = None
 
     def artifact_overview(self):
-        """Walk the workspace for the artifact list, bounded and explained.
-
-        The walk has a depth limit, an entry budget and an output cap, and
-        every bound it hits is recorded as a reason -- "the list stops here"
-        is a fact the UI shows, not a silent truncation.  Hidden entries,
-        dependency directories and names that are not valid UTF-8 are skipped
-        with their reasons kept.
-
-        Nothing here reads file contents: sizes and kinds only.
-        """
-        output = []
-        visited = [0]
-        reasons = set()
-
-        def walk(directory, prefix="", depth=0):
-            """Walk one level of the workspace, bounded and self-explaining.
-
-            Depth, entries visited and output size are three independent
-            ceilings, and hitting any of them is recorded as a reason on the
-            result rather than ending the walk silently -- the UI can then say
-            "the list is partial" instead of showing a complete-looking list
-            that stopped early.
-            """
-            if depth > 8:
-                reasons.add("depth_limit")
-                return
-            if visited[0] >= 1000 or len(output) >= 200:
-                reasons.add("entry_limit")
-                return
-            with os.scandir(directory) as entries:
-                for entry in entries:
-                    visited[0] += 1
-                    if visited[0] > 1000 or len(output) >= 200:
-                        reasons.add("entry_limit")
-                        return
-                    if entry.name.startswith(".") or entry.name in {
-                        "node_modules",
-                        "__pycache__",
-                    }:
-                        continue
-                    try:
-                        entry.name.encode("utf-8")
-                    except UnicodeEncodeError:
-                        reasons.add("unsupported_name")
-                        continue
-                    try:
-                        info = entry.stat(follow_symlinks=False)
-                        name = prefix + entry.name
-                        if stat.S_ISREG(info.st_mode):
-                            output.append(
-                                {
-                                    "path": name,
-                                    "size": info.st_size,
-                                    "revision": file_revision(info),
-                                }
-                            )
-                        elif stat.S_ISDIR(info.st_mode):
-                            child = os.open(
-                                entry.name,
-                                os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                dir_fd=directory,
-                            )
-                            try:
-                                walk(child, name + "/", depth + 1)
-                            finally:
-                                os.close(child)
-                    except OSError:
-                        reasons.add("unreadable_entry")
-                        continue
-
         try:
-            directory = open_workspace_directory(
-                self.directory, self.directory_identity
-            )
-        except ExecutionError as exc:
-            self.storage_error = str(exc)
+            result = self._artifact_access().overview()
+        except ExecutionError as error:
+            self.storage_error = str(error)
             return {
                 "entries": [],
                 "scan": {
@@ -1112,79 +1013,28 @@ class ExecutionSession:
                 },
             }
         self.storage_error = None
-        try:
-            try:
-                walk(directory)
-            except OSError:
-                reasons.add("unreadable_directory")
-        finally:
-            os.close(directory)
-        return {
-            "entries": sorted(output, key=lambda item: item["path"]),
-            "scan": {
-                "performed": True,
-                "complete": not reasons,
-                "reasons": sorted(reasons),
-                "visited_entries": visited[0],
-                "scope": "visible regular files only; links and common caches excluded",
-            },
-        }
+        return result
 
     def artifacts(self):
         return self.artifact_overview()["entries"]
 
+    def _artifact_access(self):
+        return WorkspaceArtifactAccess(self.directory, self.directory_identity)
+
     def list_directory(self, path="", cursor=None, limit=100, include_hidden=False):
-        root = open_workspace_directory(self.directory, self.directory_identity)
-        try:
-            return directory_page(root, path, cursor, limit, include_hidden)
-        except DirectoryChanged:
-            raise
-        except (OSError, ValueError) as error:
-            raise ExecutionError(str(error)) from None
-        finally:
-            os.close(root)
+        return self._artifact_access().list_directory(path, cursor, limit, include_hidden)
 
     def read_file(self, relative):
-        return safe_file(
-            self.directory, relative, root_identity=self.directory_identity
-        )
+        return self._artifact_access().read_file(relative)
 
     def preview_file(self, relative):
-        data, revision = safe_bytes(
-            self.directory, relative, read_limit(relative), self.directory_identity
-        )
-        try:
-            return artifact_projection(relative, data, revision)
-        except ValueError as error:
-            raise ExecutionError(str(error)) from None
+        return self._artifact_access().preview_file(relative)
 
     def image_file(self, relative, expected_sha256):
-        data, revision = safe_bytes(
-            self.directory, relative, IMAGE_LIMIT, self.directory_identity
-        )
-        try:
-            preview = artifact_projection(relative, data, revision)
-        except ValueError as error:
-            raise ExecutionError(str(error)) from None
-        if preview["kind"] != "image" or preview["sha256"] != expected_sha256:
-            raise ExecutionError("图像已变化或不是支持的图片，请重新读取")
-        return data, preview["mime"]
+        return self._artifact_access().image_file(relative, expected_sha256)
 
     def artifact_status(self, relative, expected_sha256):
-        if (
-            not isinstance(expected_sha256, str)
-            or len(expected_sha256) != 64
-            or any(c not in "0123456789abcdef" for c in expected_sha256)
-        ):
-            raise ExecutionError("文件摘要无效")
-        data, _ = safe_bytes(
-            self.directory, relative, read_limit(relative), self.directory_identity
-        )
-        return {
-            "schema_version": "artifact-freshness/v1",
-            "path": relative,
-            "matches": hashlib.sha256(data).hexdigest() == expected_sha256,
-        }
+        return self._artifact_access().artifact_status(relative, expected_sha256)
 
     def _change_tracker(self):
         return ChangeTracker(
