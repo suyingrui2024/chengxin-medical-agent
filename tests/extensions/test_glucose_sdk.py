@@ -10,6 +10,7 @@ import unittest
 
 from medagent.execution import ExecutionManager
 from tests.support.execution_case import model_reply
+from tests.support.subagent_runtime import wait_child
 
 
 @unittest.skipUnless(
@@ -73,9 +74,10 @@ class GlucoseSdkTests(unittest.TestCase):
                             "input": {
                                 "description": "复核血糖换算",
                                 "prompt": "CHILD_GLUCOSE 对用户的血糖180mg/dL使用注册工具换成mmol/L，保留出处，不执行脚本。",
-                                "run_in_background": False,
                             },
                         }
+                    elif step == 4:
+                        tool = wait_child(body)
                     else:
                         tool = None
                 model_reply(self, len(observed), tool)
@@ -105,7 +107,7 @@ class GlucoseSdkTests(unittest.TestCase):
                     owner.assertEqual(
                         snapshot["status"], "completed", snapshot["error"]
                     )
-                    owner.assertEqual((root_step[0], child_step[0]), (5, 2))
+                    owner.assertEqual((root_step[0], child_step[0]), (6, 2))
                     owner.assertEqual(len(snapshot["calculations"]), 2)
                     for receipt in snapshot["calculations"]:
                         owner.assertEqual(receipt["data"]["value"], "10")

@@ -7,6 +7,7 @@ import time
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.support.subagent_runtime import started_child
 from tests.support.scripted import Provider, tool, final
 from tests.support.windows_process_roots import process_container_temporary_directory
 from medagent.execution import ExecutionManager
@@ -169,22 +170,23 @@ class WindowsExecutionTests(unittest.TestCase):
                     "subagent",
                     description="Independent result verification",
                     prompt="WINDOWS_CHILD_VERIFY: independently check result.txt contains 1250, write review.txt with verified",
-                    run_in_background=False,
                 )
             if step == 2:
+                return tool("wait_subagent", agent_id=started_child(body))
+            if step == 3:
                 return tool(
                     "delivery_check",
                     label="Verify actual Windows artifacts",
                     command="python.exe -c \"from pathlib import Path; assert Path('result.txt').read_text(encoding='utf-8-sig').strip()=='1250'; assert Path('review.txt').read_text()=='verified'\"",
                 )
-            if step == 3:
+            if step == 4:
                 return tool(
                     "medical_calculate",
                     capability_id="calculate.units",
                     input={"value": "1.25", "from_unit": "kg", "to_unit": "g"},
                     evidence="1.25 kg",
                 )
-            if step == 5:
+            if step == 6:
                 return tool(
                     "bash",
                     command="if (-not (Test-Path -LiteralPath review.txt)) { throw 'missing previous result' }; 'continued' | Set-Content -Encoding UTF8 notes.txt",

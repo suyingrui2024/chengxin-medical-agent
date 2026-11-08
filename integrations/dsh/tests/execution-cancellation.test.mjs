@@ -47,6 +47,7 @@ test("an expiring grant stops only its child and recorded root command", async (
   assert.equal(
     (
       await cancelRuntime(f.ctx, {
+        task_id: "11111111-1111-4111-8111-111111111111",
         root: "root",
         sessions: ["old-child"],
         jobs: [{ id: "old-command", session_id: "root" }],
@@ -98,6 +99,7 @@ test("malformed scopes cannot become a workspace stop", async () => {
     [],
     { root: "root", sessions: [], jobs: [{ id: "x" }] },
     { root: "root", sessions: ["bad\n"], jobs: [] },
+    { root: "root", sessions: [], jobs: [], task_id: "bad" },
   ])
     assert.equal((await cancelRuntime(f.ctx, scope)).status, 400);
   assert.deepEqual(f.cancelled, []);

@@ -1,3 +1,5 @@
+import { setInterfaceMode } from "../fixtures/interface-mode.mjs";
+import { waitForChild } from "../fixtures/subagent-receipts.mjs";
 import { _electron as electron, test, expect } from "@playwright/test";
 import { createServer } from "node:http";
 import { once } from "node:events";
@@ -102,10 +104,10 @@ test("native project picker edits the chosen directory, delegates review and res
             description: "Independent project review",
             prompt:
               "Use workspace_changes to inspect calculator.py; then independently execute its addition and save review.txt containing reviewed. Do not modify other files.",
-            run_in_background: false,
           },
         };
-      else if (step === 2)
+      else if (step === 2) tool = waitForChild(body);
+      else if (step === 3)
         tool = { name: "workspace_changes", input: { path: "calculator.py" } };
     } else {
       const step = child++;
@@ -132,6 +134,7 @@ test("native project picker edits the chosen directory, delegates review and res
   const environment = {
     ...process.env,
     MEDAGENT_DESKTOP_PROFILE: path.join(temporary, "profile"),
+    MEDAGENT_PATIENT_DATA_DIR: path.join(temporary, "patient-data"),
     MEDAGENT_EXECUTION_ROOT: path.join(temporary, "records"),
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "dsh",
@@ -159,7 +162,7 @@ test("native project picker edits the chosen directory, delegates review and res
       };
     }, directory);
   const enter = async (page) => {
-    await page.getByLabel("界面模式").selectOption("developer");
+    await setInterfaceMode(page, "developer");
     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
   };
   let app;
@@ -223,14 +226,14 @@ test("native project picker edits the chosen directory, delegates review and res
     expect(await readFile(path.join(project, "keep.txt"), "utf8")).toBe(
       "original",
     );
-    expect(serial).toBe(7);
+    expect(serial).toBe(8);
     expect(child).toBe(3);
     expect(issues).toEqual([]);
     expect(await readdir(project)).not.toContain(".state");
     expect(await readdir(project)).not.toContain(".index");
     await page.getByRole("button", { name: /打开本地项目/ }).click();
     await expect(page.locator("#execution-workspace")).toHaveValue(identity);
-    expect(serial).toBe(7);
+    expect(serial).toBe(8);
     await page.getByRole("button", { name: /查看本轮变更/ }).click();
     await expect(page.locator("#execution-change-diff")).toContainText(
       "-    return a - b",
@@ -282,7 +285,7 @@ test("native project picker edits the chosen directory, delegates review and res
     await expect(page.locator("#execution-change-diff")).toContainText(
       "-    return a - b",
     );
-    expect(serial).toBe(7);
+    expect(serial).toBe(8);
   } finally {
     await app?.close();
     server.closeAllConnections();

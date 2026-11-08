@@ -5,10 +5,10 @@ import { observeTool } from "./execution-observations.mjs";
 import { mergeCheckRequirement } from "./execution-delivery.mjs";
 import { registerControl } from "./execution-control-channel.mjs";
 import { createRootAdmission } from "./execution-admission.mjs";
-import { sessionHeaders } from "./execution-ownership.mjs";
+import { registerBudgetContext } from "./execution-budget-context.mjs";
 import { cancelRuntime } from "./execution-cancellation.mjs";
 export const name = "chengxin-execution-control";
-export const inject = ["agents", "jobs", "systemPrompt", "tools"];
+export const inject = ["agents", "jobs", "tools"];
 export async function apply(ctx) {
   const admission = createRootAdmission(ctx);
   const epoch = randomUUID(),
@@ -69,37 +69,7 @@ export async function apply(ctx) {
       }
     }
   });
-  ctx.on(
-    "system-prompt/assemble",
-    async (_assembly, context, next) => {
-      const assembly = await next();
-      try {
-        const response = await fetch(
-          process.env.DEEPSEEK_BASE_URL + "/budget",
-          {
-            headers: {
-              "x-api-key": process.env.DEEPSEEK_API_KEY,
-              ...sessionHeaders(
-                context.scope?.session?.id || context.scope?.id,
-              ),
-            },
-            signal: AbortSignal.timeout(2000),
-            redirect: "error",
-          },
-        );
-        if (!response.ok) return assembly;
-        const budget = await response.json();
-        assembly.contexts.push({
-          name: "chengxin-execution-budget",
-          text: `本轮全体智能体共享剩余 ${budget.remaining_calls} 次模型调用（包括即将进行的调用），剩余执行时间约 ${budget.remaining_seconds} 秒。先完成要求的代码、运行和产物；已有检查通过后直接收尾，不额外创建复核任务或长篇报告。用户要求的子任务应提前安排并明确范围，依赖结果时使用 run_in_background=false。剩余不足 8 次时不再启动可选子任务；不足 4 次时只处理已发现的必要问题或简短收尾，不重复读取与检查。长命令交还 job id 后读取同一任务，不要重新启动；一次等待不应超出剩余时间。相关检查已经完成时，停止无关或停滞的后台检查后收尾，保留其失败或未验证说明。不要用 sleep 轮询等待子任务。`,
-        });
-      } catch {
-        /* The gateway still enforces limits when advisory context is unavailable. */
-      }
-      return assembly;
-    },
-    { prepend: true },
-  );
+  registerBudgetContext(ctx);
   const handle = async (method, path, control = {}) => {
     const { scope, admission: requestAdmission } = control;
     const url = new URL(path, "http://runtime.local");

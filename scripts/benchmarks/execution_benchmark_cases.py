@@ -198,7 +198,7 @@ cli.py 从标准输入读取 {"value":"1234","from":"mg","to":"g"}，只输出 {
         "files": INVOICE_FILES,
         "prompt": """这是合成工程对照评测。修复 invoice.py 的 total(lines) -> str，不改已有测试和 fixture_identity.json。
 每行 price 是有限非负普通十进制字符串（最多16位整数6位小数），quantity 是 0 至1000的整数，布尔值不算整数。金额必须用十进制精确相乘后求和，最后仅对总和按 ROUND_HALF_UP 舍入两位；禁止逐行舍入。返回固定两位小数字符串，空列表返回 0.00。非法/非有限/负数价格及非法数量抛 ValueError。即使调用方 Decimal 精度是8仍须准确，且不修改全局精度。
-先重现问题并修改、增加测试，再使用官方 subagent 创建独立复核者，run_in_background=false，让它读取代码并实际运行针对性检查，保存 review.json，至少包含 checks 数组（记录两项以上具体检查及发现）。根据复核修复遗留问题，再实际运行测试后收尾。分工明确，避免父子反复重复审计。""",
+先重现问题并修改、增加测试，再使用官方 subagent 创建独立复核者，取得子任务 ID 后调用 wait_subagent，核对完成状态和真实产物，让它读取代码并实际运行针对性检查，保存 review.json，至少包含 checks 数组（记录两项以上具体检查及发现）。根据复核修复遗留问题，再实际运行测试后收尾。分工明确，避免父子反复重复审计。""",
         "followup": '继续同一会话，调用已修复 total([{ "price":"0.015", "quantity":2 }])，实际执行并把 {"result":函数返回值} 保存为 followup.json。',
         "probe": INVOICE_PROBE,
         "changed": ["invoice.py"],

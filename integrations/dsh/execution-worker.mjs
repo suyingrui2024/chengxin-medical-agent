@@ -1141,6 +1141,7 @@ function rememberJob(observation, turnId) {
 }
 function scopeFor(owned) {
   return {
+    task_id: owned.id,
     root: config.id,
     sessions: ownership.sessionsFor(owned),
     jobs: [...jobOwners.values()]
@@ -1445,7 +1446,7 @@ async function run(payload) {
         ownerForTurn: (turn) => ownership.forSdkTurn(config.id, turn)?.id,
         signal: owned.abort.signal,
       });
-    const guidance = `\n\n[执行上下文] 本轮主任务、子智能体和辅助搜索合计最多 ${owned.maxCalls} 次模型请求；为实际运行、保存要求的产物和最终回复留出调用。批量读取相关文件，执行有针对性的检查；通过后及时收尾。简单任务无需额外委托。用户要求委托或任务需要分工时，提前安排范围明确的子任务；下一步依赖其结果时设置 run_in_background=false，避免父子重复检查与 sleep 轮询。`;
+    const guidance = `\n\n[执行上下文] 本轮主任务、子智能体和辅助搜索合计最多 ${owned.maxCalls} 次模型请求；为实际运行、保存要求的产物和最终回复留出调用。批量读取相关文件，执行有针对性的检查；通过后及时收尾。简单任务无需额外委托。用户要求委托或任务需要分工时，提前安排范围明确的子任务；委托立即返回 ID，下一步依赖结果时调用 wait_subagent 并检查实际状态与输出；send_message 只确认送达，接续后也要等待。超时用同一 ID 再等，避免重复委托、父子重复检查与 sleep 轮询。`;
     let result = await promptOwned(payload.text + guidance);
     const collectDeclarations = (value) => {
       // The tree subscription can lag behind run(); canonical returned events

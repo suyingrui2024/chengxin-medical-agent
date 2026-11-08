@@ -37,7 +37,7 @@ PROMPT = """这是非医疗的合成工程验收。只操作当前工作区，�
 run_checks.py 必须逐字保持不变。实际运行 python3 run_checks.py；新增回归测试只能写入
 regressions/test_*.py，并实际执行。既有检查会在 tests 下产生一次性输出文件。
 使用 workspace_changes 核对本轮真实变更，确认并清除本轮产生的一次性输出，保留原文件。
-委托一个子智能体做独立复核（run_in_background=false）：必须亲自调用 workspace_changes
+委托一个子智能体做独立复核（取得子任务 ID 后调用 wait_subagent，核对完成状态和真实产物）：必须亲自调用 workspace_changes
 查看 calculator.py 差异、验证加法，保存 review.txt。子任务不要重跑 run_checks.py。
 结束前再次调用 workspace_changes 核对结果。不要生成其它报告，最终简短说明实际完成情况。"""
 PROBE = """import sys, unittest

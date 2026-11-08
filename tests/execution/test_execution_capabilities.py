@@ -9,6 +9,7 @@ import time
 import unittest
 
 from tests.support.execution_case import model_reply, payload
+from tests.support.subagent_runtime import wait_child
 
 import medagent
 from medagent.execution import ExecutionManager, ExecutionError
@@ -285,9 +286,10 @@ class CapabilitySdkTests(unittest.TestCase):
                             "input": {
                                 "description": "核对注册计算",
                                 "prompt": "CHILD_CAPABILITY 请对用户的1.25 kg调用注册换算成g；不执行脚本。",
-                                "run_in_background": False,
                             },
                         }
+                    elif step == 4:
+                        tool = wait_child(body)
                     else:
                         tool = None
                 model_reply(self, len(observed), tool)
@@ -314,7 +316,7 @@ class CapabilitySdkTests(unittest.TestCase):
                         time.sleep(0.05)
                     snapshot = session.snapshot()
                     self.assertEqual(snapshot["status"], "completed", snapshot["error"])
-                    self.assertEqual(root_step[0], 5)
+                    self.assertEqual(root_step[0], 6)
                     self.assertEqual(child_step[0], 2)
                     self.assertEqual(len(snapshot["calculations"]), 2)
                     self.assertTrue(

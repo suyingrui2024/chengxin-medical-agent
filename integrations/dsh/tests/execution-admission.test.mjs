@@ -6,7 +6,11 @@ const oldTask = "11111111-1111-4111-8111-111111111111";
 const newTask = "22222222-2222-4222-8222-222222222222";
 
 function message(id, kind, extra = {}) {
-  return { id, content: [{ type: "text", text: id }], source: { kind, ...extra } };
+  return {
+    id,
+    content: [{ type: "text", text: id }],
+    source: { kind, ...extra },
+  };
 }
 
 function fixture() {
@@ -37,36 +41,59 @@ test("a registered root prompt receives its own task before the model boundary",
     { ...admitted[0], signal: undefined },
     { session_id: "root", sdk_turn: 7, task_id: newTask, signal: undefined },
   );
-  assert.deepEqual(decision.messages.map((value) => value.id), ["new-user", "runtime"]);
+  assert.deepEqual(
+    decision.messages.map((value) => value.id),
+    ["new-user", "runtime"],
+  );
 });
 
 test("an old child settlement is deferred when a newer user prompt is claimed with it", async () => {
   const { admission, admitted, deferred, agent } = fixture();
   admission.register(newTask);
   const user = message("new-user", "user");
-  const settled = message("old-settled", "subagent-settled", { senderSessionId: "old-child" });
+  const settled = message("old-settled", "subagent-settled", {
+    senderSessionId: "old-child",
+  });
   admission.inserted(agent, user);
   admission.inserted(agent, settled);
   const decision = await admission.decide(
-    { agent, messages: [settled, user], turn: 8, signal: new AbortController().signal },
+    {
+      agent,
+      messages: [settled, user],
+      turn: 8,
+      signal: new AbortController().signal,
+    },
     async () => ({ kind: "enter", messages: [settled, user] }),
   );
   assert.equal(admitted[0].task_id, newTask);
   assert.deepEqual(deferred, ["old-settled"]);
-  assert.deepEqual(decision.messages.map((value) => value.id), ["new-user"]);
+  assert.deepEqual(
+    decision.messages.map((value) => value.id),
+    ["new-user"],
+  );
 });
 
 test("a later child settlement uses the child task after the foreground prompt ended", async () => {
   const { admission, admitted, agent } = fixture();
   admission.root = agent.id;
-  const settled = message("old-settled", "subagent-settled", { senderSessionId: "old-child" });
+  const settled = message("old-settled", "subagent-settled", {
+    senderSessionId: "old-child",
+  });
   admission.inserted(agent, settled);
   const decision = await admission.decide(
-    { agent, messages: [settled], turn: 9, signal: new AbortController().signal },
+    {
+      agent,
+      messages: [settled],
+      turn: 9,
+      signal: new AbortController().signal,
+    },
     async () => ({ kind: "enter", messages: [settled] }),
   );
   assert.equal(admitted[0].task_id, oldTask);
-  assert.deepEqual(decision.messages.map((value) => value.id), ["old-settled"]);
+  assert.deepEqual(
+    decision.messages.map((value) => value.id),
+    ["old-settled"],
+  );
 });
 
 test("an unattributed root notice is rejected before a provider request", async () => {
@@ -75,7 +102,12 @@ test("an unattributed root notice is rejected before a provider request", async 
   const unknown = message("unknown", "tool-jobs");
   admission.inserted(agent, unknown);
   const decision = await admission.decide(
-    { agent, messages: [unknown], turn: 10, signal: new AbortController().signal },
+    {
+      agent,
+      messages: [unknown],
+      turn: 10,
+      signal: new AbortController().signal,
+    },
     async () => ({ kind: "enter", messages: [unknown] }),
   );
   assert.deepEqual(decision, { kind: "reject" });
@@ -85,13 +117,17 @@ test("an unattributed root notice is rejected before a provider request", async 
 test("a revoked child settlement is discarded before it can block a newer root turn", () => {
   const { admission, agent } = fixture();
   admission.root = agent.id;
-  admission.revoke(
-    { task_id: oldTask, sessions: ["old-child"] },
-    [{ ...agent, inbox: { nextTurn: [], nextStep: [] } }],
-  );
-  const settled = message("old-settled", "subagent-settled", { senderSessionId: "old-child" });
+  admission.revoke({ task_id: oldTask, sessions: ["old-child"] }, [
+    { ...agent, inbox: { nextTurn: [], nextStep: [] } },
+  ]);
+  const settled = message("old-settled", "subagent-settled", {
+    senderSessionId: "old-child",
+  });
   let removed;
-  admission.inserted({ ...agent, inbox: { remove: (id) => (removed = id) } }, settled);
+  admission.inserted(
+    { ...agent, inbox: { remove: (id) => (removed = id) } },
+    settled,
+  );
   assert.equal(removed, "old-settled");
 });
 
@@ -104,4 +140,31 @@ test("a later tool-only step keeps the root turn admitted by its first message",
   );
   assert.deepEqual(entered, { kind: "enter", messages: [] });
   assert.deepEqual(admitted, []);
+});
+
+test("an old notice arriving between tool steps cannot replace a running turn's owner", async () => {
+  for (const revoked of [false, true]) {
+    const { admission, admitted, deferred, agent } = fixture();
+    const signal = new AbortController().signal;
+    admission.register(newTask);
+    const user = message("new-user", "user");
+    admission.inserted(agent, user);
+    await admission.decide(
+      { agent, messages: [user], turn: 12, signal },
+      async () => ({ kind: "enter", messages: [user] }),
+    );
+    const old = message("late-child", "subagent-settled", {
+      senderSessionId: "old-child",
+    });
+    admission.inserted(agent, old);
+    // Also exercise a notice already claimed when cancellation arrives.
+    if (revoked) admission.revoke({ task_id: oldTask, sessions: [] }, []);
+    const decision = await admission.decide(
+      { agent, messages: [old], turn: 12, signal },
+      async () => ({ kind: "enter", messages: [old] }),
+    );
+    assert.equal(admitted.at(-1).task_id, newTask);
+    assert.deepEqual(decision.messages, []);
+    assert.deepEqual(deferred, revoked ? [] : [old.id]);
+  }
 });

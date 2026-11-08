@@ -3,6 +3,8 @@
 - insert:
     - id: chengxin-execution-control
       name: /opt/medical-agent/integrations/dsh/execution-control.mjs
+    - id: chengxin-execution-subagents
+      name: /opt/medical-agent/integrations/dsh/execution-subagents.mjs
     - id: chengxin-execution-search
       name: /opt/medical-agent/integrations/dsh/execution-search.mjs
     - id: chengxin-execution-fetch
@@ -30,6 +32,10 @@
   disabled: true
 - id: llm-retry
   disabled: true
+- id: llm-deepseek
+  config:
+    # Cold-resumed children use route defaults rather than the initial parent's options.
+    maxTokens: 8192
 - id: sandbox-policy
   config:
     mode: danger-full-access
@@ -64,7 +70,11 @@
       Generated research artifacts are drafts; they do not update a patient consultation or authorize treatment.
       Delegate when requested or when distinct substantial work benefits from independent or parallel execution;
       routine local edits and tests usually do not need a subagent. Give each child a bounded, self-contained task.
-      Set run_in_background=false whenever your next action depends on a child's result. Avoid repeating its checks.
+      subagent and subagent_fork return a child ID immediately. When the next action depends on its result,
+      call wait_subagent with that ID and inspect state, stop_reason and actual outputs before proceeding.
+      send_message confirms delivery only; wait_subagent then waits for the continued child's new activation.
+      A wait timeout leaves the child running. Reuse its ID rather than spawning duplicate work.
+      Do not use the obsolete run_in_background parameter or sleep polling. Avoid repeating the child's checks.
       Inspect related files together, make focused changes, then run the relevant existing and new checks.
       Treat the user's file-preservation constraints as requirements. If existing tests or configuration
       must remain unchanged, add a separate regression file instead of editing or appending to them.
@@ -115,11 +125,9 @@
   config:
     provider: spawn
     toolName: subagent
-    backgroundMode: continuable
     maxDepth: 2
 - id: tool-subagent-fork
   config:
     provider: fork
     toolName: subagent_fork
-    backgroundMode: one-shot
     maxDepth: 2

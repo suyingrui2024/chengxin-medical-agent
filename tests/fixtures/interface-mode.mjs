@@ -11,6 +11,7 @@
  * The helper restores the pre-8629351 post-condition: the caller ends up
  * back on the consultation view with the new mode applied.
  */
+import { expect } from "@playwright/test";
 
 /** Narrow viewports collapse the sidebar; open it only if it is shut. */
 async function ensureSidebarOpen(page) {
@@ -23,6 +24,8 @@ async function ensureSidebarOpen(page) {
 }
 
 export async function setInterfaceMode(page, mode) {
+  // Static HTML can appear before navigation handlers are attached on restart.
+  await expect(page.getByLabel("界面模式")).toBeEnabled();
   // Every navigate() closes the drawer, so it is reopened before each nav
   // click rather than once for the whole helper.
   await ensureSidebarOpen(page);

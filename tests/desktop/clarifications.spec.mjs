@@ -1,3 +1,5 @@
+import { setInterfaceMode } from "../fixtures/interface-mode.mjs";
+import { waitForChild } from "../fixtures/subagent-receipts.mjs";
 import { _electron as electron, test, expect } from "@playwright/test";
 import { createServer } from "node:http";
 import { once } from "node:events";
@@ -95,10 +97,10 @@ test("native clarification waits for real answers, recovers a lost response and 
             description: "Review selected requirements",
             prompt:
               "Ask the user for a brief review note using request_clarification without options. After the actual reply, write reviewed to review.txt.",
-            run_in_background: false,
           },
         };
-      } else if (step === 3)
+      } else if (step === 3) tool = waitForChild(body);
+      else if (step === 4)
         tool = {
           name: "bash",
           input: {
@@ -133,6 +135,7 @@ test("native clarification waits for real answers, recovers a lost response and 
   const environment = {
     ...process.env,
     MEDAGENT_DESKTOP_PROFILE: path.join(temporary, "profile"),
+    MEDAGENT_PATIENT_DATA_DIR: path.join(temporary, "patient-data"),
     MEDAGENT_EXECUTION_ROOT: path.join(temporary, "records"),
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "dsh",
@@ -155,7 +158,7 @@ test("native clarification waits for real answers, recovers a lost response and 
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     const enter = async () => {
-      await page.getByLabel("界面模式").selectOption("developer");
+      await setInterfaceMode(page, "developer");
       await page
         .getByRole("button", { name: "执行工作台", exact: true })
         .click();
@@ -221,7 +224,7 @@ test("native clarification waits for real answers, recovers a lost response and 
     await expect(page.locator("#execution-status")).toHaveText("本轮已完成", {
       timeout: 15000,
     });
-    expect(serial).toBe(8);
+    expect(serial).toBe(9);
     expect(child).toBe(3);
     expect(issues).toEqual([]);
     expect(errors).toEqual([]);
@@ -251,7 +254,7 @@ test("native clarification waits for real answers, recovers a lost response and 
       { id: identity, q: snapshot.clarifications[0] },
     );
     expect(duplicate).toBe(200);
-    expect(serial).toBe(8);
+    expect(serial).toBe(9);
     await app.close();
     app = null;
     const offline = { ...environment, MEDAGENT_DESKTOP_LIVE: "0" };
@@ -273,7 +276,7 @@ test("native clarification waits for real answers, recovers a lost response and 
       "<b>仅记录复核</b>",
     );
     await expect(page.locator("#execution-run")).toBeDisabled();
-    expect(serial).toBe(8);
+    expect(serial).toBe(9);
     await page.getByLabel("关闭当前工作区").click();
     await expect(page.locator("#execution-clarifications")).toBeHidden();
   } finally {

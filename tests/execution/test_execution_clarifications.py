@@ -11,6 +11,8 @@ import unittest
 from unittest.mock import Mock, patch
 from uuid import uuid4
 
+from tests.support.subagent_runtime import wait_child
+
 from medagent.execution import ExecutionManager, ExecutionError, ExecutionBusy
 from medagent.execution.clarifications import validate_clarification
 
@@ -306,10 +308,11 @@ class ClarificationSdkTests(unittest.TestCase):
                                 "input": {
                                     "description": "Review chosen format",
                                     "prompt": "Ask the user to choose a format using request_clarification. After the actual answer, create child.txt with reviewed.",
-                                    "run_in_background": False,
                                 },
                             }
                         elif step == 4:
+                            tool = wait_child(body)
+                        elif step == 5:
                             tool = {
                                 "name": "bash",
                                 "input": {
@@ -317,7 +320,7 @@ class ClarificationSdkTests(unittest.TestCase):
                                     "description": "Save only after the actual answers",
                                 },
                             }
-                        elif step == 6:
+                        elif step == 7:
                             tool = {
                                 "name": "medical_calculate",
                                 "input": {
@@ -404,9 +407,9 @@ class ClarificationSdkTests(unittest.TestCase):
                     self.assertIs(session.process, process)
                     self.assertEqual(len(session.turns), 1)
                     self.assertEqual(session.turn_id, turn)
-                    self.assertEqual(root_calls[0], 6)
+                    self.assertEqual(root_calls[0], 7)
                     self.assertEqual(child_calls[0], 3)
-                    self.assertEqual(len(requests), 9)
+                    self.assertEqual(len(requests), 10)
                     self.assertEqual(
                         (session.directory / "result.txt").read_text(), "preserved"
                     )
@@ -424,7 +427,7 @@ class ClarificationSdkTests(unittest.TestCase):
                     restored = manager.open(identity, {})
                     self.assertEqual(restored.clarifications, session.clarifications)
                     self.assertIsNone(restored.process)
-                    self.assertEqual(len(requests), 9)
+                    self.assertEqual(len(requests), 10)
                     manager.open(
                         identity,
                         {
@@ -436,7 +439,7 @@ class ClarificationSdkTests(unittest.TestCase):
                         "ROOT_CLARIFICATION_FIXTURE 沿用之前真实回答里的质量再换算一次，不重新给出输入。", 6
                     )
                     self.wait(lambda: restored.snapshot()["status"] == "completed")
-                    self.assertEqual(len(requests), 11)
+                    self.assertEqual(len(requests), 12)
                     self.assertEqual(restored.calculations[-1]["data"]["value"], "1250")
                     self.assertEqual(
                         restored.calculations[-1]["evidence"]["source_turn_id"],
