@@ -30,6 +30,7 @@ try {
   const env = {
     ...process.env,
     MEDAGENT_DESKTOP_PROFILE: join(scratch, "profile"),
+    MEDAGENT_PATIENT_DATA_DIR: join(scratch, "patient-data"),
     MEDAGENT_EXECUTION_ROOT: join(scratch, "workspaces"),
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "compatible",
@@ -67,7 +68,8 @@ try {
   );
   const appearanceFile = join(env.MEDAGENT_DESKTOP_PROFILE, "appearance.json");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "forest");
-  await page.getByRole("button", { name: "外观与皮肤", exact: true }).click();
+  await expect(page.locator("#workspace-mode")).toBeEnabled();
+  await page.getByRole("button", { name: "设置", exact: true }).click();
   const themes = ["ocean", "iris", "sand", "slate", "forest", "night"];
   for (const theme of themes) {
     await page.locator(`input[name="appearance"][value="${theme}"]`).check();
@@ -79,7 +81,7 @@ try {
       .poll(async () => JSON.parse(await readFile(appearanceFile, "utf8")))
       .toEqual({ schema: 1, value: theme });
   }
-  await page.keyboard.press("Escape");
+  await page.locator('.nav-item[data-view="consultation"]').click();
   await verifyGlucoseCalculation(page, model, { native: true });
   await app.close();
   app = undefined;
@@ -89,13 +91,11 @@ try {
     timeout: 30000,
   });
   await expect(reopened.locator("html")).toHaveAttribute("data-theme", "night");
-  await reopened
-    .getByRole("button", { name: "外观与皮肤", exact: true })
-    .click();
+  await reopened.getByRole("button", { name: "设置", exact: true }).click();
   await expect(
     reopened.locator('input[name="appearance"][value="night"]'),
   ).toBeChecked();
-  await reopened.keyboard.press("Escape");
+  await reopened.locator('.nav-item[data-view="consultation"]').click();
   const beforeChart = model.requests.length;
   const chartReceipt = await verifyNativeArtifactChart(
     reopened,

@@ -124,21 +124,34 @@ test("a delayed image save cannot export into a newly selected workspace", async
   const held = new Promise((resolve) => (release = resolve));
   let downloads = 0;
   page.on("download", () => downloads++);
+  // Deliver a late response even if the old workspace cancels its fetch.
+  // The stale-operation guard must protect downloads on its own as well.
+  await page.evaluate(() => {
+    const original = window.fetch;
+    window.fetch = (resource, options = {}) =>
+      original(
+        resource,
+        String(resource).includes("/image?")
+          ? { ...options, signal: undefined }
+          : options,
+      );
+  });
   await page.route("**/api/execution/focus-a/image?**", async (route) => {
     await held;
     await route.fulfill({ status: 409, body: "changed" });
   });
-  const requested = page.waitForRequest((request) =>
-    request.url().includes("/image?"),
+  const requested = page.waitForRequest(
+    (request) =>
+      request.resourceType() === "fetch" && request.url().includes("/image?"),
   );
   await page.locator("#execution-preview-save").click();
-  await requested;
-  await page.locator("#execution-workspace").selectOption("focus-b");
-  const responded = page.waitForResponse((response) =>
-    response.url().includes("/image?"),
+  const imageRequest = await requested;
+  const responded = page.waitForResponse(
+    (response) => response.request() === imageRequest,
   );
+  await page.locator("#execution-workspace").selectOption("focus-b");
   release();
-  await responded;
+  await (await responded).finished();
   await expect(page.locator("#execution-preview-action-status")).toBeEmpty();
   await expect(page.locator("#execution-preview-controls")).toBeHidden();
   expect(downloads).toBe(0);

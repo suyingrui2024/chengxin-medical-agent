@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22.23.3
@@ -69,7 +71,7 @@ jobs:
       # `threading` that was never imported.
       - name: Enforce Python lint baseline
         run: |
-          python -m pip install --quiet ruff
+          python -m pip install --quiet -r requirements-dev.txt
           python -m ruff check src tests scripts
       - name: Install locked browser test dependencies
         run: |
@@ -86,7 +88,6 @@ jobs:
         env:
           PYTHONPATH: src
         run: |
-          python -m pip install --quiet pytest
           python -m pytest tests -q
           python scripts/evaluation/medical/evaluate_release_gate.py
       # The three-spec smoke that used to sit here (p0-summary-status,
@@ -167,6 +168,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
@@ -176,7 +179,7 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: |
-          python -m pip install --quiet pytest ruff
+          python -m pip install --quiet -r requirements-dev.txt
           npm ci --ignore-scripts
           npx playwright install chromium
       - name: Structural guards

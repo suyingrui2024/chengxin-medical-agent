@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { reachSelfCheck } from "./self-check-drafts.mjs";
 import { degreeSnapshot } from "./visual-answer-drafts.mjs";
+import { setInterfaceMode } from "./interface-mode.mjs";
 
 // Scroll through the actual page, then reject clipping by any nested pane.
 export async function expectReachable(locator) {
@@ -112,7 +113,8 @@ export async function verifyNativePatientZoom(page, setZoom, { shot } = {}) {
   // This probe is the last step of native acceptance; select the local demo
   // through the application's controls and retain its private native document.
   await setZoom(1);
-  await page.getByLabel("界面模式").selectOption("developer");
+  await setInterfaceMode(page, "developer");
+  await page.getByRole("button", { name: "设置", exact: true }).click();
   await page
     .getByRole("button", { name: "模型与运行配置", exact: true })
     .click();
@@ -123,7 +125,7 @@ export async function verifyNativePatientZoom(page, setZoom, { shot } = {}) {
     "",
   );
   await page.getByRole("button", { name: "问诊", exact: true }).click();
-  await page.getByLabel("界面模式").selectOption("patient");
+  await setInterfaceMode(page, "patient");
   try {
     await setZoom(2);
     const id = await reachSelfCheck(page, "发热");

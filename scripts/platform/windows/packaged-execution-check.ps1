@@ -61,7 +61,7 @@ try {
     $env:MEDAGENT_PYTHON = $python
     $env:CHENGXIN_EXECUTION_ROOT = $packageRoot
     $bootstrap = 'import runpy,sys;sys.path.insert(0,sys.argv.pop(1));p=sys.argv.pop(1);sys.argv[0]=p;runpy.run_path(p,run_name="__main__")'
-    Invoke-ChengxinCommand $python @('-I', '-X', 'utf8', '-c', $bootstrap, (Join-Path $packageRoot 'src'), (Join-Path $projectRoot 'tests/test_windows_execution.py'))
+    Invoke-ChengxinCommand $python @('-I', '-X', 'utf8', '-c', $bootstrap, (Join-Path $packageRoot 'src'), (Join-Path $projectRoot 'tests/execution/test_windows_execution.py'))
     Invoke-ChengxinCommand (Join-Path $nodeRoot 'node.exe') @((Join-Path $projectRoot 'integrations/dsh/tests/root-wakeup-runtime.mjs'))
     @{passed=$true; packaged_execution=$true; python=$python; node=(Join-Path $nodeRoot 'node.exe'); source=$packageRoot} | ConvertTo-Json -Compress
 } finally {
