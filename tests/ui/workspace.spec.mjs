@@ -1,7 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { setInterfaceMode } from "../fixtures/interface-mode.mjs";
 import { mkdir } from "node:fs/promises";
-import { answerText, answerUntil, chooseChoice } from "../fixtures/intake.mjs";
+import {
+  answerText,
+  answerUntil,
+  chooseChoice,
+  recordAdultIntake,
+} from "../fixtures/intake.mjs";
 import { SHOTS_DIR } from "../fixtures/shots.mjs";
 
 const shots = SHOTS_DIR;
@@ -411,8 +416,7 @@ test("editing a fact updates the actual case and retains the previous value", as
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await answerText(page, "我自己，男，32岁");
+  await recordAdultIntake(page);
   await page.locator("#toggle-facts").click();
   const age = page.locator(".fact-row").filter({ hasText: "年龄" });
   await expect(age).toContainText("32 岁");
@@ -524,8 +528,7 @@ test("a lost response recovers persisted progress and patient markup stays plain
   request,
 }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await answerText(page, "我自己，男，32岁");
+  await recordAdultIntake(page);
   const input = page.getByRole("textbox", { name: "输入你的描述" });
   let savedSession;
   await page.route(

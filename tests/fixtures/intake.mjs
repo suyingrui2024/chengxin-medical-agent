@@ -44,6 +44,29 @@ export async function currentQuestion(page, id) {
   return replies.at(-1)?.payload?.reply?.question_id ?? null;
 }
 
+/** Record a synthetic adult's demographics, following the actual pending questions. */
+export async function recordAdultIntake(page) {
+  await expect(page.getByText("本机服务已连接", { exact: true })).toBeVisible();
+  const created = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().endsWith("/api/sessions"),
+  );
+  await page.getByRole("button", { name: "开始问诊", exact: true }).click();
+  const { session_id: id } = await (await created).json();
+  await answerUntil(
+    page,
+    id,
+    async () =>
+      (await sessionSnapshot(page, id)).state.facts.age_years?.value === 32,
+    { answers: { consult_for: "我自己", sex: "男", age: "32岁" }, max: 4 },
+  );
+  expect((await sessionSnapshot(page, id)).state.facts.age_years.value).toBe(
+    32,
+  );
+  return id;
+}
+
 export async function answerText(page, text) {
   await page.getByRole("textbox", { name: "输入你的描述" }).fill(text);
   await page.getByRole("button", { name: "发送回答" }).click();
