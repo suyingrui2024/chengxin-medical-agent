@@ -17,6 +17,8 @@ test.beforeAll(async () => {
 test("patient conversation, self-check, history, evidence and export use actual server state", async ({
   page,
 }) => {
+  // This journey spans intake, a self-check, history, evidence and an export.
+  test.slow();
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");

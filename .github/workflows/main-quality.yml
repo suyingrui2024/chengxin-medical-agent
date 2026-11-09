@@ -204,3 +204,11 @@ jobs:
           UI_PORT: 18766
           UI_OUTPUT_DIR: test-results/ui-smoke
         run: npx playwright test --config playwright.ci.config.mjs --reporter=line workspace
+      - name: Upload macOS browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-failure-macos
+          path: test-results/ui-smoke
+          retention-days: 7
+          if-no-files-found: ignore
