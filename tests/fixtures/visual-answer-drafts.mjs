@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { recordAdultIntake } from "./intake.mjs";
 
 export async function degreeSnapshot(page, id) {
   return page.evaluate(
@@ -8,23 +9,12 @@ export async function degreeSnapshot(page, id) {
 }
 
 export async function reachDegree(page, { complaint = "头疼" } = {}) {
-  const created = page.waitForResponse(
-    (r) => r.request().method() === "POST" && r.url().endsWith("/api/sessions"),
-  );
-  await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  const id = (await (await created).json()).session_id;
+  const id = await recordAdultIntake(page);
   const answer = async (text) => {
     await page.getByRole("textbox", { name: "输入你的描述" }).fill(text);
     await page.getByRole("button", { name: "发送回答" }).click();
     await expect(page.locator("#send-button")).toBeEnabled();
   };
-  await page.getByRole("button", { name: "我自己", exact: true }).click();
-  // d1568d6 起开场题序为 consult_for → sex → age → 主诉 → 急诊筛查：
-  // sex 是选项题（questions.json：choice，按钮“男”/“女”），须在“32岁”
-  // 之前先点选；旧夹具跳过 sex 导致“32岁”喂给 sex 题、主诉喂给 age 题。
-  await page.getByRole("button", { name: "男", exact: true }).click();
-  await expect(page.locator("#send-button")).toBeEnabled();
-  await answer("32岁");
   await answer(complaint);
   await page.getByRole("button", { name: "都没有", exact: true }).click();
   // The differential planner orders the history phase by discrimination

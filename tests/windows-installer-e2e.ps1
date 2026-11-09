@@ -1,6 +1,7 @@
 #requires -Version 5.1
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'windows-shortcut-target.ps1')
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $astErrors = $null
 $astTokens = $null
@@ -24,16 +25,15 @@ try {
     Invoke-ChengxinCommand (Join-Path $projectRoot '.runtime/windows/node/node.exe') @('scripts/platform/windows/gui-check.mjs')
     $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) $shortcutName
     if (-not (Test-Path -LiteralPath $shortcutPath)) { throw 'Installer did not create its desktop shortcut.' }
-    $shell = New-Object -ComObject WScript.Shell
-    $shortcut = $shell.CreateShortcut($shortcutPath)
-    # Shell links may expose a short (8.3) path; compare native file identity, not spelling.
+    $desktopTarget = Get-ChengxinShortcutTarget -Path $shortcutPath
+    # The native Unicode reader preserves link errors; compare the target's file identity.
     $installedPython = Join-Path $target 'resources/app/runtime/python/python.exe'
     $verifyTarget = 'import os,sys; actual,expected=sys.argv[1:]; assert os.path.samefile(actual,expected), f"Shortcut target differs: {actual!r} != {expected!r}"'
-    Write-Host ('Desktop shortcut target: ' + $shortcut.TargetPath + ' expected: ' + $env:MEDAGENT_DESKTOP_BINARY)
-    Invoke-ChengxinCommand $installedPython @('-I', '-c', $verifyTarget, $shortcut.TargetPath, $env:MEDAGENT_DESKTOP_BINARY)
+    Write-Host ('Desktop shortcut target: ' + $desktopTarget + ' expected: ' + $env:MEDAGENT_DESKTOP_BINARY)
+    Invoke-ChengxinCommand $installedPython @('-I', '-c', $verifyTarget, $desktopTarget, $env:MEDAGENT_DESKTOP_BINARY)
     $menuPath = Join-Path ([Environment]::GetFolderPath('Programs')) $shortcutName
     if (-not (Test-Path -LiteralPath $menuPath)) { throw 'Installer did not create its Start menu shortcut.' }
-    $menuTarget = $shell.CreateShortcut($menuPath).TargetPath
+    $menuTarget = Get-ChengxinShortcutTarget -Path $menuPath
     Write-Host ('Start menu shortcut target: ' + $menuTarget + ' expected: ' + $env:MEDAGENT_DESKTOP_BINARY)
     Invoke-ChengxinCommand $installedPython @('-I', '-c', $verifyTarget, $menuTarget, $env:MEDAGENT_DESKTOP_BINARY)
     Invoke-ChengxinCommand (Join-Path $target 'unins000.exe') @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART')
