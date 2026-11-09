@@ -86,7 +86,9 @@ jobs:
             execution: true
             artifact: Windows11-x64-compat
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 35
+    # A cold Arm/x64-compatible run includes runtime installation, packaging
+    # and the packaged SDK suite; allow the complete acceptance to finish.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
