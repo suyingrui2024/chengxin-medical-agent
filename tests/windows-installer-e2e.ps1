@@ -10,7 +10,9 @@ foreach ($name in @('ConvertTo-ChengxinArgument', 'Invoke-ChengxinCommand')) {
     $function = $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) | Where-Object { $_.Name -eq $name }
     Invoke-Expression $function.Extent.Text
 }
-$version = (Get-Content (Join-Path $projectRoot 'package.json') -Raw | ConvertFrom-Json).version
+$metadata = Get-Content (Join-Path $projectRoot 'package.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$version = $metadata.version
+$shortcutName = $metadata.productName + '.lnk'
 $setup = Join-Path $projectRoot "dist/windows/Chengxin-Setup-$version-Windows-x64.exe"
 $target = Join-Path $projectRoot '.runtime/installed application with spaces'
 $oldBinary = $env:MEDAGENT_DESKTOP_BINARY
@@ -20,12 +22,12 @@ try {
     $env:MEDAGENT_DESKTOP_BINARY = Join-Path $target 'Chengxin.exe'
     $env:MEDAGENT_PYTHON = $null
     Invoke-ChengxinCommand (Join-Path $projectRoot '.runtime/windows/node/node.exe') @('scripts/platform/windows/gui-check.mjs')
-    $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Chengxin.lnk'
+    $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) $shortcutName
     if (-not (Test-Path -LiteralPath $shortcutPath)) { throw 'Installer did not create its desktop shortcut.' }
     $shell = New-Object -ComObject WScript.Shell
     $shortcut = $shell.CreateShortcut($shortcutPath)
     if ($shortcut.TargetPath -ne $env:MEDAGENT_DESKTOP_BINARY) { throw 'Installed shortcut points at the wrong executable.' }
-    $menuPath = Join-Path ([Environment]::GetFolderPath('Programs')) 'Chengxin.lnk'
+    $menuPath = Join-Path ([Environment]::GetFolderPath('Programs')) $shortcutName
     if (-not (Test-Path -LiteralPath $menuPath)) { throw 'Installer did not create its Start menu shortcut.' }
     if ($shell.CreateShortcut($menuPath).TargetPath -ne $env:MEDAGENT_DESKTOP_BINARY) { throw 'Start menu shortcut points at the wrong executable.' }
     Invoke-ChengxinCommand (Join-Path $target 'unins000.exe') @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART')
