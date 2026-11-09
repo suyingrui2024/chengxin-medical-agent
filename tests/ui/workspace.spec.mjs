@@ -412,11 +412,7 @@ test("editing a fact updates the actual case and retains the previous value", as
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await page.getByRole("button", { name: "我自己", exact: true }).click();
-  await page.getByRole("button", { name: "男", exact: true }).click();
-  await expect(page.locator("#active-question h2")).toContainText("多大");
-  await page.getByRole("textbox", { name: "输入你的描述" }).fill("32岁");
-  await page.getByRole("button", { name: "发送回答" }).click();
+  await answerText(page, "我自己，男，32岁");
   await page.locator("#toggle-facts").click();
   const age = page.locator(".fact-row").filter({ hasText: "年龄" });
   await expect(age).toContainText("32 岁");
@@ -529,13 +525,8 @@ test("a lost response recovers persisted progress and patient markup stays plain
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "开始问诊", exact: true }).click();
-  await page.getByRole("button", { name: "我自己", exact: true }).click();
-  await page.getByRole("button", { name: "男", exact: true }).click();
-  await expect(page.locator("#active-question h2")).toContainText("多大");
+  await answerText(page, "我自己，男，32岁");
   const input = page.getByRole("textbox", { name: "输入你的描述" });
-  await input.fill("32岁");
-  await page.getByRole("button", { name: "发送回答" }).click();
-  await expect(page.locator("#busy-indicator")).toBeHidden();
   let savedSession;
   await page.route(
     "**/api/sessions/*/messages",
