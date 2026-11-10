@@ -27,6 +27,7 @@ ROW = re.compile(r"^\|\s*`(src/medagent/[\w/]+\.py)`\s*\|\s*`([^`]+)`\s*\|$", re
 #: record what happened, including paths that were deleted on the way -- which
 #: is exactly what this rule would flag.
 SKIP_PARTS = ("docs/evaluations", "node_modules", ".git", ".workbuddy")
+GENERATED_ROOTS = {"dist", "build", ".runtime", ".venv", "test-results", "playwright-report"}
 
 #: ``xxx`` is the conventional placeholder for "some module here" — the mapping
 #: table's intro and the notes pointing at it use it. It is not a claim that a
@@ -43,6 +44,7 @@ def documents() -> list[pathlib.Path]:
         p
         for p in ROOT.rglob("*.md")
         if not any(part in p.as_posix() for part in SKIP_PARTS)
+        and p.relative_to(ROOT).parts[0] not in GENERATED_ROOTS
         # The mapping table is the source of truth: its left column is, by
         # definition, a list of paths that no longer exist.
         and p != MAPPING
@@ -66,6 +68,18 @@ def test_the_mapping_table_is_present_and_parseable():
     """A silently empty table would make the check below vacuous."""
     moves = recorded_moves()
     assert len(moves) >= 20, f"only parsed {len(moves)} rows from {MAPPING.name}"
+
+
+def test_generated_app_copies_are_not_current_source_documentation(tmp_path, monkeypatch):
+    source = tmp_path / "docs" / "current.md"
+    source.parent.mkdir()
+    source.write_text("current documentation", encoding="utf-8")
+    for directory in GENERATED_ROOTS:
+        stale = tmp_path / directory / "app" / "README.md"
+        stale.parent.mkdir(parents=True)
+        stale.write_text("src/medagent/no_longer_exists.py", encoding="utf-8")
+    monkeypatch.setitem(globals(), "ROOT", tmp_path)
+    assert documents() == [source]
 
 
 def test_every_recorded_target_still_exists():

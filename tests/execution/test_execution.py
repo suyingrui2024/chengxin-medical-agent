@@ -7,6 +7,8 @@ import time
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from tests.support.subagent_runtime import wait_child
+
 from medagent.execution import (
     ExecutionManager,
     ExecutionError,
@@ -401,10 +403,11 @@ class FullDshExecutionTests(unittest.TestCase):
                             "input": {
                                 "description": "Independently verify generated result",
                                 "prompt": "CHILD_VERIFY: read result.txt, assert its value is 1250, save review.txt with verified.",
-                                "run_in_background": False,
                             },
                         }
-                    elif step == 4:
+                    elif step == 3:
+                        command = wait_child(body)
+                    elif step == 5:
                         owner.assertIn("FOLLOW_UP", json.dumps(body))
                         command = {
                             "name": "bash",
@@ -415,7 +418,7 @@ class FullDshExecutionTests(unittest.TestCase):
                         }
                     else:
                         command = None
-                    final = "完成 calc.py、result.txt 和独立复核。" if step < 4 else "接续任务完成。"
+                    final = "完成 calc.py、result.txt 和独立复核。" if step < 5 else "接续任务完成。"
                 events = [
                     {
                         "type": "message_start",
@@ -515,7 +518,7 @@ class FullDshExecutionTests(unittest.TestCase):
                     )
                     self.assertTrue((session.directory / "plot.png").read_bytes().startswith(bytes.fromhex("89504e470d0a1a0a")))
                     self.assertEqual(child_calls[0], 2)
-                    self.assertEqual(root_calls[0], 4)
+                    self.assertEqual(root_calls[0], 5)
                     serialized = json.dumps(snapshot, ensure_ascii=False)
                     self.assertNotIn(key, serialized)
                     self.assertIn("subagent.started", serialized)

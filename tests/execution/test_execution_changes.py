@@ -10,6 +10,8 @@ import time
 import unittest
 from uuid import uuid4
 
+from tests.support.subagent_runtime import wait_child
+
 from medagent.execution import ExecutionManager
 from medagent.execution.changes import ChangeTracker, ChangeError, capture, compare
 
@@ -237,17 +239,18 @@ class ChangeSdkTests(unittest.TestCase):
                                 "input": {
                                     "description": "Review actual changes",
                                     "prompt": "CHILD_DIFF_REVIEW: use workspace_changes to inspect main.py, remove only tests/generated.tmp created by this task, and write review.txt with reviewed.",
-                                    "run_in_background": False,
                                 },
                             }
                         elif step == 3:
-                            tool = {"name": "workspace_changes", "input": {}}
+                            tool = wait_child(body)
                         elif step == 4:
+                            tool = {"name": "workspace_changes", "input": {}}
+                        elif step == 5:
                             owner.assertNotIn(
                                 "tests/generated.tmp",
                                 [e["path"] for e in observed(body)[-1]["entries"]],
                             )
-                        elif step == 5:
+                        elif step == 6:
                             tool = {
                                 "name": "bash",
                                 "input": {
@@ -255,12 +258,12 @@ class ChangeSdkTests(unittest.TestCase):
                                     "description": "Continue the original session",
                                 },
                             }
-                        elif step == 6:
+                        elif step == 7:
                             tool = {
                                 "name": "workspace_changes",
                                 "input": {"path": "main.py"},
                             }
-                        elif step == 7:
+                        elif step == 8:
                             owner.assertIn(
                                 "-value = 2", observed(body)[-1]["detail"]["diff"]
                             )
@@ -332,7 +335,7 @@ class ChangeSdkTests(unittest.TestCase):
                     )
                     self.assertEqual(self.wait(session)["status"], "completed")
                     self.assertEqual(failures, [])
-                    self.assertEqual((main_calls[0], child_calls[0]), (5, 3))
+                    self.assertEqual((main_calls[0], child_calls[0]), (6, 3))
                     self.assertEqual(
                         session.changes()["counts"],
                         {"added": 2, "modified": 1, "deleted": 1, "unverified": 0},
@@ -358,7 +361,7 @@ class ChangeSdkTests(unittest.TestCase):
                     self.assertIn(
                         "-value = 2", restored.changes("main.py")["detail"]["diff"]
                     )
-                    self.assertEqual(len(requests), 11)
+                    self.assertEqual(len(requests), 12)
                     self.assertIsNone(restored.process)
                 finally:
                     cold.close()

@@ -1,6 +1,7 @@
 #requires -Version 5.1
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'windows-shortcut-target.ps1')
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $astErrors = $null
 $astTokens = $null
@@ -10,7 +11,9 @@ foreach ($name in @('ConvertTo-ChengxinArgument', 'Invoke-ChengxinCommand')) {
     $function = $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) | Where-Object { $_.Name -eq $name }
     Invoke-Expression $function.Extent.Text
 }
-$version = (Get-Content (Join-Path $projectRoot 'package.json') -Raw | ConvertFrom-Json).version
+$metadata = Get-Content (Join-Path $projectRoot 'package.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$version = $metadata.version
+$shortcutName = $metadata.productName + '.lnk'
 $setup = Join-Path $projectRoot "dist/windows/Chengxin-Setup-$version-Windows-x64.exe"
 $target = Join-Path $projectRoot '.runtime/installed application with spaces'
 $oldBinary = $env:MEDAGENT_DESKTOP_BINARY
@@ -20,14 +23,19 @@ try {
     $env:MEDAGENT_DESKTOP_BINARY = Join-Path $target 'Chengxin.exe'
     $env:MEDAGENT_PYTHON = $null
     Invoke-ChengxinCommand (Join-Path $projectRoot '.runtime/windows/node/node.exe') @('scripts/platform/windows/gui-check.mjs')
-    $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Chengxin.lnk'
+    $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) $shortcutName
     if (-not (Test-Path -LiteralPath $shortcutPath)) { throw 'Installer did not create its desktop shortcut.' }
-    $shell = New-Object -ComObject WScript.Shell
-    $shortcut = $shell.CreateShortcut($shortcutPath)
-    if ($shortcut.TargetPath -ne $env:MEDAGENT_DESKTOP_BINARY) { throw 'Installed shortcut points at the wrong executable.' }
-    $menuPath = Join-Path ([Environment]::GetFolderPath('Programs')) 'Chengxin.lnk'
+    $desktopTarget = Get-ChengxinShortcutTarget -Path $shortcutPath
+    # The native Unicode reader preserves link errors; compare the target's file identity.
+    $installedPython = Join-Path $target 'resources/app/runtime/python/python.exe'
+    $verifyTarget = 'import os,sys; actual,expected=sys.argv[1:]; assert os.path.samefile(actual,expected), f"Shortcut target differs: {actual!r} != {expected!r}"'
+    Write-Host ('Desktop shortcut target: ' + $desktopTarget + ' expected: ' + $env:MEDAGENT_DESKTOP_BINARY)
+    Invoke-ChengxinCommand $installedPython @('-I', '-c', $verifyTarget, $desktopTarget, $env:MEDAGENT_DESKTOP_BINARY)
+    $menuPath = Join-Path ([Environment]::GetFolderPath('Programs')) $shortcutName
     if (-not (Test-Path -LiteralPath $menuPath)) { throw 'Installer did not create its Start menu shortcut.' }
-    if ($shell.CreateShortcut($menuPath).TargetPath -ne $env:MEDAGENT_DESKTOP_BINARY) { throw 'Start menu shortcut points at the wrong executable.' }
+    $menuTarget = Get-ChengxinShortcutTarget -Path $menuPath
+    Write-Host ('Start menu shortcut target: ' + $menuTarget + ' expected: ' + $env:MEDAGENT_DESKTOP_BINARY)
+    Invoke-ChengxinCommand $installedPython @('-I', '-c', $verifyTarget, $menuTarget, $env:MEDAGENT_DESKTOP_BINARY)
     Invoke-ChengxinCommand (Join-Path $target 'unins000.exe') @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART')
     if (Test-Path (Join-Path $target 'Chengxin.exe')) { throw 'Uninstaller did not remove the installed executable.' }
     if ((Test-Path -LiteralPath $shortcutPath) -or (Test-Path -LiteralPath $menuPath)) { throw 'Uninstaller left application shortcuts behind.' }

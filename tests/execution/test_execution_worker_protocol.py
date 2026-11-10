@@ -375,6 +375,16 @@ def test_unparsable_lines_are_skipped_without_disturbing_state(session):
     assert session.status == "completed"
 
 
+@pytest.mark.parametrize("noise", ["null", "[]", '"console text"', "12", '{"type": []}'])
+def test_non_record_json_cannot_interrupt_the_following_valid_event(session, noise):
+    turn_id = with_turn(session)
+    run(session, FakeProcess(noise, *records({
+        "type": "turn.completed", "turn_id": turn_id, "final_response": "valid completion",
+    })))
+    assert session.status == "completed"
+    assert session.final_response == "valid completion"
+
+
 def test_an_oversized_event_is_rejected(session):
     with pytest.raises(ExecutionError, match="执行事件过大"):
         run(session, FakeProcess("x" * 4_000_001 + "\n"))

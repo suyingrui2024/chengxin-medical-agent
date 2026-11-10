@@ -58,6 +58,9 @@ class DshHttpIntegration(unittest.TestCase):
                 },
             },
             {"tool": "ask_question", "arguments": {"question_id": "emergency_screen"}},
+            # The default hypothesis ranker now asks the missing sex field first.
+            # Keep the rejected proposal above to verify a real SDK repair step.
+            {"tool": "ask_question", "arguments": {"question_id": "sex"}},
         ]
 
         class ModelHandler(BaseHTTPRequestHandler):
@@ -189,10 +192,20 @@ class DshHttpIntegration(unittest.TestCase):
                         },
                     },
                 )
-                self.assertEqual(result["reply"]["question_id"], "emergency_screen")
+                self.assertEqual(result["reply"]["question_id"], "sex")
                 self.assertEqual(result["state"]["facts"]["age_years"]["value"], 32)
                 self.assertEqual(result["state"]["facts"]["onset"]["evidence"], "两天")
-                self.assertEqual(len(requests), 3)
+                self.assertEqual(len(requests), 4)
+                envelope = next(
+                    json.loads(part["text"])
+                    for message in requests[3]["messages"]
+                    for part in message.get("content", [])
+                    if part.get("type") == "text"
+                    and part["text"].startswith('{"instructions":')
+                )
+                feedback = json.loads(envelope["messages"][-1]["content"])["tool_result"]
+                self.assertFalse(feedback["ok"])
+                self.assertIn("应先问 sex", feedback["error"])
                 self.assertEqual(
                     result["state"]["calculations"][0]["data"]["value"], "1250"
                 )
@@ -217,10 +230,10 @@ class DshHttpIntegration(unittest.TestCase):
                     },
                 )
                 self.assertEqual(emergency["reply"]["kind"], "emergency")
-                self.assertEqual(len(requests), 3, "urgent input must bypass model")
+                self.assertEqual(len(requests), 4, "urgent input must bypass model")
                 events = ctx.services.require("events").for_session(sid)
                 responses = [e for e in events if e.event_type == "model.responded"]
-                self.assertEqual(len(responses), 3)
+                self.assertEqual(len(responses), 4)
                 self.assertTrue(responses[0].payload["runtime_events"])
         finally:
             if http:

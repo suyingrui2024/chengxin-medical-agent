@@ -10,6 +10,7 @@ import unittest
 
 from medagent.execution import ExecutionManager
 from medagent.execution.observations import validate_observation
+from tests.support.subagent_runtime import started_child
 from tests.support.scripted import Provider, final, tool
 
 
@@ -412,9 +413,10 @@ class DeliveryRuntimeTests(unittest.TestCase):
                         "subagent",
                         description="独立执行交付检查",
                         prompt="CHILD_DELIVERY: run the delivery_check tool with label 子任务检查 and command python3 -c 'assert 2 + 2 == 4', then report the actual result.",
-                        run_in_background=False,
                     )
                     if len(roots) == 1
+                    else tool("wait_subagent", agent_id=started_child(body))
+                    if len(roots) == 2
                     else final("收到子任务实际检查结果")
                 )
             children.append(body)
@@ -432,9 +434,9 @@ class DeliveryRuntimeTests(unittest.TestCase):
         session.start_turn("ROOT_DELIVERY 委托子任务实际执行检查。", 8, 30)
         snapshot = self.finish(session)
         self.assertEqual(snapshot["status"], "completed", snapshot.get("error"))
-        self.assertEqual(len(roots), 2)
+        self.assertEqual(len(roots), 3)
         self.assertEqual(len(children), 2)
-        self.assertEqual(len(self.provider.requests), 4)
+        self.assertEqual(len(self.provider.requests), 5)
         values = self.observations(session)
         self.assertEqual(len(values), 1)
         self.assertNotEqual(values[0]["session_id"], session.id)

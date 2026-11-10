@@ -1,3 +1,5 @@
+import { setInterfaceMode } from "../fixtures/interface-mode.mjs";
+import { waitForChild } from "../fixtures/subagent-receipts.mjs";
 import { _electron as electron, test, expect } from "@playwright/test";
 import { createServer } from "node:http";
 import { once } from "node:events";
@@ -130,6 +132,7 @@ test("native registered calculation renders only host receipts and restores them
   const environment = {
     ...process.env,
     MEDAGENT_DESKTOP_PROFILE: path.join(temporary, "profile"),
+    MEDAGENT_PATIENT_DATA_DIR: path.join(temporary, "patient-data"),
     MEDAGENT_EXECUTION_ROOT: path.join(temporary, "workspaces"),
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "dsh",
@@ -151,7 +154,7 @@ test("native registered calculation renders only host receipts and restores them
     let page = await app.firstWindow();
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.getByLabel("界面模式").selectOption("developer");
+    await setInterfaceMode(page, "developer");
     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
     await page
       .getByLabel("描述执行任务")
@@ -159,7 +162,7 @@ test("native registered calculation renders only host receipts and restores them
         "请把用户输入的1.25 kg换算成g，先查询能力、核对错误后计算。保留草稿文件用于检查。",
       );
     await page.getByRole("button", { name: "执行任务", exact: true }).click();
-    await expect(page.locator("#execution-status")).toHaveText("本轮已完成", {
+    await expect(page.locator("#execution-status")).toHaveText("本轮已结束", {
       timeout: 20000,
     });
     const card = page.locator("#execution-results .calculation-card");
@@ -202,7 +205,7 @@ test("native registered calculation renders only host receipts and restores them
       delete offline[key];
     app = await launch(offline);
     page = await app.firstWindow();
-    await page.getByLabel("界面模式").selectOption("developer");
+    await setInterfaceMode(page, "developer");
     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
     await page.getByLabel("选择执行工作区").selectOption(identity);
     await expect(
@@ -283,10 +286,10 @@ test("native execution creates files, shows real subagents, cancels a process an
             description: "Verify calculation output independently",
             prompt:
               "Read result.txt, verify 1250, and save review.txt containing verified.",
-            run_in_background: false,
           },
         };
-      if (step === 3)
+      if (step === 2) tool = waitForChild(body);
+      if (step === 4)
         tool = {
           name: "bash",
           input: {
@@ -295,7 +298,7 @@ test("native execution creates files, shows real subagents, cancels a process an
             description: "Run a cancellable long process for verification",
           },
         };
-      if (step === 4)
+      if (step === 5)
         tool = {
           name: "bash",
           input: {
@@ -305,7 +308,7 @@ test("native execution creates files, shows real subagents, cancels a process an
               "Resume workspace after cancellation and check artifacts",
           },
         };
-      if (step === 6)
+      if (step === 7)
         tool = {
           name: "bash",
           input: {
@@ -315,7 +318,7 @@ test("native execution creates files, shows real subagents, cancels a process an
             run_in_background: true,
           },
         };
-      if (step === 8)
+      if (step === 9)
         tool = {
           name: "subagent",
           input: {
@@ -333,6 +336,7 @@ test("native execution creates files, shows real subagents, cancels a process an
   const environment = {
     ...process.env,
     MEDAGENT_DESKTOP_PROFILE: path.join(temporary, "profile"),
+    MEDAGENT_PATIENT_DATA_DIR: path.join(temporary, "patient-data"),
     MEDAGENT_EXECUTION_ROOT: path.join(temporary, "workspaces"),
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "dsh",
@@ -352,7 +356,7 @@ test("native execution creates files, shows real subagents, cancels a process an
     const page = await app.firstWindow();
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.getByLabel("界面模式").selectOption("developer");
+    await setInterfaceMode(page, "developer");
     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
     await expect(
       page.getByRole("heading", { name: "把任务，真正做出来。" }),
@@ -521,6 +525,7 @@ test("native execution uses structured outcomes despite misleading command outpu
   const environment = {
     ...process.env,
     MEDAGENT_DESKTOP_PROFILE: path.join(temporary, "profile"),
+    MEDAGENT_PATIENT_DATA_DIR: path.join(temporary, "patient-data"),
     MEDAGENT_EXECUTION_ROOT: path.join(temporary, "workspaces"),
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "dsh",
@@ -540,13 +545,13 @@ test("native execution uses structured outcomes despite misleading command outpu
     let page = await app.firstWindow();
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.getByLabel("界面模式").selectOption("developer");
+    await setInterfaceMode(page, "developer");
     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
     await page
       .getByLabel("描述执行任务")
       .fill("检查后台任务与失败管道的状态呈现。");
     await page.getByRole("button", { name: "执行任务", exact: true }).click();
-    await expect(page.locator("#execution-status")).toHaveText("本轮已完成", {
+    await expect(page.locator("#execution-status")).toHaveText("本轮已结束", {
       timeout: 15000,
     });
     await expect(page.locator(".execution-waiting > strong")).toContainText([
@@ -623,7 +628,7 @@ test("native execution uses structured outcomes despite misleading command outpu
       env: offline,
     });
     page = await app.firstWindow();
-    await page.getByLabel("界面模式").selectOption("developer");
+    await setInterfaceMode(page, "developer");
     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
     await page.getByLabel("选择执行工作区").selectOption(identity);
     await expect(
@@ -679,6 +684,7 @@ test("native execution shows bounded recovery, handles moved directories and ign
   const environment = {
     ...process.env,
     MEDAGENT_DESKTOP_PROFILE: path.join(temporary, "profile"),
+    MEDAGENT_PATIENT_DATA_DIR: path.join(temporary, "patient-data"),
     MEDAGENT_EXECUTION_ROOT: path.join(temporary, "workspaces"),
     MEDAGENT_DESKTOP_LIVE: "1",
     MEDAGENT_BACKEND: "dsh",
@@ -698,7 +704,7 @@ test("native execution shows bounded recovery, handles moved directories and ign
     const page = await app.firstWindow();
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.getByLabel("界面模式").selectOption("developer");
+    await setInterfaceMode(page, "developer");
     await page.getByRole("button", { name: "执行工作台", exact: true }).click();
     await page
       .getByLabel("描述执行任务")
@@ -761,6 +767,18 @@ test("native execution shows bounded recovery, handles moved directories and ign
     let pending;
     let requested = new Promise((resolve) => {
       pending = resolve;
+    });
+    // Deliberately deliver stale responses despite the production AbortController.
+    // This exercises the request-identity guard as well as the normal cancellation path.
+    await page.evaluate(() => {
+      const original = window.fetch;
+      window.fetch = (resource, options = {}) =>
+        original(
+          resource,
+          String(resource).includes("/preview?")
+            ? { ...options, signal: undefined }
+            : options,
+        );
     });
     await page.route("**/api/execution/*/preview?path=*", (route) => {
       if (route.request().url().endsWith("path=recovered.txt")) pending(route);

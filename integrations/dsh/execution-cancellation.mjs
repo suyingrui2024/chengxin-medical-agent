@@ -13,7 +13,12 @@ export function validCancellationScope(scope) {
     scope !== null &&
     typeof scope === "object" &&
     !Array.isArray(scope) &&
-    Object.keys(scope).every((k) => ["root", "sessions", "jobs"].includes(k)) &&
+    Object.keys(scope).every((k) =>
+      ["root", "sessions", "jobs", "task_id"].includes(k),
+    ) &&
+    (scope.task_id === undefined ||
+      (typeof scope.task_id === "string" &&
+        /^[0-9a-f-]{36}$/.test(scope.task_id))) &&
     identity(scope.root) &&
     Array.isArray(scope.sessions) &&
     scope.sessions.length <= 4097 &&

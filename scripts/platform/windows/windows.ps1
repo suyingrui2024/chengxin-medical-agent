@@ -193,13 +193,13 @@ try {
             Invoke-ChengxinCommand $node @('scripts/build/build-windows-installer.mjs')
         } elseif ($Mode -eq 'Test') {
             & (Join-Path $projectRoot 'tests\windows-installer.ps1')
-            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_native.py')
-            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_execution_closed_pipe.py')
-            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_server_asset_burst.py')
+            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\execution\test_windows_native.py')
+            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\execution\test_execution_closed_pipe.py')
+            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\server\test_server_asset_burst.py')
         } elseif ($Mode -eq 'ExecutionTest') {
             Invoke-ChengxinCommand $node @('scripts/platform/windows/isolation-check.mjs')
             Invoke-ChengxinCommand $node @('integrations/dsh/tests/root-wakeup-runtime.mjs')
-            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\test_windows_execution.py')
+            Invoke-ChengxinPython (Join-Path $projectRoot 'tests\execution\test_windows_execution.py')
         } elseif ($Live) {
             Invoke-ChengxinPython (Join-Path $projectRoot 'scripts\app\start_live_desktop.py')
         } else {

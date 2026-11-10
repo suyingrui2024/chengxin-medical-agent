@@ -22,7 +22,7 @@ PROMPT = """这是非医疗的合成执行验收，只操作当前工作区。�
 2. 再用独立 bash 调用原样执行命令 B：bash -c 'printf expected-nonzero; exit 7'
 3. 用 bash 的 run_in_background=true 执行命令 C：python3 -c 'import time,sys;time.sleep(1.5);print("background-nonzero");sys.exit(9)'
    然后使用 job_output 等待并读取同一个任务的实际结果。
-4. 委托一个子智能体实际执行命令 A，并用 bash 创建 child.txt，内容为 verified；依赖结果，run_in_background=false。
+4. 委托一个子智能体实际执行命令 A，并用 bash 创建 child.txt，内容为 verified；依赖结果，取得子任务 ID 后调用 wait_subagent，核对完成状态和真实产物。
 5. 根据真实结果保存 status.json，恰为 {"A":0,"B":7,"C":9}。A打印的文字不能当作进程退出码。
 B、C是预期失败，不要修复、改写或重复运行。不要联网和增加额外报告。最终用一句话说明实际状态。"""
 

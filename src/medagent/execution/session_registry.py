@@ -31,7 +31,7 @@ from .session import ExecutionSession
 
 class ExecutionManager:
     def __init__(self, root=None, source_root=None):
-        self.source_root = Path(source_root or Path(__file__).resolve().parents[2])
+        self.source_root = Path(source_root or Path(__file__).resolve().parents[3])
         self.root = Path(
             root
             or os.environ.get(

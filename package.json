@@ -13,7 +13,7 @@
     "test:desktop": "playwright test --config playwright.desktop.config.mjs",
     "test:desktop-credentials": "node --test desktop/model-credentials.test.cjs",
     "test:desktop:live": "PYTHONPATH=src python3 scripts/evaluation/medical/test_live_desktop.py",
-    "test:execution": "RUN_DSH_EXECUTION=1 PYTHONPATH=src python3 -m unittest discover -s tests -p test_execution.py -v",
+    "test:execution": "RUN_DSH_EXECUTION=1 PYTHONPATH=src python3 -m pytest tests/execution -q",
     "test:execution:live": "PYTHONPATH=src python3 scripts/evaluation/execution/evaluate_execution.py",
     "test:execution:benchmark": "PYTHONPATH=src python3 scripts/benchmarks/benchmark_execution.py",
     "test:execution:persistence": "PYTHONPATH=src python3 scripts/evaluation/execution/evaluate_persistence.py",
