@@ -33,6 +33,9 @@ function Copy-ChengxinTestPackage {
     $robocopy = Join-Path $env:SystemRoot 'System32\robocopy.exe'
     & $robocopy $Source $Destination '/E' '/COPY:DAT' '/DCOPY:T' '/R:1' '/W:1' '/NJH' '/NJS' '/NDL' '/NFL' '/NP'
     if ($LASTEXITCODE -gt 7) { throw "Unable to copy the test package (robocopy exit code $LASTEXITCODE)." }
+    # Robocopy codes 0..7 are successful. Actions otherwise exits with the
+    # stale native code (often 1), even after every SDK assertion has passed.
+    $global:LASTEXITCODE = 0
 }
 
 $originalApplication = (Resolve-Path -LiteralPath $ApplicationDirectory).Path

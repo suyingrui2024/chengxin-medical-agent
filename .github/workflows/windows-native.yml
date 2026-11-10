@@ -133,6 +133,9 @@ jobs:
           $env:PYTHONPATH = Join-Path (Get-Location) 'src'
           & ./.runtime/windows/python/python.exe -m unittest tests.execution.test_execution_observations.ObservationContractTests tests.execution.test_execution_checkpoints tests.execution.test_execution_persistence.WorkspaceIndexTests.test_stopped_turn_explanation_survives_offline_reopen_without_execution tests.execution.test_execution_clarifications.ClarificationRecordTests -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify native package-copy exit status
+        shell: powershell
+        run: ./tests/windows-package-copy.ps1
       - name: Native Windows isolation and full SDK execution
         if: matrix.execution
         shell: powershell
