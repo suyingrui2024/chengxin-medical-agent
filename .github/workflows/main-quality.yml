@@ -83,7 +83,9 @@ jobs:
       # the server's illustration rule and the browser's went unnoticed until
       # a task card failed to render in fourteen browser tests.
       - name: Run the frontend unit tests
-        run: npm run test:unit
+        run: |
+          npm run test:unit
+          node --test integrations/dsh/tests/execution-profile.test.mjs
       - name: Run the full Python suite and the release gate
         env:
           PYTHONPATH: src
@@ -198,7 +200,9 @@ jobs:
           PYTHONPATH: src
         run: python -m pytest tests -q
       - name: Frontend unit tests
-        run: npm run test:unit
+        run: |
+          npm run test:unit
+          node --test integrations/dsh/tests/execution-profile.test.mjs
       - name: Browser smoke (one spec file, fresh server)
         env:
           UI_PORT: 18766

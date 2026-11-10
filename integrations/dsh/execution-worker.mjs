@@ -12,6 +12,7 @@ import { createPathResolver } from "../windows/path-broker.mjs";
 import { hasActiveJobs, observationKey } from "./execution-observations.mjs";
 import { ClarificationBroker } from "./execution-clarifications.mjs";
 import { runOwnedPrompt } from "./execution-prompt.mjs";
+import { ensureExecutionProfileScope } from "./execution-profile.mjs";
 import { checkArguments } from "./execution-delivery-contract.mjs";
 import {
   ExecutionOwnership,
@@ -1039,7 +1040,7 @@ async function setup(payload) {
   config.user_turns = Array.isArray(payload.user_turns)
     ? payload.user_turns.slice(-64)
     : [];
-  await mkdir(join(config.state, "home"), { recursive: true });
+  await ensureExecutionProfileScope(config.state);
   if (process.platform === "win32") {
     const patches = join(config.state, "..", ".native-patches");
     await mkdir(patches, { recursive: true });
