@@ -64,7 +64,7 @@ class CorrectionNoticeTests(unittest.TestCase):
 
     def test_notice_skips_labels_it_does_not_know(self):
         engine, _state = build_engine()
-        notice = engine._correction_notice({"onset", "some_new_field"})
+        notice = engine.subjects._correction_notice({"onset", "some_new_field"})
         self.assertIn("开始时间", notice)
         self.assertNotIn("some_new_field", notice)
 

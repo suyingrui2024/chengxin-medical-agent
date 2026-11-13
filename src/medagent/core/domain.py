@@ -154,7 +154,7 @@ class CaseState:
     # verbatim, so a None default alone would split fresh states (None)
     # from restored ones ({}) instead of unifying them.
     follow_up: Dict[str, Any] = field(default_factory=dict)
-    # Patient-facing conclusion sheet (docs/问诊结论单设计文档.md),
+    # Patient-facing conclusion sheet (docs/features/问诊结论单设计文档.md),
     # serialized form; the composer lives in medagent.conclusion.
     conclusion: Dict[str, Any] = field(default_factory=dict)
     # P2c archive reference (design §4.3): the whitelisted baseline

@@ -347,7 +347,7 @@ class TemperatureOfferBridgingTests(unittest.TestCase):
 
     def test_offer_acknowledges_the_reported_reading(self):
         self._flow_with_reported_reading()
-        reply = self.engine._offer_task(self.state, "发烧")
+        reply = self.engine.planning._offer_task(self.state, "发烧")
         self.assertIsNotNone(reply)
         self.assertEqual(reply.kind, "self_check")
         self.assertIn("38.5℃", reply.message)
@@ -384,7 +384,7 @@ class TemperatureOfferBridgingTests(unittest.TestCase):
             cmd("ask_question", question_id="sex"),
         ]
         self.flow.submit("我自己，孩子3岁，发烧，上述危险信号都没有。")
-        reply = self.engine._offer_task(self.state, "发烧")
+        reply = self.engine.planning._offer_task(self.state, "发烧")
         self.assertIsNotNone(reply)
         self.assertEqual(reply.kind, "self_check")
         self.assertIn("为了把当前情况记录得更清楚", reply.message)

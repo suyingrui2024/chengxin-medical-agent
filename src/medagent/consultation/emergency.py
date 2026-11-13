@@ -1,4 +1,4 @@
-"""Mixin: emergency for ConsultationEngine."""
+"""Workflow component: emergency for ConsultationEngine."""
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 from ..core.domain import (
@@ -19,6 +19,10 @@ from .vocabulary import FACT_LABELS, VALUE_LABELS
 
 
 class ConsultationEngineEmergency:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _emergency_clarification_pending(self, state: CaseState) -> Optional[Dict[str, Any]]:
         pending = state.runtime_snapshot.get("emergency_clarification")
         return pending if isinstance(pending, dict) else None
@@ -50,7 +54,7 @@ class ConsultationEngineEmergency:
         if set(risk_tags or ()) & DIRECT_EMERGENCY_TAGS:
             return "none"
         try:
-            hits = self.triage.scan_detailed(text)
+            hits = self.engine.triage.scan_detailed(text)
         except Exception:
             return "none"
         if not hits:
@@ -79,21 +83,21 @@ class ConsultationEngineEmergency:
         able to say so without arguing with the wording.
         """
         try:
-            hits = self.triage.scan_detailed(text)
+            hits = self.engine.triage.scan_detailed(text)
         except Exception:
             hits = []
         # Same publication-gate reason as _urgent_or_defer: a
         # clarification question cannot be delivered while risk is
         # EMERGENCY, so the not-yet-confirmed escalation is stood down
         # (facts and the pending clarification record are untouched).
-        state.risk = self._deferred_risk(state)
+        state.risk = self.engine.planning._deferred_risk(state)
         labels = sorted({hit.label for hit in hits})
         state.runtime_snapshot["emergency_clarification"] = {
             "text": text,
             "labels": labels,
             "evidence": [hit.evidence for hit in hits],
         }
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "emergency.clarification_asked",
@@ -133,7 +137,7 @@ class ConsultationEngineEmergency:
             return None
         labels = list(pending.get("labels") or [])
         state.runtime_snapshot.pop("emergency_clarification", None)
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "emergency.clarification_confirmed",
@@ -152,7 +156,7 @@ class ConsultationEngineEmergency:
         the original turn's signals instead of the latest message's.
         """
         texts = []
-        for event in self.events.for_session(state.session_id):
+        for event in self.engine.events.for_session(state.session_id):
             if event.event_type == "turn.user_message":
                 text = event.payload.get("text")
                 if isinstance(text, str) and text:
@@ -167,7 +171,7 @@ class ConsultationEngineEmergency:
         seen = set()
         for text in texts:
             try:
-                scanned = self.triage.scan_detailed(text)
+                scanned = self.engine.triage.scan_detailed(text)
             except Exception:
                 continue
             for hit in scanned:
@@ -193,7 +197,7 @@ class ConsultationEngineEmergency:
         """
         hits = self._emergency_scan_hits(state)
         try:
-            rendered = self.triage.confirmed_trigger_labels(
+            rendered = self.engine.triage.confirmed_trigger_labels(
                 hits, state, include_clarification=include_clarification
             )
         except Exception:
@@ -220,7 +224,7 @@ class ConsultationEngineEmergency:
         replay renders with the flag on.
         """
         confirmed = set()
-        for event in self.events.for_session(state.session_id):
+        for event in self.engine.events.for_session(state.session_id):
             if event.event_type == "emergency.clarification_confirmed":
                 confirmed.update(event.payload.get("labels") or [])
         include = bool(confirmed & set(triggers or []))
@@ -330,9 +334,9 @@ class ConsultationEngineEmergency:
         whatever ``state.risk`` holds afterwards.
         """
         state.subject_resume = state.subject_candidate = None
-        self._clear_calculation(state, "emergency")
-        self._clear_observation(state, "emergency")
-        self._clear_task_conversation(state, "emergency")
+        self.engine.calculations._clear_calculation(state, "emergency")
+        self.engine.observations._clear_observation(state, "emergency")
+        self.engine.tasks._clear_task_conversation(state, "emergency")
         state.phase = Phase.CLOSED
         state.closed_reason = "emergency_route"
         state.active_question = None
@@ -340,11 +344,11 @@ class ConsultationEngineEmergency:
         state.active_task = None
         original = list(dict.fromkeys(triggers or []))
         confirmed_facts = self._confirmed_facts_summary(state)
-        facts_text = self._close_facts_text(confirmed_facts)
-        routing_text = self._close_routing_text(state, confirmed_facts)
+        facts_text = self.engine.replies._close_facts_text(confirmed_facts)
+        routing_text = self.engine.replies._close_routing_text(state, confirmed_facts)
         if requested_help:
             message = (
-                self._CLOSE_SOOTHING
+                self.engine._CLOSE_SOOTHING
                 + "你已选择优先求助。本次问诊已停止。"
                 "请现在拨打 120，或让身边的人协助呼叫急救；不要自己驾车。"
             )
@@ -370,14 +374,14 @@ class ConsultationEngineEmergency:
                 state, original, include_clarification=include_clarification
             )
             if rendered != original:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "emergency.triggers_filtered",
                         {"original": original, "rendered": rendered},
                     )
                 )
-            message = self._CLOSE_SOOTHING + emergency_explanation(rendered)
+            message = self.engine._CLOSE_SOOTHING + emergency_explanation(rendered)
             if facts_text:
                 message += f"已确认的情况：{facts_text}。"
             if routing_text:
@@ -408,10 +412,10 @@ class ConsultationEngineEmergency:
         clause is dropped rather than left dangling.
         """
         state.subject_resume = state.subject_candidate = None
-        self._clear_calculation(state, "urgent")
-        self._clear_observation(state, "urgent")
-        self._clear_task_conversation(state, "urgent")
-        reply = self._finish(state, risk_override=deepcopy(state.risk))
+        self.engine.calculations._clear_calculation(state, "urgent")
+        self.engine.observations._clear_observation(state, "urgent")
+        self.engine.tasks._clear_task_conversation(state, "urgent")
+        reply = self.engine.replies._finish(state, risk_override=deepcopy(state.risk))
         reply.kind = "urgent"
         triggers = "、".join(state.risk.triggers)
         # Batch C close copy: soothing + direct destination answer +
@@ -425,11 +429,11 @@ class ConsultationEngineEmergency:
         # the urgent_today level via _close_direct_sentence; no
         # department field is read here (C12 residual).
         items = self._confirmed_facts_summary(state)
-        facts_text = self._close_facts_text(items)
+        facts_text = self.engine.replies._close_facts_text(items)
         plan = state.follow_up or reply.follow_up or {}
-        direct = self._close_direct_sentence(plan.get("due_in_hours") or 24)
+        direct = self.engine.replies._close_direct_sentence(plan.get("due_in_hours") or 24)
         head = (
-            self._CLOSE_SOOTHING
+            self.engine._CLOSE_SOOTHING
             + "目前有需要尽快就医评估的线索（"
             + triggers
             + "）。"
@@ -450,7 +454,7 @@ class ConsultationEngineEmergency:
 
     def _source_turns(self, state: CaseState) -> Dict[str, str]:
         source_turns = {}
-        for event in self.events.for_session(state.session_id):
+        for event in self.engine.events.for_session(state.session_id):
             if event.event_type == "turn.user_message":
                 source_turns[event.turn_id] = event.payload.get("text")
             elif event.event_type == "fact.correction_requested":

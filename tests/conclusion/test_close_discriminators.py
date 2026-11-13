@@ -128,21 +128,21 @@ class G12CloseTests(unittest.TestCase):
         spent and answers still unknown — closes exactly as before
         (summary phase via _finish, no loop, no disposition change)."""
         state = self._g4_state()
-        first = self.engine._plan_next(state)
+        first = self.engine.planning._plan_next(state)
         self.assertEqual(first.kind, "question")
         self.assertEqual(first.question_id, "emergency_screen")
         # Patient again cannot say whether it counts as major bleeding.
         state.record(_unknown("emergency_screen", SCREEN_EVIDENCE))
-        second = self.engine._plan_next(state)
+        second = self.engine.planning._plan_next(state)
         self.assertEqual(second.kind, "question")
         self.assertEqual(second.question_id, "trajectory")
         state.record(_unknown("trajectory", "变化趋势不清楚"))
-        third = self.engine._plan_next(state)
+        third = self.engine.planning._plan_next(state)
         self.assertEqual(third.kind, "summary")
         self.assertEqual(third.phase, Phase.SUMMARY)
         # No fourth detour: the gate is spent, the close stands.
         state.phase = Phase.SUMMARY
-        self.assertIsNone(self.engine._undetermined_close_discriminator(state))
+        self.assertIsNone(self.engine.planning._undetermined_close_discriminator(state))
 
     def test_never_asked_discriminator_selected_first(self):
         """Helper-level guard: with gi_details never asked (and its
@@ -152,7 +152,7 @@ class G12CloseTests(unittest.TestCase):
             asked=[q for q in G4_ASKED if q != "gi_details"]
         )
         state.facts.pop("gi_details")
-        selected = self.engine._undetermined_close_discriminator(state)
+        selected = self.engine.planning._undetermined_close_discriminator(state)
         self.assertIsNotNone(selected)
         question, reask = selected
         self.assertEqual(question.id, "gi_details")
@@ -170,7 +170,7 @@ class G12CloseTests(unittest.TestCase):
                     {"question_id": question_id, "reask": True},
                 )
             )
-        reply = self.engine._plan_next(state)
+        reply = self.engine.planning._plan_next(state)
         self.assertEqual(reply.kind, "summary")
         self.assertEqual(reply.phase, Phase.SUMMARY)
 
@@ -182,7 +182,7 @@ class G12CloseTests(unittest.TestCase):
             asked=[q for q in G4_ASKED if q != "patient_goal"]
         )
         state.facts.pop("patient_goal")
-        reply = self.engine._plan_next(state)
+        reply = self.engine.planning._plan_next(state)
         self.assertEqual(reply.kind, "question")
         self.assertEqual(reply.question_id, "patient_goal")
 
@@ -194,8 +194,8 @@ class G12CloseTests(unittest.TestCase):
                 "emergency_screen", None, "没有危险信号", Assertion.ABSENT
             )
         )
-        self.assertIsNone(self.engine._undetermined_close_discriminator(state))
-        reply = self.engine._plan_next(state)
+        self.assertIsNone(self.engine.planning._undetermined_close_discriminator(state))
+        reply = self.engine.planning._plan_next(state)
         self.assertEqual(reply.kind, "summary")
         self.assertEqual(reply.phase, Phase.SUMMARY)
 
@@ -211,7 +211,7 @@ class G12CloseTests(unittest.TestCase):
                 {"question_id": "emergency_screen", "reask": True},
             )
         )
-        reply = self.engine._plan_next(state)
+        reply = self.engine.planning._plan_next(state)
         self.assertEqual(reply.kind, "question")
         self.assertEqual(reply.question_id, "trajectory")
 

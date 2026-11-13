@@ -29,7 +29,7 @@ HASH = re.compile(r"[0-9a-f]{64}")
 # a path that no longer exists raises on read, and a path that now points at
 # different code silently hashes the wrong bytes.
 #
-# ``tests/test_execution_capabilities.py::test_implementation_files_all_exist``
+# ``tests/execution/test_execution_capabilities.py::test_implementation_files_all_exist``
 # asserts every entry still resolves, so a move cannot slip through unnoticed.
 IMPLEMENTATION_FILES = (
     "execution/capabilities.py",

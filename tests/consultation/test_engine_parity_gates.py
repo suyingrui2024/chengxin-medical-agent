@@ -179,7 +179,7 @@ class NonBlockingCloseGateTests(unittest.TestCase):
 
     def test_only_non_blocking_remaining_finishes_rule_path(self):
         state = filled_state(self.engine, skip_fact_keys={"reported_temperature"})
-        reply = self.engine._plan_next(state)
+        reply = self.engine.planning._plan_next(state)
         self.assertEqual(reply.kind, "summary")
 
     def test_only_non_blocking_remaining_finishes_differential_path(self):
@@ -194,7 +194,7 @@ class NonBlockingCloseGateTests(unittest.TestCase):
         state = filled_state(
             self.engine, skip_fact_keys={"reported_temperature", "patient_goal"}
         )
-        reply = self.engine._plan_next(state)
+        reply = self.engine.planning._plan_next(state)
         self.assertEqual(reply.kind, "question")
         self.assertEqual(reply.question_id, "reported_temperature")
 

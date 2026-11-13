@@ -326,7 +326,7 @@ class SummaryLabelTests(unittest.TestCase):
                 evidence=WORRY_1,
             )
         )
-        payload = self.engine._summary_payload(
+        payload = self.engine.replies._summary_payload(
             state, review_status="confirmed_by_user"
         )
         labels = {row["key"]: row["label"] for row in payload["known"]}
@@ -344,10 +344,10 @@ class GoalGateTests(unittest.TestCase):
         engine, backend, _ = make_engine()
         state, _ = engine.create_session()
         backend.commands = []
-        context = engine._context(state, "")
+        context = engine.model_context._context(state, "")
         self.assertIn("patient_goal", context["missing_required"])
         with self.assertRaises(ProposalError) as caught:
-            engine._execute(
+            engine.model_actions._execute(
                 state, cmd("review_summary"), "", "t-gate"
             )
         self.assertIn("patient_goal", str(caught.exception))
@@ -369,7 +369,7 @@ class GoalGateTests(unittest.TestCase):
         )
         self.assertIn("patient_goal", state.facts)
         self.assertNotIn(
-            "patient_goal", engine._context(state, "")["missing_required"]
+            "patient_goal", engine.model_context._context(state, "")["missing_required"]
         )
         state.phase = Phase.CLOSED
         state.closed_reason = "confirmed_by_user"

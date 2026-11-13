@@ -42,7 +42,8 @@ test("new task occurrences reset steps while same occurrences and sessions stay 
     .at(-1).payload.reply.task;
   const states = await page.evaluate(
     async ({ task, id }) => {
-      const { createRenderer } = await import("/js/structured-ui.js");
+      const { createRenderer } =
+        await import("/js/structured/structured-ui.js");
       const renderer = createRenderer();
       const render = (interaction, sessionId = id, readOnly = false) =>
         renderer.render(

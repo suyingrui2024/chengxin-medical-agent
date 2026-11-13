@@ -1,4 +1,4 @@
-"""v1.3 conclusion composer tests (docs/问诊结论单设计文档.md §13).
+"""v1.3 conclusion composer tests (docs/features/问诊结论单设计文档.md §13).
 
 Covers the composer package only:
 

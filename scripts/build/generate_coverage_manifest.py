@@ -13,7 +13,7 @@ Coverage is derived from artefacts, not from reading test source:
   review  — it appears in a clinical review packet.
 
 Uncovered capabilities are written into the manifest as an explicit gap
-list. ``tests/test_coverage_manifest.py`` fails when that list no longer
+list. ``tests/architecture/test_coverage_manifest.py`` fails when that list no longer
 matches reality, so a gap can shrink (good, regenerate) but never grow
 silently.
 """
@@ -26,7 +26,7 @@ from medagent.extensions.builtin import load_registry
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "tests" / "fixtures" / "coverage-manifest.json"
-REPORT = ROOT / "docs" / "测试覆盖矩阵.md"
+REPORT = ROOT / "docs" / "development" / "测试覆盖矩阵.md"
 
 
 def ids_in(paths):
@@ -103,7 +103,7 @@ def main():
         "# 测试覆盖矩阵",
         "",
         "> 由 `scripts/build/generate_coverage_manifest.py` 生成，不要手工编辑。",
-        "> `tests/test_coverage_manifest.py` 会校验：引擎覆盖必须 100%，",
+        "> `tests/architecture/test_coverage_manifest.py` 会校验：引擎覆盖必须 100%，",
         "> 患者可用项必须有浏览器覆盖，缺口清单必须与实际一致。",
         "",
         "## 总量",

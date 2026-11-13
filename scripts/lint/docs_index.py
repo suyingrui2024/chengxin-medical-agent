@@ -20,11 +20,12 @@ Run locally::
     python scripts/lint/docs_index.py          # rewrite the index
     python scripts/lint/docs_index.py --check  # fail if it has drifted
 """
+
 from __future__ import annotations
 
 import argparse
 import pathlib
-import subprocess
+import os
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -39,117 +40,122 @@ GROUPS: list[tuple[str, str, list[str]]] = [
     (
         "从这里开始",
         "系统现在是什么。先读这一篇，其余按需查阅。",
-        ["系统现状总览.md"],
+        ["getting-started/系统现状总览.md"],
     ),
     (
         "规范与流程",
         "改代码前必读：规则、门禁、发布流程与数据出域边界。",
         [
-            "代码与命名规范.md",
-            "架构分层规则.md",
-            "模块路径变更对照.md",
-            "数据出域与隐私.md",
-            "发布门、阶段提交与临床评测框架.md",
+            "development/代码与命名规范.md",
+            "development/项目收敛与文件管理.md",
+            "architecture/架构分层规则.md",
+            "architecture/模块路径变更对照.md",
+            "architecture/数据出域与隐私.md",
+            "development/发布门、阶段提交与临床评测框架.md",
+            "development/THIRD_PARTY_NOTICES.md",
         ],
     ),
     (
         "产品与问诊引擎",
         "假设驱动的问诊流程、结论单、风险分流与事实校验。",
         [
-            "首版产品与技术设计.md",
-            "假设驱动问诊设计文档.md",
-            "问诊结论单设计文档.md",
-            "动态问诊选项与风险分流设计.md",
-            "事实断言与否定证据校验.md",
-            "长问诊的信息保留与原话核对.md",
-            "就诊对象与会谈草稿隔离.md",
+            "architecture/首版产品与技术设计.md",
+            "features/假设驱动问诊设计文档.md",
+            "features/问诊结论单设计文档.md",
+            "features/动态问诊选项与风险分流设计.md",
+            "features/事实断言与否定证据校验.md",
+            "features/长问诊的信息保留与原话核对.md",
+            "features/就诊对象与会谈草稿隔离.md",
         ],
     ),
     (
         "结构化交互",
         "图示定位、自检任务卡与展示协议。",
         [
-            "结构化定位答案与患者核对.md",
-            "结构化展示协议与组件扩展.md",
-            "门诊式问诊与图示自查背调.md",
+            "features/结构化定位答案与患者核对.md",
+            "architecture/结构化展示协议与组件扩展.md",
+            "features/门诊式问诊与图示自查背调.md",
         ],
     ),
     (
         "计算与能力包",
         "公式、量表、换算与执行回执。",
         [
-            "能力插件与问诊模板.md",
-            "门诊显式计算科目与项目总表.md",
-            "注册计算工具与执行回执.md",
-            "有来源的计算插件与血糖换算.md",
-            "患者计算输入与问诊衔接.md",
-            "计算请求的同轮补充与接续.md",
-            "量表与公式临床评审工作表.md",
+            "features/能力插件与问诊模板.md",
+            "features/门诊显式计算科目与项目总表.md",
+            "features/注册计算工具与执行回执.md",
+            "features/有来源的计算插件与血糖换算.md",
+            "features/患者计算输入与问诊衔接.md",
+            "features/计算请求的同轮补充与接续.md",
+            "development/量表与公式临床评审工作表.md",
         ],
     ),
     (
         "测量与接续",
         "测量反馈、重复测量与问诊接续。",
         [
-            "测量反馈与同轮补充.md",
-            "重复测量与问诊接续.md",
+            "features/测量反馈与同轮补充.md",
+            "features/重复测量与问诊接续.md",
         ],
     ),
     (
         "执行工作台",
         "患者在自己的项目目录里跑代码：底座、原位执行、澄清与恢复。",
         [
-            "通用执行底座与能力评测设计.md",
-            "本地项目目录与原位执行.md",
-            "执行澄清与用户回答.md",
-            "执行工作区恢复与存储.md",
+            "features/通用执行底座与能力评测设计.md",
+            "features/本地项目目录与原位执行.md",
+            "features/执行澄清与用户回答.md",
+            "features/执行工作区恢复与存储.md",
         ],
     ),
     (
         "健康档案",
         "患者纵向数据与图片识别。",
         [
-            "患者纵向医疗数据与图片识别归档设计.md",
+            "features/患者纵向医疗数据与图片识别归档设计.md",
         ],
     ),
     (
         "联网与子智能体",
         "教育/复核检索、出站闸门与并行分支。",
         [
-            "联网与子智能体工具设计.md",
-            "DSH后台复核与报告分析设计.md",
+            "features/联网与子智能体工具设计.md",
+            "features/DSH后台复核与报告分析设计.md",
         ],
     ),
     (
         "桌面与平台",
         "Electron 壳、打包与各平台验收。",
         [
-            "桌面应用使用与打包.md",
-            "Windows原生环境与验收.md",
+            "getting-started/桌面应用使用与打包.md",
+            "getting-started/Windows原生环境与验收.md",
         ],
     ),
     (
         "工作清单",
         "进行中的计划与待办，随时可能过期。",
         [
-            "后续工作清单.md",
-            "代码质量满分工作清单.md",
-            "长函数判定表.md",
+            "development/后续工作清单.md",
+            "development/代码质量满分工作清单.md",
+            "development/长函数判定表.md",
         ],
     ),
     (
         "评审与证据",
         "待临床评审项与结论的证据来源。",
         [
-            "待临床评审清单.md",
-            "证据与来源.md",
-            "测试覆盖矩阵.md",
-            "使用体验评测报告.md",
+            "development/待临床评审清单.md",
+            "architecture/证据与来源.md",
+            "development/测试覆盖矩阵.md",
+            "development/使用体验评测报告.md",
         ],
     ),
 ]
 
 HEADER = """# 文档导航
+
+实体目录按用途分组：`getting-started/`（上手）、`architecture/`（架构）、
+`features/`（功能）、`development/`（开发与评测）、`archive/`（历史）。
 
 本目录按**阅读顺序**组织：先读《系统现状总览》了解系统现在是什么，
 再按子系统查阅现行设计。已完成或已被取代的历史设计全部移入
@@ -185,17 +191,6 @@ def _display(path: pathlib.Path) -> str:
         return path.as_posix()
 
 
-def last_change(path: pathlib.Path) -> str:
-    """The date git last recorded a change to this file."""
-    result = subprocess.run(
-        ["git", "log", "-1", "--format=%cs", "--", str(path)],
-        capture_output=True,
-        text=True,
-        cwd=ROOT,
-    )
-    return result.stdout.strip() or "—"
-
-
 def title_of(path: pathlib.Path) -> str:
     for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
         if line.startswith("# "):
@@ -215,7 +210,7 @@ def grouped_names() -> dict[str, str]:
 
 
 def build() -> str:
-    actual = {p.name for p in DOCS.glob("*.md")} - {"README.md"}
+    actual = document_names()
     placed = grouped_names()
     ungrouped = sorted(actual - set(placed))
     phantom = sorted(set(placed) - actual)
@@ -229,18 +224,11 @@ def build() -> str:
         )
 
     archive_files = sorted(ARCHIVE.glob("*.md"))
-    archive_table = "\n".join(
-        f"- [{p.stem}]({ARCHIVE.name}/{p.name})（{last_change(p)} 最后更新）"
-        for p in archive_files
-    )
+    archive_table = "\n".join(f"- [{p.stem}]({ARCHIVE.name}/{p.name})" for p in archive_files)
 
     group_sections = []
     for heading, purpose, names in GROUPS:
-        rows = "\n".join(
-            f"- [{title_of(DOCS / name)}]({name})"
-            f"（{last_change(DOCS / name)} 最后更新）"
-            for name in names
-        )
+        rows = "\n".join(f"- [{title_of(DOCS / name)}]({name})" for name in names)
         group_sections.append(f"### {heading}\n\n{purpose}\n\n{rows}")
 
     return HEADER.format(
@@ -248,6 +236,29 @@ def build() -> str:
         groups="\n\n".join(group_sections),
         archive_table=archive_table,
     )
+
+
+def document_names() -> set[str]:
+    """All current documents, excluding generated evidence and historical designs."""
+    names = set()
+    for directory, subdirs, files in os.walk(DOCS):
+        if pathlib.Path(directory) == DOCS:
+            subdirs[:] = [
+                name
+                for name in subdirs
+                if name
+                not in {
+                    "archive",
+                    "assets",
+                    "evaluations",
+                    "review-packets",
+                }
+            ]
+        for name in files:
+            path = pathlib.Path(directory, name)
+            if path.suffix == ".md" and path != INDEX:
+                names.add(path.relative_to(DOCS).as_posix())
+    return names
 
 
 def main(argv: list[str]) -> int:

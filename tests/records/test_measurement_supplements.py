@@ -150,7 +150,7 @@ class MeasurementSupplementTests(unittest.TestCase):
         medication = state.facts["medications_taken"]
         self.assertEqual(measure.turn_id, medication.turn_id)
         self.assertEqual(measure.evidence, "腋温37.6℃")
-        context = engine._fact_provenance(measure, engine._source_turns(state))[
+        context = engine.emergency._fact_provenance(measure, engine.emergency._source_turns(state))[
             "context"
         ]
         self.assertEqual(context["text"], REPORT)

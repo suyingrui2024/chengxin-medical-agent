@@ -1,4 +1,4 @@
-"""Mixin: subject for ConsultationEngine."""
+"""Workflow component: subject for ConsultationEngine."""
 from copy import deepcopy
 from dataclasses import replace
 from typing import Any, Dict, List, Optional
@@ -24,6 +24,10 @@ from .types import StaleActionError
 
 
 class ConsultationEngineSubject:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     @staticmethod
     def _subject_completion_fingerprint(state):
         return {
@@ -36,7 +40,7 @@ class ConsultationEngineSubject:
 
     def _subject_checkpoint(self, state):
         return {
-            "reply": deepcopy(self._latest_replies.get(state.session_id)),
+            "reply": deepcopy(self.engine._latest_replies.get(state.session_id)),
             "completion": self._subject_completion_fingerprint(state),
             "interaction": {
                 key: deepcopy(getattr(state, key))
@@ -73,7 +77,7 @@ class ConsultationEngineSubject:
         old = checkpoint["interaction"]
         for request in state.pending_self_checks:
             if request not in old["pending_self_checks"]:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.request_cancelled",
@@ -82,7 +86,7 @@ class ConsultationEngineSubject:
                     )
                 )
         if old["pending_calculation"] and not state.pending_calculation:
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "capability.input_restored",
@@ -117,7 +121,7 @@ class ConsultationEngineSubject:
             "source_text": text,
             "source_turn_id": turn_id,
         }
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "subject.boundary_detected",
@@ -151,8 +155,8 @@ class ConsultationEngineSubject:
             if restored:
                 reply = deepcopy(checkpoint["reply"])
             else:
-                reply = self._plan_next(state)
-            self.events.append(
+                reply = self.engine.planning._plan_next(state)
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "subject.current_resumed",
@@ -175,7 +179,7 @@ class ConsultationEngineSubject:
         if user_input.choice_value == "resume_current_subject" and (
             user_input.expected_action_id != f"{state.session_id}:{state.revision}"
             or state.subject_resume is None
-            or getattr(self._latest_replies.get(state.session_id), "kind", None)
+            or getattr(self.engine._latest_replies.get(state.session_id), "kind", None)
             != "subject_change"
         ):
             raise StaleActionError("就诊对象入口已更新，请使用当前页面。")
@@ -239,7 +243,7 @@ class ConsultationEngineSubject:
         }
         affected = {
             task["result_key"]
-            for task in self.content.tasks.values()
+            for task in self.engine.content.tasks.values()
             if changed.intersection(task.get("invalidate_on", ["chief_complaint"]))
         }
         if "chief_complaint" in changed:
@@ -257,15 +261,15 @@ class ConsultationEngineSubject:
             }
         # Explicit replacement evidence in this batch belongs to the new state.
         affected -= {item["key"] for item in updates}
-        self._guard_calculation_followup_keys(state, affected)
+        self.engine.followups._guard_calculation_followup_keys(state, affected)
         # Validate indirect removals before cancelling tasks or mutating facts.
         if updates and (state.pending_calculation or state.calculation_resume):
-            self._clear_calculation(state, "case_updated", turn_id)
+            self.engine.calculations._clear_calculation(state, "case_updated", turn_id)
         if updates and state.observation_resume:
-            self._clear_observation(state, "case_updated", turn_id)
+            self.engine.observations._clear_observation(state, "case_updated", turn_id)
         if "chief_complaint" in changed:
             for request in state.pending_self_checks:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.request_cancelled",
@@ -277,7 +281,7 @@ class ConsultationEngineSubject:
         for key in sorted(affected):
             old = state.facts.pop(key, None)
             if old:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "fact.invalidated",
@@ -292,9 +296,9 @@ class ConsultationEngineSubject:
                     )
                 )
         if changed:
-            self._clear_task_conversation(state, "facts_corrected", turn_id)
+            self.engine.tasks._clear_task_conversation(state, "facts_corrected", turn_id)
             if state.active_task:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.cancelled",
@@ -336,8 +340,8 @@ class ConsultationEngineSubject:
         ``emergency_screen`` cannot be corrected directly: it is a screening
         result with its own rules, and rewriting it would bypass them.
         """
-        state = self.state(session_id)
-        with self._lock_for(session_id):
+        state = self.engine.state(session_id)
+        with self.engine._lock_for(session_id):
             urgent_reply = self._correction_emergency(state, new_text)
             if urgent_reply:
                 return urgent_reply
@@ -350,23 +354,23 @@ class ConsultationEngineSubject:
                 # triage and land back on the emergency reply — the
                 # route itself can never be retracted by an edit.
                 raise ValueError("会谈已结束，记录不能再更正")
-            self._check_fact_version(state, fact_key, expected_fact_id)
+            self.engine.calculations._check_fact_version(state, fact_key, expected_fact_id)
             previous_task = state.active_task
             question = next(
-                (item for item in self.content.questions if item.fact_key == fact_key),
+                (item for item in self.engine.content.questions if item.fact_key == fact_key),
                 None,
             )
             if question is None or fact_key == "emergency_screen":
                 raise ValueError("该字段不支持直接更正")
             turn_id = str(uuid4())
             facts_before = set(state.facts)
-            result = self.interpreter.interpret(question, new_text)
+            result = self.engine.interpreter.interpret(question, new_text)
             if question.input == "age" and (
                 not isinstance(result.value, (int, float))
                 or not 0 <= result.value <= 120
             ):
                 raise ValueError("年龄请写成“8个月”或“32岁”这样的格式")
-            self._prepare_fact_updates(
+            self.engine.calculations._prepare_fact_updates(
                 state,
                 [
                     {
@@ -377,7 +381,7 @@ class ConsultationEngineSubject:
                 ],
                 turn_id,
             )
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     session_id,
                     "fact.correction_requested",
@@ -390,43 +394,43 @@ class ConsultationEngineSubject:
             self._record_fact(state, fact_key, result, turn_id, new_text, merge=False)
             state.active_question = None
             state.active_task = None
-            state.risk = self.triage.assess(state, new_text)
+            state.risk = self.engine.triage.assess(state, new_text)
             if state.risk.level == RiskLevel.EMERGENCY:
-                action = self._emergency_clarification_action(state, new_text, ())
+                action = self.engine.emergency._emergency_clarification_action(state, new_text, ())
                 if action == "clarify":
-                    reply = self._emergency_clarification_reply(
+                    reply = self.engine.emergency._emergency_clarification_reply(
                         state, new_text, turn_id
                     )
                 elif action == "confirmed":
-                    reply = self._emergency_reply(
+                    reply = self.engine.emergency._emergency_reply(
                         state, state.risk.triggers, include_clarification=True
                     )
                 else:
-                    reply = self._emergency_reply(state, state.risk.triggers)
+                    reply = self.engine.emergency._emergency_reply(state, state.risk.triggers)
             elif state.risk.level == RiskLevel.URGENT:
-                gated = self._urgent_or_defer(state, turn_id)
+                gated = self.engine.planning._urgent_or_defer(state, turn_id)
                 if gated is not None:
                     reply = gated
                 else:
                     state.closed_reason = None
                     resumed = (
-                        self._offer_task(
+                        self.engine.planning._offer_task(
                             state, str(state.get("chief_complaint", "")), previous_task
                         )
                         if previous_task
                         else None
                     )
-                    reply = resumed or self._plan_next(state)
+                    reply = resumed or self.engine.planning._plan_next(state)
             else:
                 state.closed_reason = None
                 resumed = (
-                    self._offer_task(
+                    self.engine.planning._offer_task(
                         state, str(state.get("chief_complaint", "")), previous_task
                     )
                     if previous_task
                     else None
                 )
-                reply = resumed or self._plan_next(state)
+                reply = resumed or self.engine.planning._plan_next(state)
             return self._publish_correction(state, reply, fact_key, facts_before, turn_id)
 
     def _publish_correction(self, state, reply, fact_key, facts_before, turn_id):
@@ -439,7 +443,7 @@ class ConsultationEngineSubject:
         notice = self._correction_notice(withdrawn) if fact_key == "chief_complaint" else ""
         if notice:
             reply = replace(reply, message=f"{reply.message}{notice}")
-        self._record_reply(state, reply, turn_id, f"用户更正字段 {fact_key} 后重新规划")
+        self.engine.replies._record_reply(state, reply, turn_id, f"用户更正字段 {fact_key} 后重新规划")
         return reply
 
     def restore_fact(
@@ -454,11 +458,11 @@ class ConsultationEngineSubject:
         patient-visible record and the audit trail retain both the correction
         and the reversal.
         """
-        state = self.state(session_id)
-        with self._lock_for(session_id):
+        state = self.engine.state(session_id)
+        with self.engine._lock_for(session_id):
             if state.phase == Phase.CLOSED and state.closed_reason != "emergency_route":
                 raise ValueError("会谈已结束，记录不能再更正")
-            self._check_fact_version(state, fact_key, expected_fact_id)
+            self.engine.calculations._check_fact_version(state, fact_key, expected_fact_id)
             current = state.facts.get(fact_key)
             if current is None:
                 raise ValueError("没有可撤销的更正记录")
@@ -473,7 +477,7 @@ class ConsultationEngineSubject:
             if previous is None:
                 raise ValueError("没有可撤销的更正记录")
             turn_id = str(uuid4())
-            self._prepare_fact_updates(
+            self.engine.calculations._prepare_fact_updates(
                 state,
                 [
                     {
@@ -495,7 +499,7 @@ class ConsultationEngineSubject:
                 structured_input=deepcopy(previous.structured_input),
             )
             state.record(restored)
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     session_id,
                     "fact.restored",
@@ -510,7 +514,7 @@ class ConsultationEngineSubject:
             )
             state.active_question = None
             state.active_task = None
-            state.risk = self.triage.assess(state)
+            state.risk = self.engine.triage.assess(state)
             if state.risk.level == RiskLevel.EMERGENCY:
                 # A restoration replays the emergency route, so it must
                 # run the same clarification gate as a fresh turn: a
@@ -521,7 +525,7 @@ class ConsultationEngineSubject:
                 # with its signal intact, never filtered to empty).
                 texts = [
                     event.payload.get("text")
-                    for event in self.events.for_session(session_id)
+                    for event in self.engine.events.for_session(session_id)
                     if event.event_type == "turn.user_message"
                     and isinstance(event.payload.get("text"), str)
                     and event.payload.get("text")
@@ -533,37 +537,37 @@ class ConsultationEngineSubject:
                         if item.get("role") == "user" and item.get("content")
                     ]
                 signal_text = texts[-1] if texts else (restored.evidence or "")
-                action = self._emergency_clarification_action(
+                action = self.engine.emergency._emergency_clarification_action(
                     state, signal_text, ()
                 )
                 if action == "confirmed":
-                    reply = self._confirm_emergency_clarification(
+                    reply = self.engine.emergency._confirm_emergency_clarification(
                         state, turn_id
-                    ) or self._emergency_reply_with_clarification_memory(
+                    ) or self.engine.emergency._emergency_reply_with_clarification_memory(
                         state, state.risk.triggers
                     )
                 elif (
                     action == "clarify"
                     and state.closed_reason != "emergency_route"
                 ):
-                    reply = self._emergency_clarification_reply(
+                    reply = self.engine.emergency._emergency_clarification_reply(
                         state, signal_text, turn_id
                     )
                 else:
-                    reply = self._emergency_reply_with_clarification_memory(
+                    reply = self.engine.emergency._emergency_reply_with_clarification_memory(
                         state, state.risk.triggers
                     )
             elif state.risk.level == RiskLevel.URGENT:
-                gated = self._urgent_or_defer(state, turn_id)
+                gated = self.engine.planning._urgent_or_defer(state, turn_id)
                 if gated is not None:
                     reply = gated
                 else:
                     state.closed_reason = None
-                    reply = self._plan_next(state)
+                    reply = self.engine.planning._plan_next(state)
             else:
                 state.closed_reason = None
-                reply = self._plan_next(state)
-            self._record_reply(state, reply, turn_id, f"用户撤销字段 {fact_key} 的更正")
+                reply = self.engine.planning._plan_next(state)
+            self.engine.replies._record_reply(state, reply, turn_id, f"用户撤销字段 {fact_key} 的更正")
             return reply
 
     def _correction_emergency(self, state, text):
@@ -573,11 +577,11 @@ class ConsultationEngineSubject:
         other turn -- before the field and version checks.  An emergency found
         this way outranks them: the case is already unsafe.
         """
-        triggers = self.triage.scan_text(text)
+        triggers = self.engine.triage.scan_text(text)
         if not triggers:
             return None
         turn_id = str(uuid4())
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "turn.user_message",
@@ -586,32 +590,32 @@ class ConsultationEngineSubject:
             )
         )
         state.transcript.append({"role": "user", "content": text})
-        state.risk = self.triage.assess(state, text)
-        action = self._emergency_clarification_action(state, text, ())
+        state.risk = self.engine.triage.assess(state, text)
+        action = self.engine.emergency._emergency_clarification_action(state, text, ())
         if action == "clarify":
-            reply = self._emergency_clarification_reply(state, text, turn_id)
+            reply = self.engine.emergency._emergency_clarification_reply(state, text, turn_id)
             state.pending_input = None
-            self._record_reply(state, reply, turn_id, "更正原文仅为裸共现，先鉴别澄清")
+            self.engine.replies._record_reply(state, reply, turn_id, "更正原文仅为裸共现，先鉴别澄清")
             return reply
         if action == "confirmed":
-            reply = self._emergency_reply(
+            reply = self.engine.emergency._emergency_reply(
                 state, state.risk.triggers, include_clarification=True
             )
         else:
-            reply = self._emergency_reply(state, state.risk.triggers)
+            reply = self.engine.emergency._emergency_reply(state, state.risk.triggers)
         state.pending_input = None
-        self._record_reply(state, reply, turn_id, "更正原文命中急症门，优先于字段和旧版本校验")
+        self.engine.replies._record_reply(state, reply, turn_id, "更正原文命中急症门，优先于字段和旧版本校验")
         return reply
 
     def _requested_emergency_help(self, state, text):
         """A user requests priority help; this does not invent a symptom fact."""
         if (
             state.closed_reason == "emergency_route"
-            and self._help_requests.get(state.session_id) == text
+            and self.engine._help_requests.get(state.session_id) == text
         ):
-            return deepcopy(self._latest_replies[state.session_id])
+            return deepcopy(self.engine._latest_replies[state.session_id])
         turn_id = str(uuid4())
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "turn.user_message",
@@ -627,11 +631,11 @@ class ConsultationEngineSubject:
         state.risk = RiskAssessment(
             RiskLevel.EMERGENCY, sorted(set([*state.risk.triggers, "用户主动请求紧急帮助"]))
         )
-        reply = self._emergency_reply(state, state.risk.triggers, requested_help=True)
+        reply = self.engine.emergency._emergency_reply(state, state.risk.triggers, requested_help=True)
         reply.developer_trace = {"reason": "用户主动请求紧急帮助，未新增症状事实"}
         state.pending_input = None
-        self._record_reply(state, reply, turn_id, "用户主动请求优先求助")
-        self._help_requests[state.session_id] = text
+        self.engine.replies._record_reply(state, reply, turn_id, "用户主动请求优先求助")
+        self.engine._help_requests[state.session_id] = text
         return reply
 
     def _record_fact(
@@ -684,11 +688,11 @@ class ConsultationEngineSubject:
             structured_input=deepcopy(structured_input),
         )
         state.record(fact)
-        self.events.append(
+        self.engine.events.append(
             Event(state.session_id, "fact.recorded", fact.to_dict(), turn_id=turn_id)
         )
         if preserved:
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "fact.writeback_merged",

@@ -103,7 +103,7 @@ class BurdenRepeatGateTests(unittest.TestCase):
         )
         state.asked_questions.append("trajectory")
         with self.assertRaises(ProposalError) as caught:
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 ask_patient_cmd("trajectory", bridged("总体是加重、减轻，还是变化不大？")),
                 "风团此起彼伏，旧的消了新的又起。",
@@ -119,7 +119,7 @@ class BurdenRepeatGateTests(unittest.TestCase):
         )
         state.asked_questions.append("resp_cough_details")
         with self.assertRaises(ProposalError):
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 ask_patient_cmd(
                     "resp_cough_details",
@@ -134,7 +134,7 @@ class BurdenRepeatGateTests(unittest.TestCase):
         state.facts["chief_complaint"] = fact("chief_complaint", "风团发痒")
         state.followup_counts["trajectory"] = 2
         with self.assertRaises(ProposalError):
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 {
                     "tool": "clarify",
@@ -154,7 +154,7 @@ class BurdenRepeatGateTests(unittest.TestCase):
         try:
             engine = context.services.require("consultation")
             state, _ = engine.create_session()
-            engine._record_fact(
+            engine.subjects._record_fact(
                 state,
                 "resp_cough_details",
                 Interpretation("没有咳血，也没有胸口疼", Assertion.PRESENT),
@@ -174,7 +174,7 @@ class BurdenTrajectoryMappingTests(unittest.TestCase):
     def test_d02_fluctuation_evidence_rejected_as_stable(self):
         engine, state = make_adaptive()
         text = "刚才说过了，风团此起彼伏，旧的消了新的又起。"
-        result = engine._execute(
+        result = engine.model_actions._execute(
             state,
             record_cmd(
                 [
@@ -196,7 +196,7 @@ class BurdenTrajectoryMappingTests(unittest.TestCase):
     def test_d02_genuine_stable_evidence_still_records(self):
         engine, state = make_adaptive()
         text = "变化不大，一直这样。"
-        result = engine._execute(
+        result = engine.model_actions._execute(
             state,
             record_cmd([proposal("trajectory", "stable", "变化不大")]),
             text,
@@ -212,7 +212,7 @@ class BurdenScreeningTests(unittest.TestCase):
     def test_o06_screening_question_gains_the_registered_list(self):
         engine, state = make_adaptive()
         state.facts["chief_complaint"] = fact("chief_complaint", "脖子肩膀僵得厉害")
-        reply = engine._execute(
+        reply = engine.model_actions._execute(
             state,
             ask_patient_cmd(
                 "emergency_screen",
@@ -229,7 +229,7 @@ class BurdenScreeningTests(unittest.TestCase):
         state.facts["chief_complaint"] = fact("chief_complaint", "脖子肩膀僵得厉害")
         state.active_question = "emergency_screen"
         text = "没有胳膊无力，没有头晕呕吐，没有受过外伤，也没有发烧。"
-        result = engine._execute(
+        result = engine.model_actions._execute(
             state,
             record_cmd(
                 [
@@ -256,7 +256,7 @@ class BurdenScreeningTests(unittest.TestCase):
         )
         state.asked_questions.append("emergency_screen")
         with self.assertRaises(ProposalError):
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 ask_patient_cmd(
                     "emergency_screen",
@@ -266,7 +266,7 @@ class BurdenScreeningTests(unittest.TestCase):
                 "t1",
             )
         with self.assertRaises(ProposalError):
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 {
                     "tool": "clarify",
@@ -285,7 +285,7 @@ class BurdenScreeningTests(unittest.TestCase):
         state.facts["emergency_screen"] = fact(
             "emergency_screen", None, Assertion.ABSENT, "都没有"
         )
-        reply = engine._execute(
+        reply = engine.model_actions._execute(
             state,
             {
                 "tool": "clarify",
@@ -314,7 +314,7 @@ class BurdenMergeTests(unittest.TestCase):
 
     def test_o12_denials_and_unknown_survive_a_short_writeback(self):
         state, _ = self.engine.create_session()
-        self.engine._record_fact(
+        self.engine.subjects._record_fact(
             state,
             "back_details",
             Interpretation(
@@ -324,7 +324,7 @@ class BurdenMergeTests(unittest.TestCase):
             "t1",
             "没有受过外伤",
         )
-        self.engine._record_fact(
+        self.engine.subjects._record_fact(
             state,
             "back_details",
             Interpretation(
@@ -342,14 +342,14 @@ class BurdenMergeTests(unittest.TestCase):
 
     def test_o12_affirmed_term_supersedes_its_denial(self):
         state, _ = self.engine.create_session()
-        self.engine._record_fact(
+        self.engine.subjects._record_fact(
             state,
             "back_details",
             Interpretation("没有发烧", Assertion.PRESENT),
             "t1",
             "没有发烧",
         )
-        self.engine._record_fact(
+        self.engine.subjects._record_fact(
             state,
             "back_details",
             Interpretation("发烧38度", Assertion.PRESENT),
@@ -360,14 +360,14 @@ class BurdenMergeTests(unittest.TestCase):
 
     def test_o12_explicit_correction_replaces_without_merge(self):
         state, _ = self.engine.create_session()
-        self.engine._record_fact(
+        self.engine.subjects._record_fact(
             state,
             "back_details",
             Interpretation("没有受过外伤", Assertion.PRESENT),
             "t1",
             "没有受过外伤",
         )
-        self.engine._record_fact(
+        self.engine.subjects._record_fact(
             state,
             "back_details",
             Interpretation("腰痛", Assertion.PRESENT),
@@ -398,7 +398,7 @@ class BurdenCompositeFilterTests(unittest.TestCase):
         state.facts["resp_cough_details"] = fact(
             "resp_cough_details", "没有咳血，也没有胸口疼"
         )
-        reply = engine._execute(
+        reply = engine.model_actions._execute(
             state,
             ask_patient_cmd(
                 "resp_cough_details",
@@ -432,7 +432,7 @@ class BurdenOptionVisibilityTests(unittest.TestCase):
     def test_k04_dangling_reference_lists_options_in_text(self):
         engine, state = make_adaptive()
         state.facts["chief_complaint"] = fact("chief_complaint", "牙疼")
-        reply = engine._execute(
+        reply = engine.model_actions._execute(
             state,
             ask_patient_cmd(
                 "associated_symptoms",
@@ -449,7 +449,7 @@ class BurdenOptionVisibilityTests(unittest.TestCase):
     def test_k04_already_listed_option_is_not_duplicated(self):
         engine, state = make_adaptive()
         state.facts["chief_complaint"] = fact("chief_complaint", "牙疼")
-        reply = engine._execute(
+        reply = engine.model_actions._execute(
             state,
             ask_patient_cmd(
                 "associated_symptoms",
@@ -494,7 +494,7 @@ class BurdenCompletenessTests(unittest.TestCase):
         engine, state = make_adaptive()
         self._full_state(engine, state, "大便干硬，三四天一次")
         with self.assertRaises(ProposalError) as caught:
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 {"tool": "review_summary", "arguments": {}},
                 "请核对摘要",
@@ -507,7 +507,7 @@ class BurdenCompletenessTests(unittest.TestCase):
     def test_g07_covered_items_pass_to_summary(self):
         engine, state = make_adaptive()
         self._full_state(engine, state, "排便费力，体重没变")
-        reply = engine._execute(
+        reply = engine.model_actions._execute(
             state,
             {"tool": "review_summary", "arguments": {}},
             "请核对摘要",

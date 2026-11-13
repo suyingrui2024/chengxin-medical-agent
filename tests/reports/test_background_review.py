@@ -163,7 +163,7 @@ class BackgroundReviewTests(unittest.TestCase):
             self.assertEqual(state.to_dict()["background_review"]["actionable_count"], 2)
             self.assertEqual(state.to_dict()["background_review"]["mode"], "shadow")
             self.assertNotIn("advice", state.to_dict()["background_review"])
-            self.assertNotIn("background_review", engine._context(state, "下一条信息"))
+            self.assertNotIn("background_review", engine.model_context._context(state, "下一条信息"))
             completed = [
                 event
                 for event in events.for_session(state.session_id)
@@ -185,7 +185,7 @@ class BackgroundReviewTests(unittest.TestCase):
                 schedule_material_review(coordinator, engine, events, state)
             wait_for(lambda: state.background_review and state.background_review["status"] == "completed")
             self.assertEqual(
-                engine._context(state, "下一条信息")["background_review"]["missing_information"],
+                engine.model_context._context(state, "下一条信息")["background_review"]["missing_information"],
                 ["症状开始时间"],
             )
         finally:
@@ -365,7 +365,7 @@ class BackgroundReviewTests(unittest.TestCase):
                 )
             )
             self.assertNotIn(
-                "background_review", engine._context(state, "下一条信息")
+                "background_review", engine.model_context._context(state, "下一条信息")
             )
         finally:
             backend.release.set()

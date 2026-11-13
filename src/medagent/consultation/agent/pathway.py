@@ -1,11 +1,51 @@
-"""Mixin: pathway for AdaptiveConsultationEngine."""
+"""Workflow component: pathway for AdaptiveConsultationEngine."""
 from ...core.domain import CaseState
 from ...core.events import Event
 from ...core.text_match import contains_unnegated
 from ...infra.agent_tools import ProposalError
 
 
+from ...clinical.reasoning import RuleBasedProposer, load_pathways
+from typing import Any, Dict
+
+
 class AdaptiveConsultationEnginePathway:
+
+    def __init__(self, engine):
+        """Build the case-independent catalogue and pathway-specific detail gates.
+
+        Generic background facts cannot count as exploration of a pathway.
+        """
+        self.engine = engine
+        self._pathways = load_pathways()
+        self._pathway_proposer = RuleBasedProposer(
+            pathways=self._pathways,
+            question_fact_keys={q.id: q.fact_key for q in engine.content.questions},
+        )
+        self._questions_by_fact = {}
+        for question in engine.content.questions:
+            self._questions_by_fact.setdefault(question.fact_key, question)
+        gated_fact_keys = {
+            q.fact_key
+            for q in engine.content.questions
+            if q.applies_when.get("chief_complaint_contains_any")
+        }
+        self._pathway_detail_facts: Dict[str, Any] = {}
+        for pathway in self._pathways:
+            cited = {
+                condition["fact_key"]
+                for hypothesis in pathway.get("hypotheses", [])
+                for condition in [
+                    *hypothesis.get("support", []),
+                    *hypothesis.get("refute", []),
+                ]
+            }
+            self._pathway_detail_facts[pathway["id"]] = sorted(
+                fact_key
+                for fact_key in cited
+                if fact_key != "chief_complaint" and fact_key in gated_fact_keys
+            )
+
     def _pathway_exploration(self, state: CaseState):
         """Per triggered pathway: were its details actually probed?
 
@@ -34,22 +74,22 @@ class AdaptiveConsultationEnginePathway:
         chief = str(state.get("chief_complaint", ""))
         if not chief:
             return []
-        workspace = self._pathway_proposer.propose(state)
+        workspace = self.engine.pathways._pathway_proposer.propose(state)
         exploration = []
-        for pathway in self._pathways:
+        for pathway in self.engine.pathways._pathways:
             terms = pathway.get("chief_complaint_contains_any", [])
             if not any(contains_unnegated(chief, term) for term in terms):
                 continue
-            detail_facts = self._pathway_detail_facts.get(pathway["id"], [])
+            detail_facts = self.engine.pathways._pathway_detail_facts.get(pathway["id"], [])
             explored = any(
                 fact_key in state.facts
-                or self._questions_by_fact[fact_key].id in state.asked_questions
+                or self.engine.pathways._questions_by_fact[fact_key].id in state.asked_questions
                 for fact_key in detail_facts
             )
             if not explored and detail_facts:
                 explored = all(
-                    not self._fact_gates_pass(
-                        state, self._questions_by_fact[fact_key]
+                    not self.engine._fact_gates_pass(
+                        state, self.engine.pathways._questions_by_fact[fact_key]
                     )
                     for fact_key in detail_facts
                 )
@@ -107,10 +147,10 @@ class AdaptiveConsultationEnginePathway:
             for fact_key in entry["detail_fields"]:
                 if fact_key in state.facts:
                     continue
-                question = self._questions_by_fact[fact_key]
-                if not self._fact_gates_pass(state, question):
+                question = self.engine.pathways._questions_by_fact[fact_key]
+                if not self.engine._fact_gates_pass(state, question):
                     continue
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "review.pathway_gate_redirect",
@@ -118,7 +158,7 @@ class AdaptiveConsultationEnginePathway:
                         turn_id=turn_id,
                     )
                 )
-                return self._ask(
+                return self.engine._ask(
                     state,
                     question,
                     "主诉通路尚未探明，控制器在摘要前先补问其细节字段",
@@ -145,7 +185,7 @@ class AdaptiveConsultationEnginePathway:
         if redirect is not None:
             return redirect
         try:
-            return self._execute(
+            return self.engine.model_actions._execute(
                 state, {"tool": "review_summary", "arguments": {}}, text, turn_id
             )
         except ProposalError:
@@ -153,14 +193,14 @@ class AdaptiveConsultationEnginePathway:
         for fact_key in ("associated_symptoms", "relevant_history"):
             if fact_key in state.facts:
                 continue
-            question = self._questions_by_fact.get(fact_key)
+            question = self.engine.pathways._questions_by_fact.get(fact_key)
             if question is None or question.id in state.asked_questions:
                 continue
-            if not self.content.question_applies_in_state(question, state):
+            if not self.engine.content.question_applies_in_state(question, state):
                 continue
-            if not self._fact_gates_pass(state, question):
+            if not self.engine._fact_gates_pass(state, question):
                 continue
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "review.pathway_discrimination_redirect",
@@ -168,13 +208,13 @@ class AdaptiveConsultationEnginePathway:
                     turn_id=turn_id,
                 )
             )
-            return self._ask(
+            return self.engine._ask(
                 state,
                 question,
                 "主诉通路尚未探明，控制器在摘要前先补问鉴别字段",
             )
         try:
-            return self._execute(
+            return self.engine.model_actions._execute(
                 state,
                 {
                     "tool": "review_summary",
@@ -193,7 +233,7 @@ class AdaptiveConsultationEnginePathway:
             pass
         if state.self_check_conversation:
             try:
-                return self._resume_task_conversation(state)
+                return self.engine.tasks._resume_task_conversation(state)
             except ValueError:
                 # A resume that fails (e.g. the task's basis changed and
                 # the frame was cleared by the resume itself) must fall
@@ -202,7 +242,7 @@ class AdaptiveConsultationEnginePathway:
                 # that path keeps the block visible rather than silently
                 # dropping the suspended step.
                 pass
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "review.controller_fallback_exhausted",
@@ -210,4 +250,4 @@ class AdaptiveConsultationEnginePathway:
                 turn_id=turn_id,
             )
         )
-        return self._plan_next(state)
+        return self.engine.planning._plan_next(state)

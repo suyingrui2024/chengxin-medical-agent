@@ -171,11 +171,11 @@ class BaselineReferenceConsumptionTests(unittest.TestCase):
         }
         state.profile_baseline = dict(projection)
         state.baseline_reference_enabled = True
-        context = engine._context(state, "你好")
+        context = engine.model_context._context(state, "你好")
         self.assertEqual(context["profile_baseline"], projection)
         self.assertNotIn("profile_baseline", state.facts)
         state.baseline_reference_enabled = False
-        self.assertNotIn("profile_baseline", engine._context(state, "你好"))
+        self.assertNotIn("profile_baseline", engine.model_context._context(state, "你好"))
 
     def test_summary_payload_carries_baseline_reference_without_facts(self):
         from medagent.consultation import ConsultationEngine
@@ -190,13 +190,13 @@ class BaselineReferenceConsumptionTests(unittest.TestCase):
         state, _reply = engine.create_session()
         state.profile_baseline = {"chronic_conditions": ["高血压"]}
         state.baseline_reference_enabled = True
-        payload = engine._summary_payload(state, review_status="pending_review")
+        payload = engine.replies._summary_payload(state, review_status="pending_review")
         self.assertEqual(
             payload["profile_baseline"], {"chronic_conditions": ["高血压"]}
         )
         self.assertNotIn("chronic_conditions", state.facts)
         state.baseline_reference_enabled = False
-        payload = engine._summary_payload(state, review_status="pending_review")
+        payload = engine.replies._summary_payload(state, review_status="pending_review")
         self.assertEqual(payload["profile_baseline"], {})
 
 

@@ -116,7 +116,7 @@ class ConsultationTestCase(unittest.TestCase):
         self.test_respiratory_path_offers_self_check_before_background()
         self.answer("40.1℃")
         self.assertEqual(self.state.risk.level, RiskLevel.URGENT)
-        summary = self.engine._finish(self.state)
+        summary = self.engine.replies._finish(self.state)
         self.assertIn("今天", summary.summary["care_route"])
         self.assertEqual(self.state.phase, Phase.CLOSED)
         self.assertEqual(summary.summary["review_status"], "closed_unconfirmed")
@@ -127,7 +127,7 @@ class ConsultationTestCase(unittest.TestCase):
         first = self.state.facts["consult_for"]
         from medagent.clinical.interpreter import Interpretation
 
-        self.engine._record_fact(
+        self.engine.subjects._record_fact(
             self.state,
             "consult_for",
             Interpretation("child", Assertion.PRESENT, Source.CAREGIVER),

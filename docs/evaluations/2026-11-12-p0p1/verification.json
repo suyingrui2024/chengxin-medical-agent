@@ -1,0 +1,252 @@
+{
+  "date": "2026-11-12",
+  "baseline_commit": "d8c7dd82e6c4d77ce55a28241ff777b64d431a07",
+  "python": {
+    "passed": 2129,
+    "skipped": 71,
+    "subtests_passed": 12005,
+    "log": "/tmp/medagent-p0p1-python-verified.log"
+  },
+  "browser": {
+    "spec_files": 53,
+    "passed": 350,
+    "method": "4 isolated shards; corrected failures rerun as 6 specs plus appearance",
+    "results": {
+      "appearance.spec.mjs": {
+        "status": "ok",
+        "summary": "21 passed (1.4m)"
+      },
+      "application-bootstrap.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (3.5s)"
+      },
+      "artifact-actions.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (7.3s)"
+      },
+      "artifact-chart.spec.mjs": {
+        "status": "ok",
+        "summary": "8 passed (12.1s)"
+      },
+      "artifact-recovery.spec.mjs": {
+        "status": "ok",
+        "summary": "5 passed (58.7s)"
+      },
+      "assertion-flow.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (2.6s)"
+      },
+      "calculation-supplements.spec.mjs": {
+        "status": "ok",
+        "summary": "2 passed (11.5s)"
+      },
+      "capabilities.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (7.5s)"
+      },
+      "capability-sweep.spec.mjs": {
+        "status": "ok",
+        "summary": "57 passed (1.6m)"
+      },
+      "clarification-drafts.spec.mjs": {
+        "status": "ok",
+        "summary": "5 passed (15.3s)"
+      },
+      "clinician-preview-sweep.spec.mjs": {
+        "status": "ok",
+        "summary": "71 passed (1.4m)"
+      },
+      "conclusion-card.spec.mjs": {
+        "status": "ok",
+        "summary": "6 passed (11.9s)"
+      },
+      "conclusion-v13.spec.mjs": {
+        "status": "ok",
+        "summary": "10 passed (17.1s)"
+      },
+      "consultation-subjects.spec.mjs": {
+        "status": "ok",
+        "summary": "4 passed (9.8s)"
+      },
+      "directory-recovery.spec.mjs": {
+        "status": "ok",
+        "summary": "7 passed (45.6s)"
+      },
+      "execution-child-activity.spec.mjs": {
+        "status": "ok",
+        "summary": "4 passed (9.0s)"
+      },
+      "execution-earlier-question.spec.mjs": {
+        "status": "ok",
+        "summary": "2 passed (4.2s)"
+      },
+      "execution-focus.spec.mjs": {
+        "status": "ok",
+        "summary": "7 passed (18.7s)"
+      },
+      "execution-incomplete.spec.mjs": {
+        "status": "ok",
+        "summary": "4 passed (24.8s)"
+      },
+      "execution-inputs.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (4.5s)"
+      },
+      "execution-recovery.spec.mjs": {
+        "status": "ok",
+        "summary": "8 passed (56.2s)"
+      },
+      "frontend-linkage.spec.mjs": {
+        "status": "ok",
+        "summary": "7 passed (7.4s)"
+      },
+      "glucose-calculation.spec.mjs": {
+        "status": "ok",
+        "summary": "2 passed (4.6s)"
+      },
+      "handoff-print-patient-text.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (2.5s)"
+      },
+      "handoff-print.spec.mjs": {
+        "status": "ok",
+        "summary": "6 passed (3.2s)"
+      },
+      "location-answers.spec.mjs": {
+        "status": "ok",
+        "summary": "5 passed (20.9s)"
+      },
+      "location-layout.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (17.7s)"
+      },
+      "location-revisions.spec.mjs": {
+        "status": "ok",
+        "summary": "4 passed (24.2s)"
+      },
+      "measurement-supplements.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (10.2s)"
+      },
+      "observation-completion.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (14.3s)"
+      },
+      "p0-summary-status.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (2.6s)"
+      },
+      "patient-calculation.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (4.6s)"
+      },
+      "patient-records-baseline.spec.mjs": {
+        "status": "ok",
+        "summary": "2 passed (2.5s)"
+      },
+      "patient-records.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (3.3s)"
+      },
+      "patient-reflow.spec.mjs": {
+        "status": "ok",
+        "summary": "9 passed (1.1m)"
+      },
+      "present-provenance.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (9.5s)"
+      },
+      "readiness.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (1.6s)"
+      },
+      "repeated-observations.spec.mjs": {
+        "status": "ok",
+        "summary": "6 passed (24.8s)"
+      },
+      "report-handoff.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (3.3s)"
+      },
+      "report-interpretation.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (2.9s)"
+      },
+      "scale-calculation.spec.mjs": {
+        "status": "ok",
+        "summary": "2 passed (3.9s)"
+      },
+      "self-check-conversation.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (14.8s)"
+      },
+      "self-check-drafts.spec.mjs": {
+        "status": "ok",
+        "summary": "4 passed (30.4s)"
+      },
+      "self-check-visuals.spec.mjs": {
+        "status": "ok",
+        "summary": "7 passed (57.4s)"
+      },
+      "uncertain-reports.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (20.4s)"
+      },
+      "urgent-interrupt.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (5.9s)"
+      },
+      "visual-answer-drafts.spec.mjs": {
+        "status": "ok",
+        "summary": "4 passed (16.1s)"
+      },
+      "visual-consultation.spec.mjs": {
+        "status": "ok",
+        "summary": "7 passed (20.1s)"
+      },
+      "visual-simplification-s1.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (2.0s)"
+      },
+      "visual-simplification-s2.spec.mjs": {
+        "status": "ok",
+        "summary": "3 passed (3.1s)"
+      },
+      "visual-simplification-s3.spec.mjs": {
+        "status": "ok",
+        "summary": "2 passed (2.3s)"
+      },
+      "visual-simplification-s4.spec.mjs": {
+        "status": "ok",
+        "summary": "1 passed (1.8s)"
+      },
+      "workspace.spec.mjs": {
+        "status": "ok",
+        "summary": "12 passed (19.3s)"
+      }
+    }
+  },
+  "node_unit": {
+    "passed": 11
+  },
+  "dsh_bridge": {
+    "passed": 69
+  },
+  "checks": [
+    "ruff",
+    "structure",
+    "format",
+    "git diff --check"
+  ],
+  "archive": {
+    "files": 12862,
+    "bytes": 592593333,
+    "sha256_verified": true
+  },
+  "package": {
+    "wheel_built": true,
+    "web_files_included": 60,
+    "isolated_install_verified": true
+  },
+  "scope": "Local offline fixtures and loopback services; no live model requests, push or CI run"
+}

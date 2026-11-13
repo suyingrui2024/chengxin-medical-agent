@@ -27,6 +27,7 @@
  */
 import { spawn } from "node:child_process";
 import { readdirSync } from "node:fs";
+import { mkdir, writeFile } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 import process from "node:process";
@@ -40,6 +41,8 @@ const OUTPUT_DIR = path.join(
   process.env.UI_OUTPUT_DIR || "test-results/ui",
 );
 const SHOTS_DIR = path.join(ROOT, "test-results/shots");
+// Keep per-spec logs outside the store Playwright resets between specs.
+const LOG_DIR = `${OUTPUT_DIR}-logs`;
 /**
  * The port the demo server binds. Each shard needs its own: the suite is
  * sequential on purpose, but two shards running side by side would fight
@@ -188,7 +191,13 @@ function run(file) {
   return new Promise((resolve) => {
     const child = spawn(
       "npx",
-      ["playwright", "test", file, "--config", "playwright.ci.config.mjs"],
+      [
+        "playwright",
+        "test",
+        file,
+        "--config",
+        "config/playwright/ui.config.mjs",
+      ],
       {
         cwd: ROOT,
         stdio: ["ignore", "pipe", "pipe"],
@@ -222,9 +231,9 @@ const sharded = shard
 // Optional argument filters by file name, so a single spec can be run
 // through the same isolated path while iterating on it. It narrows the
 // shard, it does not replace it.
-const filter = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
-const files = filter
-  ? sharded.filter((file) => file.includes(filter))
+const filters = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+const files = filters.length
+  ? sharded.filter((file) => filters.some((filter) => file.includes(filter)))
   : sharded;
 if (shard) {
   console.log(
@@ -237,6 +246,7 @@ if (files.length === 0) {
 }
 
 const failures = [];
+await mkdir(LOG_DIR, { recursive: true });
 // Screenshots from a previous run would otherwise mix with this one's.
 // With `--shots` they go to docs/assets/ui instead, which must not be
 // emptied — the run is rewriting the committed set file by file.
@@ -255,6 +265,10 @@ for (const [index, file] of files.entries()) {
     process.exit(1);
   }
   const result = await run(file);
+  await writeFile(
+    path.join(LOG_DIR, `${path.basename(file)}.log`),
+    result.output,
+  );
   const label = `${index + 1}/${files.length} ${path.basename(file)}`;
   if (result.code === 0) {
     console.log(`ok   ${label}  ${result.summary}`);

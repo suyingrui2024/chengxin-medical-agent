@@ -7,12 +7,13 @@ from ..consultation.agent import AdaptiveConsultationEngine
 from ..core.events import EventStore
 from ..execution import ExecutionManager
 from ..infra.web_tools import WebTools
+from ..infra.env_config import subagent_kind_modes
 from ..patient_records import PatientRecordStore
 from ..patient_records.recognition_jobs import RecognitionJobStore
 from ..reports.education import EducationEnricher
 from ..review.background_review import BackgroundReviewCoordinator
 from ..subagents import SubagentCoordinator
-from .workspace import Workspace, subagent_kind_overrides
+from .workspace import Workspace
 
 
 class MedicalAgentServer(ThreadingHTTPServer):
@@ -56,7 +57,7 @@ class MedicalAgentServer(ThreadingHTTPServer):
         self.reviews = BackgroundReviewCoordinator(
             events, mode=os.environ.get("MEDAGENT_DSH_REVIEW_MODE", "shadow")
         )
-        # Web/subagent advisory layer (docs/联网与子智能体工具设计.md):
+        # Web/subagent advisory layer (docs/features/联网与子智能体工具设计.md):
         # assembled alongside the review coordinator and gated by env modes
         # that default to off, so stock deployments behave exactly as before.
         self.web_tools = WebTools(events)
@@ -65,9 +66,7 @@ class MedicalAgentServer(ThreadingHTTPServer):
             events,
             getattr(engine, "backend", None),
             mode=os.environ.get("MEDAGENT_SUBAGENT_MODE", "off"),
-            # Per-kind rollout overrides from the MEDAGENT_SUBAGENT_MODE_
-            # <KIND> env keys (env_config's helper when available).
-            kind_modes=subagent_kind_overrides(os.environ),
+            kind_modes=subagent_kind_modes(os.environ),
             web_enabled=os.environ.get("MEDAGENT_SUBAGENT_WEB", "off") == "on",
             web_tools=self.web_tools,
         )

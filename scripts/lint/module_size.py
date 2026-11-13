@@ -30,7 +30,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 THRESHOLD = 1200
 
-SCAN_ROOTS = ("src", "tests", "scripts")
+SCAN_ROOTS = ("src", "tests", "scripts", "research", "config")
 SUFFIXES = {".py", ".js", ".css"}
 SKIP_DIRS = {
     "__pycache__",

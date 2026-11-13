@@ -185,18 +185,18 @@ class UrgentSingleClueGateTests(unittest.TestCase):
             ],
         )
         self.assertEqual(self.state.risk.level, RiskLevel.URGENT)
-        self.assertEqual(self.engine._urgent_gate_missing(self.state), [])
-        reply = self.engine._urgent_or_defer(self.state, "t-urgent")
+        self.assertEqual(self.engine.planning._urgent_gate_missing(self.state), [])
+        reply = self.engine.planning._urgent_or_defer(self.state, "t-urgent")
         self.assertIsNotNone(reply)
         self.assertEqual(reply.kind, "urgent")
 
     def test_gate_missing_lists_the_unprobed_fields(self):
         _trajectory_only_state(self.engine, self.state)
-        missing = self.engine._urgent_gate_missing(self.state)
+        missing = self.engine.planning._urgent_gate_missing(self.state)
         self.assertIn("severity", missing)
         self.assertIn("associated_symptoms", missing)
         self.assertIn("patient_goal", missing)
-        self.assertIsNone(self.engine._urgent_or_defer(self.state, "t-urgent"))
+        self.assertIsNone(self.engine.planning._urgent_or_defer(self.state, "t-urgent"))
 
 
 class TrajectoryGuardTests(unittest.TestCase):
@@ -302,9 +302,9 @@ class ControllerSummaryFallbackTests(unittest.TestCase):
                 fact("patient_goal", "想知道要不要去医院", "想知道要不要去医院"),
             ],
         )
-        exploration = self.engine._pathway_exploration(self.state)
+        exploration = self.engine.pathways._pathway_exploration(self.state)
         self.assertTrue(any(not entry["explored"] for entry in exploration))
-        reply = self.engine._controller_summary(self.state, text, "t-sum")
+        reply = self.engine.pathways._controller_summary(self.state, text, "t-sum")
         self.assertEqual(reply.question_id, "associated_symptoms")
 
 
@@ -330,7 +330,7 @@ class RefusalStateTests(unittest.TestCase):
         self.assertTrue(
             _events_of(self.events, self.state.session_id, "fact.declined")
         )
-        context = self.engine._context(self.state, text)
+        context = self.engine.model_context._context(self.state, text)
         self.assertNotIn("age_years", context["missing_required"])
 
     def test_missing_message_distinguishes_asked_but_unrecorded(self):
@@ -345,7 +345,7 @@ class RefusalStateTests(unittest.TestCase):
         )
         self.state.asked_questions.append("age")
         with self.assertRaises(ProposalError) as caught:
-            self.engine._execute(
+            self.engine.model_actions._execute(
                 self.state, cmd("review_summary"), "膝盖疼", "t-sum"
             )
         self.assertIn("age_years（已提问但未落账）", str(caught.exception))
@@ -353,7 +353,7 @@ class RefusalStateTests(unittest.TestCase):
     def test_decline_option_is_mirrored_as_quick_reply(self):
         # J-01: the model-defined decline option must reach the patient
         # view as a quick reply, not only inside adaptive_question.
-        reply = self.engine._execute(
+        reply = self.engine.model_actions._execute(
             self.state,
             cmd(
                 "ask_patient",
@@ -434,7 +434,7 @@ class SummaryConfirmationTests(unittest.TestCase):
                 fact("patient_goal", "想知道要不要去医院", "想知道要不要去医院"),
             ],
         )
-        reply = self.engine._execute(
+        reply = self.engine.model_actions._execute(
             self.state, cmd("review_summary"), text, "t-sum"
         )
         self.assertEqual(reply.phase, Phase.SUMMARY)
@@ -498,7 +498,7 @@ class SelfCheckSkipAndCapTests(unittest.TestCase):
         # D-03: "跳过。" (with punctuation) must end the task like the
         # skip button, not loop back into the same self-check.
         self.state.active_task = "body_location"
-        failure = self.engine._try_task_result(
+        failure = self.engine.planning._try_task_result(
             self.state, "跳过。", None, "t-skip"
         )
         self.assertIsNone(failure)
@@ -525,7 +525,7 @@ class SelfCheckSkipAndCapTests(unittest.TestCase):
                     turn_id=f"t-suspend-{index}",
                 )
             )
-        offered = adaptive._offer_task(astate, "身上起疹子")
+        offered = adaptive.planning._offer_task(astate, "身上起疹子")
         self.assertIsNone(offered)
         self.assertIsNone(astate.self_check_conversation)
 
@@ -568,7 +568,7 @@ class EmergencyRenderingTests(unittest.TestCase):
             "也没有抽搐、嘴唇发紫、严重呼吸困难和胸痛。",
             "t-2",
         )
-        reply = self.engine._emergency_reply(
+        reply = self.engine.emergency._emergency_reply(
             self.state,
             ["严重呼吸困难", "口唇发紫", "高风险胸痛描述"],
         )
@@ -580,7 +580,7 @@ class EmergencyRenderingTests(unittest.TestCase):
 
     def test_screen_confirmed_trigger_still_renders(self):
         self._append_user_turn("鼻血一直在流，压着也不停", "t-1")
-        reply = self.engine._emergency_reply(self.state, ["患者确认急症筛查项"])
+        reply = self.engine.emergency._emergency_reply(self.state, ["患者确认急症筛查项"])
         self.assertIn("患者确认急症筛查项", reply.summary["triggers"])
         self.assertIn("120", reply.message)
 
@@ -660,7 +660,7 @@ class UrgentRenderingTests(unittest.TestCase):
             ],
         )
         self.state.risk = RiskAssessment(RiskLevel.URGENT, ["症状持续加重"])
-        reply = self.engine._urgent(self.state)
+        reply = self.engine.emergency._urgent(self.state)
         self.assertEqual(reply.kind, "urgent")
         self.assertNotIn("下面是已采集的信息，不必等", reply.message)
         self.assertIn("影响程度", reply.message)
@@ -693,13 +693,13 @@ class ConclusionCloseTests(unittest.TestCase):
         )
         self.state.phase = Phase.CLOSED
         self.state.closed_reason = "confirmed_by_user"
-        summary = self.engine._summary_payload(
+        summary = self.engine.replies._summary_payload(
             self.state, review_status="closed_unconfirmed"
         )
         reply = AgentReply(
             "本次信息已整理。", Phase.CLOSED, kind="closed", summary=summary
         )
-        self.engine._attach_conclusion(self.state, reply, "t-close")
+        self.engine.replies._attach_conclusion(self.state, reply, "t-close")
         sheet = self.state.conclusion
         self.assertTrue(sheet)
         self.assertTrue(sheet.get("neutral_fallback"))
@@ -775,7 +775,7 @@ class SuspendCapSemanticsTests(unittest.TestCase):
         for index in range(3):
             self._suspend(aevents, astate, f"t-{index}")
         self.assertEqual(
-            adaptive._self_check_suspend_count(astate, "body_location", "inter-1"),
+            adaptive.planning._self_check_suspend_count(astate, "body_location", "inter-1"),
             3,
         )
         adaptive, astate, aevents = self._frame_state()
@@ -785,7 +785,7 @@ class SuspendCapSemanticsTests(unittest.TestCase):
         self._resume(aevents, astate, "t-1")
         self._suspend(aevents, astate, "t-2")
         self.assertEqual(
-            adaptive._self_check_suspend_count(astate, "body_location", "inter-1"),
+            adaptive.planning._self_check_suspend_count(astate, "body_location", "inter-1"),
             1,
         )
         aevents.append(
@@ -797,7 +797,7 @@ class SuspendCapSemanticsTests(unittest.TestCase):
             )
         )
         self.assertEqual(
-            adaptive._self_check_suspend_count(astate, "body_location", "inter-1"),
+            adaptive.planning._self_check_suspend_count(astate, "body_location", "inter-1"),
             1,
         )
 
@@ -805,10 +805,10 @@ class SuspendCapSemanticsTests(unittest.TestCase):
         adaptive, astate, aevents = self._frame_state()
         for index in range(3):
             self._suspend(aevents, astate, f"t-{index}")
-        offered = adaptive._offer_task(astate, "身上起疹子")
+        offered = adaptive.planning._offer_task(astate, "身上起疹子")
         self.assertIsNone(offered)
         self.assertIsNone(astate.self_check_conversation)
-        reply = adaptive._plan_next(astate)
+        reply = adaptive.planning._plan_next(astate)
         self.assertTrue(
             reply.message.startswith("这一步先跳过，回到主流程继续。"),
             reply.message,
@@ -891,7 +891,7 @@ class BypassClosureTests(unittest.TestCase):
         )
         self.assertEqual(state.risk.level, RiskLevel.URGENT)
         self._observation_resume(state)
-        reply = engine._handle_observation_action(
+        reply = engine.observations._handle_observation_action(
             state, UserInput("腋温36.5度"), "腋温36.5度", "t-obs"
         )
         self.assertIsNotNone(reply)
@@ -915,7 +915,7 @@ class BypassClosureTests(unittest.TestCase):
         )
         self._observation_resume(state)
         text = "腋温36.5度，胸口一阵阵刺痛，按着疼，吃完饭还反酸烧心"
-        reply = engine._handle_observation_action(
+        reply = engine.observations._handle_observation_action(
             state, UserInput(text), text, "t-obs"
         )
         self.assertIsNotNone(reply)
@@ -978,7 +978,7 @@ class BypassClosureTests(unittest.TestCase):
             # down, leaving empty triggers. The stuck rule must not
             # turn that into a SUMMARY-phase reply of kind "urgent".
             state.risk = RiskAssessment(RiskLevel.ROUTINE, [])
-            engine._offer_task = lambda *a, **k: None
+            engine.planning._offer_task = lambda *a, **k: None
             planner = DifferentialPlanner(engine)
             planner._proposer = _StaticProposer(state.reasoning)
             reply = planner.plan(state)
@@ -1039,7 +1039,7 @@ class BypassClosureTests(unittest.TestCase):
             "task": task,
             "previous_fact_id": None,
         }
-        reply = engine._controller_summary(state, "请整理摘要", "t-sum")
+        reply = engine.pathways._controller_summary(state, "请整理摘要", "t-sum")
         self.assertIsNotNone(reply)
         self.assertIsNone(state.self_check_conversation)
         self.assertEqual(reply.kind, "question")

@@ -56,9 +56,9 @@ class FollowUpIdempotencyTests(unittest.TestCase):
         try:
             state = _closed_state(engine)
             engine._sessions[state.session_id] = state
-            first = engine._schedule_follow_up(state)
+            first = engine.replies._schedule_follow_up(state)
             self.assertIsNotNone(first)
-            second = engine._schedule_follow_up(state)
+            second = engine.replies._schedule_follow_up(state)
             self.assertEqual(first["due_at"], second["due_at"])
             scheduled = [
                 e for e in engine.events.for_session(state.session_id)

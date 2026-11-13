@@ -118,12 +118,11 @@ class WorkspaceCompositionTests(unittest.TestCase):
 
     def test_replaced_hosts_are_stopped_and_removed(self):
         self.workspace.apply({"backend": "demo"})
-        first_host = self.workspace.hosts[0]
+        first_host = self.workspace._current_host
         first_context = first_host.context
         self.workspace.apply({"backend": "demo"})
         self.workspace.apply({"backend": "demo"})
-        self.assertEqual(len(self.workspace.hosts), 1)
-        self.assertIsNot(self.workspace.hosts[0], first_host)
+        self.assertIsNot(self.workspace._current_host, first_host)
         # stop() unregisters the replaced host's services; its engine is
         # still reachable, but the composition itself is torn down.
         with self.assertRaises(RuntimeError):

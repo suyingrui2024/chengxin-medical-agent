@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { observeTool, hasActiveJobs } from "../execution-observations.mjs";
-import { observationPresentation } from "../../../src/medagent/web/js/execution-ui-observation.js";
+import { observationPresentation } from "../../../src/medagent/web/js/execution/execution-ui-observation.js";
 
 const exec = { name: "bash", agent: { id: "root" }, callId: "call" };
 const call = { turn: 1, step: 2, call_sequence: 3 };

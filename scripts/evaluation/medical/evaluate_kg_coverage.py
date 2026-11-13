@@ -29,7 +29,7 @@ from medagent.kg import ConceptStore, Normalizer
 ROOT = Path(__file__).resolve().parents[3]
 CORPUS = ROOT / "tests" / "fixtures" / "red_flag_corpus_v0.json"
 DB = ROOT / "data" / "kg" / "kg.db"
-OUT = ROOT / "docs" / "知识库覆盖评估.md"
+OUT = ROOT / "docs" / "evaluations" / "knowledge-graph" / "coverage.md"
 
 
 def main() -> int:
@@ -157,6 +157,7 @@ def main() -> int:
         "一份 200–500 条的问诊口语同义词表，而这必须由临床方提供或签字。",
         "",
     ]
+    OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")
 
     print(f"wrote {OUT}")

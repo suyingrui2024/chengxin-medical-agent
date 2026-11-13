@@ -56,7 +56,7 @@ def main():
     rows = json.loads(rows_path.read_text())
     excluded = set()
     exposure = {}
-    for path in sorted((ROOT / "benchmarks").glob("**/instance.json")):
+    for path in sorted((ROOT / "research" / "benchmarks").glob("**/instance.json")):
         row = json.loads(path.read_text())
         excluded.add(row["instance_id"])
         exposure[str(path.relative_to(ROOT))] = hashlib.sha256(

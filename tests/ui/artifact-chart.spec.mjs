@@ -127,7 +127,7 @@ test("long previews scroll with the keyboard without changing row order", async 
   const list = page.locator(".artifact-chart-points");
   await page.evaluate(() => {
     const sheet = [...document.styleSheets].find((s) =>
-      s.href.endsWith("artifact-chart.css"),
+      s.href?.endsWith("/css/styles.css"),
     );
     sheet.insertRule(
       ".artifact-chart-scroll::-webkit-scrollbar {width:17px}",

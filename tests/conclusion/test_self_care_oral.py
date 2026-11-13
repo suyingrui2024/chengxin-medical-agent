@@ -1,4 +1,4 @@
-"""v1.3 oral self-care content (design docs/问诊结论单设计文档.md §13.7).
+"""v1.3 oral self-care content (design docs/features/问诊结论单设计文档.md §13.7).
 
 Scope of this package (content only):
 - self_care.json gains exactly one group, ``oral_routine``

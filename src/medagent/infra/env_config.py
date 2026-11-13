@@ -64,7 +64,20 @@ def subagent_kind_modes(source) -> dict:
     return modes
 
 
-def read_env(path):
+def read_partial(path, *, allowed=None):
+    """Parse supported keys without requiring a complete configuration.
+
+    Configuration writers and launchers share the same non-executable parser.
+    Unknown keys are ignored; malformed syntax never includes secret values
+    in the error. A missing layer is an empty mapping.
+    """
+    path = Path(path)
+    if not path.exists():
+        return {}
+    return _parse_env(path, ALLOWED if allowed is None else allowed)
+
+
+def _parse_env(path, allowed):
     """Read a .env file with shell quoting rules and export-prefix tolerance.
 
     Values go through shlex, so quoted secrets keep their spaces and comments
@@ -89,11 +102,22 @@ def read_env(path):
             raise ValueError(f"Invalid .env assignment on line {index}")
         name, value = assignment.split("=", 1)
         name = name.strip()
-        if name in ALLOWED:
+        if name in allowed:
             value = value.strip()
             if any(ord(char) < 32 for char in value):
                 raise ValueError("Configuration contains control characters")
             settings[name] = value
+    return settings
+
+
+def read_env(path):
+    """Read and validate a complete explicit configuration with one parser."""
+    return validate_settings(_parse_env(Path(path), ALLOWED))
+
+
+def validate_settings(settings):
+    """Validate a merged configuration, keeping file and layered startup aligned."""
+    settings = dict(settings)
     for name in ("MEDAGENT_LLM_BASE_URL", "MEDAGENT_LLM_API_KEY", "MEDAGENT_LLM_MODEL"):
         if not settings.get(name) or settings[name] == "replace-me":
             raise ValueError(f"Missing configuration: {name}")
@@ -153,3 +177,25 @@ def for_backend(settings, backend):
             output["MEDAGENT_LLM_BASE_URL"] = "https://api.deepseek.com"
     output["MEDAGENT_BACKEND"] = backend
     return output
+
+
+def read_configuration(root, *, env_file=None, backend=None):
+    """Resolve explicit live startup without silently overriding a hand-edited .env.
+
+    An explicit file is exclusive; otherwise .env wins. When it is absent,
+    merge .env.common and .env.dsh, unless direct mode was explicitly selected.
+    Nothing here loads files into the process environment or prints secrets.
+    """
+    root = Path(root)
+    path = Path(env_file) if env_file is not None else root / ".env"
+    if env_file is not None or path.exists():
+        settings = read_env(path)
+    else:
+        settings = read_partial(root / ".env.common")
+        if backend != "compatible":
+            settings.update(read_partial(root / ".env.dsh"))
+        settings = validate_settings(settings)
+    mode = backend or settings.get("MEDAGENT_BACKEND", "compatible")
+    if mode not in {"compatible", "dsh"}:
+        raise ValueError("Live configuration backend must be compatible or dsh")
+    return for_backend(settings, mode)

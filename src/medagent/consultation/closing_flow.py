@@ -1,4 +1,4 @@
-"""Mixin: closing flow for ConsultationEngine."""
+"""Workflow component: closing flow for ConsultationEngine."""
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
@@ -30,6 +30,10 @@ from .vocabulary import (
 
 
 class ConsultationEngineClosing:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     @staticmethod
     def _close_facts_text(items: List[Dict[str, Any]]) -> str:
         """Render confirmed facts with patient evidence preferred.
@@ -99,12 +103,12 @@ class ConsultationEngineClosing:
         unknown_details: List[Dict[str, Any]] = []
         declined: List[str] = []
         declined_details: List[Dict[str, Any]] = []
-        source_turns = self._source_turns(state)
+        source_turns = self.engine.emergency._source_turns(state)
         for key, fact in state.facts.items():
             task = next(
                 (
                     task
-                    for task in self.content.tasks.values()
+                    for task in self.engine.content.tasks.values()
                     if task["result_key"] == key
                 ),
                 {},
@@ -124,7 +128,7 @@ class ConsultationEngineClosing:
             detail = {
                 "key": key,
                 "label": label,
-                **self._fact_provenance(fact, source_turns),
+                **self.engine.emergency._fact_provenance(fact, source_turns),
             }
             if fact.assertion == Assertion.UNKNOWN:
                 unknown.append(label)
@@ -159,7 +163,7 @@ class ConsultationEngineClosing:
         else:
             route = "本次已完成结构化信息整理。系统没有据此作出诊断；请结合症状变化和专业医疗评估决定下一步。"
         return {
-            "content_versions": self.content.versions,
+            "content_versions": self.engine.content.versions,
             "known": known,
             "unknown": unknown,
             "unknown_details": unknown_details,
@@ -180,8 +184,8 @@ class ConsultationEngineClosing:
             "review_status": review_status,
             "return_now_if": ["意识异常或抽搐", "严重呼吸困难或嘴唇发紫", "持续压榨样胸痛", "大量或无法控制的出血"],
             "observations": [
-                self._observation_series(state, task)
-                for task in self.content.tasks.values()
+                self.engine.observations._observation_series(state, task)
+                for task in self.engine.content.tasks.values()
                 if task.get("repeatable") and task["result_key"] in state.facts
             ],
         }
@@ -204,7 +208,7 @@ class ConsultationEngineClosing:
         was not confirmed.
         """
         state.phase = Phase.SUMMARY
-        state.risk = risk_override or self.triage.assess(state)
+        state.risk = risk_override or self.engine.triage.assess(state)
         needs_confirmation = state.risk.level not in {
             RiskLevel.EMERGENCY,
             RiskLevel.URGENT,
@@ -255,7 +259,7 @@ class ConsultationEngineClosing:
         if plan is None:
             return None
         state.follow_up = plan
-        self.events.append(
+        self.engine.events.append(
             Event(state.session_id, "followup.scheduled", dict(plan), turn_id=turn_id)
         )
         if reply is not None:
@@ -267,13 +271,13 @@ class ConsultationEngineClosing:
     ) -> Dict[str, Any]:
         """Record a follow-up outcome; worsening reopens triage as a new
         session linked to this one (design phase 4 longitudinal loop)."""
-        state = self.state(session_id)
-        with self._lock_for(session_id):
+        state = self.engine.state(session_id)
+        with self.engine._lock_for(session_id):
             plan = state.follow_up
             if not plan:
                 raise ValueError("该会话没有随访计划，无法记录结局")
             apply_outcome(plan, outcome, note)
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     session_id,
                     "followup.outcome_recorded",
@@ -286,7 +290,7 @@ class ConsultationEngineClosing:
                 "new_session_id": None,
             }
             if outcome in RETRIAGE_OUTCOMES:
-                new_state, _opening = self.create_session()
+                new_state, _opening = self.engine.create_session()
                 new_state.runtime_snapshot["follow_up_of"] = session_id
                 # Longitudinal prior: the re-triage session carries a
                 # compact snapshot of the case it grew out of, so the
@@ -305,7 +309,7 @@ class ConsultationEngineClosing:
                 }
                 plan["retriage_session_id"] = new_state.session_id
                 result["new_session_id"] = new_state.session_id
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         session_id,
                         "followup.retriage_session_created",
@@ -314,7 +318,7 @@ class ConsultationEngineClosing:
                 )
             # The outcome mutated this (possibly restored) closed case;
             # write it back so the recorded outcome itself is durable.
-            self._persist(state)
+            self.engine._persist(state)
             return result
 
     def _apply_bridging(self, state: CaseState, reply: AgentReply) -> None:
@@ -334,7 +338,7 @@ class ConsultationEngineClosing:
         fact_key = None
         if reply.question_id:
             try:
-                fact_key = self.content.question(reply.question_id).fact_key
+                fact_key = self.engine.content.question(reply.question_id).fact_key
             except Exception:
                 fact_key = None
         prior = [
@@ -425,7 +429,7 @@ class ConsultationEngineClosing:
         """
         self._apply_bridging(state, reply)
         self._apply_group_bridge(state, reply)
-        decision = self.publication_gate.validate(state, reply)
+        decision = self.engine.publication_gate.validate(state, reply)
         if not decision.allowed:
             if state.risk.level == RiskLevel.EMERGENCY:
                 state.phase = Phase.CLOSED
@@ -433,7 +437,7 @@ class ConsultationEngineClosing:
                 state.active_question = None
                 state.active_question_is_clarification = False
                 state.active_task = None
-            fallback = self.publication_gate.fallback(state, decision)
+            fallback = self.engine.publication_gate.fallback(state, decision)
             for field_name in AgentReply.__dataclass_fields__:
                 setattr(reply, field_name, getattr(fallback, field_name))
         trace = dict(reply.developer_trace or {})
@@ -442,7 +446,7 @@ class ConsultationEngineClosing:
             "rule_ids": list(decision.rule_ids),
         }
         reply.developer_trace = trace
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "reply.publication_allowed" if decision.allowed else "reply.publication_blocked",
@@ -450,7 +454,7 @@ class ConsultationEngineClosing:
                 turn_id=turn_id,
             )
         )
-        transition_id = commit_phase(self.events, state, reason, turn_id)
+        transition_id = commit_phase(self.engine.events, state, reason, turn_id)
         if transition_id:
             trace["transition_id"] = transition_id
             reply.developer_trace = trace
@@ -500,13 +504,13 @@ class ConsultationEngineClosing:
         if reply.kind != "subject_change":
             if reply.kind != "service_error":
                 state.subject_resume = None
-            self._project_calculation_followup(state, reply)
-            self._project_observation_feedback(state, reply)
-        with self._session_conditions[state.session_id]:
+            self.engine.followups._project_calculation_followup(state, reply)
+            self.engine.observations._project_observation_feedback(state, reply)
+        with self.engine._session_conditions[state.session_id]:
             state.revision += 1
             reply.action_id = f"{state.session_id}:{state.revision}"
-            reply.location_revision_action = self._location_revision_entry(state)
-            self._remember_location_revision_question(state, reply)
+            reply.location_revision_action = self.engine.locations._location_revision_entry(state)
+            self.engine.locations._remember_location_revision_question(state, reply)
             if reply.task:
                 from ..dialogue.task_interactions import task_with_interaction
 
@@ -514,9 +518,9 @@ class ConsultationEngineClosing:
                     reply.task,
                     state.session_id,
                     reply.action_id,
-                    self.events.for_session(state.session_id),
+                    self.engine.events.for_session(state.session_id),
                 )
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "turn.agent_reply",
@@ -525,9 +529,9 @@ class ConsultationEngineClosing:
                 )
             )
             state.transcript.append({"role": "assistant", "content": reply.message})
-            self._latest_replies[state.session_id] = deepcopy(reply)
-            self._session_conditions[state.session_id].notify_all()
-        self._persist(state)
+            self.engine._latest_replies[state.session_id] = deepcopy(reply)
+            self.engine._session_conditions[state.session_id].notify_all()
+        self.engine._persist(state)
 
     def _attach_conclusion(self, state: CaseState, reply: AgentReply, turn_id: str) -> None:
         """Compose the conclusion sheet at close (design: 结论单 §5).
@@ -562,7 +566,7 @@ class ConsultationEngineClosing:
             if sheet is None:
                 return
             state.conclusion = sheet
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "conclusion.generated",
@@ -582,7 +586,7 @@ class ConsultationEngineClosing:
             # Fail-open for the patient, but never silent: a missing
             # conclusion sheet must be attributable from the event log.
             try:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "conclusion.failed",

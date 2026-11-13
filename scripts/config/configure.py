@@ -13,6 +13,12 @@ import sys
 import tempfile
 from urllib.parse import urlsplit
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+from medagent.infra.env_config import (  # noqa: E402
+    ALLOWED,
+    for_backend,
+    read_partial as read_env_partial,
+)
 
 COMMON_KEYS = (
     "MEDAGENT_BACKEND",
@@ -22,13 +28,22 @@ COMMON_KEYS = (
     "MEDAGENT_VISION_MODEL",
     "MEDAGENT_LLM_MAX_TOKENS",
     "MEDAGENT_LLM_THINKING",
+    "MEDAGENT_LLM_REASONING_EFFORT",
+    "MEDAGENT_WEB_TOOLS",
 )
 DSH_KEYS = (
     "MEDAGENT_BACKEND",
     "MEDAGENT_LLM_BASE_URL",
     "MEDAGENT_DSH_REVIEW_MODE",
+    "MEDAGENT_SUBAGENT_MODE",
+    "MEDAGENT_SUBAGENT_WEB",
+    "MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP",
+    "MEDAGENT_SUBAGENT_MODE_CASE_DIGEST",
+    "MEDAGENT_SUBAGENT_MODE_EVIDENCE_LOOKUP",
+    "MEDAGENT_SUBAGENT_MODE_SECOND_OPINION",
+    "MEDAGENT_SUBAGENT_MODE_FOLLOWUP_BATCH",
 )
-KNOWN_KEYS = set(COMMON_KEYS) | set(DSH_KEYS)
+KNOWN_KEYS = ALLOWED
 
 
 def project_root() -> Path:
@@ -36,31 +51,7 @@ def project_root() -> Path:
 
 
 def read_partial(path: Path) -> dict[str, str]:
-    if not path.exists():
-        return {}
-    values: dict[str, str] = {}
-    for index, line in enumerate(
-        path.read_text(encoding="utf-8-sig").splitlines(), 1
-    ):
-        if not line.strip() or line.lstrip().startswith("#"):
-            continue
-        try:
-            parts = shlex.split(line, comments=True, posix=True)
-        except ValueError:
-            raise ValueError(f"{path.name} 第 {index} 行格式无效") from None
-        if parts and parts[0] == "export":
-            parts.pop(0)
-        assignment = " ".join(parts)
-        if "=" not in assignment:
-            raise ValueError(f"{path.name} 第 {index} 行不是配置项")
-        name, value = assignment.split("=", 1)
-        name = name.strip()
-        if name in KNOWN_KEYS:
-            value = value.strip()
-            if any(ord(char) < 32 for char in value):
-                raise ValueError(f"{name} 包含控制字符")
-            values[name] = value
-    return values
+    return read_env_partial(path, allowed=KNOWN_KEYS)
 
 
 def env_value(name: str, *sources: dict[str, str], default: str = "") -> str:
@@ -108,17 +99,11 @@ def validate_url(value: str, label: str) -> None:
 
 
 def direct_endpoint(value: str) -> str:
-    parsed = urlsplit(value)
-    if parsed.hostname == "api.deepseek.com" and parsed.path.rstrip("/") == "/anthropic":
-        return "https://api.deepseek.com"
-    return value
+    return for_backend({"MEDAGENT_LLM_BASE_URL": value}, "compatible")["MEDAGENT_LLM_BASE_URL"]
 
 
 def dsh_endpoint(value: str) -> str:
-    parsed = urlsplit(value)
-    if parsed.hostname == "api.deepseek.com" and parsed.path.rstrip("/") in {"", "/v1"}:
-        return "https://api.deepseek.com/anthropic"
-    return value
+    return for_backend({"MEDAGENT_LLM_BASE_URL": value}, "dsh")["MEDAGENT_LLM_BASE_URL"]
 
 
 def encode(value: str) -> str:
@@ -159,7 +144,8 @@ def write_dsh(path: Path, values: dict[str, str]) -> None:
         "# Apply after .env.common; this file is ignored by Git.",
     ]
     for name in DSH_KEYS:
-        lines.append(f"{name}={encode(values[name])}")
+        if name in values:
+            lines.append(f"{name}={encode(values[name])}")
     atomic_write(path, lines)
 
 
@@ -173,16 +159,7 @@ def write_full(path: Path, common: dict[str, str], dsh: dict[str, str]) -> None:
         ),
         "# Regenerate with the matching script in scripts/config/<platform>/.",
     ]
-    for name in (
-        "MEDAGENT_BACKEND",
-        "MEDAGENT_LLM_BASE_URL",
-        "MEDAGENT_LLM_API_KEY",
-        "MEDAGENT_LLM_MODEL",
-        "MEDAGENT_VISION_MODEL",
-        "MEDAGENT_LLM_MAX_TOKENS",
-        "MEDAGENT_LLM_THINKING",
-        "MEDAGENT_DSH_REVIEW_MODE",
-    ):
+    for name in dict.fromkeys((*COMMON_KEYS, *DSH_KEYS)):
         if merged.get(name, "") != "":
             lines.append(f"{name}={encode(merged[name])}")
     atomic_write(path, lines)
@@ -205,16 +182,12 @@ def build_common(root: Path, *, interactive: bool) -> dict[str, str]:
     )
     model = prompt_text(
         "文字模型 ID",
-        env_value(
-            "MEDAGENT_LLM_MODEL", layer, existing, default="deepseek-flash"
-        ),
+        env_value("MEDAGENT_LLM_MODEL", layer, existing, default="deepseek-flash"),
         interactive=interactive,
     )
     vision_model = prompt_text(
         "图片模型 ID",
-        env_value(
-            "MEDAGENT_VISION_MODEL", layer, existing, default="deepseek-flash"
-        ),
+        env_value("MEDAGENT_VISION_MODEL", layer, existing, default="deepseek-flash"),
         interactive=interactive,
     )
     validate_url(base_url, "模型服务地址")
@@ -229,7 +202,7 @@ def build_common(root: Path, *, interactive: bool) -> dict[str, str]:
         "MEDAGENT_LLM_MODEL": model,
         "MEDAGENT_VISION_MODEL": vision_model,
     }
-    for name in ("MEDAGENT_LLM_MAX_TOKENS", "MEDAGENT_LLM_THINKING"):
+    for name in COMMON_KEYS[5:]:
         value = env_value(name, layer, existing)
         if value:
             values[name] = value
@@ -251,15 +224,18 @@ def build_dsh(root: Path, common: dict[str, str], *, interactive: bool) -> dict[
     base_url = prompt_text("DSH Messages 服务地址", base_url, interactive=interactive)
     review_mode = prompt_text(
         "后台复核模式（shadow/advisory）",
-        env_value(
-            "MEDAGENT_DSH_REVIEW_MODE", layer, existing, default="shadow"
-        ),
+        env_value("MEDAGENT_DSH_REVIEW_MODE", layer, existing, default="shadow"),
         interactive=interactive,
     )
     validate_url(base_url, "DSH 服务地址")
     if review_mode not in {"shadow", "advisory"}:
         raise ValueError("后台复核模式只能是 shadow 或 advisory")
     return {
+        **{
+            name: env_value(name, layer, existing)
+            for name in DSH_KEYS[3:]
+            if env_value(name, layer, existing)
+        },
         "MEDAGENT_BACKEND": "dsh",
         "MEDAGENT_LLM_BASE_URL": base_url,
         "MEDAGENT_DSH_REVIEW_MODE": review_mode,

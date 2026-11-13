@@ -106,7 +106,7 @@ class ConsultationSubjectTests(unittest.TestCase):
         before = deepcopy(self.state.to_dict()["facts"])
         command = record("我母亲", 65, "肚子痛", correction=True)
         with self.assertRaises(SubjectBoundaryError):
-            self.engine._execute(self.state, command, "我母亲65岁，肚子痛。", "source")
+            self.engine.model_actions._execute(self.state, command, "我母亲65岁，肚子痛。", "source")
         self.assertEqual(self.state.to_dict()["facts"], before)
 
     def test_model_has_a_subject_change_tool_and_does_not_write_new_person_facts(self):
@@ -202,7 +202,7 @@ class ConsultationSubjectTests(unittest.TestCase):
         self.engine.submit(self.state.session_id, UserInput("这次是其他家人。"))
         self.assertEqual(subject_profile(self.state)["label"], "父亲")
         self.assertEqual(
-            self.engine._finish(self.state).summary["known"][0]["value"], "父亲"
+            self.engine.replies._finish(self.state).summary["known"][0]["value"], "父亲"
         )
 
     def test_child_refinements_do_not_forget_previous_compatible_constraints(self):

@@ -16,8 +16,8 @@ from this table instead of being hand-maintained:
 - ``builtin.load_registry`` admits a pack only when its id appears here
   with ``status == "delivered"`` — replacing the old hand-written
   ``SCALE_IDS`` tuple that had already drifted (29 ids, 4 packs).
-- ``docs/门诊显式计算科目与项目总表.md`` is generated from the same
-  rows, and ``tests/test_catalog.py`` asserts the three agree.
+- ``docs/features/门诊显式计算科目与项目总表.md`` is generated from the same
+  rows, and ``tests/extensions/test_catalog.py`` asserts the three agree.
 
 Status values:
 - ``delivered``        registered, executable, covered by tests

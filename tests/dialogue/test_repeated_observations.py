@@ -263,13 +263,13 @@ class RepeatedObservationTests(unittest.TestCase):
             "比如刚刚又测了一次腋温40.1℃",
         ):
             self.assertIsNone(
-                engine._handle_observation_action(
+                engine.observations._handle_observation_action(
                     state, UserInput(text), text, "test-turn"
                 )
             )
         for text in ("想重新测量，血糖40.1", "想重新测量，腋温可能是38.6℃"):
             engine, _, state, _ = measured_case()
-            reply = engine._handle_observation_action(
+            reply = engine.observations._handle_observation_action(
                 state, UserInput(text), text, "test-turn"
             )
             if text == "想重新测量，血糖40.1":
@@ -280,7 +280,7 @@ class RepeatedObservationTests(unittest.TestCase):
                 continue
             self.assertIsNotNone(reply)
             self.assertNotIn("candidate", reply.task["repeat"])
-            engine._handle_observation_action(
+            engine.observations._handle_observation_action(
                 state, UserInput("跳过", "skip"), "跳过", "skip-turn"
             )
 
@@ -293,13 +293,13 @@ class RepeatedObservationTests(unittest.TestCase):
             ("axillary_temperature", "想重新测量", "没有说过"),
         ):
             with self.assertRaises(ValueError):
-                engine._execute(
+                engine.model_actions._execute(
                     state,
                     cmd("repeat_self_check", task_id=identity, evidence=evidence),
                     text,
                     "test-turn",
                 )
-        reply = engine._execute(
+        reply = engine.model_actions._execute(
             state,
             cmd("repeat_self_check", task_id="axillary_temperature", evidence="想重新测量"),
             "想重新测量",

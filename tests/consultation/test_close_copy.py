@@ -58,13 +58,13 @@ def _emergency_case(engine, state, turn, chief_evidence, triggers):
             fact("chief_complaint", chief_evidence, chief_evidence),
         ],
     )
-    return engine._emergency_reply(state, triggers)
+    return engine.emergency._emergency_reply(state, triggers)
 
 
 def _urgent_case(engine, state, turn, facts, trigger):
     record(engine, state, turn, facts)
     state.risk = RiskAssessment(RiskLevel.URGENT, [trigger])
-    return engine._urgent(state)
+    return engine.emergency._urgent(state)
 
 
 def _urgent_facts(chief, associated, goal="想知道要不要马上去急诊"):
@@ -342,7 +342,7 @@ class UrgentCloseTests(unittest.TestCase):
         # Batch-A rule preserved by batch C: with no facts at all,
         # the close must not promise collected information.
         self.state.risk = RiskAssessment(RiskLevel.URGENT, ["症状持续加重"])
-        reply = self.engine._urgent(self.state)
+        reply = self.engine.emergency._urgent(self.state)
         self.assertEqual(reply.kind, "urgent")
         self.assertIn(SOOTHING, reply.message)
         self.assertIn("要不要马上去急诊", reply.message)
@@ -365,7 +365,7 @@ class RequestedHelpAndSpokenLineTests(unittest.TestCase):
                 fact("chief_complaint", "喘不上气", "喘不上气"),
             ],
         )
-        reply = self.engine._emergency_reply(
+        reply = self.engine.emergency._emergency_reply(
             self.state, ["严重呼吸困难"], requested_help=True
         )
         self.assertIn(SOOTHING, reply.message)
@@ -427,7 +427,7 @@ class RequestedHelpAndSpokenLineTests(unittest.TestCase):
             self.state.risk = RiskAssessment(
                 RiskLevel.URGENT, ["症状持续加重"]
             )
-            reply = self.engine._urgent(self.state)
+            reply = self.engine.emergency._urgent(self.state)
             self.assertIn("今天内去急诊", reply.message)
         finally:
             if had:
@@ -448,7 +448,7 @@ class RequestedHelpAndSpokenLineTests(unittest.TestCase):
             self.state.risk = RiskAssessment(
                 RiskLevel.URGENT, ["症状持续加重"]
             )
-            reply = self.engine._urgent(self.state)
+            reply = self.engine.emergency._urgent(self.state)
             self.assertIn("要不要马上去急诊：要，建议今天内", reply.message)
         finally:
             if had:

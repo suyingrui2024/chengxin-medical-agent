@@ -131,7 +131,8 @@ test("body diagram clicks and keyboard selection keep a draft until explicit con
   expect(await degreeSnapshot(page, id)).toEqual(before);
   const inert = await page.evaluate(
     async (task) => {
-      const { createRenderer } = await import("/js/structured-ui.js");
+      const { createRenderer } =
+        await import("/js/structured/structured-ui.js");
       let changes = 0;
       const card = createRenderer().render(
         { id: "readonly", type: "self_check", data: task },
@@ -167,7 +168,8 @@ test("a different capability instruction is never replaced by the compact vocabu
   const before = await degreeSnapshot(page, id);
   const rendered = await page.evaluate(
     async (task) => {
-      const { createRenderer } = await import("/js/structured-ui.js");
+      const { createRenderer } =
+        await import("/js/structured/structured-ui.js");
       const card = createRenderer().render(
         {
           id: "different",

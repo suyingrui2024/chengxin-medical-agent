@@ -2,7 +2,7 @@
 
 Three artefacts describe the same 154 items: ``extensions/catalog.py``
 (machine), ``packs/*.json`` (content) and
-``docs/门诊显式计算科目与项目总表.md`` (human). This test is what stops
+``docs/features/门诊显式计算科目与项目总表.md`` (human). This test is what stops
 them from drifting — the previous hand-written whitelist had already
 listed 29 ids for 4 packs before anyone noticed.
 """
@@ -25,7 +25,7 @@ from medagent.extensions.formula_forms import formula_form_spec
 from medagent.extensions.scale_forms import scale_form_spec
 
 ROOT = Path(__file__).resolve().parents[2]
-DOC = ROOT / "docs" / "门诊显式计算科目与项目总表.md"
+DOC = ROOT / "docs" / "features" / "门诊显式计算科目与项目总表.md"
 
 
 def pack_files():
@@ -208,7 +208,7 @@ class ScaleRangeAuditTests(unittest.TestCase):
         self.assertGreater(checked, 0)
 
 
-WORKSHEET = ROOT / "docs" / "量表与公式临床评审工作表.md"
+WORKSHEET = ROOT / "docs" / "development" / "量表与公式临床评审工作表.md"
 
 
 class ReviewWorksheetTests(unittest.TestCase):

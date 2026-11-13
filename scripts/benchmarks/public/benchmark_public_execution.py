@@ -182,7 +182,7 @@ def source_inventory():
         "src/medagent",
         "integrations/dsh",
         "scripts",
-        "benchmarks/swe-lite-dev",
+        "research/benchmarks/swe-lite-dev",
     ]:
         paths.extend(
             p

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {
   inputProofMissing,
   observationPresentation,
-} from "../../src/medagent/web/js/execution-ui-observation.js";
+} from "../../src/medagent/web/js/execution/execution-ui-observation.js";
 
 test("input proof and command exit status remain distinct in presentation", () => {
   const value = {

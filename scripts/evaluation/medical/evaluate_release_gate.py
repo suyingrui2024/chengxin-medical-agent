@@ -10,7 +10,7 @@ unless every threshold holds:
 These corpora are unreviewed engineering assets; passing this gate is
 necessary, never sufficient, for a clinical release. The clinician-case
 gate remains scripts/evaluation/medical/evaluate_medical_release.py, and the behaviour
-baseline is the pytest suite (tests/test_triage_layered.py embeds the
+baseline is the pytest suite (tests/clinical/test_triage_layered.py embeds the
 same corpora as tests).
 
     PYTHONPATH=src python3 scripts/evaluation/medical/evaluate_release_gate.py

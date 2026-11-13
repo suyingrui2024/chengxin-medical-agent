@@ -1,4 +1,4 @@
-"""Generate docs/门诊显式计算科目与项目总表.md from extensions/catalog.py."""
+"""Generate docs/features/门诊显式计算科目与项目总表.md from extensions/catalog.py."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from pathlib import Path
 from medagent.extensions.catalog import CATALOG, by_department, summary
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "docs" / "门诊显式计算科目与项目总表.md"
+OUT = ROOT / "docs" / "features" / "门诊显式计算科目与项目总表.md"
 
 STATUS_TEXT = {
     "delivered": "已交付",
@@ -58,7 +58,7 @@ def main():
         "# 门诊显式计算科目与项目总表",
         "",
         "> 本表由 `src/medagent/extensions/catalog.py` 生成，**不要手工编辑**。",
-        "> `tests/test_catalog.py` 断言本表、目录与内容包三者一致；改动请改 catalog 后重新生成本表。",
+        "> `tests/extensions/test_catalog.py` 断言本表、目录与内容包三者一致；改动请改 catalog 后重新生成本表。",
         "",
         "## 0. 目的与边界",
         "",
@@ -135,7 +135,7 @@ def main():
         "",
         "- 每个已交付项目必须有可核对的 HTTPS 来源，且 `citation` 出现在 `references[].section` 中。",
         "- 所有项目 `review_status` 为 `engineering_verified_not_clinical`；数值正确不等于临床可用。",
-        "- 临床评审条目见 `docs/待临床评审清单.md`（C15 量表组、C17 公式组、C18 扩容组）。",
+        "- 临床评审条目见 `docs/development/待临床评审清单.md`（C15 量表组、C17 公式组、C18 扩容组）。",
         "- 结果不写入病例事实，不进入结论单。",
         "",
         "## 6. 与代码的映射",
@@ -147,7 +147,7 @@ def main():
         "| `src/medagent/extensions/formula_engine.py` | 公式校验与执行 |",
         "| `src/medagent/extensions/formulas.py` | 公式白名单实现 |",
         "| `src/medagent/extensions/packs/*.json` | 内容包（已交付项目） |",
-        "| `tests/test_catalog.py` | 三方一致性门禁 |",
+        "| `tests/extensions/test_catalog.py` | 三方一致性门禁 |",
         "",
     ]
     OUT.write_text("\n".join(lines), encoding="utf-8")

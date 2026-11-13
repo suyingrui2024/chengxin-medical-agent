@@ -7,7 +7,7 @@ from time import monotonic
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 from ...clinical.reasoning import ReasoningWorkspace
-from ...core.decision_wait import DecisionInterrupted
+from ...core.decision_wait import DecisionInterrupted, invoke_decision
 from ...core.domain import CaseState
 from ...core.events import Event
 from ...infra.backends import parse_decision
@@ -662,8 +662,8 @@ class CoordinatorBranch:
                         break
                     steps += 1
                     try:
-                        raw_command = self.backend.decide_cancellable(
-                            sub_session, messages, cancel
+                        raw_command = invoke_decision(
+                            self.backend, sub_session, messages, cancel
                         )
                     except DecisionInterrupted:
                         settle = "timeout" if timed_out.is_set() else "cancelled"

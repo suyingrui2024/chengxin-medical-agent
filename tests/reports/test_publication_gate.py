@@ -38,7 +38,7 @@ class PublicationGateTests(unittest.TestCase):
 
     def test_invalid_reply_is_replaced_before_transcript_and_event_commit(self):
         invalid = AgentReply("继续回答", Phase.CLOSED, kind="question")
-        self.engine._record_reply(self.state, invalid, "fixture", "invalid fixture")
+        self.engine.replies._record_reply(self.state, invalid, "fixture", "invalid fixture")
         self.assertEqual(invalid.kind, "publication_blocked")
         self.assertEqual(invalid.phase, self.state.phase)
         self.assertEqual(self.state.transcript[-1]["content"], invalid.message)
@@ -56,7 +56,7 @@ class PublicationGateTests(unittest.TestCase):
     def test_emergency_mismatch_uses_fixed_emergency_fallback(self):
         self.state.risk.level = RiskLevel.EMERGENCY
         invalid = AgentReply("普通回复", Phase.CLOSED, kind="question")
-        self.engine._record_reply(self.state, invalid, "fixture", "emergency fixture")
+        self.engine.replies._record_reply(self.state, invalid, "fixture", "emergency fixture")
         self.assertEqual(invalid.kind, "emergency")
         self.assertEqual(self.state.phase, Phase.CLOSED)
         self.assertIn("120", invalid.message)

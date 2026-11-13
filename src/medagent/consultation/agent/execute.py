@@ -1,4 +1,4 @@
-"""Mixin: execute for AdaptiveConsultationEngine."""
+"""Workflow component: execute for AdaptiveConsultationEngine."""
 from typing import Any, Dict
 from ...core.domain import (
     AgentReply,
@@ -45,6 +45,10 @@ class AdaptiveConsultationEngineExecute:
     handler and adding one line to ``_TOOLS`` — nothing here knows what any
     individual tool does.
     """
+
+    def __init__(self, engine):
+        self.engine = engine
+
 
     _TOOLS = {
         "change_subject": "_tool_change_subject",
@@ -105,7 +109,7 @@ class AdaptiveConsultationEngineExecute:
             or compatible(current["reference"], requested)
         ):
             raise ProposalError("这可能是当前对象的称谓补充。先澄清，不把普通家族史当作换人。")
-        return self._subject_change_reply(
+        return self.engine.subjects._subject_change_reply(
             state,
             {
                 "category": "self"
@@ -130,7 +134,7 @@ class AdaptiveConsultationEngineExecute:
             raise ProposalError("这次测量已处理，请先处理同轮补充信息，不要重复已完成的动作")
         if not isinstance(args["task_id"], str):
             raise ProposalError("图示任务ID必须是字符串")
-        task = self._repeat_task(state, args["task_id"])
+        task = self.engine.observations._repeat_task(state, args["task_id"])
         if (
             not isinstance(evidence, str)
             or not 2 <= len(evidence) <= 300
@@ -139,15 +143,15 @@ class AdaptiveConsultationEngineExecute:
             or not repeat_intent(task, evidence)
         ):
             raise ProposalError("重复观察必须引用本轮明确请求的连续原文")
-        return self._request_repeat(state, task["id"], text, turn_id)
+        return self.engine.observations._request_repeat(state, task["id"], text, turn_id)
 
     def _tool_revise_self_check(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
-        self._request_location_revision(state, args, text, turn_id)
+        self.engine.locations._request_location_revision(state, args, text, turn_id)
         return {
             "ok": True,
-            "case": self._context(state, text),
+            "case": self.engine.model_context._context(state, text),
             "next": "修改卡已建立；可用propose_self_check_result整理本轮明确更正，或show_self_check展示核对。原事实尚未修改。",
         }
 
@@ -169,7 +173,7 @@ class AdaptiveConsultationEngineExecute:
         task = next(
             (
                 t
-                for t in self.content.applicable_tasks(
+                for t in self.engine.content.applicable_tasks(
                     str(state.get("chief_complaint", ""))
                 )
                 if t["id"] == task_id and t["result_key"] not in state.facts
@@ -188,7 +192,7 @@ class AdaptiveConsultationEngineExecute:
         ):
             request = {"task_id": task_id, "evidence": evidence, "turn_id": turn_id}
             state.pending_self_checks.append(request)
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "self_check.requested",
@@ -196,14 +200,14 @@ class AdaptiveConsultationEngineExecute:
                     turn_id=turn_id,
                 )
             )
-        return {"ok": True, "case": self._context(state, text)}
+        return {"ok": True, "case": self.engine.model_context._context(state, text)}
 
     def _tool_run_capability(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
         if not isinstance(args["id"], str) or not isinstance(args["input"], dict):
             raise ProposalError("能力 ID 或输入格式无效")
-        return self.request_calculation(
+        return self.engine.request_calculation(
             state, args["id"], args["input"], args["evidence"], text, turn_id
         )
 
@@ -236,22 +240,22 @@ class AdaptiveConsultationEngineExecute:
                     "请改用 evidence_lookup 或 second_opinion 重提"
                 ),
             }
-        coordinator = self.subagent_coordinator
+        coordinator = self.engine.subagent_coordinator
         if coordinator is None:
             return {"ok": False, "status": "unavailable"}
-        if self._round_spawn_counts.get(state.session_id, 0) >= 1:
+        if self.engine._round_spawn_counts.get(state.session_id, 0) >= 1:
             return {"ok": False, "error": "每轮至多派生一次子智能体"}
-        self._round_spawn_counts[state.session_id] = (
-            self._round_spawn_counts.get(state.session_id, 0) + 1
+        self.engine._round_spawn_counts[state.session_id] = (
+            self.engine._round_spawn_counts.get(state.session_id, 0) + 1
         )
-        turn = self._active_turns.get(state.session_id)
+        turn = self.engine._active_turns.get(state.session_id)
         result = coordinator.run_spawn(
             state,
             args,
             session_id=state.session_id,
             cancelled=turn.cancelled if turn is not None else None,
         )
-        if self._subagent_mode_for(args.get("task_kind")) != "advisory":
+        if self.engine._subagent_mode_for(args.get("task_kind")) != "advisory":
             if isinstance(result, dict) and result.get("ok"):
                 # Shadow: the run executed and is recorded as events
                 # only; nothing a subagent produced enters the context.
@@ -308,7 +312,7 @@ class AdaptiveConsultationEngineExecute:
                     # event is the durable record the metrics layer
                     # aggregates disagreement rates from. Same firing
                     # condition, no change to what is fed back.
-                    self.events.append(
+                    self.engine.events.append(
                         Event(
                             state.session_id,
                             "subagent.disagreement",
@@ -326,7 +330,7 @@ class AdaptiveConsultationEngineExecute:
     def _tool_propose_self_check_result(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
-        return self._propose_task_result(state, args, text, turn_id)
+        return self.engine.tasks._propose_task_result(state, args, text, turn_id)
 
     def _tool_record_facts(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
@@ -348,7 +352,7 @@ class AdaptiveConsultationEngineExecute:
         self._backstop_screening_denial(state, text, proposals)
         if not proposals and rejected:
             return self._partial_record_result(state, text, [], rejected)
-        self._guard_calculation_followup_updates(state, proposals)
+        self.engine.followups._guard_calculation_followup_updates(state, proposals)
         # No mutation happens until the accepted set has validated per
         # item and been dependency-checked as a set (_prepare_fact_updates
         # still raises on a subject boundary before anything is recorded).
@@ -356,7 +360,7 @@ class AdaptiveConsultationEngineExecute:
             (p["value"] for p in proposals if p["key"] == "consult_for"),
             state.get("consult_for"),
         )
-        self._prepare_fact_updates(state, proposals, turn_id)
+        self.engine.calculations._prepare_fact_updates(state, proposals, turn_id)
         active_before = self._active_question(state)
         self._record_each_proposal(
             state, proposals, incoming_subject, turn_id, active_before
@@ -366,12 +370,12 @@ class AdaptiveConsultationEngineExecute:
             return self._partial_record_result(
                 state, text, [p["key"] for p in proposals], rejected
             )
-        return {"ok": True, "case": self._context(state, text)}
+        return {"ok": True, "case": self.engine.model_context._context(state, text)}
 
     def _active_question(self, state: CaseState):
         """The question the patient is looking at, or None when none is set."""
         return next(
-            (q for q in self.content.questions if q.id == state.active_question),
+            (q for q in self.engine.content.questions if q.id == state.active_question),
             None,
         )
 
@@ -396,7 +400,7 @@ class AdaptiveConsultationEngineExecute:
         if isinstance(raw_facts, list):
             kept_facts = []
             for item in raw_facts:
-                if isinstance(item, dict) and self._is_declined_proposal(
+                if isinstance(item, dict) and self.engine._is_declined_proposal(
                     state, text, item
                 ):
                     declined_keys.add(item["key"])
@@ -438,7 +442,7 @@ class AdaptiveConsultationEngineExecute:
         else:
             try:
                 proposals = validate_proposals(
-                    self.content,
+                    self.engine.content,
                     state,
                     text,
                     kept_facts if kept_facts is not None else raw_facts,
@@ -480,7 +484,7 @@ class AdaptiveConsultationEngineExecute:
                         ),
                     }
                 )
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "fact.trajectory_guard",
@@ -521,7 +525,7 @@ class AdaptiveConsultationEngineExecute:
                         ),
                     }
                 )
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "fact.trajectory_fluctuation_guard",
@@ -610,7 +614,7 @@ class AdaptiveConsultationEngineExecute:
                 evidence=proposal["evidence"],
             )
             state.record(fact)
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "fact.recorded",
@@ -618,7 +622,7 @@ class AdaptiveConsultationEngineExecute:
                     turn_id=turn_id,
                 )
             )
-            self._track_incidental(state, proposal, active_before)
+            self.engine._track_incidental(state, proposal, active_before)
             if state.closed_reason != "emergency_route":
                 state.closed_reason = None
 
@@ -633,7 +637,7 @@ class AdaptiveConsultationEngineExecute:
         """Post-write bookkeeping: declined notes, tasks, screen, triage."""
         for key in declined_keys:
             if key in state.facts:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "fact.declined",
@@ -641,13 +645,13 @@ class AdaptiveConsultationEngineExecute:
                         turn_id=turn_id,
                     )
                 )
-        self._sync_task_requests(state, text, turn_id)
+        self.engine.planning._sync_task_requests(state, text, turn_id)
         active = self._active_question(state)
         if active and any(item["key"] == active.fact_key for item in proposals):
             state.active_question = None
             state.active_question_is_clarification = False
-        state.risk = self.triage.assess(state, text)
-        self.events.append(
+        state.risk = self.engine.triage.assess(state, text)
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "triage.assessed",
@@ -676,13 +680,13 @@ class AdaptiveConsultationEngineExecute:
                 "已通过项已写入，不要重复提议；只需修正 rejected 中的"
                 "字段后重新提议 record_facts（只含修正项）。"
             ),
-            "case": self._context(state, text),
+            "case": self.engine.model_context._context(state, text),
         }
 
     def _tool_inspect_case(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
     ):
-        return {"ok": True, "case": self._context(state, text)}
+        return {"ok": True, "case": self.engine.model_context._context(state, text)}
 
     def _tool_ask_question(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
@@ -706,15 +710,15 @@ class AdaptiveConsultationEngineExecute:
         if (
             state.pending_self_checks
             and not state.self_check_conversation
-            and not self._self_check_block_reason(state)
+            and not self.engine.replies._self_check_block_reason(state)
         ):
             raise ProposalError("患者请求的图示任务已满足条件，应先处理待办")
-        question = self.content.question(args["question_id"])
+        question = self.engine.content.question(args["question_id"])
         if question.fact_key in state.facts:
             raise ProposalError("已记录这个字段；需要核实时使用 clarify")
-        if not self.content.question_applies_in_state(question, state):
+        if not self.engine.content.question_applies_in_state(question, state):
             raise ProposalError("问题不适用于当前主诉")
-        if not self._fact_gates_pass(state, question):
+        if not self.engine._fact_gates_pass(state, question):
             raise ProposalError("该问题已被当前已知事实排除（如性别或年龄范围不适用）")
         # Hypothesis-order check (P0): the model may phrase the
         # question, but what to ask next is the ranker's call. The
@@ -726,10 +730,10 @@ class AdaptiveConsultationEngineExecute:
         # clarifications. The pick must come from the same validated
         # candidate set, otherwise the check passes through rather
         # than risk a proposal loop the model cannot exit.
-        ranker = getattr(self, "ranker", None)
+        ranker = getattr(self.engine, "ranker", None)
         if ranker is not None and not state.active_question_is_clarification:
             chief = str(state.get("chief_complaint", "") or "")
-            candidates = self._candidate_questions(state, chief)
+            candidates = self.engine._candidate_questions(state, chief)
             candidate_ids = {item.id for item in candidates}
             pick = ranker.choose(state, candidates)
             if (
@@ -737,13 +741,13 @@ class AdaptiveConsultationEngineExecute:
                 and pick in candidate_ids
                 and args["question_id"] in candidate_ids
                 and args["question_id"] != state.active_question
-                and self._emergency_clarification_pending(state) is None
+                and self.engine.emergency._emergency_clarification_pending(state) is None
                 and args["question_id"] != pick
             ):
                 raise ProposalError(
                     f"按假设排序应先问 {pick}，当前提议 {args['question_id']} 暂缓"
                 )
-        return self._ask(state, question, "根据本轮证据与尚未处理的缺口选择下一问")
+        return self.engine._ask(state, question, "根据本轮证据与尚未处理的缺口选择下一问")
 
     def _tool_ask_patient(
         self, state: CaseState, args: Dict[str, Any], text: str, turn_id: str
@@ -770,12 +774,12 @@ class AdaptiveConsultationEngineExecute:
         if (
             state.pending_self_checks
             and not state.self_check_conversation
-            and not self._self_check_block_reason(state)
+            and not self.engine.replies._self_check_block_reason(state)
         ):
             raise ProposalError("患者请求的图示任务已满足条件，应先处理待办")
         spec = validate_adaptive_question(
             args,
-            allowed_topics={question.fact_key for question in self.content.questions},
+            allowed_topics={question.fact_key for question in self.engine.content.questions},
         )
         # B route: a model-written question must carry its own bridging
         # sentence plus a "why ask" half-sentence. Enforced only when an
@@ -789,7 +793,7 @@ class AdaptiveConsultationEngineExecute:
                 raise ProposalError(MODEL_BRIDGING_REPAIR_HINT)
         question = next(
             item
-            for item in self.content.questions
+            for item in self.engine.content.questions
             if item.fact_key == spec["topic"]
         )
         # Topic legality is the registered field set, not the dynamic
@@ -800,7 +804,7 @@ class AdaptiveConsultationEngineExecute:
         # the context flags (active_question_field_already_recorded).
         # Fact-dependent exclusions still apply: a field excluded by
         # known facts (e.g. pregnancy once sex is male) is not askable.
-        if not self._fact_gates_pass(state, question):
+        if not self.engine._fact_gates_pass(state, question):
             raise ProposalError(
                 "该字段已被当前已知事实排除（如性别或年龄范围不适用），请改问其他主题"
             )
@@ -859,7 +863,7 @@ class AdaptiveConsultationEngineExecute:
                 display_question, state.facts
             )
         if spec["topic"] == "emergency_screen":
-            display_question = self._ensure_screening_list(display_question)
+            display_question = self.engine._ensure_screening_list(display_question)
         labels = [
             item["label"] for item in spec["options"] if item.get("label")
         ]
@@ -880,7 +884,7 @@ class AdaptiveConsultationEngineExecute:
             quick_replies=decline_replies,
             developer_trace={
                 "reason": "模型根据当前病例生成可变数量的受控患者选项",
-                "content_version": self.content.versions["questions"],
+                "content_version": self.engine.content.versions["questions"],
             },
         )
 
@@ -904,7 +908,7 @@ class AdaptiveConsultationEngineExecute:
         format.
         """
         topic, message = args.get("topic"), args.get("message")
-        fields = {q.fact_key for q in self.content.questions}
+        fields = {q.fact_key for q in self.engine.content.questions}
         frame = state.self_check_conversation
         location_topic = bool(
             frame
@@ -946,7 +950,7 @@ class AdaptiveConsultationEngineExecute:
         if location_topic:
             if len(message) > 80:
                 raise ProposalError("定位补问最多80字，保持一个简短问题。")
-            reply = self._clarify_location_task(
+            reply = self.engine.tasks._clarify_location_task(
                 state, message, args.get("answer_fields")
             )
             state.followup_counts[topic] = state.followup_counts.get(topic, 0) + 1
@@ -956,14 +960,14 @@ class AdaptiveConsultationEngineExecute:
         state.followup_counts[topic] = state.followup_counts.get(topic, 0) + 1
         state.active_question_is_clarification = True
         state.active_question = next(
-            q.id for q in self.content.questions if q.fact_key == topic
+            q.id for q in self.engine.content.questions if q.fact_key == topic
         )
         state.phase = Phase.HISTORY
         display_message = message
         if topic in DETAIL_FACT_KEYS:
             display_message = _strip_denied_items(display_message, state.facts)
         if topic == "emergency_screen":
-            display_message = self._ensure_screening_list(display_message)
+            display_message = self.engine._ensure_screening_list(display_message)
         return AgentReply(
             display_message, state.phase, question_id=state.active_question
         )
@@ -988,7 +992,7 @@ class AdaptiveConsultationEngineExecute:
         ] == args.get("task_id"):
             frame_id = state.self_check_conversation["task"]["id"]
             if (
-                self._self_check_suspend_count(
+                self.engine.planning._self_check_suspend_count(
                     state,
                     frame_id,
                     state.self_check_conversation["task"].get(
@@ -997,13 +1001,13 @@ class AdaptiveConsultationEngineExecute:
                 )
                 >= SELF_CHECK_SUSPEND_CAP
             ):
-                self._clear_task_conversation(state, "suspend_cap_reached")
+                self.engine.tasks._clear_task_conversation(state, "suspend_cap_reached")
                 state.pending_self_checks = [
                     item
                     for item in state.pending_self_checks
                     if item["task_id"] != frame_id
                 ]
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.suspend_cap_reached",
@@ -1011,14 +1015,14 @@ class AdaptiveConsultationEngineExecute:
                         turn_id=turn_id,
                     )
                 )
-                return self._plan_next(state)
-            return self._resume_task_conversation(state)
+                return self.engine.planning._plan_next(state)
+            return self.engine.tasks._resume_task_conversation(state)
         if state.self_check_conversation:
             raise ProposalError("先接续原图示任务或澄清病史，另一图示请求可以登记为待办。")
         task = next(
             (
                 t
-                for t in self.content.applicable_tasks(
+                for t in self.engine.content.applicable_tasks(
                     str(state.get("chief_complaint", ""))
                 )
                 if args.get("task_id") == t["id"]
@@ -1027,10 +1031,10 @@ class AdaptiveConsultationEngineExecute:
         )
         if task is None or task["result_key"] in state.facts:
             raise ProposalError("任务未注册、不适用或已经尝试")
-        blocked = self._self_check_block_reason(state)
+        blocked = self.engine.replies._self_check_block_reason(state)
         if blocked:
             raise ProposalError(blocked)
-        return self._offer_task(
+        return self.engine.planning._offer_task(
             state, str(state.get("chief_complaint", "")), task["id"]
         )
 
@@ -1058,7 +1062,7 @@ class AdaptiveConsultationEngineExecute:
             or len(abstain_reason.strip()) > 200
         ):
             raise ProposalError("abstain_reason 须为 1 到 200 字的字符串，说明主诉通路为何不适用探明")
-        context = self._context(state, text)
+        context = self.engine.model_context._context(state, text)
         unexplored = [
             entry
             for entry in context.get("pathway_exploration", [])
@@ -1072,7 +1076,7 @@ class AdaptiveConsultationEngineExecute:
             Phase.CLOSED,
         } or bool(state.conclusion)
         if unexplored and not already_summarized and not abstain_reason:
-            raise self._unexplored_pathway_error(unexplored)
+            raise self.engine.pathways._unexplored_pathway_error(unexplored)
         missing = context["missing_required"]
         if unexplored and (already_summarized or abstain_reason):
             # The abstention (or the earlier close, when re-summarizing)
@@ -1094,7 +1098,7 @@ class AdaptiveConsultationEngineExecute:
             labelled = [
                 (
                     f"{key}（已提问但未落账）"
-                    if self._questions_by_fact[key].id
+                    if self.engine.pathways._questions_by_fact[key].id
                     in state.asked_questions
                     else key
                 )
@@ -1108,7 +1112,7 @@ class AdaptiveConsultationEngineExecute:
         # reaching the draft for the patient to correct. Abstention
         # does not excuse this gate: it excuses unexplored pathways,
         # not missing sub-items of a recorded detail fact.
-        gaps = self._completeness_gaps(state)
+        gaps = self.engine._completeness_gaps(state)
         if gaps:
             raise ProposalError(
                 "摘要确认前完整性检查未通过：主诉关键项尚未记录："
@@ -1116,7 +1120,7 @@ class AdaptiveConsultationEngineExecute:
                 + "。请先追问这些项再出摘要首版，不得依赖患者主动更正。"
             )
         if unexplored and not already_summarized and abstain_reason:
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "review.abstained",
@@ -1134,7 +1138,7 @@ class AdaptiveConsultationEngineExecute:
                     turn_id=turn_id,
                 )
             )
-        reply = super()._finish(state)
+        reply = self.engine.replies._finish(state)
         state.phase = Phase.SUMMARY
         state.closed_reason = None
         state.active_question = None

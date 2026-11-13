@@ -1,6 +1,6 @@
 # DSH 后端
 
-此目录包含真实官方 DSH SDK/CLI 的医疗决策适配和完整执行底座。运行时使用统一固定的 `0.2.1-rc.2` 包；研究源码快照单独记录在 `../../vendor/upstream.lock.json`。
+此目录包含真实官方 DSH SDK/CLI 的医疗决策适配和完整执行底座。运行时使用统一固定的 `0.2.1-rc.2` 包；研究源码快照单独记录在 `upstream.lock.json`，按需下载到 `.runtime/upstream/`。
 
 医疗决策路径：
 
@@ -14,7 +14,7 @@
 
 - `execution-worker.mjs`：官方完整 SDK 生命周期、密钥隔离网关、共享预算和有限截断恢复。
 - `execution.patch.yml`：保留官方完整工具，配置研究执行行为。
-- `execution-capabilities.mjs`：向主任务与子任务注册能力查询、受信计算工具，经宿主网关调用固定 Python 实现；不执行模型指定代码。见 [回执协议](../../docs/注册计算工具与执行回执.md)。
+- `execution-capabilities.mjs`：向主任务与子任务注册能力查询、受信计算工具，经宿主网关调用固定 Python 实现；不执行模型指定代码。见 [回执协议](../../docs/features/注册计算工具与执行回执.md)。
 - `isolated-entry.mjs`：在 bubblewrap 内启动官方 CLI，只挂载当前工作区及必要运行资料。
 - `execution-delivery.mjs`：注册 `delivery_check`，嵌套调用官方 Bash/job_output，沿用同一任务、取消和隔离。必需／参考检查分别处理，同一用户回合的同一命令不可降级；typed 结果投影到运行观察，不能由 stdout 冒充退出状态。
 - `execution-delivery-contract.mjs`：工具与宿主共用参数校验；未接受的提议不提交验收，有效调用缺失结果仍为未知。长检查持续读取同一作业，受原截止时间与取消约束。
@@ -25,7 +25,7 @@
 - `execution-shell.mjs`：继承官方 sandbox Bash 执行器，默认启用 `pipefail`；完整 profile 配置前台默认 10 秒、最多 30 秒后交还后台任务 ID，保留官方任务与取消生命周期。`job_output` 默认等待 10 秒，显式等待最多 600 秒，仍受本轮截止时间限制。
 - `check-artifacts.mjs`：在相同文件隔离下执行宿主选定的独立产物检查。
 
-完整执行工作台实际支持文件、终端、代码、联网及子智能体，不与医疗问诊路径的空工具配置混用。说明与测试见 [通用执行底座](../../docs/通用执行底座与能力评测设计.md)。
+完整执行工作台实际支持文件、终端、代码、联网及子智能体，不与医疗问诊路径的空工具配置混用。说明与测试见 [通用执行底座](../../docs/features/通用执行底座与能力评测设计.md)。
 
 ## 执行工作台预算口径
 

@@ -54,7 +54,7 @@ def fingerprints():
         "src/medagent",
         "integrations/dsh",
         "scripts",
-        "benchmarks/swe-lite-test-sample",
+        "research/benchmarks/swe-lite-test-sample",
     ]:
         paths.extend(
             p

@@ -60,11 +60,10 @@ class ConsultationBusyError(RuntimeError):
 class ModelBackedEngine:
     """Marker for engines that carry a model backend.
 
-    ``observations.ObservationMixin`` has to know whether it is mixed into the
-    deterministic engine or the adaptive one, because only the adaptive one
-    may take the model-backed branches.  It used to answer that with
+    ``observations.ObservationWorkflow`` checks its owning engine, because only
+    the adaptive engine may take the model-backed branches. It used to check
     ``isinstance(self, AdaptiveConsultationEngine)``, which made a kernel
-    mixin import the ``agent`` feature package — again a kernel -> feature
+    component import the ``agent`` feature package — again a kernel -> feature
     dependency (R6).
 
     A marker base class keeps the "judge by type, not by a stray attribute"

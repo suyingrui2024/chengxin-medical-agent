@@ -45,7 +45,7 @@ class TaskInteractionTests(unittest.TestCase):
         self.fail("Expected a registered task")
 
     def record(self, reply):
-        self.engine._record_reply(self.state, reply, "test-turn", "metadata check")
+        self.engine.replies._record_reply(self.state, reply, "test-turn", "metadata check")
         return reply
 
     def test_first_offer_identity_is_in_reply_and_projection_without_mutating_catalog(
@@ -80,13 +80,13 @@ class TaskInteractionTests(unittest.TestCase):
     def test_new_offer_of_same_task_gets_a_new_identity_without_result_writes(self):
         first = self.task()
         before = deepcopy(self.state.to_dict()["facts"])
-        second = self.record(self.engine._offer_task(self.state, "头疼", "body_location"))
+        second = self.record(self.engine.planning._offer_task(self.state, "头疼", "body_location"))
         self.assertNotEqual(second.task["interaction_id"], first.task["interaction_id"])
         self.assertEqual(self.state.to_dict()["facts"], before)
 
     def test_host_continuation_can_restore_an_earlier_offer(self):
         first = self.task()
-        self.record(self.engine._offer_task(self.state, "头疼", "body_location"))
+        self.record(self.engine.planning._offer_task(self.state, "头疼", "body_location"))
         restored = self.record(deepcopy(first))
         self.assertEqual(restored.task["interaction_id"], first.task["interaction_id"])
 
@@ -94,7 +94,7 @@ class TaskInteractionTests(unittest.TestCase):
         self,
     ):
         first = self.task("发热")
-        self.record(self.engine._offer_task(self.state, "发热", "axillary_temperature"))
+        self.record(self.engine.planning._offer_task(self.state, "发热", "axillary_temperature"))
         self.record(deepcopy(first))
         invalid = self.helper.answer("abc")
         self.assertTrue(invalid.input_error)
@@ -103,7 +103,7 @@ class TaskInteractionTests(unittest.TestCase):
     def test_repeat_uses_its_registered_attempt_and_feedback_keeps_it(self):
         first = self.task("发热")
         self.helper.answer("37.2℃")
-        repeat = self.engine._request_repeat(
+        repeat = self.engine.observations._request_repeat(
             self.state, "axillary_temperature", "想再测一次腋温", "repeat-request"
         )
         self.record(repeat)

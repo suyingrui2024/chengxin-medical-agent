@@ -1,6 +1,6 @@
 """Controlled subagent coordinator for the adaptive consultation engine.
 
-Implements docs/联网与子智能体工具设计.md §5/§6 (Phase C, core C1):
+Implements docs/features/联网与子智能体工具设计.md §5/§6 (Phase C, core C1):
 a Python-layer coordinator that lets the adaptive engine spawn bounded,
 read-only subagents for a closed set of task kinds. The medical DSH
 bridge stays zero-tool by design; sub-runs go through the same

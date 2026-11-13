@@ -41,7 +41,7 @@ from scripts.benchmarks.public.public_test_sample import (
     classify,
 )
 
-FIXTURES = ROOT / "benchmarks/swe-lite-transfer"
+FIXTURES = ROOT / "research/benchmarks/swe-lite-transfer"
 CALLS, SECONDS, MAXIMUM = 20, 600, 320
 
 

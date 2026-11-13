@@ -6,7 +6,6 @@ from uuid import uuid4
 from ..core.domain import AgentReply, Phase, QuickReply
 from ..core.events import Event
 from ..reports.measurement_reports import temperature_report
-from .location_revisions import LocationRevisionMixin
 from ..shared_types import StaleActionError
 from .task_interactions import task_with_interaction
 from ..guards.assertion_evidence import has_uncertainty, UNCERTAIN_TERMS
@@ -76,11 +75,15 @@ def is_observation_entry(task, text, choice):
     )
 
 
-class TaskConversationMixin(LocationRevisionMixin):
+class TaskConversation:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _clear_task_conversation(self, state, reason, turn_id=None):
         frame = state.self_check_conversation
         if frame:
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "self_check.conversation_cleared",
@@ -106,7 +109,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         identity = state.active_task
         frame = state.self_check_conversation
         if not frame:
-            latest = self._latest_replies.get(state.session_id)
+            latest = self.engine._latest_replies.get(state.session_id)
             task = (
                 deepcopy(latest.task)
                 if latest and latest.task and latest.task["id"] == identity
@@ -114,10 +117,10 @@ class TaskConversationMixin(LocationRevisionMixin):
             )
             if task is None:
                 task = task_with_interaction(
-                    self.content.tasks[identity],
+                    self.engine.content.tasks[identity],
                     state.session_id,
                     f"{state.session_id}:{state.revision}",
-                    self.events.for_session(state.session_id),
+                    self.engine.events.for_session(state.session_id),
                 )
             previous = state.facts.get(task["result_key"])
             frame = {
@@ -133,7 +136,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         state.active_question = None
         state.active_question_is_clarification = False
         state.phase = Phase.HISTORY
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.conversation_suspended",
@@ -195,7 +198,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         task = deepcopy(frame["task"])
         eligible = {
             t["id"]
-            for t in self.content.applicable_tasks(
+            for t in self.engine.content.applicable_tasks(
                 str(state.get("chief_complaint", ""))
             )
         }
@@ -207,7 +210,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         ):
             self._clear_task_conversation(state, "task_no_longer_current")
             raise ValueError("原任务依据已经变化，请按最新病例重新选择。")
-        blocked = self._self_check_block_reason(state)
+        blocked = self.engine.replies._self_check_block_reason(state)
         if blocked:
             raise ValueError(blocked)
         if frame.get("candidate"):
@@ -230,7 +233,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         state.active_question = None
         state.active_question_is_clarification = False
         state.phase = Phase.OBSERVATION
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.conversation_resumed",
@@ -262,7 +265,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         queried, because a new region invalidates the area, side and extent
         recorded for the old one.
         """
-        spec = answer_spec(self.content.tasks["body_location"], fields)
+        spec = answer_spec(self.engine.content.tasks["body_location"], fields)
         reply = self._resume_task_conversation(state)
         frame = state.self_check_conversation
         if frame.get("revision_resume"):
@@ -349,7 +352,7 @@ class TaskConversationMixin(LocationRevisionMixin):
             }:
                 raise ValueError("定位草稿input只能包含area、side、extent。")
             spec = answer_spec(
-                self.content.tasks["body_location"], ["region", *args["input"]]
+                self.engine.content.tasks["body_location"], ["region", *args["input"]]
             )
         if spec:
             raw = args.get("input", {})
@@ -405,7 +408,7 @@ class TaskConversationMixin(LocationRevisionMixin):
                     ],
                 )
             frame.pop("candidate", None)
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "self_check.answer_drafted",
@@ -433,7 +436,7 @@ class TaskConversationMixin(LocationRevisionMixin):
             "text": text,
             "source_turn_id": turn_id,
         }
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.result_proposed",
@@ -464,7 +467,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         expected = f"{state.session_id}:{state.revision}"
         valid = bool(frame and user_input.expected_action_id == expected)
         if choice.startswith("resume_self_check:"):
-            latest = self._latest_replies.get(state.session_id)
+            latest = self.engine._latest_replies.get(state.session_id)
             valid = (
                 valid
                 and choice == f"resume_self_check:{frame['id']}"
@@ -496,7 +499,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         if choice.startswith("confirm_self_check:"):
             frame = state.self_check_conversation
             candidate = deepcopy(frame["candidate"])
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "self_check.result_confirmed",
@@ -508,7 +511,7 @@ class TaskConversationMixin(LocationRevisionMixin):
                     turn_id=turn_id,
                 )
             )
-            self._accept_task_result(
+            self.engine.planning._accept_task_result(
                 state,
                 frame["task"]["id"],
                 candidate["evidence"],
@@ -558,7 +561,7 @@ class TaskConversationMixin(LocationRevisionMixin):
             or state.facts["symptom_location"].fact_id != frame["previous_fact_id"]
         ):
             raise StaleActionError("原定位已变化，请从最新记录重新修改。")
-        if self._self_check_block_reason(state):
+        if self.engine.replies._self_check_block_reason(state):
             raise StaleActionError("当前应先处理风险或必要信息，定位输入尚未写入。")
         text, structured = project_answer(spec, payload["answers"], payload["note"])
         return {"text": text, "structured_input": structured}
@@ -602,7 +605,7 @@ class TaskConversationMixin(LocationRevisionMixin):
                 ObservationQuality.NOT_ASSESSED,
             ),
         )
-        self._accept_task_result(
+        self.engine.planning._accept_task_result(
             state,
             "body_location",
             prepared["text"],
@@ -614,7 +617,7 @@ class TaskConversationMixin(LocationRevisionMixin):
         state.observation_feedback["has_supplement"] = bool(
             prepared["structured_input"]["note"]
         )
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.answer_confirmed",

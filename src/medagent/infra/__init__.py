@@ -1,5 +1,5 @@
 """Infrastructure: backends, process and platform helpers, environment config,
-plugins, web tools, the session store, medical images and the agent tool schemas."""
+web tools, the session store, medical images and the agent tool schemas."""
 
 #: This package is organised by submodule: callers import from the module they
 #: need (``from medagent.infra.triage import TriageService``), and the package

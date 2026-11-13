@@ -18,6 +18,26 @@ SPEC.loader.exec_module(CONFIG)
 
 
 class LayeredQuickConfigTests(unittest.TestCase):
+    def test_regeneration_preserves_supported_advanced_settings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_root(directory)
+            (root / ".env").write_text(
+                "MEDAGENT_LLM_API_KEY=test-secret\n"
+                "MEDAGENT_LLM_MODEL=fixture\n"
+                "MEDAGENT_LLM_BASE_URL=https://api.deepseek.com\n"
+                "MEDAGENT_LLM_REASONING_EFFORT=high\n"
+                "MEDAGENT_WEB_TOOLS=review\n"
+                "MEDAGENT_SUBAGENT_MODE_SECOND_OPINION=shadow\n"
+                "MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP=12345\n"
+            )
+            with redirect_stdout(io.StringIO()):
+                CONFIG.configure_full(root, interactive=False)
+            merged = CONFIG.read_partial(root / ".env")
+            self.assertEqual(merged["MEDAGENT_LLM_REASONING_EFFORT"], "high")
+            self.assertEqual(merged["MEDAGENT_WEB_TOOLS"], "review")
+            self.assertEqual(merged["MEDAGENT_SUBAGENT_MODE_SECOND_OPINION"], "shadow")
+            self.assertEqual(merged["MEDAGENT_SUBAGENT_DAILY_TOKEN_CAP"], "12345")
+
     def make_root(self, directory):
         root = Path(directory)
         (root / "pyproject.toml").write_text("[project]\nname='fixture'\n")

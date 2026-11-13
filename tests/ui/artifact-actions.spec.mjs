@@ -132,13 +132,11 @@ test("a delayed image save cannot export into a newly selected workspace", async
     request.url().includes("/image?"),
   );
   await page.locator("#execution-preview-save").click();
-  await requested;
+  const imageRequest = await requested;
+  // Workspace selection can cancel the fetch before a response exists.
   await page.locator("#execution-workspace").selectOption("focus-b");
-  const responded = page.waitForResponse((response) =>
-    response.url().includes("/image?"),
-  );
   release();
-  await responded;
+  await imageRequest.response();
   await expect(page.locator("#execution-preview-action-status")).toBeEmpty();
   await expect(page.locator("#execution-preview-controls")).toBeHidden();
   expect(downloads).toBe(0);

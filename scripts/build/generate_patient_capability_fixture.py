@@ -1,7 +1,7 @@
 """Emit the patient-facing capability list the UI smoke test iterates.
 
 The spec needs the list at load time, before any server call. Generating
-it here keeps the test honest: `tests/test_catalog.py` asserts the file
+it here keeps the test honest: `tests/extensions/test_catalog.py` asserts the file
 still matches the registry, so a capability added or removed without
 regenerating turns the suite red instead of silently shrinking coverage.
 """

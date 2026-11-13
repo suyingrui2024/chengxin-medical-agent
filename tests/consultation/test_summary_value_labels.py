@@ -36,13 +36,13 @@ def build_engine():
 class SummaryValueLabelTests(unittest.TestCase):
     def test_sex_renders_as_a_word_not_an_enum(self):
         engine, state = build_engine()
-        payload = engine._summary_payload(state, review_status="pending")
+        payload = engine.replies._summary_payload(state, review_status="pending")
         values = {item["key"]: item["value"] for item in payload["known"]}
         self.assertEqual(values["sex"], "男")
 
     def test_labels_and_values_do_not_leak_keys(self):
         engine, state = build_engine()
-        payload = engine._summary_payload(state, review_status="pending")
+        payload = engine.replies._summary_payload(state, review_status="pending")
         for item in payload["known"]:
             self.assertNotIn(item["value"], {"male", "female", "self", "child"})
             self.assertFalse(str(item["label"]).startswith("warning_"))

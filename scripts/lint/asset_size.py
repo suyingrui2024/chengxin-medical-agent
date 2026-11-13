@@ -60,30 +60,15 @@ SKIP_DIRS = {
 # path (relative to repo root) -> size in bytes.  Frozen evidence only.
 # Remove an entry once the file has been archived out of the working tree.
 BASELINE: dict[str, int] = {
-    "docs/evaluations/2026-10-16/v0.10.5-transfer/environment/archives/matplotlib__matplotlib-25498.tar.gz": 37691777,
-    "docs/evaluations/2026-10-16/v0.10.2/inputs/archives/matplotlib__matplotlib-25311.tar.gz": 37682384,
-    "docs/evaluations/2026-10-16/v0.10.2/inputs/archives/matplotlib__matplotlib-26011.tar.gz": 35415318,
-    "docs/evaluations/2026-10-16/v0.9.8/upstream/pvlib__pvlib-python-1707.tar.gz": 35407579,
     "docs/evaluations/2026-10-16/v0.10.2/uniform-supplement.original-report.json": 27434331,
     "docs/evaluations/2026-10-16/v0.10.2/public-report.json": 27434331,
-    "docs/evaluations/2026-10-16/v0.10.5-transfer/environment/python/cpython-3.9.20+20241002-x86_64-unknown-linux-gnu-install_only.tar.gz": 26326845,
-    "docs/evaluations/2026-10-16/v0.10.2/inputs/python/cpython-3.9.20+20241002-x86_64-unknown-linux-gnu-install_only.tar.gz": 26326845,
     "src/medagent/web/assets/fonts/NotoSerifCJKsc-Regular.otf": 24543080,
-    "docs/evaluations/2026-10-17/v0.11.17/source/src/medagent/web/NotoSerifCJKsc-Regular.otf": 24543080,
     "docs/evaluations/2026-10-16/v0.10.2/uniform-supplement.json": 21208898,
     "docs/evaluations/2026-10-16/v0.10.2/supplemental-checkpoint-01.original-report.json": 19210282,
     "docs/evaluations/2026-10-16/v0.10.5-transfer/complete.json": 17692839,
     "src/medagent/web/assets/fonts/NotoSansCJKsc-Regular.otf": 16437364,
     "docs/review-packets/2026-10-17-v0.11.17/sources/src/medagent/web/NotoSansCJKsc-Regular.otf": 16437364,
-    "docs/evaluations/2026-10-17/v0.11.17/source/src/medagent/web/NotoSansCJKsc-Regular.otf": 16437364,
     "docs/evaluations/2026-10-16/v0.10.2/supplemental-checkpoint-01.json": 15722253,
-    "docs/evaluations/2026-10-16/v0.9.8/wheels/pandas-1.5.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": 12062104,
-    "docs/evaluations/2026-10-16/v0.10.5-transfer/environment/wheels/pandas-1.5.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": 12062104,
-    "docs/evaluations/2026-10-16/v0.10.2/inputs/wheels/pandas-1.5.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": 12062104,
-    "docs/evaluations/2026-10-16/v0.10.5-transfer/environment/wheels/matplotlib-3.7.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": 11571945,
-    "docs/evaluations/2026-10-16/v0.10.2/inputs/wheels/matplotlib-3.7.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": 11571945,
-    "docs/evaluations/2026-10-16/v0.10.5-transfer/environment/wheels/Babel-2.11.0-py3-none-any.whl": 9501187,
-    "docs/evaluations/2026-10-16/v0.10.2/inputs/wheels/Babel-2.11.0-py3-none-any.whl": 9501187,
 }
 
 

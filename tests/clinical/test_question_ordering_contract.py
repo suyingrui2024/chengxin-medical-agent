@@ -66,7 +66,7 @@ class QuestionOrderingContractTests(unittest.TestCase):
         state = _history_state(engine)
         ordered = expected_question_order("rule", state, engine.content)
         self.assertTrue(ordered, "HISTORY state must have candidates")
-        reply = engine._plan_next(state)
+        reply = engine.planning._plan_next(state)
         self.assertEqual(reply.question_id, ordered[0])
         # The order is a permutation of the earliest-phase candidate ids,
         # not a subset/superset: the helper never adds or drops candidates.

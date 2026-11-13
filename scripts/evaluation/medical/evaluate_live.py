@@ -77,7 +77,7 @@ class LegacyLayoutEngine(AdaptiveConsultationEngine):
     """Pre-optimization layout, with the same current policy and controller."""
 
     def _messages(self, state, text):
-        context = self._context(state, text)
+        context = self.model_context._context(state, text)
         context.update(
             {
                 "facts": {key: fact.to_dict() for key, fact in state.facts.items()},

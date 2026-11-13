@@ -455,6 +455,22 @@ def validate_workspace(
 # Differential planner.
 # ----------------------------------------------------------------------
 
+def potential_discrimination(state: CaseState, pathways) -> Dict[str, int]:
+    """Count discriminating questions from chief-matched pathways without mutation."""
+    chief = str(state.get("chief_complaint", ""))
+    counts: Dict[str, int] = {}
+    if not chief:
+        return counts
+    for pathway in pathways:
+        terms = pathway.get("chief_complaint_contains_any", [])
+        if not any(contains_unnegated(chief, term) for term in terms):
+            continue
+        for raw in pathway.get("hypotheses", []):
+            for qid in raw.get("discriminating_questions", []):
+                counts[qid] = counts.get(qid, 0) + 1
+    return counts
+
+
 class DifferentialPlanner:
     """Question selection by red-flag coverage + discrimination value."""
 
@@ -547,28 +563,7 @@ class DifferentialPlanner:
         return accepted, changed_ids
 
     def _potential_discrimination(self, state: CaseState) -> Dict[str, int]:
-        """Discriminating-question counts from chief-matched pathways.
-
-        Hypotheses whose support conditions avoid the chief complaint
-        itself (the abstention-preserving content rule) cannot enter the
-        workspace until their detail question has been answered — a
-        chicken-and-egg problem for ordering. The pathway match on the
-        chief complaint alone is enough to know which questions *would*
-        discriminate, so ordering can use it without touching workspace
-        or abstention semantics.
-        """
-        chief = str(state.get("chief_complaint", ""))
-        counts: Dict[str, int] = {}
-        if not chief:
-            return counts
-        for pathway in self._proposer._pathways:
-            terms = pathway.get("chief_complaint_contains_any", [])
-            if not any(contains_unnegated(chief, term) for term in terms):
-                continue
-            for raw in pathway.get("hypotheses", []):
-                for qid in raw.get("discriminating_questions", []):
-                    counts[qid] = counts.get(qid, 0) + 1
-        return counts
+        return potential_discrimination(state, self._proposer._pathways)
 
     def score(
         self,
@@ -646,7 +641,7 @@ class DifferentialPlanner:
                 item for item in candidates if planning_rank(item.phase) == earliest_phase
             ]
             if same_phase[0].phase == Phase.BACKGROUND:
-                offered = engine._offer_task(state, chief)
+                offered = engine.planning._offer_task(state, chief)
                 if offered:
                     return offered
             potential = self._potential_discrimination(state)
@@ -659,7 +654,7 @@ class DifferentialPlanner:
             )
             return engine._ask(state, best, reason=self._reason(best, workspace))
 
-        offered = engine._offer_task(state, chief)
+        offered = engine.planning._offer_task(state, chief)
         if offered:
             return offered
         # Abstention (v1 mapping of design §4.5): a red-flag hypothesis
@@ -689,14 +684,14 @@ class DifferentialPlanner:
                 for event in engine.events.for_session(state.session_id)
             )
             if state.risk.level == RiskLevel.URGENT:
-                gated = engine._urgent_or_defer(state)
+                gated = engine.planning._urgent_or_defer(state)
                 if gated is not None:
                     return gated
-                return engine._finish(state)
+                return engine.replies._finish(state)
             if state.risk.level == RiskLevel.ROUTINE or deferred:
-                return engine._finish(state)
-            return engine._urgent(state)
-        return engine._finish(state)
+                return engine.replies._finish(state)
+            return engine.emergency._urgent(state)
+        return engine.replies._finish(state)
 
 
 def enable_differential_planning(engine) -> DifferentialPlanner:

@@ -62,7 +62,7 @@ consistent convention: ``consultation/core.py``, ``consultation/agent/core.py``
 and ``server/core.py`` each hold the base mixin of a class assembled from
 several mixin modules, sitting beside ``agent.py``/``patient.py``/``closing.py``
 by design.  Renaming those would desynchronise them from the class names they
-define (``HandlerCore``, ``ConsultationEngineCore``) without making any of them
+define (``HandlerCore``, ``ConsultationEngine``) without making any of them
 easier to find.
 
 ``_and_`` in the middle of a name is not checked either.  ``test_worry_and_goal.py``
@@ -94,7 +94,7 @@ import sys
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
-SCAN_ROOTS = ("src", "tests", "scripts", "desktop", "integrations")
+SCAN_ROOTS = ("src", "tests", "scripts", "desktop", "integrations", "config", "research")
 EXTENSIONS = {".py", ".js", ".mjs", ".cjs", ".css"}
 SKIP_DIRS = {
     "__pycache__",

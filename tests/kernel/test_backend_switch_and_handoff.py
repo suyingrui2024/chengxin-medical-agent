@@ -57,10 +57,10 @@ class Point0BackendSwitchTests(unittest.TestCase):
     def test_type_check_ignores_a_setattr_backend_on_a_deterministic_engine(self):
         engine, _, _, _ = measured_case()
         demo = _demo_engine(engine)
-        self.assertFalse(demo._has_model_backend())
+        self.assertFalse(demo.observations._has_model_backend())
         demo.backend = _StubBackend()
-        self.assertFalse(demo._has_model_backend())
-        self.assertTrue(engine._has_model_backend())
+        self.assertFalse(demo.observations._has_model_backend())
+        self.assertTrue(engine.observations._has_model_backend())
         self.assertIsInstance(engine, AdaptiveConsultationEngine)
 
     def test_repeat_suspend_branch_ignores_setattr_backend(self):
@@ -71,8 +71,8 @@ class Point0BackendSwitchTests(unittest.TestCase):
         self.assertTrue(state.observation_resume)
         self.assertEqual(state.active_task, "axillary_temperature")
         calls = []
-        engine._suspend_task_conversation = lambda s, t: calls.append(t)
-        result = engine._handle_observation_action(
+        engine.tasks._suspend_task_conversation = lambda s, t: calls.append(t)
+        result = engine.observations._handle_observation_action(
             state, UserInput("昨晚用过药物甲"), "昨晚用过药物甲", "t-p2"
         )
         self.assertEqual(calls, ["t-p2"])
@@ -85,8 +85,8 @@ class Point0BackendSwitchTests(unittest.TestCase):
         demo = _demo_engine(engine2)
         demo.backend = _StubBackend()
         calls2 = []
-        demo._suspend_task_conversation = lambda s, t: calls2.append(t)
-        result2 = demo._handle_observation_action(
+        demo.tasks._suspend_task_conversation = lambda s, t: calls2.append(t)
+        result2 = demo.observations._handle_observation_action(
             state2, UserInput("昨晚用过药物甲"), "昨晚用过药物甲", "t-p2"
         )
         self.assertEqual(calls2, [])
@@ -99,7 +99,7 @@ class Point0BackendSwitchTests(unittest.TestCase):
         # axillary-qualified reading is parked for model-side handling.
         engine, _, state, _ = measured_case(summary=True)
         self.assertFalse(state.active_task)
-        result = engine._handle_observation_action(
+        result = engine.observations._handle_observation_action(
             state, UserInput(text), text, "t-p2"
         )
         self.assertIsNone(result)
@@ -113,7 +113,7 @@ class Point0BackendSwitchTests(unittest.TestCase):
         engine2, _, state2, _ = measured_case(summary=True)
         demo = _demo_engine(engine2)
         demo.backend = _StubBackend()
-        result2 = demo._handle_observation_action(
+        result2 = demo.observations._handle_observation_action(
             state2, UserInput(text), text, "t-p2"
         )
         self.assertEqual(state2.pending_self_checks, [])
@@ -166,7 +166,7 @@ class Point0FollowUpContractTests(unittest.TestCase):
         # Reply side was already None.
         self.assertIsNone(reply.follow_up)
         # Scheduler: no plan to schedule, idempotent no-op.
-        self.assertIsNone(engine._schedule_follow_up(state))
+        self.assertIsNone(engine.replies._schedule_follow_up(state))
         self.assertEqual(state.follow_up, {})
         # Outcome recording: no plan means the guard raises.
         with self.assertRaises(ValueError):
@@ -196,7 +196,7 @@ class Point0FollowUpContractTests(unittest.TestCase):
         }
         state.follow_up = dict(plan)
         # Idempotent scheduler returns the stored plan, not a rebuild.
-        self.assertEqual(engine._schedule_follow_up(state), plan)
+        self.assertEqual(engine.replies._schedule_follow_up(state), plan)
         self.assertEqual(state.to_dict()["follow_up"], plan)
         self.assertEqual(build_handoff(state)["follow_up"], plan)
         workspace = Workspace(engine, events, None)

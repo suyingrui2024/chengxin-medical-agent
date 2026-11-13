@@ -237,7 +237,7 @@ class AbstentionTests(unittest.TestCase):
                     "updated_at_rev": 0,
                 }],
             }
-            engine._offer_task = lambda *a, **k: None
+            engine.planning._offer_task = lambda *a, **k: None
             planner = DifferentialPlanner(engine)
             # The proposer recomputes from facts; stub it to keep the
             # preloaded workspace so this test isolates the abstain rule.

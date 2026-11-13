@@ -13,7 +13,7 @@ import shutil
 import stat
 
 ROOT = Path(__file__).resolve().parents[3]
-FIXTURES = ROOT / "benchmarks/swe-lite-dev"
+FIXTURES = ROOT / "research/benchmarks/swe-lite-dev"
 MARKER = "CHENGXIN_PUBLIC_TEST_RESULT="
 PUBLIC_RUNNER = '''"""Local test helper; no hidden tests or reference implementation."""
 import os,sys

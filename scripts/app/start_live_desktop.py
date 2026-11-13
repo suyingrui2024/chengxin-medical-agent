@@ -9,7 +9,7 @@ import shutil
 import subprocess
 from urllib.parse import urlsplit
 
-from medagent.infra.env_config import for_backend, read_env
+from medagent.infra.env_config import read_configuration
 
 
 def require_dsh_node():
@@ -31,9 +31,7 @@ def require_dsh_node():
         raise SystemExit("Unable to verify the Node runtime required by DSH") from None
     match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)", output)
     if not match or tuple(map(int, match.groups())) < (22, 19, 0):
-        raise SystemExit(
-            f"DSH live desktop requires Node 22.19+; found {output or 'unknown'}"
-        )
+        raise SystemExit(f"DSH live desktop requires Node 22.19+; found {output or 'unknown'}")
     return output
 
 
@@ -45,17 +43,19 @@ def main():
         help="Explicit local configuration file for the native desktop application",
     )
     parser.add_argument(
+        "--backend",
+        choices=("compatible", "dsh"),
+        help="Select a transport using the same model configuration",
+    )
+    parser.add_argument(
         "--check",
         action="store_true",
         help="Check settings without starting or calling a model",
     )
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
-    settings = read_env(args.env_file or root / ".env")
-    mode = settings.get("MEDAGENT_BACKEND", "compatible")
-    if mode not in {"compatible", "dsh"}:
-        raise SystemExit("Live desktop requires MEDAGENT_BACKEND=compatible or dsh")
-    settings = for_backend(settings, mode)
+    settings = read_configuration(root, env_file=args.env_file, backend=args.backend)
+    mode = settings["MEDAGENT_BACKEND"]
     node_version = require_dsh_node() if mode == "dsh" else None
     if args.check:
         print(
@@ -63,9 +63,7 @@ def main():
                 {
                     "backend": mode,
                     "model": settings["MEDAGENT_LLM_MODEL"],
-                    "endpoint_host": urlsplit(
-                        settings["MEDAGENT_LLM_BASE_URL"]
-                    ).hostname,
+                    "endpoint_host": urlsplit(settings["MEDAGENT_LLM_BASE_URL"]).hostname,
                     "key_configured": True,
                     **({"node": node_version} if node_version else {}),
                 },
@@ -78,15 +76,12 @@ def main():
     if os.name == "nt":
         metadata = json.loads((root / "package.json").read_text(encoding="utf-8"))
         candidates = [
-            root
-            / f"dist/desktop/Chengxin-{metadata['version']}-win32-x64/Chengxin.exe",
+            root / f"dist/desktop/Chengxin-{metadata['version']}-win32-x64/Chengxin.exe",
             root / "node_modules/electron/dist/electron.exe",
         ]
         for index, binary in enumerate(candidates):
             if binary.is_file():
-                os.execve(
-                    str(binary), [str(binary), *([str(root)] if index else [])], env
-                )
+                os.execve(str(binary), [str(binary), *([str(root)] if index else [])], env)
         raise OSError(
             "Windows Electron runtime is missing; run scripts/platform/windows/windows.ps1 -Mode Setup"
         )
@@ -97,6 +92,4 @@ if __name__ == "__main__":
     try:
         main()
     except (ValueError, OSError) as exc:
-        raise SystemExit(
-            f"Live desktop configuration failed ({type(exc).__name__})"
-        ) from None
+        raise SystemExit(f"Live desktop configuration failed ({type(exc).__name__})") from None

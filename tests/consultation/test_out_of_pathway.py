@@ -1,4 +1,4 @@
-"""P3 off-pathway flow (docs/假设驱动问诊设计文档.md §4): content + module.
+"""P3 off-pathway flow (docs/features/假设驱动问诊设计文档.md §4): content + module.
 
 Contract under test (frozen for the P0 sorter):
 - ``warning_signs.json``: version 1.0.0, exactly the six danger-signal

@@ -1,32 +1,17 @@
-/*
- * The ordered stylesheet. index.html loads this one file; it pulls in the rest.
- *
- * Order is the contract, not a preference: later rules win, so nothing here may
- * be sorted alphabetically or merged casually. Two groups, in this order:
- *
- *   1. faces  — @font-face and the font-stack variables nothing else can use yet
- *   2. slices — the bulk sheet, cut into eight files of a reviewable size
- *
- * The feature overrides (appearance, self-check, patient-reflow, patient-records,
- * execution-focus, artifact-chart) are not imported here: index.html links them
- * after this file, which is what puts them after the bulk sheet in the cascade.
- *
- * The slices are cascade slices, not topic modules. A slice holds whatever fell
- * in its line range and is named for its leading topic; the header comment in
- * each one lists everything it actually contains. Splitting them by topic would
- * mean reordering 7,000 rules with the rendered layout as the only proof that
- * nothing broke — a trade nobody would accept for a tidier file name.
- */
+/* Single cascade manifest. Keep this order: palette, fonts, base, features. */
+@import url("appearance/themes.css");
 @import url("fonts.css");
-
-/* Bulk sheet, in cascade order. Every file in this directory must appear here
-   exactly once and the numbers must ascend; tests/test_static_assets.py enforces
-   both, because a slice nothing imports is dead CSS. */
-@import url("01-tokens.css");
-@import url("02-artifacts.css");
-@import url("03-conversation.css");
-@import url("04-conclusion.css");
-@import url("05-facts.css");
-@import url("06-adaptive.css");
-@import url("07-urgent.css");
-@import url("08-settings.css");
+@import url("base/01-tokens.css");
+@import url("base/02-artifacts.css");
+@import url("base/03-conversation.css");
+@import url("base/04-conclusion.css");
+@import url("base/05-facts.css");
+@import url("base/06-adaptive.css");
+@import url("base/07-urgent.css");
+@import url("base/08-settings.css");
+@import url("appearance/appearance.css");
+@import url("features/self-check.css");
+@import url("features/patient-reflow.css");
+@import url("features/patient-records.css");
+@import url("features/execution-focus.css");
+@import url("features/artifact-chart.css");

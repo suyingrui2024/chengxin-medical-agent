@@ -135,7 +135,7 @@ class StateConsistencyTests(unittest.TestCase):
         for engine, state, _, backend in self.engines():
             with self.subTest(engine=type(engine).__name__):
                 self.establish(state)
-                engine._offer_task(state, "发烧")
+                engine.planning._offer_task(state, "发烧")
                 state.pending_input = "旧的失败输入"
                 engine.correct_fact(state.session_id, "age_years", "40岁")
                 self.assertEqual(state.active_task, "axillary_temperature")
@@ -243,9 +243,9 @@ class StateConsistencyTests(unittest.TestCase):
             with self.subTest(engine=type(engine).__name__):
                 self.establish(state)
                 self.record(state, "emergency_screen", None, Assertion.UNKNOWN)
-                self.assertIsNone(engine._offer_task(state, "发烧"))
+                self.assertIsNone(engine.planning._offer_task(state, "发烧"))
                 if isinstance(engine, AdaptiveConsultationEngine):
-                    context = engine._context(state, "想测量")
+                    context = engine.model_context._context(state, "想测量")
                     self.assertEqual(context["available_self_checks"], [])
                     self.assertIn("未知不能当阴性", context["self_check_block_reason"])
 
@@ -253,7 +253,7 @@ class StateConsistencyTests(unittest.TestCase):
         for engine, state, _, backend in self.engines():
             with self.subTest(engine=type(engine).__name__):
                 self.establish(state)
-                engine._offer_task(state, "发烧")
+                engine.planning._offer_task(state, "发烧")
                 for text in (
                     "380",
                     "38.2和39.1",
@@ -282,7 +282,7 @@ class StateConsistencyTests(unittest.TestCase):
             with self.subTest(engine=type(engine).__name__):
                 question = engine.content.question(state.active_question)
                 reply = engine._ask(state, question, "fixture-repeat")
-                engine._record_reply(state, reply, "fixture", "repeat")
+                engine.replies._record_reply(state, reply, "fixture", "repeat")
                 self.assertNotEqual(opening.action_id, reply.action_id)
                 with self.assertRaises(StaleActionError):
                     engine.submit(

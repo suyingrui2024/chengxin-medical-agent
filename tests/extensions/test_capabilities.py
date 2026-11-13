@@ -248,13 +248,13 @@ class CapabilityTests(unittest.TestCase):
         self.addCleanup(host.stop)
         engine = host.start().services.require("consultation")
         state, _ = engine.create_session()
-        engine._record_fact(
+        engine.subjects._record_fact(
             state, "chief_complaint", Interpretation("头痛", Assertion.PRESENT), "fixture"
         )
-        engine._record_fact(
+        engine.subjects._record_fact(
             state, "emergency_screen", Interpretation(None, Assertion.ABSENT), "fixture"
         )
-        engine._offer_task(state, "头痛", "fixture_location")
+        engine.planning._offer_task(state, "头痛", "fixture_location")
         return engine, state
 
     def test_new_content_pack_uses_existing_flow_and_invalidation(self):
@@ -263,7 +263,7 @@ class CapabilityTests(unittest.TestCase):
         )
         engine.submit(state.session_id, UserInput("头部", "head"))
         self.assertEqual(state.get("fixture_location"), "头/面部")
-        summary = engine._finish(state).summary
+        summary = engine.replies._finish(state).summary
         self.assertEqual(
             next(
                 item for item in summary["known"] if item["key"] == "fixture_location"

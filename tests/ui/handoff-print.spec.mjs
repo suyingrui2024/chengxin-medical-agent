@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// P4-D 就诊摘要打印页与导出：只读渲染断言，不发任何写请求、不改
-// 对话框、不依赖后端 handoff v2（P4-A 尚未落地时，用合成 v2 数据
-// 覆盖打印模块；v2 字段名见 handoff-print.js 底部的对齐点）。
+// 用合成 patient-handoff/v2 数据覆盖打印与导出，不依赖后端问诊状态。
 const v2Handoff = {
   title: "就诊交接摘要（患者核对版）",
   limitations: "这是患者提供信息的整理，不构成诊断、治疗建议或临床检验复核。",
@@ -62,7 +60,7 @@ test("handoff print renders all v2 sections without horizontal overflow", async 
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     const element = module.buildHandoffPrintElement(handoff);
     document.body.append(element);
     const headings = [...element.querySelectorAll("h2")].map((node) =>
@@ -99,7 +97,7 @@ test("handoff print markdown/text share section order and v1 renders safely", as
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     const markdown = module.handoffPrintMarkdown(handoff);
     const text = module.handoffPrintText(handoff);
     // shadow 方向不得泄漏：directions_visible 为 false 时不输出方向行。
@@ -190,7 +188,7 @@ test("shadow narrative.reasoning with a direction label never leaks, visible rea
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     // M2: the old shadow case used a reasoning sentence with no
     // direction label, so it could not catch the leak. Here the
     // reasoning itself carries a direction label.
@@ -229,7 +227,7 @@ test("v1.3 mode gating: restricted shows directions + visit notes without reason
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     // restricted: composer order (rule_out first), rule_out prominent,
     // reasoning hidden, visit-notes section visible.
     const restricted = JSON.parse(JSON.stringify(handoff));
@@ -278,7 +276,7 @@ test("v1.3 department gate under restricted mode: flag true only", async ({
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     const shown = JSON.parse(JSON.stringify(handoff));
     shown.conclusion.directions_mode = "restricted";
     shown.conclusion.department_visible = true;
@@ -311,7 +309,7 @@ test("interpretation note on a report item renders in markdown and DOM", async (
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     const noted = JSON.parse(JSON.stringify(handoff));
     noted.report_items[0].interpretation_note =
       "体温 38.5 °C，无法判断；只作记录，不下判断";

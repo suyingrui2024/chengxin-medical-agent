@@ -14,6 +14,21 @@ class DecisionCapacityError(RuntimeError):
     pass
 
 
+def invoke_decision(backend, session_id, messages, cancelled=None):
+    """Single dispatch for foreground and review model calls.
+
+    Callers retain their own deadlines, budgets and late-result handling;
+    transports retain their retry policy. Legacy offline backends may expose
+    only decide(), while real transports receive the same cancellation token.
+    """
+    if cancelled is not None and cancelled.is_set():
+        raise DecisionInterrupted()
+    cancellable = getattr(backend, "decide_cancellable", None)
+    if cancelled is not None and callable(cancellable):
+        return cancellable(session_id, messages, cancelled)
+    return backend.decide(session_id, messages)
+
+
 @dataclass
 class DecisionTurn:
     identity: str = field(default_factory=lambda: str(uuid4()))
@@ -54,11 +69,8 @@ class DecisionWaiter:
 
         def work():
             try:
-                cancellable = getattr(backend, "decide_cancellable", None)
-                result["value"] = (
-                    cancellable(session_id, messages, turn.cancelled)
-                    if callable(cancellable)
-                    else backend.decide(session_id, messages)
+                result["value"] = invoke_decision(
+                    backend, session_id, messages, turn.cancelled
                 )
             except Exception as error:
                 result["error"] = error

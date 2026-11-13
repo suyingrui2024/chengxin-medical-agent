@@ -10,6 +10,7 @@ from typing import Any, Dict, Optional
 from uuid import uuid4
 
 from ..core.events import Event
+from ..core.decision_wait import invoke_decision
 
 
 MAX_ITEMS = 4
@@ -379,7 +380,8 @@ class BackgroundReviewCoordinator:
                         turn_id=job.turn_id,
                     )
                 )
-            command = job.engine.backend.decide_cancellable(
+            command = invoke_decision(
+                job.engine.backend,
                 job.session_id,
                 [
                     {"role": "system", "content": REVIEW_INSTRUCTIONS},

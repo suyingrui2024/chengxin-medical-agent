@@ -1,6 +1,6 @@
 """Consultation conclusion sheet composer.
 
-Implements docs/问诊结论单设计文档.md (v1.1): at close time, derive the
+Implements docs/features/问诊结论单设计文档.md (v1.1): at close time, derive the
 patient-facing conclusion sheet — disposition, differential directions,
 information gaps, self-care, safety net, outlook — deterministically from
 the concluded case. No model calls; every clinical sentence traces to the

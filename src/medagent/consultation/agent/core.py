@@ -1,22 +1,20 @@
-"""Mixin: core for AdaptiveConsultationEngine."""
+"""Model state owner and composition root for adaptive consultation."""
 import hashlib
 from importlib import resources
 import json
 import re
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 from uuid import uuid4
 from ... import __version__
 from ...core.decision_wait import DecisionTurn, DecisionWaiter
 from ...core.domain import AgentReply, CaseState, Phase, QuickReply
 from ...core.events import Event
 from ...clinical.knowledge import Question, question_fact_gates_pass
-from ...clinical.reasoning import RuleBasedProposer, load_pathways
 from ...dialogue.adaptive_questions import (
     AdaptiveQuestionError,
     RISK_TAG_CUES,
     project_selected_answer,
 )
-from ...dialogue.consultation_subject import subject_profile
 from ...infra.agent_tools import TOOL_DEFINITIONS
 from ...infra.backends import DecisionBackend
 from ...kg import runtime as kg_runtime
@@ -33,7 +31,19 @@ from .catalog import (
 from .questions import _strip_denied_items
 
 
-class AdaptiveConsultationEngineCore:
+from .. import ConsultationEngine
+from ...shared_types import ModelBackedEngine
+from .submit import AdaptiveConsultationEngineSubmit
+from .run import AdaptiveConsultationEngineRun
+from .execute import AdaptiveConsultationEngineExecute
+from .context import AdaptiveConsultationEngineContext
+from .pathway import AdaptiveConsultationEnginePathway
+
+class AdaptiveConsultationEngine(ConsultationEngine, ModelBackedEngine):
+    """Own model/session state and compose explicit model workflows."""
+
+    _ADULT_AGE_PROMPT = "你多大？可直接写年龄，例如 32 岁。"
+
     def __init__(
         self, *args, backend: DecisionBackend, subagent_coordinator=None, **kwargs
     ):
@@ -58,6 +68,11 @@ class AdaptiveConsultationEngineCore:
         """
         super().__init__(*args, **kwargs)
         self.backend = backend
+        self.model_turns = AdaptiveConsultationEngineSubmit(self)
+        self.model_loop = AdaptiveConsultationEngineRun(self)
+        self.model_actions = AdaptiveConsultationEngineExecute(self)
+        self.model_context = AdaptiveConsultationEngineContext(self)
+        self.pathways = AdaptiveConsultationEnginePathway(self)
         # Optional medagent.subagents.SubagentCoordinator; None keeps the
         # spawn_subagent tool unavailable (the server assembles and injects
         # it; other construction paths stay coordinator-free by default).
@@ -68,44 +83,6 @@ class AdaptiveConsultationEngineCore:
         self._incidental_records: Dict[str, set] = {}
         self._active_turns = {}
         self._decision_waiter = DecisionWaiter()
-        # Pathway close-gate structures (live-eval case 3: a triggered
-        # chief-complaint pathway whose details were never probed must not
-        # be silently summarized away). Triggering reuses the reasoning
-        # core's own pathway definitions and proposer — no second keyword
-        # table. A pathway's detail facts are derived from the DSL: fact
-        # keys cited by the pathway's hypotheses in support/refute
-        # conditions that are collected by a chief-complaint-gated
-        # question (the *_details-style fields). Generic background fields
-        # (trajectory, severity, relevant_history…) are cited by many
-        # pathways and never count as "the pathway was probed".
-        self._pathways = load_pathways()
-        self._pathway_proposer = RuleBasedProposer(
-            pathways=self._pathways,
-            question_fact_keys={q.id: q.fact_key for q in self.content.questions},
-        )
-        self._questions_by_fact = {}
-        for question in self.content.questions:
-            self._questions_by_fact.setdefault(question.fact_key, question)
-        gated_fact_keys = {
-            q.fact_key
-            for q in self.content.questions
-            if q.applies_when.get("chief_complaint_contains_any")
-        }
-        self._pathway_detail_facts: Dict[str, Any] = {}
-        for pathway in self._pathways:
-            cited = {
-                condition["fact_key"]
-                for hypothesis in pathway.get("hypotheses", [])
-                for condition in [
-                    *hypothesis.get("support", []),
-                    *hypothesis.get("refute", []),
-                ]
-            }
-            self._pathway_detail_facts[pathway["id"]] = sorted(
-                fact_key
-                for fact_key in cited
-                if fact_key != "chief_complaint" and fact_key in gated_fact_keys
-            )
         self.prompt = (
             resources.files("medagent.content")
             .joinpath("agent_prompt.txt")
@@ -305,7 +282,7 @@ class AdaptiveConsultationEngineCore:
                 state, self.content.question("chief_complaint"), "先听取主诉，自然叙述后再补关键缺口"
             )
             reply.message = "你好，这次是你自己还是替家人咨询？请先说说最困扰的问题，以及大约从什么时候开始。"
-            self._record_reply(state, reply, "session_start", "开放式开场")
+            self.replies._record_reply(state, reply, "session_start", "开放式开场")
             self.events.append(
                 Event(
                     state.session_id,
@@ -401,14 +378,6 @@ class AdaptiveConsultationEngineCore:
             gaps.append("体重变化")
         return gaps
 
-    @staticmethod
-    def _subject_is_child(state: CaseState) -> bool:
-        if state.get("consult_for") == "child":
-            return True
-        profile = subject_profile(state)
-        reference = (profile or {}).get("reference") or {}
-        attributes = reference.get("attributes") or []
-        return bool(attributes) and attributes[0] == "child"
 
     def _interrupt_or_reject(self, state, text, explicit_help=False):
         active = self._active_turns.get(state.session_id)
@@ -441,7 +410,7 @@ class AdaptiveConsultationEngineCore:
         with self._session_locks[session_id]:
             self._interrupt_or_reject(
                 state,
-                self._location_input_text(user_input),
+                self.tasks._location_input_text(user_input),
                 user_input.choice_value == "request_emergency_help",
             )
             turn = DecisionTurn()
@@ -456,7 +425,7 @@ class AdaptiveConsultationEngineCore:
             )
             try:
                 self._observe_knowledge(state, user_input)
-                return self._submit(state, user_input)
+                return self.model_turns._submit(state, user_input)
             finally:
                 self.events.clear_trace(session_id)
                 if self._active_turns.get(session_id) is turn:
@@ -548,13 +517,13 @@ class AdaptiveConsultationEngineCore:
             "你已确认本次摘要，会谈现已结束。可以把它提供给接诊医生；情况有变化时请重新评估。",
             Phase.CLOSED,
             kind="closed",
-            summary=self._summary_payload(
+            summary=self.replies._summary_payload(
                 state, review_status="confirmed_by_user"
             ),
         )
         # Parity with the deterministic pipeline's confirm handler:
         # a user-confirmed close also derives the follow-up plan.
-        self._schedule_follow_up(state, reply, turn_id)
+        self.replies._schedule_follow_up(state, reply, turn_id)
         return reply
 
     @staticmethod
@@ -640,7 +609,7 @@ class AdaptiveConsultationEngineCore:
     def _messages(self, state, text):
         return [
             {"role": "system", "content": self._current_prefix()[0]},
-            {"role": "user", "content": self._json(self._context(state, text))},
+            {"role": "user", "content": self._json(self.model_context._context(state, text))},
         ]
 
     def _deliver(self, state: CaseState, reply: AgentReply, turn_id: str) -> AgentReply:
@@ -663,7 +632,7 @@ class AdaptiveConsultationEngineCore:
         if (
             state.self_check_conversation
             and reply.kind == "question"
-            and self._self_check_suspend_count(
+            and self.planning._self_check_suspend_count(
                 state,
                 state.self_check_conversation["task"]["id"],
                 state.self_check_conversation["task"].get("interaction_id"),
@@ -680,5 +649,11 @@ class AdaptiveConsultationEngineCore:
             reply.quick_replies = [QuickReply("重试这一轮", "retry_turn")]
         elif reply.kind != "subject_change":
             state.pending_input = None
-        self._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
+        self.replies._record_reply(state, reply, turn_id, "受约束工具执行后的患者可见动作")
         return reply
+
+    def correct_fact(
+        self, session_id: str, fact_key: str, new_text: str,
+        expected_fact_id: Optional[str] = None,
+    ) -> AgentReply:
+        return self.model_turns.correct_fact(session_id, fact_key, new_text, expected_fact_id)

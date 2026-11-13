@@ -25,7 +25,7 @@ test("unresolved reports render inertly, validate their contract and preserve ol
 }) => {
   await page.goto("/");
   await page.evaluate(async () => {
-    const { createRenderer } = await import("/js/structured-ui.js");
+    const { createRenderer } = await import("/js/structured/structured-ui.js");
     const renderer = createRenderer();
     const report = {
       key: "allergies",

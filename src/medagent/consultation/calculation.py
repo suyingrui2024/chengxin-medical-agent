@@ -1,4 +1,4 @@
-"""Mixin: calculation for ConsultationEngine."""
+"""Workflow component: calculation for ConsultationEngine."""
 from copy import deepcopy
 from ..core.domain import AgentReply, Assertion, Phase, QuickReply
 from ..core.events import Event
@@ -12,6 +12,10 @@ from .types import StaleActionError, SubjectBoundaryError
 
 
 class ConsultationEngineCalculation:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _calculation_input_reply(self, state, feedback=""):
         draft = deepcopy(state.pending_calculation)
         draft["feedback"] = feedback
@@ -94,7 +98,7 @@ class ConsultationEngineCalculation:
         if state.pending_calculation and state.calculation_feedback:
             state.calculation_feedback["outcome"] = "cancelled"
         if state.pending_calculation:
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "capability.input_cancelled",
@@ -123,7 +127,7 @@ class ConsultationEngineCalculation:
         question = next(
             (
                 q
-                for q in self.content.questions
+                for q in self.engine.content.questions
                 if q.id == resume.get("question_id") and q.id == state.active_question
             ),
             None,
@@ -131,7 +135,7 @@ class ConsultationEngineCalculation:
         if question and (
             question.fact_key not in state.facts or resume.get("clarification")
         ):
-            reply = self._ask(state, question, "计算交互结束，继续此前未回答的问题")
+            reply = self.engine._ask(state, question, "计算交互结束，继续此前未回答的问题")
             if old.get("question_id") == question.id and old.get("kind") == "question":
                 reply.message = old["message"]
                 reply.quick_replies = [
@@ -153,7 +157,7 @@ class ConsultationEngineCalculation:
             and state.phase == Phase.SUMMARY
             and old.get("kind") == "summary"
         ):
-            return self._finish(state)
+            return self.engine.replies._finish(state)
         return None
 
     def _handle_calculation_action(self, state, user_input, text, turn_id):
@@ -178,9 +182,9 @@ class ConsultationEngineCalculation:
             draft = state.pending_calculation
             try:
                 values = confirmed_parameters(
-                    self.content.registry, draft, user_input.calculation["input"]
+                    self.engine.content.registry, draft, user_input.calculation["input"]
                 )
-                result = self.run_capability(
+                result = self.engine.run_capability(
                     state,
                     draft["capability_id"],
                     values,
@@ -268,7 +272,7 @@ class ConsultationEngineCalculation:
             if choice == "skip_calculation":
                 if state.calculation_feedback:
                     state.calculation_feedback["outcome"] = "skipped"
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "capability.input_cancelled",
@@ -323,4 +327,4 @@ class ConsultationEngineCalculation:
                     )
                 ):
                     raise SubjectBoundaryError("这次问诊的对象不同，请为另一位家人新建问诊。", requested)
-        self._apply_fact_update_dependencies(state, updates, turn_id)
+        self.engine.subjects._apply_fact_update_dependencies(state, updates, turn_id)

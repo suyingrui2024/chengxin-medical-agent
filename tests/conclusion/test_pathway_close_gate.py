@@ -82,7 +82,7 @@ class PathwayGateTests(unittest.TestCase):
         )
         self.assertNotIn("gi_details", self.state.facts)
         with self.assertRaises(ProposalError) as caught:
-            self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+            self.engine.model_actions._execute(self.state, cmd("review_summary"), text, "t-sum")
         message = str(caught.exception)
         self.assertIn("主诉通路尚未探明", message)
         self.assertIn("abdominal", message)
@@ -99,7 +99,7 @@ class PathwayGateTests(unittest.TestCase):
         chief = "反酸烧心"
         text = text_for(chief)
         record(self.engine, self.state, text, background_facts(self.engine, chief))
-        context = self.engine._context(self.state, text)
+        context = self.engine.model_context._context(self.state, text)
         self.assertEqual(context["missing_required"], [])
         self.assertEqual(
             context["pathway_exploration"],
@@ -112,7 +112,7 @@ class PathwayGateTests(unittest.TestCase):
             ],
         )
         with self.assertRaises(ProposalError) as caught:
-            self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+            self.engine.model_actions._execute(self.state, cmd("review_summary"), text, "t-sum")
         self.assertIn("abdominal", str(caught.exception))
 
     def test_abstain_reason_opens_the_gate_and_leaves_an_event(self):
@@ -127,7 +127,7 @@ class PathwayGateTests(unittest.TestCase):
             text,
             background_facts(self.engine, chief, skip={"gi_details"}),
         )
-        reply = self.engine._execute(
+        reply = self.engine.model_actions._execute(
             self.state,
             cmd(
                 "review_summary",
@@ -156,7 +156,7 @@ class PathwayGateTests(unittest.TestCase):
             background_facts(self.engine, chief, skip={"gi_details"}),
         )
         with self.assertRaises(ProposalError) as caught:
-            self.engine._execute(
+            self.engine.model_actions._execute(
                 self.state, cmd("review_summary", abstain_reason="  "), text, "t-sum"
             )
         self.assertIn("abstain_reason", str(caught.exception))
@@ -168,7 +168,7 @@ class PathwayGateTests(unittest.TestCase):
         text = text_for(chief)
         record(self.engine, self.state, text, background_facts(self.engine, chief))
         self.assertIn("gi_details", self.state.facts)
-        reply = self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+        reply = self.engine.model_actions._execute(self.state, cmd("review_summary"), text, "t-sum")
         self.assertEqual(reply.kind, "summary")
         self.assertEqual(self.events_of("review.abstained"), [])
 
@@ -178,11 +178,11 @@ class PathwayGateTests(unittest.TestCase):
         chief = "膝盖扭伤"
         text = text_for(chief)
         record(self.engine, self.state, text, background_facts(self.engine, chief))
-        self.assertEqual(self.engine._pathway_exploration(self.state), [])
+        self.assertEqual(self.engine.pathways._pathway_exploration(self.state), [])
         self.assertNotIn(
-            "pathway_exploration", self.engine._context(self.state, text)
+            "pathway_exploration", self.engine.model_context._context(self.state, text)
         )
-        reply = self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+        reply = self.engine.model_actions._execute(self.state, cmd("review_summary"), text, "t-sum")
         self.assertEqual(reply.kind, "summary")
 
     def test_already_concluded_case_can_resummarize_after_correction(self):
@@ -198,7 +198,7 @@ class PathwayGateTests(unittest.TestCase):
             background_facts(self.engine, chief, skip={"gi_details"}),
         )
         self.state.conclusion = {"disposition": {"level": "self_care"}}
-        reply = self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+        reply = self.engine.model_actions._execute(self.state, cmd("review_summary"), text, "t-sum")
         self.assertEqual(reply.kind, "summary")
         self.assertEqual(self.events_of("review.abstained"), [])
 
@@ -216,7 +216,7 @@ class PathwayGateTests(unittest.TestCase):
             ],
         )
         self.assertEqual(
-            self.engine._pathway_exploration(self.state),
+            self.engine.pathways._pathway_exploration(self.state),
             [{"pathway": "chest", "detail_fields": [], "explored": True}],
         )
 
@@ -232,7 +232,7 @@ class PathwayGateTests(unittest.TestCase):
             ],
         )
         self.assertEqual(
-            engine._pathway_exploration(state),
+            engine.pathways._pathway_exploration(state),
             [{"pathway": "chest", "detail_fields": [], "explored": False}],
         )
 
@@ -262,14 +262,14 @@ class ChestGateTestabilityTests(unittest.TestCase):
             text,
             background_facts(self.engine, chief),
         )
-        context = self.engine._context(self.state, text)
+        context = self.engine.model_context._context(self.state, text)
         self.assertEqual(context["missing_required"], [])
         self.assertEqual(
             context["pathway_exploration"],
             [{"pathway": "chest", "detail_fields": [], "explored": False}],
         )
         with self.assertRaises(ProposalError) as caught:
-            self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+            self.engine.model_actions._execute(self.state, cmd("review_summary"), text, "t-sum")
         message = str(caught.exception)
         self.assertIn("主诉通路尚未探明", message)
         self.assertIn("chest", message)
@@ -291,10 +291,10 @@ class ChestGateTestabilityTests(unittest.TestCase):
         facts.append(fact("trajectory", "stable", "变化不大"))
         record(self.engine, self.state, text, facts)
         self.assertEqual(
-            self.engine._pathway_exploration(self.state),
+            self.engine.pathways._pathway_exploration(self.state),
             [{"pathway": "chest", "detail_fields": [], "explored": True}],
         )
-        reply = self.engine._execute(self.state, cmd("review_summary"), text, "t-sum")
+        reply = self.engine.model_actions._execute(self.state, cmd("review_summary"), text, "t-sum")
         self.assertEqual(reply.kind, "summary")
         self.assertEqual(self.state.phase, Phase.SUMMARY)
 

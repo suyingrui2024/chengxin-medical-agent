@@ -313,7 +313,7 @@ class PriorCaseContextTests(unittest.TestCase):
             "outcome_note": "咳得更厉害了",
             "outcome_recorded_at": "2026-10-23T10:00:00+08:00",
         }
-        context = self.engine._context(self.state, "还是咳嗽")
+        context = self.engine.model_context._context(self.state, "还是咳嗽")
         self.assertEqual(
             context["prior_case"],
             {
@@ -326,7 +326,7 @@ class PriorCaseContextTests(unittest.TestCase):
         )
 
     def test_no_prior_case_no_key(self):
-        context = self.engine._context(self.state, "咳嗽")
+        context = self.engine.model_context._context(self.state, "咳嗽")
         self.assertNotIn("prior_case", context)
 
     def test_prompt_carries_retriage_guidance(self):
@@ -394,7 +394,7 @@ class ToolCatalogTrimTests(unittest.TestCase):
     def test_execution_side_remains_fail_closed_without_coordinator(self):
         engine = self._engine()
         state, _reply = engine.create_session()
-        result = engine._execute(state, SPAWN_COMMAND, "复核一下", "turn-1")
+        result = engine.model_actions._execute(state, SPAWN_COMMAND, "复核一下", "turn-1")
         self.assertEqual(result, {"ok": False, "status": "unavailable"})
 
 

@@ -18,7 +18,7 @@ from scripts.benchmarks.public.prepare_public_execution import extract_source
 from scripts.benchmarks.public.prepare_public_test_sample import fetch
 
 ROOT = Path(__file__).resolve().parents[3]
-FIXTURES = ROOT / "benchmarks/swe-lite-transfer"
+FIXTURES = ROOT / "research/benchmarks/swe-lite-transfer"
 CACHE = ROOT / ".runtime/public-transfer"
 SHARED = ROOT / ".runtime/public-test-sample"
 

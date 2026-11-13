@@ -25,7 +25,7 @@ from medagent.infra.env_config import for_backend, read_env
 from scripts.benchmarks.public.public_execution_cases import load_cases, sha256
 
 
-FIXTURES = ROOT / "benchmarks/swe-lite-dev-expanded"
+FIXTURES = ROOT / "research/benchmarks/swe-lite-dev-expanded"
 KIND = "paired-public-explicit-contracts/v1"
 
 

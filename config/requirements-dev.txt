@@ -1,0 +1,6 @@
+# 开发与测试依赖；在项目根目录安装：
+# python3 -m pip install -r config/requirements-dev.txt
+hypothesis>=6
+coverage>=7
+pytest>=8
+ruff>=0.17

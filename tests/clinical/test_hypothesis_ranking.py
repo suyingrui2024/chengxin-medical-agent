@@ -459,7 +459,7 @@ class RankerEngineRegressionTests(unittest.TestCase):
 
 class AdaptiveOrderCheckTests(unittest.TestCase):
     def _ask(self, engine, state, question_id):
-        return engine._execute(
+        return engine.model_actions._execute(
             state,
             {"tool": "ask_question", "arguments": {"question_id": question_id}},
             "",

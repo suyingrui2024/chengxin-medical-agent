@@ -2,7 +2,7 @@
 
 The corpus is an *engineering* corpus (review_status: unreviewed in the
 fixture): it verifies the deterministic safety machinery of the web
-advisory layer from docs/联网与子智能体工具设计.md §8.1 — source-tier
+advisory layer from docs/features/联网与子智能体工具设计.md §8.1 — source-tier
 filtering, verbatim citation fidelity, the outbound PII gate, conflict
 and injection detection, and the dosage lint. Provider responses and
 fetch bodies are frozen snapshots injected through the WebTools

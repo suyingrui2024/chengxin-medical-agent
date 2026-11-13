@@ -23,7 +23,7 @@ from medagent.kg import ConceptStore, Normalizer
 
 ROOT = Path(__file__).resolve().parents[3]
 DB = ROOT / "data" / "kg" / "kg.db"
-OUT = ROOT / "docs" / "知识库审计报告.md"
+OUT = ROOT / "docs" / "evaluations" / "knowledge-graph" / "audit.md"
 
 #: (患者怎么说, 期望的概念规范名). Written independently of the alias
 #: tables so that a pass means the layer generalises, not that it echoes.
@@ -221,6 +221,7 @@ def main() -> int:
         lines.append(f"可疑概念名（过短）：{'、'.join(suspicious[:10])}")
         lines.append("")
 
+    OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")
 
     print(f"wrote {OUT}")

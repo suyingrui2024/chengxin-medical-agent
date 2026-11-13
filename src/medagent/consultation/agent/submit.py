@@ -1,4 +1,4 @@
-"""Mixin: submit for AdaptiveConsultationEngine."""
+"""Workflow component: submit for AdaptiveConsultationEngine."""
 from typing import NamedTuple, Optional
 from uuid import uuid4
 from ...core.domain import RiskAssessment
@@ -34,9 +34,13 @@ class _PreparedTurn(NamedTuple):
 
 
 class AdaptiveConsultationEngineSubmit:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _submit(self, state: CaseState, user_input: UserInput) -> AgentReply:
         if user_input.choice_value == "request_emergency_help":
-            return self._requested_emergency_help(state, user_input.text)
+            return self.engine.subjects._requested_emergency_help(state, user_input.text)
 
         prepared = self._prepare_turn(state, user_input)
         turn_id = self._record_user_turn(state, prepared)
@@ -72,7 +76,7 @@ class AdaptiveConsultationEngineSubmit:
         if (
             user_input.expected_action_id
             and user_input.expected_action_id != expected
-            and not self.triage.scan_text(self._location_input_text(user_input))
+            and not self.engine.triage.scan_text(self.engine.tasks._location_input_text(user_input))
         ):
             raise StaleActionError("回答对应的页面已更新，请刷新当前问题")
         text = (
@@ -80,22 +84,22 @@ class AdaptiveConsultationEngineSubmit:
             if user_input.choice_value == "retry_turn" and state.pending_input
             else user_input.text.strip()
         )
-        adaptive_answer = self._prepare_adaptive_answer(state, user_input, text)
+        adaptive_answer = self.engine._prepare_adaptive_answer(state, user_input, text)
         if adaptive_answer:
             text = adaptive_answer["text"]
-        location_input_text = self._location_input_text(user_input)
-        if self.triage.scan_text(location_input_text):
+        location_input_text = self.engine.tasks._location_input_text(user_input)
+        if self.engine.triage.scan_text(location_input_text):
             text = location_input_text
         prepared_location = None
-        if not self.triage.scan_text(text):
-            prepared_location = self._prepare_location_answer(state, user_input)
+        if not self.engine.triage.scan_text(text):
+            prepared_location = self.engine.tasks._prepare_location_answer(state, user_input)
             if prepared_location:
                 text = prepared_location["text"]
-            self._check_subject_action(state, user_input)
-            self._check_calculation_action(state, user_input)
-            self._check_observation_action(state, user_input)
-            self._check_task_conversation_action(state, user_input)
-            self._check_location_revision_action(state, user_input)
+            self.engine.subjects._check_subject_action(state, user_input)
+            self.engine.calculations._check_calculation_action(state, user_input)
+            self.engine.observations._check_observation_action(state, user_input)
+            self.engine.tasks._check_task_conversation_action(state, user_input)
+            self.engine.locations._check_location_revision_action(state, user_input)
         return _PreparedTurn(text, adaptive_answer, prepared_location)
 
     def _record_user_turn(self, state: CaseState, prepared: _PreparedTurn) -> str:
@@ -106,7 +110,7 @@ class AdaptiveConsultationEngineSubmit:
         user's message to be the first of the group.
         """
         turn_id = str(uuid4())
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "turn.user_message",
@@ -141,7 +145,7 @@ class AdaptiveConsultationEngineSubmit:
         # deterministic engine's _begin_turn, so its own _submit calls
         # the same shared helper here, on the finalized turn text, with
         # the same first-wins / never-patient_goal semantics.
-        self._capture_worry(state, prepared.text, turn_id)
+        self.engine.turns._capture_worry(state, prepared.text, turn_id)
         return turn_id
 
     def _assess_turn_risk(
@@ -154,7 +158,7 @@ class AdaptiveConsultationEngineSubmit:
         does not overwrite it.  The assessment is stored rather than only
         returned, because every stage below reads ``state.risk``.
         """
-        risk = self.triage.assess(
+        risk = self.engine.triage.assess(
             state,
             prepared.text,
             prepared.adaptive["risk_tags"] if prepared.adaptive else (),
@@ -185,9 +189,9 @@ class AdaptiveConsultationEngineSubmit:
         Returns a reply to deliver, or ``None`` to carry on with the normal flow.
         """
         if user_input.choice_value == "confirm_emergency_clarification":
-            confirmed = self._confirm_emergency_clarification(state, turn_id)
+            confirmed = self.engine.emergency._confirm_emergency_clarification(state, turn_id)
             if confirmed is not None:
-                return self._deliver(state, confirmed, turn_id)
+                return self.engine._deliver(state, confirmed, turn_id)
         if user_input.choice_value == "deny_emergency_clarification":
             self._apply_emergency_denial(state, prepared.text, turn_id)
         # P5 (round-2 ④-4): the urgent gate is NOT evaluated here, before
@@ -232,8 +236,8 @@ class AdaptiveConsultationEngineSubmit:
         the stand-down above rewrites ``state.risk``, and the emergency reply
         must still quote the signals that were actually found.
         """
-        action = self._emergency_clarification_action(state, text, risk_tags)
-        if action == "clarify" and self._emergency_clarification_denied_before(
+        action = self.engine.emergency._emergency_clarification_action(state, text, risk_tags)
+        if action == "clarify" and self.engine._emergency_clarification_denied_before(
             state, text
         ):
             # C-10: this danger-signal group was already denied once; do not
@@ -243,22 +247,22 @@ class AdaptiveConsultationEngineSubmit:
             # exactly as the clarification reply does it, or the publication gate
             # would block the normal question and close the case as an emergency
             # instead.
-            state.risk = self._deferred_risk(state)
+            state.risk = self.engine.planning._deferred_risk(state)
             return None
         if action == "clarify":
-            return self._deliver(
+            return self.engine._deliver(
                 state,
-                self._emergency_clarification_reply(state, text, turn_id),
+                self.engine.emergency._emergency_clarification_reply(state, text, turn_id),
                 turn_id,
             )
         if action == "confirmed":
-            return self._deliver(
+            return self.engine._deliver(
                 state,
-                self._emergency_reply(state, triggers, include_clarification=True),
+                self.engine.emergency._emergency_reply(state, triggers, include_clarification=True),
                 turn_id,
             )
-        return self._deliver(
-            state, self._emergency_reply(state, triggers), turn_id
+        return self.engine._deliver(
+            state, self.engine.emergency._emergency_reply(state, triggers), turn_id
         )
 
     def _apply_emergency_denial(
@@ -273,7 +277,7 @@ class AdaptiveConsultationEngineSubmit:
         agent_tools).  The scope key (``for_input``) keeps the exception inert on
         every later turn: the current-turn evidence rule is otherwise untouched.
         """
-        pending = self._emergency_clarification_pending(state)
+        pending = self.engine.emergency._emergency_clarification_pending(state)
         if pending is None:
             return
         denied_text = pending.get("text")
@@ -303,7 +307,7 @@ class AdaptiveConsultationEngineSubmit:
             if labels not in history:
                 history.append(labels)
         state.runtime_snapshot.pop("emergency_clarification", None)
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "emergency.clarification_denied",
@@ -331,13 +335,13 @@ class AdaptiveConsultationEngineSubmit:
         recorded yet, so the gate would close on "asked" minimum facts while the
         answer was still in flight.  ``_run`` evaluates it after ``record_facts``.
         """
-        revision_reply = self._handle_location_revision_action(
+        revision_reply = self.engine.locations._handle_location_revision_action(
             state, user_input, prepared.text, turn_id
         )
         if revision_reply is not None:
-            return self._deliver(state, revision_reply, turn_id)
+            return self.engine._deliver(state, revision_reply, turn_id)
         if state.phase == Phase.CLOSED:
-            return self._deliver(
+            return self.engine._deliver(
                 state,
                 AgentReply(
                     "这次会谈已结束。新问题可重新开始问诊。",
@@ -351,23 +355,23 @@ class AdaptiveConsultationEngineSubmit:
             or state.calculation_resume
             or state.self_check_conversation
         ):
-            gated = self._urgent_or_defer(state, turn_id)
+            gated = self.engine.planning._urgent_or_defer(state, turn_id)
             if gated is not None:
-                return self._deliver(state, gated, turn_id)
-        subject_reply = self._subject_control(
+                return self.engine._deliver(state, gated, turn_id)
+        subject_reply = self.engine.subjects._subject_control(
             state, user_input, prepared.text, turn_id
         )
         if subject_reply is not None:
-            return self._deliver(state, subject_reply, turn_id)
+            return self.engine._deliver(state, subject_reply, turn_id)
         if prepared.location:
             return self._finish_location_answer(state, prepared, turn_id)
-        task_action = self._handle_task_conversation_action(
+        task_action = self.engine.tasks._handle_task_conversation_action(
             state, user_input, turn_id
         )
         if isinstance(task_action, AgentReply):
-            return self._deliver(state, task_action, turn_id)
+            return self.engine._deliver(state, task_action, turn_id)
         if task_action is not None:
-            return self._run(state, task_action["text"], task_action["source_turn_id"])
+            return self.engine.model_loop._run(state, task_action["text"], task_action["source_turn_id"])
         return None
 
     def _finish_location_answer(
@@ -379,7 +383,7 @@ class AdaptiveConsultationEngineSubmit:
         goes down, then the feedback text is what the model reads, so the
         patient's extra detail is not lost by recording only the map position.
         """
-        revised = self._complete_location_revision(
+        revised = self.engine.locations._complete_location_revision(
             state, prepared.location, turn_id
         )
         if revised is not None:
@@ -387,10 +391,10 @@ class AdaptiveConsultationEngineSubmit:
                 state.observation_feedback
                 and state.observation_feedback["has_supplement"]
             ):
-                return self._run(state, prepared.text, turn_id)
-            return self._deliver(state, revised, turn_id)
-        self._record_location_answer(state, prepared.location, turn_id)
-        return self._run(state, prepared.text, turn_id)
+                return self.engine.model_loop._run(state, prepared.text, turn_id)
+            return self.engine._deliver(state, revised, turn_id)
+        self.engine.tasks._record_location_answer(state, prepared.location, turn_id)
+        return self.engine.model_loop._run(state, prepared.text, turn_id)
 
     def _pending_work_turn(
         self,
@@ -413,16 +417,16 @@ class AdaptiveConsultationEngineSubmit:
         if user_input.choice_value and user_input.choice_value.startswith(
             "process_calculation_supplement:"
         ):
-            return self._process_calculation_followup(state)
+            return self.engine.followups._process_calculation_followup(state)
         if (
             user_input.choice_value == "retry_turn"
             and state.calculation_feedback
             and state.calculation_feedback["processing"]
         ):
-            return self._process_calculation_followup(state)
+            return self.engine.followups._process_calculation_followup(state)
         if user_input.choice_value == "retry_turn" and state.observation_feedback:
             feedback = state.observation_feedback
-            return self._run(state, feedback["text"], feedback["source_turn_id"])
+            return self.engine.model_loop._run(state, feedback["text"], feedback["source_turn_id"])
         if state.calculation_feedback:
             state.calculation_feedback["processing"] = False
         if state.observation_feedback:
@@ -435,16 +439,16 @@ class AdaptiveConsultationEngineSubmit:
         reply = self._observation_turn(state, prepared, user_input, turn_id)
         if reply is not None:
             return reply
-        calculation_reply = self._handle_calculation_action(
+        calculation_reply = self.engine.calculations._handle_calculation_action(
             state, user_input, prepared.text, turn_id
         )
         if (
             user_input.choice_value in {"skip_calculation", "resume_after_calculation"}
             and state.calculation_feedback
         ):
-            return self._process_calculation_followup(state)
+            return self.engine.followups._process_calculation_followup(state)
         if calculation_reply is not None:
-            return self._deliver(state, calculation_reply, turn_id)
+            return self.engine._deliver(state, calculation_reply, turn_id)
         return None
 
     def _summary_confirmation_reply(
@@ -474,8 +478,8 @@ class AdaptiveConsultationEngineSubmit:
         )
         if not confirmed:
             return None
-        return self._deliver(
-            state, self._confirmed_summary_reply(state, turn_id), turn_id
+        return self.engine._deliver(
+            state, self.engine._confirmed_summary_reply(state, turn_id), turn_id
         )
 
     def _observation_turn(
@@ -494,7 +498,7 @@ class AdaptiveConsultationEngineSubmit:
 
         Returns ``None`` when this turn is not an observation answer.
         """
-        observation_reply = self._handle_observation_action(
+        observation_reply = self.engine.observations._handle_observation_action(
             state, user_input, prepared.text, turn_id
         )
         if observation_reply is None:
@@ -505,10 +509,10 @@ class AdaptiveConsultationEngineSubmit:
             and observation_reply.kind not in {"urgent", "emergency", "closed"}
         ):
             feedback = state.observation_feedback
-            self._clear_calculation(state, "supplemental_patient_information", turn_id)
+            self.engine.calculations._clear_calculation(state, "supplemental_patient_information", turn_id)
             state.pending_input = feedback["text"]
-            return self._run(state, feedback["text"], feedback["source_turn_id"])
-        return self._deliver(state, observation_reply, turn_id)
+            return self.engine.model_loop._run(state, feedback["text"], feedback["source_turn_id"])
+        return self.engine._deliver(state, observation_reply, turn_id)
 
     def _answer_turn(
         self,
@@ -528,7 +532,7 @@ class AdaptiveConsultationEngineSubmit:
         Always returns a reply: this is the floor of ``_submit``, so there is no
         ``None`` for a caller above to check.
         """
-        self._sync_task_requests(state, prepared.text, turn_id)
+        self.engine.planning._sync_task_requests(state, prepared.text, turn_id)
         reply = self._answer_emergency_screen(state, prepared, user_input, turn_id)
         if reply is not None:
             return reply
@@ -536,31 +540,31 @@ class AdaptiveConsultationEngineSubmit:
             user_input.choice_value == "confirm_summary"
             or is_summary_confirmation_text(prepared.text)
         ):
-            return self._deliver(
-                state, self._confirmed_summary_reply(state, turn_id), turn_id
+            return self.engine._deliver(
+                state, self.engine._confirmed_summary_reply(state, turn_id), turn_id
             )
         if state.active_task:
             from ...dialogue.task_conversation import is_observation_entry
 
             if is_observation_entry(
-                self.content.tasks[state.active_task],
+                self.engine.content.tasks[state.active_task],
                 prepared.text,
                 user_input.choice_value,
             ):
-                failure = self._try_task_result(
+                failure = self.engine.planning._try_task_result(
                     state, prepared.text, user_input.choice_value, turn_id
                 )
                 if failure:
-                    return self._deliver(state, failure, turn_id)
+                    return self.engine._deliver(state, failure, turn_id)
             else:
-                self._suspend_task_conversation(state, turn_id)
-            state.risk = self.triage.assess(state, prepared.text)
+                self.engine.tasks._suspend_task_conversation(state, turn_id)
+            state.risk = self.engine.triage.assess(state, prepared.text)
             if state.risk.level == RiskLevel.URGENT:
-                gated = self._urgent_or_defer(state, turn_id)
+                gated = self.engine.planning._urgent_or_defer(state, turn_id)
                 if gated is not None:
-                    return self._deliver(state, gated, turn_id)
+                    return self.engine._deliver(state, gated, turn_id)
         state.pending_input = prepared.text
-        return self._run(state, prepared.text, turn_id)
+        return self.engine.model_loop._run(state, prepared.text, turn_id)
 
     def _answer_emergency_screen(
         self,
@@ -587,7 +591,7 @@ class AdaptiveConsultationEngineSubmit:
             state, user_input, prepared.text, turn_id
         )
         state.active_question = None
-        state.risk = self.triage.assess(state, prepared.text)
+        state.risk = self.engine.triage.assess(state, prepared.text)
         if state.risk.level == RiskLevel.EMERGENCY:
             reply = self._dispatch_emergency_clarification(
                 state, prepared.text, (), state.risk.triggers, turn_id
@@ -604,9 +608,9 @@ class AdaptiveConsultationEngineSubmit:
             "没有上述情况",
             "没有危险信号",
         }:
-            pending_reply = self._offer_pending_self_check(state)
+            pending_reply = self.engine.planning._offer_pending_self_check(state)
             if pending_reply:
-                return self._deliver(state, pending_reply, turn_id)
+                return self.engine._deliver(state, pending_reply, turn_id)
         return None
 
     def _record_emergency_screen_answer(
@@ -619,8 +623,8 @@ class AdaptiveConsultationEngineSubmit:
         has already passed the priority gate.  The caregiver/patient distinction
         is kept because the fact's source decides how it is quoted later.
         """
-        interpreted = self.interpreter.interpret(
-            self.content.question("emergency_screen"), text, user_input.choice_value
+        interpreted = self.engine.interpreter.interpret(
+            self.engine.content.question("emergency_screen"), text, user_input.choice_value
         )
         assertion = interpreted.assertion.value
         source = (
@@ -638,7 +642,7 @@ class AdaptiveConsultationEngineSubmit:
                 turn_id=turn_id,
             )
         )
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "fact.recorded",
@@ -672,12 +676,12 @@ class AdaptiveConsultationEngineSubmit:
         correction goes through the same dispatch as any other emergency turn.
         """
         # Explicit UI correction remains available; it does not use ungrounded model values.
-        state = self.state(session_id)
-        with self._session_locks[session_id]:
-            self._interrupt_or_reject(state, new_text)
+        state = self.engine.state(session_id)
+        with self.engine._session_locks[session_id]:
+            self.engine._interrupt_or_reject(state, new_text)
             if state.calculation_feedback:
                 state.calculation_feedback["processing"] = False
-            urgent_reply = self._correction_emergency(state, new_text)
+            urgent_reply = self.engine.subjects._correction_emergency(state, new_text)
             if urgent_reply:
                 return urgent_reply
             if state.phase == Phase.CLOSED and state.closed_reason != "emergency_route":
@@ -690,7 +694,7 @@ class AdaptiveConsultationEngineSubmit:
                 # correction there re-runs triage and the route itself
                 # can never be retracted by an edit.
                 raise ValueError("会谈已结束，记录不能再更正")
-            self._check_fact_version(state, fact_key, expected_fact_id)
+            self.engine.calculations._check_fact_version(state, fact_key, expected_fact_id)
             previous_question, previous_task, previous_phase = (
                 state.active_question,
                 state.active_task,
@@ -698,13 +702,13 @@ class AdaptiveConsultationEngineSubmit:
             )
             was_clarification = state.active_question_is_clarification
             question = next(
-                (q for q in self.content.questions if q.fact_key == fact_key), None
+                (q for q in self.engine.content.questions if q.fact_key == fact_key), None
             )
             if question is None or fact_key == "emergency_screen":
                 raise ValueError("字段不可直接编辑")
-            result = self.interpreter.interpret(question, new_text)
+            result = self.engine.interpreter.interpret(question, new_text)
             proposals = validate_proposals(
-                self.content,
+                self.engine.content,
                 state,
                 new_text,
                 [
@@ -720,7 +724,7 @@ class AdaptiveConsultationEngineSubmit:
                 ],
             )
             turn_id = str(uuid4())
-            self._execute(
+            self.engine.model_actions._execute(
                 state,
                 {
                     "tool": "record_facts",
@@ -733,7 +737,7 @@ class AdaptiveConsultationEngineSubmit:
                 new_text,
                 turn_id,
             )
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     session_id,
                     "fact.correction_requested",
@@ -757,32 +761,32 @@ class AdaptiveConsultationEngineSubmit:
                 if reply is not None:
                     return reply
             if state.risk.level == RiskLevel.URGENT:
-                gated = self._urgent_or_defer(state, turn_id)
+                gated = self.engine.planning._urgent_or_defer(state, turn_id)
                 if gated is not None:
-                    return self._deliver(state, gated, turn_id)
-            pending_reply = self._offer_pending_self_check(state)
+                    return self.engine._deliver(state, gated, turn_id)
+            pending_reply = self.engine.planning._offer_pending_self_check(state)
             if pending_reply:
-                return self._deliver(state, pending_reply, turn_id)
+                return self.engine._deliver(state, pending_reply, turn_id)
             if previous_task:
-                resumed = self._offer_task(
+                resumed = self.engine.planning._offer_task(
                     state, str(state.get("chief_complaint", "")), previous_task
                 )
                 if resumed:
-                    return self._deliver(state, resumed, turn_id)
+                    return self.engine._deliver(state, resumed, turn_id)
             if (
                 previous_phase in {Phase.SUMMARY, Phase.CLOSED}
-                and not self._context(state, new_text)["missing_required"]
+                and not self.engine.model_context._context(state, new_text)["missing_required"]
             ):
-                reply = self._execute(
+                reply = self.engine.model_actions._execute(
                     state,
                     {"tool": "review_summary", "arguments": {}},
                     new_text,
                     turn_id,
                 )
-                return self._deliver(state, reply, turn_id)
+                return self.engine._deliver(state, reply, turn_id)
             if previous_question:
                 previous = next(
-                    (q for q in self.content.questions if q.id == previous_question),
+                    (q for q in self.engine.content.questions if q.id == previous_question),
                     None,
                 )
                 if (
@@ -791,9 +795,9 @@ class AdaptiveConsultationEngineSubmit:
                         previous.fact_key not in state.facts
                         or (was_clarification and previous.fact_key != fact_key)
                     )
-                    and self.content.question_applies_in_state(previous, state)
+                    and self.engine.content.question_applies_in_state(previous, state)
                 ):
-                    reply = self._ask(state, previous, "更正已由控制器写入，继续此前未回答的问题")
+                    reply = self.engine._ask(state, previous, "更正已由控制器写入，继续此前未回答的问题")
                     state.active_question_is_clarification = was_clarification
-                    return self._deliver(state, reply, turn_id)
-            return self._deliver(state, self._plan_next(state), turn_id)
+                    return self.engine._deliver(state, reply, turn_id)
+            return self.engine._deliver(state, self.engine.planning._plan_next(state), turn_id)

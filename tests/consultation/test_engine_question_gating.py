@@ -69,7 +69,7 @@ class BlockingCandidateTests(unittest.TestCase):
             "发烧两天",
             [fact("chief_complaint", "发烧", "发烧")],
         )
-        context = self.engine._context(self.state, "发烧两天")
+        context = self.engine.model_context._context(self.state, "发烧两天")
         fields = [q["field"] for q in context["questions"]]
         self.assertIn("reported_temperature", fields)
         self.assertIn("sex", fields)
@@ -108,7 +108,7 @@ class BlockingCandidateTests(unittest.TestCase):
         # sex and reported_temperature were never asked or recorded.
         self.assertNotIn("sex", self.state.facts)
         self.assertNotIn("reported_temperature", self.state.facts)
-        reply = self.engine._execute(
+        reply = self.engine.model_actions._execute(
             self.state, cmd("review_summary"), text, "t-summary"
         )
         self.assertEqual(reply.kind, "summary")
@@ -120,7 +120,7 @@ class FactGateTests(unittest.TestCase):
         self.state, _ = self.engine.create_session()
 
     def candidate_fields(self):
-        context = self.engine._context(self.state, "核对")
+        context = self.engine.model_context._context(self.state, "核对")
         return [q["field"] for q in context["questions"]], context
 
     def test_male_excludes_pregnancy(self):
@@ -197,7 +197,7 @@ class FactGateTests(unittest.TestCase):
             ],
         )
         with self.assertRaises(ProposalError) as caught:
-            self.engine._execute(
+            self.engine.model_actions._execute(
                 self.state,
                 cmd("ask_question", question_id="pregnancy_status"),
                 "肚子疼",
@@ -250,7 +250,7 @@ class AskPatientWideningTests(unittest.TestCase):
                 fact("urinary_details", "小便有点疼", "小便有点疼"),
             ],
         )
-        reply = self.engine._execute(
+        reply = self.engine.model_actions._execute(
             self.state,
             ask_patient_cmd(
                 "urinary_details",
@@ -260,7 +260,7 @@ class AskPatientWideningTests(unittest.TestCase):
             "t-follow",
         )
         self.assertEqual(reply.kind, "question")
-        context = self.engine._context(self.state, text)
+        context = self.engine.model_context._context(self.state, text)
         self.assertEqual(
             context["active_question_field_already_recorded"], "urinary_details"
         )
@@ -277,7 +277,7 @@ class AskPatientWideningTests(unittest.TestCase):
             ],
         )
         with self.assertRaises(ProposalError) as caught:
-            self.engine._execute(
+            self.engine.model_actions._execute(
                 self.state,
                 ask_patient_cmd(
                     "pregnancy_status",
@@ -369,7 +369,7 @@ class SpilloverSignalTests(unittest.TestCase):
                 fact("associated_symptoms", "能正常活动", "能正常活动"),
             ],
         )
-        context = self.engine._context(self.state, "不适程度3分，能正常活动")
+        context = self.engine.model_context._context(self.state, "不适程度3分，能正常活动")
         self.assertEqual(context["incidentally_recorded"], ["associated_symptoms"])
         # Option (a): the fact still counts as recorded; the signal is
         # advisory only and does not re-gate the summary.
@@ -383,7 +383,7 @@ class SpilloverSignalTests(unittest.TestCase):
             "还有喉咙痛，没有其他不适",
             [fact("associated_symptoms", "还有喉咙痛", "还有喉咙痛")],
         )
-        context = self.engine._context(self.state, "还有喉咙痛")
+        context = self.engine.model_context._context(self.state, "还有喉咙痛")
         self.assertNotIn("incidentally_recorded", context)
 
     def test_correction_clears_the_flag(self):
@@ -412,7 +412,7 @@ class SpilloverSignalTests(unittest.TestCase):
             ],
             turn="t-correct",
         )
-        context = self.engine._context(self.state, "还有喉咙痛")
+        context = self.engine.model_context._context(self.state, "还有喉咙痛")
         self.assertNotIn("incidentally_recorded", context)
 
 

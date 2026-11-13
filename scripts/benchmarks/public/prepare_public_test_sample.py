@@ -17,7 +17,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from scripts.benchmarks.public.prepare_public_execution import extract_source
 
 ROOT = Path(__file__).resolve().parents[3]
-FIXTURES = ROOT / "benchmarks/swe-lite-test-sample"
+FIXTURES = ROOT / "research/benchmarks/swe-lite-test-sample"
 CACHE = ROOT / ".runtime/public-test-sample"
 WHEELS = {
     "pytest-mock": "3.11.1",

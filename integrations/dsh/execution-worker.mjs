@@ -428,7 +428,7 @@ async function capabilityRequest(request, response) {
           "-X",
           "utf8",
           "-c",
-          "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution_capabilities import main;main()",
+          "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution.capabilities import main;main()",
           join(integration, "../../src"),
         ],
         {
@@ -545,7 +545,7 @@ async function workspaceRequest(request, response) {
           "-X",
           "utf8",
           "-c",
-          "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution_changes import main;main()",
+          "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution.changes import main;main()",
           join(integration, "../../src"),
         ],
         {
@@ -622,7 +622,7 @@ async function workspaceCheckpoint(paths, owned) {
           "-X",
           "utf8",
           "-c",
-          "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution_checkpoints import main;main()",
+          "import sys;sys.path.insert(0,sys.argv[1]);from medagent.execution.checkpoints import main;main()",
           join(integration, "../../src"),
         ],
         {

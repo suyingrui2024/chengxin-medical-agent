@@ -13,7 +13,7 @@ import hashlib
 import stat
 
 ROOT = Path(__file__).resolve().parents[3]
-FIXTURES = ROOT / "benchmarks/swe-lite-test-sample"
+FIXTURES = ROOT / "research/benchmarks/swe-lite-test-sample"
 MARKER = "CHENGXIN_TEST_SAMPLE_RESULT="
 
 

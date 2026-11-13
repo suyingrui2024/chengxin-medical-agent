@@ -222,7 +222,7 @@ def main():
                     "node_modules/@playwright/test/cli.js",
                     "test",
                     "--config",
-                    "playwright.live.config.mjs",
+                    "config/playwright/live.config.mjs",
                 ],
                 cwd=root,
                 env=environment,
@@ -258,7 +258,7 @@ def main():
                     "scripts/evaluation/medical/test_live_desktop.py",
                     "tests/live/workflow.spec.mjs",
                     "tests/live/location-workflow.mjs",
-                    "playwright.live.config.mjs",
+                    "config/playwright/live.config.mjs",
                 )
             }
             report["passed"] = (

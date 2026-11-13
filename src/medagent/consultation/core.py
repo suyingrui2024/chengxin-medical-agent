@@ -1,15 +1,15 @@
-"""Mixin: core for ConsultationEngine."""
+"""Session state owner and composition root for deterministic consultation."""
 from copy import deepcopy
 import os
 from threading import Condition, Lock, RLock
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 from uuid import uuid4
 from .. import __version__
 from ..core.domain import AgentReply, CaseState, Phase, RiskLevel
 from ..core.events import Event, EventStore
 from ..core.presentation import calculation_presentation
 from ..clinical.interpreter import Interpreter
-from ..clinical.knowledge import ContentRepository
+from ..clinical.knowledge import ContentRepository, Question
 from ..clinical.planner import RulePlanner
 from ..clinical.reasoner import QuestionRanker
 from ..clinical.triage import TriageService
@@ -20,7 +20,22 @@ from ..reports.patient_calculations import request_draft
 from .types import UserInput
 
 
-class ConsultationEngineCore:
+from .calculation import ConsultationEngineCalculation
+from .subject import ConsultationEngineSubject
+from .handlers import ConsultationEngineHandlers
+from .planning import ConsultationEnginePlanning
+from .emergency import ConsultationEngineEmergency
+from .closing_flow import ConsultationEngineClosing
+from ..dialogue.task_conversation import TaskConversation
+from ..dialogue.observations import ObservationWorkflow
+from ..dialogue.location_revisions import LocationRevisions
+from ..reports.calculation_followup import CalculationFollowup
+
+class ConsultationEngine:
+    """Own session state and explicitly compose the consultation workflows."""
+
+    _CLOSE_SOOTHING = "我听到你说的这些了，先别慌，按下面的步骤来就可以。"
+
     def __init__(
         self,
         content: ContentRepository,
@@ -56,17 +71,16 @@ class ConsultationEngineCore:
             from ..clinical.reasoning import DifferentialPlanner
 
             self.planner = DifferentialPlanner(self)
-        self._turn_pipeline = (
-            ("location_revision", self._h_location_revision),
-            ("closed_session", self._h_closed_session),
-            ("subject_control", self._h_subject_control),
-            ("prepared_location", self._h_prepared_location),
-            ("observation_action", self._h_observation_action),
-            ("summary_review", self._h_summary_review),
-            ("intake", self._h_intake),
-            ("risk_escalation", self._h_risk_escalation),
-            ("planning", self._h_planning),
-        )
+        self.calculations = ConsultationEngineCalculation(self)
+        self.subjects = ConsultationEngineSubject(self)
+        self.turns = ConsultationEngineHandlers(self)
+        self.planning = ConsultationEnginePlanning(self)
+        self.emergency = ConsultationEngineEmergency(self)
+        self.replies = ConsultationEngineClosing(self)
+        self.tasks = TaskConversation(self)
+        self.observations = ObservationWorkflow(self)
+        self.locations = LocationRevisions(self)
+        self.followups = CalculationFollowup(self)
         self._sessions: Dict[str, CaseState] = {}
         self._session_locks: Dict[str, RLock] = {}
         self._session_conditions = {}
@@ -112,7 +126,7 @@ class ConsultationEngineCore:
         state = self._create_state(trace_id, request_id)
         try:
             reply = self._ask(state, self.content.questions[0], reason="开始会谈并确认咨询对象")
-            self._record_reply(state, reply, "session_start", "开始会谈并确认咨询对象")
+            self.replies._record_reply(state, reply, "session_start", "开始会谈并确认咨询对象")
         finally:
             self.events.clear_trace(state.session_id)
         return state, reply
@@ -198,7 +212,7 @@ class ConsultationEngineCore:
             trace_id = str(uuid4())
             self.events.bind_trace(session_id, trace_id, user_input.request_id)
             try:
-                return self._submit(state, user_input)
+                return self.turns._submit(state, user_input)
             finally:
                 self.events.clear_trace(session_id)
 
@@ -293,7 +307,7 @@ class ConsultationEngineCore:
             "reply": deepcopy(previous),
         }
         state.pending_calculation = draft
-        self._retain_calculation_followup(state, draft, text, turn_id)
+        self.followups._retain_calculation_followup(state, draft, text, turn_id)
         self.events.append(
             Event(
                 state.session_id,
@@ -302,4 +316,26 @@ class ConsultationEngineCore:
                 turn_id=turn_id,
             )
         )
-        return self._calculation_input_reply(state)
+        return self.calculations._calculation_input_reply(state)
+
+    def _ask(self, state: CaseState, question: Question, reason: str) -> AgentReply:
+        return self.planning._ask(state, question, reason)
+
+    def _subject_is_child(self, state: CaseState) -> bool:
+        return self.subjects._subject_is_child(state)
+
+    def correct_fact(
+        self, session_id: str, fact_key: str, new_text: str,
+        expected_fact_id: Optional[str] = None,
+    ) -> AgentReply:
+        return self.subjects.correct_fact(session_id, fact_key, new_text, expected_fact_id)
+
+    def restore_fact(
+        self, session_id: str, fact_key: str, expected_fact_id: Optional[str] = None,
+    ) -> AgentReply:
+        return self.subjects.restore_fact(session_id, fact_key, expected_fact_id)
+
+    def record_follow_up_outcome(
+        self, session_id: str, outcome: str, note: str = "",
+    ) -> Dict[str, Any]:
+        return self.replies.record_follow_up_outcome(session_id, outcome, note)

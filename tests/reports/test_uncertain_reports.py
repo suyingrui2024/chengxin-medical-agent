@@ -145,7 +145,7 @@ class AdaptiveUncertainReportTests(unittest.TestCase):
             cmd("ask_question", question_id="chief_complaint"),
         ]
         engine.submit(state.session_id, UserInput(f"{MEDICATION}；{ALLERGY}"))
-        summary = engine._finish(state).summary
+        summary = engine.replies._finish(state).summary
         reports = {item["key"]: item for item in summary["unknown_details"]}
         self.assertEqual(reports["medications_taken"]["evidence"], MEDICATION)
         self.assertEqual(reports["allergies"]["evidence"], "是否药物过敏不确定")
@@ -165,7 +165,7 @@ class AdaptiveUncertainReportTests(unittest.TestCase):
                 turn_id="missing-source-turn",
             )
         )
-        engine._record_fact(
+        engine.subjects._record_fact(
             state,
             "allergies",
             Interpretation(None, Assertion.UNKNOWN),
@@ -174,7 +174,7 @@ class AdaptiveUncertainReportTests(unittest.TestCase):
         )
         replaced = next(
             item
-            for item in engine._finish(state).summary["unknown_details"]
+            for item in engine.replies._finish(state).summary["unknown_details"]
             if item["key"] == "allergies"
         )
         self.assertNotIn("context", replaced)

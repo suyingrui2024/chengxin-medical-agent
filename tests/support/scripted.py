@@ -70,7 +70,7 @@ def make_engine():
 
 
 def record(engine, state, text, facts, turn="t-record"):
-    return engine._execute(state, cmd("record_facts", facts=facts), text, turn)
+    return engine.model_actions._execute(state, cmd("record_facts", facts=facts), text, turn)
 
 
 def medication(correction=False, taken_by="昨晚用过药物甲"):

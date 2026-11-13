@@ -19,10 +19,7 @@ from ..core.events import Event
 from ..infra.medical_images import vision_configuration_status
 from ..infra.web_tools import web_mode
 
-try:
-    from ..infra.env_config import subagent_kind_modes as _env_subagent_kind_modes
-except ImportError:  # the per-kind env helper has not landed yet
-    _env_subagent_kind_modes = None
+from ..infra.env_config import SUBAGENT_KIND_MODE_KEYS
 
 
 class StaleCompositionError(ValueError):
@@ -31,16 +28,8 @@ class StaleCompositionError(ValueError):
 
 # Per-kind subagent rollout (design §5.7): four fixed task kinds, each
 # with its own mode layered over the global MEDAGENT_SUBAGENT_MODE.
-SUBAGENT_KINDS = (
-    "case_digest",
-    "evidence_lookup",
-    "second_opinion",
-    "followup_batch",
-)
+SUBAGENT_KINDS = tuple(SUBAGENT_KIND_MODE_KEYS)
 SUBAGENT_MODES = frozenset({"off", "shadow", "advisory"})
-_SUBAGENT_KIND_ENV_KEYS = {
-    kind: f"MEDAGENT_SUBAGENT_MODE_{kind.upper()}" for kind in SUBAGENT_KINDS
-}
 
 
 def subagent_env_modes(environ=None):
@@ -57,46 +46,10 @@ def subagent_env_modes(environ=None):
     if global_mode not in SUBAGENT_MODES:
         global_mode = "off"
     kinds = {}
-    for kind in SUBAGENT_KINDS:
-        override = source.get(_SUBAGENT_KIND_ENV_KEYS[kind])
+    for kind, key in SUBAGENT_KIND_MODE_KEYS.items():
+        override = source.get(key)
         kinds[kind] = override if override in SUBAGENT_MODES else global_mode
     return {"mode": global_mode, "kinds": kinds}
-
-
-def subagent_env_kind_overrides(environ=None):
-    """Only the per-kind overrides explicitly present (and valid) in the
-    environment — the shape the coordinator's ``kind_modes`` kwarg takes."""
-    source = os.environ if environ is None else environ
-    overrides = {}
-    for kind in SUBAGENT_KINDS:
-        value = source.get(_SUBAGENT_KIND_ENV_KEYS[kind])
-        if value in SUBAGENT_MODES:
-            overrides[kind] = value
-    return overrides
-
-
-def subagent_kind_overrides(environ=None):
-    """``{kind: mode}`` overrides for coordinator assembly/reporting:
-    env_config's helper when it is available, else the env keys read
-    directly (same keys, same values — one derivation, two doors)."""
-    source = os.environ if environ is None else environ
-    if _env_subagent_kind_modes is not None:
-        derived = _env_subagent_kind_modes(source)
-        if isinstance(derived, dict):
-            if all(kind in SUBAGENT_KINDS for kind in derived):
-                return {
-                    kind: mode
-                    for kind, mode in derived.items()
-                    if mode in SUBAGENT_MODES
-                }
-            nested = derived.get("kinds")
-            if isinstance(nested, dict):
-                return {
-                    kind: mode
-                    for kind, mode in nested.items()
-                    if kind in SUBAGENT_KINDS and mode in SUBAGENT_MODES
-                }
-    return subagent_env_kind_overrides(source)
 
 
 def _validate_subagent_modes(mapping):
@@ -117,28 +70,14 @@ def _validate_subagent_modes(mapping):
 
 class Workspace:
     def __init__(self, engine, events, backend):
-        """Hold the running composition and the coordinates it must be rebuilt with.
-
-        The desktop sidecar builds its first runtime with an explicit session
-        directory and event path; a recomposition that forgets them produces an
-        engine whose session store is None, so every session created after a
-        settings apply silently stops reaching disk.  They are recorded here,
-        at the moment they are known, for exactly that reason.
-        """
+        """Retain session engines and reuse startup persistence when rebuilding."""
         self.engine = engine
         self.events = events
         self.backend = backend
         self.engines = [engine]
-        self.hosts = []
         self.probes = set()
         self.closing = False
-        # Persistence coordinates of the startup composition. The desktop
-        # sidecar builds its first runtime with an explicit session_dir and
-        # event_path; a recomposition that forgets them produces an engine
-        # whose session_store is None, so every session created after a
-        # settings apply silently stops reaching disk. Derived from the
-        # startup engine/events so any host that composes a Workspace
-        # (server, desktop) keeps the same behaviour.
+        # Preserve the startup store after settings changes in either launcher.
         store = getattr(engine, "session_store", None)
         self.session_dir = getattr(store, "root", None)
         event_path = getattr(events, "_path", None)
@@ -390,7 +329,6 @@ class Workspace:
         engine = context.services.require("consultation")
         self._attach_subagents(engine)
         replaced = self._current_host
-        self.hosts.append(host)
         self._current_host = host
         self.engine = engine
         self.engines.append(engine)
@@ -399,7 +337,6 @@ class Workspace:
             # still reachable through engine_for), but its runtime host is
             # stopped and dropped: hosts used to accumulate one live
             # composition per apply/reconfigure until process shutdown.
-            self.hosts.remove(replaced)
             try:
                 replaced.stop()
             except Exception as exc:
@@ -590,81 +527,52 @@ class Workspace:
         return sorted(output, key=lambda s: s["created_at"], reverse=True)
 
     def subagent_metrics(self):
-        """Aggregate subagent telemetry from the event store, per kind.
+        """Count coordinator events per kind without changing their terminal semantics.
 
-        Sources are only the events the coordinator actually appends:
-        ``subagent.proposed`` (kind at payload.proposal.task_kind) for
-        proposed; branch-level ``subagent.finished`` for
-        completed/partial/failed (any other terminal branch status —
-        failed, timeout, cancelled, stale, budget_exhausted — folds
-        into failed); spawn-level ``subagent.finished``
-        (usage_total.total_tokens) for tokens; ``subagent.validated``
-        (dropped_claims) for dropped. ``subagent.disagreement`` events
-        (emitted by the adaptive engine at the §5.7.2 flag site, kind at
-        payload.task_kind) for disagreements. Unknown kinds and
-        malformed payloads are skipped; an empty store yields the
-        all-zero structure.
+        Branch failures include timeout/cancellation; spawn events supply token
+        usage. Unlabelled disagreements belong to the blinded second opinion.
+        Malformed counters are ignored and never affect consultation state.
         """
         kinds = {
-            kind: {
-                "proposed": 0,
-                "completed": 0,
-                "partial": 0,
-                "failed": 0,
-                "dropped": 0,
-                "tokens": 0,
-                "disagreements": 0,
-            }
+            kind: dict.fromkeys((
+                "proposed", "completed", "partial", "failed", "dropped",
+                "tokens", "disagreements",
+            ), 0)
             for kind in SUBAGENT_KINDS
         }
-        for event in list(getattr(self.events, "_events", None) or []):
-            payload = event.payload if isinstance(event.payload, dict) else {}
+        for event in list(self.events._events):
             event_type = event.event_type
+            if event_type not in (
+                "subagent.proposed", "subagent.finished",
+                "subagent.validated", "subagent.disagreement",
+            ):
+                continue
+            payload = event.payload if isinstance(event.payload, dict) else {}
+            kind = payload.get("task_kind")
             if event_type == "subagent.proposed":
                 proposal = payload.get("proposal")
-                kind = (
-                    proposal.get("task_kind")
-                    if isinstance(proposal, dict)
-                    else None
-                )
-                if kind in kinds:
-                    kinds[kind]["proposed"] += 1
-            elif event_type == "subagent.finished":
-                kind = payload.get("task_kind")
-                if kind not in kinds:
-                    continue
-                level = payload.get("level")
-                if level == "spawn":
+                kind = proposal.get("task_kind") if isinstance(proposal, dict) else None
+            elif event_type == "subagent.disagreement" and kind not in kinds:
+                kind = "second_opinion"
+            if kind not in kinds:
+                continue
+            counters = kinds[kind]
+            if event_type == "subagent.finished":
+                if payload.get("level") == "spawn":
                     usage = payload.get("usage_total")
-                    tokens = (
-                        usage.get("total_tokens")
-                        if isinstance(usage, dict)
-                        else None
-                    )
+                    tokens = usage.get("total_tokens") if isinstance(usage, dict) else None
                     if isinstance(tokens, (int, float)):
-                        kinds[kind]["tokens"] += int(tokens)
-                elif level == "branch":
+                        counters["tokens"] += int(tokens)
+                elif payload.get("level") == "branch":
                     status = payload.get("status")
-                    if status == "completed":
-                        kinds[kind]["completed"] += 1
-                    elif status == "partial":
-                        kinds[kind]["partial"] += 1
-                    elif isinstance(status, str) and status:
-                        kinds[kind]["failed"] += 1
+                    if isinstance(status, str) and status:
+                        counters[status if status in ("completed", "partial") else "failed"] += 1
             elif event_type == "subagent.validated":
-                kind = payload.get("task_kind")
-                if kind in kinds:
-                    dropped = payload.get("dropped_claims")
-                    if isinstance(dropped, (int, float)):
-                        kinds[kind]["dropped"] += int(dropped)
-            elif event_type == "subagent.disagreement":
-                kind = payload.get("task_kind")
-                if kind not in kinds:
-                    # The only disagreement that exists is the blinded
-                    # second opinion's (§5.7.2); an unlabelled event
-                    # belongs to it.
-                    kind = "second_opinion"
-                kinds[kind]["disagreements"] += 1
+                dropped = payload.get("dropped_claims")
+                if isinstance(dropped, (int, float)):
+                    counters["dropped"] += int(dropped)
+            else:
+                counters["proposed" if event_type == "subagent.proposed" else "disagreements"] += 1
         return {"kinds": kinds, "generated_at": utc_now()}
 
     # -- follow-up draft store + in-process batch trigger (§5.7.4) --
@@ -905,5 +813,5 @@ class Workspace:
             ] + list(self.probes):
                 if hasattr(backend, "close"):
                     backend.close()
-            for host in self.hosts:
-                host.stop()
+            if self._current_host is not None:
+                self._current_host.stop()

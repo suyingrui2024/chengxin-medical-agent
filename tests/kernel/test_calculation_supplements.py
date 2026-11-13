@@ -295,8 +295,8 @@ class CalculationSupplementTests(unittest.TestCase):
             self.state.session_id,
             UserInput("先不换算了", expected_action_id=draft.action_id),
         )
-        summary = self.engine._finish(self.state)
-        self.engine._record_reply(self.state, summary, "test-summary", "fixture")
+        summary = self.engine.replies._finish(self.state)
+        self.engine.replies._record_reply(self.state, summary, "test-summary", "fixture")
         self.assertEqual(summary.quick_replies, [])
         revision = self.state.revision
         for value, action in [

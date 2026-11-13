@@ -14,29 +14,12 @@ from __future__ import annotations
 from ..guards.baseline_projection import build_baseline_projection
 
 
-def _default_baseline_projection(store) -> dict:
-    """Build the P2c projection for the default (self) profile.
-
-    Fail-open by contract: archive errors must never break session
-    creation, so any failure yields an empty projection.
-    """
-    try:
-        patient = store.ensure_default_patient()
-        recent = store.recent_confirmed_measurements(patient["patient_id"])
-        return build_baseline_projection(patient, recent)
-    except Exception:
-        return {}
-
 def _session_baseline_projection(store, state=None) -> dict:
-    """Build the P2c projection for a session's bound subject (P2d).
+    """Project a bound profile, or the default profile when no binding exists.
 
-    A session bound via POST /api/sessions/{id}/bind-patient projects
-    the bound member; an unbound session keeps the old semantics — the
-    default (self) profile. Only an explicit snapshot binding counts:
-    an unbound proxy session (consult_for != self, no binding) still
-    gets the default projection at creation, exactly as before, and
-    never an empty one via the attach-gate resolver. Fail-open like
-    _default_baseline_projection.
+    Archive failures return an empty projection and never block consultation.
+    An unbound proxy session retains the default projection; attachment
+    permission is independently resolved by _consultation_patient_id.
     """
     try:
         bound = None
@@ -45,11 +28,9 @@ def _session_baseline_projection(store, state=None) -> dict:
             candidate = snapshot.get("consultation_patient_id")
             if isinstance(candidate, str) and candidate:
                 bound = candidate
-        if bound is not None:
-            patient = store.patient(bound)
-            recent = store.recent_confirmed_measurements(patient["patient_id"])
-            return build_baseline_projection(patient, recent)
-        return _default_baseline_projection(store)
+        patient = store.patient(bound) if bound else store.ensure_default_patient()
+        recent = store.recent_confirmed_measurements(patient["patient_id"])
+        return build_baseline_projection(patient, recent)
     except Exception:
         return {}
 
@@ -75,6 +56,5 @@ def _consultation_patient_id(state, default_patient_id):
 
 __all__ = [
     "_consultation_patient_id",
-    "_default_baseline_projection",
     "_session_baseline_projection",
 ]

@@ -84,7 +84,11 @@ def simple_conversion_request(text):
     return bool(text)
 
 
-class CalculationFollowupMixin:
+class CalculationFollowup:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _retain_calculation_followup(self, state, draft, text, turn_id):
         if simple_conversion_request(text):
             return
@@ -97,7 +101,7 @@ class CalculationFollowupMixin:
             "processing": False,
             "fact_ids": {k: v.fact_id for k, v in state.facts.items()},
         }
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "capability.supplement_retained",
@@ -126,7 +130,7 @@ class CalculationFollowupMixin:
     def _process_calculation_followup(self, state):
         feedback = state.calculation_feedback
         feedback["processing"] = True
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "capability.supplement_forwarded",
@@ -135,11 +139,11 @@ class CalculationFollowupMixin:
             )
         )
         state.pending_input = feedback["text"]
-        return self._run(state, feedback["text"], feedback["source_turn_id"])
+        return self.engine.model_loop._run(state, feedback["text"], feedback["source_turn_id"])
 
     @staticmethod
     def _guard_calculation_followup_updates(state, proposals):
-        CalculationFollowupMixin._guard_calculation_followup_keys(
+        CalculationFollowup._guard_calculation_followup_keys(
             state, {p["key"] for p in proposals}
         )
 
@@ -196,7 +200,7 @@ class CalculationFollowupMixin:
             reply.quick_replies = []
             reply.message = "还有同轮补充待处理，处理后再核对摘要。"
         if status != "pending":
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "capability.supplement_released",

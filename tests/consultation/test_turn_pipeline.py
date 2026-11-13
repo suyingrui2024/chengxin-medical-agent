@@ -45,19 +45,19 @@ class PipelineStructureTests(unittest.TestCase):
         self.host.stop()
 
     def test_pipeline_registry_order(self):
-        names = [name for name, _ in self.engine._turn_pipeline]
+        names = [name for name, _ in self.engine.turns._turn_pipeline]
         self.assertEqual(names, EXPECTED_ORDER)
 
     def test_normal_turn_reaches_planning_with_full_trace(self):
         ctx_holder = {}
-        original = self.engine._begin_turn
+        original = self.engine.turns._begin_turn
 
         def capturing(state, user_input):
             ctx = original(state, user_input)
             ctx_holder["ctx"] = ctx
             return ctx
 
-        self.engine._begin_turn = capturing
+        self.engine.turns._begin_turn = capturing
         reply = self.engine.submit(
             self.state.session_id, UserInput("我自己", "self")
         )
@@ -67,14 +67,14 @@ class PipelineStructureTests(unittest.TestCase):
     def test_direct_emergency_bypasses_pipeline(self):
         self.engine.submit(self.state.session_id, UserInput("我自己", "self"))
         ctx_holder = {}
-        original = self.engine._begin_turn
+        original = self.engine.turns._begin_turn
 
         def capturing(state, user_input):
             ctx = original(state, user_input)
             ctx_holder["ctx"] = ctx
             return ctx
 
-        self.engine._begin_turn = capturing
+        self.engine.turns._begin_turn = capturing
         reply = self.engine.submit(
             self.state.session_id, UserInput("他现在叫不醒")
         )

@@ -160,8 +160,8 @@ class LocationRevisionTests(unittest.TestCase):
             self.state.session_id,
             UserInput("重试这一轮", "retry_turn", self.original_reply.action_id),
         )
-        summary = self.engine._finish(self.state)
-        self.engine._record_reply(self.state, summary, "fixture", "Summary setup")
+        summary = self.engine.replies._finish(self.state)
+        self.engine.replies._record_reply(self.state, summary, "fixture", "Summary setup")
         reply = self.start(summary)
         payload = self.flow.payload(reply)
         payload["answers"]["side"] = "left"
@@ -179,8 +179,8 @@ class LocationRevisionTests(unittest.TestCase):
     def test_closed_confirmed_record_can_be_cancelled_or_reopened_for_reconfirmation(
         self,
     ):
-        summary = self.engine._finish(self.state)
-        self.engine._record_reply(self.state, summary, "fixture", "Summary setup")
+        summary = self.engine.replies._finish(self.state)
+        self.engine.replies._record_reply(self.state, summary, "fixture", "Summary setup")
         closed = self.engine.submit(
             self.state.session_id,
             UserInput("摘要准确", "confirm_summary", summary.action_id),

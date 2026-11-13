@@ -4,7 +4,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { asset } from "../../src/medagent/web/js/structured-ui-primitives.js";
+import { asset } from "../../src/medagent/web/js/structured/structured-ui-primitives.js";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

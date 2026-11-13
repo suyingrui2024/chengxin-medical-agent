@@ -40,7 +40,7 @@ def build_engine():
 class DeferredUrgentNoticeTests(unittest.TestCase):
     def test_the_next_question_explains_why_it_keeps_asking(self):
         engine, content, state = build_engine()
-        deferred = engine._urgent_or_defer(state, "t1")
+        deferred = engine.planning._urgent_or_defer(state, "t1")
         self.assertIsNone(deferred, "单一线索应当先补最小事实，而不是立刻关闭")
 
         question = content.question("associated_symptoms")
@@ -53,7 +53,7 @@ class DeferredUrgentNoticeTests(unittest.TestCase):
 
     def test_the_notice_appears_only_once(self):
         engine, content, state = build_engine()
-        engine._urgent_or_defer(state, "t1")
+        engine.planning._urgent_or_defer(state, "t1")
         engine._ask(state, content.question("associated_symptoms"), "补最小事实")
         second = engine._ask(state, content.question("onset"), "继续")
 

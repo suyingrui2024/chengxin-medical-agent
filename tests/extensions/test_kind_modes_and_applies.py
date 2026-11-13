@@ -198,7 +198,7 @@ class SpawnBranchPerKindTests(unittest.TestCase):
             kind_modes={"second_opinion": "shadow"},
             spawn_result=_spawn_result("second_opinion", "urgent_today"),
         )
-        result = self.engine._execute(
+        result = self.engine.model_actions._execute(
             self.state, _spawn_command("second_opinion"), "复核一下", "turn-1"
         )
         self.assertEqual(
@@ -216,7 +216,7 @@ class SpawnBranchPerKindTests(unittest.TestCase):
             kind_modes={"second_opinion": "advisory"},
             spawn_result=_spawn_result("second_opinion", "routine_visit"),
         )
-        result = self.engine._execute(
+        result = self.engine.model_actions._execute(
             self.state, _spawn_command("second_opinion"), "复核一下", "turn-1"
         )
         self.assertTrue(result["ok"])
@@ -230,7 +230,7 @@ class SpawnBranchPerKindTests(unittest.TestCase):
             kind_modes={"second_opinion": "advisory"},
             spawn_result=_spawn_result("second_opinion", "urgent_today"),
         )
-        result = self.engine._execute(
+        result = self.engine.model_actions._execute(
             self.state, _spawn_command("second_opinion"), "复核一下", "turn-1"
         )
         self.assertTrue(result["spawn"]["second_opinion_disagreement"])
@@ -254,7 +254,7 @@ class SpawnBranchPerKindTests(unittest.TestCase):
             mode="advisory",
             spawn_result=_spawn_result("second_opinion", "routine_visit"),
         )
-        result = self.engine._execute(
+        result = self.engine.model_actions._execute(
             self.state, _spawn_command("second_opinion"), "复核一下", "turn-1"
         )
         self.assertNotIn("second_opinion_disagreement", result["spawn"])

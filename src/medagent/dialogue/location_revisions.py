@@ -11,7 +11,11 @@ from .task_interactions import task_with_interaction
 from .task_intents import task_intent
 
 
-class LocationRevisionMixin:
+class LocationRevisions:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _location_revision_target(self, state, fact_id, current_input=None):
         """Check that this fact may still be revised, and return the task and fact.
 
@@ -22,7 +26,7 @@ class LocationRevisionMixin:
         runs against a case that has moved on.
         """
         fact = state.facts.get("symptom_location")
-        task = self.content.tasks.get("body_location")
+        task = self.engine.content.tasks.get("body_location")
         if (
             not fact
             or fact.fact_id != fact_id
@@ -30,7 +34,7 @@ class LocationRevisionMixin:
             or not task.get("answer_contract")
             or not any(
                 t["id"] == "body_location"
-                for t in self.content.applicable_tasks(
+                for t in self.engine.content.applicable_tasks(
                     str(state.get("chief_complaint", ""))
                 )
             )
@@ -171,14 +175,14 @@ class LocationRevisionMixin:
             "source_turn_id": fact.turn_id,
             "note": (fact.structured_input or {}).get("note", ""),
         }
-        old = deepcopy(self._latest_replies.get(state.session_id))
+        old = deepcopy(self.engine._latest_replies.get(state.session_id))
         state.self_check_conversation = {
             "id": str(uuid4()),
             "task": task_with_interaction(
                 task,
                 state.session_id,
                 f"{state.session_id}:{state.revision}",
-                self.events.for_session(state.session_id),
+                self.engine.events.for_session(state.session_id),
             ),
             "previous_fact_id": fact.fact_id,
             "answer_request": spec,
@@ -196,7 +200,7 @@ class LocationRevisionMixin:
         }
         if state.phase == Phase.CLOSED:
             state.phase, state.closed_reason = Phase.SUMMARY, None
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.location_revision_started",
@@ -204,7 +208,7 @@ class LocationRevisionMixin:
                 turn_id=turn_id,
             )
         )
-        return self._resume_task_conversation(state)
+        return self.engine.tasks._resume_task_conversation(state)
 
     def _request_location_revision(self, state, args, text, turn_id):
         evidence = args.get("evidence")
@@ -245,15 +249,15 @@ class LocationRevisionMixin:
             return old
         state.closed_reason = None
         if resume["phase"] in {Phase.SUMMARY, Phase.CLOSED}:
-            return self._finish(state)
+            return self.engine.replies._finish(state)
         question = next(
-            (q for q in self.content.questions if q.id == resume["question_id"]), None
+            (q for q in self.engine.content.questions if q.id == resume["question_id"]), None
         )
         if (
             question
             and old
             and old.question_id == question.id
-            and self.content.question_applies_in_state(question, state)
+            and self.engine.content.question_applies_in_state(question, state)
         ):
             current = state.facts.get(question.fact_key)
             if (current.fact_id if current else None) == resume["fact_ids"].get(
@@ -269,7 +273,7 @@ class LocationRevisionMixin:
                 return old
         state.active_question = None
         state.active_question_is_clarification = False
-        return self._plan_next(state)
+        return self.engine.planning._plan_next(state)
 
     def _handle_location_revision_action(self, state, user_input, text, turn_id):
         choice = user_input.choice_value or ""
@@ -288,7 +292,7 @@ class LocationRevisionMixin:
         )
         if cancel:
             resume = deepcopy(frame["revision_resume"])
-            self._clear_task_conversation(state, "revision_cancelled", turn_id)
+            self.engine.tasks._clear_task_conversation(state, "revision_cancelled", turn_id)
             return self._restore_location_revision_host(state, resume, False)
         return None
 
@@ -309,12 +313,12 @@ class LocationRevisionMixin:
             frame["previous_fact_id"],
         )
         prepared["structured_input"]["revision_of"] = previous_id
-        self._record_location_answer(state, prepared, turn_id)
+        self.engine.tasks._record_location_answer(state, prepared, turn_id)
         state.observation_feedback["has_supplement"] = bool(
             prepared["structured_input"]["note"]
             and prepared["structured_input"]["note"] != resume["previous_note"]
         )
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.location_revision_completed",

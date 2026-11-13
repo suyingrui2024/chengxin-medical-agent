@@ -191,7 +191,7 @@ class BridgingRecordReplyTests(unittest.TestCase):
     def test_non_question_kind_is_never_bridged(self):
         state, _ = self.engine.create_session()
         reply = AgentReply("一段摘要", state.phase, kind="summary")
-        self.engine._record_reply(state, reply, "t1", "test")
+        self.engine.replies._record_reply(state, reply, "t1", "test")
         self.assertEqual(reply.message, "一段摘要")
         self.assertNotIn("bridging", reply.developer_trace or {})
 
@@ -199,9 +199,9 @@ class BridgingRecordReplyTests(unittest.TestCase):
         state, _ = self.engine.create_session()
         state.facts["chief_complaint"] = fact("chief_complaint", "肚子痛")
         reply = AgentReply("哪里痛？", state.phase, kind="question", question_id="gi_details")
-        self.engine._apply_bridging(state, reply)
+        self.engine.replies._apply_bridging(state, reply)
         first = reply.message
-        self.engine._apply_bridging(state, reply)
+        self.engine.replies._apply_bridging(state, reply)
         self.assertEqual(reply.message, first)
         self.assertEqual(first.count("再细问一下"), 1)
 
@@ -223,7 +223,7 @@ class BridgingAdaptiveEngineTests(unittest.TestCase):
         reply = AgentReply(
             "腹痛在哪个位置？", state.phase, kind="question", question_id="gi_details"
         )
-        self.engine._record_reply(state, reply, "t1", "test")
+        self.engine.replies._record_reply(state, reply, "t1", "test")
         # N-S1 bridge starvation fix: on a group switch the group
         # bridge now precedes the single entry anchor even on the
         # adaptive engine (shared _record_reply choke point) — the
@@ -461,7 +461,7 @@ class BridgingEngineTriggerTests(unittest.TestCase):
             {"role": "assistant", "content": "你说肚子痛，再问一句：" + original}
         )
         reply = AgentReply(original, state.phase, kind="question", question_id="gi_details")
-        self.engine._apply_bridging(state, reply)
+        self.engine.replies._apply_bridging(state, reply)
         self.assertIn("之前问过一次", reply.message)
         self.assertEqual(reply.developer_trace["bridging"]["kind"], "repeat")
 
@@ -474,7 +474,7 @@ class BridgingEngineTriggerTests(unittest.TestCase):
             kind="question",
             question_id="allergies",
         )
-        self.engine._apply_bridging(state, reply)
+        self.engine.replies._apply_bridging(state, reply)
         self.assertIn("没有青霉素", reply.message)
         self.assertEqual(reply.developer_trace["bridging"]["kind"], "denial")
 
@@ -487,7 +487,7 @@ class BridgingEngineTriggerTests(unittest.TestCase):
             kind="question",
             question_id="allergies",
         )
-        self.engine._apply_bridging(state, reply)
+        self.engine.replies._apply_bridging(state, reply)
         self.assertIn("还没注意过", reply.message)
         self.assertNotIn("你没有", reply.message)
 
@@ -496,7 +496,7 @@ class BridgingEngineTriggerTests(unittest.TestCase):
         state.facts["chief_complaint"] = fact("chief_complaint", "发烧咳嗽")
         original = "你说发烧咳嗽两天了，为了确认后续筛查适用，想先确认一下：请问是男是女？"
         reply = AgentReply(original, state.phase, kind="question", question_id="sex")
-        self.engine._apply_bridging(state, reply)
+        self.engine.replies._apply_bridging(state, reply)
         self.assertEqual(reply.message, original)
         self.assertEqual(reply.developer_trace["bridging"]["reason"], "self_bridged")
 
@@ -516,7 +516,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
         self.state, _ = self.engine.create_session()
 
     def _ask_patient(self, topic, question):
-        return self.engine._execute(
+        return self.engine.model_actions._execute(
             self.state,
             {
                 "tool": "ask_patient",
@@ -533,7 +533,7 @@ class ModelBridgingValidationTests(unittest.TestCase):
         )
 
     def _clarify(self, topic, message):
-        return self.engine._execute(
+        return self.engine.model_actions._execute(
             self.state,
             {"tool": "clarify", "arguments": {"topic": topic, "message": message}},
             "患者原话",

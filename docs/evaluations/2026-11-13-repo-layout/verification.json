@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-13",
+  "scope": "Repository layout and current reference migration, preserving prior uncommitted changes",
+  "python": {
+    "passed": 2134,
+    "skipped": 71,
+    "subtests_passed": 12003
+  },
+  "browser": {
+    "specs": 53,
+    "passed": 350,
+    "shards": 4,
+    "results": {
+      "appearance.spec.mjs": "21 passed (2.2m)",
+      "application-bootstrap.spec.mjs": "1 passed (3.1s)",
+      "artifact-actions.spec.mjs": "3 passed (7.0s)",
+      "artifact-chart.spec.mjs": "8 passed (16.6s)",
+      "artifact-recovery.spec.mjs": "5 passed (58.3s)",
+      "assertion-flow.spec.mjs": "1 passed (4.0s)",
+      "calculation-supplements.spec.mjs": "2 passed (11.3s)",
+      "capabilities.spec.mjs": "3 passed (7.6s)",
+      "capability-sweep.spec.mjs": "57 passed (1.4m)",
+      "clarification-drafts.spec.mjs": "5 passed (17.0s)",
+      "clinician-preview-sweep.spec.mjs": "71 passed (1.9m)",
+      "conclusion-card.spec.mjs": "6 passed (19.9s)",
+      "conclusion-v13.spec.mjs": "10 passed (24.3s)",
+      "consultation-subjects.spec.mjs": "4 passed (17.9s)",
+      "directory-recovery.spec.mjs": "7 passed (44.7s)",
+      "execution-child-activity.spec.mjs": "4 passed (10.5s)",
+      "execution-earlier-question.spec.mjs": "2 passed (4.6s)",
+      "execution-focus.spec.mjs": "7 passed (22.0s)",
+      "execution-incomplete.spec.mjs": "4 passed (24.5s)",
+      "execution-inputs.spec.mjs": "1 passed (5.5s)",
+      "execution-recovery.spec.mjs": "8 passed (56.1s)",
+      "frontend-linkage.spec.mjs": "7 passed (11.6s)",
+      "glucose-calculation.spec.mjs": "2 passed (4.7s)",
+      "handoff-print-patient-text.spec.mjs": "3 passed (4.3s)",
+      "handoff-print.spec.mjs": "6 passed (3.0s)",
+      "location-answers.spec.mjs": "5 passed (28.4s)",
+      "location-layout.spec.mjs": "3 passed (17.1s)",
+      "location-revisions.spec.mjs": "4 passed (37.8s)",
+      "measurement-supplements.spec.mjs": "3 passed (9.1s)",
+      "observation-completion.spec.mjs": "3 passed (18.1s)",
+      "p0-summary-status.spec.mjs": "3 passed (2.3s)",
+      "patient-calculation.spec.mjs": "1 passed (5.8s)",
+      "patient-records-baseline.spec.mjs": "2 passed (2.2s)",
+      "patient-records.spec.mjs": "1 passed (4.0s)",
+      "patient-reflow.spec.mjs": "9 passed (53.7s)",
+      "present-provenance.spec.mjs": "3 passed (11.8s)",
+      "readiness.spec.mjs": "1 passed (1.4s)",
+      "repeated-observations.spec.mjs": "6 passed (15.5s)",
+      "report-handoff.spec.mjs": "1 passed (3.1s)",
+      "report-interpretation.spec.mjs": "3 passed (3.8s)",
+      "scale-calculation.spec.mjs": "2 passed (3.4s)",
+      "self-check-conversation.spec.mjs": "3 passed (12.1s)",
+      "self-check-drafts.spec.mjs": "4 passed (28.4s)",
+      "self-check-visuals.spec.mjs": "7 passed (46.1s)",
+      "uncertain-reports.spec.mjs": "3 passed (16.7s)",
+      "urgent-interrupt.spec.mjs": "3 passed (5.0s)",
+      "visual-answer-drafts.spec.mjs": "4 passed (13.4s)",
+      "visual-consultation.spec.mjs": "7 passed (16.3s)",
+      "visual-simplification-s1.spec.mjs": "3 passed (2.0s)",
+      "visual-simplification-s2.spec.mjs": "3 passed (2.4s)",
+      "visual-simplification-s3.spec.mjs": "2 passed (2.0s)",
+      "visual-simplification-s4.spec.mjs": "1 passed (1.7s)",
+      "workspace.spec.mjs": "12 passed (19.4s)"
+    }
+  },
+  "node_unit": {
+    "passed": 12
+  },
+  "dsh_bridge": {
+    "passed": 69
+  },
+  "configuration_discovery": {
+    "ui_tests": 350,
+    "ui_specs": 53,
+    "desktop_tests": 41,
+    "desktop_specs": 33,
+    "live_tests": 1,
+    "live_specs": 1,
+    "cwd_independent": true
+  },
+  "layout": {
+    "current_docs": 42,
+    "historical_docs": 35,
+    "docs_root_markdown": [
+      "README.md"
+    ],
+    "real_playwright_configs": "config/playwright",
+    "root_discovery_entry": "playwright.config.mjs",
+    "research": "research",
+    "workspace": "medical-agent.code-workspace"
+  },
+  "checks": [
+    "ruff",
+    "structure",
+    "format",
+    "git diff --check",
+    "current Markdown links",
+    "nested docs indexing",
+    "installed benchmark contracts"
+  ],
+  "limitations": [
+    "No live model calls",
+    "No Windows/Linux native desktop rerun",
+    "No push or remote CI"
+  ]
+}

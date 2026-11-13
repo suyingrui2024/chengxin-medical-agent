@@ -4,7 +4,7 @@ import {
   numericCell,
   numericColumns,
   chartSeries,
-} from "../../src/medagent/web/js/artifact-chart-ui.js";
+} from "../../src/medagent/web/js/execution/artifact-chart-ui.js";
 const table = (rows) => ({ kind: "table", rows, columns: rows[0].length });
 
 test("chart cells accept finite decimal numbers without coercing missing, formatted or unsafe values", () => {

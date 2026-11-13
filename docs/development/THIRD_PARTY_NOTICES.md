@@ -1,0 +1,25 @@
+# Third-party components
+
+Paths below are relative to the repository root. Desktop distributions include this document as `THIRD_PARTY_NOTICES.md` in the application root.
+
+Windows distributions include the official CPython 3.14.8 portable runtime (PSF license), Node.js 22.23.3 Windows runtime (Node's bundled license), and the native `wxc-exec.exe` / `wxc-host-prep.exe` from Microsoft's MXC 1.0.1 distribution (MIT). Original runtime license files are retained. Exact download URLs and pinned SHA256 values are recorded in `scripts/platform/windows/runtime-lock.json`. The MXC integration uses its Windows ProcessContainer JSON CLI and does not invoke WSL or its WSLC backend. MXC diagnostic telemetry is explicitly disabled. Source: https://github.com/microsoft/mxc.
+
+The application bundles the original, unmodified Noto Sans CJK SC Regular and Noto Serif CJK SC Regular font files from https://github.com/notofonts/noto-cjk at commit `f8d157532fbfaeda587e826d4cd5b21a49186f7c`.
+
+- Noto Sans CJK SC: © 2014–2021 Adobe (http://www.adobe.com/).
+- Noto Serif CJK SC: © 2017–2024 Adobe (http://www.adobe.com/).
+
+Both fonts retain their original metadata and are distributed under the SIL Open Font License 1.1. The full license is included at `src/medagent/web/assets/fonts/fonts-OFL.txt`; exact original copyright strings, upstream URLs, versions, sizes and hashes are recorded in `src/medagent/web/assets/fonts/font-sources.json`. CSS family aliases do not modify the font files. Loading is local and does not contact a font CDN.
+
+The optional DSH backend executes official DeepSeek Harness packages, distributed under the MIT license. Package versions and integrity hashes are recorded in `package-lock.json`; their original license files remain in the installed packages.
+
+Repository: https://github.com/deepseek-ai/deepseek-harness
+
+The optional read-only upstream source checkout lives at `.runtime/upstream/deepseek-harness` and retains its original `LICENSE` and `THIRD_PARTY_NOTICES.md`. Its inspected revision is recorded separately in `integrations/dsh/upstream.lock.json`. This project does not modify or redistribute a renamed fork of that upstream checkout.
+
+Installed transitive dependencies retain their own licenses. The medical controller, frontend and clinical prototype content in this repository are separate project code; no production clinical validation is implied by the upstream software license.
+
+
+Public development evaluation fixtures are separate from the desktop application. The fixed SWE-bench Lite DEV metadata and source archives retain their upstream attribution and licenses. Sources used across the evaluation sets include pydicom and marshmallow (MIT), astroid (LGPL; see its original LICENSE), pvlib-python (BSD-3-Clause), and SQLFluff (MIT). The pinned repository commits and archive hashes are recorded in research/benchmarks/swe-lite-dev*/manifest.json. Full upstream license texts remain in the source archives; they are not replaced by this notice.
+
+The expanded evaluation's additional dependency wheels retain their original metadata and bundled license files. These wheels are extracted only into isolated evaluation workspaces, and are not added to the desktop app's production dependency graph. Public issue/test metadata and evaluation outcomes are research fixtures, not patient records or clinical validation.

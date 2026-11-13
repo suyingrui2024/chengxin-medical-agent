@@ -22,7 +22,7 @@ from scripts.benchmarks.public.public_execution_cases import (
 )
 
 
-FIXTURES = ROOT / "benchmarks/swe-lite-dev-expanded"
+FIXTURES = ROOT / "research/benchmarks/swe-lite-dev-expanded"
 
 
 class PublicContractTests(unittest.TestCase):

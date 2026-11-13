@@ -34,7 +34,7 @@ def build_engine():
 class TaskCancelTextTests(unittest.TestCase):
     def test_cancel_words_end_the_task_instead_of_rejecting_the_text(self):
         engine, state = build_engine()
-        failure = engine._try_task_result(state, "取消定位", None, "t1")
+        failure = engine.planning._try_task_result(state, "取消定位", None, "t1")
 
         self.assertIsNone(failure, "取消不该以错误回复的形式退回")
         location = state.facts.get("symptom_location")
@@ -45,7 +45,7 @@ class TaskCancelTextTests(unittest.TestCase):
 
     def test_a_location_word_still_gets_the_pick_it_on_the_map_message(self):
         engine, state = build_engine()
-        failure = engine._try_task_result(state, "头/面部", None, "t2")
+        failure = engine.planning._try_task_result(state, "头/面部", None, "t2")
 
         self.assertIsNotNone(failure, "用文字说部位仍应被拒绝，避免绕过图示")
         self.assertIn("图示", failure.message)

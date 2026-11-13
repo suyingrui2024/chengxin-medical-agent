@@ -220,11 +220,13 @@ class ReferenceGraphTests(unittest.TestCase):
         that only shows up as a doubled rule nobody can find."""
         imported = CSS_IMPORT.findall((WEB_ROOT / "css" / "styles.css").read_text(encoding="utf-8"))
         numbered = sorted(
-            path.name for path in (WEB_ROOT / "css").glob("[0-9][0-9]-*.css")
+            path.relative_to(WEB_ROOT / "css").as_posix()
+            for path in (WEB_ROOT / "css" / "base").glob("[0-9][0-9]-*.css")
         )
         self.assertTrue(numbered, "没有找到编号分片")
         self.assertEqual(
-            [name for name in imported if name[0].isdigit()],
+            [name.removeprefix("./") for name in imported
+             if pathlib.PurePosixPath(name).name[0].isdigit()],
             numbered,
             "styles.css 的导入顺序与编号分片不一致（有序或缺失）",
         )

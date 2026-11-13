@@ -120,7 +120,7 @@ class P25IntermittentTrajectoryTests(unittest.TestCase):
 
     def test_adaptive_validation_accepts_intermittent(self):
         engine, state = _make_adaptive()
-        result = engine._execute(
+        result = engine.model_actions._execute(
             state,
             _record_cmd(
                 [_proposal("trajectory", "intermittent", "一阵一阵的，中间有缓解")]
@@ -133,7 +133,7 @@ class P25IntermittentTrajectoryTests(unittest.TestCase):
 
     def test_paroxysmal_evidence_still_not_stable(self):
         engine, state = _make_adaptive()
-        result = engine._execute(
+        result = engine.model_actions._execute(
             state,
             _record_cmd(
                 [_proposal("trajectory", "stable", "一阵一阵的，中间有缓解")]

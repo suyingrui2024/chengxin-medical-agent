@@ -114,10 +114,10 @@ class ContradictionSuppressionTests(unittest.TestCase):
         ):
             state.record(item)
         if worry_sentence is not None:
-            self.engine._capture_worry(state, worry_sentence, "t-worry")
+            self.engine.turns._capture_worry(state, worry_sentence, "t-worry")
         state.risk = RiskAssessment(RiskLevel.URGENT, ["症状影响评分较高"])
-        reply = self.engine._urgent(state)
-        self.engine._record_reply(state, reply, "t-close", "test urgent close")
+        reply = self.engine.emergency._urgent(state)
+        self.engine.replies._record_reply(state, reply, "t-close", "test urgent close")
         return reply
 
     def test_graded_answer_suppresses_mitigation_but_keeps_worry(self):
@@ -174,8 +174,8 @@ class UrgentWalkthroughTests(unittest.TestCase):
         ):
             state.record(item)
         state.risk = RiskAssessment(RiskLevel.URGENT, ["症状持续加重"])
-        reply = self.engine._urgent(state)
-        self.engine._record_reply(state, reply, "t-close", "test urgent close")
+        reply = self.engine.emergency._urgent(state)
+        self.engine.replies._record_reply(state, reply, "t-close", "test urgent close")
         return reply
 
     def test_o19_examination_part_gets_offline_evaluation_sentence(self):

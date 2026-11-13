@@ -1,10 +1,14 @@
-"""Mixin: context for AdaptiveConsultationEngine."""
+"""Workflow component: context for AdaptiveConsultationEngine."""
 from typing import Any, Dict
 from ...core.domain import CaseState
 from ...dialogue.consultation_subject import subject_profile
 
 
 class AdaptiveConsultationEngineContext:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _context(self, state: CaseState, text: str) -> Dict[str, Any]:
         """Build the state view the model reasons over.
 
@@ -21,9 +25,9 @@ class AdaptiveConsultationEngineContext:
         twice under two names.
         """
         chief = str(state.get("chief_complaint", ""))
-        candidates = self._candidate_questions(state, chief)
+        candidates = self.engine._candidate_questions(state, chief)
         active_question = next(
-            (q for q in self.content.questions if q.id == state.active_question),
+            (q for q in self.engine.content.questions if q.id == state.active_question),
             None,
         )
         recent = state.transcript[-16:]
@@ -48,9 +52,9 @@ class AdaptiveConsultationEngineContext:
             for k, v in state.facts.items()
         }
         earlier = {}
-        source_turns = self._source_turns(state)
+        source_turns = self.engine.emergency._source_turns(state)
         for key, fact in state.facts.items():
-            context = self._fact_provenance(fact, source_turns).get("context")
+            context = self.engine.emergency._fact_provenance(fact, source_turns).get("context")
             if context and context["text"] not in recent_user_texts:
                 facts[key]["source_context_id"] = context["turn_id"]
                 earlier[context["turn_id"]] = context["text"]
@@ -58,7 +62,7 @@ class AdaptiveConsultationEngineContext:
             "latest_user_text": text,
             "active_question": state.active_question,
             "active_task": state.active_task,
-            "self_check_conversation": self._task_conversation_context(state),
+            "self_check_conversation": self.engine.tasks._task_conversation_context(state),
             "consultation_subject": subject_profile(state),
             "facts": facts,
             **(
@@ -81,17 +85,17 @@ class AdaptiveConsultationEngineContext:
             ],
             **(
                 {"pathway_exploration": exploration}
-                if (exploration := self._pathway_exploration(state))
+                if (exploration := self.engine.pathways._pathway_exploration(state))
                 else {}
             ),
             "questions": [{"id": q.id, "field": q.fact_key} for q in candidates],
             **(
                 {
                     "incidentally_recorded": sorted(
-                        self._incidental_records.get(state.session_id, ())
+                        self.engine._incidental_records.get(state.session_id, ())
                     )
                 }
-                if self._incidental_records.get(state.session_id)
+                if self.engine._incidental_records.get(state.session_id)
                 else {}
             ),
             **(
@@ -102,26 +106,26 @@ class AdaptiveConsultationEngineContext:
             ),
             "available_self_checks": [
                 {key: t[key] for key in ("id", "title", "result_key")}
-                for t in self.content.applicable_tasks(chief)
+                for t in self.engine.content.applicable_tasks(chief)
                 if t["result_key"] not in state.facts
-                and not self._self_check_block_reason(state)
+                and not self.engine.replies._self_check_block_reason(state)
             ],
-            "self_check_block_reason": self._self_check_block_reason(state),
+            "self_check_block_reason": self.engine.replies._self_check_block_reason(state),
             "requestable_self_checks": [
                 {key: task[key] for key in ("id", "title", "result_key")}
-                for task in self.content.applicable_tasks(chief)
+                for task in self.engine.content.applicable_tasks(chief)
                 if task["result_key"] not in state.facts
             ],
             "pending_self_checks": state.pending_self_checks,
             "repeatable_self_checks": [
                 {key: task[key] for key in ("id", "title", "result_key")}
-                for task in self.content.applicable_tasks(chief)
+                for task in self.engine.content.applicable_tasks(chief)
                 if task.get("repeatable") and task["result_key"] in state.facts
             ],
             "recent_observation_attempts": state.observation_attempts[-8:],
-            "observation_completion": self._observation_completion_context(state),
+            "observation_completion": self.engine.observations._observation_completion_context(state),
             "observation_fields_read_only": sorted(
-                {t["result_key"] for t in self.content.tasks.values()}
+                {t["result_key"] for t in self.engine.content.tasks.values()}
             ),
             "completed_observation_with_supplement": (
                 state.observation_feedback
@@ -129,7 +133,7 @@ class AdaptiveConsultationEngineContext:
                 and state.observation_feedback.get("has_supplement", True)
                 else None
             ),
-            "calculation_request_with_supplement": self._calculation_followup_context(
+            "calculation_request_with_supplement": self.engine.followups._calculation_followup_context(
                 state
             ),
             "transcript": recent,

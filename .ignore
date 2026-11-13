@@ -1,0 +1,5 @@
+# Frozen evidence is available explicitly with rg --no-ignore docs/evaluations.
+# Keep normal code searches on current source, tests and design documents.
+docs/evaluations/
+docs/review-packets/
+docs/assets/

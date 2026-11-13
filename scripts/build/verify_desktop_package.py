@@ -19,22 +19,21 @@ def matches(values, host):
 
 def verify(root, application):
     metadata = json.loads((root / "package.json").read_text())
-    files = [
-        path
+    files = {
+        path.relative_to(root): path
         for name in ["src", "desktop", "integrations"]
         for path in (root / name).rglob("*")
         if path.is_file()
         and "__pycache__" not in path.parts
         and path.suffix not in {".pyc", ".pyo"}
-    ] + [
-        root / name
-        for name in ["pyproject.toml", "README.md", "THIRD_PARTY_NOTICES.md"]
-    ]
+    }
+    files.update({Path(name): root / name for name in ["pyproject.toml", "README.md"]})
+    files[Path("THIRD_PARTY_NOTICES.md")] = root / "docs/development/THIRD_PARTY_NOTICES.md"
     source_errors = [
-        str(path.relative_to(root))
-        for path in files
-        if not (application / path.relative_to(root)).is_file()
-        or digest(path) != digest(application / path.relative_to(root))
+        str(relative)
+        for relative, path in files.items()
+        if not (application / relative).is_file()
+        or digest(path) != digest(application / relative)
     ]
     expected_metadata = {
         key: value
@@ -72,7 +71,7 @@ def verify(root, application):
         "version": metadata["version"],
         "platform": "linux-x64",
         "source_files_checked": len(files),
-        "source_sha256": {str(path.relative_to(root)): digest(path) for path in files},
+        "source_sha256": {str(relative): digest(path) for relative, path in files.items()},
         "source_mismatches": source_errors,
         "production_metadata_matches_expected_packager_reduction": metadata_matches,
         "locked_production_packages_checked": len(versions),

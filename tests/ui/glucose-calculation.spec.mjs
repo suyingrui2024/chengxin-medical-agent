@@ -31,7 +31,8 @@ test("glucose renderer rejects missing basis and unsafe links while preserving l
   await page.goto("/");
   await page.evaluate(
     async ({ glucose, legacy }) => {
-      const { createRenderer } = await import("/js/structured-ui.js");
+      const { createRenderer } =
+        await import("/js/structured/structured-ui.js");
       const renderer = createRenderer();
       const target = document.createElement("section");
       target.id = "glucose-renderer-check";

@@ -1,6 +1,6 @@
 """Post-conclusion web enrichment: patient reading + guideline telemetry.
 
-Design: docs/联网与子智能体工具设计.md §4.3/§4.5/§7. This module is an
+Design: docs/features/联网与子智能体工具设计.md §4.3/§4.5/§7. This module is an
 advisory layer *outside* the consultation kernel. It runs after a case is
 closed with a finished conclusion sheet and may only:
 

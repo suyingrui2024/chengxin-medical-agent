@@ -1,6 +1,6 @@
 """联网工具服务（Phase B 模块 B1）：官方搜索 + 自研抓取 + 来源分级。
 
-Implements docs/联网与子智能体工具设计.md §4/§6/§7 的服务端部分：
+Implements docs/features/联网与子智能体工具设计.md §4/§6/§7 的服务端部分：
 
 - 来源分级注册表（content/web_sources.json）：域名 → T1–T4，未注册一律 T4；
 - web_search：经 DeepSeek 官方 Search（Anthropic 格式端点的

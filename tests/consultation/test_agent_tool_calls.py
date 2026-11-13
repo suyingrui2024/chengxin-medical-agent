@@ -266,7 +266,7 @@ class PathwayGateTests(unittest.TestCase):
         """A case with every blocking field recorded, pathway untouched."""
         engine = build_engine([])
         state, _ = engine.create_session()
-        engine._execute(
+        engine.model_actions._execute(
             state,
             {
                 "tool": "record_facts",
@@ -294,11 +294,11 @@ class PathwayGateTests(unittest.TestCase):
         )
         warnings = [
             key
-            for key in engine._context(state, self.TEXT)["missing_required"]
+            for key in engine.model_context._context(state, self.TEXT)["missing_required"]
             if key.startswith("warning_")
         ]
         if warnings:
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 {
                     "tool": "record_facts",
@@ -316,7 +316,7 @@ class PathwayGateTests(unittest.TestCase):
 
     def test_the_fixture_really_leaves_the_pathway_unexplored(self):
         engine, state = self.open_case()
-        pathway = engine._context(state, self.TEXT)["pathway_exploration"]
+        pathway = engine.model_context._context(state, self.TEXT)["pathway_exploration"]
         self.assertEqual([entry["pathway"] for entry in pathway], ["respiratory"])
         self.assertFalse(pathway[0]["explored"])
 
@@ -325,7 +325,7 @@ class PathwayGateTests(unittest.TestCase):
 
         engine, state = self.open_case()
         with self.assertRaises(ProposalError) as raised:
-            engine._execute(
+            engine.model_actions._execute(
                 state, {"tool": "review_summary", "arguments": {}}, self.TEXT, "t1"
             )
         self.assertIn("主诉通路尚未探明", str(raised.exception))
@@ -336,7 +336,7 @@ class PathwayGateTests(unittest.TestCase):
 
         engine, state = self.open_case()
         try:
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 {
                     "tool": "review_summary",
@@ -357,7 +357,7 @@ class PathwayGateTests(unittest.TestCase):
         for reason in ("", "   ", "x" * 201):
             with self.subTest(reason=reason):
                 with self.assertRaises(ProposalError):
-                    engine._execute(
+                    engine.model_actions._execute(
                         state,
                         {
                             "tool": "review_summary",
@@ -412,7 +412,7 @@ class PartialRecordingTests(unittest.TestCase):
             {"key": key, "value": None, "evidence": "过敏不知道", "assertion": assertion}
             for key in self.UNCERTAIN
         ]
-        result = engine._execute(
+        result = engine.model_actions._execute(
             state, {"tool": "record_facts", "arguments": {"facts": facts}}, self.TEXT, "t1"
         )
         return state, result

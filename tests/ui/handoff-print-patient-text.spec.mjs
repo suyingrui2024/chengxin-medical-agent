@@ -33,7 +33,7 @@ test("object department hint renders as readable text on all three paths", async
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     const markdown = module.handoffPrintMarkdown(handoff);
     const text = module.handoffPrintText(handoff);
     const element = module.buildHandoffPrintElement(handoff);
@@ -55,7 +55,7 @@ test("object department hint renders as readable text on all three paths", async
 test("department gate stays fail-closed for object hints", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     const hidden = JSON.parse(JSON.stringify(handoff));
     hidden.conclusion.department_visible = false;
     const missing = JSON.parse(JSON.stringify(handoff));
@@ -86,7 +86,7 @@ test("fact rows use patient wording for verified values only", async ({
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (handoff) => {
-    const module = await import("/js/handoff-print.js");
+    const module = await import("/js/app/handoff-print.js");
     const base = JSON.parse(JSON.stringify(handoff));
     // agent 固定选项路径：ABSENT 时 value 为 null，同样是否认。
     const absentNull = JSON.parse(JSON.stringify(handoff));

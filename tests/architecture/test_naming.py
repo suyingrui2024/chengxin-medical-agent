@@ -148,10 +148,10 @@ def test_close_copy_is_not_a_dated_name(tmp_path):
     [
         # An ordered stylesheet slice: the number is cascade position, and the
         # word after it is the subject. Neither is a date.
-        "src/medagent/web/css/02-artifacts.css",
+        "src/medagent/web/css/base/02-artifacts.css",
         "src/medagent/web/css/styles.css",
-        "src/medagent/web/js/structured-ui-cards.js",
-        "src/medagent/web/js/execution-ui-observation.js",
+        "src/medagent/web/js/structured/structured-ui-cards.js",
+        "src/medagent/web/js/execution/execution-ui-observation.js",
         "src/medagent/web/index.html",
         # ``and`` in a test name joins two subjects the test really covers.
         "tests/conclusion/test_worry_and_goal.py",

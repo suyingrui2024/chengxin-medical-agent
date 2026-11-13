@@ -1,4 +1,4 @@
-"""Mixin: run for AdaptiveConsultationEngine."""
+"""Workflow component: run for AdaptiveConsultationEngine."""
 from copy import deepcopy
 from ...core.decision_wait import DecisionInterrupted
 from ...core.domain import (
@@ -17,6 +17,10 @@ from .decision import _decision_envelope_guidance
 
 
 class AdaptiveConsultationEngineRun:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _run(self, state: CaseState, text: str, turn_id: str) -> AgentReply:
         """Run the model loop until the turn has an answer to deliver.
 
@@ -46,17 +50,17 @@ class AdaptiveConsultationEngineRun:
             )
         if state.observation_feedback:
             state.observation_feedback["forwarded"] = True
-        turn = self._active_turns[state.session_id]
+        turn = self.engine._active_turns[state.session_id]
         turn.turn_id = turn_id
         # Controller-triggered case digest (design §5.7 case_digest): once
         # the transcript outgrows the context window, a coordinator-verified
         # digest replaces out-of-window turns via _context. It consumes this
         # round's single spawn allowance, so the model cannot also spawn.
         spawns = 0
-        coordinator = self.subagent_coordinator
+        coordinator = self.engine.subagent_coordinator
         if (
             coordinator is not None
-            and self._subagent_mode_for("case_digest") == "advisory"
+            and self.engine._subagent_mode_for("case_digest") == "advisory"
             and len(state.transcript) > 16
             and (
                 not state.subagent_digest
@@ -76,8 +80,8 @@ class AdaptiveConsultationEngineRun:
                     "status": "ready",
                 }
                 spawns = 1
-        self._round_spawn_counts[state.session_id] = spawns
-        messages = self._messages(state, text)
+        self.engine._round_spawn_counts[state.session_id] = spawns
+        messages = self.engine._messages(state, text)
         writes = 0
         # Fact keys rejected by record_facts earlier in this round.
         # A later call containing ONLY such keys is a correction retry
@@ -89,17 +93,17 @@ class AdaptiveConsultationEngineRun:
         rejected_keys = set()
         for step in range(6):
             if step:
-                pending_reply = self._offer_pending_self_check(state)
+                pending_reply = self.engine.planning._offer_pending_self_check(state)
                 if pending_reply:
-                    return self._deliver(state, pending_reply, turn_id)
+                    return self.engine._deliver(state, pending_reply, turn_id)
             try:
-                command = self._decision_waiter.invoke(
-                    self.backend,
+                command = self.engine._decision_waiter.invoke(
+                    self.engine.backend,
                     state.session_id,
                     messages,
                     turn,
-                    self._session_conditions[state.session_id],
-                    lambda: self.events.append(
+                    self.engine._session_conditions[state.session_id],
+                    lambda: self.engine.events.append(
                         Event(
                             state.session_id,
                             "agent.decision_discarded",
@@ -109,7 +113,7 @@ class AdaptiveConsultationEngineRun:
                     ),
                 )
             except DecisionInterrupted:
-                return deepcopy(self._latest_replies[state.session_id])
+                return deepcopy(self.engine._latest_replies[state.session_id])
             except Exception as exc:
                 # Repairable decision-envelope errors (healthcheck
                 # P1-A-D3) are the model's own malformed output, so
@@ -122,7 +126,7 @@ class AdaptiveConsultationEngineRun:
                 # model keeps producing bad envelopes.
                 guidance = _decision_envelope_guidance(exc)
                 if guidance is not None:
-                    self.events.append(
+                    self.engine.events.append(
                         Event(
                             state.session_id,
                             "agent.backend_failed",
@@ -136,14 +140,14 @@ class AdaptiveConsultationEngineRun:
                     messages.append(
                         {
                             "role": "user",
-                            "content": self._json(
+                            "content": self.engine._json(
                                 {"tool_result": {"ok": False, "error": guidance}}
                             ),
                         }
                     )
                     continue
                 state.pending_input = text
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "agent.backend_failed",
@@ -156,18 +160,18 @@ class AdaptiveConsultationEngineRun:
                         turn_id=turn_id,
                     )
                 )
-                return self._deliver(
+                return self.engine._deliver(
                     state,
                     AgentReply(
                         "这次反馈已处理。后续对话暂时不可用，重试即可继续。"
-                        if self._observation_completion_context(state)
+                        if self.engine.observations._observation_completion_context(state)
                         else "这一步的对话服务暂时不可用，已保存的内容会保留。请稍后重试，或先查看目前记录。",
                         state.phase,
                         kind="service_error",
                     ),
                     turn_id,
                 )
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "tool.requested",
@@ -188,7 +192,7 @@ class AdaptiveConsultationEngineRun:
                     if "patient_goal" in state.facts
                     else None
                 )
-                result = self._execute(state, command, text, turn_id)
+                result = self.engine.model_actions._execute(state, command, text, turn_id)
                 if command["tool"] == "record_facts":
                     writes, goal_answered = self._book_write_result(
                         state,
@@ -206,7 +210,7 @@ class AdaptiveConsultationEngineRun:
                     ):
                         goal_answered = False
             except SubjectBoundaryError as exc:
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "tool.completed",
@@ -217,9 +221,9 @@ class AdaptiveConsultationEngineRun:
                         turn_id=turn_id,
                     )
                 )
-                return self._deliver(
+                return self.engine._deliver(
                     state,
-                    self._subject_change_reply(state, exc.requested, text, turn_id),
+                    self.engine.subjects._subject_change_reply(state, exc.requested, text, turn_id),
                     turn_id,
                 )
             except (ValueError, KeyError, TypeError) as exc:
@@ -239,7 +243,7 @@ class AdaptiveConsultationEngineRun:
                             rejected_keys.add(verdict["key"])
                 result = {"ok": False, "error": str(exc)}
             if isinstance(result, AgentReply):
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "tool.completed",
@@ -259,11 +263,11 @@ class AdaptiveConsultationEngineRun:
                     result.kind == "question"
                     and state.risk.level == RiskLevel.URGENT
                 ):
-                    gated = self._urgent_or_defer(state, turn_id)
+                    gated = self.engine.planning._urgent_or_defer(state, turn_id)
                     if gated is not None:
-                        return self._deliver(state, gated, turn_id)
-                return self._deliver(state, result, turn_id)
-            self.events.append(
+                        return self.engine._deliver(state, gated, turn_id)
+                return self.engine._deliver(state, result, turn_id)
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "tool.completed",
@@ -271,9 +275,9 @@ class AdaptiveConsultationEngineRun:
                     turn_id=turn_id,
                 )
             )
-            messages.append({"role": "assistant", "content": self._json(command)})
+            messages.append({"role": "assistant", "content": self.engine._json(command)})
             messages.append(
-                {"role": "user", "content": self._json({"tool_result": result})}
+                {"role": "user", "content": self.engine._json({"tool_result": result})}
             )
             if state.risk.level == RiskLevel.EMERGENCY:
                 # Same dispatch the submit path uses.  Record_facts re-assesses
@@ -281,19 +285,19 @@ class AdaptiveConsultationEngineRun:
                 # suppressed pre-model turn would otherwise re-trigger; a
                 # denial already on record stands the risk down and returns
                 # None, falling through to the normal next question.
-                reply = self._dispatch_emergency_clarification(
+                reply = self.engine.model_turns._dispatch_emergency_clarification(
                     state, text, (), state.risk.triggers, turn_id
                 )
                 if reply is not None:
                     return reply
             if state.risk.level == RiskLevel.URGENT:
-                gated = self._urgent_or_defer(state, turn_id)
+                gated = self.engine.planning._urgent_or_defer(state, turn_id)
                 if gated is not None:
-                    return self._deliver(state, gated, turn_id)
+                    return self.engine._deliver(state, gated, turn_id)
             if (
                 goal_answered
                 and not state.pending_self_checks
-                and not self._context(state, text)["missing_required"]
+                and not self.engine.model_context._context(state, text)["missing_required"]
             ):
                 # All blocking fields, including the final patient-goal answer,
                 # are recorded. Non-blocking candidates (sex, reported
@@ -305,9 +309,9 @@ class AdaptiveConsultationEngineRun:
                 # controller asks its detail question first (the pathway
                 # term list is wider than the question catalog's, so this
                 # fires exactly where missing_required cannot see the gap).
-                reply = self._controller_summary(state, text, turn_id)
+                reply = self.engine.pathways._controller_summary(state, text, turn_id)
                 if reply.phase == Phase.SUMMARY:
-                    self.events.append(
+                    self.engine.events.append(
                         Event(
                             state.session_id,
                             "agent.summary_ready",
@@ -318,9 +322,9 @@ class AdaptiveConsultationEngineRun:
                             turn_id=turn_id,
                         )
                     )
-                return self._deliver(state, reply, turn_id)
+                return self.engine._deliver(state, reply, turn_id)
         state.pending_input = text
-        return self._deliver(
+        return self.engine._deliver(
             state,
             AgentReply(
                 "我还需要核实信息才能继续。这轮未能选定合适的问题，请重试或查看已记录内容。",
@@ -442,7 +446,7 @@ class AdaptiveConsultationEngineRun:
         if answering_goal:
             state.active_question = "patient_goal"
             state.active_question_is_clarification = False
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "goal.worry_diverted",

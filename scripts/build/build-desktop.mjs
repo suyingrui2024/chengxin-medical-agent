@@ -65,7 +65,6 @@ try {
     "package-lock.json",
     "pyproject.toml",
     "README.md",
-    "THIRD_PARTY_NOTICES.md",
     "src",
     "desktop",
     "integrations",
@@ -77,6 +76,10 @@ try {
         !source.endsWith(".pyc") &&
         !source.split(path.sep).includes("node_modules"),
     });
+  await cp(
+    path.join(root, "docs/development/THIRD_PARTY_NOTICES.md"),
+    path.join(staging, "THIRD_PARTY_NOTICES.md"),
+  );
   const npmArguments = [
     "ci",
     "--omit=dev",
@@ -132,7 +135,7 @@ try {
     electronZipDir,
     tmpdir: packagerTemp,
     ignore: [
-      /^\/(?:dist|build|vendor|docs|tests|experiments|test-results|playwright-report|data|scripts|workspaces|\.runtime|\.venv|\.git|\.agents|\.codex)(?:\/|$)/,
+      /^\/(?:dist|build|vendor|docs|tests|research|config|test-results|playwright-report|data|scripts|workspaces|\.runtime|\.venv|\.git|\.agents|\.codex|\.vscode)(?:\/|$)/,
       /(?:^|\/)\.env(?:[ .]|$)/,
       /(?:^|\/)__pycache__(?:\/|$)/,
       /\.py[co]$/,

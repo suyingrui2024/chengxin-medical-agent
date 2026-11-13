@@ -1,6 +1,6 @@
 """Off-pathway first-class flow: content + module package (P3).
 
-Implements docs/假设驱动问诊设计文档.md §4 for the off-pathway case:
+Implements docs/features/假设驱动问诊设计文档.md §4 for the off-pathway case:
 when a chief complaint triggers no differential pathway, the consultation
 asks a fixed set of symptom-domain warning questions (danger-signal
 domains only, no organ-specific wording) instead of borrowing the
@@ -86,7 +86,7 @@ def warning_domain_specs(
     """Askable specs for the P3 warning domains (question-layer seam).
 
     ``warning_questions`` keeps its frozen ``{domain, question}``
-    contract (tests/test_out_of_pathway.py pins the content schema, and
+    contract (tests/consultation/test_out_of_pathway.py pins the content schema, and
     ``bridging.py`` derives ``warning_<domain>`` ids from it). This
     function is the seam that adds the id/fact_key the question layer
     needs. The id convention is the same ``warning_<domain>`` that

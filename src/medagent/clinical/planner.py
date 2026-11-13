@@ -31,4 +31,4 @@ class RulePlanner:
         self._engine = engine
 
     def plan(self, state: CaseState) -> AgentReply:
-        return self._engine._plan_next(state)
+        return self._engine.planning._plan_next(state)

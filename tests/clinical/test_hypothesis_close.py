@@ -151,10 +151,10 @@ class UrgentWorryTests(unittest.TestCase):
 
     def _urgent_close(self, state, worry_sentence=None):
         if worry_sentence is not None:
-            self.engine._capture_worry(state, worry_sentence, "t-worry")
+            self.engine.turns._capture_worry(state, worry_sentence, "t-worry")
         state.risk = RiskAssessment(RiskLevel.URGENT, ["症状影响评分较高"])
-        reply = self.engine._urgent(state)
-        self.engine._record_reply(state, reply, "t-close", "test urgent close")
+        reply = self.engine.emergency._urgent(state)
+        self.engine.replies._record_reply(state, reply, "t-close", "test urgent close")
         return reply
 
     def _base_state(self, chief, goal="想知道要不要马上去急诊"):
@@ -658,7 +658,7 @@ class P21Tests(unittest.TestCase):
                 "content": "我是替孩子咨询的。我家孩子发烧时突然抽搐了，眼往上翻，叫不应。",
             }
         )
-        reply = self.engine._emergency_reply(state, ["意识明显异常"])
+        reply = self.engine.emergency._emergency_reply(state, ["意识明显异常"])
         self.assertNotIn("。。", reply.message)
         self.assertNotIn("我是替孩子咨询的", reply.message)
         self.assertIn(
@@ -667,7 +667,7 @@ class P21Tests(unittest.TestCase):
         )
 
     def test_close_facts_text_strips_trailing_period(self):
-        text = self.engine._close_facts_text(
+        text = self.engine.replies._close_facts_text(
             [
                 {
                     "label": "主要问题",
@@ -679,7 +679,7 @@ class P21Tests(unittest.TestCase):
         self.assertEqual(text, "主要问题：叫不应")
 
     def test_identity_prefix_rule_keeps_real_statements(self):
-        strip = self.engine._strip_identity_prefix
+        strip = self.engine.emergency._strip_identity_prefix
         self.assertEqual(strip("我自己咨询，我胸口一阵阵刺痛。"), "我胸口一阵阵刺痛。")
         # "咨询过医生" is a real statement, not an identity clause.
         self.assertEqual(
@@ -768,7 +768,7 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
 
     def test_group_bridge_prepends_when_no_single_bridge(self):
         state, reply = self._question_reply("severity", "咳嗽两天")
-        self.engine._apply_group_bridge(state, reply)
+        self.engine.replies._apply_group_bridge(state, reply)
         self.assertTrue(reply.message.startswith(GROUP_BRIDGES["deep_dive"]))
         self.assertTrue(lint_group_bridge(GROUP_BRIDGES["deep_dive"]))
         self.assertEqual(
@@ -784,7 +784,7 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
         for question_id, chief, group in cases:
             with self.subTest(question_id=question_id):
                 state, reply = self._question_reply(question_id, chief)
-                self.engine._apply_group_bridge(state, reply)
+                self.engine.replies._apply_group_bridge(state, reply)
                 self.assertTrue(reply.message.startswith(GROUP_BRIDGES[group]))
 
     def test_group_bridge_stacks_with_single_bridge_on_group_switch(self):
@@ -798,7 +798,7 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
         state, reply = self._question_reply("severity", "咳嗽两天")
         reply.message = "承接句，原问题？"
         reply.developer_trace = {"bridging": {"applied": True, "kind": "anchor"}}
-        self.engine._apply_group_bridge(state, reply)
+        self.engine.replies._apply_group_bridge(state, reply)
         self.assertEqual(
             reply.message,
             GROUP_BRIDGES["deep_dive"] + "承接句，原问题？",
@@ -819,12 +819,12 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
         first = AgentReply(
             "原问题？", Phase.HISTORY, kind="question", question_id="severity"
         )
-        self.engine._apply_group_bridge(state, first)
+        self.engine.replies._apply_group_bridge(state, first)
         self.assertTrue(first.message.startswith(GROUP_BRIDGES["deep_dive"]))
         same_group = AgentReply(
             "原问题？", Phase.HISTORY, kind="question", question_id="onset"
         )
-        self.engine._apply_group_bridge(state, same_group)
+        self.engine.replies._apply_group_bridge(state, same_group)
         self.assertEqual(same_group.message, "原问题？")
         switched = AgentReply(
             "原问题？",
@@ -832,12 +832,12 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
             kind="question",
             question_id="medications_taken",
         )
-        self.engine._apply_group_bridge(state, switched)
+        self.engine.replies._apply_group_bridge(state, switched)
         self.assertTrue(switched.message.startswith(GROUP_BRIDGES["background"]))
         back = AgentReply(
             "原问题？", Phase.HISTORY, kind="question", question_id="severity"
         )
-        self.engine._apply_group_bridge(state, back)
+        self.engine.replies._apply_group_bridge(state, back)
         self.assertTrue(back.message.startswith(GROUP_BRIDGES["deep_dive"]))
 
     def test_group_bridge_lint_drop_still_applies_and_does_not_poison(self):
@@ -848,17 +848,17 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
             "medagent.reports.bridging.build_group_bridge",
             return_value="初步考虑是感冒。",
         ):
-            self.engine._apply_group_bridge(state, reply)
+            self.engine.replies._apply_group_bridge(state, reply)
         self.assertEqual(reply.message, "原问题？")
         # A lint-dropped bridge must not record the group: the next
         # real question in that group still gets its bridge.
-        self.engine._apply_group_bridge(state, reply)
+        self.engine.replies._apply_group_bridge(state, reply)
         self.assertTrue(reply.message.startswith(GROUP_BRIDGES["deep_dive"]))
 
     def test_group_bridge_p3_warning_still_bridges_with_anchor(self):
         state, reply = self._question_reply("warning_意识", "体重一年涨了20斤")
         reply.developer_trace = {"bridging": {"applied": True, "kind": "anchor"}}
-        self.engine._apply_group_bridge(state, reply)
+        self.engine.replies._apply_group_bridge(state, reply)
         self.assertTrue(reply.message.startswith(GROUP_BRIDGES["proactive"]))
 
     def test_scope_note_appended_on_off_pathway_close_only(self):
@@ -882,11 +882,11 @@ class GroupBridgeAndScopeTests(unittest.TestCase):
                     "原收尾。",
                     Phase.CLOSED,
                     kind="closed",
-                    summary=self.engine._summary_payload(
+                    summary=self.engine.replies._summary_payload(
                         state, review_status="confirmed_by_user"
                     ),
                 )
-                self.engine._record_reply(state, reply, "t-close", "test close")
+                self.engine.replies._record_reply(state, reply, "t-close", "test close")
                 if expect:
                     self.assertIn(SCOPE_NOTE, reply.message)
                 else:

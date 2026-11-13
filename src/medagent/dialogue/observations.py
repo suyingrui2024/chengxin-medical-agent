@@ -23,7 +23,11 @@ def repeat_intent(task, text):
     return evidence if kind == "request" else None
 
 
-class ObservationMixin:
+class ObservationWorkflow:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _has_model_backend(self):
         """True only for the adaptive engine type, never for a bare attribute.
 
@@ -37,13 +41,13 @@ class ObservationMixin:
         kernel (``shared_types.ModelBackedEngine``) so that asking the question
         does not make this mixin depend on the ``agent`` feature package.
         """
-        return isinstance(self, ModelBackedEngine)
+        return isinstance(self.engine, ModelBackedEngine)
 
     def _repeat_task(self, state, identity):
         task = next(
             (
                 t
-                for t in self.content.applicable_tasks(
+                for t in self.engine.content.applicable_tasks(
                     str(state.get("chief_complaint", ""))
                 )
                 if t["id"] == identity and t.get("repeatable") is True
@@ -55,7 +59,7 @@ class ObservationMixin:
             or task["result_key"] not in state.facts
             or state.active_task
             or state.observation_resume
-            or self._self_check_block_reason(state)
+            or self.engine.replies._self_check_block_reason(state)
         ):
             raise ValueError("当前任务不能重复，请先处理当前步骤或求助提示")
         return task
@@ -95,7 +99,7 @@ class ObservationMixin:
         """
         task = self._repeat_task(state, identity)
         previous = state.facts[task["result_key"]]
-        old = self._latest_replies.get(state.session_id)
+        old = self.engine._latest_replies.get(state.session_id)
         attempt = {
             "id": str(uuid4()),
             "task_id": identity,
@@ -120,7 +124,7 @@ class ObservationMixin:
         # A candidate is still a patient report. No model-selected number is used.
         if task["input_kind"] == "temperature":
             report = temperature_report(text)
-            value = self.interpreter.temperature(report.reading_text)
+            value = self.engine.interpreter.temperature(report.reading_text)
             numeric_clause = report.evidence
             if (
                 value is not None
@@ -141,7 +145,7 @@ class ObservationMixin:
         state.active_question_is_clarification = False
         state.active_task = identity
         state.phase = Phase.OBSERVATION
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.repeat_started",
@@ -153,7 +157,7 @@ class ObservationMixin:
 
     def _repeat_reply(self, state, feedback=""):
         resume = state.observation_resume
-        task = deepcopy(self.content.tasks[resume["task_id"]])
+        task = deepcopy(self.engine.content.tasks[resume["task_id"]])
         previous = state.facts[task["result_key"]]
         task["repeat"] = {
             "attempt_id": resume["attempt_id"],
@@ -191,7 +195,7 @@ class ObservationMixin:
             a for a in state.observation_attempts if a["id"] == resume["attempt_id"]
         )
         attempt.update(status="cancelled", finished_at=utc_now(), reason=reason)
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.repeat_cancelled",
@@ -201,7 +205,7 @@ class ObservationMixin:
         )
         draft = resume.get("pending_calculation")
         if draft:
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "capability.input_cancelled",
@@ -216,7 +220,7 @@ class ObservationMixin:
         if state.self_check_conversation and state.self_check_conversation["task"].get(
             "repeat"
         ):
-            self._clear_task_conversation(state, "repeat_" + reason, turn_id)
+            self.engine.tasks._clear_task_conversation(state, "repeat_" + reason, turn_id)
 
     def _handle_observation_action(self, state, user_input, text, turn_id):
         """Route one turn that arrives while an observation is on screen.
@@ -230,7 +234,7 @@ class ObservationMixin:
         choice = user_input.choice_value or ""
         if state.observation_resume and state.active_task:
             resume = state.observation_resume
-            task = self.content.tasks[resume["task_id"]]
+            task = self.engine.content.tasks[resume["task_id"]]
             from .task_conversation import is_observation_entry
 
             if (
@@ -239,7 +243,7 @@ class ObservationMixin:
                 and task_intent(text, [], task.get("cancel_phrases", []))[0] != "cancel"
                 and not is_observation_entry(task, text, choice)
             ):
-                self._suspend_task_conversation(state, turn_id)
+                self.engine.tasks._suspend_task_conversation(state, turn_id)
                 return None
             source_turn = turn_id
             if choice.startswith("confirm_observation:"):
@@ -249,7 +253,7 @@ class ObservationMixin:
                     candidate["turn_id"],
                     None,
                 )
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.reading_confirmed",
@@ -262,15 +266,15 @@ class ObservationMixin:
                 )
             elif task_intent(text, [], task.get("cancel_phrases", []))[0] == "cancel":
                 choice = "skip"
-            failure = self._try_task_result(state, text, choice, source_turn)
+            failure = self.engine.planning._try_task_result(state, text, choice, source_turn)
             if failure:
                 # A rejected entry also dismisses the earlier candidate. It must
                 # not be offered as if it described the patient's edited input.
                 resume.pop("candidate", None)
                 return self._repeat_reply(state, failure.message)
             state.observation_resume = None
-            state.risk = self.triage.assess(state, text)
-            self.events.append(
+            state.risk = self.engine.triage.assess(state, text)
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "triage.assessed",
@@ -282,24 +286,24 @@ class ObservationMixin:
                 # Same clarification gate as a fresh turn: a bare
                 # co-occurrence signal is clarified first, and a
                 # confirmed clarification replays with its signal intact.
-                action = self._emergency_clarification_action(state, text, ())
+                action = self.engine.emergency._emergency_clarification_action(state, text, ())
                 if action == "clarify":
-                    return self._emergency_clarification_reply(
+                    return self.engine.emergency._emergency_clarification_reply(
                         state, text, turn_id
                     )
                 if action == "confirmed":
-                    confirmed = self._confirm_emergency_clarification(
+                    confirmed = self.engine.emergency._confirm_emergency_clarification(
                         state, turn_id
                     )
                     if confirmed is not None:
                         return confirmed
-                return self._emergency_reply_with_clarification_memory(
+                return self.engine.emergency._emergency_reply_with_clarification_memory(
                     state, state.risk.triggers
                 )
             if state.risk.level == RiskLevel.URGENT:
                 # Reintroduce only to record cancellation of an interrupted form.
                 state.pending_calculation = resume.get("pending_calculation")
-                gated = self._urgent_or_defer(state, turn_id)
+                gated = self.engine.planning._urgent_or_defer(state, turn_id)
                 if gated is not None:
                     return gated
                 # Deferred: fall through to the restored reply below and
@@ -311,7 +315,7 @@ class ObservationMixin:
             state.active_question_is_clarification = resume.get("clarification", False)
             old = resume.get("reply") or {}
             if state.pending_calculation:
-                reply = self._calculation_input_reply(state)
+                reply = self.engine.calculations._calculation_input_reply(state)
             elif old.get("calculation_result") and state.calculation_resume:
                 reply = AgentReply(
                     old["message"],
@@ -320,7 +324,7 @@ class ObservationMixin:
                     calculation_result=old["calculation_result"],
                 )
             elif state.phase == Phase.SUMMARY:
-                reply = self._finish(state)
+                reply = self.engine.replies._finish(state)
             elif (
                 state.active_question
                 and old.get("question_id") == state.active_question
@@ -340,13 +344,13 @@ class ObservationMixin:
                     developer_trace=deepcopy(old.get("developer_trace")),
                 )
             else:
-                reply = self._plan_next(state)
+                reply = self.engine.planning._plan_next(state)
             if not reply.summary:
                 reply.observation_result = self._observation_series(state, task)
             return reply
         if choice.startswith("repeat_self_check:"):
             return self._request_repeat(state, choice.split(":", 1)[1], text, turn_id)
-        for task in self.content.applicable_tasks(
+        for task in self.engine.content.applicable_tasks(
             str(state.get("chief_complaint", ""))
         ):
             if (
@@ -355,11 +359,11 @@ class ObservationMixin:
                 and state.facts[task["result_key"]].assertion == Assertion.PRESENT
                 and not state.active_task
             ):
-                if repeat_intent(task, text) and not self._self_check_block_reason(
+                if repeat_intent(task, text) and not self.engine.replies._self_check_block_reason(
                     state
                 ):
                     report = temperature_report(text)
-                    candidate = self.interpreter.temperature(report.reading_text)
+                    candidate = self.engine.interpreter.temperature(report.reading_text)
                     if (
                         report.has_supplement
                         and (
@@ -380,7 +384,7 @@ class ObservationMixin:
                                 "repeat": True,
                             }
                             state.pending_self_checks.append(request)
-                            self.events.append(
+                            self.engine.events.append(
                                 Event(
                                     state.session_id,
                                     "self_check.requested",
@@ -409,7 +413,7 @@ class ObservationMixin:
         # temperature supplement or a claim that another measurement is needed.
         if (
             not feedback.get("has_supplement", True)
-            or self.content.tasks[feedback["task_id"]]["input_kind"] != "temperature"
+            or self.engine.content.tasks[feedback["task_id"]]["input_kind"] != "temperature"
         ):
             if reply.kind != "service_error":
                 state.observation_feedback = None
@@ -422,7 +426,7 @@ class ObservationMixin:
             else "unprocessed"
         )
         supplement = {"text": feedback["text"], "status": status}
-        task = self.content.tasks[feedback["task_id"]]
+        task = self.engine.content.tasks[feedback["task_id"]]
         if reply.summary and reply.kind != "emergency":
             for series in reply.summary.get("observations", []):
                 if series["task_id"] == feedback["task_id"]:
@@ -509,7 +513,7 @@ class ObservationMixin:
             "unit": "℃",
             "entries": visible,
             "total": len(entries),
-            "can_repeat": not self._self_check_block_reason(state)
+            "can_repeat": not self.engine.replies._self_check_block_reason(state)
             and not state.active_task,
             "latest_status": entries[-1]["status"],
         }

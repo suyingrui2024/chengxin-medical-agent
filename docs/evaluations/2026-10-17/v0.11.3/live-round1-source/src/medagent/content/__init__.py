@@ -1,2 +1,0 @@
-"""Versioned consultation content packs."""
-

@@ -95,7 +95,7 @@ class PatientGoalGateTests(unittest.TestCase):
                 )
             else:
                 facts.append(fact(question.fact_key, None, "不知道", "unknown"))
-        engine._execute(
+        engine.model_actions._execute(
             state,
             cmd("record_facts", facts=facts),
             self.SEED_TEXT,
@@ -107,7 +107,7 @@ class PatientGoalGateTests(unittest.TestCase):
         engine, _, _ = make_engine()
         state, _ = engine.create_session()
         self._seed_without_goal(engine, state)
-        context = engine._context(state, self.SEED_TEXT)
+        context = engine.model_context._context(state, self.SEED_TEXT)
         self.assertEqual(context["missing_required"], ["patient_goal"])
         self.assertEqual(
             context["pathway_exploration"],
@@ -120,7 +120,7 @@ class PatientGoalGateTests(unittest.TestCase):
             ],
         )
         with self.assertRaises(ProposalError) as caught:
-            engine._execute(
+            engine.model_actions._execute(
                 state,
                 cmd(
                     "review_summary",
@@ -136,7 +136,7 @@ class PatientGoalGateTests(unittest.TestCase):
         engine, _, _ = make_engine()
         state, _ = engine.create_session()
         self._seed_without_goal(engine, state)
-        engine._execute(
+        engine.model_actions._execute(
             state,
             cmd(
                 "record_facts",
@@ -145,8 +145,8 @@ class PatientGoalGateTests(unittest.TestCase):
             "想知道要不要紧",
             "t-goal",
         )
-        self.assertEqual(engine._context(state, "复核")["missing_required"], [])
-        reply = engine._execute(
+        self.assertEqual(engine.model_context._context(state, "复核")["missing_required"], [])
+        reply = engine.model_actions._execute(
             state,
             cmd(
                 "review_summary",
@@ -169,7 +169,7 @@ class SpawnKindWhitelistTests(unittest.TestCase):
         self.state.risk.level = RiskLevel.ROUTINE
 
     def _execute(self, kind):
-        return self.engine._execute(
+        return self.engine.model_actions._execute(
             self.state, _spawn_command(kind), "复核一下", "turn-1"
         )
 
@@ -195,7 +195,7 @@ class SpawnKindWhitelistTests(unittest.TestCase):
             engine = _engine(coordinator=_AdvisoryCoordinator())
             state, _ = engine.create_session()
             state.risk.level = RiskLevel.ROUTINE
-            result = engine._execute(state, _spawn_command(kind), "复核一下", "t")
+            result = engine.model_actions._execute(state, _spawn_command(kind), "复核一下", "t")
             self.assertTrue(result["ok"], kind)
 
     def test_case_digest_proposal_is_replanned_end_to_end(self):

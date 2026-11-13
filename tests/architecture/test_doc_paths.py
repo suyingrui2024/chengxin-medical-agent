@@ -4,7 +4,7 @@ The kernel regrouping moved 59 modules. Twelve documents kept naming the old
 paths, and nothing noticed until someone followed one and landed on a missing
 file. Fixing the documents by hand only helps until the next refactor, so the
 rule is now enforced: a document may name a moved module **only if** the move is
-recorded in `docs/模块路径变更对照.md`.
+recorded in `docs/architecture/模块路径变更对照.md`.
 
 That is the same discipline the code already uses for architecture rules — a
 baseline you update deliberately, rather than drift nobody sees.
@@ -15,7 +15,7 @@ import pathlib
 import re
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-MAPPING = ROOT / "docs" / "模块路径变更对照.md"
+MAPPING = ROOT / "docs" / "architecture" / "模块路径变更对照.md"
 
 #: Any ``src/medagent/...py`` mentioned in prose.
 REFERENCE = re.compile(r"src/medagent/[\w/]+\.py")

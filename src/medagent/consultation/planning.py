@@ -1,4 +1,4 @@
-"""Mixin: planning for ConsultationEngine."""
+"""Workflow component: planning for ConsultationEngine."""
 from copy import deepcopy
 from dataclasses import replace
 from typing import Any, List, Optional
@@ -37,6 +37,10 @@ from .vocabulary import is_self_check_skip_text
 
 
 class ConsultationEnginePlanning:
+
+    def __init__(self, engine):
+        self.engine = engine
+
     def _try_task_result(self, state, text, choice_value, turn_id):
         # D-03: free-text "跳过" (with or without punctuation) counts as
         # one skip attempt, exactly like tapping the skip option.
@@ -58,9 +62,9 @@ class ConsultationEnginePlanning:
             # 回到原来的问题——所以按跳过处理，而不是报错让他再点一次。
             choice_value = "skip"
         try:
-            decoded = self.self_checks.interpret(state.active_task, text, choice_value)
+            decoded = self.engine.self_checks.interpret(state.active_task, text, choice_value)
         except Exception as exc:
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "self_check.failed",
@@ -68,7 +72,7 @@ class ConsultationEnginePlanning:
                     turn_id=turn_id,
                 )
             )
-            task = self.content.tasks[state.active_task]
+            task = self.engine.content.tasks[state.active_task]
             message = (
                 str(exc)
                 if isinstance(exc, ObservationInputError)
@@ -89,7 +93,7 @@ class ConsultationEnginePlanning:
 
     def _is_task_cancel_text(self, state, text: str) -> bool:
         """当前任务上，患者这句话是不是"我不做这一步了"。"""
-        task = self.content.tasks.get(state.active_task) if state.active_task else None
+        task = self.engine.content.tasks.get(state.active_task) if state.active_task else None
         if not task:
             return False
         intent, _evidence = task_intent(text, [], task.get("cancel_phrases", []))
@@ -122,13 +126,13 @@ class ConsultationEnginePlanning:
         no narrative, because a failed decision retry needs it.  It is not a
         new fact.
         """
-        task_result = decoded or self.self_checks.interpret(task_id, text, choice_value)
+        task_result = decoded or self.engine.self_checks.interpret(task_id, text, choice_value)
         result = task_result.interpretation
         from ..reports.measurement_reports import temperature_report
 
         report = (
             temperature_report(text)
-            if self.content.tasks[task_id]["input_kind"] == "temperature"
+            if self.engine.content.tasks[task_id]["input_kind"] == "temperature"
             and choice_value not in {"skip", "unable", "not_available"}
             else None
         )
@@ -141,7 +145,7 @@ class ConsultationEnginePlanning:
             and result.assertion != Assertion.PRESENT
         )
         if not preserve:
-            self._record_fact(
+            self.engine.subjects._record_fact(
                 state,
                 task_result.fact_key,
                 result,
@@ -172,7 +176,7 @@ class ConsultationEnginePlanning:
             )
             if result.assertion == Assertion.PRESENT:
                 attempt["fact_id"] = state.facts[task_result.fact_key].fact_id
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "self_check.repeat_completed",
@@ -203,8 +207,8 @@ class ConsultationEnginePlanning:
             },
         }
         state.active_task = None
-        self._clear_task_conversation(state, "result_recorded", turn_id)
-        self.events.append(
+        self.engine.tasks._clear_task_conversation(state, "result_recorded", turn_id)
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.completed",
@@ -238,9 +242,9 @@ class ConsultationEnginePlanning:
         # ranker-id-mismatch fallback below, and the G-12(d) / _finish
         # tail are all unchanged; only the call sites moved.
         candidates = filter_candidates(
-            self.content.questions,
+            self.engine.content.questions,
             state,
-            applies=self.content.question_applies_in_state,
+            applies=self.engine.content.question_applies_in_state,
             gates=lambda question, st: question_fact_gates_pass(
                 question, st.facts
             ),
@@ -254,7 +258,7 @@ class ConsultationEnginePlanning:
                 offered = self._offer_task(state, chief)
                 if offered:
                     return self._attach_suspend_cap_notice(state, offered)
-            selected_id = ordering_for_ranker(self.ranker).choose(
+            selected_id = ordering_for_ranker(self.engine.ranker).choose(
                 state, same_phase
             )
             selected = next(
@@ -277,7 +281,7 @@ class ConsultationEnginePlanning:
         discriminator = self._undetermined_close_discriminator(state)
         if discriminator is not None:
             question, reask = discriminator
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "close.undetermined_discriminator_asked",
@@ -296,7 +300,7 @@ class ConsultationEnginePlanning:
                     ),
                 ),
             )
-        return self._attach_suspend_cap_notice(state, self._finish(state))
+        return self._attach_suspend_cap_notice(state, self.engine.replies._finish(state))
 
     def _undetermined_close_discriminator(self, state: CaseState):
         """G-12(d): one discriminator question still owed before an
@@ -326,9 +330,9 @@ class ConsultationEnginePlanning:
         frequency, ongoing/recurrent, dizziness-palpitation
         persistence).
         """
-        if self.triage.assess(state).level != RiskLevel.UNDETERMINED:
+        if self.engine.triage.assess(state).level != RiskLevel.UNDETERMINED:
             return None
-        by_id = {item.id: item for item in self.content.questions}
+        by_id = {item.id: item for item in self.engine.content.questions}
         for question_id in (
             "emergency_screen",
             "gi_details",
@@ -342,14 +346,14 @@ class ConsultationEnginePlanning:
                 continue
             if question.fact_key in state.facts:
                 continue
-            if not self.content.question_applies_in_state(question, state):
+            if not self.engine.content.question_applies_in_state(question, state):
                 continue
             if not question_fact_gates_pass(question, state.facts):
                 continue
             return question, False
         reasked = {
             (event.payload or {}).get("question_id")
-            for event in self.events.for_session(state.session_id)
+            for event in self.engine.events.for_session(state.session_id)
             if event.event_type == "close.undetermined_discriminator_asked"
             and (event.payload or {}).get("reask") is True
         }
@@ -362,7 +366,7 @@ class ConsultationEnginePlanning:
             fact = state.facts.get(question.fact_key)
             if fact is None or fact.assertion != Assertion.UNKNOWN:
                 continue
-            if not self.content.question_applies_in_state(question, state):
+            if not self.engine.content.question_applies_in_state(question, state):
                 continue
             return question, True
         return None
@@ -387,7 +391,7 @@ class ConsultationEnginePlanning:
         that keeps being suspended without any such progress is capped.
         """
         count = 0
-        for event in self.events.for_session(state.session_id):
+        for event in self.engine.events.for_session(state.session_id):
             payload = event.payload or {}
             if payload.get("task_id") != task_id:
                 continue
@@ -419,7 +423,7 @@ class ConsultationEnginePlanning:
         """
         capped = False
         noticed = False
-        for event in self.events.for_session(state.session_id):
+        for event in self.engine.events.for_session(state.session_id):
             if event.event_type == "self_check.suspend_cap_reached":
                 capped = True
                 noticed = False
@@ -430,7 +434,7 @@ class ConsultationEnginePlanning:
         if reply.message.startswith(SUSPEND_CAP_NOTICE):
             return reply
         reply.message = SUSPEND_CAP_NOTICE + reply.message
-        self.events.append(
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "self_check.suspend_cap_noticed",
@@ -467,13 +471,13 @@ class ConsultationEnginePlanning:
                 frame_id,
                 state.self_check_conversation["task"].get("interaction_id"),
             ) >= SELF_CHECK_SUSPEND_CAP:
-                self._clear_task_conversation(state, "suspend_cap_reached")
+                self.engine.tasks._clear_task_conversation(state, "suspend_cap_reached")
                 state.pending_self_checks = [
                     item
                     for item in state.pending_self_checks
                     if item["task_id"] != frame_id
                 ]
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.suspend_cap_reached",
@@ -482,13 +486,13 @@ class ConsultationEnginePlanning:
                 )
                 return None
             if task_id is None or task_id == frame_id:
-                return self._resume_task_conversation(state)
+                return self.engine.tasks._resume_task_conversation(state)
             return None
-        if self._self_check_block_reason(state):
+        if self.engine.replies._self_check_block_reason(state):
             return None
         tasks = [
             t
-            for t in self.content.applicable_tasks(chief)
+            for t in self.engine.content.applicable_tasks(chief)
             if t["result_key"] not in state.facts
             and (task_id is None or t["id"] == task_id)
         ]
@@ -508,13 +512,13 @@ class ConsultationEnginePlanning:
             state.active_question = None
             state.active_question_is_clarification = False
             state.active_task = task["id"]
-            self.events.append(
+            self.engine.events.append(
                 Event(
                     state.session_id,
                     "self_check.offered",
                     {
                         "task_id": task["id"],
-                        "content_version": self.content.versions["self_checks"],
+                        "content_version": self.engine.content.versions["self_checks"],
                         "requested_by_user": bool(requests),
                         "requests": requests,
                     },
@@ -552,11 +556,11 @@ class ConsultationEnginePlanning:
         return "为了把当前情况记录得更清楚，可以完成下面这一步。做不到或不想做都可以跳过。"
 
     def _offer_pending_self_check(self, state):
-        if self._self_check_block_reason(state):
+        if self.engine.replies._self_check_block_reason(state):
             return None
         for request in list(state.pending_self_checks):
             if request.get("repeat"):
-                return self._request_repeat(
+                return self.engine.observations._request_repeat(
                     state, request["task_id"], request["evidence"], request["turn_id"]
                 )
             reply = self._offer_task(
@@ -572,7 +576,7 @@ class ConsultationEnginePlanning:
         Matching records an intent only. All execution eligibility checks remain
         in _offer_task. Negative preferences are never measurements.
         """
-        for task in self.content.applicable_tasks(
+        for task in self.engine.content.applicable_tasks(
             str(state.get("chief_complaint", ""))
         ):
             key, identity = task["result_key"], task["id"]
@@ -586,7 +590,7 @@ class ConsultationEnginePlanning:
                     state.self_check_conversation
                     and state.self_check_conversation["task"]["id"] == identity
                 ):
-                    self._clear_task_conversation(state, "user_declined", turn_id)
+                    self.engine.tasks._clear_task_conversation(state, "user_declined", turn_id)
                 state.pending_self_checks = [
                     item
                     for item in state.pending_self_checks
@@ -598,11 +602,11 @@ class ConsultationEnginePlanning:
                 # Preserve any existing reading. Declining a future action cannot
                 # retract already reported evidence.
                 if previous is None:
-                    result = self.self_checks.interpret(identity, text, "skip")
-                    self._record_fact(
+                    result = self.engine.self_checks.interpret(identity, text, "skip")
+                    self.engine.subjects._record_fact(
                         state, key, result.interpretation, turn_id, cancellation
                     )
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.request_cancelled",
@@ -625,7 +629,7 @@ class ConsultationEnginePlanning:
                 ):
                     continue
                 state.facts.pop(key)
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "fact.invalidated",
@@ -646,7 +650,7 @@ class ConsultationEnginePlanning:
                     "turn_id": turn_id,
                 }
                 state.pending_self_checks.append(request)
-                self.events.append(
+                self.engine.events.append(
                     Event(
                         state.session_id,
                         "self_check.requested",
@@ -688,7 +692,7 @@ class ConsultationEnginePlanning:
         if question.id not in state.asked_questions:
             state.asked_questions.append(question.id)
         prompt = question.prompt
-        if question.fact_key == "age_years" and not self._subject_is_child(state):
+        if question.fact_key == "age_years" and not self.engine._subject_is_child(state):
             # Same adaptation as the adaptive engine: the catalog's
             # infant-months wording is only presented for child subjects.
             prompt = ADULT_AGE_PROMPT
@@ -704,7 +708,7 @@ class ConsultationEnginePlanning:
                     quick_replies=question.options,
                     developer_trace={
                         "reason": reason,
-                        "content_version": self.content.versions["questions"],
+                        "content_version": self.engine.content.versions["questions"],
                     },
                 ),
             ),
@@ -719,14 +723,14 @@ class ConsultationEnginePlanning:
         if key in state.facts:
             return True
         question = next(
-            (item for item in self.content.questions if item.fact_key == key),
+            (item for item in self.engine.content.questions if item.fact_key == key),
             None,
         )
         if question is None:
             return True
         if question.id in state.asked_questions:
             return True
-        if not self.content.question_applies_in_state(question, state):
+        if not self.engine.content.question_applies_in_state(question, state):
             return True
         return not question_fact_gates_pass(question, state.facts)
 
@@ -777,8 +781,8 @@ class ConsultationEnginePlanning:
         when a single-clue urgent close would cut the session short."""
         missing = self._urgent_gate_missing(state)
         if not missing:
-            return self._urgent(state)
-        self.events.append(
+            return self.engine.emergency._urgent(state)
+        self.engine.events.append(
             Event(
                 state.session_id,
                 "triage.urgent_deferred",

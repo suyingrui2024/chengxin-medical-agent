@@ -338,7 +338,7 @@
       "reviewed_at": "2026-10-26"
     }
   ],
-  "note": "Self-care content for the conclusion sheet (docs/问诊结论单设计文档.md §5.5). Engineering v1: generic and respiratory/chest groups written against the same risk bar as the already-live care-route copy; every group carries review metadata and pathway-specific groups require clinician review before the directions layer opens to patients (phase B). Groups are matched by (match, tier): match is a pathway group key derived from the accepted hypothesis workspace, or 'generic'. Entries with empty reviewed_by are treated as absent at runtime.",
+  "note": "Self-care content for the conclusion sheet (docs/features/问诊结论单设计文档.md §5.5). Engineering v1: generic and respiratory/chest groups written against the same risk bar as the already-live care-route copy; every group carries review metadata and pathway-specific groups require clinician review before the directions layer opens to patients (phase B). Groups are matched by (match, tier): match is a pathway group key derived from the accepted hypothesis workspace, or 'generic'. Entries with empty reviewed_by are treated as absent at runtime.",
   "return_now_if": {
     "reviewed_at": "2026-10-23",
     "reviewed_by": "engineering-v1",

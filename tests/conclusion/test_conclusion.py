@@ -1,4 +1,4 @@
-"""Conclusion sheet (docs/问诊结论单设计文档.md): composer unit behavior,
+"""Conclusion sheet (docs/features/问诊结论单设计文档.md): composer unit behavior,
 serialization through both engines, emergency exclusion, abstention, and
 the return_now_if drift guard against the summary payload."""
 from __future__ import annotations

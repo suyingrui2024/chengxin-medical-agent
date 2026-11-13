@@ -29,7 +29,7 @@ guard = _load()
 
 def test_grouping_covers_every_root_document_exactly_once():
     """The real tree: nothing at docs/ root is unplaced, nothing phantom."""
-    actual = {p.name for p in guard.DOCS.glob("*.md")} - {"README.md"}
+    actual = guard.document_names()
     placed = set(guard.grouped_names())
     assert placed == actual, sorted(placed ^ actual)
 
@@ -39,6 +39,7 @@ def test_an_ungrouped_document_stops_the_build(tmp_path, monkeypatch, capsys):
     docs = tmp_path / "docs"
     docs.mkdir()
     for name in guard.GROUPS[0][2]:
+        (docs / name).parent.mkdir(parents=True, exist_ok=True)
         (docs / name).write_text(f"# {name}\n", encoding="utf-8")
     (docs / "没人分组的设计.md").write_text("# 没人分组的设计\n", encoding="utf-8")
     monkeypatch.setattr(guard, "DOCS", docs)
@@ -54,6 +55,7 @@ def test_a_phantom_group_entry_stops_the_build(tmp_path, monkeypatch):
     docs.mkdir()
     for _heading, _purpose, names in guard.GROUPS:
         for name in names:
+            (docs / name).parent.mkdir(parents=True, exist_ok=True)
             (docs / name).write_text(f"# {name}\n", encoding="utf-8")
     (docs / guard.GROUPS[0][2][0]).unlink()  # remove one grouped file
     monkeypatch.setattr(guard, "DOCS", docs)
@@ -69,6 +71,7 @@ def test_build_renders_groups_in_order_and_archives_collapsed(tmp_path, monkeypa
     (docs / "archive").mkdir()
     for _heading, _purpose, names in guard.GROUPS:
         for name in names:
+            (docs / name).parent.mkdir(parents=True, exist_ok=True)
             (docs / name).write_text(f"# {name}\n", encoding="utf-8")
     (docs / "archive" / "旧设计.md").write_text("# 旧设计\n", encoding="utf-8")
     monkeypatch.setattr(guard, "DOCS", docs)
@@ -85,3 +88,12 @@ def test_the_committed_index_matches_the_groups():
     """The committed navigation is exactly what the groups produce."""
     assert guard.INDEX.exists()
     assert guard.INDEX.read_text(encoding="utf-8") == guard.build()
+
+
+def test_an_ungrouped_nested_document_stops_the_build(tmp_path, monkeypatch):
+    docs = tmp_path / "docs"
+    (docs / "features").mkdir(parents=True)
+    (docs / "features/unlisted.md").write_text("# Unlisted\n")
+    monkeypatch.setattr(guard, "DOCS", docs)
+    with pytest.raises(SystemExit, match="unlisted.md"):
+        guard.build()

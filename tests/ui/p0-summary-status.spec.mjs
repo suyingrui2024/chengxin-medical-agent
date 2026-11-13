@@ -18,7 +18,8 @@ test("summary status distinguishes confirmation from automatic urgent closure", 
   await page.goto("/");
   const rendered = await page.evaluate(
     async ({ pending, confirmed, urgent }) => {
-      const { createRenderer } = await import("/js/structured-ui.js");
+      const { createRenderer } =
+        await import("/js/structured/structured-ui.js");
       const render = (data, readOnly) => {
         const node = createRenderer().render(
           { id: data.review_status, type: "summary", data },
@@ -55,7 +56,7 @@ test("emergency notice exposes an immediate call action", async ({ page }) => {
   await page.goto("/");
   const action = await page.evaluate(async () => {
     const { replyEnvelope, createRenderer } =
-      await import("/js/structured-ui.js");
+      await import("/js/structured/structured-ui.js");
     const envelope = replyEnvelope({
       message: "请现在拨打 120。",
       kind: "emergency",
@@ -83,7 +84,7 @@ test("correction feedback offers one reachable undo action", async ({
 }) => {
   await page.goto("/");
   const result = await page.evaluate(async (data) => {
-    const { createRenderer } = await import("/js/structured-ui.js");
+    const { createRenderer } = await import("/js/structured/structured-ui.js");
     let undo = null;
     const card = createRenderer().render(
       { id: "correction", type: "summary", data },

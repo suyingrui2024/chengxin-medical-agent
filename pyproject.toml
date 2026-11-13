@@ -21,7 +21,8 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-medagent = ["web/*", "content/*.json", "content/*.txt"]
+medagent = ["content/*.json", "content/*.txt"]
+"medagent.web" = ["index.html", "js/*.js", "js/**/*.js", "css/*.css", "css/**/*.css", "assets/**/*"]
 "medagent.extensions" = ["packs/*.json", "templates/*.json"]
 
 [tool.ruff]

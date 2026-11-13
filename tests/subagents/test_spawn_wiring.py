@@ -82,7 +82,7 @@ class SpawnWiringTests(unittest.TestCase):
         self.state.risk.level = RiskLevel.ROUTINE
 
     def _execute(self):
-        return self.engine._execute(
+        return self.engine.model_actions._execute(
             self.state, SPAWN_COMMAND, "复核一下", "turn-1"
         )
 

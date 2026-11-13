@@ -105,7 +105,7 @@ class PresentProvenanceTests(unittest.TestCase):
         self,
     ):
         engine, _, state, _, raw = complete_report()
-        recent = engine._context(state, "继续")
+        recent = engine.model_context._context(state, "继续")
         self.assertNotIn("earlier_source_turns", recent)
         engine.correct_fact(state.session_id, "age_years", "40岁")
         for index in range(12):
@@ -113,7 +113,7 @@ class PresentProvenanceTests(unittest.TestCase):
                 {"role": "user", "content": f"后续补充 {index}"},
                 {"role": "assistant", "content": "已收到"},
             ]
-        context = engine._context(state, "继续核对")
+        context = engine.model_context._context(state, "继续核对")
         self.assertFalse(any(item["content"] == raw for item in context["transcript"]))
         self.assertEqual(len(context["earlier_source_turns"]), 1)
         source = context["earlier_source_turns"][0]
@@ -148,7 +148,7 @@ class PresentProvenanceTests(unittest.TestCase):
                 {"role": "user", "content": f"后续补充 {index}"},
                 {"role": "assistant", "content": "已收到"},
             ]
-        context = engine._context(state, "继续核对")
+        context = engine.model_context._context(state, "继续核对")
         self.assertTrue(context["earlier_source_turns"])
         self.assertNotIn("source_context_id", context["facts"]["medications_taken"])
         engine.backend.commands = [
@@ -190,9 +190,9 @@ class PresentProvenanceTests(unittest.TestCase):
                 evidence=report,
             )
         )
-        item = engine._finish(state).summary["known"][0]
+        item = engine.replies._finish(state).summary["known"][0]
         self.assertNotIn("context", item)
-        self.assertNotIn("earlier_source_turns", engine._context(state, "继续"))
+        self.assertNotIn("earlier_source_turns", engine.model_context._context(state, "继续"))
         engine.events.append(
             Event(
                 state.session_id,
@@ -202,8 +202,8 @@ class PresentProvenanceTests(unittest.TestCase):
             )
         )
         state.facts["medications_taken"].source = Source.SYSTEM_INFERENCE
-        self.assertNotIn("context", engine._finish(state).summary["known"][0])
+        self.assertNotIn("context", engine.replies._finish(state).summary["known"][0])
         self.assertNotIn(
             "source_context_id",
-            engine._context(state, "继续")["facts"]["medications_taken"],
+            engine.model_context._context(state, "继续")["facts"]["medications_taken"],
         )

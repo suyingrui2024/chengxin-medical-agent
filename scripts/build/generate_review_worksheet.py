@@ -2,7 +2,7 @@
 
 Every delivered item gets one row-block with its declared parameters and
 the specific questions a reviewer has to answer. The worksheet is derived,
-never hand-edited: ``tests/test_catalog.py`` asserts every delivered item
+never hand-edited: ``tests/extensions/test_catalog.py`` asserts every delivered item
 appears in it.
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 from medagent.extensions.catalog import CATALOG, by_department, summary
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "docs" / "量表与公式临床评审工作表.md"
+OUT = ROOT / "docs" / "development" / "量表与公式临床评审工作表.md"
 
 KIND_TEXT = {"scale": "量表", "formula": "公式", "table": "查表"}
 AUDIENCE_TEXT = {"patient": "患者可自评", "clinician": "仅医生"}
@@ -132,7 +132,7 @@ def main():
         "1. 按科室分配评审人，一次评一个科室。",
         "2. 对每一项，先看「已声明参数」，再逐条回答「需确认的问题」。",
         "3. 在「结论」列填 `通过` / `修改` / `不做`；填 `修改` 时请写明改成什么。",
-        "4. 结论汇总到 `docs/待临床评审清单.md` 的评审记录表。",
+        "4. 结论汇总到 `docs/development/待临床评审清单.md` 的评审记录表。",
         "",
         "## 2. 状态说明",
         "",
@@ -208,7 +208,7 @@ def main():
         "## 附：评审完成后需要工程侧做的事",
         "",
         "1. 按结论修改 `packs/*.json`，`version` 递增。",
-        "2. 若分档或阈值有改动，同步更新 `docs/门诊显式计算科目与项目总表.md`（重新生成）。",
+        "2. 若分档或阈值有改动，同步更新 `docs/features/门诊显式计算科目与项目总表.md`（重新生成）。",
         "3. 把 `review_status` 从 `engineering_verified_not_clinical` 改为评审通过后的状态。",
         "4. 重跑 `pytest` 与发布门，附结果再报。",
         "",

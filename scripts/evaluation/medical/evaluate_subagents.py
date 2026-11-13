@@ -2,7 +2,7 @@
 
 The corpus is an *engineering* corpus (review_status: unreviewed in the
 fixture): it verifies the deterministic validation pipeline of the
-Python SubagentCoordinator from docs/联网与子智能体工具设计.md §8.2 —
+Python SubagentCoordinator from docs/features/联网与子智能体工具设计.md §8.2 —
 schema discipline, verbatim evidence checking (a fabricated quote must
 never survive: hard red line), the drop-rate fuse, staleness watermark
 judgement, and case_digest quote fidelity. The model backend is a

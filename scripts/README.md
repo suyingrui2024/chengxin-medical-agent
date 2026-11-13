@@ -36,6 +36,9 @@ PYTHONPATH=src python3 scripts/app/start_live_desktop.py --check
 # 创建桌面快捷方式
 npm run desktop:shortcut
 
+# 离线整理到期随访（仅 advisory 模式实际调用模型）
+PYTHONPATH=src python3 scripts/app/run_followup_batch.py --help
+
 # 构建 Linux x64 或 Windows x64 桌面包
 npm run desktop:build
 
@@ -61,3 +64,5 @@ Windows 的统一入口为：
 - Python 脚本之间通过 `scripts.*` 包路径导入，命令从项目根目录运行时使用 `PYTHONPATH=src:.`。
 - `docs/evaluations/`、`docs/review-packets/` 和 `docs/assets/` 中保存的是历史结果或校验快照，其中记录的旧脚本路径用于复现实验，不随目录重组改写。
 - 移动入口脚本时，需要同步检查 `package.json`、`.github/workflows/`、测试和使用文档中的引用。
+
+配置优先级见 [两层配置说明](config/README.md)。历史评测源码与依赖恢复由 `maintenance/evaluation_archive.py` 管理，说明见 [评测归档](../docs/evaluations/README.md)。界面测试逐 spec 日志保存在对应输出目录旁的 `*-logs/`，不会被下一组测试清空；可一次传入多个文件名筛选重跑失败组。
